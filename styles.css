@@ -1614,6 +1614,16 @@ svg {
   margin-bottom: 22px;
 }
 
+.training-page-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.training-page-toolbar .compact-field {
+  width: min(220px, 100%);
+}
+
 .summary-chip {
   display: flex;
   gap: 12px;
@@ -2295,9 +2305,11 @@ svg {
 }
 
 .training-matrix-body {
+  display: flex;
   min-height: 0;
   flex: 1 1 auto;
-  overflow-y: auto;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .training-matrix-dialog .modal-header,
@@ -2321,6 +2333,13 @@ svg {
   width: min(220px, 100%);
 }
 
+#trainingMatrixContent {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
 .training-matrix-summary {
   display: flex;
   flex-direction: column;
@@ -2339,11 +2358,31 @@ svg {
 }
 
 .training-matrix-scroll {
-  max-height: min(58vh, 650px);
+  min-height: 0;
+  flex: 1 1 auto;
   overflow: auto;
   border: 1px solid var(--slate-200);
   border-radius: 12px;
   background: white;
+  scrollbar-gutter: stable;
+}
+
+.training-matrix-horizontal-scroll {
+  height: 16px;
+  flex: 0 0 16px;
+  margin: 0 2px 7px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-color: var(--slate-400) var(--slate-100);
+  scrollbar-width: thin;
+}
+
+.training-matrix-horizontal-scroll[hidden] {
+  display: none;
+}
+
+.training-matrix-horizontal-spacer {
+  height: 1px;
 }
 
 .training-matrix-scroll:focus-visible {
@@ -2352,8 +2391,9 @@ svg {
 }
 
 .training-matrix-table {
-  width: 100%;
-  min-width: max-content;
+  width: max-content;
+  min-width: 100%;
+  table-layout: fixed;
   border-spacing: 0;
   border-collapse: separate;
   color: var(--slate-700);
@@ -2374,13 +2414,13 @@ svg {
   position: sticky;
   z-index: 2;
   top: 0;
-  min-width: 145px;
-  max-width: 190px;
-  overflow: hidden;
+  width: 132px;
+  min-width: 132px;
+  max-width: 132px;
   color: var(--slate-700);
   font-size: 0.62rem;
   line-height: 1.3;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
   background: var(--slate-50);
 }
 
@@ -2388,9 +2428,9 @@ svg {
   position: sticky;
   z-index: 1;
   left: 0;
-  width: 210px;
-  min-width: 210px;
-  max-width: 210px;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
   text-align: left;
   background: white;
 }
@@ -2398,6 +2438,17 @@ svg {
 .training-matrix-table thead th:first-child {
   z-index: 3;
   background: var(--slate-50);
+}
+
+.training-matrix-table thead th:not(:first-child),
+.training-matrix-table tbody td {
+  width: 132px;
+  min-width: 132px;
+  max-width: 132px;
+}
+
+.training-matrix-table thead th {
+  height: 64px;
 }
 
 .training-matrix-table tbody th {
@@ -3539,6 +3590,13 @@ legend {
     max-width: 165px;
   }
 
+  .training-matrix-table thead th:not(:first-child),
+  .training-matrix-table tbody td {
+    width: 116px;
+    min-width: 116px;
+    max-width: 116px;
+  }
+
   .training-matrix-legend {
     width: 100%;
     flex-wrap: wrap;
@@ -3661,6 +3719,14 @@ legend {
   .training-summary {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .training-page-toolbar {
+    justify-content: stretch;
+  }
+
+  .training-page-toolbar .compact-field {
+    width: 100%;
   }
 
   .summary-chip {
@@ -3939,6 +4005,41 @@ legend {
 .user-management-row strong,
 .user-management-row small {
   display: block;
+}
+
+.user-management-username {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: var(--slate-600);
+  font-size: 0.61rem;
+  font-weight: 750;
+}
+
+.user-management-username input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  color: var(--slate-900);
+  font-size: 0.72rem;
+  font-weight: 750;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.user-management-username input:focus {
+  border-color: var(--blue-600);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--blue-100);
+}
+
+.user-management-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .user-management-row strong {
@@ -5375,6 +5476,86 @@ html[data-theme="cellitinnen"] :is(
   box-shadow: 0 0 0 3px rgb(56 130 133 / 13%);
 }
 
+html[data-theme="cellitinnen-red"] {
+  --cellitinnen-red-primary: #e03a0d;
+  --cellitinnen-red-secondary: #862308;
+  --cellitinnen-red-shade: #f3b09e;
+  --navy-950: #32150e;
+  --navy-900: #4b2117;
+  --navy-800: #672b1c;
+  --blue-700: #b62f0b;
+  --blue-600: #d4380d;
+  --blue-100: #fde2da;
+  --blue-50: #fff4f1;
+  --teal-700: #9e3b21;
+  --teal-100: #fbe8e2;
+  --shadow-sm: 0 1px 2px rgb(75 33 23 / 6%);
+  --shadow-md: 0 12px 32px rgb(134 35 8 / 12%);
+  --shadow-lg: 0 24px 70px rgb(134 35 8 / 18%);
+}
+
+html[data-theme="cellitinnen-red"] body {
+  background:
+    radial-gradient(circle at 78% -20%, rgb(224 58 13 / 10%), transparent 33rem),
+    #faf7f6;
+}
+
+html[data-theme="cellitinnen-red"] .sidebar {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 5%), transparent 40%),
+    var(--cellitinnen-red-secondary);
+}
+
+html[data-theme="cellitinnen-red"] .brand-mark {
+  background: linear-gradient(
+    145deg,
+    var(--cellitinnen-red-primary),
+    var(--cellitinnen-red-secondary)
+  );
+}
+
+html[data-theme="cellitinnen-red"] .nav-item.is-active {
+  background: linear-gradient(90deg, rgb(255 255 255 / 17%), rgb(255 255 255 / 7%));
+  box-shadow: inset 3px 0 var(--cellitinnen-red-shade);
+}
+
+html[data-theme="cellitinnen-red"] .button-primary {
+  background: #b62f0b;
+  box-shadow: 0 6px 15px rgb(134 35 8 / 22%);
+}
+
+html[data-theme="cellitinnen-red"] .button-primary:hover {
+  background: var(--cellitinnen-red-secondary);
+  box-shadow: 0 8px 20px rgb(134 35 8 / 30%);
+}
+
+html[data-theme="cellitinnen-red"] .button-secondary {
+  border-color: #edb7a8;
+}
+
+html[data-theme="cellitinnen-red"] :is(
+    .search-field:focus-within,
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus,
+    .compact-field select:focus,
+    .bulk-attendance-bar select:focus,
+    .attendance-status-field select:focus
+  ) {
+  border-color: var(--cellitinnen-red-primary);
+  box-shadow: 0 0 0 3px rgb(224 58 13 / 14%);
+}
+
+html[data-theme="cellitinnen-red"] :is(.sidebar-note-icon, .user-session-icon) {
+  color: #ffd9cf;
+  background: rgb(255 255 255 / 12%);
+}
+
+html[data-theme="cellitinnen-red"] .theme-selector select:focus {
+  border-color: var(--cellitinnen-red-shade);
+  box-shadow: 0 0 0 3px rgb(243 176 158 / 18%);
+}
+
 html[data-theme="dark"] {
   --navy-950: #f4f7fa;
   --navy-900: #e8eef4;
@@ -6384,6 +6565,7 @@ html[data-theme="dark"] :is(
   #trainingMatrixDialog .modal-header .icon-button,
   #trainingMatrixDialog .modal-subtitle,
   #trainingMatrixDialog .training-matrix-toolbar .compact-field,
+  #trainingMatrixDialog .training-matrix-horizontal-scroll,
   #trainingMatrixDialog .modal-footer .button {
     display: none !important;
   }
@@ -6392,6 +6574,10 @@ html[data-theme="dark"] :is(
     max-height: none;
     padding: 5mm 0 0;
     overflow: visible;
+  }
+
+  #trainingMatrixDialog #trainingMatrixContent {
+    display: block;
   }
 
   #trainingMatrixDialog .training-matrix-toolbar {

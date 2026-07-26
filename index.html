@@ -209,7 +209,7 @@
             <svg><use href="#icon-logo"></use></svg>
           </span>
           <div>
-            <strong id="projectBuildLabel">TeO – Team &amp; Employee Organizer - 002.000</strong>
+            <strong id="projectBuildLabel">TeO – Team &amp; Employee Organizer - 002.009</strong>
             <p>&copy; 2026 Oliver Becker</p>
           </div>
         </div>
@@ -455,7 +455,7 @@
                   id="employeeSearch"
                   type="search"
                   aria-label="Mitarbeiter durchsuchen"
-                  placeholder="Name, Beruf oder Qualifikation suchen …"
+                  placeholder="Name, Benutzername, Beruf oder Qualifikation suchen …"
                   autocomplete="off"
                 />
               </label>
@@ -697,6 +697,13 @@
             </div>
           </div>
 
+          <div class="training-page-toolbar">
+            <label class="compact-field" for="trainingDisplayYear">
+              <span>Anzuzeigendes Jahr</span>
+              <select id="trainingDisplayYear" aria-label="Fortbildungsjahr anzeigen"></select>
+            </label>
+          </div>
+
           <div class="training-summary" id="trainingSummary"></div>
 
           <section class="training-list" id="trainingList"></section>
@@ -899,6 +906,7 @@
                   <option value="standard">Standard</option>
                   <option value="dark">Dark Mode</option>
                   <option value="cellitinnen">Cellitinnen</option>
+                  <option value="cellitinnen-red">Cellitinnen Rot</option>
                 </select>
               </label>
             </section>
@@ -1527,7 +1535,9 @@
         <div>
           <p class="eyebrow">Administration</p>
           <h2 id="userManagementDialogTitle">Benutzer verwalten</h2>
-          <p class="modal-subtitle">Passwörter normaler Benutzer zurücksetzen.</p>
+          <p class="modal-subtitle">
+            Benutzernamen bearbeiten und Passwörter normaler Benutzer zurücksetzen.
+          </p>
         </div>
         <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
           <svg><use href="#icon-close"></use></svg>
@@ -1598,7 +1608,20 @@
                   placeholder="+49 …"
                 />
               </label>
-              <label class="form-field form-field-wide">
+              <label class="form-field">
+                <span>Benutzername</span>
+                <input
+                  id="employeeUsername"
+                  name="employeeUsername"
+                  type="text"
+                  maxlength="40"
+                  pattern="[A-Za-z0-9]{4,40}"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="z. B. Muste001"
+                />
+              </label>
+              <label class="form-field">
                 <span>E-Mail-Adresse</span>
                 <input
                   id="email"
@@ -1710,7 +1733,7 @@
               />
             </label>
             <label class="form-field">
-              <span>Fortbildungsjahr <em>*</em></span>
+              <span>Im Katalog seit <em>*</em></span>
               <input
                 id="trainingYear"
                 name="year"
@@ -1720,7 +1743,9 @@
                 step="1"
                 required
               />
-              <small class="field-hint">Bestimmt die Jahresgruppe in der Übersicht.</small>
+              <small class="field-hint">
+                Ab diesem Jahr gehört die Fortbildung zum Pflichtkatalog.
+              </small>
             </label>
             <label class="form-field">
               <span>Wiederholung</span>

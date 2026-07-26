@@ -3,9 +3,9 @@
 
   const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
-  const STATE_VERSION = 19;
+  const STATE_VERSION = 20;
   const PROJECT_NAME = "TeO – Team & Employee Organizer";
-  const PROJECT_VERSION = Object.freeze({ major: 2, minor: 0 });
+  const PROJECT_VERSION = Object.freeze({ major: 2, minor: 9 });
   const BACKUP_FORMAT = "intensivteam-datensicherung";
   const BACKUP_FORMAT_VERSION = 1;
   const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
@@ -139,6 +139,7 @@
     standard: "Standard",
     dark: "Dark Mode",
     cellitinnen: "Cellitinnen",
+    "cellitinnen-red": "Cellitinnen Rot",
   };
 
   const PASSWORD_ITERATIONS = 210000;
@@ -413,6 +414,7 @@
   let employeeSortKey = "name";
   let employeeSortDirection = "asc";
   let trainingRecurrenceManuallyChanged = false;
+  let trainingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let vacationYear = new Date().getFullYear();
   let vacationMonth = new Date().getMonth() + 1;
@@ -512,6 +514,7 @@
     vacationSummary: document.querySelector("#vacationSummary"),
     vacationPlanner: document.querySelector("#vacationPlanner"),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
+    trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),
     trainingList: document.querySelector("#trainingList"),
     openTrainingMatrixButton: document.querySelector("#openTrainingMatrixButton"),
@@ -840,6 +843,16 @@
     const employees = Array.isArray(parsed.employees)
       ? parsed.employees.map(normalizeEmployee).filter(Boolean)
       : [];
+    const assignedEmployeeUsernames = new Set();
+    employees.forEach((employee) => {
+      const normalizedUsername = employee.username.toLocaleLowerCase("de-DE");
+      if (!normalizedUsername) return;
+      if (assignedEmployeeUsernames.has(normalizedUsername)) {
+        employee.username = "";
+        return;
+      }
+      assignedEmployeeUsernames.add(normalizedUsername);
+    });
     if ((Number(parsed.version) || 0) < 13) {
       applyEmployeeEmailAssignments(employees);
     }
@@ -853,6 +866,7 @@
         }
       });
     }
+    assignTrainingSeriesIds(trainings);
     const meetings = Array.isArray(parsed.meetings)
       ? parsed.meetings.map(normalizeMeeting).filter(Boolean)
       : [];
@@ -1182,6 +1196,11 @@
       id,
       firstName: String(employee.firstName || ""),
       lastName: String(employee.lastName || ""),
+      username: /^[A-Za-z0-9]{4,40}$/.test(
+        String(employee.username || "").trim(),
+      )
+        ? String(employee.username || "").trim()
+        : "",
       birthDate: String(employee.birthDate || ""),
       phone: String(employee.phone || ""),
       email: String(employee.email || ""),
@@ -1216,9 +1235,55 @@
           ? storedYear
           : fallbackYear,
       recurrenceMonths: Number.isFinite(recurrence) && recurrence > 0 ? recurrence : null,
+      seriesId: normalizeId(training.seriesId) || "",
       createdAt,
       updatedAt: validTimestamp(training.updatedAt || training.createdAt),
     };
+  }
+
+  function trainingSeriesSignature(title) {
+    return String(title || "")
+      .normalize("NFKD")
+      .replace(/\p{Diacritic}/gu, "")
+      .replace(/ß/gi, "ss")
+      .toLocaleLowerCase("de-DE")
+      .replace(/\b(?:19|20)\d{2}\b/g, " ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function generatedTrainingSeriesId(title, fallbackId = "") {
+    const signature = trainingSeriesSignature(title) || fallbackId || "fortbildung";
+    let hash = 2166136261;
+    for (let index = 0; index < signature.length; index += 1) {
+      hash ^= signature.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `training-series-${(hash >>> 0).toString(36)}`;
+  }
+
+  function assignTrainingSeriesIds(trainings) {
+    const seriesBySignature = new Map();
+    trainings.forEach((training) => {
+      if (!training.recurrenceMonths || !training.seriesId) return;
+      const signature = trainingSeriesSignature(training.title);
+      if (signature && !seriesBySignature.has(signature)) {
+        seriesBySignature.set(signature, training.seriesId);
+      }
+    });
+    trainings.forEach((training) => {
+      if (!training.recurrenceMonths) {
+        training.seriesId = "";
+        return;
+      }
+      if (training.seriesId) return;
+      const signature = trainingSeriesSignature(training.title);
+      const seriesId =
+        seriesBySignature.get(signature) ||
+        generatedTrainingSeriesId(training.title, training.id);
+      training.seriesId = seriesId;
+      if (signature) seriesBySignature.set(signature, seriesId);
+    });
   }
 
   function defaultTrainingRecurrenceMonths(title) {
@@ -1813,6 +1878,10 @@
 
     elements.copyActiveEmailsButton.addEventListener("click", copyActiveEmployeeEmails);
     elements.openTrainingMatrixButton.addEventListener("click", openTrainingMatrixDialog);
+    elements.trainingDisplayYear.addEventListener("change", () => {
+      trainingDisplayYear = Number(elements.trainingDisplayYear.value);
+      renderTrainings();
+    });
     elements.trainingMatrixYear.addEventListener("change", renderTrainingMatrix);
     elements.exportTrainingMatrixCsvButton.addEventListener(
       "click",
@@ -2264,8 +2333,22 @@
     });
     elements.mobileAccountButton.addEventListener("click", openAccountDialog);
     elements.userManagementList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-reset-user-password]");
-      if (button) requestPasswordReset(button.dataset.resetUserPassword);
+      const resetButton = event.target.closest("[data-reset-user-password]");
+      if (resetButton) {
+        requestPasswordReset(resetButton.dataset.resetUserPassword);
+        return;
+      }
+      const saveButton = event.target.closest("[data-save-user-username]");
+      if (saveButton) saveUsername(saveButton.dataset.saveUserUsername);
+    });
+    elements.userManagementList.addEventListener("keydown", (event) => {
+      if (
+        event.key === "Enter" &&
+        event.target.matches("[data-user-username]")
+      ) {
+        event.preventDefault();
+        saveUsername(event.target.dataset.userUsername);
+      }
     });
     elements.copyTemporaryPassword.addEventListener("click", async () => {
       const password = elements.temporaryPasswordValue.value;
@@ -2763,25 +2846,101 @@
             <span class="user-management-avatar">${escapeHtml(
               user.username.slice(0, 2).toUpperCase(),
             )}</span>
-            <span>
-              <strong>${escapeHtml(user.username)}</strong>
+            <label class="user-management-username">
+              <span>Benutzername</span>
+              <input
+                type="text"
+                value="${escapeHtml(user.username)}"
+                maxlength="40"
+                pattern="[A-Za-z0-9]{4,40}"
+                autocomplete="off"
+                spellcheck="false"
+                data-user-username="${user.id}"
+                aria-label="Benutzername für ${escapeHtml(user.username)}"
+              />
               <small>${user.role === "admin" ? "Administrator" : "Normaler Benutzer"}${
                 user.mustChangePassword ? " · Passwortänderung erforderlich" : ""
               }</small>
-            </span>
-            ${
-              user.role === "user"
-                ? `<button
+            </label>
+            <div class="user-management-actions">
+              <button
+                class="button button-secondary"
+                type="button"
+                data-save-user-username="${user.id}"
+              >
+                <svg><use href="#icon-check"></use></svg>
+                Benutzername speichern
+              </button>
+              ${
+                user.role === "user"
+                  ? `<button
                     class="button button-secondary"
                     type="button"
                     data-reset-user-password="${user.id}"
                   >Passwort zurücksetzen</button>`
-                : '<span class="tag tag-muted">Admin</span>'
-            }
+                  : '<span class="tag tag-muted">Admin</span>'
+              }
+            </div>
           </article>
         `,
       )
       .join("");
+  }
+
+  async function saveUsername(userId) {
+    if (!requireAdmin()) return;
+    const user = state.users.find((item) => item.id === userId);
+    const input = [
+      ...elements.userManagementList.querySelectorAll(
+        "[data-user-username]",
+      ),
+    ].find(
+      (field) => field.dataset.userUsername === userId,
+    );
+    if (!user || !input) return;
+
+    const username = input.value.trim();
+    if (!/^[A-Za-z0-9]{4,40}$/.test(username)) {
+      showToast(
+        "Der Benutzername muss aus 4 bis 40 Buchstaben oder Ziffern bestehen.",
+        "error",
+      );
+      input.focus();
+      return;
+    }
+    if (
+      state.users.some(
+        (item) =>
+          item.id !== user.id &&
+          item.username.toLocaleLowerCase("de-DE") ===
+            username.toLocaleLowerCase("de-DE"),
+      )
+    ) {
+      showToast("Dieser Benutzername ist bereits vergeben.", "error");
+      input.focus();
+      return;
+    }
+    if (username === user.username) {
+      showToast("Der Benutzername ist bereits aktuell.");
+      return;
+    }
+
+    const previousUsername = user.username;
+    const committed = await commitStateMutation(() => {
+      state.users = state.users.map((item) =>
+        item.id === user.id ? { ...item, username } : item,
+      );
+    });
+    if (!committed) return;
+
+    if (currentUser?.id === user.id) {
+      currentUser = state.users.find((item) => item.id === user.id);
+      renderAll();
+    }
+    renderUserManagement();
+    showToast(
+      `Benutzername „${previousUsername}“ wurde in „${username}“ geändert.`,
+    );
   }
 
   function requestPasswordReset(userId) {
@@ -3121,6 +3280,12 @@
   function getCurrentUserFirstName() {
     if (!currentUser?.username) return "";
     const usernameKey = currentUser.username.toLocaleLowerCase("de-DE");
+    const linkedEmployee = state.employees.find(
+      (employee) =>
+        employee.username?.toLocaleLowerCase("de-DE") === usernameKey,
+    );
+    if (linkedEmployee?.firstName?.trim()) return linkedEmployee.firstName.trim();
+
     const employeeCode = usernameKey.replace(/\d+$/, "");
     const matchingEmployee = state.employees.find((employee) =>
       normalizeCompactLookupValue(employee.lastName).startsWith(employeeCode),
@@ -3349,17 +3514,23 @@
                     : renderAvatar(item.employee, true)
                 }</span>
                 <span>
-                  <strong>${escapeHtml(item.title)}</strong>
+                  <strong>${escapeHtml(
+                    item.kind === "birthday"
+                      ? `${fullName(item.employee)} - ${item.title}`
+                      : item.title,
+                  )}</strong>
                   <small>${escapeHtml(
-                    item.kind === "appointment"
-                      ? [
-                          item.type,
-                          formatAppointmentTime(item.appointment),
-                          item.appointment.location,
-                        ]
-                          .filter(Boolean)
-                          .join(" · ")
-                      : `${fullName(item.employee)} · ${item.type}`,
+                    item.kind === "birthday"
+                      ? `Geburtsdatum: ${formatDate(item.employee.birthDate)}`
+                      : item.kind === "appointment"
+                        ? [
+                            item.type,
+                            formatAppointmentTime(item.appointment),
+                            item.appointment.location,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")
+                        : `${fullName(item.employee)} · ${item.type}`,
                   )}</small>
                 </span>
                 <span>
@@ -3431,7 +3602,7 @@
           daysUntil: daysBetween(today, parseLocalDate(birthday.date)),
         });
       }
-      state.trainings.forEach((training) => {
+      trainingObligations().forEach((training) => {
         const latest = latestCompletion(employee.id, training.id);
         let dueDate = "";
         if (latest && training.recurrenceMonths) {
@@ -3532,7 +3703,7 @@
     const selectedQualifications = state.catalogs.qualifications.filter(
       (qualification) => employee.qualifications[qualification.id],
     );
-    const trainings = [...state.trainings].sort(
+    const trainings = trainingObligations().sort(
       (a, b) => b.year - a.year || a.title.localeCompare(b.title, "de"),
     );
     const attendances = state.meetingAttendances.filter(
@@ -3555,6 +3726,7 @@
         ${renderDossierItem("Geburtsdatum", formatDate(employee.birthDate))}
         ${renderDossierItem("Telefon", employee.phone || "–")}
         ${renderDossierItem("E-Mail", employee.email || "–")}
+        ${renderDossierItem("Benutzername", employee.username || "–")}
         ${renderDossierItem("Stellenumfang", `${employee.employmentPercent} %`)}
         ${renderDossierItem("Dienstwochenende", serviceWeekendLabel(employee.serviceWeekend))}
         ${renderDossierItem(
@@ -4942,6 +5114,7 @@
         const haystack = [
           employee.firstName,
           employee.lastName,
+          employee.username,
           employee.profession,
           employee.email,
           qualificationText,
@@ -5029,7 +5202,16 @@
             ${renderAvatar(employee)}
             <div>
               <strong>${escapeHtml(fullName(employee))}</strong>
-              <small>${escapeHtml(employee.email || employee.phone || "Keine Kontaktdaten")}</small>
+              <small>${escapeHtml(
+                [
+                  employee.username
+                    ? `Benutzername: ${employee.username}`
+                    : "",
+                  employee.email || employee.phone || "",
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "Keine Kontaktdaten",
+              )}</small>
             </div>
           </div>
         </td>
@@ -5207,16 +5389,30 @@
   }
 
   function renderTrainings() {
+    const availableYears = getTrainingDisplayYears();
+    if (!availableYears.includes(trainingDisplayYear)) {
+      trainingDisplayYear = new Date().getFullYear();
+    }
+    elements.trainingDisplayYear.innerHTML = availableYears
+      .map(
+        (year) =>
+          `<option value="${year}" ${year === trainingDisplayYear ? "selected" : ""}>${year}</option>`,
+      )
+      .join("");
+
+    const displayedTrainings = trainingObligations().filter(
+      (training) => training.year <= trainingDisplayYear,
+    );
     const activeCount = activeEmployeeList().length;
-    const totalAssignments = activeCount * state.trainings.length;
-    const currentAssignments = state.trainings.reduce(
+    const totalAssignments = activeCount * displayedTrainings.length;
+    const currentAssignments = displayedTrainings.reduce(
       (sum, training) => sum + getTrainingStats(training).current,
       0,
     );
     const openAssignments = Math.max(0, totalAssignments - currentAssignments);
 
     elements.trainingSummary.innerHTML = `
-      ${renderSummaryChip("training", state.trainings.length, "Fortbildungen angelegt")}
+      ${renderSummaryChip("training", displayedTrainings.length, `im Katalog ${trainingDisplayYear}`)}
       ${renderSummaryChip("check", currentAssignments, "aktuelle Nachweise", "teal")}
       ${renderSummaryChip("alert", openAssignments, "offene Nachweise", "orange")}
     `;
@@ -5239,13 +5435,30 @@
       return;
     }
 
-    elements.trainingList.innerHTML = groupTrainingsByYear()
+    if (displayedTrainings.length === 0) {
+      elements.trainingList.innerHTML = `
+        <section class="panel">
+          ${renderEmptyState({
+            title: `Bis ${trainingDisplayYear} keine Pflichtfortbildungen`,
+            text: "Wählen Sie ein späteres Jahr oder ergänzen Sie den Fortbildungskatalog.",
+            buttonText: isAdmin() ? "Fortbildung anlegen" : "",
+            buttonAttribute: "data-empty-add-training",
+          })}
+        </section>
+      `;
+      elements.trainingList
+        .querySelector("[data-empty-add-training]")
+        ?.addEventListener("click", () => openTrainingDialog());
+      return;
+    }
+
+    elements.trainingList.innerHTML = groupTrainingsByYear(displayedTrainings)
       .map(
         ([year, trainings]) => `
           <section class="training-year-group" aria-labelledby="trainingYear${year}">
             <div class="training-year-header">
               <div>
-                <p class="eyebrow">Fortbildungsjahr</p>
+                <p class="eyebrow">Im Katalog seit</p>
                 <h2 id="trainingYear${year}">${year}</h2>
               </div>
               <span>${trainings.length} Fortbildung${trainings.length === 1 ? "" : "en"}</span>
@@ -5259,9 +5472,20 @@
       .join("");
   }
 
-  function groupTrainingsByYear() {
+  function getTrainingDisplayYears() {
+    return [
+      ...new Set([
+        new Date().getFullYear(),
+        ...state.trainings.map((training) => Number(training.year)),
+      ]),
+    ]
+      .filter((year) => Number.isInteger(year) && year >= 2000 && year <= 2100)
+      .sort((yearA, yearB) => yearB - yearA);
+  }
+
+  function groupTrainingsByYear(trainings = state.trainings) {
     const groups = new Map();
-    state.trainings.forEach((training) => {
+    trainings.forEach((training) => {
       if (!groups.has(training.year)) groups.set(training.year, []);
       groups.get(training.year).push(training);
     });
@@ -5275,9 +5499,7 @@
   }
 
   function openTrainingMatrixDialog() {
-    const years = [...new Set(state.trainings.map((training) => training.year))].sort(
-      (a, b) => b - a,
-    );
+    const years = getTrainingEvaluationYears();
     if (years.length === 0) {
       showToast("Für die Auswertung sind noch keine Pflichtfortbildungen vorhanden.", "error");
       return;
@@ -5301,7 +5523,7 @@
     elements.trainingMatrixDialogTitle.textContent = `Status der Pflichtfortbildungen · ${year}`;
     elements.trainingMatrixSummary.innerHTML = `
       <strong>${matrix.completedAssignments} von ${matrix.totalAssignments}</strong>
-      <span>Nachweise vorhanden · ${matrix.completionRate}&thinsp;%</span>
+      <span>Pflichten zum Jahresende erfüllt · ${matrix.completionRate}&thinsp;%</span>
     `;
 
     if (matrix.employees.length === 0) {
@@ -5314,6 +5536,13 @@
     }
 
     elements.trainingMatrixContent.innerHTML = `
+      <div
+        class="training-matrix-horizontal-scroll"
+        tabindex="0"
+        aria-label="Fortbildungsspalten horizontal scrollen"
+      >
+        <div class="training-matrix-horizontal-spacer"></div>
+      </div>
       <div class="training-matrix-scroll" tabindex="0" aria-label="Fortbildungsmatrix ${year}">
         <table class="training-matrix-table">
           <thead>
@@ -5344,10 +5573,14 @@
                               role="img"
                               aria-label="${escapeHtml(
                                 `${fullName(row.employee)}: ${training.title} ${
-                                  completed ? "absolviert" : "offen"
+                                  completed ? "für das Auswertungsjahr erfüllt" : "offen"
                                 }`,
                               )}"
-                              title="${completed ? "Absolviert" : "Offen"}"
+                              title="${
+                                completed
+                                  ? "Für das Auswertungsjahr erfüllt"
+                                  : "Zum Jahresende offen"
+                              }"
                             >${completed ? "✓" : "×"}</span>
                           </td>
                         `,
@@ -5361,6 +5594,41 @@
         </table>
       </div>
     `;
+    bindTrainingMatrixScrollers();
+  }
+
+  function bindTrainingMatrixScrollers() {
+    const horizontalScroll = elements.trainingMatrixContent.querySelector(
+      ".training-matrix-horizontal-scroll",
+    );
+    const matrixScroll = elements.trainingMatrixContent.querySelector(
+      ".training-matrix-scroll",
+    );
+    const spacer = horizontalScroll?.querySelector(
+      ".training-matrix-horizontal-spacer",
+    );
+    if (!horizontalScroll || !matrixScroll || !spacer) return;
+
+    let syncing = false;
+    const synchronize = (source, target) => {
+      if (syncing) return;
+      syncing = true;
+      target.scrollLeft = source.scrollLeft;
+      syncing = false;
+    };
+    horizontalScroll.addEventListener("scroll", () =>
+      synchronize(horizontalScroll, matrixScroll),
+    );
+    matrixScroll.addEventListener("scroll", () =>
+      synchronize(matrixScroll, horizontalScroll),
+    );
+
+    window.requestAnimationFrame(() => {
+      spacer.style.width = `${matrixScroll.scrollWidth}px`;
+      horizontalScroll.hidden =
+        matrixScroll.scrollWidth <= matrixScroll.clientWidth + 1;
+      horizontalScroll.scrollLeft = matrixScroll.scrollLeft;
+    });
   }
 
   function printTrainingMatrix() {
@@ -5381,28 +5649,33 @@
       ["Mitarbeiter", ...matrix.trainings.map((training) => training.title)],
       matrix.rows.map((row) => [
         fullName(row.employee),
-        ...row.statuses.map(({ completed }) => (completed ? "Absolviert" : "Offen")),
+        ...row.statuses.map(({ completed }) => (completed ? "Erfüllt" : "Offen")),
       ]),
     );
   }
 
   function getAnnualTrainingMatrix(year) {
-    const trainings = state.trainings
-      .filter((training) => training.year === year)
+    const referenceDate = `${year}-12-31`;
+    const trainings = trainingObligations()
+      .filter((training) => training.year <= year)
       .sort((a, b) => a.title.localeCompare(b.title, "de"));
     const employees = [...activeEmployeeList()].sort(sortEmployees);
-    const completedKeys = new Set(
-      state.completions.map(
-        (completion) => `${completion.employeeId}\u0000${completion.trainingId}`,
-      ),
-    );
     let completedAssignments = 0;
     const rows = employees.map((employee) => ({
       employee,
       statuses: trainings.map((training) => {
-        const completed = completedKeys.has(`${employee.id}\u0000${training.id}`);
+        const latest = latestCompletionForTraining(
+          employee.id,
+          training,
+          referenceDate,
+        );
+        const completed = Boolean(
+          latest &&
+            (!training.recurrenceMonths ||
+              addMonths(latest.completedOn, training.recurrenceMonths) >= referenceDate),
+        );
         if (completed) completedAssignments += 1;
-        return { training, completed };
+        return { training, completed, completion: latest || null };
       }),
     }));
     const totalAssignments = employees.length * trainings.length;
@@ -5416,6 +5689,27 @@
       totalAssignments,
       completionRate: percentage(completedAssignments, totalAssignments),
     };
+  }
+
+  function getTrainingEvaluationYears() {
+    const currentYear = new Date().getFullYear();
+    const trainingYears = state.trainings
+      .map((training) => Number(training.year))
+      .filter(Number.isInteger);
+    const completionYears = [];
+    state.completions.forEach((completion) => {
+      const completionYear = Number(completion.completedOn.slice(0, 4));
+      if (Number.isInteger(completionYear)) completionYears.push(completionYear);
+    });
+    const firstYear = trainingYears.length
+      ? Math.min(...trainingYears)
+      : completionYears.length
+        ? Math.min(...completionYears)
+        : currentYear;
+    const lastYear = Math.max(currentYear, ...trainingYears, ...completionYears);
+    const years = new Set();
+    for (let year = firstYear; year <= lastYear; year += 1) years.add(year);
+    return [...years].sort((a, b) => b - a);
   }
 
   function renderSummaryChip(icon, value, label, tone = "blue") {
@@ -5442,7 +5736,7 @@
     const stats = getTrainingStats(training);
     const activeCount = activeEmployeeList().length;
     const history = state.completions
-      .filter((completion) => completion.trainingId === training.id)
+      .filter((completion) => completionMatchesTraining(completion, training))
       .sort(
         (a, b) =>
           b.completedOn.localeCompare(a.completedOn) ||
@@ -5519,7 +5813,7 @@
         <details class="training-card-details">
           <summary>${history.length} erfasste${history.length === 1 ? "r" : ""} Nachweis${
             history.length === 1 ? "" : "e"
-          }</summary>
+          }${training.recurrenceMonths ? " in dieser Fortbildungsreihe" : ""}</summary>
           <div class="completion-history">
             ${
               history.length
@@ -7382,7 +7676,13 @@
   function openEmployeeDialog(employeeId = null) {
     if (!requireAdmin()) return;
     elements.employeeForm.reset();
-    ["#firstName", "#lastName", "#profession", "#birthDate"].forEach((selector) => {
+    [
+      "#firstName",
+      "#lastName",
+      "#profession",
+      "#birthDate",
+      "#employeeUsername",
+    ].forEach((selector) => {
       document.querySelector(selector).setCustomValidity("");
     });
     document.querySelector("#employeeId").value = "";
@@ -7398,6 +7698,8 @@
       document.querySelector("#employeeId").value = employee.id;
       document.querySelector("#firstName").value = employee.firstName;
       document.querySelector("#lastName").value = employee.lastName;
+      document.querySelector("#employeeUsername").value =
+        employee.username || "";
       document.querySelector("#birthDate").value = employee.birthDate;
       document.querySelector("#phone").value = employee.phone;
       document.querySelector("#email").value = employee.email;
@@ -7457,6 +7759,7 @@
     const firstNameInput = document.querySelector("#firstName");
     const lastNameInput = document.querySelector("#lastName");
     const professionInput = document.querySelector("#profession");
+    const usernameInput = document.querySelector("#employeeUsername");
 
     birthDate.setCustomValidity(
       birthDate.value && birthDate.value > todayIso()
@@ -7471,6 +7774,23 @@
     );
     professionInput.setCustomValidity(
       professionInput.value.trim() ? "" : "Bitte einen Beruf eingeben.",
+    );
+    const username = usernameInput.value.trim();
+    const editingEmployeeId = document.querySelector("#employeeId").value;
+    const duplicateUsername = username
+      ? state.employees.some(
+          (employee) =>
+            employee.id !== editingEmployeeId &&
+            employee.username?.toLocaleLowerCase("de-DE") ===
+              username.toLocaleLowerCase("de-DE"),
+        )
+      : false;
+    usernameInput.setCustomValidity(
+      username && !/^[A-Za-z0-9]{4,40}$/.test(username)
+        ? "Der Benutzername muss aus 4 bis 40 Buchstaben oder Ziffern bestehen."
+        : duplicateUsername
+          ? "Dieser Benutzername ist bereits einem anderen Mitarbeiter zugewiesen."
+          : "",
     );
     if (!elements.employeeForm.reportValidity()) return;
 
@@ -7493,6 +7813,7 @@
       id: existingEmployee?.id || createId(),
       firstName: firstNameInput.value.trim(),
       lastName: lastNameInput.value.trim(),
+      username,
       birthDate: birthDate.value,
       phone: document.querySelector("#phone").value.trim(),
       email: document.querySelector("#email").value.trim(),
@@ -7689,17 +8010,32 @@
     const existingTraining = trainingId ? getTraining(trainingId) : null;
     const now = new Date().toISOString();
     const recurrence = Number(document.querySelector("#trainingRecurrence").value);
+    const recurrenceMonths =
+      Number.isFinite(recurrence) && recurrence > 0 ? recurrence : null;
     const trainingYear = Number(document.querySelector("#trainingYear").value);
+    const matchingSeries = state.trainings.find(
+      (item) =>
+        item.id !== existingTraining?.id &&
+        item.recurrenceMonths &&
+        trainingSeriesSignature(item.title) === trainingSeriesSignature(titleInput.value),
+    );
     const training = {
       id: existingTraining?.id || createId(),
       title: titleInput.value.trim(),
       year: trainingYear,
-      recurrenceMonths: Number.isFinite(recurrence) && recurrence > 0 ? recurrence : null,
+      recurrenceMonths,
+      seriesId: recurrenceMonths
+        ? existingTraining?.seriesId ||
+          matchingSeries?.seriesId ||
+          generatedTrainingSeriesId(titleInput.value, existingTraining?.id)
+        : "",
       description: document.querySelector("#trainingDescription").value.trim(),
       createdAt: existingTraining?.createdAt || now,
       updatedAt: now,
     };
 
+    const previousDisplayYear = trainingDisplayYear;
+    trainingDisplayYear = trainingYear;
     const committed = await commitStateMutation(() => {
       if (existingTraining) {
         state.trainings = state.trainings.map((item) =>
@@ -7709,7 +8045,10 @@
         state.trainings.push(training);
       }
     });
-    if (!committed) return;
+    if (!committed) {
+      trainingDisplayYear = previousDisplayYear;
+      return;
+    }
 
     elements.trainingDialog.close();
     showToast(existingTraining ? "Fortbildung wurde aktualisiert." : "Fortbildung wurde angelegt.");
@@ -8164,10 +8503,10 @@
     elements.completionDate.setCustomValidity("");
     elements.completionDate.value = todayIso();
 
-    elements.completionTraining.innerHTML = groupTrainingsByYear()
+    elements.completionTraining.innerHTML = groupTrainingsByYear(trainingObligations())
       .map(
         ([year, trainings]) => `
-          <optgroup label="Jahr ${year}">
+          <optgroup label="Im Katalog seit ${year}">
             ${trainings
               .map(
                 (training) =>
@@ -9067,8 +9406,9 @@
   }
 
   function getEmployeeTrainingStats(employeeId) {
-    const total = state.trainings.length;
-    const current = state.trainings.filter((training) =>
+    const obligations = trainingObligations();
+    const total = obligations.length;
+    const current = obligations.filter((training) =>
       isEmployeeCurrentForTraining(employeeId, training),
     ).length;
     return {
@@ -9111,16 +9451,66 @@
   }
 
   function latestCompletion(employeeId, trainingId) {
+    const training = getTraining(trainingId);
+    return training
+      ? latestCompletionForTraining(employeeId, training)
+      : state.completions
+          .filter(
+            (completion) =>
+              completion.employeeId === employeeId &&
+              completion.trainingId === trainingId,
+          )
+          .sort(sortCompletionsDescending)[0];
+  }
+
+  function latestCompletionForTraining(employeeId, training, completedOnOrBefore = "") {
     return state.completions
       .filter(
         (completion) =>
-          completion.employeeId === employeeId && completion.trainingId === trainingId,
+          completion.employeeId === employeeId &&
+          completionMatchesTraining(completion, training) &&
+          (!completedOnOrBefore || completion.completedOn <= completedOnOrBefore),
       )
-      .sort(
-        (a, b) =>
-          b.completedOn.localeCompare(a.completedOn) ||
-          Date.parse(b.createdAt) - Date.parse(a.createdAt),
-      )[0];
+      .sort(sortCompletionsDescending)[0];
+  }
+
+  function sortCompletionsDescending(a, b) {
+    return (
+      b.completedOn.localeCompare(a.completedOn) ||
+      Date.parse(b.createdAt) - Date.parse(a.createdAt)
+    );
+  }
+
+  function completionMatchesTraining(completion, training) {
+    if (!completion || !training) return false;
+    if (!training.recurrenceMonths || !training.seriesId) {
+      return completion.trainingId === training.id;
+    }
+    const completedTraining = getTraining(completion.trainingId);
+    return (
+      completedTraining?.recurrenceMonths &&
+      completedTraining.seriesId === training.seriesId
+    );
+  }
+
+  function trainingObligations() {
+    const obligations = new Map();
+    state.trainings.forEach((training) => {
+      const key =
+        training.recurrenceMonths && training.seriesId
+          ? `series:${training.seriesId}`
+          : `training:${training.id}`;
+      const existing = obligations.get(key);
+      if (
+        !existing ||
+        training.year < existing.year ||
+        (training.year === existing.year &&
+          training.updatedAt.localeCompare(existing.updatedAt) > 0)
+      ) {
+        obligations.set(key, training);
+      }
+    });
+    return [...obligations.values()];
   }
 
   function getMeetingStats(meeting) {

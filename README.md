@@ -1,6 +1,6 @@
 # TeO – Team & Employee Organizer
 
-Aktuelle Projektversion: **TeO – Team & Employee Organizer - 002.000**
+Aktuelle Projektversion: **TeO – Team & Employee Organizer - 002.009**
 
 Die Buildnummer besteht aus einer dreistelligen Major- und Minor-Nummer. Größere,
 strukturelle Änderungen erhöhen die Major-Nummer; Funktionen, Erweiterungen und
@@ -23,6 +23,8 @@ Der Server liefert die App anschließend selbst aus.
 - Mitarbeiter anlegen, bearbeiten, als aktiv, in Einarbeitung oder inaktiv führen und löschen
 - E-Mail-Adressen aller aktiven Mitarbeiter als Semikolon-Liste in die Zwischenablage kopieren
 - Stammdaten, Stellenumfang, Beruf, festes Dienstwochenende und Zusatzqualifikationen verwalten
+- Mitarbeitern einen eindeutigen Benutzernamen zuweisen und damit Anmeldekonten
+  zuverlässig den zugehörigen Personalstammdaten zuordnen
 - Berufe und Zusatzqualifikationen in administrierbaren Katalogen ergänzen, umbenennen und löschen
 - Die Berufsbezeichnungen „Gesundheits- und Krankenpfleger/in“ sowie
   „3-jährig examiniert“ automatisch unter „Pflegefachkraft“ zusammenführen
@@ -33,6 +35,8 @@ Der Server liefert die App anschließend selbst aus.
   `hh:mm` im 24-Stunden-Format
 - Fristenmonitor für anstehende Termine und Geburtstage sowie überfällige und
   innerhalb von 30, 60 oder 90 Tagen fällige Fortbildungen und Zusatzqualifikationen
+- Geburtstage im Fristenmonitor mit Mitarbeitername, erreichtem Lebensjahr und
+  vollständigem Geburtsdatum darstellen
 - Fristenmonitor nach Terminen, Geburtstagen, Fortbildungen und Zusatzqualifikationen
   filterbar; die Auswahl bleibt lokal gespeichert
 - Druckbare Gesamtakte je Mitarbeiter mit Stammdaten, Qualifikationen,
@@ -72,10 +76,15 @@ Der Server liefert die App anschließend selbst aus.
   unterschiedliche bewegliche Ferientage sind nicht enthalten
 - Pflichtfortbildungen mit Wiederholungsintervall anlegen und bearbeiten:
   standardmäßig jährlich, Gewaltprävention standardmäßig alle fünf Jahre
-- Pflichtfortbildungen einem Jahr zuordnen und nach Fortbildungsjahren gruppiert anzeigen
+- Wiederkehrende Fortbildungen thematisch zu Fortbildungsreihen verbinden, sodass
+  ein neuerer Nachweis die Auffrischungsfrist der gesamten Reihe fortschreibt
+- Das angegebene Jahr als Einführungsjahr in den Pflichtkatalog behandeln und die
+  Fortbildung ab diesem Zeitpunkt in allen Folgejahren anbieten
 - Jahresmatrix mit allen aktiven Mitarbeitern und absolvierten beziehungsweise offenen
   Pflichtfortbildungen anzeigen, Excel-kompatibel als CSV exportieren und im Querformat
   ausdrucken beziehungsweise über den Druckdialog als PDF speichern
+- Jahresmatrix anhand der zum Jahresende gültigen Nachweise berechnen; mehrjährig
+  gültige Abschlüsse erfüllen dadurch auch die folgenden Auswertungsjahre
 - Abschlüsse für einen oder mehrere aktive Mitarbeiter gleichzeitig erfassen
 - Historische Fortbildungsnachweise anzeigen und korrigieren
 - Teamsitzungen anlegen, bearbeiten und löschen
@@ -128,6 +137,7 @@ Der Server liefert die App anschließend selbst aus.
 - Lokale Anmeldung mit Administrator- und Nutzerrolle sowie erzwungener Passwortänderung
 - Administrator kann Passwörter normaler Benutzer auf ein zufälliges temporäres Passwort
   zurücksetzen
+- Administrator kann die eindeutigen Benutzernamen bestehender Konten bearbeiten
 
 ## Betriebsarten und Datenschutz
 

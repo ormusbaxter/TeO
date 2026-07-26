@@ -466,6 +466,42 @@ function validateStateShape(state) {
       "Der TeO-Datenbestand ist unvollständig oder ungültig.",
     );
   }
+  const normalizedUsernames = state.users.map((user) =>
+    String(user?.username || "").toLocaleLowerCase("de-DE"),
+  );
+  if (
+    state.users.some(
+      (user) =>
+        !/^[A-Za-z0-9]{4,40}$/.test(String(user?.username || "")) ||
+        !["admin", "user"].includes(user?.role),
+    ) ||
+    new Set(normalizedUsernames).size !== normalizedUsernames.length
+  ) {
+    throw httpError(
+      400,
+      "invalid_users",
+      "Die Benutzerkonten enthalten ungültige oder doppelte Benutzernamen.",
+    );
+  }
+  const employeeUsernames = state.employees
+    .map((employee) => String(employee?.username || "").trim())
+    .filter(Boolean);
+  if (
+    employeeUsernames.some(
+      (username) => !/^[A-Za-z0-9]{4,40}$/.test(username),
+    ) ||
+    new Set(
+      employeeUsernames.map((username) =>
+        username.toLocaleLowerCase("de-DE"),
+      ),
+    ).size !== employeeUsernames.length
+  ) {
+    throw httpError(
+      400,
+      "invalid_employee_usernames",
+      "Die Mitarbeiterdaten enthalten ungültige oder doppelte Benutzernamen.",
+    );
+  }
   const byteLength = Buffer.byteLength(JSON.stringify(state), "utf8");
   if (byteLength > MAX_STATE_BYTES) {
     throw httpError(
