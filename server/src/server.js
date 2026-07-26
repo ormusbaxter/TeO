@@ -67,7 +67,17 @@ app.use((request, response, next) => {
 app.use((request, response, next) => {
   const origin = request.headers.origin;
   if (!origin) return next();
-  if (!allowedOrigins.length || allowedOrigins.includes(origin)) {
+  let sameHostOrigin = false;
+  try {
+    sameHostOrigin = new URL(origin).host === request.get("host");
+  } catch {
+    sameHostOrigin = false;
+  }
+  if (
+    sameHostOrigin ||
+    allowedOrigins.includes("*") ||
+    allowedOrigins.includes(origin)
+  ) {
     response.setHeader("Access-Control-Allow-Origin", origin);
     response.setHeader("Vary", "Origin");
     response.setHeader(
@@ -268,6 +278,20 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
       currentState,
       nextState,
     );
+    if (
+      currentUser.mustChangePassword &&
+      !containsRequiredPasswordChange(
+        currentState,
+        hydratedNextState,
+        currentUser.id,
+      )
+    ) {
+      await connection.rollback();
+      return response.status(403).json({
+        code: "password_change_required",
+        message: "Vor weiteren Änderungen muss ein neues Passwort festgelegt werden.",
+      });
+    }
     if (
       currentUser.role !== "admin" &&
       !isPermittedUserMutation(
@@ -616,6 +640,18 @@ function isPermittedUserMutation(before, after, userId) {
   if (!isPermittedSettingsMutation(before.settings, after.settings)) return false;
   if (!isPermittedOwnUserMutation(before.users, after.users, userId)) return false;
   return true;
+}
+
+function containsRequiredPasswordChange(before, after, userId) {
+  const previousUser = before.users?.find((user) => user.id === userId);
+  const nextUser = after.users?.find((user) => user.id === userId);
+  return Boolean(
+    previousUser &&
+      nextUser &&
+      previousUser.passwordHash !== nextUser.passwordHash &&
+      previousUser.passwordSalt !== nextUser.passwordSalt &&
+      !nextUser.mustChangePassword,
+  );
 }
 
 function isPermittedSettingsMutation(before, after) {

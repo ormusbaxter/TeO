@@ -1628,6 +1628,13 @@
       currentUser =
         state.users.find((user) => user.id === currentUser.id) || currentUser;
     }
+    if (currentUser?.mustChangePassword) {
+      completeLogin(currentUser);
+      showToast(
+        "Das Passwort wurde zurückgesetzt. Bitte legen Sie ein neues Passwort fest.",
+      );
+      return false;
+    }
     renderAll();
     return false;
   }
@@ -2405,6 +2412,13 @@
       }
       currentUser = refreshedUser;
       applyTheme(state.settings.theme);
+      if (currentUser.mustChangePassword) {
+        completeLogin(currentUser);
+        showToast(
+          "Das Passwort wurde zurückgesetzt. Bitte legen Sie ein neues Passwort fest.",
+        );
+        return;
+      }
       renderAll();
       showToast("Änderungen von einem anderen Arbeitsplatz wurden geladen.");
     } catch (error) {
@@ -8607,7 +8621,11 @@
       state.settings.backupReminderDays,
     );
     elements.settingsStorageBackend.value = backendMode;
-    elements.settingsMariaDbApiUrl.value = backendConfig.apiUrl || "";
+    elements.settingsMariaDbApiUrl.value =
+      backendConfig.apiUrl ||
+      (/^https?:$/.test(window.location.protocol)
+        ? window.location.origin
+        : "");
     elements.settingsMariaDbPassword.value = "";
     elements.settingsBackendStatus.classList.toggle(
       "is-remote",

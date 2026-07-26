@@ -44,7 +44,7 @@ geladen.
 | `TEO_HOST` | Bind-Adresse des HTTP-Dienstes | `0.0.0.0` |
 | `TEO_PORT` | HTTP-Port | `3000` |
 | `TEO_SESSION_HOURS` | Laufzeit inaktiver Serversitzungen | `12` |
-| `TEO_CORS_ORIGINS` | Kommagetrennte erlaubte Ursprünge; leer erlaubt alle | leer |
+| `TEO_CORS_ORIGINS` | Kommagetrennte zusätzlich erlaubte Ursprünge; `*` erlaubt alle | leer |
 | `DB_HOST` | MariaDB-Server | erforderlich |
 | `DB_PORT` | MariaDB-Port | `3306` |
 | `DB_NAME` | Datenbankname | erforderlich |
