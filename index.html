@@ -1,0 +1,2325 @@
+<!doctype html>
+<html lang="de-DE">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Lokale Mitarbeiter- und Pflichtfortbildungsverwaltung für die Intensivstation"
+    />
+    <title>TeO – Team &amp; Employee Organizer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="is-auth-locked">
+    <svg class="icon-library" aria-hidden="true">
+      <symbol id="icon-logo" viewBox="0 0 24 24">
+        <path d="M3 12h4l2.1-5 4.1 10 2.2-5H21" />
+      </symbol>
+      <symbol id="icon-dashboard" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="2" />
+        <rect x="14" y="3" width="7" height="7" rx="2" />
+        <rect x="3" y="14" width="7" height="7" rx="2" />
+        <rect x="14" y="14" width="7" height="7" rx="2" />
+      </symbol>
+      <symbol id="icon-users" viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+      </symbol>
+      <symbol id="icon-training" viewBox="0 0 24 24">
+        <path d="m22 10-10-5L2 10l10 5 10-5Z" />
+        <path d="M6 12.5V17c3 2.7 9 2.7 12 0v-4.5M22 10v6" />
+      </symbol>
+      <symbol id="icon-meeting" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="17" rx="2" />
+        <path d="M16 2v4M8 2v4M3 9h18" />
+        <circle cx="9" cy="14" r="2" />
+        <path d="M6 19a3 3 0 0 1 6 0M15 13h3M15 16h3" />
+      </symbol>
+      <symbol id="icon-chart" viewBox="0 0 24 24">
+        <path d="M12 3a9 9 0 1 0 9 9h-9Z" />
+        <path d="M15 3.5A9 9 0 0 1 20.5 9H15Z" />
+      </symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" />
+      </symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </symbol>
+      <symbol id="icon-edit" viewBox="0 0 24 24">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+      </symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24">
+        <path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v5M14 11v5" />
+      </symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" />
+      </symbol>
+      <symbol id="icon-copy" viewBox="0 0 24 24">
+        <rect x="8" y="8" width="12" height="12" rx="2" />
+        <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+      </symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24">
+        <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+      </symbol>
+      <symbol id="icon-upload" viewBox="0 0 24 24">
+        <path d="M12 16V4M7 9l5-5 5 5M5 21h14" />
+      </symbol>
+      <symbol id="icon-print" viewBox="0 0 24 24">
+        <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+        <rect x="6" y="14" width="12" height="7" rx="1" />
+      </symbol>
+      <symbol id="icon-palette" viewBox="0 0 24 24">
+        <path d="M12 3a9 9 0 0 0 0 18h1.5a1.5 1.5 0 0 0 0-3H12a2 2 0 0 1 0-4h2.5A6.5 6.5 0 0 0 21 7.5C21 5 17 3 12 3Z" />
+        <circle cx="7.5" cy="10" r="1" />
+        <circle cx="10" cy="6.5" r="1" />
+        <circle cx="15" cy="6.5" r="1" />
+        <circle cx="17.5" cy="10" r="1" />
+      </symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </symbol>
+      <symbol id="icon-more" viewBox="0 0 24 24">
+        <circle cx="5" cy="12" r="1" />
+        <circle cx="12" cy="12" r="1" />
+        <circle cx="19" cy="12" r="1" />
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24">
+        <path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h8M16 18h4" />
+        <circle cx="16" cy="6" r="2" />
+        <circle cx="8" cy="12" r="2" />
+        <circle cx="14" cy="18" r="2" />
+      </symbol>
+      <symbol id="icon-calendar" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M16 3v4M8 3v4M3 11h18" />
+      </symbol>
+      <symbol id="icon-chevron" viewBox="0 0 24 24">
+        <path d="m9 18 6-6-6-6" />
+      </symbol>
+      <symbol id="icon-alert" viewBox="0 0 24 24">
+        <path d="M10.3 3.7 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z" />
+        <path d="M12 9v4M12 17h.01" />
+      </symbol>
+      <symbol id="icon-lock" viewBox="0 0 24 24">
+        <rect x="4" y="10" width="16" height="11" rx="2" />
+        <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+      </symbol>
+      <symbol id="icon-empty" viewBox="0 0 24 24">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
+        <path d="M8 7h8M8 11h5" />
+      </symbol>
+    </svg>
+
+    <div class="app-layout">
+      <aside class="sidebar" aria-label="Hauptnavigation">
+        <a class="brand" href="#uebersicht" aria-label="TeO Startseite">
+          <span class="brand-mark">
+            <svg><use href="#icon-logo"></use></svg>
+          </span>
+          <span>
+            <strong>TeO</strong>
+            <small>Team &amp; Employee Organizer</small>
+          </span>
+        </a>
+
+        <nav class="main-nav">
+          <p class="nav-label">Verwaltung</p>
+          <button class="nav-item is-active" type="button" data-view="dashboard">
+            <svg><use href="#icon-dashboard"></use></svg>
+            <span>Übersicht</span>
+          </button>
+          <button class="nav-item" type="button" data-view="employees">
+            <svg><use href="#icon-users"></use></svg>
+            <span>Mitarbeiter</span>
+            <span class="nav-count" id="navEmployeeCount">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="weekends">
+            <svg><use href="#icon-calendar"></use></svg>
+            <span>Wochenendverteilung</span>
+          </button>
+          <button class="nav-item" type="button" data-view="vacations">
+            <svg><use href="#icon-calendar"></use></svg>
+            <span>Urlaubsplanung</span>
+          </button>
+          <button class="nav-item" type="button" data-view="appointments">
+            <svg><use href="#icon-calendar"></use></svg>
+            <span>Terminkalender</span>
+            <span class="nav-count" id="navAppointmentCount">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="trainings">
+            <svg><use href="#icon-training"></use></svg>
+            <span>Pflichtfortbildungen</span>
+            <span class="nav-count" id="navTrainingCount">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="meetings">
+            <svg><use href="#icon-meeting"></use></svg>
+            <span>Teamsitzungen</span>
+            <span class="nav-count" id="navMeetingCount">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="devices">
+            <svg><use href="#icon-empty"></use></svg>
+            <span>Geräteeinweisungen</span>
+          </button>
+          <button
+            class="nav-item"
+            type="button"
+            data-view="device-management"
+            data-admin-only
+          >
+            <svg><use href="#icon-edit"></use></svg>
+            <span>Geräteverwaltung</span>
+            <span class="nav-count" id="navDeviceManagementCount">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="settings">
+            <svg><use href="#icon-settings"></use></svg>
+            <span>Einstellungen</span>
+          </button>
+        </nav>
+
+        <section class="user-session" aria-label="Angemeldeter Benutzer">
+          <span class="user-session-icon">
+            <svg><use href="#icon-users"></use></svg>
+          </span>
+          <div>
+            <strong id="currentUsername">Nicht angemeldet</strong>
+            <small id="currentUserRole">–</small>
+          </div>
+          <div class="user-session-actions">
+            <button
+              type="button"
+              data-open-user-management
+              data-admin-only
+              aria-label="Benutzer verwalten"
+              title="Benutzer verwalten"
+            >
+              <svg><use href="#icon-edit"></use></svg>
+            </button>
+            <button type="button" data-logout aria-label="Abmelden" title="Abmelden">
+              <svg><use href="#icon-close"></use></svg>
+            </button>
+          </div>
+        </section>
+
+        <div class="sidebar-note">
+          <span class="sidebar-note-icon">
+            <svg><use href="#icon-logo"></use></svg>
+          </span>
+          <div>
+            <strong id="projectBuildLabel">TeO – Team &amp; Employee Organizer - 002.000</strong>
+            <p>&copy; 2026 Oliver Becker</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="mobile-header">
+          <a class="brand brand-mobile" href="#uebersicht">
+            <span class="brand-mark">
+              <svg><use href="#icon-logo"></use></svg>
+            </span>
+            <strong>TeO</strong>
+          </a>
+          <div class="mobile-header-actions">
+            <button
+              class="mobile-theme-button"
+              id="mobileAccountButton"
+              type="button"
+              aria-label="Benutzerkonto öffnen"
+              title="Benutzerkonto"
+            >
+              <svg><use href="#icon-users"></use></svg>
+            </button>
+            <button
+              class="mobile-theme-button"
+              id="mobileThemeButton"
+              type="button"
+              aria-label="Farbthema wechseln"
+              title="Farbthema wechseln"
+            >
+              <svg><use href="#icon-palette"></use></svg>
+            </button>
+            <button
+              class="button button-primary button-compact"
+              id="mobileCreateButton"
+              type="button"
+              data-create-type="employee"
+              data-admin-only
+            >
+              <svg><use href="#icon-plus"></use></svg>
+              <span>Anlegen</span>
+            </button>
+          </div>
+        </header>
+
+        <section class="view is-active" id="dashboardView" data-view-panel="dashboard">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Intensivstation</p>
+              <h1 id="dashboardGreeting">Guten Tag!</h1>
+              <p class="page-subtitle">Personal und Pflichtfortbildungen kompakt im Blick.</p>
+            </div>
+            <button
+              class="button button-primary desktop-only-flex"
+              type="button"
+              data-open-employee
+              data-admin-only
+            >
+              <svg><use href="#icon-plus"></use></svg>
+              Mitarbeiter anlegen
+            </button>
+          </div>
+
+          <div class="stats-grid" id="dashboardStats" aria-label="Kennzahlen"></div>
+
+          <div class="dashboard-grid">
+            <section class="panel panel-large">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Fortbildungsstatus</p>
+                  <h2>Pflichtfortbildungen</h2>
+                </div>
+                <button class="text-button" type="button" data-go-to="trainings">
+                  Alle anzeigen
+                  <svg><use href="#icon-chevron"></use></svg>
+                </button>
+              </div>
+              <div id="dashboardTrainingProgress"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Schnellzugriff</p>
+                  <h2>Neue Einträge</h2>
+                </div>
+              </div>
+              <div class="quick-actions">
+                <button class="quick-action" type="button" data-open-employee data-admin-only>
+                  <span class="quick-action-icon quick-action-icon-blue">
+                    <svg><use href="#icon-users"></use></svg>
+                  </span>
+                  <span>
+                    <strong>Mitarbeiter anlegen</strong>
+                    <small>Stammdaten und Qualifikationen erfassen</small>
+                  </span>
+                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
+                </button>
+                <button class="quick-action" type="button" data-open-training data-admin-only>
+                  <span class="quick-action-icon quick-action-icon-teal">
+                    <svg><use href="#icon-training"></use></svg>
+                  </span>
+                  <span>
+                    <strong>Pflichtfortbildung anlegen</strong>
+                    <small>Neue Fortbildung definieren</small>
+                  </span>
+                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
+                </button>
+                <button class="quick-action" type="button" data-open-completion>
+                  <span class="quick-action-icon quick-action-icon-orange">
+                    <svg><use href="#icon-check"></use></svg>
+                  </span>
+                  <span>
+                    <strong>Abschluss eintragen</strong>
+                    <small>Nachweis für aktive Mitarbeiter erfassen</small>
+                  </span>
+                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
+                </button>
+                <button class="quick-action" type="button" data-open-meeting data-admin-only>
+                  <span class="quick-action-icon quick-action-icon-purple">
+                    <svg><use href="#icon-meeting"></use></svg>
+                  </span>
+                  <span>
+                    <strong>Teamsitzung anlegen</strong>
+                    <small>Termin und Teilnahmen dokumentieren</small>
+                  </span>
+                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <section class="panel deadline-panel" aria-labelledby="deadlineOverviewTitle">
+            <div class="panel-header deadline-panel-header">
+              <div>
+                <p class="eyebrow">Fristenmonitor</p>
+                <h2 id="deadlineOverviewTitle">Anstehende und überfällige Fristen</h2>
+              </div>
+              <div class="deadline-controls">
+                <fieldset class="deadline-filter-group">
+                  <legend>Anzeigen</legend>
+                  <label class="deadline-filter-chip">
+                    <input type="checkbox" value="appointment" data-deadline-filter checked />
+                    <span>Termine</span>
+                  </label>
+                  <label class="deadline-filter-chip">
+                    <input type="checkbox" value="birthday" data-deadline-filter checked />
+                    <span>Geburtstage</span>
+                  </label>
+                  <label class="deadline-filter-chip">
+                    <input type="checkbox" value="training" data-deadline-filter checked />
+                    <span>Fortbildungen</span>
+                  </label>
+                  <label class="deadline-filter-chip">
+                    <input type="checkbox" value="qualification" data-deadline-filter checked />
+                    <span>Qualifikationen</span>
+                  </label>
+                </fieldset>
+                <label class="compact-field">
+                  <span>Zeitraum</span>
+                  <select id="deadlineHorizon">
+                    <option value="30">30 Tage</option>
+                    <option value="60">60 Tage</option>
+                    <option value="90" selected>90 Tage</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div id="deadlineOverview"></div>
+          </section>
+
+          <section class="panel recent-panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Team</p>
+                <h2>Zuletzt bearbeitet</h2>
+              </div>
+              <button class="text-button" type="button" data-go-to="employees">
+                Mitarbeiter verwalten
+                <svg><use href="#icon-chevron"></use></svg>
+              </button>
+            </div>
+            <div id="recentEmployees"></div>
+          </section>
+
+        </section>
+
+        <section class="view" id="employeesView" data-view-panel="employees">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Teamverwaltung</p>
+              <h1>Mitarbeiter</h1>
+              <p class="page-subtitle">Stammdaten, Status und Zusatzqualifikationen verwalten.</p>
+            </div>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="openCatalogManagementButton"
+                type="button"
+                data-admin-only
+              >
+                <svg><use href="#icon-edit"></use></svg>
+                Berufe &amp; Qualifikationen
+              </button>
+              <button
+                class="button button-secondary"
+                id="openWeekendOverviewButton"
+                type="button"
+              >
+                <svg><use href="#icon-calendar"></use></svg>
+                Dienstwochenenden
+              </button>
+              <button
+                class="button button-secondary"
+                id="openDataQualityButton"
+                type="button"
+                data-admin-only
+              >
+                <svg><use href="#icon-alert"></use></svg>
+                Datenqualität
+              </button>
+              <button
+                class="button button-secondary"
+                id="copyActiveEmailsButton"
+                type="button"
+                data-admin-only
+              >
+                <svg><use href="#icon-copy"></use></svg>
+                <span id="copyActiveEmailsLabel">E-Mails kopieren</span>
+              </button>
+              <button class="button button-primary" type="button" data-open-employee data-admin-only>
+                <svg><use href="#icon-plus"></use></svg>
+                Mitarbeiter anlegen
+              </button>
+            </div>
+          </div>
+
+          <section class="panel table-panel">
+            <div class="toolbar">
+              <label class="search-field" for="employeeSearch">
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="employeeSearch"
+                  type="search"
+                  aria-label="Mitarbeiter durchsuchen"
+                  placeholder="Name, Beruf oder Qualifikation suchen …"
+                  autocomplete="off"
+                />
+              </label>
+              <div
+                class="segmented-control"
+                role="group"
+                aria-label="Mitarbeiter nach Status filtern"
+              >
+                <button
+                  class="is-active"
+                  type="button"
+                  data-status-filter="all"
+                  aria-pressed="true"
+                >
+                  Alle
+                </button>
+                <button type="button" data-status-filter="active" aria-pressed="false">
+                  Aktiv
+                </button>
+                <button type="button" data-status-filter="onboarding" aria-pressed="false">
+                  In Einarbeitung
+                </button>
+                <button type="button" data-status-filter="inactive" aria-pressed="false">
+                  Inaktiv
+                </button>
+              </div>
+            </div>
+            <div class="employee-filter-bar">
+              <label class="compact-field">
+                <span>Beruf</span>
+                <select id="employeeProfessionFilter"></select>
+              </label>
+              <label class="compact-field">
+                <span>Qualifikation</span>
+                <select id="employeeQualificationFilter"></select>
+              </label>
+              <label class="compact-field">
+                <span>Dienstwochenende</span>
+                <select id="employeeWeekendFilter">
+                  <option value="all">Alle</option>
+                  <option value="none">Kein festes</option>
+                  <option value="oli">Oli</option>
+                  <option value="claudio">Claudio</option>
+                </select>
+              </label>
+              <button class="button button-ghost" id="resetEmployeeFilters" type="button">
+                Filter zurücksetzen
+              </button>
+            </div>
+            <div class="employee-bulk-bar" id="employeeBulkBar" hidden>
+              <strong id="employeeBulkCount">0 ausgewählt</strong>
+              <button class="button button-secondary" id="openBulkEditButton" type="button">
+                Auswahl bearbeiten
+              </button>
+              <button class="button button-ghost" id="clearEmployeeSelection" type="button">
+                Auswahl aufheben
+              </button>
+            </div>
+            <div id="employeeTable"></div>
+          </section>
+        </section>
+
+        <section class="view" id="weekendsView" data-view-panel="weekends">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Personalverteilung</p>
+              <h1>Wochenendverteilung</h1>
+              <p class="page-subtitle">
+                Stellenanteile, Einarbeitung und Schlüsselqualifikationen der festen
+                Dienstwochenenden vergleichen.
+              </p>
+            </div>
+            <button class="button button-secondary" id="openWeekendPrintButton" type="button">
+              <svg><use href="#icon-print"></use></svg>
+              Druckansicht
+            </button>
+          </div>
+          <div id="weekendDistributionContent"></div>
+        </section>
+
+        <section class="view" id="vacationsView" data-view-panel="vacations">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Jahresplanung</p>
+              <h1>Urlaubs- und Abwesenheitsplanung</h1>
+              <p class="page-subtitle">
+                Urlaub, weitere Abwesenheiten und verpflichtende Dienstzusagen
+                monatsweise für das gesamte Team eintragen.
+              </p>
+            </div>
+          </div>
+
+          <section class="panel vacation-controls-panel">
+            <div class="vacation-controls">
+              <label class="compact-field">
+                <span>Planungsjahr</span>
+                <select id="vacationYear"></select>
+              </label>
+              <label class="compact-field">
+                <span>Monat</span>
+                <select id="vacationMonth">
+                  <option value="1">Januar</option>
+                  <option value="2">Februar</option>
+                  <option value="3">März</option>
+                  <option value="4">April</option>
+                  <option value="5">Mai</option>
+                  <option value="6">Juni</option>
+                  <option value="7">Juli</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Dezember</option>
+                </select>
+              </label>
+              <label class="compact-field" data-admin-only>
+                <span>Eintragsart</span>
+                <select id="vacationEntryType">
+                  <option value="vacation">Urlaub</option>
+                  <option value="onboardingVacation">Urlaub Einarbeitung</option>
+                  <option value="school">Schule / Weiterbildung / Uni</option>
+                  <option value="unpaid">Unbezahlter Urlaub</option>
+                  <option value="external">Externer Einsatz</option>
+                  <option value="plannedOff">Frei geplant</option>
+                  <option value="mandatoryDuty">Verpflichtende Dienstzusage</option>
+                </select>
+              </label>
+              <label class="compact-field" data-admin-only>
+                <span>Vollzeit-Grundurlaub</span>
+                <span class="input-suffix compact-input-suffix">
+                  <input
+                    id="vacationBaseDays"
+                    type="number"
+                    min="1"
+                    max="60"
+                    step="0.5"
+                  />
+                  <span>Tage</span>
+                </span>
+              </label>
+              <label class="compact-field" data-admin-only>
+                <span>Max. abwesend werktags</span>
+                <input
+                  id="vacationWeekdayAbsenceLimit"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="1"
+                />
+              </label>
+              <label class="compact-field" data-admin-only>
+                <span>Max. Wochenende / Feiertag</span>
+                <input
+                  id="vacationWeekendAbsenceLimit"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="1"
+                />
+              </label>
+              <label class="compact-field" data-admin-only>
+                <span>Referenzsamstag Oli</span>
+                <input id="vacationOliReferenceSaturday" type="date" />
+              </label>
+              <button
+                class="button button-secondary"
+                id="saveVacationSettingsButton"
+                type="button"
+                data-admin-only
+              >
+                Einstellungen speichern
+              </button>
+            </div>
+            <div class="vacation-legend" aria-label="Legende">
+              <span><i class="legend-vacation"></i> Urlaub</span>
+              <span><i class="legend-planner-onboarding-vacation"></i> Urlaub Einarbeitung</span>
+              <span><i class="legend-planner-school"></i> Schule / Weiterbildung / Uni</span>
+              <span><i class="legend-planner-unpaid"></i> Unbezahlter Urlaub</span>
+              <span><i class="legend-planner-external"></i> Externer Einsatz</span>
+              <span><i class="legend-planner-planned-off"></i> Frei geplant</span>
+              <span><i class="legend-planner-duty"></i> Dienstzusage</span>
+              <span><i class="legend-weekend-oli"></i> Wochenende Oli</span>
+              <span><i class="legend-weekend-claudio"></i> Wochenende Claudio</span>
+              <span><i class="legend-holiday"></i> Feiertag NRW</span>
+              <span><i class="legend-school-vacation"></i> Schulferien NRW</span>
+            </div>
+          </section>
+
+          <div class="training-summary vacation-summary" id="vacationSummary"></div>
+          <section class="panel vacation-planner-panel" id="vacationPlanner"></section>
+        </section>
+
+        <section class="view" id="appointmentsView" data-view-panel="appointments">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Organisation</p>
+              <h1>Terminkalender</h1>
+              <p class="page-subtitle">
+                Anstehende und vergangene Termine zentral verwalten.
+              </p>
+            </div>
+            <button
+              class="button button-primary"
+              type="button"
+              data-open-appointment
+              data-admin-only
+            >
+              <svg><use href="#icon-plus"></use></svg>
+              Termin anlegen
+            </button>
+          </div>
+
+          <div class="training-summary" id="appointmentSummary"></div>
+          <section class="meeting-list" id="appointmentList"></section>
+        </section>
+
+        <section class="view" id="trainingsView" data-view-panel="trainings">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Qualität &amp; Sicherheit</p>
+              <h1>Pflichtfortbildungen</h1>
+              <p class="page-subtitle">
+                Fortbildungen anlegen und absolvierte Nachweise dokumentieren.
+              </p>
+            </div>
+            <div class="header-actions">
+              <button class="button button-secondary" id="openTrainingMatrixButton" type="button">
+                <svg><use href="#icon-chart"></use></svg>
+                Jahresauswertung
+              </button>
+              <button class="button button-secondary" type="button" data-open-completion>
+                <svg><use href="#icon-check"></use></svg>
+                Abschluss eintragen
+              </button>
+              <button class="button button-primary" type="button" data-open-training data-admin-only>
+                <svg><use href="#icon-plus"></use></svg>
+                Fortbildung anlegen
+              </button>
+            </div>
+          </div>
+
+          <div class="training-summary" id="trainingSummary"></div>
+
+          <section class="training-list" id="trainingList"></section>
+        </section>
+
+        <section class="view" id="meetingsView" data-view-panel="meetings">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Teamkommunikation</p>
+              <h1>Teamsitzungen</h1>
+              <p class="page-subtitle">
+                Sitzungen planen und die Teilnahme des aktiven Teams effizient dokumentieren.
+              </p>
+            </div>
+            <div class="header-actions">
+              <button class="button button-secondary" id="openMeetingStatsButton" type="button">
+                <svg><use href="#icon-chart"></use></svg>
+                Statistische Auswertung
+              </button>
+              <button class="button button-primary" type="button" data-open-meeting data-admin-only>
+                <svg><use href="#icon-plus"></use></svg>
+                Teamsitzung anlegen
+              </button>
+            </div>
+          </div>
+
+          <div class="training-summary" id="meetingSummary"></div>
+          <section class="meeting-list" id="meetingList"></section>
+        </section>
+
+        <section class="view" id="devicesView" data-view-panel="devices">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Medizinproduktesicherheit</p>
+              <h1>Geräteeinweisungen</h1>
+              <p class="page-subtitle">
+                Einweisungsnachweise personenbezogen dokumentieren und auswerten.
+              </p>
+            </div>
+            <button class="button button-primary" type="button" data-open-device-instruction>
+              <svg><use href="#icon-check"></use></svg>
+              Einweisung dokumentieren
+            </button>
+          </div>
+
+          <div class="training-summary" id="deviceSummary"></div>
+
+          <section class="panel device-matrix-panel">
+            <div class="device-filter-bar">
+              <label class="search-field device-search-field" for="deviceSearch">
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="deviceSearch"
+                  type="search"
+                  aria-label="Geräte durchsuchen"
+                  placeholder="Gerätename oder Hersteller suchen …"
+                  autocomplete="off"
+                />
+              </label>
+              <label class="compact-field">
+                <span>Gerätebestand</span>
+                <select id="deviceInventoryFilter">
+                  <option value="current">Nur aktuelle Geräte</option>
+                  <option value="former">Nicht mehr im Bestand</option>
+                  <option value="all">Alle Geräte</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Anlage 1</span>
+                <select id="deviceAnnexFilter">
+                  <option value="all">Alle Geräte</option>
+                  <option value="yes">Nur Anlage 1</option>
+                  <option value="no">Ohne Anlage 1</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Gerätekategorie</span>
+                <select id="deviceCategoryFilter">
+                  <option value="all">Alle Kategorien</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Mitarbeiterstatus</span>
+                <select id="deviceEmployeeStatusFilter">
+                  <option value="employed">Aktiv &amp; in Einarbeitung</option>
+                  <option value="active">Aktiv</option>
+                  <option value="onboarding">In Einarbeitung</option>
+                  <option value="inactive">Inaktiv</option>
+                  <option value="all">Alle Status</option>
+                </select>
+              </label>
+              <label class="compact-field device-employee-search-field">
+                <span>Mitarbeiter suchen</span>
+                <input id="deviceEmployeeSearch" type="search" placeholder="Name eingeben" />
+              </label>
+            </div>
+            <div id="deviceInstructionMatrix"></div>
+          </section>
+
+          <section class="device-instruction-log-section">
+            <div class="section-heading device-instruction-log-heading">
+              <div>
+                <p class="eyebrow">Dokumentation</p>
+                <h2>Erfasste Einweisungen</h2>
+              </div>
+              <span>Neueste zuerst</span>
+            </div>
+            <div id="deviceInstructionList"></div>
+          </section>
+        </section>
+
+        <section
+          class="view"
+          id="deviceManagementView"
+          data-view-panel="device-management"
+          data-admin-only
+        >
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Medizinproduktesicherheit</p>
+              <h1>Geräteverwaltung</h1>
+              <p class="page-subtitle">
+                Gerätebestand, Kategorien und Anlage-1-Kennzeichnung verwalten.
+              </p>
+            </div>
+            <button class="button button-primary" type="button" data-open-device>
+              <svg><use href="#icon-plus"></use></svg>
+              Gerät anlegen
+            </button>
+          </div>
+
+          <div class="training-summary" id="deviceManagementSummary"></div>
+
+          <section class="panel device-management-filter-panel">
+            <div class="device-filter-bar">
+              <label class="compact-field">
+                <span>Gerätebestand</span>
+                <select id="deviceManagementInventoryFilter">
+                  <option value="current">Nur aktuelle Geräte</option>
+                  <option value="former">Nicht mehr im Bestand</option>
+                  <option value="all">Alle Geräte</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Anlage 1</span>
+                <select id="deviceManagementAnnexFilter">
+                  <option value="all">Alle Geräte</option>
+                  <option value="yes">Nur Anlage 1</option>
+                  <option value="no">Ohne Anlage 1</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Gerätekategorie</span>
+                <select id="deviceManagementCategoryFilter">
+                  <option value="all">Alle Kategorien</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="device-catalog-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Gerätekatalog</p>
+                <h2>Angelegte Geräte</h2>
+              </div>
+            </div>
+            <div class="training-list" id="deviceCatalog"></div>
+          </section>
+        </section>
+
+        <section class="view" id="settingsView" data-view-panel="settings">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Anwendung</p>
+              <h1>Einstellungen</h1>
+              <p class="page-subtitle">
+                Darstellung, Datenspeicherung und zentrale Verwaltungsfunktionen.
+              </p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <section class="panel settings-card">
+              <div class="settings-card-heading">
+                <span class="settings-card-icon">
+                  <svg><use href="#icon-palette"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Darstellung</p>
+                  <h2>Farbthema</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Das gewählte Erscheinungsbild wird für diesen Datenbestand gespeichert.
+              </p>
+              <label class="settings-field">
+                <span>Aktives Farbthema</span>
+                <select data-theme-select aria-label="Farbthema auswählen">
+                  <option value="standard">Standard</option>
+                  <option value="dark">Dark Mode</option>
+                  <option value="cellitinnen">Cellitinnen</option>
+                </select>
+              </label>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-storage">
+                  <svg><use href="#icon-lock"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Speicherort</p>
+                  <h2>Datenbank-Backend</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                TeO kann lokal mit localForage oder gemeinsam über den geschützten
+                MariaDB-API-Dienst betrieben werden.
+              </p>
+              <label class="settings-field">
+                <span>Aktiver Datenspeicher</span>
+                <select id="settingsStorageBackend">
+                  <option value="local">Lokaler Browser – localForage / IndexedDB</option>
+                  <option value="mariadb">MariaDB – zentraler TeO-Server</option>
+                </select>
+              </label>
+              <div class="backend-settings-fields" id="mariaDbSettingsFields" hidden>
+                <label class="settings-field">
+                  <span>Adresse des TeO-Servers</span>
+                  <input
+                    id="settingsMariaDbApiUrl"
+                    type="url"
+                    inputmode="url"
+                    placeholder="http://server-name:3000"
+                    autocomplete="url"
+                  />
+                </label>
+                <label class="settings-field">
+                  <span>Aktuelles Administratorpasswort</span>
+                  <input
+                    id="settingsMariaDbPassword"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Nur zum Verbinden erforderlich"
+                  />
+                </label>
+              </div>
+              <p class="settings-backend-hint" id="settingsBackendHint"></p>
+              <span class="settings-status" id="settingsBackendStatus">
+                <i></i>
+                Lokal verbunden
+              </span>
+              <div class="settings-actions backend-settings-actions">
+                <button
+                  class="button button-secondary"
+                  id="testBackendConnectionButton"
+                  type="button"
+                >
+                  <svg><use href="#icon-check"></use></svg>
+                  Verbindung testen
+                </button>
+                <button
+                  class="button button-primary"
+                  id="applyStorageBackendButton"
+                  type="button"
+                >
+                  Backend aktivieren
+                </button>
+              </div>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-admin">
+                  <svg><use href="#icon-edit"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Administration</p>
+                  <h2>Stammdaten &amp; Zugriffe</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Benutzerkonten, Kataloge und die Qualität des Datenbestands zentral verwalten.
+              </p>
+              <div class="settings-actions">
+                <button class="button button-secondary" type="button" data-open-user-management>
+                  <svg><use href="#icon-users"></use></svg>
+                  Benutzer verwalten
+                </button>
+                <button
+                  class="button button-secondary"
+                  type="button"
+                  data-open-catalog-management
+                >
+                  <svg><use href="#icon-edit"></use></svg>
+                  Berufe &amp; Qualifikationen
+                </button>
+                <button class="button button-secondary" type="button" data-open-data-quality>
+                  <svg><use href="#icon-alert"></use></svg>
+                  Datenqualität prüfen
+                </button>
+              </div>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-reminder">
+                  <svg><use href="#icon-alert"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Sicherheit</p>
+                  <h2>Sicherungserinnerung</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                TeO warnt, sobald die letzte Datensicherung länger als der gewählte
+                Zeitraum zurückliegt.
+              </p>
+              <div class="settings-inline-form">
+                <label class="settings-field">
+                  <span>Erinnerung nach</span>
+                  <span class="input-suffix">
+                    <input
+                      id="settingsBackupReminderDays"
+                      type="number"
+                      min="1"
+                      max="365"
+                      step="1"
+                    />
+                    <span>Tagen</span>
+                  </span>
+                </label>
+                <button
+                  class="button button-primary"
+                  id="saveGeneralSettingsButton"
+                  type="button"
+                >
+                  Speichern
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <section
+            class="panel backup-panel settings-backup-panel"
+            aria-labelledby="backupTitle"
+            data-admin-only
+          >
+            <div class="backup-content">
+              <span class="backup-icon" aria-hidden="true">
+                <svg><use href="#icon-lock"></use></svg>
+              </span>
+              <div>
+                <p class="eyebrow">Datensicherung</p>
+                <h2 id="backupTitle">Gesamten Datenbestand sichern</h2>
+                <p class="backup-description">
+                  Exportiert oder ersetzt Mitarbeiter, Termine, Fortbildungen,
+                  Nachweise, Teamsitzungen, Geräteeinweisungen und die
+                  Abwesenheitsplanung gemeinsam.
+                </p>
+                <p class="backup-status" id="backupStatus"></p>
+                <div class="browser-storage-info">
+                  <p class="browser-storage-status" id="browserStorageStatus">
+                    Browserspeicher wird ermittelt …
+                  </p>
+                  <button
+                    class="button button-ghost button-compact"
+                    id="requestPersistentStorageButton"
+                    type="button"
+                  >
+                    <svg><use href="#icon-lock"></use></svg>
+                    Dauerhaften Speicher aktivieren
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="backup-actions">
+              <button class="button button-ghost" id="openAuditLogButton" type="button">
+                <svg><use href="#icon-more"></use></svg>
+                Änderungsprotokoll
+              </button>
+              <button class="button button-secondary" id="validateBackupButton" type="button">
+                <svg><use href="#icon-check"></use></svg>
+                Sicherung prüfen
+              </button>
+              <button class="button button-secondary" id="importDataButton" type="button">
+                <svg><use href="#icon-upload"></use></svg>
+                Sicherung importieren
+              </button>
+              <button class="button button-primary" id="exportDataButton" type="button">
+                <svg><use href="#icon-download"></use></svg>
+                Sicherung exportieren
+              </button>
+              <button class="button button-secondary" id="exportEncryptedDataButton" type="button">
+                <svg><use href="#icon-lock"></use></svg>
+                Verschlüsselt exportieren
+              </button>
+              <input
+                class="sr-only"
+                id="importDataFile"
+                type="file"
+                accept="application/json,.json"
+                aria-label="JSON-Sicherungsdatei auswählen"
+              />
+              <input
+                class="sr-only"
+                id="validateBackupFile"
+                type="file"
+                accept="application/json,.json"
+                aria-label="JSON-Sicherungsdatei zur Prüfung auswählen"
+              />
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="Mobile Hauptnavigation">
+      <button class="is-active" type="button" data-view="dashboard">
+        <svg><use href="#icon-dashboard"></use></svg>
+        <span>Übersicht</span>
+      </button>
+      <button type="button" data-view="employees">
+        <svg><use href="#icon-users"></use></svg>
+        <span>Mitarbeiter</span>
+      </button>
+      <button type="button" data-view="weekends">
+        <svg><use href="#icon-calendar"></use></svg>
+        <span>Wochenenden</span>
+      </button>
+      <button type="button" data-view="vacations">
+        <svg><use href="#icon-calendar"></use></svg>
+        <span>Urlaub</span>
+      </button>
+      <button type="button" data-view="appointments">
+        <svg><use href="#icon-calendar"></use></svg>
+        <span>Termine</span>
+      </button>
+      <button type="button" data-view="trainings">
+        <svg><use href="#icon-training"></use></svg>
+        <span>Fortbildungen</span>
+      </button>
+      <button type="button" data-view="meetings">
+        <svg><use href="#icon-meeting"></use></svg>
+        <span>Sitzungen</span>
+      </button>
+      <button type="button" data-view="devices">
+        <svg><use href="#icon-empty"></use></svg>
+        <span>Einweisungen</span>
+      </button>
+      <button type="button" data-view="device-management" data-admin-only>
+        <svg><use href="#icon-edit"></use></svg>
+        <span>Geräte</span>
+      </button>
+      <button type="button" data-view="settings">
+        <svg><use href="#icon-settings"></use></svg>
+        <span>Einstellungen</span>
+      </button>
+    </nav>
+
+    <dialog
+      class="modal auth-dialog"
+      id="loginDialog"
+      aria-labelledby="loginDialogTitle"
+      data-persistent-dialog
+    >
+      <form id="loginForm">
+        <div class="modal-header auth-dialog-header">
+          <span class="brand-mark">
+            <svg><use href="#icon-logo"></use></svg>
+          </span>
+          <div>
+            <p class="eyebrow">TeO – Team &amp; Employee Organizer</p>
+            <h2 id="loginDialogTitle">Anmelden</h2>
+            <p class="modal-subtitle">Bitte mit Ihrem persönlichen Benutzerkonto anmelden.</p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Benutzername</span>
+              <input
+                id="loginUsername"
+                name="username"
+                type="text"
+                autocomplete="username"
+                autocapitalize="none"
+                required
+              />
+            </label>
+            <label class="form-field">
+              <span>Passwort</span>
+              <input
+                id="loginPassword"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+            </label>
+          </div>
+          <p class="form-error auth-error" id="loginError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-primary" type="submit">Anmelden</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
+      id="changePasswordDialog"
+      aria-labelledby="changePasswordDialogTitle"
+      data-persistent-dialog
+    >
+      <form id="changePasswordForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Sicherheitsanforderung</p>
+            <h2 id="changePasswordDialogTitle">Neues Passwort festlegen</h2>
+            <p class="modal-subtitle">
+              Das temporäre Passwort muss vor der weiteren Nutzung ersetzt werden.
+            </p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Neues Passwort</span>
+              <input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+              <small class="field-hint">
+                Mindestens 8 Zeichen mit Groß- und Kleinbuchstaben sowie einer Zahl.
+              </small>
+            </label>
+            <label class="form-field">
+              <span>Passwort wiederholen</span>
+              <input
+                id="confirmNewPassword"
+                name="confirmNewPassword"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+            </label>
+          </div>
+          <p class="form-error auth-error" id="changePasswordError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-logout>Abmelden</button>
+          <button class="button button-primary" type="submit">Passwort speichern</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="accountDialog" aria-labelledby="accountDialogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Benutzerkonto</p>
+          <h2 id="accountDialogTitle">Angemeldet</h2>
+          <p class="modal-subtitle" id="accountDialogRole"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button
+          class="button button-secondary"
+          type="button"
+          data-open-user-management
+          data-admin-only
+        >
+          Benutzer verwalten
+        </button>
+        <button class="button button-danger" type="button" data-logout>Abmelden</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="catalogManagementDialog"
+      aria-labelledby="catalogManagementDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Stammdaten-Kataloge</p>
+          <h2 id="catalogManagementDialogTitle">Berufe &amp; Zusatzqualifikationen</h2>
+          <p class="modal-subtitle">
+            Einträge ergänzen, umbenennen oder unbenutzte Einträge löschen.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="catalog-management-grid">
+          <section class="catalog-section" aria-labelledby="professionCatalogTitle">
+            <div>
+              <p class="eyebrow">Berufskatalog</p>
+              <h3 id="professionCatalogTitle">Berufe</h3>
+            </div>
+            <div class="catalog-add-row">
+              <input
+                id="newProfession"
+                type="text"
+                maxlength="100"
+                placeholder="Neuen Beruf eingeben"
+                aria-label="Neuen Beruf eingeben"
+              />
+              <button class="button button-primary" id="addProfessionButton" type="button">
+                Hinzufügen
+              </button>
+            </div>
+            <div class="catalog-list" id="professionCatalogList"></div>
+          </section>
+
+          <section class="catalog-section" aria-labelledby="qualificationCatalogTitle">
+            <div>
+              <p class="eyebrow">Qualifikationskatalog</p>
+              <h3 id="qualificationCatalogTitle">Zusatzqualifikationen</h3>
+            </div>
+            <div class="catalog-add-row">
+              <input
+                id="newQualification"
+                type="text"
+                maxlength="100"
+                placeholder="Neue Qualifikation eingeben"
+                aria-label="Neue Zusatzqualifikation eingeben"
+              />
+              <button class="button button-primary" id="addQualificationButton" type="button">
+                Hinzufügen
+              </button>
+            </div>
+            <div class="catalog-list" id="qualificationCatalogList"></div>
+          </section>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large dossier-dialog"
+      id="employeeDossierDialog"
+      aria-labelledby="employeeDossierTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Mitarbeiterakte</p>
+          <h2 id="employeeDossierTitle">Mitarbeiterübersicht</h2>
+          <p class="modal-subtitle" id="employeeDossierSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="employeeDossierContent"></div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="printEmployeeDossierButton" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Akte drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large vacation-overview-dialog"
+      id="vacationEmployeeOverviewDialog"
+      aria-labelledby="vacationEmployeeOverviewTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Jahresabwesenheiten</p>
+          <h2 id="vacationEmployeeOverviewTitle">Geplante Abwesenheiten</h2>
+          <p class="modal-subtitle" id="vacationEmployeeOverviewSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="vacationEmployeeOverviewContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="weekendOverviewDialog"
+      aria-labelledby="weekendOverviewTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Personalverteilung</p>
+          <h2 id="weekendOverviewTitle">Feste Dienstwochenenden</h2>
+          <p class="modal-subtitle">
+            Stellenanteile, Einarbeitung, Fachweiterbildung I/A und Praxisanleitung
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="weekendOverviewContent"></div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="printWeekendOverviewButton" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Liste drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal modal-large" id="bulkEditDialog" aria-labelledby="bulkEditTitle">
+      <form id="bulkEditForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Sammelbearbeitung</p>
+            <h2 id="bulkEditTitle">Ausgewählte Mitarbeiter bearbeiten</h2>
+            <p class="modal-subtitle" id="bulkEditSubtitle"></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="field-hint">Leere Felder bleiben unverändert.</p>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Mitarbeiterstatus</span>
+              <select id="bulkActive">
+                <option value="">Nicht ändern</option>
+                <option value="active">Aktiv</option>
+                <option value="onboarding">In Einarbeitung</option>
+                <option value="inactive">Inaktiv</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Beruf</span>
+              <select id="bulkProfession"></select>
+            </label>
+            <label class="form-field">
+              <span>Dienstwochenende</span>
+              <select id="bulkServiceWeekend">
+                <option value="">Nicht ändern</option>
+                <option value="none">Kein festes Dienstwochenende</option>
+                <option value="oli">Oli</option>
+                <option value="claudio">Claudio</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Zusatzqualifikation</span>
+              <select id="bulkQualification"></select>
+            </label>
+            <label class="form-field">
+              <span>Qualifikation setzen</span>
+              <select id="bulkQualificationState">
+                <option value="">Nicht ändern</option>
+                <option value="add">Zuweisen</option>
+                <option value="remove">Entfernen</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">Änderungen anwenden</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal modal-large" id="dataQualityDialog" aria-labelledby="dataQualityTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Plausibilitätsprüfung</p>
+          <h2 id="dataQualityTitle">Datenqualität</h2>
+          <p class="modal-subtitle">Mögliche Dubletten und unvollständige Kontaktdaten</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="dataQualityContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal modal-large" id="auditLogDialog" aria-labelledby="auditLogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Nachvollziehbarkeit</p>
+          <h2 id="auditLogTitle">Änderungsprotokoll</h2>
+          <p class="modal-subtitle">Lokales Arbeitsprotokoll der letzten 1.000 Änderungen</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="auditLogContent"></div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="exportAuditLogCsvButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          CSV exportieren
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="userManagementDialog"
+      aria-labelledby="userManagementDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Administration</p>
+          <h2 id="userManagementDialogTitle">Benutzer verwalten</h2>
+          <p class="modal-subtitle">Passwörter normaler Benutzer zurücksetzen.</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="user-management-list" id="userManagementList"></div>
+        <section class="temporary-password" id="temporaryPasswordResult" hidden>
+          <p class="eyebrow">Temporäres Passwort – nur einmal sichtbar</p>
+          <strong id="temporaryPasswordUsername"></strong>
+          <div>
+            <input id="temporaryPasswordValue" type="text" readonly />
+            <button class="button button-secondary" id="copyTemporaryPassword" type="button">
+              <svg><use href="#icon-copy"></use></svg>
+              Kopieren
+            </button>
+          </div>
+          <p>Beim nächsten Login muss der Benutzer ein neues Passwort festlegen.</p>
+        </section>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="employeeDialog"
+      aria-labelledby="employeeDialogTitle"
+    >
+      <form id="employeeForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Personalakte</p>
+            <h2 id="employeeDialogTitle">Mitarbeiter anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <input id="employeeId" type="hidden" />
+
+          <fieldset>
+            <legend>Persönliche Daten</legend>
+            <div class="form-grid">
+              <label class="form-field">
+                <span>Vorname <em>*</em></span>
+                <input id="firstName" name="firstName" type="text" maxlength="80" required />
+              </label>
+              <label class="form-field">
+                <span>Nachname <em>*</em></span>
+                <input id="lastName" name="lastName" type="text" maxlength="80" required />
+              </label>
+              <label class="form-field">
+                <span>Geburtsdatum</span>
+                <input id="birthDate" name="birthDate" type="date" />
+              </label>
+              <label class="form-field">
+                <span>Handynummer</span>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  maxlength="40"
+                  autocomplete="tel"
+                  placeholder="+49 …"
+                />
+              </label>
+              <label class="form-field form-field-wide">
+                <span>E-Mail-Adresse</span>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  maxlength="160"
+                  autocomplete="email"
+                  placeholder="name@klinik.de"
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Beschäftigung</legend>
+            <div class="form-grid">
+              <label class="form-field">
+                <span>Beruf <em>*</em></span>
+                <input
+                  id="profession"
+                  name="profession"
+                  type="text"
+                  list="professionOptions"
+                  maxlength="100"
+                  required
+                  placeholder="z. B. Pflegefachkraft"
+                />
+                <datalist id="professionOptions"></datalist>
+              </label>
+              <label class="form-field">
+                <span>Stellenumfang <em>*</em></span>
+                <span class="input-suffix">
+                  <input
+                    id="employmentPercent"
+                    name="employmentPercent"
+                    type="number"
+                    min="1"
+                    max="100"
+                    step="1"
+                    value="100"
+                    required
+                  />
+                  <span>%</span>
+                </span>
+              </label>
+              <label class="form-field form-field-wide">
+                <span>Festes Dienstwochenende</span>
+                <select id="serviceWeekend" name="serviceWeekend">
+                  <option value="none">Kein festes Dienstwochenende</option>
+                  <option value="oli">Oli</option>
+                  <option value="claudio">Claudio</option>
+                </select>
+              </label>
+            </div>
+            <label class="form-field employee-status-field">
+              <span>Mitarbeiterstatus</span>
+              <select id="employeeStatus" name="employmentStatus">
+                <option value="active">Aktiv</option>
+                <option value="onboarding">In Einarbeitung</option>
+                <option value="inactive">Inaktiv</option>
+              </select>
+              <small>
+                Aktive Mitarbeiter und Mitarbeiter in Einarbeitung stehen für
+                Fortbildungen und Teamsitzungen zur Verfügung.
+              </small>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Zusatzqualifikationen</legend>
+            <p class="field-hint">Alle zutreffenden Qualifikationen auswählen.</p>
+            <div class="qualification-grid" id="qualificationFields"></div>
+          </fieldset>
+        </div>
+
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="employeeSubmitLabel">Mitarbeiter speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="trainingDialog" aria-labelledby="trainingDialogTitle">
+      <form id="trainingForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Fortbildungskatalog</p>
+            <h2 id="trainingDialogTitle">Pflichtfortbildung anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="trainingId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field form-field-wide">
+              <span>Bezeichnung <em>*</em></span>
+              <input
+                id="trainingTitle"
+                name="title"
+                type="text"
+                maxlength="120"
+                required
+                placeholder="z. B. Brandschutzunterweisung"
+              />
+            </label>
+            <label class="form-field">
+              <span>Fortbildungsjahr <em>*</em></span>
+              <input
+                id="trainingYear"
+                name="year"
+                type="number"
+                min="2000"
+                max="2100"
+                step="1"
+                required
+              />
+              <small class="field-hint">Bestimmt die Jahresgruppe in der Übersicht.</small>
+            </label>
+            <label class="form-field">
+              <span>Wiederholung</span>
+              <select id="trainingRecurrence" name="recurrenceMonths">
+                <option value="">Einmalig / ohne Ablauf</option>
+                <option value="6">Alle 6 Monate</option>
+                <option value="12">Jährlich</option>
+                <option value="24">Alle 2 Jahre</option>
+                <option value="36">Alle 3 Jahre</option>
+                <option value="60">Alle 5 Jahre</option>
+              </select>
+              <small class="field-hint">
+                Standard: jährlich; Gewaltprävention wird mit fünf Jahren vorbelegt.
+              </small>
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Beschreibung</span>
+              <textarea
+                id="trainingDescription"
+                name="description"
+                rows="4"
+                maxlength="500"
+                placeholder="Optionale Hinweise oder Inhalte der Fortbildung"
+              ></textarea>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="trainingSubmitLabel">Fortbildung speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="completionDialog"
+      aria-labelledby="completionDialogTitle"
+    >
+      <form id="completionForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Teilnahmenachweis</p>
+            <h2 id="completionDialogTitle">Abschluss eintragen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Pflichtfortbildung <em>*</em></span>
+              <select id="completionTraining" name="trainingId" required></select>
+            </label>
+            <label class="form-field">
+              <span>Abschlussdatum <em>*</em></span>
+              <input id="completionDate" name="completedOn" type="date" required />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Bemerkung</span>
+              <input
+                id="completionNote"
+                name="note"
+                type="text"
+                maxlength="200"
+                placeholder="Optional, z. B. Schulungsanbieter"
+              />
+            </label>
+          </div>
+
+          <div
+            class="selection-group"
+            role="group"
+            aria-labelledby="completionEmployeesLabel"
+            aria-describedby="completionEmployeeHelp completionEmployeeError"
+            aria-required="true"
+          >
+            <div class="selection-heading">
+              <div>
+                <strong id="completionEmployeesLabel">Aktive Mitarbeiter auswählen <em>*</em></strong>
+                <p id="completionEmployeeHelp">
+                  Ein Nachweis kann für mehrere Personen gleichzeitig erfasst werden.
+                </p>
+              </div>
+              <button class="text-button" id="toggleAllEmployees" type="button">
+                Alle auswählen
+              </button>
+            </div>
+            <label class="search-field search-field-modal" for="completionEmployeeSearch">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="completionEmployeeSearch"
+                type="search"
+                aria-label="Aktive Mitarbeiter durchsuchen"
+                placeholder="Mitarbeiter suchen …"
+                autocomplete="off"
+              />
+            </label>
+            <div class="employee-selection" id="completionEmployeeList"></div>
+            <p class="form-error" id="completionEmployeeError" role="alert"></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <span class="selection-count" id="completionSelectionCount">0 ausgewählt</span>
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            Abschluss speichern
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal training-matrix-dialog"
+      id="trainingMatrixDialog"
+      aria-labelledby="trainingMatrixDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Jahresauswertung</p>
+          <h2 id="trainingMatrixDialogTitle">Status der Pflichtfortbildungen</h2>
+          <p class="modal-subtitle">Alle aktiven Mitarbeiter und Fortbildungen im Überblick</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body training-matrix-body">
+        <div class="training-matrix-toolbar">
+          <label class="compact-field">
+            <span>Fortbildungsjahr</span>
+            <select id="trainingMatrixYear"></select>
+          </label>
+          <div class="training-matrix-summary" id="trainingMatrixSummary"></div>
+        </div>
+        <div id="trainingMatrixContent"></div>
+      </div>
+      <div class="modal-footer">
+        <span class="training-matrix-legend">
+          <span class="matrix-status matrix-complete" aria-hidden="true">✓</span> absolviert
+          <span class="matrix-status matrix-open" aria-hidden="true">×</span> offen
+        </span>
+        <button class="button button-secondary" id="exportTrainingMatrixCsvButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          CSV für Excel
+        </button>
+        <button class="button button-secondary" id="printTrainingMatrixButton" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Auswertung drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="appointmentDialog" aria-labelledby="appointmentDialogTitle">
+      <form id="appointmentForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Terminkalender</p>
+            <h2 id="appointmentDialogTitle">Termin anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="appointmentId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field form-field-wide">
+              <span>Titel / Name <em>*</em></span>
+              <input
+                id="appointmentTitle"
+                name="title"
+                type="text"
+                maxlength="120"
+                required
+              />
+            </label>
+            <label class="form-field">
+              <span>Datum <em>*</em></span>
+              <input id="appointmentDate" name="date" type="date" required />
+            </label>
+            <label class="form-field">
+              <span>Ort</span>
+              <input id="appointmentLocation" name="location" type="text" maxlength="160" />
+            </label>
+            <label class="form-field">
+              <span>Uhrzeit von</span>
+              <input id="appointmentStartTime" name="startTime" type="time" step="60" />
+            </label>
+            <label class="form-field">
+              <span>Uhrzeit bis</span>
+              <input id="appointmentEndTime" name="endTime" type="time" step="60" />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Beschreibung</span>
+              <textarea
+                id="appointmentDescription"
+                name="description"
+                rows="5"
+                maxlength="1000"
+                placeholder="Optionale Hinweise zum Termin"
+              ></textarea>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="appointmentSubmitLabel">Termin speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="meetingDialog" aria-labelledby="meetingDialogTitle">
+      <form id="meetingForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Teamkommunikation</p>
+            <h2 id="meetingDialogTitle">Teamsitzung anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="meetingId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field form-field-wide">
+              <span>Bezeichnung <em>*</em></span>
+              <input
+                id="meetingTitle"
+                name="title"
+                type="text"
+                maxlength="120"
+                value="Teamsitzung"
+                required
+              />
+            </label>
+            <label class="form-field">
+              <span>Datum <em>*</em></span>
+              <input id="meetingDate" name="date" type="date" required />
+            </label>
+            <label class="form-field">
+              <span>Uhrzeit</span>
+              <input id="meetingTime" name="time" type="time" step="60" />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Bemerkung</span>
+              <textarea
+                id="meetingNotes"
+                name="notes"
+                rows="4"
+                maxlength="500"
+                placeholder="Optionale Hinweise oder Themen der Sitzung"
+              ></textarea>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="meetingSubmitLabel">Teamsitzung speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal modal-attendance"
+      id="attendanceDialog"
+      aria-labelledby="attendanceDialogTitle"
+    >
+      <form id="attendanceForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Sammelerfassung</p>
+            <h2 id="attendanceDialogTitle">Teilnahmen dokumentieren</h2>
+            <p class="modal-subtitle" id="attendanceMeetingMeta"></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body attendance-modal-body">
+          <input id="attendanceMeetingId" type="hidden" />
+
+          <div class="efficiency-hint">
+            <span class="efficiency-hint-icon">
+              <svg><use href="#icon-check"></use></svg>
+            </span>
+            <p>
+              <strong>Schneller erfassen:</strong> Zuerst alle sichtbaren Mitarbeiter gesammelt
+              auf „Teilgenommen“ setzen, danach nur Urlaub, Dienst oder andere Ausnahmen ändern.
+            </p>
+          </div>
+
+          <div class="attendance-tools">
+            <label class="search-field" for="attendanceSearch">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="attendanceSearch"
+                type="search"
+                aria-label="Mitarbeiter in der Teilnahmeliste suchen"
+                placeholder="Mitarbeiter suchen …"
+                autocomplete="off"
+              />
+            </label>
+            <label class="compact-field">
+              <span>Anzeige</span>
+              <select id="attendanceFilter">
+                <option value="all">Alle Mitarbeiter</option>
+                <option value="open">Nur noch offen</option>
+                <option value="documented">Nur dokumentiert</option>
+                <option value="absent">Nur nicht teilgenommen</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="bulk-attendance-bar">
+            <div>
+              <strong>Sammelstatus für sichtbare Mitarbeiter</strong>
+              <small>Die Auswahl kann anschließend pro Person angepasst werden.</small>
+            </div>
+            <select id="attendanceBulkStatus" aria-label="Status für sichtbare Mitarbeiter">
+              <option value="teilgenommen">Teilgenommen</option>
+              <option value="urlaub">Urlaub</option>
+              <option value="dienst">Dienst</option>
+              <option value="krankheit">Krankheit</option>
+              <option value="schule">Schule</option>
+              <option value="entschuldigt">Entschuldigt</option>
+              <option value="unentschuldigt">Unentschuldigt</option>
+              <option value="">Status entfernen</option>
+            </select>
+            <button class="button button-secondary" id="applyBulkAttendance" type="button">
+              Auf sichtbare anwenden
+            </button>
+          </div>
+
+          <div class="attendance-list-heading" aria-hidden="true">
+            <span>Mitarbeiter</span>
+            <span>Teilnahmestatus</span>
+          </div>
+          <div class="attendance-list" id="attendanceList"></div>
+        </div>
+        <div class="modal-footer">
+          <span class="selection-count" id="attendanceProgress">0 von 0 dokumentiert</span>
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            Erfassung speichern
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="deviceDialog" aria-labelledby="deviceDialogTitle">
+      <form id="deviceForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Gerätekatalog</p>
+            <h2 id="deviceDialogTitle">Gerät anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="deviceId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Produktname <em>*</em></span>
+              <input id="deviceProductName" type="text" maxlength="120" required />
+            </label>
+            <label class="form-field">
+              <span>Hersteller <em>*</em></span>
+              <input id="deviceManufacturer" type="text" maxlength="120" required />
+            </label>
+            <label class="form-field">
+              <span>Gerätekategorie <em>*</em></span>
+              <input
+                id="deviceCategory"
+                type="text"
+                maxlength="100"
+                list="deviceCategoryOptions"
+                required
+              />
+              <datalist id="deviceCategoryOptions"></datalist>
+            </label>
+            <label class="form-field">
+              <span>Medizinprodukt der Anlage 1 <em>*</em></span>
+              <select id="deviceAnnex1" required>
+                <option value="no">Nein</option>
+                <option value="yes">Ja</option>
+              </select>
+            </label>
+            <label class="check-card form-field-wide device-inventory-toggle">
+              <input id="deviceCurrentInventory" type="checkbox" checked />
+              <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
+              <span>Gerät befindet sich aktuell im Gerätebestand</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="deviceSubmitLabel">Gerät speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="deviceInstructionDialog"
+      aria-labelledby="deviceInstructionDialogTitle"
+    >
+      <form id="deviceInstructionForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Einweisungsnachweis</p>
+            <h2 id="deviceInstructionDialogTitle">Einweisung dokumentieren</h2>
+            <p class="modal-subtitle">Mehrere Teilnehmer können gemeinsam erfasst werden.</p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="deviceInstructionId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Gerät <em>*</em></span>
+              <select id="deviceInstructionDevice" required></select>
+            </label>
+            <label class="form-field">
+              <span>Einweisungsdatum <em>*</em></span>
+              <input id="deviceInstructionDate" type="date" required />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Art des Einweisenden <em>*</em></span>
+              <select id="deviceInstructorType" required>
+                <option value="manufacturer">Von der Herstellerfirma beauftragte Person</option>
+                <option value="employee">Medizinproduktebeauftragte/r Mitarbeiter/in</option>
+              </select>
+            </label>
+            <label class="form-field form-field-wide" id="externalInstructorField">
+              <span>Name des Einweisenden <em>*</em></span>
+              <input id="externalInstructorName" type="text" maxlength="120" />
+            </label>
+            <div class="form-field form-field-wide" id="employeeInstructorFields" hidden>
+              <label class="form-field">
+                <span>Einweisende/r Mitarbeiter/in <em>*</em></span>
+                <select id="employeeInstructor"></select>
+              </label>
+              <label class="check-card device-instructor-confirmation">
+                <input id="employeeInstructorMpoConfirmation" type="checkbox" />
+                <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
+                <span>
+                  Diese Person war zum Einweisungszeitpunkt
+                  Medizinproduktebeauftragte/r.
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <section class="device-participant-section">
+            <div class="selection-toolbar">
+              <label class="search-field">
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="deviceParticipantSearch"
+                  type="search"
+                  placeholder="Mitarbeiter suchen"
+                  aria-label="Einweisungsteilnehmer suchen"
+                />
+              </label>
+              <button class="text-button" id="toggleAllDeviceParticipants" type="button">
+                Sichtbare auswählen
+              </button>
+            </div>
+            <div class="device-participant-heading" aria-hidden="true">
+              <span>Einweisungsteilnehmer</span>
+              <span>war Medizinproduktebeauftragte/r</span>
+            </div>
+            <div class="selection-list device-participant-list" id="deviceParticipantList"></div>
+            <p class="form-error" id="deviceParticipantError"></p>
+          </section>
+        </div>
+        <div class="modal-footer">
+          <span class="selection-count" id="deviceParticipantCount">0 ausgewählt</span>
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="deviceInstructionSubmitLabel">Einweisung speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="deviceInstructionHistoryDialog"
+      aria-labelledby="deviceInstructionHistoryTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Einweisungsverlauf</p>
+          <h2 id="deviceInstructionHistoryTitle">Geräteeinweisungen</h2>
+          <p class="modal-subtitle" id="deviceInstructionHistorySubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="deviceInstructionHistoryContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large meeting-stats-dialog"
+      id="meetingStatsDialog"
+      aria-labelledby="meetingStatsDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Jahresauswertung</p>
+          <h2 id="meetingStatsDialogTitle">Statistik der Teamsitzungen</h2>
+          <p class="modal-subtitle">Teilnahmen, Abwesenheiten und Dokumentationsstand</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body meeting-stats-body">
+        <label class="compact-field meeting-stats-year">
+          <span>Auswertungsjahr</span>
+          <select id="meetingStatsYear"></select>
+        </label>
+        <div id="meetingStatsContent"></div>
+      </div>
+      <div class="modal-footer">
+        <label class="compact-field meeting-threshold-field" data-admin-only>
+          <span>Mindestquote</span>
+          <select id="meetingAttendanceThreshold">
+            <option value="50">50 %</option>
+            <option value="60">60 %</option>
+            <option value="70">70 %</option>
+            <option value="75">75 %</option>
+            <option value="80">80 %</option>
+            <option value="90">90 %</option>
+          </select>
+        </label>
+        <button class="button button-secondary" id="exportMeetingStatsCsvButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          CSV exportieren
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-confirm"
+      id="confirmDialog"
+      aria-labelledby="confirmTitle"
+      aria-describedby="confirmMessage"
+    >
+      <div class="confirm-icon">
+        <svg><use href="#icon-alert"></use></svg>
+      </div>
+      <h2 id="confirmTitle">Eintrag löschen?</h2>
+      <p id="confirmMessage"></p>
+      <div class="modal-footer">
+        <button class="button button-ghost" id="confirmCancel" type="button">Abbrechen</button>
+        <button class="button button-danger" id="confirmAccept" type="button">Löschen</button>
+      </div>
+    </dialog>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+    <noscript>
+      <div class="noscript-message">
+        Für diese Anwendung muss JavaScript im Browser aktiviert sein.
+      </div>
+    </noscript>
+
+    <script src="vendor/localforage.min.js"></script>
+    <script src="backend-client.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
