@@ -555,6 +555,9 @@ Beim ersten Verbinden kann der lokale Datenbestand kontrolliert auf den Server
 übertragen werden. Anschließend:
 
 - werden Änderungen zentral gespeichert
+- werden Mitarbeiter, Fortbildungen, Sitzungen, Termine, Geräte und
+  Abwesenheiten in getrennten MariaDB-Tabellen geführt
+- werden beim Speichern nur tatsächlich veränderte Datensätze geschrieben
 - werden Änderungen anderer Arbeitsplätze regelmäßig geladen
 - verhindern Datenrevisionen unbemerkte Überschreibungen
 - werden offene Formulare bei externen Änderungen vorsorglich geschlossen
@@ -562,6 +565,18 @@ Beim ersten Verbinden kann der lokale Datenbestand kontrolliert auf den Server
 
 Für den Server wird Node.js 20 oder neuer benötigt. Details stehen in
 [`server/README.md`](server/README.md).
+
+Bestehende MariaDB-Installationen mit dem früheren JSON-Gesamtbestand werden
+beim ersten Start automatisch und transaktional in das relationale
+Datenbankschema migriert. Sicherungsdateien bleiben unverändert kompatibel.
+
+Ab Datenbankschema 6 werden Qualifikationen, Einweisungsteilnehmer und
+erwartete Teamsitzungsteilnehmer zusätzlich in normalisierten
+Beziehungstabellen geführt. Fremdschlüssel verhindern verwaiste
+Fortbildungsnachweise, Teilnahmen, Abwesenheiten und Geräteeinweisungen. Der
+Verlauf von Qualifikations- und Rollenzuordnungen wird ab dem
+Migrationszeitpunkt protokolliert. Das JSON-Sicherungsformat bleibt dabei
+unverändert kompatibel.
 
 ## Einstellungen und Administration
 

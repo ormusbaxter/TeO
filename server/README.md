@@ -4,6 +4,57 @@ Der Browser verbindet sich nicht direkt mit MariaDB. Dieser Node.js-Dienst stell
 authentifizierte HTTP-API bereit, speichert den TeO-Datenbestand in MariaDB und liefert
 gleichzeitig die statischen App-Dateien aus.
 
+## Datenbankmodell
+
+Seit Datenbankschema 4 wird der fachliche Datenbestand relational nach
+Fachbereichen getrennt gespeichert. Jeder fachliche Datensatz besitzt eine
+eigene Tabellenzeile. Häufig benötigte Felder liegen zusätzlich als
+indexierbare Spalten vor; das vollständige Objekt bleibt als JSON-Payload
+erhalten, damit Sicherungsformat und Browser-API kompatibel bleiben.
+
+Wichtige Tabellen:
+
+| Tabelle | Inhalt |
+| --- | --- |
+| `teo_meta` | Revision, Datenformat, Einstellungen und Kataloge |
+| `teo_employees` | Mitarbeiter |
+| `teo_trainings`, `teo_completions` | Fortbildungskatalog und Nachweise |
+| `teo_meetings`, `teo_meeting_attendances` | Teamsitzungen und Teilnahmen |
+| `teo_appointments` | Termine |
+| `teo_devices`, `teo_device_instructions` | Geräte und Einweisungen |
+| `teo_vacation_entitlements`, `teo_vacation_days` | Urlaubsansprüche und Abwesenheiten |
+| `teo_users` | Benutzerkonten und geschützte Passwortdaten |
+| `teo_client_audit_entries` | fachliches Änderungsprotokoll |
+| `teo_sessions`, `teo_audit_log` | Serversitzungen und Serverprotokoll |
+
+Beim Speichern vergleicht der Server die einzelnen Datensätze und schreibt nur
+neue, geänderte oder gelöschte Zeilen. Die globale Revision schützt weiterhin
+vor unbemerkten konkurrierenden Änderungen.
+
+### Normalisierte Beziehungen und Fremdschlüssel
+
+Seit Datenbankschema 6 werden zusätzlich folgende Strukturen geführt:
+
+| Tabelle | Inhalt |
+| --- | --- |
+| `teo_qualification_catalog` | Qualifikationskatalog |
+| `teo_employee_qualifications` | aktuelle Qualifikationszuordnungen |
+| `teo_employee_qualification_history` | zeitlicher Verlauf von Qualifikations- und Rollenzuordnungen |
+| `teo_device_instruction_participants` | Einweisungsteilnehmer |
+| `teo_meeting_expected_employees` | erwartete Teilnehmer einer Teamsitzung |
+
+Fremdschlüssel sichern die Beziehungen zwischen Mitarbeitern, Fortbildungen,
+Teamsitzungen, Abwesenheiten, Geräten, Einweisungsteilnehmern und
+Benutzerkonten ab. Abhängige Fachdaten werden entsprechend der bestehenden
+Löschlogik kaskadiert entfernt. Optionale historische Verweise wie die
+einweisende Person oder die Mitarbeiterzuordnung eines Benutzerkontos werden
+auf `NULL` gesetzt.
+
+Qualifikationen, Einweisungsteilnehmer und Sollteilnehmer von Teamsitzungen
+werden aus den normalisierten Tabellen gelesen. Die JSON-Payloads bleiben
+vorerst als Kompatibilitätsschicht für Browser-API und Sicherungsformat
+erhalten.
+
 ## Voraussetzungen
 
 - Node.js 20 oder neuer
@@ -42,6 +93,42 @@ administrativer MariaDB-Benutzer ausführen. Dadurch erhält das eingeschränkte
 App-Konto auch das für abgelaufene Sitzungen notwendige `DELETE`-Recht. Die
 eigentlichen Tabellenänderungen führt der Server danach versioniert selbst aus.
 
+### Migration aus dem bisherigen JSON-Gesamtbestand
+
+Beim ersten Serverstart mit Datenbankschema 4:
+
+1. werden die relationalen Fachtabellen angelegt,
+2. wird ein vorhandener Datensatz aus `teo_state` vollständig und innerhalb
+   einer Transaktion übertragen,
+3. werden Revision und Reihenfolge beibehalten,
+4. wird die erfolgreiche Migration in `teo_schema_migrations` protokolliert.
+
+`teo_state` bleibt danach unverändert als technische Rückfallebene erhalten,
+wird aber nicht mehr als Primärspeicher verwendet oder fortgeschrieben. Ein
+Downgrade auf eine ältere Serverversion ist deshalb nach neuen Änderungen
+nicht zulässig.
+
+Falls zwischen Migration und Neustart noch ein alter Serverprozess eine höhere
+Legacy-Revision gespeichert hat, erkennt der aktuelle Server dies beim Start
+und übernimmt diese Revision einmalig erneut. Danach darf ausschließlich der
+aktuelle Serverprozess betrieben werden.
+
+### Migration der Beziehungen
+
+Die Datenbankschemata 5 und 6 werden beim Serverstart automatisch angewendet:
+
+1. vorhandene Qualifikationen, Einweisungsteilnehmer und Sollteilnehmer werden
+   aus den bisherigen Payloads in Beziehungstabellen übertragen,
+2. Benutzerkonten werden anhand des eindeutigen Benutzernamens optional einem
+   Mitarbeiter zugeordnet,
+3. der aktuelle Qualifikationsstand wird als Ausgangspunkt der
+   Qualifikationshistorie übernommen,
+4. danach werden die Fremdschlüssel aktiviert.
+
+Vor dem ersten Start dieser Version sollte eine vollständige MariaDB-Sicherung
+erstellt werden. Ein Downgrade auf einen Server vor Datenbankschema 6 ist
+anschließend nicht zulässig.
+
 ## Umgebungsvariablen
 
 | Variable | Bedeutung | Standard |
@@ -72,6 +159,8 @@ eigentlichen Tabellenänderungen führt der Server danach versioniert selbst aus
   Teamsitzungsteilnahmen, ihr eigenes Passwort und das Farbthema verändern.
 - Revisionsnummern verhindern, dass gleichzeitige Änderungen unbemerkt überschrieben
   werden.
+- Fachobjekte werden in getrennten Tabellen gespeichert; nur tatsächlich
+  geänderte Zeilen werden aktualisiert.
 - Passworthashes werden keinem Browser ausgeliefert und beim Speichern
   serverseitig geschützt wieder ergänzt.
 - Ein unveränderbares Serverprotokoll in `teo_audit_log` dokumentiert

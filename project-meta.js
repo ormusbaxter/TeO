@@ -4,8 +4,8 @@
   global.TeOProjectMeta = Object.freeze({
   "name": "TeO – Team & Employee Organizer",
   "version": {
-    "major": 3,
-    "minor": 23
+    "major": 4,
+    "minor": 1
   },
   "stateVersion": 24,
   "backupFormat": "intensivteam-datensicherung",

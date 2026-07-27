@@ -5,14 +5,22 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import mariadb from "mariadb";
 import { validateStateShape as validateSharedState } from "../../src/shared/state-schema.mjs";
-import { runMigrations } from "./migrations.js";
+import { MIGRATIONS, runMigrations } from "./migrations.js";
+import {
+  initializeRelationalState,
+  readRelationalState,
+  reconcileNewerLegacyState,
+  replaceRelationalState,
+} from "./relational-state-store.js";
 import { createSessionStore } from "./session-store.js";
 
-const APP_STATE_ID = 1;
 const PASSWORD_ITERATIONS = 210000;
 const MAX_STATE_BYTES = 20 * 1024 * 1024;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_ATTEMPTS_PER_WINDOW = 8;
+const DATABASE_SCHEMA_VERSION = Math.max(
+  ...MIGRATIONS.map((migration) => migration.version),
+);
 
 const host = process.env.TEO_HOST || "0.0.0.0";
 const port = integerEnv("TEO_PORT", 3000, 1, 65535);
@@ -120,6 +128,8 @@ app.get("/api/health", asyncHandler(async (_request, response) => {
     service: "TeO MariaDB API",
     initialized: Boolean(row),
     revision: row ? Number(row.revision) : 0,
+    storageModel: "relational",
+    databaseSchemaVersion: DATABASE_SCHEMA_VERSION,
     serverTime: new Date().toISOString(),
   });
 }));
@@ -153,12 +163,10 @@ app.post("/api/bootstrap", loginRateLimit, asyncHandler(async (request, response
       });
     }
 
-    await connection.query(
-      `INSERT INTO teo_state
-        (id, revision, payload, updated_at, updated_by)
-       VALUES (?, 1, ?, CURRENT_TIMESTAMP(3), ?)`,
-      [APP_STATE_ID, JSON.stringify(state), user.username],
-    );
+    await initializeRelationalState(connection, state, {
+      revision: 1,
+      updatedBy: user.username,
+    });
     await appendServerAudit(connection, {
       eventType: "database_bootstrap",
       actor: user,
@@ -195,7 +203,7 @@ app.post("/api/auth/login", loginRateLimit, asyncHandler(async (request, respons
     });
   }
 
-  const state = parseStatePayload(row.payload);
+  const state = row.state;
   const user = findUser(state, request.body?.username);
   if (!user || !verifyPassword(request.body?.password, user)) {
     registerFailedLogin(request.ip);
@@ -228,7 +236,7 @@ app.get("/api/state", requireSession, asyncHandler(async (request, response) => 
       message: "In MariaDB ist noch kein TeO-Datenbestand vorhanden.",
     });
   }
-  const state = parseStatePayload(row.payload);
+  const state = row.state;
   const currentUser = state.users?.find(
     (user) => user.id === request.session.userId,
   );
@@ -251,7 +259,7 @@ app.get("/api/audit", requireSession, asyncHandler(async (request, response) => 
   if (!row) {
     throw httpError(409, "not_initialized", "In MariaDB ist noch kein TeO-Datenbestand vorhanden.");
   }
-  const state = parseStatePayload(row.payload);
+  const state = row.state;
   const currentUser = state.users?.find(
     (user) => user.id === request.session.userId,
   );
@@ -295,7 +303,7 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
     }
 
     const currentRevision = Number(row.revision);
-    const currentState = parseStatePayload(row.payload);
+    const currentState = row.state;
     const currentUser = currentState.users?.find(
       (user) => user.id === request.session.userId,
     );
@@ -355,20 +363,10 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
     }
 
     const nextRevision = currentRevision + 1;
-    await connection.query(
-      `UPDATE teo_state
-          SET revision = ?,
-              payload = ?,
-              updated_at = CURRENT_TIMESTAMP(3),
-              updated_by = ?
-        WHERE id = ?`,
-      [
-        nextRevision,
-        JSON.stringify(hydratedNextState),
-        currentUser.username,
-        APP_STATE_ID,
-      ],
-    );
+    await replaceRelationalState(connection, hydratedNextState, {
+      revision: nextRevision,
+      updatedBy: currentUser.username,
+    });
     await appendServerAudit(connection, {
       eventType: "state_updated",
       actor: currentUser,
@@ -460,22 +458,17 @@ function asyncHandler(handler) {
 
 async function ensureSchema() {
   await runMigrations(pool);
+  const reconciliation = await reconcileNewerLegacyState(pool);
+  if (reconciliation.reconciled) {
+    console.warn(
+      `Eine neuere Legacy-Revision ${reconciliation.revision} wurde in das relationale Schema übernommen.`,
+    );
+  }
   await sessionStore.prune();
 }
 
 async function readStateRow(connection = pool, forUpdate = false) {
-  const rows = await connection.query(
-    `SELECT revision, payload, updated_at, updated_by
-       FROM teo_state
-      WHERE id = ?${forUpdate ? " FOR UPDATE" : ""}`,
-    [APP_STATE_ID],
-  );
-  return rows[0] || null;
-}
-
-function parseStatePayload(payload) {
-  if (payload && typeof payload === "object") return payload;
-  return JSON.parse(String(payload));
+  return readRelationalState(connection, { forUpdate });
 }
 
 function validateStateShape(state, { requireCredentials = false } = {}) {

@@ -8875,6 +8875,10 @@
           state.deviceInstructions = state.deviceInstructions
             .map((instruction) => ({
               ...instruction,
+              instructorEmployeeId:
+                instruction.instructorEmployeeId === employeeId
+                  ? ""
+                  : instruction.instructorEmployeeId,
               participants: instruction.participants.filter(
                 (participant) => participant.employeeId !== employeeId,
               ),

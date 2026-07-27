@@ -1455,8 +1455,10 @@
 <h3 id="hilfe-mariadb-modus">MariaDB-Modus</h3>
 <p>Für gemeinsames Arbeiten mehrerer Arbeitsplätze wird der separate TeO-API-Dienst verwendet. Datenbankzugangsdaten werden nicht an den Browser ausgeliefert.</p>
 <p>Beim ersten Verbinden kann der lokale Datenbestand kontrolliert auf den Server übertragen werden. Anschließend:</p>
-<ul><li>werden Änderungen zentral gespeichert</li><li>werden Änderungen anderer Arbeitsplätze regelmäßig geladen</li><li>verhindern Datenrevisionen unbemerkte Überschreibungen</li><li>werden offene Formulare bei externen Änderungen vorsorglich geschlossen</li><li>werden Sitzungen und Rollen serverseitig geprüft</li></ul>
+<ul><li>werden Änderungen zentral gespeichert</li><li>werden Mitarbeiter, Fortbildungen, Sitzungen, Termine, Geräte und Abwesenheiten in getrennten MariaDB-Tabellen geführt</li><li>werden beim Speichern nur tatsächlich veränderte Datensätze geschrieben</li><li>werden Änderungen anderer Arbeitsplätze regelmäßig geladen</li><li>verhindern Datenrevisionen unbemerkte Überschreibungen</li><li>werden offene Formulare bei externen Änderungen vorsorglich geschlossen</li><li>werden Sitzungen und Rollen serverseitig geprüft</li></ul>
 <p>Für den Server wird Node.js 20 oder neuer benötigt. Details stehen in <a href="server/README.md" target="_blank" rel="noopener noreferrer"><code>server/README.md</code></a>.</p>
+<p>Bestehende MariaDB-Installationen mit dem früheren JSON-Gesamtbestand werden beim ersten Start automatisch und transaktional in das relationale Datenbankschema migriert. Sicherungsdateien bleiben unverändert kompatibel.</p>
+<p>Ab Datenbankschema 6 werden Qualifikationen, Einweisungsteilnehmer und erwartete Teamsitzungsteilnehmer zusätzlich in normalisierten Beziehungstabellen geführt. Fremdschlüssel verhindern verwaiste Fortbildungsnachweise, Teilnahmen, Abwesenheiten und Geräteeinweisungen. Der Verlauf von Qualifikations- und Rollenzuordnungen wird ab dem Migrationszeitpunkt protokolliert. Das JSON-Sicherungsformat bleibt dabei unverändert kompatibel.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-einstellungen-und-administration">
 <h2 id="hilfe-einstellungen-und-administration">Einstellungen und Administration</h2>

@@ -1,7 +1,7 @@
 # TeO Demo-Datenbank
 
 `teo-demo-datenbank-60-ma-2025-2026.json` ist eine vollständig synthetische
-Datensicherung für TeO Build 003.023 / Datenformat 24.
+Datensicherung für TeO Build 004.001 / Datenformat 24.
 
 Enthalten sind:
 

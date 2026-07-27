@@ -210,6 +210,15 @@ function validateReferences(state, ids, issues) {
       issues.push(`Geräteeinweisung „${entry.id}“ verweist auf ein unbekanntes Gerät.`);
     }
     if (
+      entry.instructorType === "employee" &&
+      entry.instructorEmployeeId &&
+      !ids.employeeIds.has(entry.instructorEmployeeId)
+    ) {
+      issues.push(
+        `Geräteeinweisung „${entry.id}“ verweist auf eine unbekannte einweisende Person.`,
+      );
+    }
+    if (
       !Array.isArray(entry.participants) ||
       entry.participants.some(
         (participant) => !ids.employeeIds.has(participant?.employeeId),
