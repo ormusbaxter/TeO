@@ -354,7 +354,6 @@
           class="button button-primary"
           id="applyWeekendSimulationButton"
           type="button"
-          data-admin-only
         >
           <svg><use href="#icon-check"></use></svg>
           Simulation übernehmen
@@ -473,7 +472,8 @@
           <p class="eyebrow">Administration</p>
           <h2 id="userManagementDialogTitle">Benutzer verwalten</h2>
           <p class="modal-subtitle">
-            Benutzernamen bearbeiten und Passwörter normaler Benutzer zurücksetzen.
+            Konten anlegen und löschen, Benutzernamen bearbeiten und Passwörter
+            zurücksetzen.
           </p>
         </div>
         <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
@@ -481,6 +481,32 @@
         </button>
       </div>
       <div class="modal-body">
+        <form class="user-management-create" id="createUserForm">
+          <label class="user-management-create-field">
+            <span>Neuer Benutzername</span>
+            <input
+              id="newUserUsername"
+              type="text"
+              maxlength="40"
+              pattern="[A-Za-z0-9]{4,40}"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="4 bis 40 Buchstaben oder Ziffern"
+              required
+            />
+          </label>
+          <label class="user-management-create-field">
+            <span>Rolle</span>
+            <select id="newUserRole">
+              <option value="user">Normaler Benutzer</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </label>
+          <button class="button button-primary" id="createUserButton" type="submit">
+            <svg><use href="#icon-plus"></use></svg>
+            Benutzer anlegen
+          </button>
+        </form>
         <div class="user-management-list" id="userManagementList"></div>
         <section class="temporary-password" id="temporaryPasswordResult" hidden>
           <p class="eyebrow">Temporäres Passwort – nur einmal sichtbar</p>

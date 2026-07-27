@@ -313,7 +313,7 @@
   }
 
   function handleBeforeUnload(event) {
-    if (!databaseSaveReminderArmed || !isAdmin()) return;
+    if (!databaseSaveReminderArmed) return;
     event.preventDefault();
     event.returnValue = "";
   }
@@ -473,7 +473,6 @@
   }
 
   function exportEmployeePhoneList() {
-    if (!requireAdmin()) return;
     const rows = getFilteredEmployeePhoneListRows();
     if (rows.length === 0) {
       showToast(
@@ -501,7 +500,6 @@
   }
 
   async function copyActiveEmployeeEmails() {
-    if (!requireAdmin()) return;
     const emailAddresses = getFilteredEmployeeEmailAddresses();
     if (emailAddresses.length === 0) {
       showToast(

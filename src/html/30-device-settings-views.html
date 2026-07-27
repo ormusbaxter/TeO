@@ -83,7 +83,6 @@
           class="view"
           id="deviceManagementView"
           data-view-panel="device-management"
-          data-admin-only
         >
           <div class="page-header">
             <div>
@@ -175,7 +174,7 @@
               </label>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section class="panel settings-card">
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-calendar"></use></svg>
@@ -291,21 +290,27 @@
               </div>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section class="panel settings-card">
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-admin">
                   <svg><use href="#icon-edit"></use></svg>
                 </span>
                 <div>
-                  <p class="eyebrow">Administration</p>
+                  <p class="eyebrow">Verwaltung</p>
                   <h2>Stammdaten &amp; Zugriffe</h2>
                 </div>
               </div>
               <p class="settings-description">
-                Benutzerkonten, Kataloge und die Qualität des Datenbestands zentral verwalten.
+                Kataloge und die Qualität des Datenbestands zentral verwalten.
+                Benutzerkonten sind Administratoren vorbehalten.
               </p>
               <div class="settings-actions">
-                <button class="button button-secondary" type="button" data-open-user-management>
+                <button
+                  class="button button-secondary"
+                  type="button"
+                  data-open-user-management
+                  data-admin-only
+                >
                   <svg><use href="#icon-users"></use></svg>
                   Benutzer verwalten
                 </button>
@@ -366,7 +371,6 @@
           <section
             class="panel backup-panel settings-backup-panel"
             aria-labelledby="backupTitle"
-            data-admin-only
           >
             <div class="backup-content">
               <span class="backup-icon" aria-hidden="true">
@@ -397,7 +401,12 @@
               </div>
             </div>
             <div class="backup-actions">
-              <button class="button button-ghost" id="openAuditLogButton" type="button">
+              <button
+                class="button button-ghost"
+                id="openAuditLogButton"
+                type="button"
+                data-admin-only
+              >
                 <svg><use href="#icon-more"></use></svg>
                 Änderungsprotokoll
               </button>
@@ -505,7 +514,7 @@
         <svg><use href="#icon-empty"></use></svg>
         <span>Einweisungen</span>
       </button>
-      <button type="button" data-view="device-management" data-admin-only>
+      <button type="button" data-view="device-management">
         <svg><use href="#icon-edit"></use></svg>
         <span>Geräte</span>
       </button>

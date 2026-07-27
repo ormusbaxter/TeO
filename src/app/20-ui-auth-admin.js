@@ -669,10 +669,16 @@
       button.addEventListener("click", openUserManagementDialog);
     });
     elements.mobileAccountButton.addEventListener("click", openAccountDialog);
+    elements.createUserForm.addEventListener("submit", handleCreateUserSubmit);
     elements.userManagementList.addEventListener("click", (event) => {
       const resetButton = event.target.closest("[data-reset-user-password]");
       if (resetButton) {
         requestPasswordReset(resetButton.dataset.resetUserPassword);
+        return;
+      }
+      const deleteButton = event.target.closest("[data-delete-user]");
+      if (deleteButton) {
+        requestDeleteUser(deleteButton.dataset.deleteUser);
         return;
       }
       const saveButton = event.target.closest("[data-save-user-username]");
@@ -1251,14 +1257,40 @@
     if (elements.accountDialog.open) elements.accountDialog.close();
     elements.temporaryPasswordResult.hidden = true;
     elements.temporaryPasswordValue.value = "";
+    elements.createUserForm.reset();
     renderUserManagement();
     elements.userManagementDialog.showModal();
   }
 
+  // Das eigene Konto bleibt ausgenommen, damit sich niemand mitten in der
+  // Sitzung selbst aussperrt. Der letzte Administrator bleibt bestehen, weil
+  // ein Datenbestand ohne Administrator nicht mehr verwaltbar wäre.
+  function userDeletionBlocker(user) {
+    if (user.id === currentUser?.id) return "Das eigene Konto kann nicht gelöscht werden.";
+    if (
+      user.role === "admin" &&
+      state.users.filter((item) => item.role === "admin").length <= 1
+    ) {
+      return "Der letzte Administrator kann nicht gelöscht werden.";
+    }
+    return "";
+  }
+
+  function isUsernameTaken(username, exceptId = "") {
+    const normalized = username.toLocaleLowerCase("de-DE");
+    return state.users.some(
+      (item) =>
+        item.id !== exceptId &&
+        item.username.toLocaleLowerCase("de-DE") === normalized,
+    );
+  }
+
   function renderUserManagement() {
     elements.userManagementList.innerHTML = state.users
-      .map(
-        (user) => `
+      .map((user) => {
+        const isSelf = user.id === currentUser?.id;
+        const deletionBlocker = userDeletionBlocker(user);
+        return `
           <article class="user-management-row">
             <span class="user-management-avatar">${escapeHtml(
               user.username.slice(0, 2).toUpperCase(),
@@ -1276,6 +1308,8 @@
                 aria-label="Benutzername für ${escapeHtml(user.username)}"
               />
               <small>${user.role === "admin" ? "Administrator" : "Normaler Benutzer"}${
+                isSelf ? " · eigenes Konto" : ""
+              }${
                 user.mustChangePassword ? " · Passwortänderung erforderlich" : ""
               }</small>
             </label>
@@ -1289,19 +1323,121 @@
                 Benutzername speichern
               </button>
               ${
-                user.role === "user"
-                  ? `<button
+                isSelf
+                  ? ""
+                  : `<button
                     class="button button-secondary"
                     type="button"
                     data-reset-user-password="${user.id}"
                   >Passwort zurücksetzen</button>`
-                  : '<span class="tag tag-muted">Admin</span>'
+              }
+              ${
+                deletionBlocker
+                  ? `<span class="tag tag-muted" title="${escapeHtml(
+                      deletionBlocker,
+                    )}">Nicht löschbar</span>`
+                  : `<button
+                    class="button button-danger"
+                    type="button"
+                    data-delete-user="${user.id}"
+                    aria-label="Konto ${escapeHtml(user.username)} löschen"
+                  >
+                    <svg><use href="#icon-trash"></use></svg>
+                    Löschen
+                  </button>`
               }
             </div>
           </article>
-        `,
-      )
+        `;
+      })
       .join("");
+  }
+
+  async function handleCreateUserSubmit(event) {
+    event.preventDefault();
+    if (!requireAdmin()) return;
+
+    const username = elements.newUserUsername.value.trim();
+    if (!/^[A-Za-z0-9]{4,40}$/.test(username)) {
+      showToast(
+        "Der Benutzername muss aus 4 bis 40 Buchstaben oder Ziffern bestehen.",
+        "error",
+      );
+      elements.newUserUsername.focus();
+      return;
+    }
+    if (isUsernameTaken(username)) {
+      showToast("Dieser Benutzername ist bereits vergeben.", "error");
+      elements.newUserUsername.focus();
+      return;
+    }
+
+    const role = elements.newUserRole.value === "admin" ? "admin" : "user";
+    const temporaryPassword = createTemporaryPassword();
+    const credentials = await createPasswordCredentials(temporaryPassword);
+    const newUser = {
+      id: `user-${createId()}`,
+      username,
+      role,
+      ...credentials,
+      mustChangePassword: true,
+    };
+
+    const committed = await commitStateMutation(() => {
+      state.users = [...state.users, newUser];
+    });
+    if (!committed) return;
+
+    elements.createUserForm.reset();
+    renderUserManagement();
+    showTemporaryPassword(username, temporaryPassword);
+    showToast(
+      `Konto „${username}“ wurde als ${
+        role === "admin" ? "Administrator" : "normaler Benutzer"
+      } angelegt.`,
+    );
+  }
+
+  function requestDeleteUser(userId) {
+    if (!requireAdmin()) return;
+    const user = state.users.find((item) => item.id === userId);
+    if (!user) return;
+    const blocker = userDeletionBlocker(user);
+    if (blocker) {
+      showToast(blocker, "error");
+      return;
+    }
+    requestConfirmation({
+      title: "Benutzerkonto löschen?",
+      message: `Das Konto „${user.username}“ wird dauerhaft entfernt und kann sich danach nicht mehr anmelden. Eine noch offene Serversitzung dieses Kontos endet beim nächsten Serverkontakt. Der fachliche Datenbestand bleibt unverändert.`,
+      acceptLabel: "Konto löschen",
+      tone: "danger",
+      callback: () => deleteUser(user.id),
+    });
+  }
+
+  async function deleteUser(userId) {
+    if (!requireAdmin()) return;
+    const user = state.users.find((item) => item.id === userId);
+    if (!user || userDeletionBlocker(user)) return;
+
+    const committed = await commitStateMutation(() => {
+      state.users = state.users.filter((item) => item.id !== user.id);
+    });
+    if (!committed) return;
+
+    elements.temporaryPasswordResult.hidden = true;
+    elements.temporaryPasswordValue.value = "";
+    renderUserManagement();
+    showToast(`Konto „${user.username}“ wurde gelöscht.`);
+  }
+
+  function showTemporaryPassword(username, password) {
+    elements.temporaryPasswordUsername.textContent = username;
+    elements.temporaryPasswordValue.value = password;
+    elements.temporaryPasswordResult.hidden = false;
+    elements.temporaryPasswordValue.focus();
+    elements.temporaryPasswordValue.select();
   }
 
   async function saveUsername(userId) {
@@ -1325,14 +1461,7 @@
       input.focus();
       return;
     }
-    if (
-      state.users.some(
-        (item) =>
-          item.id !== user.id &&
-          item.username.toLocaleLowerCase("de-DE") ===
-            username.toLocaleLowerCase("de-DE"),
-      )
-    ) {
+    if (isUsernameTaken(username, user.id)) {
       showToast("Dieser Benutzername ist bereits vergeben.", "error");
       input.focus();
       return;
@@ -1360,9 +1489,17 @@
     );
   }
 
+  // Das eigene Passwort wird über den Kontodialog geändert, nicht hier
+  // zurückgesetzt – sonst wäre die eigene Sitzung sofort änderungspflichtig.
+  function resettableUser(userId) {
+    return state.users.find(
+      (item) => item.id === userId && item.id !== currentUser?.id,
+    );
+  }
+
   function requestPasswordReset(userId) {
     if (!requireAdmin()) return;
-    const user = state.users.find((item) => item.id === userId && item.role === "user");
+    const user = resettableUser(userId);
     if (!user) return;
     requestConfirmation({
       title: "Passwort zurücksetzen?",
@@ -1375,7 +1512,7 @@
 
   async function resetUserPassword(userId) {
     if (!requireAdmin()) return;
-    const user = state.users.find((item) => item.id === userId && item.role === "user");
+    const user = resettableUser(userId);
     if (!user) return;
     const temporaryPassword = createTemporaryPassword();
     const credentials = await createPasswordCredentials(temporaryPassword);
@@ -1389,11 +1526,7 @@
     if (!committed) return;
 
     renderUserManagement();
-    elements.temporaryPasswordUsername.textContent = user.username;
-    elements.temporaryPasswordValue.value = temporaryPassword;
-    elements.temporaryPasswordResult.hidden = false;
-    elements.temporaryPasswordValue.focus();
-    elements.temporaryPasswordValue.select();
+    showTemporaryPassword(user.username, temporaryPassword);
     showToast(`Passwort für ${user.username} wurde zurückgesetzt.`);
   }
 
@@ -1419,7 +1552,6 @@
   }
 
   function openCatalogManagementDialog() {
-    if (!requireAdmin()) return;
     elements.newProfession.value = "";
     elements.newQualification.value = "";
     renderCatalogManagement();
@@ -1481,7 +1613,6 @@
   }
 
   async function addProfession() {
-    if (!requireAdmin()) return;
     const profession = normalizeProfession(elements.newProfession.value);
     if (!profession) {
       showToast("Bitte eine Berufsbezeichnung eingeben.", "error");
@@ -1503,7 +1634,6 @@
   }
 
   async function addQualification() {
-    if (!requireAdmin()) return;
     const label = elements.newQualification.value.trim();
     if (!label) {
       showToast("Bitte eine Bezeichnung für die Zusatzqualifikation eingeben.", "error");
@@ -1557,7 +1687,6 @@
   }
 
   async function saveProfession(index, nextValue) {
-    if (!requireAdmin()) return;
     const previousValue = state.catalogs.professions[index];
     const profession = normalizeProfession(nextValue);
     if (!previousValue || !profession) {
@@ -1590,7 +1719,6 @@
   }
 
   function deleteProfession(index) {
-    if (!requireAdmin()) return;
     const profession = state.catalogs.professions[index];
     if (!profession) return;
     const assignmentCount = state.employees.filter(
@@ -1621,7 +1749,6 @@
   }
 
   async function saveQualification(id, nextValue) {
-    if (!requireAdmin()) return;
     const qualification = state.catalogs.qualifications.find((item) => item.id === id);
     const label = String(nextValue || "").trim();
     if (
@@ -1660,7 +1787,6 @@
   }
 
   function deleteQualification(id) {
-    if (!requireAdmin()) return;
     const qualification = state.catalogs.qualifications.find((item) => item.id === id);
     if (!qualification) return;
     if (LEADERSHIP_QUALIFICATION_IDS.includes(id)) {

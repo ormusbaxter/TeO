@@ -278,7 +278,6 @@
                   title="${escapeHtml(
                     [entryType?.label, metadata.title].filter(Boolean).join(" · "),
                   )}"
-                  ${isAdmin() ? "" : "disabled"}
                   class="${entry ? `planner-entry-${entry.type}` : ""}"
                 >${entryType?.shortLabel || ""}</button>
               </td>
@@ -296,7 +295,6 @@
             value="${entitlement.additional}"
             data-vacation-additional-employee="${employee.id}"
             aria-label="Zusatzurlaub ${escapeHtml(fullName(employee))}"
-            ${isAdmin() ? "" : "disabled"}
           />
         </td>
         <td class="vacation-total-column"><strong>${formatVacationNumber(entitlement.total)}</strong></td>
@@ -568,7 +566,7 @@
     const button = event.target.closest(
       "[data-vacation-employee][data-vacation-date]",
     );
-    if (!button || !requireAdmin()) return;
+    if (!button) return;
     const scrollPosition = captureVacationScrollPosition();
     const employeeId = button.dataset.vacationEmployee;
     const date = button.dataset.vacationDate;
@@ -618,7 +616,7 @@
 
   async function handleVacationPlannerChange(event) {
     const input = event.target.closest("[data-vacation-additional-employee]");
-    if (!input || !requireAdmin()) return;
+    if (!input) return;
     const scrollPosition = captureVacationScrollPosition();
     const employeeId = input.dataset.vacationAdditionalEmployee;
     const additionalDays =
@@ -660,7 +658,6 @@
   }
 
   async function saveVacationSettings() {
-    if (!requireAdmin()) return;
     const baseDays =
       Math.round(clampNumber(elements.vacationBaseDays.value, 1, 60, 30) * 2) /
       2;

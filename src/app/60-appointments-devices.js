@@ -20,7 +20,7 @@
           ${renderEmptyState({
             title: "Noch keine Termine",
             text: "Legen Sie den ersten Termin an. Anstehende Termine erscheinen automatisch im Fristenmonitor.",
-            buttonText: isAdmin() ? "Ersten Termin anlegen" : "",
+            buttonText: "Ersten Termin anlegen",
             buttonAttribute: "data-empty-add-appointment",
           })}
         </section>
@@ -98,7 +98,6 @@
               class="icon-button"
               type="button"
               data-action="edit-appointment"
-              data-admin-only
               data-id="${appointment.id}"
               aria-label="${escapeHtml(appointment.title)} bearbeiten"
               title="Bearbeiten"
@@ -109,7 +108,6 @@
               class="icon-button danger"
               type="button"
               data-action="delete-appointment"
-              data-admin-only
               data-id="${appointment.id}"
               aria-label="${escapeHtml(appointment.title)} löschen"
               title="Löschen"
@@ -241,7 +239,7 @@
           ${renderEmptyState({
             title: "Noch keine Geräte",
             text: "Legen Sie das erste Gerät an, bevor Einweisungen dokumentiert werden.",
-            buttonText: isAdmin() ? "Erstes Gerät anlegen" : "",
+            buttonText: "Erstes Gerät anlegen",
             buttonAttribute: "data-empty-add-device",
           })}
         </section>
@@ -344,7 +342,6 @@
               class="icon-button"
               type="button"
               data-action="edit-device"
-              data-admin-only
               data-id="${device.id}"
               aria-label="${escapeHtml(device.productName)} bearbeiten"
               title="Bearbeiten"
@@ -355,7 +352,6 @@
               class="icon-button danger"
               type="button"
               data-action="delete-device"
-              data-admin-only
               data-id="${device.id}"
               aria-label="${escapeHtml(device.productName)} löschen"
               title="Löschen"
@@ -550,7 +546,6 @@
                     class="icon-button danger"
                     type="button"
                     data-delete-device-instruction="${instruction.id}"
-                    data-admin-only
                     aria-label="Einweisung vom ${formatDate(
                       instruction.date,
                     )} löschen"
@@ -684,7 +679,6 @@
   }
 
   function openDeviceDialog(deviceId = null) {
-    if (!requireAdmin()) return;
     elements.deviceForm.reset();
     document.querySelector("#deviceId").value = "";
     document.querySelector("#deviceCurrentInventory").checked = true;
@@ -729,7 +723,6 @@
 
   async function handleDeviceSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
     const productName = document.querySelector("#deviceProductName");
     const manufacturer = document.querySelector("#deviceManufacturer");
     const category = document.querySelector("#deviceCategory");
@@ -773,7 +766,6 @@
   }
 
   function requestDeleteDevice(deviceId) {
-    if (!requireAdmin()) return;
     const device = getDevice(deviceId);
     if (!device) return;
     const instructionCount = state.deviceInstructions.filter(
@@ -803,12 +795,7 @@
 
   function openDeviceInstructionDialog(deviceId = null, instructionId = null) {
     if (!state.devices.length) {
-      showToast(
-        isAdmin()
-          ? "Bitte legen Sie zuerst ein Gerät an."
-          : "Es wurde noch kein Gerät angelegt.",
-        "error",
-      );
+      showToast("Bitte legen Sie zuerst ein Gerät an.", "error");
       return;
     }
     const existingInstruction = instructionId
@@ -1161,7 +1148,6 @@
                     class="icon-button danger"
                     type="button"
                     data-delete-device-instruction="${instruction.id}"
-                    data-admin-only
                     aria-label="Einweisungsnachweis vom ${formatDate(
                       instruction.date,
                     )} löschen"
@@ -1187,7 +1173,6 @@
   }
 
   function requestDeleteDeviceInstruction(instructionId) {
-    if (!requireAdmin()) return;
     const instruction = state.deviceInstructions.find(
       (item) => item.id === instructionId,
     );

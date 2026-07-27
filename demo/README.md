@@ -13,9 +13,14 @@ Enthalten sind:
 
 Die Datei kann unter **Einstellungen → Gesamten Datenbestand sichern →
 Sicherung importieren** geladen werden. Der Import ersetzt den gesamten
-aktuellen Datenbestand. Daher vorher bei Bedarf eine Sicherung exportieren.
+fachlichen Datenbestand. Daher vorher bei Bedarf eine Sicherung exportieren.
 
-Demo-Anmeldung:
+Die **Benutzerkonten werden nicht ersetzt**: Wer bereits ein Konto besitzt,
+meldet sich nach dem Import weiterhin damit an. Die enthaltenen Demo-Konten
+werden nur übernommen, wenn noch gar kein Konto existiert – also bei einem
+Import direkt in eine frische, noch nicht eingerichtete TeO-Installation.
+
+Demo-Anmeldung (nur bei Import in eine leere Installation):
 
 - Administrator: `DemoAdmin` / `DemoStart2026!`
 - Benutzer: `DemoUser1` oder `DemoUser2` / `DemoUser2026!`

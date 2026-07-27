@@ -358,7 +358,7 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
       return response.status(403).json({
         code: "forbidden_mutation",
         message:
-          "Diese Änderung ist für ein normales Benutzerkonto nicht freigegeben.",
+          "Benutzerkonten und die Sicherungserinnerung können nur von einem Administrator geändert werden.",
       });
     }
 
@@ -627,24 +627,11 @@ function clearFailedLogins(ip) {
   loginAttempts.delete(ip);
 }
 
+// Normale Benutzerkonten dürfen den gesamten fachlichen Datenbestand pflegen.
+// Administratoren vorbehalten sind ausschließlich die Benutzerverwaltung und
+// die Sicherungserinnerung; der Speicherort ist reine Clientkonfiguration und
+// gar nicht Teil des Datenbestands.
 function isPermittedUserMutation(before, after, userId) {
-  const permittedTopLevelKeys = new Set([
-    "completions",
-    "meetingAttendances",
-    "users",
-    "settings",
-    "auditLog",
-  ]);
-  const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
-  for (const key of allKeys) {
-    if (
-      !permittedTopLevelKeys.has(key) &&
-      !deepEqual(before[key], after[key])
-    ) {
-      return false;
-    }
-  }
-
   if (!isPermittedSettingsMutation(before.settings, after.settings)) return false;
   if (!isPermittedOwnUserMutation(before.users, after.users, userId)) return false;
   return true;
@@ -663,11 +650,10 @@ function containsRequiredPasswordChange(before, after, userId) {
 }
 
 function isPermittedSettingsMutation(before, after) {
-  const beforeCopy = structuredClone(before || {});
-  const afterCopy = structuredClone(after || {});
-  delete beforeCopy.theme;
-  delete afterCopy.theme;
-  return deepEqual(beforeCopy, afterCopy);
+  return deepEqual(
+    (before || {}).backupReminderDays,
+    (after || {}).backupReminderDays,
+  );
 }
 
 function isPermittedOwnUserMutation(beforeUsers, afterUsers, userId) {

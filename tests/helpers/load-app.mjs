@@ -19,6 +19,7 @@ export async function loadAppFunctions(names) {
       ${exposed},
       setState(value) { state = value; },
       getState() { return state; },
+      setCurrentUser(value) { currentUser = value; },
       setEmployeeFilters(value = {}) {
         employeeStatusFilter = value.status || "all";
         employeeProfessionFilter = value.profession || "all";

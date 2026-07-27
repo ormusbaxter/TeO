@@ -98,28 +98,69 @@ Uhrzeiten werden im 24-Stunden-Format `HH:MM` angezeigt.
 
 ## Benutzerkonten und Berechtigungen
 
-### Administratoren
-
-Administratoren dürfen:
-
-- Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen
-- Berufe und Zusatzqualifikationen verwalten
-- Pflichtfortbildungen und Fortbildungsreihen verwalten
-- Teamsitzungen und Termine verwalten
-- Geräte und Geräteeinweisungen verwalten
-- Urlaubsansprüche und Abwesenheitsplanung bearbeiten
-- Dienstwochenenden konfigurieren und Simulationen übernehmen
-- Benutzerkonten verwalten und Passwörter zurücksetzen
-- Daten sichern, importieren und das Speicher-Backend wechseln
+Jedes angemeldete Konto bedient TeO vollständig. Die Rollentrennung betrifft
+ausschließlich die Verwaltung der Anwendung selbst, nicht die tägliche Arbeit.
 
 ### Normale Benutzer
 
-Normale Benutzer dürfen:
+Normale Benutzer dürfen alles, was zur regulären Bedienung gehört:
 
-- absolvierte Pflichtfortbildungen zuweisen
-- Teamsitzungsteilnahmen und Abwesenheitsgründe dokumentieren
+- Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen
+- Berufe und Zusatzqualifikationen verwalten
+- Pflichtfortbildungen, Fortbildungsreihen und Nachweise verwalten
+- Teamsitzungen, Teilnahmen und Termine verwalten
+- Geräte und Geräteeinweisungen verwalten
+- Urlaubsansprüche und Abwesenheitsplanung bearbeiten
+- Dienstwochenenden konfigurieren und Simulationen übernehmen
+- Datenqualität prüfen, Telefonliste und E-Mail-Adressen exportieren
+- Daten sichern, prüfen und Sicherungen importieren
+- das eigene Passwort und das Farbthema ändern
 
-Administrative Stammdaten und Planungsgrundlagen bleiben geschützt.
+### Administratoren
+
+Administratoren dürfen zusätzlich drei Einstellungen ändern:
+
+- **Speicherort** – zwischen lokalem Browserspeicher und MariaDB wechseln
+- **Benutzer verwalten** – siehe unten
+- **Sicherungserinnerung** – nach wie vielen Tagen TeO zur Sicherung mahnt
+
+Zusätzlich ist das **Änderungsprotokoll** Administratoren vorbehalten, weil es
+die Tätigkeit der übrigen Konten nachvollziehbar macht.
+
+Diese Aufteilung gilt im lokalen Modus und im MariaDB-Modus gleichermaßen. Im
+MariaDB-Modus setzt der Server sie unabhängig vom Browser durch: Ein normales
+Konto kann Benutzerkonten und die Sicherungserinnerung auch dann nicht
+verändern, wenn der Client umgangen wird.
+
+### Benutzer verwalten
+
+Über **Einstellungen → Stammdaten & Zugriffe → Benutzer verwalten** stehen
+Administratoren zur Verfügung:
+
+- **Konto anlegen** – Benutzername und Rolle wählen. TeO erzeugt ein einmalig
+  angezeigtes temporäres Passwort; beim ersten Anmelden muss der Benutzer ein
+  eigenes Passwort festlegen.
+- **Benutzername ändern** – 4 bis 40 Buchstaben oder Ziffern, eindeutig.
+- **Passwort zurücksetzen** – für jedes andere Konto, auch für weitere
+  Administratoren. Es entsteht wieder ein temporäres Passwort. Das eigene
+  Passwort wird stattdessen über **Konto → Passwort ändern** geändert.
+- **Konto löschen** – dauerhaft; der fachliche Datenbestand bleibt unberührt.
+
+Zwei Konten lassen sich nicht löschen und sind entsprechend gekennzeichnet: das
+**eigene Konto**, damit man sich nicht mitten in der Sitzung aussperrt, und der
+**letzte verbliebene Administrator**, weil ein Datenbestand ohne Administrator
+nicht mehr verwaltbar wäre.
+
+### Benutzerkonten beim Import
+
+Ein Sicherungsimport ersetzt den fachlichen Datenbestand, **nicht** die
+Benutzerkonten. Wer angemeldet ist, bleibt angemeldet, und die vorhandenen
+Konten und Passwörter gelten unverändert weiter. Nur wenn noch gar kein Konto
+existiert – etwa bei einer Wiederherstellung auf einem leeren System – werden
+die Konten aus der Sicherungsdatei übernommen.
+
+Deshalb kann der Import gefahrlos allen Konten offenstehen: Er ist kein Weg,
+sich Administratorrechte zu verschaffen.
 
 ### Ersteinrichtung und Passwörter
 
@@ -411,8 +452,8 @@ exportiert werden.
 
 ### Sitzung anlegen
 
-Administratoren erfassen Titel, Datum, Uhrzeit und Notizen. Die Sitzungen
-werden chronologisch sortiert.
+Titel, Datum, Uhrzeit und Notizen werden erfasst. Die Sitzungen werden
+chronologisch sortiert.
 
 ### Teilnahme effizient dokumentieren
 
@@ -444,7 +485,7 @@ Die jahresbezogene Auswertung enthält:
 
 ### Gerätekatalog
 
-Administratoren verwalten:
+Im Gerätekatalog werden verwaltet:
 
 - Hersteller
 - Produkt- oder Modellname
@@ -533,10 +574,15 @@ Vor einem Import:
 TeO lädt vor dem Ersetzen zusätzlich eine Wiederherstellungssicherung
 herunter.
 
+Die Benutzerkonten werden dabei nicht ersetzt. Wer angemeldet ist, bleibt
+angemeldet; bestehende Konten und Passwörter gelten unverändert weiter. Nur auf
+einem System ohne jedes Konto werden die Konten aus der Sicherung übernommen.
+
 ### Änderungsprotokoll
 
 Administrative und fachliche Änderungen werden mit Zeitpunkt, Benutzer und
-Beschreibung protokolliert. Das Protokoll kann als CSV exportiert werden.
+Beschreibung protokolliert. Das Protokoll kann als CSV exportiert werden. Die
+Einsicht ist Administratoren vorbehalten.
 
 ## Datenspeicherung und MariaDB
 

@@ -18,7 +18,7 @@
           ${renderEmptyState({
             title: "Noch keine Teamsitzungen",
             text: "Legen Sie die erste Sitzung an. Anschließend kann der Status des gesamten aktiven Teams gesammelt erfasst werden.",
-            buttonText: isAdmin() ? "Erste Teamsitzung anlegen" : "",
+            buttonText: "Erste Teamsitzung anlegen",
             buttonAttribute: "data-empty-add-meeting",
           })}
         </section>
@@ -117,7 +117,6 @@
               class="icon-button"
               type="button"
               data-action="edit-meeting"
-              data-admin-only
               data-id="${meeting.id}"
               aria-label="${escapeHtml(meeting.title)} bearbeiten"
               title="Bearbeiten"
@@ -128,7 +127,6 @@
               class="icon-button danger"
               type="button"
               data-action="delete-meeting"
-              data-admin-only
               data-id="${meeting.id}"
               aria-label="${escapeHtml(meeting.title)} löschen"
               title="Löschen"
@@ -403,12 +401,6 @@
   }
 
   async function updateMeetingAttendanceThreshold() {
-    if (!requireAdmin()) {
-      elements.meetingAttendanceThreshold.value = String(
-        state.settings.meetingAttendanceThreshold,
-      );
-      return;
-    }
     const threshold = clampNumber(
       elements.meetingAttendanceThreshold.value,
       1,
@@ -537,7 +529,7 @@
     selectedEmployeeIds = new Set(
       [...selectedEmployeeIds].filter((employeeId) => getEmployee(employeeId)),
     );
-    elements.employeeBulkBar.hidden = !isAdmin() || selectedEmployeeIds.size === 0;
+    elements.employeeBulkBar.hidden = selectedEmployeeIds.size === 0;
     elements.employeeBulkCount.textContent = `${selectedEmployeeIds.size} ausgewählt`;
   }
 
@@ -592,7 +584,6 @@
   }
 
   function openEmployeeDialog(employeeId = null) {
-    if (!requireAdmin()) return;
     elements.employeeForm.reset();
     [
       "#firstName",
@@ -702,7 +693,6 @@
 
   async function handleEmployeeSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
 
     const birthDate = document.querySelector("#birthDate");
     const firstNameInput = document.querySelector("#firstName");
@@ -827,7 +817,6 @@
   }
 
   async function toggleEmployee(employeeId) {
-    if (!requireAdmin()) return;
     const employee = getEmployee(employeeId);
     if (!employee) return;
 
@@ -844,7 +833,6 @@
   }
 
   function requestDeleteEmployee(employeeId) {
-    if (!requireAdmin()) return;
     const employee = getEmployee(employeeId);
     if (!employee) return;
     const ownerWeekend = serviceWeekendOwnerKey(employeeId);
@@ -946,7 +934,6 @@
   }
 
   function openTrainingDialog(trainingId = null) {
-    if (!requireAdmin()) return;
     elements.trainingForm.reset();
     document.querySelector("#trainingTitle").setCustomValidity("");
     document.querySelector("#trainingId").value = "";
@@ -981,7 +968,6 @@
 
   async function handleTrainingSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
     const titleInput = document.querySelector("#trainingTitle");
     titleInput.setCustomValidity(
       titleInput.value.trim() ? "" : "Bitte eine Bezeichnung eingeben.",
@@ -1037,7 +1023,6 @@
   }
 
   function requestDeleteTraining(trainingId) {
-    if (!requireAdmin()) return;
     const training = getTraining(trainingId);
     if (!training) return;
     const completionCount = state.completions.filter(
@@ -1068,7 +1053,6 @@
   }
 
   function openAppointmentDialog(appointmentId = null) {
-    if (!requireAdmin()) return;
     elements.appointmentForm.reset();
     document.querySelector("#appointmentId").value = "";
     document.querySelector("#appointmentTitle").setCustomValidity("");
@@ -1113,7 +1097,6 @@
 
   async function handleAppointmentSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
     const titleInput = document.querySelector("#appointmentTitle");
     titleInput.setCustomValidity(
       titleInput.value.trim() ? "" : "Bitte einen Titel eingeben.",
@@ -1156,7 +1139,6 @@
   }
 
   function requestDeleteAppointment(appointmentId) {
-    if (!requireAdmin()) return;
     const appointment = getAppointment(appointmentId);
     if (!appointment) return;
 
@@ -1179,7 +1161,6 @@
   }
 
   function openMeetingDialog(meetingId = null) {
-    if (!requireAdmin()) return;
     elements.meetingForm.reset();
     document.querySelector("#meetingTitle").setCustomValidity("");
     document.querySelector("#meetingId").value = "";
@@ -1209,7 +1190,6 @@
 
   async function handleMeetingSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
     const titleInput = document.querySelector("#meetingTitle");
     titleInput.setCustomValidity(
       titleInput.value.trim() ? "" : "Bitte eine Bezeichnung eingeben.",
@@ -1249,7 +1229,6 @@
   }
 
   function requestDeleteMeeting(meetingId) {
-    if (!requireAdmin()) return;
     const meeting = getMeeting(meetingId);
     if (!meeting) return;
     const attendanceCount = state.meetingAttendances.filter(
@@ -1652,7 +1631,6 @@
   }
 
   function requestDeleteCompletion(completionId) {
-    if (!requireAdmin()) return;
     const completion = state.completions.find((item) => item.id === completionId);
     if (!completion) return;
     const employee = getEmployee(completion.employeeId);

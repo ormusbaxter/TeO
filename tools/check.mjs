@@ -62,10 +62,67 @@ assert.doesNotMatch(
   /professionOptions|<datalist[^>]*id="profession/,
   "Das Berufsfeld darf kein schwer bedienbares Datalist-Eingabefeld verwenden",
 );
+// Rollenmodell: Administratoren unterscheiden sich ausschließlich durch
+// Speicherort, Benutzerverwaltung und Sicherungserinnerung (dazu das
+// Änderungsprotokoll als Kontrollinstrument). Alles Übrige gehört zur normalen
+// Bedienung und steht jedem angemeldeten Konto offen.
+const settingsCardFor = (elementId) => {
+  const cards = htmlSource.split("<section");
+  const card = cards.find((chunk) => chunk.includes(`id="${elementId}"`));
+  assert.ok(card, `Einstellungskarte zu ${elementId} nicht gefunden`);
+  return card.slice(0, card.indexOf(">") + 1);
+};
+
+for (const [elementId, label] of [
+  ["settingsStorageBackend", "Speicherort"],
+  ["settingsBackupReminderDays", "Sicherungserinnerung"],
+]) {
+  assert.match(
+    settingsCardFor(elementId),
+    /data-admin-only/,
+    `Die Einstellungskarte „${label}“ muss Administratoren vorbehalten bleiben`,
+  );
+}
+assert.equal(
+  (htmlSource.match(/data-open-user-management[^>]*data-admin-only/g) || [])
+    .length,
+  (htmlSource.match(/data-open-user-management/g) || []).length,
+  "Jeder Zugang zur Benutzerverwaltung muss Administratoren vorbehalten bleiben",
+);
 assert.match(
   htmlSource,
-  /id="applyWeekendSimulationButton"[\s\S]*data-admin-only/,
-  "Die Simulationsübernahme muss als administrative Aktion gekennzeichnet sein",
+  /id="openAuditLogButton"[^>]*data-admin-only/,
+  "Das Änderungsprotokoll muss Administratoren vorbehalten bleiben",
+);
+for (const [pattern, label] of [
+  [/id="applyWeekendSimulationButton"[^>]*data-admin-only/, "Simulationsübernahme"],
+  [/data-open-employee[^>]*data-admin-only/, "Mitarbeiteranlage"],
+  [/id="importDataButton"[^>]*data-admin-only/, "Sicherungsimport"],
+  [/id="saveVacationSettingsButton"[^>]*data-admin-only/, "Urlaubseinstellungen"],
+]) {
+  assert.doesNotMatch(
+    htmlSource,
+    pattern,
+    `${label} gehört zur normalen Bedienung und darf nicht auf Administratoren beschränkt sein`,
+  );
+}
+assert.doesNotMatch(
+  appSource,
+  /function handleEmployeeSubmit[\s\S]{0,400}requireAdmin\(\)/,
+  "Die Mitarbeiterpflege darf keine Administratorprüfung mehr enthalten",
+);
+// Die Sperren gehören ausschließlich in die statische Oberfläche. Würde app.js
+// weitere data-admin-only-Markierungen erzeugen, blieben Schaltflächen für
+// normale Konten unsichtbar, ohne dass es in index.html auffällt.
+assert.equal(
+  (appSource.match(/data-admin-only/g) || []).length,
+  1,
+  "app.js darf data-admin-only nur zum Anwenden der Sperre verwenden, nicht in gerenderten Vorlagen",
+);
+assert.match(
+  appSource,
+  /querySelectorAll\("\[data-admin-only\]"\)/,
+  "Die Sperre muss beim Anwenden der Zugriffsrechte weiterhin ausgewertet werden",
 );
 assert.deepEqual(
   JSON.parse(JSON.stringify(metaContext.window.TeOProjectMeta)),

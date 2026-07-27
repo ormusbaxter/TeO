@@ -1,5 +1,5 @@
   function openBulkEditDialog() {
-    if (!requireAdmin() || selectedEmployeeIds.size === 0) return;
+    if (selectedEmployeeIds.size === 0) return;
     elements.bulkEditForm.reset();
     elements.bulkEditSubtitle.textContent = `${selectedEmployeeIds.size} Mitarbeiter werden gemeinsam bearbeitet.`;
     elements.bulkProfession.innerHTML = [
@@ -25,7 +25,7 @@
 
   async function handleBulkEditSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin() || selectedEmployeeIds.size === 0) return;
+    if (selectedEmployeeIds.size === 0) return;
     const active = elements.bulkActive.value;
     const profession = elements.bulkProfession.value;
     const weekend = elements.bulkServiceWeekend.value;
@@ -111,7 +111,6 @@
   }
 
   function openDataQualityDialog() {
-    if (!requireAdmin()) return;
     const issues = getDataQualityIssues();
     elements.dataQualityContent.innerHTML = issues.length
       ? `<div class="quality-issue-list">${issues
@@ -289,7 +288,7 @@
       elements.employeeTable.innerHTML = renderEmptyState({
         title: "Noch keine Mitarbeiter angelegt",
         text: "Erfassen Sie Stammdaten, Beschäftigungsumfang und Zusatzqualifikationen.",
-        buttonText: isAdmin() ? "Ersten Mitarbeiter anlegen" : "",
+        buttonText: "Ersten Mitarbeiter anlegen",
         buttonAttribute: "data-empty-add-employee",
       });
       elements.employeeTable
@@ -312,7 +311,7 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th class="selection-column" data-admin-only>
+              <th class="selection-column">
                 <input
                   type="checkbox"
                   data-select-all-employees
@@ -401,7 +400,7 @@
 
     return `
       <tr>
-        <td class="selection-column" data-admin-only>
+        <td class="selection-column">
           <input
             type="checkbox"
             data-select-employee="${employee.id}"
@@ -489,7 +488,7 @@
             >
               <svg><use href="#icon-more"></use></svg>
             </button>
-            <span data-admin-only>
+            <span>
             <button
               class="icon-button"
               type="button"
@@ -650,7 +649,7 @@
           ${renderEmptyState({
             title: "Noch keine Pflichtfortbildungen",
             text: "Legen Sie eine Fortbildung an und erfassen Sie anschließend die absolvierten Nachweise aktiver Mitarbeiter.",
-            buttonText: isAdmin() ? "Erste Fortbildung anlegen" : "",
+            buttonText: "Erste Fortbildung anlegen",
             buttonAttribute: "data-empty-add-training",
           })}
         </section>
@@ -667,7 +666,7 @@
           ${renderEmptyState({
             title: `Bis ${trainingDisplayYear} keine Pflichtfortbildungen`,
             text: "Wählen Sie ein späteres Jahr oder ergänzen Sie den Fortbildungskatalog.",
-            buttonText: isAdmin() ? "Fortbildung anlegen" : "",
+            buttonText: "Fortbildung anlegen",
             buttonAttribute: "data-empty-add-training",
           })}
         </section>
@@ -1016,7 +1015,6 @@
               class="icon-button"
               type="button"
               data-action="edit-training"
-              data-admin-only
               data-id="${training.id}"
               aria-label="${escapeHtml(training.title)} bearbeiten"
               title="Bearbeiten"
@@ -1027,7 +1025,6 @@
               class="icon-button danger"
               type="button"
               data-action="delete-training"
-              data-admin-only
               data-id="${training.id}"
               aria-label="${escapeHtml(training.title)} löschen"
               title="Löschen"
@@ -1074,7 +1071,6 @@
           class="icon-button danger"
           type="button"
           data-action="delete-completion"
-          data-admin-only
           data-id="${completion.id}"
           aria-label="Nachweis von ${escapeHtml(fullName(employee))} löschen"
           title="Nachweis löschen"

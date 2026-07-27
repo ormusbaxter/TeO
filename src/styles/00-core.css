@@ -4529,6 +4529,14 @@ legend {
     width: 100%;
   }
 
+  .modal .user-management-create {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .user-management-create .button {
+    width: 100%;
+  }
+
   .temporary-password > div {
     grid-template-columns: 1fr;
   }
@@ -4570,6 +4578,37 @@ legend {
 .auth-error {
   min-height: 20px;
   margin-top: 14px;
+}
+
+/* `.modal form` legt das Formular an, das einen ganzen Dialog umschließt.
+   Dieses Formular liegt im Dialogkörper und braucht deshalb eine höhere
+   Spezifität, sonst erbt es Flex-Spalte und Höhenbegrenzung. */
+.modal .user-management-create {
+  display: grid;
+  max-height: none;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: end;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  background: var(--slate-50);
+}
+
+.user-management-create-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: var(--slate-600);
+  font-size: 0.61rem;
+  font-weight: 750;
+}
+
+.user-management-create-field input,
+.user-management-create-field select {
+  width: 100%;
+  min-height: 38px;
 }
 
 .user-management-list {
@@ -6076,6 +6115,14 @@ button.device-matrix-status {
   }
 
   .user-management-row .button {
+    width: 100%;
+  }
+
+  .modal .user-management-create {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .user-management-create .button {
     width: 100%;
   }
 

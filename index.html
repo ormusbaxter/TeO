@@ -179,7 +179,6 @@
             class="nav-item"
             type="button"
             data-view="device-management"
-            data-admin-only
           >
             <svg><use href="#icon-edit"></use></svg>
             <span>Geräteverwaltung</span>
@@ -292,7 +291,6 @@
               id="mobileCreateButton"
               type="button"
               data-create-type="employee"
-              data-admin-only
             >
               <svg><use href="#icon-plus"></use></svg>
               <span>Anlegen</span>
@@ -316,7 +314,6 @@
             class="button button-compact database-save-warning-action"
             id="databaseSaveWarningExportButton"
             type="button"
-            data-admin-only
           >
             <svg><use href="#icon-download"></use></svg>
             Jetzt exportieren
@@ -334,7 +331,6 @@
               class="button button-primary desktop-only-flex"
               type="button"
               data-open-employee
-              data-admin-only
             >
               <svg><use href="#icon-plus"></use></svg>
               Mitarbeiter anlegen
@@ -366,7 +362,7 @@
                 </div>
               </div>
               <div class="quick-actions">
-                <button class="quick-action" type="button" data-open-employee data-admin-only>
+                <button class="quick-action" type="button" data-open-employee>
                   <span class="quick-action-icon quick-action-icon-blue">
                     <svg><use href="#icon-users"></use></svg>
                   </span>
@@ -376,7 +372,7 @@
                   </span>
                   <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
                 </button>
-                <button class="quick-action" type="button" data-open-training data-admin-only>
+                <button class="quick-action" type="button" data-open-training>
                   <span class="quick-action-icon quick-action-icon-teal">
                     <svg><use href="#icon-training"></use></svg>
                   </span>
@@ -396,7 +392,7 @@
                   </span>
                   <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
                 </button>
-                <button class="quick-action" type="button" data-open-meeting data-admin-only>
+                <button class="quick-action" type="button" data-open-meeting>
                   <span class="quick-action-icon quick-action-icon-purple">
                     <svg><use href="#icon-meeting"></use></svg>
                   </span>
@@ -477,7 +473,6 @@
                 class="button button-secondary"
                 id="openCatalogManagementButton"
                 type="button"
-                data-admin-only
               >
                 <svg><use href="#icon-edit"></use></svg>
                 Berufe &amp; Qualifikationen
@@ -494,7 +489,6 @@
                 class="button button-secondary"
                 id="openDataQualityButton"
                 type="button"
-                data-admin-only
               >
                 <svg><use href="#icon-alert"></use></svg>
                 Datenqualität
@@ -503,7 +497,6 @@
                 class="button button-secondary"
                 id="copyActiveEmailsButton"
                 type="button"
-                data-admin-only
               >
                 <svg><use href="#icon-copy"></use></svg>
                 <span id="copyActiveEmailsLabel">E-Mails kopieren</span>
@@ -512,12 +505,11 @@
                 class="button button-secondary"
                 id="exportEmployeePhoneListButton"
                 type="button"
-                data-admin-only
               >
                 <svg><use href="#icon-print"></use></svg>
                 <span id="exportEmployeePhoneListLabel">Telefonliste drucken</span>
               </button>
-              <button class="button button-primary" type="button" data-open-employee data-admin-only>
+              <button class="button button-primary" type="button" data-open-employee>
                 <svg><use href="#icon-plus"></use></svg>
                 Mitarbeiter anlegen
               </button>
@@ -658,7 +650,7 @@
                   <option value="12">Dezember</option>
                 </select>
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span>Eintragsart</span>
                 <select id="vacationEntryType">
                   <option value="vacation">Urlaub</option>
@@ -670,7 +662,7 @@
                   <option value="mandatoryDuty">Verpflichtende Dienstzusage</option>
                 </select>
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span>Vollzeit-Grundurlaub</span>
                 <span class="input-suffix compact-input-suffix">
                   <input
@@ -683,7 +675,7 @@
                   <span>Tage</span>
                 </span>
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span>Max. abwesend werktags</span>
                 <input
                   id="vacationWeekdayAbsenceLimit"
@@ -693,7 +685,7 @@
                   step="1"
                 />
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span>Max. Wochenende / Feiertag</span>
                 <input
                   id="vacationWeekendAbsenceLimit"
@@ -703,7 +695,7 @@
                   step="1"
                 />
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
                 <input id="vacationWeekendAReferenceSaturday" type="date" />
               </label>
@@ -711,7 +703,6 @@
                 class="button button-secondary"
                 id="saveVacationSettingsButton"
                 type="button"
-                data-admin-only
               >
                 Einstellungen speichern
               </button>
@@ -748,7 +739,6 @@
               class="button button-primary"
               type="button"
               data-open-appointment
-              data-admin-only
             >
               <svg><use href="#icon-plus"></use></svg>
               Termin anlegen
@@ -777,7 +767,7 @@
                 <svg><use href="#icon-check"></use></svg>
                 Abschluss eintragen
               </button>
-              <button class="button button-primary" type="button" data-open-training data-admin-only>
+              <button class="button button-primary" type="button" data-open-training>
                 <svg><use href="#icon-plus"></use></svg>
                 Fortbildung anlegen
               </button>
@@ -810,7 +800,7 @@
                 <svg><use href="#icon-chart"></use></svg>
                 Statistische Auswertung
               </button>
-              <button class="button button-primary" type="button" data-open-meeting data-admin-only>
+              <button class="button button-primary" type="button" data-open-meeting>
                 <svg><use href="#icon-plus"></use></svg>
                 Teamsitzung anlegen
               </button>
@@ -907,7 +897,6 @@
           class="view"
           id="deviceManagementView"
           data-view-panel="device-management"
-          data-admin-only
         >
           <div class="page-header">
             <div>
@@ -999,7 +988,7 @@
               </label>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section class="panel settings-card">
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-calendar"></use></svg>
@@ -1115,21 +1104,27 @@
               </div>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section class="panel settings-card">
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-admin">
                   <svg><use href="#icon-edit"></use></svg>
                 </span>
                 <div>
-                  <p class="eyebrow">Administration</p>
+                  <p class="eyebrow">Verwaltung</p>
                   <h2>Stammdaten &amp; Zugriffe</h2>
                 </div>
               </div>
               <p class="settings-description">
-                Benutzerkonten, Kataloge und die Qualität des Datenbestands zentral verwalten.
+                Kataloge und die Qualität des Datenbestands zentral verwalten.
+                Benutzerkonten sind Administratoren vorbehalten.
               </p>
               <div class="settings-actions">
-                <button class="button button-secondary" type="button" data-open-user-management>
+                <button
+                  class="button button-secondary"
+                  type="button"
+                  data-open-user-management
+                  data-admin-only
+                >
                   <svg><use href="#icon-users"></use></svg>
                   Benutzer verwalten
                 </button>
@@ -1190,7 +1185,6 @@
           <section
             class="panel backup-panel settings-backup-panel"
             aria-labelledby="backupTitle"
-            data-admin-only
           >
             <div class="backup-content">
               <span class="backup-icon" aria-hidden="true">
@@ -1221,7 +1215,12 @@
               </div>
             </div>
             <div class="backup-actions">
-              <button class="button button-ghost" id="openAuditLogButton" type="button">
+              <button
+                class="button button-ghost"
+                id="openAuditLogButton"
+                type="button"
+                data-admin-only
+              >
                 <svg><use href="#icon-more"></use></svg>
                 Änderungsprotokoll
               </button>
@@ -1330,13 +1329,22 @@
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-benutzerkonten-und-berechtigungen">
 <h2 id="hilfe-benutzerkonten-und-berechtigungen">Benutzerkonten und Berechtigungen</h2>
-<h3 id="hilfe-administratoren">Administratoren</h3>
-<p>Administratoren dürfen:</p>
-<ul><li>Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen</li><li>Berufe und Zusatzqualifikationen verwalten</li><li>Pflichtfortbildungen und Fortbildungsreihen verwalten</li><li>Teamsitzungen und Termine verwalten</li><li>Geräte und Geräteeinweisungen verwalten</li><li>Urlaubsansprüche und Abwesenheitsplanung bearbeiten</li><li>Dienstwochenenden konfigurieren und Simulationen übernehmen</li><li>Benutzerkonten verwalten und Passwörter zurücksetzen</li><li>Daten sichern, importieren und das Speicher-Backend wechseln</li></ul>
+<p>Jedes angemeldete Konto bedient TeO vollständig. Die Rollentrennung betrifft ausschließlich die Verwaltung der Anwendung selbst, nicht die tägliche Arbeit.</p>
 <h3 id="hilfe-normale-benutzer">Normale Benutzer</h3>
-<p>Normale Benutzer dürfen:</p>
-<ul><li>absolvierte Pflichtfortbildungen zuweisen</li><li>Teamsitzungsteilnahmen und Abwesenheitsgründe dokumentieren</li></ul>
-<p>Administrative Stammdaten und Planungsgrundlagen bleiben geschützt.</p>
+<p>Normale Benutzer dürfen alles, was zur regulären Bedienung gehört:</p>
+<ul><li>Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen</li><li>Berufe und Zusatzqualifikationen verwalten</li><li>Pflichtfortbildungen, Fortbildungsreihen und Nachweise verwalten</li><li>Teamsitzungen, Teilnahmen und Termine verwalten</li><li>Geräte und Geräteeinweisungen verwalten</li><li>Urlaubsansprüche und Abwesenheitsplanung bearbeiten</li><li>Dienstwochenenden konfigurieren und Simulationen übernehmen</li><li>Datenqualität prüfen, Telefonliste und E-Mail-Adressen exportieren</li><li>Daten sichern, prüfen und Sicherungen importieren</li><li>das eigene Passwort und das Farbthema ändern</li></ul>
+<h3 id="hilfe-administratoren">Administratoren</h3>
+<p>Administratoren dürfen zusätzlich drei Einstellungen ändern:</p>
+<ul><li><strong>Speicherort</strong> – zwischen lokalem Browserspeicher und MariaDB wechseln</li><li><strong>Benutzer verwalten</strong> – siehe unten</li><li><strong>Sicherungserinnerung</strong> – nach wie vielen Tagen TeO zur Sicherung mahnt</li></ul>
+<p>Zusätzlich ist das <strong>Änderungsprotokoll</strong> Administratoren vorbehalten, weil es die Tätigkeit der übrigen Konten nachvollziehbar macht.</p>
+<p>Diese Aufteilung gilt im lokalen Modus und im MariaDB-Modus gleichermaßen. Im MariaDB-Modus setzt der Server sie unabhängig vom Browser durch: Ein normales Konto kann Benutzerkonten und die Sicherungserinnerung auch dann nicht verändern, wenn der Client umgangen wird.</p>
+<h3 id="hilfe-benutzer-verwalten">Benutzer verwalten</h3>
+<p>Über <strong>Einstellungen → Stammdaten &amp; Zugriffe → Benutzer verwalten</strong> stehen Administratoren zur Verfügung:</p>
+<ul><li><strong>Konto anlegen</strong> – Benutzername und Rolle wählen. TeO erzeugt ein einmalig angezeigtes temporäres Passwort; beim ersten Anmelden muss der Benutzer ein eigenes Passwort festlegen.</li><li><strong>Benutzername ändern</strong> – 4 bis 40 Buchstaben oder Ziffern, eindeutig.</li><li><strong>Passwort zurücksetzen</strong> – für jedes andere Konto, auch für weitere Administratoren. Es entsteht wieder ein temporäres Passwort. Das eigene Passwort wird stattdessen über <strong>Konto → Passwort ändern</strong> geändert.</li><li><strong>Konto löschen</strong> – dauerhaft; der fachliche Datenbestand bleibt unberührt.</li></ul>
+<p>Zwei Konten lassen sich nicht löschen und sind entsprechend gekennzeichnet: das <strong>eigene Konto</strong>, damit man sich nicht mitten in der Sitzung aussperrt, und der <strong>letzte verbliebene Administrator</strong>, weil ein Datenbestand ohne Administrator nicht mehr verwaltbar wäre.</p>
+<h3 id="hilfe-benutzerkonten-beim-import">Benutzerkonten beim Import</h3>
+<p>Ein Sicherungsimport ersetzt den fachlichen Datenbestand, <strong>nicht</strong> die Benutzerkonten. Wer angemeldet ist, bleibt angemeldet, und die vorhandenen Konten und Passwörter gelten unverändert weiter. Nur wenn noch gar kein Konto existiert – etwa bei einer Wiederherstellung auf einem leeren System – werden die Konten aus der Sicherungsdatei übernommen.</p>
+<p>Deshalb kann der Import gefahrlos allen Konten offenstehen: Er ist kein Weg, sich Administratorrechte zu verschaffen.</p>
 <h3 id="hilfe-ersteinrichtung-und-passworter">Ersteinrichtung und Passwörter</h3>
 <p>TeO enthält keine fest eingebauten Produktivkonten oder Standardpasswörter. Beim ersten Start wird ein Administratorkonto erstellt.</p>
 <p>Wird das Passwort eines normalen Benutzers zurückgesetzt, erzeugt TeO ein temporäres Passwort. Beim nächsten Anmelden muss der Benutzer ein neues Passwort festlegen.</p>
@@ -1439,7 +1447,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-teamsitzungen">
 <h2 id="hilfe-teamsitzungen">Teamsitzungen</h2>
 <h3 id="hilfe-sitzung-anlegen">Sitzung anlegen</h3>
-<p>Administratoren erfassen Titel, Datum, Uhrzeit und Notizen. Die Sitzungen werden chronologisch sortiert.</p>
+<p>Titel, Datum, Uhrzeit und Notizen werden erfasst. Die Sitzungen werden chronologisch sortiert.</p>
 <h3 id="hilfe-teilnahme-effizient-dokumentieren">Teilnahme effizient dokumentieren</h3>
 <p>Für das aktive Team stehen folgende Statuswerte zur Verfügung:</p>
 <ul><li>teilgenommen</li><li>Urlaub</li><li>Dienst</li><li>Krankheit</li><li>Schule</li><li>entschuldigt</li><li>unentschuldigt</li></ul>
@@ -1451,7 +1459,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-gerateverwaltung-und-gerateeinweisungen">
 <h2 id="hilfe-gerateverwaltung-und-gerateeinweisungen">Geräteverwaltung und Geräteeinweisungen</h2>
 <h3 id="hilfe-geratekatalog">Gerätekatalog</h3>
-<p>Administratoren verwalten:</p>
+<p>Im Gerätekatalog werden verwaltet:</p>
 <ul><li>Hersteller</li><li>Produkt- oder Modellname</li><li>Gerätekategorie</li><li>aktueller Gerätebestand</li><li>Medizinprodukt der Anlage 1</li></ul>
 <p>Der Katalog ist alphabetisch nach Gerätenamen sortiert. Standardmäßig werden nur Geräte aus dem aktuellen Bestand angezeigt.</p>
 <h3 id="hilfe-einweisung-dokumentieren">Einweisung dokumentieren</h3>
@@ -1481,8 +1489,9 @@
 <p>Vor einem Import:</p>
 <ol><li>Aktuellen Datenbestand exportieren.</li><li>Zu importierende Datei über <strong>Sicherung prüfen</strong> validieren.</li><li><strong>Sicherung importieren</strong> auswählen.</li><li>Sicherheitsabfrage bestätigen.</li></ol>
 <p>TeO lädt vor dem Ersetzen zusätzlich eine Wiederherstellungssicherung herunter.</p>
+<p>Die Benutzerkonten werden dabei nicht ersetzt. Wer angemeldet ist, bleibt angemeldet; bestehende Konten und Passwörter gelten unverändert weiter. Nur auf einem System ohne jedes Konto werden die Konten aus der Sicherung übernommen.</p>
 <h3 id="hilfe-anderungsprotokoll">Änderungsprotokoll</h3>
-<p>Administrative und fachliche Änderungen werden mit Zeitpunkt, Benutzer und Beschreibung protokolliert. Das Protokoll kann als CSV exportiert werden.</p>
+<p>Administrative und fachliche Änderungen werden mit Zeitpunkt, Benutzer und Beschreibung protokolliert. Das Protokoll kann als CSV exportiert werden. Die Einsicht ist Administratoren vorbehalten.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-datenspeicherung-und-mariadb">
 <h2 id="hilfe-datenspeicherung-und-mariadb">Datenspeicherung und MariaDB</h2>
@@ -1597,7 +1606,7 @@ npm run verify</code></pre>
         <svg><use href="#icon-empty"></use></svg>
         <span>Einweisungen</span>
       </button>
-      <button type="button" data-view="device-management" data-admin-only>
+      <button type="button" data-view="device-management">
         <svg><use href="#icon-edit"></use></svg>
         <span>Geräte</span>
       </button>
@@ -1967,7 +1976,6 @@ npm run verify</code></pre>
           class="button button-primary"
           id="applyWeekendSimulationButton"
           type="button"
-          data-admin-only
         >
           <svg><use href="#icon-check"></use></svg>
           Simulation übernehmen
@@ -2086,7 +2094,8 @@ npm run verify</code></pre>
           <p class="eyebrow">Administration</p>
           <h2 id="userManagementDialogTitle">Benutzer verwalten</h2>
           <p class="modal-subtitle">
-            Benutzernamen bearbeiten und Passwörter normaler Benutzer zurücksetzen.
+            Konten anlegen und löschen, Benutzernamen bearbeiten und Passwörter
+            zurücksetzen.
           </p>
         </div>
         <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
@@ -2094,6 +2103,32 @@ npm run verify</code></pre>
         </button>
       </div>
       <div class="modal-body">
+        <form class="user-management-create" id="createUserForm">
+          <label class="user-management-create-field">
+            <span>Neuer Benutzername</span>
+            <input
+              id="newUserUsername"
+              type="text"
+              maxlength="40"
+              pattern="[A-Za-z0-9]{4,40}"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="4 bis 40 Buchstaben oder Ziffern"
+              required
+            />
+          </label>
+          <label class="user-management-create-field">
+            <span>Rolle</span>
+            <select id="newUserRole">
+              <option value="user">Normaler Benutzer</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </label>
+          <button class="button button-primary" id="createUserButton" type="submit">
+            <svg><use href="#icon-plus"></use></svg>
+            Benutzer anlegen
+          </button>
+        </form>
         <div class="user-management-list" id="userManagementList"></div>
         <section class="temporary-password" id="temporaryPasswordResult" hidden>
           <p class="eyebrow">Temporäres Passwort – nur einmal sichtbar</p>
@@ -2844,7 +2879,7 @@ npm run verify</code></pre>
         <div id="meetingStatsContent"></div>
       </div>
       <div class="modal-footer">
-        <label class="compact-field meeting-threshold-field" data-admin-only>
+        <label class="compact-field meeting-threshold-field">
           <span>Mindestquote</span>
           <select id="meetingAttendanceThreshold">
             <option value="50">50 %</option>

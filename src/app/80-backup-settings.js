@@ -10,12 +10,10 @@
   }
 
   async function exportDatabase() {
-    if (!requireAdmin()) return;
     await createAndDownloadBackup();
   }
 
   async function exportEncryptedDatabase() {
-    if (!requireAdmin()) return;
     const password = await requestBackupPassword({ mode: "export" });
     if (!password) return;
     try {
@@ -272,10 +270,6 @@
   }
 
   async function handleBackupFileSelection(event) {
-    if (!requireAdmin()) {
-      event.target.value = "";
-      return;
-    }
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
@@ -304,12 +298,14 @@
       `${importedState.appointments.length} Termine`,
       `${importedState.devices.length} Geräte`,
       `${importedState.deviceInstructions.length} Geräteeinweisungen`,
-      `${importedState.users.length} Benutzerkonten`,
     ].join(", ");
+    const accountNote = state.users.length
+      ? "Die bestehenden Benutzerkonten bleiben unverändert erhalten."
+      : "Da noch kein Benutzerkonto vorhanden ist, werden die Konten aus der Sicherung übernommen.";
 
     requestConfirmation({
       title: "Datensicherung importieren?",
-      message: `Die aktuellen Daten werden vollständig durch diese Sicherung ersetzt: ${counts}. Dieser Vorgang kann nur mit einer zuvor exportierten Sicherung rückgängig gemacht werden.`,
+      message: `Die aktuellen Daten werden vollständig durch diese Sicherung ersetzt: ${counts}. ${accountNote} Dieser Vorgang kann nur mit einer zuvor exportierten Sicherung rückgängig gemacht werden.`,
       acceptLabel: "Daten importieren",
       tone: "primary",
       callback: async () => {
@@ -323,10 +319,6 @@
   }
 
   async function handleBackupValidationSelection(event) {
-    if (!requireAdmin()) {
-      event.target.value = "";
-      return;
-    }
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
@@ -416,7 +408,6 @@
   }
 
   async function saveWeekendSettings() {
-    if (!requireAdmin()) return;
     const ownerA = elements.settingsWeekendOwnerA.value;
     const ownerB = elements.settingsWeekendOwnerB.value;
     if (!ownerA || !ownerB) {
@@ -507,6 +498,7 @@
   }
 
   async function testBackendConnection() {
+    if (!requireAdmin()) return;
     const apiUrl = window.TeOBackend.normalizeApiUrl(
       elements.settingsMariaDbApiUrl.value,
     );
@@ -541,7 +533,7 @@
   }
 
   async function applyStorageBackend() {
-    if (!isAdmin()) return;
+    if (!requireAdmin()) return;
     const selectedBackend = elements.settingsStorageBackend.value;
     if (selectedBackend === "local") {
       if (!isMariaDbMode()) return;
@@ -653,7 +645,7 @@
   }
 
   async function saveGeneralSettings() {
-    if (!isAdmin()) return;
+    if (!requireAdmin()) return;
 
     const backupReminderDays = Number(
       elements.settingsBackupReminderDays.value,
@@ -690,7 +682,7 @@
       elements.backupStatus.textContent =
         "Noch keine Sicherung dokumentiert – bitte zeitnah exportieren.";
       elements.backupStatus.classList.add("is-warning");
-      if (isAdmin() && !backupReminderShown) {
+      if (!backupReminderShown) {
         backupReminderShown = true;
         showToast("Es wurde noch keine Datensicherung dokumentiert.", "error");
       }
@@ -707,7 +699,7 @@
       overdue ? " – neue Sicherung empfohlen" : ""
     }`;
     elements.backupStatus.classList.toggle("is-warning", overdue);
-    if (isAdmin() && overdue && !backupReminderShown) {
+    if (overdue && !backupReminderShown) {
       backupReminderShown = true;
       showToast(
         `Die letzte Datensicherung liegt ${ageDays} Tage zurück. Bitte eine neue Sicherung exportieren.`,
@@ -720,9 +712,8 @@
     const visible = Boolean(currentUser && databaseSaveReminderArmed);
     elements.databaseSaveWarning.hidden = !visible;
     if (!visible) return;
-    elements.databaseSaveWarningText.textContent = isAdmin()
-      ? "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert."
-      : "Änderungen wurden automatisch gespeichert. Bitte den Administrator über die ausstehende Datensicherung informieren.";
+    elements.databaseSaveWarningText.textContent =
+      "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert.";
   }
 
   async function renderBrowserStorageStatus() {
@@ -912,8 +903,18 @@
   }
 
   async function importDatabase(importedState) {
-    if (!requireAdmin()) return;
     const previousState = state;
+    // Benutzerkonten sind bewusst nicht Teil des Imports: Der Import ersetzt den
+    // fachlichen Datenbestand, die Anmeldung bleibt davon unberührt. Nur auf einem
+    // System ohne jedes Konto werden die Konten aus der Sicherung übernommen,
+    // damit eine Wiederherstellung von Grund auf möglich bleibt.
+    const preservedUsers = Array.isArray(previousState?.users)
+      ? previousState.users
+      : [];
+    const usersFromBackup = preservedUsers.length === 0;
+    if (!usersFromBackup) {
+      importedState.users = preservedUsers;
+    }
     state = importedState;
     if (!(await persistState())) {
       state = previousState;
@@ -935,5 +936,9 @@
       return;
     }
     renderAll();
-    showToast("Die Datensicherung wurde vollständig importiert.");
+    showToast(
+      usersFromBackup
+        ? "Die Datensicherung wurde einschließlich der Benutzerkonten importiert."
+        : "Die Datensicherung wurde importiert. Die Benutzerkonten sind unverändert.",
+    );
   }

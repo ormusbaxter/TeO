@@ -10,7 +10,6 @@
                 class="button button-secondary"
                 id="openCatalogManagementButton"
                 type="button"
-                data-admin-only
               >
                 <svg><use href="#icon-edit"></use></svg>
                 Berufe &amp; Qualifikationen
@@ -27,7 +26,6 @@
                 class="button button-secondary"
                 id="openDataQualityButton"
                 type="button"
-                data-admin-only
               >
                 <svg><use href="#icon-alert"></use></svg>
                 Datenqualität
@@ -36,7 +34,6 @@
                 class="button button-secondary"
                 id="copyActiveEmailsButton"
                 type="button"
-                data-admin-only
               >
                 <svg><use href="#icon-copy"></use></svg>
                 <span id="copyActiveEmailsLabel">E-Mails kopieren</span>
@@ -45,12 +42,11 @@
                 class="button button-secondary"
                 id="exportEmployeePhoneListButton"
                 type="button"
-                data-admin-only
               >
                 <svg><use href="#icon-print"></use></svg>
                 <span id="exportEmployeePhoneListLabel">Telefonliste drucken</span>
               </button>
-              <button class="button button-primary" type="button" data-open-employee data-admin-only>
+              <button class="button button-primary" type="button" data-open-employee>
                 <svg><use href="#icon-plus"></use></svg>
                 Mitarbeiter anlegen
               </button>
@@ -191,7 +187,7 @@
                   <option value="12">Dezember</option>
                 </select>
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span>Eintragsart</span>
                 <select id="vacationEntryType">
                   <option value="vacation">Urlaub</option>
@@ -203,7 +199,7 @@
                   <option value="mandatoryDuty">Verpflichtende Dienstzusage</option>
                 </select>
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span>Vollzeit-Grundurlaub</span>
                 <span class="input-suffix compact-input-suffix">
                   <input
@@ -216,7 +212,7 @@
                   <span>Tage</span>
                 </span>
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span>Max. abwesend werktags</span>
                 <input
                   id="vacationWeekdayAbsenceLimit"
@@ -226,7 +222,7 @@
                   step="1"
                 />
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span>Max. Wochenende / Feiertag</span>
                 <input
                   id="vacationWeekendAbsenceLimit"
@@ -236,7 +232,7 @@
                   step="1"
                 />
               </label>
-              <label class="compact-field" data-admin-only>
+              <label class="compact-field">
                 <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
                 <input id="vacationWeekendAReferenceSaturday" type="date" />
               </label>
@@ -244,7 +240,6 @@
                 class="button button-secondary"
                 id="saveVacationSettingsButton"
                 type="button"
-                data-admin-only
               >
                 Einstellungen speichern
               </button>

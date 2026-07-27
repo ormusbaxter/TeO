@@ -569,6 +569,9 @@
     accountDialogRole: document.querySelector("#accountDialogRole"),
     userManagementDialog: document.querySelector("#userManagementDialog"),
     userManagementList: document.querySelector("#userManagementList"),
+    createUserForm: document.querySelector("#createUserForm"),
+    newUserUsername: document.querySelector("#newUserUsername"),
+    newUserRole: document.querySelector("#newUserRole"),
     temporaryPasswordResult: document.querySelector("#temporaryPasswordResult"),
     temporaryPasswordUsername: document.querySelector("#temporaryPasswordUsername"),
     temporaryPasswordValue: document.querySelector("#temporaryPasswordValue"),
@@ -2541,10 +2544,16 @@
       button.addEventListener("click", openUserManagementDialog);
     });
     elements.mobileAccountButton.addEventListener("click", openAccountDialog);
+    elements.createUserForm.addEventListener("submit", handleCreateUserSubmit);
     elements.userManagementList.addEventListener("click", (event) => {
       const resetButton = event.target.closest("[data-reset-user-password]");
       if (resetButton) {
         requestPasswordReset(resetButton.dataset.resetUserPassword);
+        return;
+      }
+      const deleteButton = event.target.closest("[data-delete-user]");
+      if (deleteButton) {
+        requestDeleteUser(deleteButton.dataset.deleteUser);
         return;
       }
       const saveButton = event.target.closest("[data-save-user-username]");
@@ -3123,14 +3132,40 @@
     if (elements.accountDialog.open) elements.accountDialog.close();
     elements.temporaryPasswordResult.hidden = true;
     elements.temporaryPasswordValue.value = "";
+    elements.createUserForm.reset();
     renderUserManagement();
     elements.userManagementDialog.showModal();
   }
 
+  // Das eigene Konto bleibt ausgenommen, damit sich niemand mitten in der
+  // Sitzung selbst aussperrt. Der letzte Administrator bleibt bestehen, weil
+  // ein Datenbestand ohne Administrator nicht mehr verwaltbar wäre.
+  function userDeletionBlocker(user) {
+    if (user.id === currentUser?.id) return "Das eigene Konto kann nicht gelöscht werden.";
+    if (
+      user.role === "admin" &&
+      state.users.filter((item) => item.role === "admin").length <= 1
+    ) {
+      return "Der letzte Administrator kann nicht gelöscht werden.";
+    }
+    return "";
+  }
+
+  function isUsernameTaken(username, exceptId = "") {
+    const normalized = username.toLocaleLowerCase("de-DE");
+    return state.users.some(
+      (item) =>
+        item.id !== exceptId &&
+        item.username.toLocaleLowerCase("de-DE") === normalized,
+    );
+  }
+
   function renderUserManagement() {
     elements.userManagementList.innerHTML = state.users
-      .map(
-        (user) => `
+      .map((user) => {
+        const isSelf = user.id === currentUser?.id;
+        const deletionBlocker = userDeletionBlocker(user);
+        return `
           <article class="user-management-row">
             <span class="user-management-avatar">${escapeHtml(
               user.username.slice(0, 2).toUpperCase(),
@@ -3148,6 +3183,8 @@
                 aria-label="Benutzername für ${escapeHtml(user.username)}"
               />
               <small>${user.role === "admin" ? "Administrator" : "Normaler Benutzer"}${
+                isSelf ? " · eigenes Konto" : ""
+              }${
                 user.mustChangePassword ? " · Passwortänderung erforderlich" : ""
               }</small>
             </label>
@@ -3161,19 +3198,121 @@
                 Benutzername speichern
               </button>
               ${
-                user.role === "user"
-                  ? `<button
+                isSelf
+                  ? ""
+                  : `<button
                     class="button button-secondary"
                     type="button"
                     data-reset-user-password="${user.id}"
                   >Passwort zurücksetzen</button>`
-                  : '<span class="tag tag-muted">Admin</span>'
+              }
+              ${
+                deletionBlocker
+                  ? `<span class="tag tag-muted" title="${escapeHtml(
+                      deletionBlocker,
+                    )}">Nicht löschbar</span>`
+                  : `<button
+                    class="button button-danger"
+                    type="button"
+                    data-delete-user="${user.id}"
+                    aria-label="Konto ${escapeHtml(user.username)} löschen"
+                  >
+                    <svg><use href="#icon-trash"></use></svg>
+                    Löschen
+                  </button>`
               }
             </div>
           </article>
-        `,
-      )
+        `;
+      })
       .join("");
+  }
+
+  async function handleCreateUserSubmit(event) {
+    event.preventDefault();
+    if (!requireAdmin()) return;
+
+    const username = elements.newUserUsername.value.trim();
+    if (!/^[A-Za-z0-9]{4,40}$/.test(username)) {
+      showToast(
+        "Der Benutzername muss aus 4 bis 40 Buchstaben oder Ziffern bestehen.",
+        "error",
+      );
+      elements.newUserUsername.focus();
+      return;
+    }
+    if (isUsernameTaken(username)) {
+      showToast("Dieser Benutzername ist bereits vergeben.", "error");
+      elements.newUserUsername.focus();
+      return;
+    }
+
+    const role = elements.newUserRole.value === "admin" ? "admin" : "user";
+    const temporaryPassword = createTemporaryPassword();
+    const credentials = await createPasswordCredentials(temporaryPassword);
+    const newUser = {
+      id: `user-${createId()}`,
+      username,
+      role,
+      ...credentials,
+      mustChangePassword: true,
+    };
+
+    const committed = await commitStateMutation(() => {
+      state.users = [...state.users, newUser];
+    });
+    if (!committed) return;
+
+    elements.createUserForm.reset();
+    renderUserManagement();
+    showTemporaryPassword(username, temporaryPassword);
+    showToast(
+      `Konto „${username}“ wurde als ${
+        role === "admin" ? "Administrator" : "normaler Benutzer"
+      } angelegt.`,
+    );
+  }
+
+  function requestDeleteUser(userId) {
+    if (!requireAdmin()) return;
+    const user = state.users.find((item) => item.id === userId);
+    if (!user) return;
+    const blocker = userDeletionBlocker(user);
+    if (blocker) {
+      showToast(blocker, "error");
+      return;
+    }
+    requestConfirmation({
+      title: "Benutzerkonto löschen?",
+      message: `Das Konto „${user.username}“ wird dauerhaft entfernt und kann sich danach nicht mehr anmelden. Eine noch offene Serversitzung dieses Kontos endet beim nächsten Serverkontakt. Der fachliche Datenbestand bleibt unverändert.`,
+      acceptLabel: "Konto löschen",
+      tone: "danger",
+      callback: () => deleteUser(user.id),
+    });
+  }
+
+  async function deleteUser(userId) {
+    if (!requireAdmin()) return;
+    const user = state.users.find((item) => item.id === userId);
+    if (!user || userDeletionBlocker(user)) return;
+
+    const committed = await commitStateMutation(() => {
+      state.users = state.users.filter((item) => item.id !== user.id);
+    });
+    if (!committed) return;
+
+    elements.temporaryPasswordResult.hidden = true;
+    elements.temporaryPasswordValue.value = "";
+    renderUserManagement();
+    showToast(`Konto „${user.username}“ wurde gelöscht.`);
+  }
+
+  function showTemporaryPassword(username, password) {
+    elements.temporaryPasswordUsername.textContent = username;
+    elements.temporaryPasswordValue.value = password;
+    elements.temporaryPasswordResult.hidden = false;
+    elements.temporaryPasswordValue.focus();
+    elements.temporaryPasswordValue.select();
   }
 
   async function saveUsername(userId) {
@@ -3197,14 +3336,7 @@
       input.focus();
       return;
     }
-    if (
-      state.users.some(
-        (item) =>
-          item.id !== user.id &&
-          item.username.toLocaleLowerCase("de-DE") ===
-            username.toLocaleLowerCase("de-DE"),
-      )
-    ) {
+    if (isUsernameTaken(username, user.id)) {
       showToast("Dieser Benutzername ist bereits vergeben.", "error");
       input.focus();
       return;
@@ -3232,9 +3364,17 @@
     );
   }
 
+  // Das eigene Passwort wird über den Kontodialog geändert, nicht hier
+  // zurückgesetzt – sonst wäre die eigene Sitzung sofort änderungspflichtig.
+  function resettableUser(userId) {
+    return state.users.find(
+      (item) => item.id === userId && item.id !== currentUser?.id,
+    );
+  }
+
   function requestPasswordReset(userId) {
     if (!requireAdmin()) return;
-    const user = state.users.find((item) => item.id === userId && item.role === "user");
+    const user = resettableUser(userId);
     if (!user) return;
     requestConfirmation({
       title: "Passwort zurücksetzen?",
@@ -3247,7 +3387,7 @@
 
   async function resetUserPassword(userId) {
     if (!requireAdmin()) return;
-    const user = state.users.find((item) => item.id === userId && item.role === "user");
+    const user = resettableUser(userId);
     if (!user) return;
     const temporaryPassword = createTemporaryPassword();
     const credentials = await createPasswordCredentials(temporaryPassword);
@@ -3261,11 +3401,7 @@
     if (!committed) return;
 
     renderUserManagement();
-    elements.temporaryPasswordUsername.textContent = user.username;
-    elements.temporaryPasswordValue.value = temporaryPassword;
-    elements.temporaryPasswordResult.hidden = false;
-    elements.temporaryPasswordValue.focus();
-    elements.temporaryPasswordValue.select();
+    showTemporaryPassword(user.username, temporaryPassword);
     showToast(`Passwort für ${user.username} wurde zurückgesetzt.`);
   }
 
@@ -3291,7 +3427,6 @@
   }
 
   function openCatalogManagementDialog() {
-    if (!requireAdmin()) return;
     elements.newProfession.value = "";
     elements.newQualification.value = "";
     renderCatalogManagement();
@@ -3353,7 +3488,6 @@
   }
 
   async function addProfession() {
-    if (!requireAdmin()) return;
     const profession = normalizeProfession(elements.newProfession.value);
     if (!profession) {
       showToast("Bitte eine Berufsbezeichnung eingeben.", "error");
@@ -3375,7 +3509,6 @@
   }
 
   async function addQualification() {
-    if (!requireAdmin()) return;
     const label = elements.newQualification.value.trim();
     if (!label) {
       showToast("Bitte eine Bezeichnung für die Zusatzqualifikation eingeben.", "error");
@@ -3429,7 +3562,6 @@
   }
 
   async function saveProfession(index, nextValue) {
-    if (!requireAdmin()) return;
     const previousValue = state.catalogs.professions[index];
     const profession = normalizeProfession(nextValue);
     if (!previousValue || !profession) {
@@ -3462,7 +3594,6 @@
   }
 
   function deleteProfession(index) {
-    if (!requireAdmin()) return;
     const profession = state.catalogs.professions[index];
     if (!profession) return;
     const assignmentCount = state.employees.filter(
@@ -3493,7 +3624,6 @@
   }
 
   async function saveQualification(id, nextValue) {
-    if (!requireAdmin()) return;
     const qualification = state.catalogs.qualifications.find((item) => item.id === id);
     const label = String(nextValue || "").trim();
     if (
@@ -3532,7 +3662,6 @@
   }
 
   function deleteQualification(id) {
-    if (!requireAdmin()) return;
     const qualification = state.catalogs.qualifications.find((item) => item.id === id);
     if (!qualification) return;
     if (LEADERSHIP_QUALIFICATION_IDS.includes(id)) {
@@ -4393,7 +4522,6 @@
   }
 
   function requestApplyWeekendSimulation() {
-    if (!requireAdmin()) return;
     const simulation = currentWeekendSimulation;
     if (!simulation || simulation.employeeCount === 0) {
       showToast("Es liegt keine übernehmbare Simulation vor.", "error");
@@ -4426,7 +4554,6 @@
   }
 
   async function applyWeekendSimulation(simulation) {
-    if (!requireAdmin()) return;
     if (!weekendSimulationMatchesCurrentState(simulation)) {
       renderWeekendSimulation();
       showToast(
@@ -5255,7 +5382,6 @@
                   title="${escapeHtml(
                     [entryType?.label, metadata.title].filter(Boolean).join(" · "),
                   )}"
-                  ${isAdmin() ? "" : "disabled"}
                   class="${entry ? `planner-entry-${entry.type}` : ""}"
                 >${entryType?.shortLabel || ""}</button>
               </td>
@@ -5273,7 +5399,6 @@
             value="${entitlement.additional}"
             data-vacation-additional-employee="${employee.id}"
             aria-label="Zusatzurlaub ${escapeHtml(fullName(employee))}"
-            ${isAdmin() ? "" : "disabled"}
           />
         </td>
         <td class="vacation-total-column"><strong>${formatVacationNumber(entitlement.total)}</strong></td>
@@ -5545,7 +5670,7 @@
     const button = event.target.closest(
       "[data-vacation-employee][data-vacation-date]",
     );
-    if (!button || !requireAdmin()) return;
+    if (!button) return;
     const scrollPosition = captureVacationScrollPosition();
     const employeeId = button.dataset.vacationEmployee;
     const date = button.dataset.vacationDate;
@@ -5595,7 +5720,7 @@
 
   async function handleVacationPlannerChange(event) {
     const input = event.target.closest("[data-vacation-additional-employee]");
-    if (!input || !requireAdmin()) return;
+    if (!input) return;
     const scrollPosition = captureVacationScrollPosition();
     const employeeId = input.dataset.vacationAdditionalEmployee;
     const additionalDays =
@@ -5637,7 +5762,6 @@
   }
 
   async function saveVacationSettings() {
-    if (!requireAdmin()) return;
     const baseDays =
       Math.round(clampNumber(elements.vacationBaseDays.value, 1, 60, 30) * 2) /
       2;
@@ -5787,7 +5911,7 @@
   }
 
   function openBulkEditDialog() {
-    if (!requireAdmin() || selectedEmployeeIds.size === 0) return;
+    if (selectedEmployeeIds.size === 0) return;
     elements.bulkEditForm.reset();
     elements.bulkEditSubtitle.textContent = `${selectedEmployeeIds.size} Mitarbeiter werden gemeinsam bearbeitet.`;
     elements.bulkProfession.innerHTML = [
@@ -5813,7 +5937,7 @@
 
   async function handleBulkEditSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin() || selectedEmployeeIds.size === 0) return;
+    if (selectedEmployeeIds.size === 0) return;
     const active = elements.bulkActive.value;
     const profession = elements.bulkProfession.value;
     const weekend = elements.bulkServiceWeekend.value;
@@ -5899,7 +6023,6 @@
   }
 
   function openDataQualityDialog() {
-    if (!requireAdmin()) return;
     const issues = getDataQualityIssues();
     elements.dataQualityContent.innerHTML = issues.length
       ? `<div class="quality-issue-list">${issues
@@ -6077,7 +6200,7 @@
       elements.employeeTable.innerHTML = renderEmptyState({
         title: "Noch keine Mitarbeiter angelegt",
         text: "Erfassen Sie Stammdaten, Beschäftigungsumfang und Zusatzqualifikationen.",
-        buttonText: isAdmin() ? "Ersten Mitarbeiter anlegen" : "",
+        buttonText: "Ersten Mitarbeiter anlegen",
         buttonAttribute: "data-empty-add-employee",
       });
       elements.employeeTable
@@ -6100,7 +6223,7 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th class="selection-column" data-admin-only>
+              <th class="selection-column">
                 <input
                   type="checkbox"
                   data-select-all-employees
@@ -6189,7 +6312,7 @@
 
     return `
       <tr>
-        <td class="selection-column" data-admin-only>
+        <td class="selection-column">
           <input
             type="checkbox"
             data-select-employee="${employee.id}"
@@ -6277,7 +6400,7 @@
             >
               <svg><use href="#icon-more"></use></svg>
             </button>
-            <span data-admin-only>
+            <span>
             <button
               class="icon-button"
               type="button"
@@ -6438,7 +6561,7 @@
           ${renderEmptyState({
             title: "Noch keine Pflichtfortbildungen",
             text: "Legen Sie eine Fortbildung an und erfassen Sie anschließend die absolvierten Nachweise aktiver Mitarbeiter.",
-            buttonText: isAdmin() ? "Erste Fortbildung anlegen" : "",
+            buttonText: "Erste Fortbildung anlegen",
             buttonAttribute: "data-empty-add-training",
           })}
         </section>
@@ -6455,7 +6578,7 @@
           ${renderEmptyState({
             title: `Bis ${trainingDisplayYear} keine Pflichtfortbildungen`,
             text: "Wählen Sie ein späteres Jahr oder ergänzen Sie den Fortbildungskatalog.",
-            buttonText: isAdmin() ? "Fortbildung anlegen" : "",
+            buttonText: "Fortbildung anlegen",
             buttonAttribute: "data-empty-add-training",
           })}
         </section>
@@ -6804,7 +6927,6 @@
               class="icon-button"
               type="button"
               data-action="edit-training"
-              data-admin-only
               data-id="${training.id}"
               aria-label="${escapeHtml(training.title)} bearbeiten"
               title="Bearbeiten"
@@ -6815,7 +6937,6 @@
               class="icon-button danger"
               type="button"
               data-action="delete-training"
-              data-admin-only
               data-id="${training.id}"
               aria-label="${escapeHtml(training.title)} löschen"
               title="Löschen"
@@ -6862,7 +6983,6 @@
           class="icon-button danger"
           type="button"
           data-action="delete-completion"
-          data-admin-only
           data-id="${completion.id}"
           aria-label="Nachweis von ${escapeHtml(fullName(employee))} löschen"
           title="Nachweis löschen"
@@ -6895,7 +7015,7 @@
           ${renderEmptyState({
             title: "Noch keine Termine",
             text: "Legen Sie den ersten Termin an. Anstehende Termine erscheinen automatisch im Fristenmonitor.",
-            buttonText: isAdmin() ? "Ersten Termin anlegen" : "",
+            buttonText: "Ersten Termin anlegen",
             buttonAttribute: "data-empty-add-appointment",
           })}
         </section>
@@ -6973,7 +7093,6 @@
               class="icon-button"
               type="button"
               data-action="edit-appointment"
-              data-admin-only
               data-id="${appointment.id}"
               aria-label="${escapeHtml(appointment.title)} bearbeiten"
               title="Bearbeiten"
@@ -6984,7 +7103,6 @@
               class="icon-button danger"
               type="button"
               data-action="delete-appointment"
-              data-admin-only
               data-id="${appointment.id}"
               aria-label="${escapeHtml(appointment.title)} löschen"
               title="Löschen"
@@ -7116,7 +7234,7 @@
           ${renderEmptyState({
             title: "Noch keine Geräte",
             text: "Legen Sie das erste Gerät an, bevor Einweisungen dokumentiert werden.",
-            buttonText: isAdmin() ? "Erstes Gerät anlegen" : "",
+            buttonText: "Erstes Gerät anlegen",
             buttonAttribute: "data-empty-add-device",
           })}
         </section>
@@ -7219,7 +7337,6 @@
               class="icon-button"
               type="button"
               data-action="edit-device"
-              data-admin-only
               data-id="${device.id}"
               aria-label="${escapeHtml(device.productName)} bearbeiten"
               title="Bearbeiten"
@@ -7230,7 +7347,6 @@
               class="icon-button danger"
               type="button"
               data-action="delete-device"
-              data-admin-only
               data-id="${device.id}"
               aria-label="${escapeHtml(device.productName)} löschen"
               title="Löschen"
@@ -7425,7 +7541,6 @@
                     class="icon-button danger"
                     type="button"
                     data-delete-device-instruction="${instruction.id}"
-                    data-admin-only
                     aria-label="Einweisung vom ${formatDate(
                       instruction.date,
                     )} löschen"
@@ -7559,7 +7674,6 @@
   }
 
   function openDeviceDialog(deviceId = null) {
-    if (!requireAdmin()) return;
     elements.deviceForm.reset();
     document.querySelector("#deviceId").value = "";
     document.querySelector("#deviceCurrentInventory").checked = true;
@@ -7604,7 +7718,6 @@
 
   async function handleDeviceSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
     const productName = document.querySelector("#deviceProductName");
     const manufacturer = document.querySelector("#deviceManufacturer");
     const category = document.querySelector("#deviceCategory");
@@ -7648,7 +7761,6 @@
   }
 
   function requestDeleteDevice(deviceId) {
-    if (!requireAdmin()) return;
     const device = getDevice(deviceId);
     if (!device) return;
     const instructionCount = state.deviceInstructions.filter(
@@ -7678,12 +7790,7 @@
 
   function openDeviceInstructionDialog(deviceId = null, instructionId = null) {
     if (!state.devices.length) {
-      showToast(
-        isAdmin()
-          ? "Bitte legen Sie zuerst ein Gerät an."
-          : "Es wurde noch kein Gerät angelegt.",
-        "error",
-      );
+      showToast("Bitte legen Sie zuerst ein Gerät an.", "error");
       return;
     }
     const existingInstruction = instructionId
@@ -8036,7 +8143,6 @@
                     class="icon-button danger"
                     type="button"
                     data-delete-device-instruction="${instruction.id}"
-                    data-admin-only
                     aria-label="Einweisungsnachweis vom ${formatDate(
                       instruction.date,
                     )} löschen"
@@ -8062,7 +8168,6 @@
   }
 
   function requestDeleteDeviceInstruction(instructionId) {
-    if (!requireAdmin()) return;
     const instruction = state.deviceInstructions.find(
       (item) => item.id === instructionId,
     );
@@ -8115,7 +8220,7 @@
           ${renderEmptyState({
             title: "Noch keine Teamsitzungen",
             text: "Legen Sie die erste Sitzung an. Anschließend kann der Status des gesamten aktiven Teams gesammelt erfasst werden.",
-            buttonText: isAdmin() ? "Erste Teamsitzung anlegen" : "",
+            buttonText: "Erste Teamsitzung anlegen",
             buttonAttribute: "data-empty-add-meeting",
           })}
         </section>
@@ -8214,7 +8319,6 @@
               class="icon-button"
               type="button"
               data-action="edit-meeting"
-              data-admin-only
               data-id="${meeting.id}"
               aria-label="${escapeHtml(meeting.title)} bearbeiten"
               title="Bearbeiten"
@@ -8225,7 +8329,6 @@
               class="icon-button danger"
               type="button"
               data-action="delete-meeting"
-              data-admin-only
               data-id="${meeting.id}"
               aria-label="${escapeHtml(meeting.title)} löschen"
               title="Löschen"
@@ -8500,12 +8603,6 @@
   }
 
   async function updateMeetingAttendanceThreshold() {
-    if (!requireAdmin()) {
-      elements.meetingAttendanceThreshold.value = String(
-        state.settings.meetingAttendanceThreshold,
-      );
-      return;
-    }
     const threshold = clampNumber(
       elements.meetingAttendanceThreshold.value,
       1,
@@ -8634,7 +8731,7 @@
     selectedEmployeeIds = new Set(
       [...selectedEmployeeIds].filter((employeeId) => getEmployee(employeeId)),
     );
-    elements.employeeBulkBar.hidden = !isAdmin() || selectedEmployeeIds.size === 0;
+    elements.employeeBulkBar.hidden = selectedEmployeeIds.size === 0;
     elements.employeeBulkCount.textContent = `${selectedEmployeeIds.size} ausgewählt`;
   }
 
@@ -8689,7 +8786,6 @@
   }
 
   function openEmployeeDialog(employeeId = null) {
-    if (!requireAdmin()) return;
     elements.employeeForm.reset();
     [
       "#firstName",
@@ -8799,7 +8895,6 @@
 
   async function handleEmployeeSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
 
     const birthDate = document.querySelector("#birthDate");
     const firstNameInput = document.querySelector("#firstName");
@@ -8924,7 +9019,6 @@
   }
 
   async function toggleEmployee(employeeId) {
-    if (!requireAdmin()) return;
     const employee = getEmployee(employeeId);
     if (!employee) return;
 
@@ -8941,7 +9035,6 @@
   }
 
   function requestDeleteEmployee(employeeId) {
-    if (!requireAdmin()) return;
     const employee = getEmployee(employeeId);
     if (!employee) return;
     const ownerWeekend = serviceWeekendOwnerKey(employeeId);
@@ -9043,7 +9136,6 @@
   }
 
   function openTrainingDialog(trainingId = null) {
-    if (!requireAdmin()) return;
     elements.trainingForm.reset();
     document.querySelector("#trainingTitle").setCustomValidity("");
     document.querySelector("#trainingId").value = "";
@@ -9078,7 +9170,6 @@
 
   async function handleTrainingSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
     const titleInput = document.querySelector("#trainingTitle");
     titleInput.setCustomValidity(
       titleInput.value.trim() ? "" : "Bitte eine Bezeichnung eingeben.",
@@ -9134,7 +9225,6 @@
   }
 
   function requestDeleteTraining(trainingId) {
-    if (!requireAdmin()) return;
     const training = getTraining(trainingId);
     if (!training) return;
     const completionCount = state.completions.filter(
@@ -9165,7 +9255,6 @@
   }
 
   function openAppointmentDialog(appointmentId = null) {
-    if (!requireAdmin()) return;
     elements.appointmentForm.reset();
     document.querySelector("#appointmentId").value = "";
     document.querySelector("#appointmentTitle").setCustomValidity("");
@@ -9210,7 +9299,6 @@
 
   async function handleAppointmentSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
     const titleInput = document.querySelector("#appointmentTitle");
     titleInput.setCustomValidity(
       titleInput.value.trim() ? "" : "Bitte einen Titel eingeben.",
@@ -9253,7 +9341,6 @@
   }
 
   function requestDeleteAppointment(appointmentId) {
-    if (!requireAdmin()) return;
     const appointment = getAppointment(appointmentId);
     if (!appointment) return;
 
@@ -9276,7 +9363,6 @@
   }
 
   function openMeetingDialog(meetingId = null) {
-    if (!requireAdmin()) return;
     elements.meetingForm.reset();
     document.querySelector("#meetingTitle").setCustomValidity("");
     document.querySelector("#meetingId").value = "";
@@ -9306,7 +9392,6 @@
 
   async function handleMeetingSubmit(event) {
     event.preventDefault();
-    if (!requireAdmin()) return;
     const titleInput = document.querySelector("#meetingTitle");
     titleInput.setCustomValidity(
       titleInput.value.trim() ? "" : "Bitte eine Bezeichnung eingeben.",
@@ -9346,7 +9431,6 @@
   }
 
   function requestDeleteMeeting(meetingId) {
-    if (!requireAdmin()) return;
     const meeting = getMeeting(meetingId);
     if (!meeting) return;
     const attendanceCount = state.meetingAttendances.filter(
@@ -9749,7 +9833,6 @@
   }
 
   function requestDeleteCompletion(completionId) {
-    if (!requireAdmin()) return;
     const completion = state.completions.find((item) => item.id === completionId);
     if (!completion) return;
     const employee = getEmployee(completion.employeeId);
@@ -9784,12 +9867,10 @@
   }
 
   async function exportDatabase() {
-    if (!requireAdmin()) return;
     await createAndDownloadBackup();
   }
 
   async function exportEncryptedDatabase() {
-    if (!requireAdmin()) return;
     const password = await requestBackupPassword({ mode: "export" });
     if (!password) return;
     try {
@@ -10046,10 +10127,6 @@
   }
 
   async function handleBackupFileSelection(event) {
-    if (!requireAdmin()) {
-      event.target.value = "";
-      return;
-    }
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
@@ -10078,12 +10155,14 @@
       `${importedState.appointments.length} Termine`,
       `${importedState.devices.length} Geräte`,
       `${importedState.deviceInstructions.length} Geräteeinweisungen`,
-      `${importedState.users.length} Benutzerkonten`,
     ].join(", ");
+    const accountNote = state.users.length
+      ? "Die bestehenden Benutzerkonten bleiben unverändert erhalten."
+      : "Da noch kein Benutzerkonto vorhanden ist, werden die Konten aus der Sicherung übernommen.";
 
     requestConfirmation({
       title: "Datensicherung importieren?",
-      message: `Die aktuellen Daten werden vollständig durch diese Sicherung ersetzt: ${counts}. Dieser Vorgang kann nur mit einer zuvor exportierten Sicherung rückgängig gemacht werden.`,
+      message: `Die aktuellen Daten werden vollständig durch diese Sicherung ersetzt: ${counts}. ${accountNote} Dieser Vorgang kann nur mit einer zuvor exportierten Sicherung rückgängig gemacht werden.`,
       acceptLabel: "Daten importieren",
       tone: "primary",
       callback: async () => {
@@ -10097,10 +10176,6 @@
   }
 
   async function handleBackupValidationSelection(event) {
-    if (!requireAdmin()) {
-      event.target.value = "";
-      return;
-    }
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
@@ -10190,7 +10265,6 @@
   }
 
   async function saveWeekendSettings() {
-    if (!requireAdmin()) return;
     const ownerA = elements.settingsWeekendOwnerA.value;
     const ownerB = elements.settingsWeekendOwnerB.value;
     if (!ownerA || !ownerB) {
@@ -10281,6 +10355,7 @@
   }
 
   async function testBackendConnection() {
+    if (!requireAdmin()) return;
     const apiUrl = window.TeOBackend.normalizeApiUrl(
       elements.settingsMariaDbApiUrl.value,
     );
@@ -10315,7 +10390,7 @@
   }
 
   async function applyStorageBackend() {
-    if (!isAdmin()) return;
+    if (!requireAdmin()) return;
     const selectedBackend = elements.settingsStorageBackend.value;
     if (selectedBackend === "local") {
       if (!isMariaDbMode()) return;
@@ -10427,7 +10502,7 @@
   }
 
   async function saveGeneralSettings() {
-    if (!isAdmin()) return;
+    if (!requireAdmin()) return;
 
     const backupReminderDays = Number(
       elements.settingsBackupReminderDays.value,
@@ -10464,7 +10539,7 @@
       elements.backupStatus.textContent =
         "Noch keine Sicherung dokumentiert – bitte zeitnah exportieren.";
       elements.backupStatus.classList.add("is-warning");
-      if (isAdmin() && !backupReminderShown) {
+      if (!backupReminderShown) {
         backupReminderShown = true;
         showToast("Es wurde noch keine Datensicherung dokumentiert.", "error");
       }
@@ -10481,7 +10556,7 @@
       overdue ? " – neue Sicherung empfohlen" : ""
     }`;
     elements.backupStatus.classList.toggle("is-warning", overdue);
-    if (isAdmin() && overdue && !backupReminderShown) {
+    if (overdue && !backupReminderShown) {
       backupReminderShown = true;
       showToast(
         `Die letzte Datensicherung liegt ${ageDays} Tage zurück. Bitte eine neue Sicherung exportieren.`,
@@ -10494,9 +10569,8 @@
     const visible = Boolean(currentUser && databaseSaveReminderArmed);
     elements.databaseSaveWarning.hidden = !visible;
     if (!visible) return;
-    elements.databaseSaveWarningText.textContent = isAdmin()
-      ? "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert."
-      : "Änderungen wurden automatisch gespeichert. Bitte den Administrator über die ausstehende Datensicherung informieren.";
+    elements.databaseSaveWarningText.textContent =
+      "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert.";
   }
 
   async function renderBrowserStorageStatus() {
@@ -10686,8 +10760,18 @@
   }
 
   async function importDatabase(importedState) {
-    if (!requireAdmin()) return;
     const previousState = state;
+    // Benutzerkonten sind bewusst nicht Teil des Imports: Der Import ersetzt den
+    // fachlichen Datenbestand, die Anmeldung bleibt davon unberührt. Nur auf einem
+    // System ohne jedes Konto werden die Konten aus der Sicherung übernommen,
+    // damit eine Wiederherstellung von Grund auf möglich bleibt.
+    const preservedUsers = Array.isArray(previousState?.users)
+      ? previousState.users
+      : [];
+    const usersFromBackup = preservedUsers.length === 0;
+    if (!usersFromBackup) {
+      importedState.users = preservedUsers;
+    }
     state = importedState;
     if (!(await persistState())) {
       state = previousState;
@@ -10709,7 +10793,11 @@
       return;
     }
     renderAll();
-    showToast("Die Datensicherung wurde vollständig importiert.");
+    showToast(
+      usersFromBackup
+        ? "Die Datensicherung wurde einschließlich der Benutzerkonten importiert."
+        : "Die Datensicherung wurde importiert. Die Benutzerkonten sind unverändert.",
+    );
   }
 
   function getTrainingStats(training) {
@@ -11027,7 +11115,7 @@
   }
 
   function handleBeforeUnload(event) {
-    if (!databaseSaveReminderArmed || !isAdmin()) return;
+    if (!databaseSaveReminderArmed) return;
     event.preventDefault();
     event.returnValue = "";
   }
@@ -11187,7 +11275,6 @@
   }
 
   function exportEmployeePhoneList() {
-    if (!requireAdmin()) return;
     const rows = getFilteredEmployeePhoneListRows();
     if (rows.length === 0) {
       showToast(
@@ -11215,7 +11302,6 @@
   }
 
   async function copyActiveEmployeeEmails() {
-    if (!requireAdmin()) return;
     const emailAddresses = getFilteredEmployeeEmailAddresses();
     if (emailAddresses.length === 0) {
       showToast(

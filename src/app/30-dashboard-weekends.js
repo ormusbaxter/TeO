@@ -645,7 +645,6 @@
   }
 
   function requestApplyWeekendSimulation() {
-    if (!requireAdmin()) return;
     const simulation = currentWeekendSimulation;
     if (!simulation || simulation.employeeCount === 0) {
       showToast("Es liegt keine übernehmbare Simulation vor.", "error");
@@ -678,7 +677,6 @@
   }
 
   async function applyWeekendSimulation(simulation) {
-    if (!requireAdmin()) return;
     if (!weekendSimulationMatchesCurrentState(simulation)) {
       renderWeekendSimulation();
       showToast(
