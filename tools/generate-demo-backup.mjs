@@ -1,10 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { PROJECT_META } from "../src/meta/project-meta.mjs";
 
 const SEED = 20260726;
-const STATE_VERSION = 20;
-const BACKUP_FORMAT = "intensivteam-datensicherung";
+const STATE_VERSION = PROJECT_META.stateVersion;
+const BACKUP_FORMAT = PROJECT_META.backupFormat;
 const EXPORTED_AT = "2026-07-26T12:00:00.000Z";
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULT_OUTPUT = path.join(
@@ -14,6 +15,8 @@ const DEFAULT_OUTPUT = path.join(
 );
 
 const QUALIFICATIONS = [
+  ["stationsleitung", "Stationsleitung"],
+  ["stellvertretendeStationsleitung", "Stellvertretende Stationsleitung"],
   ["fachweiterbildungIA", "Fachweiterbildung I/A"],
   ["praxisanleiter", "Praxisanleiter/in"],
   ["hygienebeauftragter", "Hygienebeauftragte/r"],
@@ -181,7 +184,7 @@ function createEmployees() {
     const serviceWeekend =
       profession === "Stationsassistenz" || profession === "Arzt/Ärztin"
         ? "none"
-        : weightedPick([["oli", 45], ["claudio", 45], ["none", 10]]);
+        : weightedPick([["weekend_a", 45], ["weekend_b", 45], ["none", 10]]);
     const qualifications = Object.fromEntries(
       QUALIFICATIONS.map(([id]) => [id, false]),
     );
@@ -461,26 +464,26 @@ function initialUsers() {
   return [
     {
       id: "user-admin",
-      username: "Becke003",
+      username: "DemoAdmin",
       role: "admin",
-      passwordSalt: "PRJwiOdOJrDJMnvi9ii+Nw==",
-      passwordHash: "nohBaPFvNb82bZ42kqeReikbLR0LPfsr1j9AxN0Qsdk=",
+      passwordSalt: "IsuQeqq+lG55f5qseebb0w==",
+      passwordHash: "+T4fSji3T70wJDJi7CfoM+8kRrah2J2TelxOq3XT0z0=",
       mustChangePassword: false,
     },
     {
       id: "user-botze",
-      username: "Botze003",
+      username: "DemoUser1",
       role: "user",
-      passwordSalt: "Pb5FJQr9W/AYuWWFTFMMJw==",
-      passwordHash: "2ko1h7SMKwvKdWosUnOKb/HP0kc7tF8bk1EZ99RNWzI=",
+      passwordSalt: "M9joS35LnetkzDqbmevCug==",
+      passwordHash: "SfywWsFa6OsRZTdKSlO7IcS3R/kC+kMWII86a/FB7AQ=",
       mustChangePassword: true,
     },
     {
       id: "user-ferre",
-      username: "Ferre001",
+      username: "DemoUser2",
       role: "user",
-      passwordSalt: "TkRiTRbHdkRLB00eXtbHIA==",
-      passwordHash: "2rUFkTolfTPNPz7KaVPHTEy/72gBBaxqGYXYJ0SIOy8=",
+      passwordSalt: "TGOkhLO5sEg+BWMPvqoFgg==",
+      passwordHash: "+MSWxorSpl/CaYCPZTCxn6GA4AybIAFCgIrtdppyjYM=",
       mustChangePassword: true,
     },
   ];
@@ -612,6 +615,23 @@ function validateBackup(backup) {
 export async function generateDemoBackup(outputPath = DEFAULT_OUTPUT) {
   const devices = await readDefaultDevices();
   const employees = createEmployees();
+  const weekendAOwner = employees.find(
+    (employee) =>
+      employee.employmentStatus !== "inactive" &&
+      employee.serviceWeekend === "weekend_a",
+  );
+  const weekendBOwner = employees.find(
+    (employee) =>
+      employee.employmentStatus !== "inactive" &&
+      employee.serviceWeekend === "weekend_b" &&
+      employee.id !== weekendAOwner?.id,
+  );
+  if (weekendAOwner) {
+    weekendAOwner.qualifications.stationsleitung = true;
+  }
+  if (weekendBOwner) {
+    weekendBOwner.qualifications.stellvertretendeStationsleitung = true;
+  }
   const { meetings, meetingAttendances } = createMeetings(employees);
   const { trainings, completions } = createTrainings(employees);
   const deviceInstructions = createDeviceInstructions(devices, employees);
@@ -644,9 +664,19 @@ export async function generateDemoBackup(outputPath = DEFAULT_OUTPUT) {
         backupReminderDays: 14,
         meetingAttendanceThreshold: 70,
         vacationBaseDays: 30,
-        vacationOliReferenceSaturday: "2026-01-03",
+        vacationWeekendAReferenceSaturday: "2026-01-03",
         vacationWeekdayAbsenceLimit: 8,
         vacationWeekendAbsenceLimit: 5,
+        serviceWeekends: {
+          weekend_a: {
+            name: weekendAOwner?.firstName || "Wochenende A",
+            ownerId: weekendAOwner?.id || "",
+          },
+          weekend_b: {
+            name: weekendBOwner?.firstName || "Wochenende B",
+            ownerId: weekendBOwner?.id || "",
+          },
+        },
         deadlineKinds: ["appointment", "birthday", "training", "qualification"],
       },
       users: initialUsers(),

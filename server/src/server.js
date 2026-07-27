@@ -4,6 +4,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import mariadb from "mariadb";
+import { validateStateShape as validateSharedState } from "../../src/shared/state-schema.mjs";
+import { runMigrations } from "./migrations.js";
+import { createSessionStore } from "./session-store.js";
 
 const APP_STATE_ID = 1;
 const PASSWORD_ITERATIONS = 210000;
@@ -19,6 +22,11 @@ const allowedOrigins = String(process.env.TEO_CORS_ORIGINS || "")
   .split(",")
   .map((value) => value.trim())
   .filter(Boolean);
+if (allowedOrigins.includes("*")) {
+  throw new Error(
+    "TEO_CORS_ORIGINS darf aus Sicherheitsgründen keinen Platzhalter (*) enthalten.",
+  );
+}
 
 const requiredDatabaseSettings = ["DB_HOST", "DB_NAME", "DB_USER", "DB_PASSWORD"];
 const missingDatabaseSettings = requiredDatabaseSettings.filter(
@@ -43,13 +51,14 @@ const pool = mariadb.createPool({
   insertIdAsNumber: true,
 });
 
-const sessions = new Map();
 const loginAttempts = new Map();
 const app = express();
 const currentFile = fileURLToPath(import.meta.url);
 const projectRoot = path.resolve(path.dirname(currentFile), "../..");
+const sessionStore = createSessionStore(pool, sessionTtlMs);
 
 app.disable("x-powered-by");
+if (booleanEnv("TEO_TRUST_PROXY", false)) app.set("trust proxy", 1);
 app.use((request, response, next) => {
   response.set({
     "X-Content-Type-Options": "nosniff",
@@ -62,6 +71,12 @@ app.use((request, response, next) => {
       ? "no-store"
       : "no-cache",
   });
+  if (booleanEnv("TEO_HTTPS_ONLY", false)) {
+    response.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains",
+    );
+  }
   next();
 });
 app.use((request, response, next) => {
@@ -75,7 +90,6 @@ app.use((request, response, next) => {
   }
   if (
     sameHostOrigin ||
-    allowedOrigins.includes("*") ||
     allowedOrigins.includes(origin)
   ) {
     response.setHeader("Access-Control-Allow-Origin", origin);
@@ -112,7 +126,7 @@ app.get("/api/health", asyncHandler(async (_request, response) => {
 
 app.post("/api/bootstrap", loginRateLimit, asyncHandler(async (request, response) => {
   const { state, username, password } = request.body || {};
-  validateStateShape(state);
+  validateStateShape(state, { requireCredentials: true });
   const user = findUser(state, username);
   if (
     !user ||
@@ -145,6 +159,13 @@ app.post("/api/bootstrap", loginRateLimit, asyncHandler(async (request, response
        VALUES (?, 1, ?, CURRENT_TIMESTAMP(3), ?)`,
       [APP_STATE_ID, JSON.stringify(state), user.username],
     );
+    await appendServerAudit(connection, {
+      eventType: "database_bootstrap",
+      actor: user,
+      revision: 1,
+      ipAddress: request.ip,
+      details: { source: "api" },
+    });
     await connection.commit();
   } catch (error) {
     if (connection) await safeRollback(connection);
@@ -154,7 +175,7 @@ app.post("/api/bootstrap", loginRateLimit, asyncHandler(async (request, response
   }
 
   clearFailedLogins(request.ip);
-  const token = createSession(user);
+  const token = await sessionStore.create(user);
   response.status(201).json({
     token,
     user: publicUser(user),
@@ -185,7 +206,7 @@ app.post("/api/auth/login", loginRateLimit, asyncHandler(async (request, respons
   }
 
   clearFailedLogins(request.ip);
-  const token = createSession(user);
+  const token = await sessionStore.create(user);
   response.json({
     token,
     user: publicUser(user),
@@ -194,10 +215,10 @@ app.post("/api/auth/login", loginRateLimit, asyncHandler(async (request, respons
   });
 }));
 
-app.delete("/api/auth/session", requireSession, (request, response) => {
-  sessions.delete(request.session.token);
+app.delete("/api/auth/session", requireSession, asyncHandler(async (request, response) => {
+  await sessionStore.removeByHash(request.session.tokenHash);
   response.sendStatus(204);
-});
+}));
 
 app.get("/api/state", requireSession, asyncHandler(async (request, response) => {
   const row = await readStateRow();
@@ -212,7 +233,7 @@ app.get("/api/state", requireSession, asyncHandler(async (request, response) => 
     (user) => user.id === request.session.userId,
   );
   if (!currentUser) {
-    sessions.delete(request.session.token);
+    await sessionStore.removeByHash(request.session.tokenHash);
     return response.status(401).json({
       code: "session_user_missing",
       message: "Das Benutzerkonto dieser Sitzung existiert nicht mehr.",
@@ -223,6 +244,30 @@ app.get("/api/state", requireSession, asyncHandler(async (request, response) => 
     revision: Number(row.revision),
     user: publicUser(currentUser),
   });
+}));
+
+app.get("/api/audit", requireSession, asyncHandler(async (request, response) => {
+  const row = await readStateRow();
+  if (!row) {
+    throw httpError(409, "not_initialized", "In MariaDB ist noch kein TeO-Datenbestand vorhanden.");
+  }
+  const state = parseStatePayload(row.payload);
+  const currentUser = state.users?.find(
+    (user) => user.id === request.session.userId,
+  );
+  if (currentUser?.role !== "admin") {
+    throw httpError(403, "admin_required", "Das Serverprotokoll ist nur für Administratoren verfügbar.");
+  }
+  const limit = Math.min(1000, Math.max(1, Number(request.query.limit) || 200));
+  const entries = await pool.query(
+    `SELECT id, event_type, actor_user_id, actor_username, revision,
+            ip_address, details, created_at
+       FROM teo_audit_log
+      ORDER BY id DESC
+      LIMIT ?`,
+    [limit],
+  );
+  response.json({ entries });
 }));
 
 app.put("/api/state", requireSession, asyncHandler(async (request, response) => {
@@ -256,7 +301,7 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
     );
     if (!currentUser) {
       await connection.rollback();
-      sessions.delete(request.session.token);
+      await sessionStore.removeByHash(request.session.tokenHash);
       return response.status(401).json({
         code: "session_user_missing",
         message: "Das Benutzerkonto dieser Sitzung existiert nicht mehr.",
@@ -278,6 +323,7 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
       currentState,
       nextState,
     );
+    validateStateShape(hydratedNextState, { requireCredentials: true });
     if (
       currentUser.mustChangePassword &&
       !containsRequiredPasswordChange(
@@ -323,6 +369,13 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
         APP_STATE_ID,
       ],
     );
+    await appendServerAudit(connection, {
+      eventType: "state_updated",
+      actor: currentUser,
+      revision: nextRevision,
+      ipAddress: request.ip,
+      details: summarizeStateMutation(currentState, hydratedNextState),
+    });
     await connection.commit();
     response.json({
       state: stateForClient(hydratedNextState, currentUser.id),
@@ -344,6 +397,8 @@ app.use("/vendor", express.static(path.join(projectRoot, "vendor"), {
 for (const fileName of [
   "index.html",
   "styles.css",
+  "project-meta.js",
+  "state-schema.js",
   "backend-client.js",
   "app.js",
 ]) {
@@ -403,20 +458,9 @@ function asyncHandler(handler) {
   };
 }
 
-async function ensureSchema(connection = pool) {
-  await connection.query(`
-    CREATE TABLE IF NOT EXISTS teo_state (
-      id TINYINT UNSIGNED NOT NULL,
-      revision BIGINT UNSIGNED NOT NULL DEFAULT 1,
-      payload JSON NOT NULL,
-      updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-      updated_by VARCHAR(40) NOT NULL,
-      PRIMARY KEY (id),
-      CONSTRAINT chk_teo_singleton CHECK (id = 1)
-    ) ENGINE=InnoDB
-      DEFAULT CHARACTER SET utf8mb4
-      COLLATE utf8mb4_unicode_ci
-  `);
+async function ensureSchema() {
+  await runMigrations(pool);
+  await sessionStore.prune();
 }
 
 async function readStateRow(connection = pool, forUpdate = false) {
@@ -434,82 +478,34 @@ function parseStatePayload(payload) {
   return JSON.parse(String(payload));
 }
 
-function validateStateShape(state) {
-  if (!state || typeof state !== "object" || Array.isArray(state)) {
-    throw httpError(400, "invalid_state", "Der TeO-Datenbestand ist ungültig.");
-  }
-  const requiredArrays = [
-    "employees",
-    "trainings",
-    "completions",
-    "meetings",
-    "meetingAttendances",
-    "appointments",
-    "devices",
-    "deviceInstructions",
-    "vacationEntitlements",
-    "vacationDays",
-    "users",
-    "auditLog",
-  ];
-  if (
-    !Number.isFinite(Number(state.version)) ||
-    requiredArrays.some((key) => !Array.isArray(state[key])) ||
-    !state.settings ||
-    typeof state.settings !== "object" ||
-    !state.catalogs ||
-    typeof state.catalogs !== "object"
-  ) {
-    throw httpError(
-      400,
-      "invalid_state",
-      "Der TeO-Datenbestand ist unvollständig oder ungültig.",
-    );
-  }
-  const normalizedUsernames = state.users.map((user) =>
-    String(user?.username || "").toLocaleLowerCase("de-DE"),
-  );
-  if (
-    state.users.some(
+function validateStateShape(state, { requireCredentials = false } = {}) {
+  const validation = validateSharedState(state, {
+    maxBytes: MAX_STATE_BYTES,
+    requireAdmin: true,
+    maxAuditEntries: 1000,
+  });
+  if (validation.valid && requireCredentials) {
+    const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
+    const invalidCredentials = state.users.some(
       (user) =>
-        !/^[A-Za-z0-9]{4,40}$/.test(String(user?.username || "")) ||
-        !["admin", "user"].includes(user?.role),
-    ) ||
-    new Set(normalizedUsernames).size !== normalizedUsernames.length
-  ) {
-    throw httpError(
-      400,
-      "invalid_users",
-      "Die Benutzerkonten enthalten ungültige oder doppelte Benutzernamen.",
+        !base64Pattern.test(String(user.passwordSalt || "")) ||
+        !base64Pattern.test(String(user.passwordHash || "")),
     );
+    if (invalidCredentials) {
+      throw httpError(
+        400,
+        "invalid_credentials_data",
+        "Mindestens ein Benutzerkonto enthält keine gültigen Passwortdaten.",
+      );
+    }
   }
-  const employeeUsernames = state.employees
-    .map((employee) => String(employee?.username || "").trim())
-    .filter(Boolean);
-  if (
-    employeeUsernames.some(
-      (username) => !/^[A-Za-z0-9]{4,40}$/.test(username),
-    ) ||
-    new Set(
-      employeeUsernames.map((username) =>
-        username.toLocaleLowerCase("de-DE"),
-      ),
-    ).size !== employeeUsernames.length
-  ) {
-    throw httpError(
-      400,
-      "invalid_employee_usernames",
-      "Die Mitarbeiterdaten enthalten ungültige oder doppelte Benutzernamen.",
-    );
-  }
-  const byteLength = Buffer.byteLength(JSON.stringify(state), "utf8");
-  if (byteLength > MAX_STATE_BYTES) {
-    throw httpError(
-      413,
-      "state_too_large",
-      "Der TeO-Datenbestand überschreitet die zulässige Größe von 20 MB.",
-    );
-  }
+  if (validation.valid) return;
+  const tooLarge = validation.byteLength > MAX_STATE_BYTES;
+  throw httpError(
+    tooLarge ? 413 : 400,
+    tooLarge ? "state_too_large" : "invalid_state",
+    `Der TeO-Datenbestand ist ungültig: ${validation.issues[0]}`,
+  );
 }
 
 function httpError(status, code, message) {
@@ -559,16 +555,10 @@ function publicUser(user) {
   };
 }
 
-function stateForClient(state, currentUserId) {
+function stateForClient(state, _currentUserId) {
   const clientState = structuredClone(state);
-  const currentUser = clientState.users.find(
-    (user) => user.id === currentUserId,
-  );
-  if (currentUser?.role === "admin") return clientState;
   clientState.users = clientState.users.map((user) =>
-    user.id === currentUserId
-      ? user
-      : { ...user, passwordSalt: "", passwordHash: "" },
+    ({ ...user, passwordSalt: "", passwordHash: "" }),
   );
   return clientState;
 }
@@ -590,40 +580,24 @@ function mergeProtectedCredentials(currentState, nextState) {
   return hydratedState;
 }
 
-function createSession(user) {
-  const token = crypto.randomBytes(32).toString("base64url");
-  sessions.set(token, {
-    token,
-    userId: user.id,
-    expiresAt: Date.now() + sessionTtlMs,
-  });
-  pruneSessions();
-  return token;
-}
-
 function requireSession(request, response, next) {
   const authorization = request.headers.authorization || "";
   const token = authorization.startsWith("Bearer ")
     ? authorization.slice(7).trim()
     : "";
-  const session = sessions.get(token);
-  if (!session || session.expiresAt <= Date.now()) {
-    if (token) sessions.delete(token);
-    return response.status(401).json({
-      code: "session_expired",
-      message: "Die Serversitzung ist abgelaufen. Bitte erneut anmelden.",
-    });
-  }
-  session.expiresAt = Date.now() + sessionTtlMs;
-  request.session = session;
-  next();
-}
-
-function pruneSessions() {
-  const now = Date.now();
-  sessions.forEach((session, token) => {
-    if (session.expiresAt <= now) sessions.delete(token);
-  });
+  sessionStore
+    .read(token)
+    .then((session) => {
+      if (!session) {
+        return response.status(401).json({
+          code: "session_expired",
+          message: "Die Serversitzung ist abgelaufen. Bitte erneut anmelden.",
+        });
+      }
+      request.session = session;
+      next();
+    })
+    .catch(next);
 }
 
 function loginRateLimit(request, response, next) {
@@ -731,6 +705,39 @@ function isPermittedOwnUserMutation(beforeUsers, afterUsers, userId) {
 
 function deepEqual(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
+}
+
+async function appendServerAudit(
+  connection,
+  { eventType, actor, revision = null, ipAddress = null, details = null },
+) {
+  await connection.query(
+    `INSERT INTO teo_audit_log
+      (event_type, actor_user_id, actor_username, revision, ip_address, details)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      eventType,
+      actor?.id || null,
+      actor?.username || "system",
+      revision,
+      ipAddress,
+      details ? JSON.stringify(details) : null,
+    ],
+  );
+}
+
+function summarizeStateMutation(before, after) {
+  const changedCollections = [];
+  for (const key of Object.keys(after)) {
+    if (!deepEqual(before[key], after[key])) {
+      changedCollections.push({
+        key,
+        beforeCount: Array.isArray(before[key]) ? before[key].length : null,
+        afterCount: Array.isArray(after[key]) ? after[key].length : null,
+      });
+    }
+  }
+  return { changedCollections };
 }
 
 async function safeRollback(connection) {

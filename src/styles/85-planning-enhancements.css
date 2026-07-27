@@ -1,0 +1,793 @@
+.vacation-controls-panel {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 20px;
+  padding: 20px 22px;
+}
+
+.vacation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: end;
+}
+
+.vacation-controls .compact-field {
+  min-width: 145px;
+}
+
+.vacation-controls .compact-field input,
+.vacation-controls .compact-field select {
+  min-height: 42px;
+}
+
+.compact-input-suffix {
+  min-width: 145px;
+}
+
+.vacation-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding-top: 15px;
+  color: var(--slate-600);
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-top: 1px solid var(--slate-200);
+}
+
+.vacation-legend span {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.vacation-legend i {
+  width: 15px;
+  height: 15px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.legend-vacation {
+  background: var(--green-700);
+}
+
+.legend-planner-onboarding-vacation {
+  background: #0891b2;
+}
+
+.legend-planner-school {
+  background: var(--blue-600);
+}
+
+.legend-planner-unpaid {
+  background: var(--red-700);
+}
+
+.legend-planner-external {
+  background: #805bad;
+}
+
+.legend-planner-planned-off {
+  background: #526273;
+}
+
+.legend-planner-duty {
+  border-color: var(--orange-700) !important;
+  background: var(--orange-100);
+}
+
+.legend-weekend-weekend_a {
+  background: #dcebff;
+  border-color: #73a9f1 !important;
+}
+
+.legend-weekend-weekend_b {
+  background: #f0e6ff;
+  border-color: #a57adb !important;
+}
+
+.legend-holiday {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--red-100),
+    var(--red-100) 4px,
+    var(--white) 4px,
+    var(--white) 8px
+  );
+  border-color: var(--red-700) !important;
+}
+
+.legend-school-vacation {
+  border-color: #d8a800 !important;
+  background:
+    linear-gradient(#e7b900 0 4px, transparent 4px),
+    #fff8cf;
+}
+
+.vacation-summary {
+  margin-bottom: 20px;
+}
+
+body.is-vacation-view .main-content {
+  max-width: none;
+  padding-right: clamp(18px, 2vw, 36px);
+  padding-left: clamp(18px, 2vw, 36px);
+}
+
+.vacation-planner-panel {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.vacation-table-note {
+  display: grid;
+  gap: 5px;
+  padding: 14px 18px;
+  color: var(--slate-600);
+  font-size: 0.78rem;
+  border-bottom: 1px solid var(--slate-200);
+  background: var(--slate-50);
+}
+
+.vacation-table-note .is-warning {
+  color: var(--orange-700);
+  font-weight: 700;
+}
+
+.vacation-table-scroll {
+  max-width: 100%;
+  max-height: min(70vh, 760px);
+  max-height: min(70dvh, 760px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.vacation-table {
+  --vacation-total-width: 58px;
+
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.76rem;
+}
+
+.vacation-table th,
+.vacation-table td {
+  height: 50px;
+  padding: 5px;
+  text-align: center;
+  border-right: 1px solid var(--slate-200);
+  border-bottom: 1px solid var(--slate-200);
+  background: var(--white);
+}
+
+.vacation-table thead th {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+  height: 108px;
+  color: var(--slate-700);
+  background: var(--slate-50);
+}
+
+.vacation-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.vacation-table .vacation-employee-column {
+  position: sticky;
+  z-index: 2;
+  left: 0;
+  width: 190px;
+  min-width: 190px;
+  max-width: 190px;
+  padding: 7px 10px;
+  text-align: left;
+  box-shadow: 7px 0 12px -12px rgb(16 34 54 / 55%);
+}
+
+.vacation-table thead .vacation-employee-column {
+  z-index: 5;
+}
+
+.vacation-table tbody .vacation-employee-weekend-weekend_a {
+  background: #eef5ff;
+  box-shadow:
+    inset 5px 0 #73a9f1,
+    7px 0 12px -12px rgb(16 34 54 / 55%);
+}
+
+.vacation-table tbody .vacation-employee-weekend-weekend_b {
+  background: #f7f0ff;
+  box-shadow:
+    inset 5px 0 #a57adb,
+    7px 0 12px -12px rgb(16 34 54 / 55%);
+}
+
+.vacation-table tbody .vacation-employee-weekend-none {
+  background: var(--white);
+  box-shadow:
+    inset 5px 0 var(--slate-300),
+    7px 0 12px -12px rgb(16 34 54 / 55%);
+}
+
+.vacation-employee {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+
+.vacation-employee .avatar {
+  width: 31px;
+  height: 31px;
+  min-width: 31px;
+  font-size: 0.65rem;
+}
+
+.vacation-employee > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+
+.vacation-employee strong,
+.vacation-employee small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vacation-employee-link {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  color: var(--slate-900);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 0;
+  background: transparent;
+}
+
+.vacation-employee-link:hover {
+  color: var(--blue-700);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.vacation-employee small {
+  margin-top: 2px;
+  color: var(--slate-500);
+  font-size: 0.67rem;
+  font-weight: 600;
+}
+
+.vacation-day-column,
+.vacation-day-cell {
+  width: 34px;
+  min-width: 34px;
+  max-width: 34px;
+  padding-right: 2px !important;
+  padding-left: 2px !important;
+}
+
+.vacation-day-column strong,
+.vacation-day-column small {
+  display: block;
+}
+
+.vacation-capacity {
+  display: block;
+  width: max-content;
+  min-width: 28px;
+  margin: 5px auto 0;
+  padding: 2px 3px;
+  color: var(--slate-600);
+  font-size: 0.58rem;
+  font-weight: 900;
+  border: 1px solid var(--slate-300);
+  border-radius: 5px;
+  background: var(--white);
+}
+
+.vacation-day-column.is-at-limit .vacation-capacity {
+  color: var(--orange-700);
+  border-color: var(--orange-700);
+  background: var(--orange-100);
+}
+
+.vacation-day-column.is-over-limit .vacation-capacity {
+  color: var(--white);
+  border-color: var(--red-700);
+  background: var(--red-700);
+}
+
+.vacation-day-column.is-over-limit {
+  color: var(--white);
+  background: var(--red-700) !important;
+}
+
+.vacation-day-column.is-over-limit :is(
+    small,
+    .vacation-duty-count,
+    .vacation-offset-count
+  ) {
+  color: var(--white);
+}
+
+.vacation-day-cell.is-over-limit {
+  background-color: var(--red-100) !important;
+  box-shadow:
+    inset 2px 0 rgb(180 35 47 / 38%),
+    inset -2px 0 rgb(180 35 47 / 38%);
+}
+
+.vacation-duty-count {
+  display: block;
+  margin-top: 2px;
+  color: var(--orange-700);
+  font-size: 0.56rem;
+  font-weight: 900;
+}
+
+.vacation-offset-count {
+  display: block;
+  width: max-content;
+  margin: 2px auto 0;
+  padding: 1px 4px;
+  color: var(--teal-700);
+  font-size: 0.56rem;
+  font-weight: 900;
+  border-radius: 99px;
+  background: var(--teal-100);
+}
+
+.vacation-day-column strong {
+  font-size: 0.85rem;
+}
+
+.vacation-day-column small {
+  margin-top: 2px;
+  color: inherit;
+  font-size: 0.61rem;
+  font-weight: 700;
+}
+
+.vacation-weekend-weekend_a {
+  background: #eef5ff !important;
+}
+
+.vacation-weekend-weekend_b {
+  background: #f7f0ff !important;
+}
+
+.vacation-holiday {
+  background-image: linear-gradient(
+    135deg,
+    transparent 0 88%,
+    rgb(180 35 47 / 44%) 88% 100%
+  ) !important;
+}
+
+.vacation-holiday-dot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  margin: 3px auto 0;
+  border-radius: 50%;
+  background: var(--red-700);
+}
+
+.vacation-school-vacation {
+  box-shadow: inset 0 4px #e7b900;
+}
+
+.vacation-school-vacation-dot {
+  display: block;
+  width: 12px;
+  height: 3px;
+  margin: 2px auto 0;
+  border-radius: 99px;
+  background: #d8a800;
+}
+
+.vacation-day-cell button {
+  display: grid;
+  width: 28px;
+  height: 31px;
+  margin: auto;
+  cursor: pointer;
+  place-items: center;
+  color: var(--green-700);
+  font-size: 0.7rem;
+  font-weight: 900;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: rgb(255 255 255 / 48%);
+}
+
+.vacation-day-cell button:hover:not(:disabled) {
+  border-color: var(--blue-600);
+  background: var(--white);
+}
+
+.vacation-day-cell.is-own-weekend button {
+  border-color: currentColor;
+  border-style: dashed;
+}
+
+.vacation-day-cell button:is(
+    .planner-entry-vacation,
+    .planner-entry-onboardingVacation,
+    .planner-entry-school,
+    .planner-entry-unpaid,
+    .planner-entry-external,
+    .planner-entry-plannedOff
+  ) {
+  color: var(--white);
+  box-shadow: 0 3px 9px rgb(16 34 54 / 20%);
+}
+
+.vacation-day-cell button.planner-entry-vacation {
+  border-color: var(--green-700);
+  background: var(--green-700);
+}
+
+.vacation-day-cell button.planner-entry-onboardingVacation {
+  border-color: #087f9c;
+  background: #0891b2;
+}
+
+.vacation-day-cell button.planner-entry-school {
+  border-color: var(--blue-700);
+  background: var(--blue-700);
+}
+
+.vacation-day-cell button.planner-entry-unpaid {
+  border-color: var(--red-700);
+  background: var(--red-700);
+}
+
+.vacation-day-cell button.planner-entry-external {
+  border-color: #805bad;
+  background: #805bad;
+}
+
+.vacation-day-cell button.planner-entry-plannedOff {
+  border-color: #526273;
+  background: #526273;
+}
+
+.vacation-day-cell button.planner-entry-mandatoryDuty {
+  color: var(--orange-700);
+  border: 2px solid var(--orange-700);
+  background: var(--orange-100);
+  box-shadow: 0 3px 9px rgb(165 90 10 / 16%);
+}
+
+.vacation-total-column {
+  width: var(--vacation-total-width);
+  min-width: var(--vacation-total-width);
+  max-width: var(--vacation-total-width);
+  padding-right: 3px !important;
+  padding-left: 3px !important;
+  background: var(--slate-50) !important;
+}
+
+.vacation-table tbody .vacation-total-column {
+  position: sticky;
+  z-index: 2;
+}
+
+.vacation-table thead .vacation-total-column {
+  z-index: 6;
+}
+
+.vacation-table tr > .vacation-total-column:last-child {
+  right: 0;
+}
+
+.vacation-table tr > .vacation-total-column:nth-last-child(2) {
+  right: var(--vacation-total-width);
+}
+
+.vacation-table tr > .vacation-total-column:nth-last-child(3) {
+  right: calc(var(--vacation-total-width) * 2);
+}
+
+.vacation-table tr > .vacation-total-column:nth-last-child(4) {
+  right: calc(var(--vacation-total-width) * 3);
+}
+
+.vacation-table tr > .vacation-total-column:nth-last-child(5) {
+  right: calc(var(--vacation-total-width) * 4);
+  box-shadow: -8px 0 12px -12px rgb(16 34 54 / 65%);
+}
+
+.vacation-additional-input {
+  width: 46px;
+  min-height: 32px;
+  padding: 4px;
+  text-align: center;
+  color: var(--slate-800);
+  border: 1px solid var(--slate-300);
+  border-radius: 7px;
+  background: var(--white);
+}
+
+.vacation-negative {
+  color: var(--red-700);
+  background: var(--red-100) !important;
+}
+
+.vacation-overview-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.vacation-overview-dialog {
+  width: min(96vw, 1500px);
+  max-width: 1500px;
+}
+
+.vacation-overview-dialog[open] {
+  display: flex;
+  height: min(850px, calc(100dvh - 24px));
+  max-height: calc(100dvh - 24px);
+  flex-direction: column;
+}
+
+.vacation-overview-dialog > :is(.modal-header, .modal-footer) {
+  flex: 0 0 auto;
+}
+
+.vacation-overview-dialog > .modal-body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.vacation-year-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 16px;
+  align-items: center;
+  margin-top: 17px;
+  color: var(--slate-600);
+  font-size: 0.61rem;
+  font-weight: 700;
+}
+
+.vacation-year-legend > span {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.vacation-year-weekend-swatch {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--slate-300);
+  border-radius: 5px;
+}
+
+.vacation-year-weekend-swatch.is-weekend_a {
+  background: #eef5ff;
+  border-color: #73a9f1;
+}
+
+.vacation-year-weekend-swatch.is-weekend_b {
+  background: #f7f0ff;
+  border-color: #a57adb;
+}
+
+.vacation-year-matrix-scroll {
+  max-width: 100%;
+  margin-top: 15px;
+  overflow: auto;
+  border: 1px solid var(--slate-200);
+  border-radius: 11px;
+}
+
+.vacation-year-matrix {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.vacation-year-matrix th,
+.vacation-year-matrix td {
+  width: 35px;
+  min-width: 35px;
+  height: 42px;
+  padding: 3px;
+  text-align: center;
+  border-right: 1px solid var(--slate-200);
+  border-bottom: 1px solid var(--slate-200);
+  background: var(--white);
+}
+
+.vacation-year-matrix thead th {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+  color: var(--slate-600);
+  font-size: 0.62rem;
+  background: var(--slate-50);
+}
+
+.vacation-year-matrix tr:last-child > * {
+  border-bottom: 0;
+}
+
+.vacation-year-matrix tr > *:last-child {
+  border-right: 0;
+}
+
+.vacation-year-matrix .vacation-year-month-column {
+  position: sticky;
+  z-index: 2;
+  left: 0;
+  width: 105px;
+  min-width: 105px;
+  padding: 7px 10px;
+  color: var(--slate-800);
+  font-size: 0.65rem;
+  text-align: left;
+  text-transform: capitalize;
+  background: var(--slate-50);
+  box-shadow: 7px 0 12px -12px rgb(16 34 54 / 55%);
+}
+
+.vacation-year-matrix thead .vacation-year-month-column {
+  z-index: 5;
+}
+
+.vacation-year-matrix td.is-unavailable {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      var(--slate-100),
+      var(--slate-100) 4px,
+      var(--slate-50) 4px,
+      var(--slate-50) 8px
+    );
+}
+
+.vacation-year-entry {
+  display: inline-grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  color: var(--white);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 900;
+  border-radius: 7px;
+  box-shadow: 0 2px 6px rgb(16 34 54 / 16%);
+}
+
+.vacation-year-entry.planner-entry-vacation {
+  background: var(--green-700);
+}
+
+.vacation-year-entry.planner-entry-onboardingVacation {
+  background: #0891b2;
+}
+
+.vacation-year-entry.planner-entry-school {
+  background: var(--blue-700);
+}
+
+.vacation-year-entry.planner-entry-unpaid {
+  background: var(--red-700);
+}
+
+.vacation-year-entry.planner-entry-external {
+  background: #805bad;
+}
+
+.vacation-year-entry.planner-entry-plannedOff {
+  background: #526273;
+}
+
+.vacation-year-entry.planner-entry-mandatoryDuty {
+  color: var(--orange-700);
+  border: 1px solid var(--orange-700);
+  background: var(--orange-100);
+}
+
+.vacation-table tr.is-inactive {
+  opacity: 0.55;
+}
+
+html[data-theme="dark"] :is(
+    .legend-weekend-weekend_a,
+    .vacation-weekend-weekend_a,
+    .vacation-employee-weekend-weekend_a
+  ) {
+  background: rgb(40 120 227 / 20%) !important;
+}
+
+html[data-theme="dark"] :is(
+    .legend-weekend-weekend_b,
+    .vacation-weekend-weekend_b,
+    .vacation-employee-weekend-weekend_b
+  ) {
+  background: rgb(165 122 219 / 20%) !important;
+}
+
+@media (max-width: 720px) {
+  .vacation-controls-panel {
+    padding: 16px;
+  }
+
+  .vacation-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vacation-controls .compact-field,
+  .compact-input-suffix {
+    min-width: 0;
+  }
+
+  .vacation-controls .button {
+    grid-column: 1 / -1;
+  }
+
+  .vacation-table .vacation-employee-column {
+    width: 175px;
+    min-width: 175px;
+    max-width: 175px;
+  }
+
+  .vacation-table tbody .vacation-total-column {
+    position: static;
+  }
+
+  .vacation-table thead .vacation-total-column {
+    right: auto !important;
+  }
+
+  .vacation-employee .avatar {
+    display: none;
+  }
+
+  .vacation-overview-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mobile-nav {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .mobile-nav button {
+    font-size: 0.55rem;
+  }
+}
+
+@media (max-width: 470px) {
+  .vacation-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .vacation-controls .button {
+    grid-column: auto;
+  }
+
+  .vacation-legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node src/server.js",
-    "check": "node --check src/server.js"
+    "check": "node --check src/server.js && node --check src/session-store.js && node --check src/migrations.js"
   },
   "dependencies": {
     "dotenv": "17.4.2",

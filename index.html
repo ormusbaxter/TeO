@@ -1,3 +1,4 @@
+<!-- Generiert aus src/html/*.html – Änderungen dort vornehmen. -->
 <!doctype html>
 <html lang="de-DE">
   <head>
@@ -112,6 +113,10 @@
         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
         <path d="M8 7h8M8 11h5" />
       </symbol>
+      <symbol id="icon-help" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9.8 9a2.4 2.4 0 1 1 3.7 2c-1 .7-1.5 1.2-1.5 2.5M12 17h.01" />
+      </symbol>
     </svg>
 
     <div class="app-layout">
@@ -178,6 +183,10 @@
             <svg><use href="#icon-settings"></use></svg>
             <span>Einstellungen</span>
           </button>
+          <button class="nav-item" type="button" data-view="help">
+            <svg><use href="#icon-help"></use></svg>
+            <span>Hilfe</span>
+          </button>
         </nav>
 
         <section class="user-session" aria-label="Angemeldeter Benutzer">
@@ -209,7 +218,7 @@
             <svg><use href="#icon-logo"></use></svg>
           </span>
           <div>
-            <strong id="projectBuildLabel">TeO – Team &amp; Employee Organizer - 002.009</strong>
+            <strong id="projectBuildLabel">TeO – Team &amp; Employee Organizer</strong>
             <p>&copy; 2026 Oliver Becker</p>
           </div>
         </div>
@@ -254,6 +263,29 @@
             </button>
           </div>
         </header>
+
+        <section
+          class="database-save-warning"
+          id="databaseSaveWarning"
+          role="status"
+          aria-live="polite"
+          hidden
+        >
+          <svg aria-hidden="true"><use href="#icon-alert"></use></svg>
+          <strong>Datensicherung erforderlich:</strong>
+          <span id="databaseSaveWarningText">
+            Änderungen wurden gespeichert, aber noch nicht exportiert.
+          </span>
+          <button
+            class="button button-compact database-save-warning-action"
+            id="databaseSaveWarningExportButton"
+            type="button"
+            data-admin-only
+          >
+            <svg><use href="#icon-download"></use></svg>
+            Jetzt exportieren
+          </button>
+        </section>
 
         <section class="view is-active" id="dashboardView" data-view-panel="dashboard">
           <div class="page-header">
@@ -440,6 +472,15 @@
                 <svg><use href="#icon-copy"></use></svg>
                 <span id="copyActiveEmailsLabel">E-Mails kopieren</span>
               </button>
+              <button
+                class="button button-secondary"
+                id="exportEmployeePhoneListButton"
+                type="button"
+                data-admin-only
+              >
+                <svg><use href="#icon-print"></use></svg>
+                <span id="exportEmployeePhoneListLabel">Telefonliste drucken</span>
+              </button>
               <button class="button button-primary" type="button" data-open-employee data-admin-only>
                 <svg><use href="#icon-plus"></use></svg>
                 Mitarbeiter anlegen
@@ -497,8 +538,8 @@
                 <select id="employeeWeekendFilter">
                   <option value="all">Alle</option>
                   <option value="none">Kein festes</option>
-                  <option value="oli">Oli</option>
-                  <option value="claudio">Claudio</option>
+                  <option value="weekend_a">Wochenende A</option>
+                  <option value="weekend_b">Wochenende B</option>
                 </select>
               </label>
               <button class="button button-ghost" id="resetEmployeeFilters" type="button">
@@ -528,10 +569,20 @@
                 Dienstwochenenden vergleichen.
               </p>
             </div>
-            <button class="button button-secondary" id="openWeekendPrintButton" type="button">
-              <svg><use href="#icon-print"></use></svg>
-              Druckansicht
-            </button>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="openWeekendSimulationButton"
+                type="button"
+              >
+                <svg><use href="#icon-chart"></use></svg>
+                Verteilung simulieren
+              </button>
+              <button class="button button-secondary" id="openWeekendPrintButton" type="button">
+                <svg><use href="#icon-print"></use></svg>
+                Druckansicht
+              </button>
+            </div>
           </div>
           <div id="weekendDistributionContent"></div>
         </section>
@@ -617,8 +668,8 @@
                 />
               </label>
               <label class="compact-field" data-admin-only>
-                <span>Referenzsamstag Oli</span>
-                <input id="vacationOliReferenceSaturday" type="date" />
+                <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
+                <input id="vacationWeekendAReferenceSaturday" type="date" />
               </label>
               <button
                 class="button button-secondary"
@@ -637,8 +688,8 @@
               <span><i class="legend-planner-external"></i> Externer Einsatz</span>
               <span><i class="legend-planner-planned-off"></i> Frei geplant</span>
               <span><i class="legend-planner-duty"></i> Dienstzusage</span>
-              <span><i class="legend-weekend-oli"></i> Wochenende Oli</span>
-              <span><i class="legend-weekend-claudio"></i> Wochenende Claudio</span>
+              <span><i class="legend-weekend-weekend_a"></i> <span id="vacationWeekendALegend">Wochenende A</span></span>
+              <span><i class="legend-weekend-weekend_b"></i> <span id="vacationWeekendBLegend">Wochenende B</span></span>
               <span><i class="legend-holiday"></i> Feiertag NRW</span>
               <span><i class="legend-school-vacation"></i> Schulferien NRW</span>
             </div>
@@ -733,6 +784,7 @@
           <div class="training-summary" id="meetingSummary"></div>
           <section class="meeting-list" id="meetingList"></section>
         </section>
+
 
         <section class="view" id="devicesView" data-view-panel="devices">
           <div class="page-header">
@@ -909,6 +961,56 @@
                   <option value="cellitinnen-red">Cellitinnen Rot</option>
                 </select>
               </label>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-storage">
+                  <svg><use href="#icon-calendar"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Dienstplanung</p>
+                  <h2>Feste Dienstwochenenden</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Jedem Wochenende wird eine Stationsleitung oder stellvertretende
+                Stationsleitung zugewiesen. Die Bezeichnung entspricht automatisch
+                dem Vornamen der verantwortlichen Person.
+              </p>
+              <div class="settings-weekend-config">
+                <fieldset>
+                  <legend>Wochenende A</legend>
+                  <label class="settings-field">
+                    <span>Bezeichnung (automatisch)</span>
+                    <input id="settingsWeekendNameA" type="text" readonly />
+                  </label>
+                  <label class="settings-field">
+                    <span>Verantwortliche Person</span>
+                    <select id="settingsWeekendOwnerA"></select>
+                  </label>
+                </fieldset>
+                <fieldset>
+                  <legend>Wochenende B</legend>
+                  <label class="settings-field">
+                    <span>Bezeichnung (automatisch)</span>
+                    <input id="settingsWeekendNameB" type="text" readonly />
+                  </label>
+                  <label class="settings-field">
+                    <span>Verantwortliche Person</span>
+                    <select id="settingsWeekendOwnerB"></select>
+                  </label>
+                </fieldset>
+              </div>
+              <div class="settings-actions">
+                <button
+                  class="button button-primary"
+                  id="saveWeekendSettingsButton"
+                  type="button"
+                >
+                  Wochenenden speichern
+                </button>
+              </div>
             </section>
 
             <section class="panel settings-card" data-admin-only>
@@ -1120,6 +1222,303 @@
             </div>
           </section>
         </section>
+
+        <section class="view" id="helpView" data-view-panel="help">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Dokumentation</p>
+              <h1>Hilfe</h1>
+              <p class="page-subtitle">
+                Funktionen, Betriebshinweise und Datenschutzinformationen zu TeO.
+              </p>
+            </div>
+          </div>
+          <section class="panel help-search-panel" aria-label="Hilfe durchsuchen">
+            <label class="search-field help-search-field">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="helpSearch"
+                type="search"
+                placeholder="Hilfe durchsuchen, z. B. Urlaub, Sicherung oder Fortbildung …"
+                autocomplete="off"
+              />
+            </label>
+            <span id="helpSearchStatus" aria-live="polite"></span>
+            <button class="button button-ghost button-compact" id="clearHelpSearch" type="button">
+              Suche löschen
+            </button>
+          </section>
+          <div class="panel help-no-results" id="helpNoResults" hidden>
+            <svg><use href="#icon-search"></use></svg>
+            <div>
+              <strong>Kein Hilfethema gefunden</strong>
+              <span>Versuchen Sie einen allgemeineren Suchbegriff.</span>
+            </div>
+          </div>
+          <div class="help-layout">
+            <nav class="panel help-toc" aria-label="Inhaltsverzeichnis der Hilfe">
+              <p class="eyebrow">Inhalt</p>
+              <button type="button" data-help-target="hilfe-schnellstart" data-help-nav-target="hilfe-schnellstart">Schnellstart</button><button type="button" data-help-target="hilfe-navigation-und-bedienung" data-help-nav-target="hilfe-navigation-und-bedienung">Navigation und Bedienung</button><button type="button" data-help-target="hilfe-benutzerkonten-und-berechtigungen" data-help-nav-target="hilfe-benutzerkonten-und-berechtigungen">Benutzerkonten und Berechtigungen</button><button type="button" data-help-target="hilfe-mitarbeiterverwaltung" data-help-nav-target="hilfe-mitarbeiterverwaltung">Mitarbeiterverwaltung</button><button type="button" data-help-target="hilfe-dienstwochenenden" data-help-nav-target="hilfe-dienstwochenenden">Dienstwochenenden</button><button type="button" data-help-target="hilfe-urlaubs-und-abwesenheitsplanung" data-help-nav-target="hilfe-urlaubs-und-abwesenheitsplanung">Urlaubs- und Abwesenheitsplanung</button><button type="button" data-help-target="hilfe-terminkalender-und-fristenmonitor" data-help-nav-target="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</button><button type="button" data-help-target="hilfe-pflichtfortbildungen" data-help-nav-target="hilfe-pflichtfortbildungen">Pflichtfortbildungen</button><button type="button" data-help-target="hilfe-teamsitzungen" data-help-nav-target="hilfe-teamsitzungen">Teamsitzungen</button><button type="button" data-help-target="hilfe-gerateverwaltung-und-gerateeinweisungen" data-help-nav-target="hilfe-gerateverwaltung-und-gerateeinweisungen">Geräteverwaltung und Geräteeinweisungen</button><button type="button" data-help-target="hilfe-datensicherung-und-wiederherstellung" data-help-nav-target="hilfe-datensicherung-und-wiederherstellung">Datensicherung und Wiederherstellung</button><button type="button" data-help-target="hilfe-datenspeicherung-und-mariadb" data-help-nav-target="hilfe-datenspeicherung-und-mariadb">Datenspeicherung und MariaDB</button><button type="button" data-help-target="hilfe-einstellungen-und-administration" data-help-nav-target="hilfe-einstellungen-und-administration">Einstellungen und Administration</button><button type="button" data-help-target="hilfe-haufige-fragen-und-problemlosung" data-help-nav-target="hilfe-haufige-fragen-und-problemlosung">Häufige Fragen und Problemlösung</button><button type="button" data-help-target="hilfe-datenschutz-und-it-sicherheit" data-help-nav-target="hilfe-datenschutz-und-it-sicherheit">Datenschutz und IT-Sicherheit</button><button type="button" data-help-target="hilfe-entwicklung-und-projektstruktur" data-help-nav-target="hilfe-entwicklung-und-projektstruktur">Entwicklung und Projektstruktur</button>
+            </nav>
+            <article class="panel help-article">
+              <h1 id="hilfe-teo-team-employee-organizer">TeO – Team &amp; Employee Organizer</h1>
+<p>TeO ist eine Mitarbeiter- und Organisationsverwaltung für eine Intensivstation. Die Anwendung unterstützt Personalstammdaten, Pflichtfortbildungen, Teamsitzungen, Geräteeinweisungen, Urlaubsplanung, Termine und Fristen.</p>
+<p>Diese Datei ist zugleich das Benutzerhandbuch und wird beim Build vollständig als Online-Hilfe in die Anwendung eingebettet.</p>
+<section class="help-section" data-help-section data-help-heading="hilfe-schnellstart">
+<h2 id="hilfe-schnellstart">Schnellstart</h2>
+<h3 id="hilfe-anwendung-starten">Anwendung starten</h3>
+<p>Im lokalen Einzelplatzmodus wird <code>index.html</code> in einem aktuellen Browser geöffnet. Beim ersten Start führt TeO durch die Einrichtung des ersten Administratorkontos.</p>
+<p>Für den gemeinsamen Betrieb über MariaDB wird die Anwendung über den TeO-Server aufgerufen. Die technische Einrichtung ist im Abschnitt „Datenspeicherung und MariaDB“ beschrieben.</p>
+<h3 id="hilfe-erste-sinnvolle-schritte">Erste sinnvolle Schritte</h3>
+<ol><li>Unter <strong>Einstellungen</strong> das gewünschte Farbthema und die Sicherungserinnerung festlegen.</li><li>Unter <strong>Mitarbeiter</strong> Personalstammdaten, Stellenanteile, Berufe und Qualifikationen erfassen.</li><li>Stationsleitung und stellvertretende Stationsleitung kennzeichnen.</li><li>Unter <strong>Einstellungen → Feste Dienstwochenenden</strong> die beiden verantwortlichen Personen bestimmen.</li><li>Pflichtfortbildungen, Teamsitzungen, Termine und Geräte katalogisieren.</li><li>Eine erste vollständige Datensicherung exportieren.</li></ol>
+<h3 id="hilfe-grundprinzip-der-speicherung">Grundprinzip der Speicherung</h3>
+<p>Änderungen werden im lokalen Modus automatisch in localForage beziehungsweise IndexedDB gespeichert. Im MariaDB-Modus werden sie an den zentralen Server übertragen. Der zusätzliche <strong>Sicherungsexport</strong> ist trotzdem erforderlich, damit eine unabhängige Wiederherstellungsdatei vorhanden ist.</p>
+<p>Nach Änderungen zeigt TeO deshalb oben im Inhaltsbereich eine Warnleiste an. Sie verschwindet erst nach einem erfolgreichen Sicherungsexport.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-navigation-und-bedienung">
+<h2 id="hilfe-navigation-und-bedienung">Navigation und Bedienung</h2>
+<h3 id="hilfe-hauptnavigation">Hauptnavigation</h3>
+<p>Die Desktop-Navigation befindet sich links. Auf kleinen Bildschirmen wird am unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.</p>
+<p>Folgende Bereiche stehen zur Verfügung:</p>
+<ul><li><strong>Übersicht:</strong> Kennzahlen, Fristenmonitor und zuletzt bearbeitete Daten</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
+<h3 id="hilfe-suche-und-filter">Suche und Filter</h3>
+<p>Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können kombiniert werden. Filter beziehen sich immer auf die aktuell sichtbare Ansicht.</p>
+<p>In der Mitarbeiterverwaltung berücksichtigt auch <strong>E-Mails kopieren</strong> nur die aktuell gefilterte Liste.</p>
+<p>Der Qualifikationsfilter bietet zusätzlich <strong>Keine Qualifikation</strong>. Damit lassen sich gezielt Mitarbeiter anzeigen, denen aktuell keine Zusatzqualifikation zugewiesen ist.</p>
+<h3 id="hilfe-datums-und-zeitangaben">Datums- und Zeitangaben</h3>
+<p>Datumswerte werden einheitlich als <code>TT.MM.JJJJ</code> dargestellt. Intern speichert TeO Datumswerte im ISO-Format, damit Sortierung und Berechnung zuverlässig funktionieren.</p>
+<p>Uhrzeiten werden im 24-Stunden-Format <code>HH:MM</code> angezeigt.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-benutzerkonten-und-berechtigungen">
+<h2 id="hilfe-benutzerkonten-und-berechtigungen">Benutzerkonten und Berechtigungen</h2>
+<h3 id="hilfe-administratoren">Administratoren</h3>
+<p>Administratoren dürfen:</p>
+<ul><li>Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen</li><li>Berufe und Zusatzqualifikationen verwalten</li><li>Pflichtfortbildungen und Fortbildungsreihen verwalten</li><li>Teamsitzungen und Termine verwalten</li><li>Geräte und Geräteeinweisungen verwalten</li><li>Urlaubsansprüche und Abwesenheitsplanung bearbeiten</li><li>Dienstwochenenden konfigurieren und Simulationen übernehmen</li><li>Benutzerkonten verwalten und Passwörter zurücksetzen</li><li>Daten sichern, importieren und das Speicher-Backend wechseln</li></ul>
+<h3 id="hilfe-normale-benutzer">Normale Benutzer</h3>
+<p>Normale Benutzer dürfen:</p>
+<ul><li>absolvierte Pflichtfortbildungen zuweisen</li><li>Teamsitzungsteilnahmen und Abwesenheitsgründe dokumentieren</li></ul>
+<p>Administrative Stammdaten und Planungsgrundlagen bleiben geschützt.</p>
+<h3 id="hilfe-ersteinrichtung-und-passworter">Ersteinrichtung und Passwörter</h3>
+<p>TeO enthält keine fest eingebauten Produktivkonten oder Standardpasswörter. Beim ersten Start wird ein Administratorkonto erstellt.</p>
+<p>Wird das Passwort eines normalen Benutzers zurückgesetzt, erzeugt TeO ein temporäres Passwort. Beim nächsten Anmelden muss der Benutzer ein neues Passwort festlegen.</p>
+<p>Passwörter werden mit PBKDF2 gehasht gespeichert. Im lokalen Modus ist die Anmeldung ein Schutz innerhalb der Browser-Anwendung. Im MariaDB-Modus werden Anmeldung und Rollen zusätzlich serverseitig geprüft.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-mitarbeiterverwaltung">
+<h2 id="hilfe-mitarbeiterverwaltung">Mitarbeiterverwaltung</h2>
+<h3 id="hilfe-mitarbeiter-anlegen">Mitarbeiter anlegen</h3>
+<ol><li><strong>Mitarbeiter</strong> öffnen.</li><li><strong>Mitarbeiter anlegen</strong> auswählen.</li><li>Vorname, Nachname, Beruf und Stellenanteil erfassen.</li><li>Optional Geburtsdatum, Telefonnummer, E-Mail-Adresse und Benutzername ergänzen.</li><li>Mitarbeiterstatus und festes Dienstwochenende auswählen.</li><li>Zusatzqualifikationen kennzeichnen und gegebenenfalls ein Ablaufdatum hinterlegen.</li><li>Speichern.</li></ol>
+<h3 id="hilfe-mitarbeiterstatus">Mitarbeiterstatus</h3>
+<p>TeO unterscheidet:</p>
+<ul><li><strong>Aktiv:</strong> regulär beschäftigte Person</li><li><strong>In Einarbeitung:</strong> beschäftigte Person mit gesonderter Kennzeichnung</li><li><strong>Inaktiv:</strong> wird in aktuellen Planungen und Auswahlfeldern nicht regulär angeboten</li></ul>
+<h3 id="hilfe-berufe-und-qualifikationen">Berufe und Qualifikationen</h3>
+<p>Berufe und frei definierbare Zusatzqualifikationen werden über <strong>Einstellungen → Berufe &amp; Qualifikationen</strong> verwaltet.</p>
+<p>Die Bezeichnungen „Gesundheits- und Krankenpfleger/in“ und „3-jährig examiniert“ werden automatisch der Berufsgruppe „Pflegefachkraft“ zugeordnet.</p>
+<p>Die Qualifikationen <strong>Stationsleitung</strong> und <strong>Stellvertretende Stationsleitung</strong> sind feste Systemrollen. Sie werden für die Dienstwochenendzuweisung benötigt und können nicht gelöscht oder umbenannt werden.</p>
+<h3 id="hilfe-filtern-sortieren-und-sammelbearbeitung">Filtern, Sortieren und Sammelbearbeitung</h3>
+<p>Die Mitarbeiterliste kann nach Status, Beruf, Qualifikation, Dienstwochenende und Suchtext eingeschränkt werden.</p>
+<p>Über die Auswahlkästchen können mehrere Mitarbeiter gleichzeitig bearbeitet werden. Möglich sind Änderungen an Status, Beruf, Dienstwochenende und Zusatzqualifikationen.</p>
+<p>Verantwortliche Personen eines Dienstwochenendes können nicht durch eine Sammelaktion in ein anderes Wochenende verschoben werden.</p>
+<h3 id="hilfe-mitarbeiter-gesamtakte">Mitarbeiter-Gesamtakte</h3>
+<p>Ein Klick auf einen Mitarbeiter öffnet die Gesamtakte mit:</p>
+<ul><li>Stammdaten und Kontaktdaten</li><li>Beschäftigungsstatus und Stellenanteil</li><li>Qualifikationen und Ablaufdaten</li><li>Pflichtfortbildungsstatus</li><li>Teamsitzungsteilnahmen</li><li>Druckansicht</li></ul>
+<h3 id="hilfe-e-mail-adressen-exportieren">E-Mail-Adressen exportieren</h3>
+<p><strong>E-Mails kopieren</strong> erzeugt aus den sichtbaren, aktiven Mitarbeitern einen einzelnen String. Die Adressen werden durch Semikolon getrennt und direkt in die Zwischenablage kopiert.</p>
+<h3 id="hilfe-telefonliste-drucken">Telefonliste drucken</h3>
+<p><strong>Telefonliste drucken</strong> öffnet eine integrierte DIN-A4-Druckvorschau innerhalb von TeO. Es wird kein separates Browser- oder <code>about:blank</code>-Fenster benötigt. Die Liste ist alphabetisch nach Nachname und Vorname sortiert und enthält ausschließlich die Spalten <strong>Name</strong> und <strong>Nummer</strong>.</p>
+<p>Abhängig von der Anzahl der Mitarbeiter verteilt TeO die Liste automatisch auf einen, zwei oder drei nebeneinanderliegende Tabellenblöcke. Rund 60 Mitarbeiter werden auf zwei breite Blöcke mit jeweils ungefähr 30 Zeilen verteilt. Schriftgröße und Zeilenhöhe passen sich an die Listenlänge an, damit die DIN-A4-Seite innerhalb eines umlaufenden Randes von 15 mm möglichst vollständig genutzt wird. Über den Browser-Druckdialog kann sie gedruckt oder als PDF gespeichert werden. Mitarbeiter ohne Telefonnummer bleiben mit einem leeren Eintrag sichtbar.</p>
+<p>Der Seitenrand ist Bestandteil der Druckfläche und damit unabhängig von den Randvorgaben des Browsers oder Druckertreibers sichtbar.</p>
+<p>Die Druckgestaltung ist für einen Schwarzweiß-Laserdrucker ausgelegt. Informationen werden nicht ausschließlich über Farbe vermittelt. Schwarze Trennlinien, kontrastreiche Tabellenköpfe und sparsame Grauflächen sorgen auch ohne aktivierten Farbdruck für eine gut lesbare Liste.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-dienstwochenenden">
+<h2 id="hilfe-dienstwochenenden">Dienstwochenenden</h2>
+<h3 id="hilfe-verantwortliche-personen-festlegen">Verantwortliche Personen festlegen</h3>
+<p>Jedes der beiden Dienstwochenenden benötigt eine verantwortliche Person. Zuweisbar sind ausschließlich Mitarbeiter mit der Qualifikation <strong>Stationsleitung</strong> oder <strong>Stellvertretende Stationsleitung</strong>.</p>
+<p>Die Bezeichnung eines Wochenendes entspricht automatisch dem Vornamen der verantwortlichen Person.</p>
+<p>Eine verantwortliche Person:</p>
+<ul><li>bleibt fest ihrem eigenen Wochenende zugeordnet</li><li>kann nicht durch Sammelbearbeitung verschoben werden</li><li>kann nicht durch die Verteilungssimulation verschoben werden</li><li>kann erst gelöscht oder von der letzten Leitungsrolle befreit werden, nachdem eine andere verantwortliche Person festgelegt wurde</li></ul>
+<h3 id="hilfe-verteilung-auswerten">Verteilung auswerten</h3>
+<p>Die Wochenendansicht vergleicht:</p>
+<ul><li>Vollzeitäquivalente</li><li>kumulierte Stellenanteile</li><li>absolute Mitarbeiterzahl</li><li>Personen in Einarbeitung</li><li>Fachweiterbildung I/A</li><li>Praxisanleiter</li></ul>
+<h3 id="hilfe-verteilung-simulieren">Verteilung simulieren</h3>
+<p>Die Simulation versucht, die beiden Wochenenden anhand der genannten Kennzahlen möglichst gleichmäßig zu verteilen und zugleich möglichst wenige bestehende Zuordnungen zu verändern.</p>
+<p>Mitarbeiter ohne festes Dienstwochenende werden nicht automatisch zugeordnet. Die Simulation verändert zunächst keine Daten. Eine Übernahme muss gesondert ausgewählt und nochmals bestätigt werden.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-urlaubs-und-abwesenheitsplanung">
+<h2 id="hilfe-urlaubs-und-abwesenheitsplanung">Urlaubs- und Abwesenheitsplanung</h2>
+<h3 id="hilfe-urlaubsanspruch">Urlaubsanspruch</h3>
+<p>Der Jahresanspruch setzt sich zusammen aus:</p>
+<ul><li>konfigurierbarem Grundurlaub einer Vollzeitkraft</li><li>Stellenanteil des Mitarbeiters</li><li>individuell erarbeitetem Zusatzurlaub durch Schichtdienst</li></ul>
+<p>Die fünf Summenspalten <strong>Basis</strong>, <strong>Zusatz</strong>, <strong>Anspruch</strong>, <strong>Geplant</strong> und <strong>Rest</strong> bleiben beim horizontalen Scrollen fixiert.</p>
+<h3 id="hilfe-planungseintrage">Planungseinträge</h3>
+<p>Folgende Eintragsarten stehen zur Verfügung:</p>
+<ul><li>Urlaub</li><li>Urlaub Einarbeitung</li><li>Schule, Weiterbildung oder Universität</li><li>unbezahlter Urlaub</li><li>externer Einsatz</li><li>frei geplant</li><li>verpflichtende Dienstzusage</li></ul>
+<p><strong>Urlaub Einarbeitung</strong> wird nicht auf die tägliche Abwesenheitsgrenze und nicht auf den regulären Urlaubsverbrauch angerechnet.</p>
+<p><strong>Frei geplant</strong> zählt als Abwesenheit, verbraucht aber keinen Urlaubstag.</p>
+<h3 id="hilfe-monatsplanung">Monatsplanung</h3>
+<ol><li>Jahr und Monat auswählen.</li><li>Gewünschte Eintragsart festlegen.</li><li>In der Zeile des Mitarbeiters auf den entsprechenden Tag klicken.</li><li>Ein erneuter Klick beziehungsweise die Auswahl „Kein Eintrag“ entfernt den Planungseintrag.</li></ol>
+<p>Die Kopfzeile bleibt beim vertikalen Scrollen sichtbar. Wochenenden, Feiertage, Schulferien und die beiden Dienstwochenenden werden farblich unterschieden.</p>
+<h3 id="hilfe-abwesenheitsgrenzen">Abwesenheitsgrenzen</h3>
+<p>Standardmäßig gelten:</p>
+<ul><li>Werktage: höchstens 8 gleichzeitig abwesende Mitarbeiter</li><li>Wochenenden und Feiertage: höchstens 5 gleichzeitig abwesende Mitarbeiter</li></ul>
+<p>Beide Grenzwerte sind konfigurierbar. Eine Überplanung bleibt möglich, wird aber deutlich rot markiert.</p>
+<h3 id="hilfe-dienstwochenenden-und-kompensation">Dienstwochenenden und Kompensation</h3>
+<p>Urlaub auf dem eigenen Dienstwochenende wirkt auf die Abwesenheitsberechnung. Eine verpflichtende Dienstzusage eines Mitarbeiters aus dem jeweils anderen Wochenende kann diesen Effekt kompensieren.</p>
+<h3 id="hilfe-jahresubersicht-je-mitarbeiter">Jahresübersicht je Mitarbeiter</h3>
+<p>Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix:</p>
+<ul><li>Monate in der ersten Spalte</li><li>Kalendertage in der Kopfzeile</li><li>Wochenenden und Dienstwochenenden farblich markiert</li><li>alle Abwesenheiten und Dienstzusagen tageweise sichtbar</li></ul>
+<h3 id="hilfe-feiertage-und-schulferien">Feiertage und Schulferien</h3>
+<p>Gesetzliche Feiertage in Nordrhein-Westfalen werden automatisch berechnet. Die amtlich festgelegten NRW-Schulferien werden angezeigt. Örtlich unterschiedliche bewegliche Ferientage sind nicht enthalten.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-terminkalender-und-fristenmonitor">
+<h2 id="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</h2>
+<h3 id="hilfe-termine-anlegen">Termine anlegen</h3>
+<p>Ein Termin benötigt mindestens:</p>
+<ul><li>Titel</li><li>Datum</li></ul>
+<p>Optional können Uhrzeit von/bis, Ort und Beschreibung hinterlegt werden.</p>
+<h3 id="hilfe-fristenmonitor">Fristenmonitor</h3>
+<p>Der Fristenmonitor auf der Übersichtsseite zeigt:</p>
+<ul><li>anstehende Termine</li><li>Geburtstage</li><li>fällige und überfällige Pflichtfortbildungen</li><li>ablaufende Zusatzqualifikationen</li></ul>
+<p>Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien lassen sich einzeln ein- oder ausblenden.</p>
+<p>Geburtstage erscheinen mit Name, erreichtem Lebensjahr und vollständigem Geburtsdatum.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-pflichtfortbildungen">
+<h2 id="hilfe-pflichtfortbildungen">Pflichtfortbildungen</h2>
+<h3 id="hilfe-fortbildungskatalog">Fortbildungskatalog</h3>
+<p>Beim Anlegen einer Pflichtfortbildung werden Titel, Einführungsjahr, Beschreibung und Wiederholungsintervall festgelegt.</p>
+<p>Das angegebene Jahr ist das Einführungsjahr im Pflichtkatalog. Eine Fortbildung steht ab diesem Jahr auch in späteren Jahren zur Verfügung.</p>
+<h3 id="hilfe-wiederholungsintervalle">Wiederholungsintervalle</h3>
+<p>Standardmäßig gilt eine jährliche Wiederholung. Für Gewaltprävention sind standardmäßig fünf Jahre vorgesehen. Andere Intervalle können ebenfalls festgelegt werden.</p>
+<p>Wiederkehrende Einträge desselben Themas werden zu einer Fortbildungsreihe verbunden. Der neueste gültige Nachweis bestimmt die nächste Fälligkeit der gesamten Reihe.</p>
+<h3 id="hilfe-abschluss-dokumentieren">Abschluss dokumentieren</h3>
+<ol><li><strong>Pflichtfortbildungen</strong> öffnen.</li><li><strong>Abschluss eintragen</strong> wählen.</li><li>Fortbildung auswählen.</li><li>Abschlussdatum erfassen.</li><li>Einen oder mehrere aktive Mitarbeiter auswählen.</li><li>Speichern.</li></ol>
+<p>Historische Nachweise können anschließend korrigiert oder gelöscht werden.</p>
+<h3 id="hilfe-jahresauswertung">Jahresauswertung</h3>
+<p>Die Jahresmatrix zeigt:</p>
+<ul><li>aktive Mitarbeiter in der ersten Spalte</li><li>Pflichtfortbildungen in der Kopfzeile</li><li>grünes Häkchen für erfüllt</li><li>rotes Kreuz für offen</li></ul>
+<p>Mehrjährig gültige Nachweise erfüllen auch nachfolgende Auswertungsjahre. Die Matrix kann gedruckt, als PDF gespeichert oder Excel-kompatibel als CSV exportiert werden.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-teamsitzungen">
+<h2 id="hilfe-teamsitzungen">Teamsitzungen</h2>
+<h3 id="hilfe-sitzung-anlegen">Sitzung anlegen</h3>
+<p>Administratoren erfassen Titel, Datum, Uhrzeit und Notizen. Die Sitzungen werden chronologisch sortiert.</p>
+<h3 id="hilfe-teilnahme-effizient-dokumentieren">Teilnahme effizient dokumentieren</h3>
+<p>Für das aktive Team stehen folgende Statuswerte zur Verfügung:</p>
+<ul><li>teilgenommen</li><li>Urlaub</li><li>Dienst</li><li>Krankheit</li><li>Schule</li><li>entschuldigt</li><li>unentschuldigt</li></ul>
+<p>Über die Sammelaktion kann zunächst allen sichtbaren Mitarbeitern ein Status zugewiesen werden. Anschließend müssen nur noch Ausnahmen einzeln geändert werden.</p>
+<h3 id="hilfe-statistische-auswertung">Statistische Auswertung</h3>
+<p>Die jahresbezogene Auswertung enthält:</p>
+<ul><li>durchschnittliche Teilnahmequote</li><li>Verteilung der Abwesenheitsgründe</li><li>Teilnahmequote je Mitarbeiter</li><li>konfigurierbare Mindestquote</li><li>CSV-Export</li></ul>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-gerateverwaltung-und-gerateeinweisungen">
+<h2 id="hilfe-gerateverwaltung-und-gerateeinweisungen">Geräteverwaltung und Geräteeinweisungen</h2>
+<h3 id="hilfe-geratekatalog">Gerätekatalog</h3>
+<p>Administratoren verwalten:</p>
+<ul><li>Hersteller</li><li>Produkt- oder Modellname</li><li>Gerätekategorie</li><li>aktueller Gerätebestand</li><li>Medizinprodukt der Anlage 1</li></ul>
+<p>Der Katalog ist alphabetisch nach Gerätenamen sortiert. Standardmäßig werden nur Geräte aus dem aktuellen Bestand angezeigt.</p>
+<h3 id="hilfe-einweisung-dokumentieren">Einweisung dokumentieren</h3>
+<p>Eine Geräteeinweisung enthält:</p>
+<ul><li>Gerät</li><li>Einweisungsdatum</li><li>einen oder mehrere Teilnehmer</li><li>Einweisenden</li></ul>
+<p>Einweisende können externe, vom Hersteller beauftragte Personen oder interne Medizinproduktebeauftragte sein. Der Status zum Zeitpunkt der Einweisung wird historisch festgehalten.</p>
+<h3 id="hilfe-einweisungsmatrix">Einweisungsmatrix</h3>
+<p>Die Matrix zeigt Mitarbeiter in den Zeilen und Geräte in den Spalten. Filterbar sind unter anderem:</p>
+<ul><li>Anlage 1</li><li>Gerätekategorie</li><li>aktueller Gerätebestand</li><li>Mitarbeiterstatus</li><li>Mitarbeitername</li><li>Gerätename</li></ul>
+<p>Der Einweisungsstand je Gerät wird farblich angezeigt:</p>
+<ul><li>0 bis 65 Prozent: rot</li><li>66 bis 80 Prozent: gelb</li><li>81 bis 100 Prozent: grün</li></ul>
+<p>Bei Medizinproduktebeauftragten wird eine Herstellereinweisung gold gekennzeichnet.</p>
+<p>Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch aufgelistet und können bearbeitet werden.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-datensicherung-und-wiederherstellung">
+<h2 id="hilfe-datensicherung-und-wiederherstellung">Datensicherung und Wiederherstellung</h2>
+<h3 id="hilfe-wann-muss-gesichert-werden">Wann muss gesichert werden?</h3>
+<p>Nach jeder fachlichen Änderung aktiviert TeO:</p>
+<ul><li>die Warnleiste im oberen Inhaltsbereich</li><li>die Erinnerung beim Schließen oder Verlassen der Anwendung</li></ul>
+<p>Die Hinweise beziehen sich auf den unabhängigen Sicherungsexport. Die laufende Browser- beziehungsweise MariaDB-Speicherung erfolgt bereits automatisch.</p>
+<h3 id="hilfe-sicherung-exportieren">Sicherung exportieren</h3>
+<ol><li>In der Warnleiste <strong>Jetzt exportieren</strong> wählen oder <strong>Einstellungen → Sicherung exportieren</strong> öffnen.</li><li>Die JSON-Datei an einem geschützten Ort speichern.</li><li>Prüfen, ob die Datei vollständig heruntergeladen wurde.</li></ol>
+<p>Optional kann die Sicherung mit Passwort, PBKDF2 und AES-GCM verschlüsselt werden. TeO verwendet dafür einen eigenen Passwortdialog mit Wiederholung, Eingabeprüfung und optionaler Passwortanzeige. Das Passwort kann nicht aus der Datei wiederhergestellt werden.</p>
+<h3 id="hilfe-sicherung-prufen">Sicherung prüfen</h3>
+<p>Über <strong>Sicherung prüfen</strong> wird eine Datei validiert, ohne den aktuellen Datenbestand zu verändern.</p>
+<h3 id="hilfe-sicherung-importieren">Sicherung importieren</h3>
+<p>Vor einem Import:</p>
+<ol><li>Aktuellen Datenbestand exportieren.</li><li>Zu importierende Datei über <strong>Sicherung prüfen</strong> validieren.</li><li><strong>Sicherung importieren</strong> auswählen.</li><li>Sicherheitsabfrage bestätigen.</li></ol>
+<p>TeO lädt vor dem Ersetzen zusätzlich eine Wiederherstellungssicherung herunter.</p>
+<h3 id="hilfe-anderungsprotokoll">Änderungsprotokoll</h3>
+<p>Administrative und fachliche Änderungen werden mit Zeitpunkt, Benutzer und Beschreibung protokolliert. Das Protokoll kann als CSV exportiert werden.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-datenspeicherung-und-mariadb">
+<h2 id="hilfe-datenspeicherung-und-mariadb">Datenspeicherung und MariaDB</h2>
+<h3 id="hilfe-lokaler-modus">Lokaler Modus</h3>
+<p>Im lokalen Modus liegen die Daten im Browserprofil des verwendeten Arbeitsplatzes. localForage verwendet bevorzugt IndexedDB und fällt bei Bedarf auf andere Browserspeicher zurück.</p>
+<p>Wichtig:</p>
+<ul><li>Ein Netzlaufwerk mit derselben <code>index.html</code> teilt nicht automatisch den IndexedDB-Datenbestand zwischen Arbeitsplätzen.</li><li>Jeder Browser und jedes Browserprofil besitzt seinen eigenen lokalen Speicher.</li><li>Browserbereinigung oder ein Profilwechsel kann lokale Daten entfernen.</li><li>Regelmäßige JSON-Sicherungen bleiben erforderlich.</li></ul>
+<p>Unter <strong>Einstellungen</strong> zeigt TeO den belegten und geschätzten verfügbaren Browserspeicher an. Dauerhafter Speicher kann beim Browser angefordert werden.</p>
+<h3 id="hilfe-mariadb-modus">MariaDB-Modus</h3>
+<p>Für gemeinsames Arbeiten mehrerer Arbeitsplätze wird der separate TeO-API-Dienst verwendet. Datenbankzugangsdaten werden nicht an den Browser ausgeliefert.</p>
+<p>Beim ersten Verbinden kann der lokale Datenbestand kontrolliert auf den Server übertragen werden. Anschließend:</p>
+<ul><li>werden Änderungen zentral gespeichert</li><li>werden Änderungen anderer Arbeitsplätze regelmäßig geladen</li><li>verhindern Datenrevisionen unbemerkte Überschreibungen</li><li>werden offene Formulare bei externen Änderungen vorsorglich geschlossen</li><li>werden Sitzungen und Rollen serverseitig geprüft</li></ul>
+<p>Für den Server wird Node.js 20 oder neuer benötigt. Details stehen in <a href="server/README.md" target="_blank" rel="noopener noreferrer"><code>server/README.md</code></a>.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-einstellungen-und-administration">
+<h2 id="hilfe-einstellungen-und-administration">Einstellungen und Administration</h2>
+<p>Die Einstellungsseite bündelt:</p>
+<ul><li>Farbthema</li><li>Dienstwochenendverantwortliche</li><li>lokales oder MariaDB-Backend</li><li>Benutzerverwaltung</li><li>Berufe und Qualifikationen</li><li>Datenqualitätsprüfung</li><li>Sicherungserinnerung</li><li>Import, Export und Sicherungsprüfung</li><li>verschlüsselten Export</li><li>Änderungsprotokoll</li></ul>
+<p>Verfügbare Farbthemen sind Standard, Dark Mode, Cellitinnen und Cellitinnen Rot. Die Auswahl wird mit dem Datenbestand gespeichert.</p>
+<p>Die Datenqualitätsprüfung sucht unter anderem nach:</p>
+<ul><li>möglichen Dubletten</li><li>ungültigen E-Mail-Adressen</li><li>auffälligen Telefonnummern</li><li>fehlenden Kontaktdaten</li></ul>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-haufige-fragen-und-problemlosung">
+<h2 id="hilfe-haufige-fragen-und-problemlosung">Häufige Fragen und Problemlösung</h2>
+<h3 id="hilfe-warum-sehe-ich-meine-daten-an-einem-anderen-arbeitsplatz-nicht">Warum sehe ich meine Daten an einem anderen Arbeitsplatz nicht?</h3>
+<p>Wahrscheinlich wird der lokale Modus verwendet. IndexedDB gehört zum jeweiligen Browserprofil. Für einen gemeinsamen Datenbestand muss MariaDB eingerichtet oder der JSON-Bestand kontrolliert exportiert und importiert werden.</p>
+<h3 id="hilfe-warum-erscheint-die-sicherungswarnung-trotz-automatischer-speicherung">Warum erscheint die Sicherungswarnung trotz automatischer Speicherung?</h3>
+<p>Automatische Speicherung und Sicherungsdatei sind zwei verschiedene Dinge. Die Warnung bleibt bestehen, bis eine unabhängige JSON-Sicherung exportiert wurde.</p>
+<h3 id="hilfe-warum-erscheint-beim-schlie-en-ein-browserdialog">Warum erscheint beim Schließen ein Browserdialog?</h3>
+<p>Seit der letzten Sicherung liegen Änderungen vor. Browser verwenden für diesen Dialog einen eigenen Standardtext. Auch ein Neuladen kann technisch als Verlassen der Seite gelten.</p>
+<h3 id="hilfe-warum-kann-eine-leitungsrolle-nicht-entfernt-werden">Warum kann eine Leitungsrolle nicht entfernt werden?</h3>
+<p>Die Person ist noch als Verantwortliche eines Dienstwochenendes eingetragen. Zuerst unter <strong>Einstellungen → Feste Dienstwochenenden</strong> eine andere Stationsleitung oder stellvertretende Stationsleitung auswählen.</p>
+<h3 id="hilfe-warum-wird-ein-mitarbeiter-nicht-in-einer-auswahl-angezeigt">Warum wird ein Mitarbeiter nicht in einer Auswahl angezeigt?</h3>
+<p>Prüfen:</p>
+<ul><li>Ist der Mitarbeiter inaktiv?</li><li>Ist ein Such- oder Statusfilter aktiv?</li><li>Wird für die Funktion eine bestimmte Qualifikation benötigt?</li><li>Gehört der Mitarbeiter bereits zu einer geschützten Zuordnung?</li></ul>
+<h3 id="hilfe-warum-wird-eine-fortbildung-als-offen-oder-fallig-angezeigt">Warum wird eine Fortbildung als offen oder fällig angezeigt?</h3>
+<p>Prüfen:</p>
+<ul><li>Einführungsjahr der Fortbildung</li><li>Wiederholungsintervall</li><li>Datum des neuesten Nachweises</li><li>Zuordnung zur richtigen Fortbildungsreihe</li><li>ausgewähltes Auswertungsjahr</li></ul>
+<h3 id="hilfe-warum-kann-ein-gerat-nicht-gefunden-werden">Warum kann ein Gerät nicht gefunden werden?</h3>
+<p>Der Filter steht möglicherweise auf „aktueller Bestand“. Für ausgemusterte Geräte den Bestandsfilter erweitern und zusätzlich Suchbegriff, Gerätekategorie und Anlage-1-Filter prüfen.</p>
+<h3 id="hilfe-warum-ist-ein-tag-in-der-urlaubsplanung-rot">Warum ist ein Tag in der Urlaubsplanung rot?</h3>
+<p>Die konfigurierte Abwesenheitsgrenze wurde überschritten. Die Planung ist bewusst weiterhin möglich, muss aber organisatorisch geprüft werden.</p>
+<h3 id="hilfe-was-tun-wenn-der-import-abgelehnt-wird">Was tun, wenn der Import abgelehnt wird?</h3>
+<ol><li>Datei über <strong>Sicherung prüfen</strong> untersuchen.</li><li>Sicherstellen, dass es sich um eine vollständige TeO-JSON-Sicherung handelt.</li><li>Bei verschlüsselten Dateien das korrekte Passwort verwenden.</li><li>Keine manuell bearbeiteten oder abgeschnittenen JSON-Dateien importieren.</li><li>Bei Sicherungen aus einer neueren TeO-Version zunächst die Anwendung aktualisieren.</li></ol>
+<p>Bei einer verschlüsselten Datei zeigt TeO einen eigenen Entschlüsselungsdialog. Ein falsches Passwort kann dort erneut eingegeben werden, ohne die Datei noch einmal auswählen zu müssen.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-datenschutz-und-it-sicherheit">
+<h2 id="hilfe-datenschutz-und-it-sicherheit">Datenschutz und IT-Sicherheit</h2>
+<p>TeO verarbeitet personenbezogene Beschäftigtendaten und teilweise gesundheits- oder qualifikationsbezogene Informationen. Für einen produktiven Einsatz müssen Datenschutz, Informationssicherheit und betriebliche Mitbestimmung berücksichtigt werden.</p>
+<p>Mindestens erforderlich sind:</p>
+<ul><li>geregelte Zugriffsrechte</li><li>persönliche Benutzerkonten</li><li>sichere Passwörter</li><li>HTTPS im MariaDB-Betrieb</li><li>kontrollierte Server- und Datenbank-Backups</li><li>Betriebssystem- und Netzwerkhärtung</li><li>Schutz exportierter Sicherungsdateien</li><li>geregelte Aufbewahrungs- und Löschfristen</li><li>Protokollierung und organisatorische Verantwortlichkeiten</li><li>abgestimmte Betriebsvereinbarung</li></ul>
+<p>Unverschlüsselte JSON-Sicherungen enthalten den vollständigen Datenbestand und müssen entsprechend geschützt gespeichert und übertragen werden.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-entwicklung-und-projektstruktur">
+<h2 id="hilfe-entwicklung-und-projektstruktur">Entwicklung und Projektstruktur</h2>
+<p>Die aktuelle Projekt- und Datenformatversion wird zentral in <a href="src/meta/project-meta.mjs" target="_blank" rel="noopener noreferrer"><code>src/meta/project-meta.mjs</code></a> gepflegt.</p>
+<p>Die Buildnummer besteht aus einer dreistelligen Major- und Minor-Nummer. Strukturelle Änderungen erhöhen die Major-Nummer; Funktionen und Korrekturen erhöhen die Minor-Nummer.</p>
+<p>Direkt startbare Dateien wie <code>index.html</code>, <code>styles.css</code>, <code>app.js</code>, <code>project-meta.js</code> und <code>state-schema.js</code> werden aus den Quellen unter <code>src/</code> erzeugt. Änderungen deshalb nicht in den generierten Dateien vornehmen.</p>
+<pre><code>src/app/       Fachmodule der Browser-Anwendung
+src/html/      Ansichten und Dialoge
+src/styles/    Basis-, Themen-, Planungs- und Druckstile
+src/shared/    gemeinsamer Datenvertrag für Browser und Server
+src/meta/      zentrale Projekt- und Datenformatversion
+server/src/    MariaDB-API und persistente Sitzungsverwaltung
+tests/         automatisierte Migrations- und Fachlogiktests
+tools/         Build, Strukturprüfung und Demo-Datengenerator</code></pre>
+<p>Mit Node.js 20 oder neuer:</p>
+<pre><code>npm ci
+npm run verify</code></pre>
+<p><code>npm run verify</code> erzeugt die verteilbaren Dateien neu, prüft die Struktur und führt alle automatisierten Tests aus.</p>
+<p>Die mitgelieferte localForage-Version <code>1.10.0</code> befindet sich zusammen mit ihrer Lizenz im Ordner <code>vendor</code>.</p>
+</section>
+            </article>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -1164,7 +1563,80 @@
         <svg><use href="#icon-settings"></use></svg>
         <span>Einstellungen</span>
       </button>
+      <button type="button" data-view="help">
+        <svg><use href="#icon-help"></use></svg>
+        <span>Hilfe</span>
+      </button>
     </nav>
+
+    <dialog
+      class="modal auth-dialog"
+      id="setupDialog"
+      aria-labelledby="setupDialogTitle"
+      data-persistent-dialog
+    >
+      <form id="setupForm">
+        <div class="modal-header auth-dialog-header">
+          <span class="brand-mark">
+            <svg><use href="#icon-logo"></use></svg>
+          </span>
+          <div>
+            <p class="eyebrow">Sichere Ersteinrichtung</p>
+            <h2 id="setupDialogTitle">Administrator anlegen</h2>
+            <p class="modal-subtitle">
+              Legen Sie das erste Administratorkonto für diesen Datenbestand fest.
+            </p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Benutzername</span>
+              <input
+                id="setupUsername"
+                name="username"
+                type="text"
+                minlength="4"
+                maxlength="40"
+                pattern="[A-Za-z0-9]+"
+                autocomplete="username"
+                autocapitalize="none"
+                required
+              />
+            </label>
+            <label class="form-field">
+              <span>Passwort</span>
+              <input
+                id="setupPassword"
+                name="password"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+              <small class="field-hint">
+                Mindestens 8 Zeichen mit Groß- und Kleinbuchstaben sowie einer Zahl.
+              </small>
+            </label>
+            <label class="form-field">
+              <span>Passwort wiederholen</span>
+              <input
+                id="setupPasswordConfirmation"
+                name="passwordConfirmation"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+            </label>
+          </div>
+          <p class="form-error auth-error" id="setupError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-primary" type="submit">TeO einrichten</button>
+        </div>
+      </form>
+    </dialog>
 
     <dialog
       class="modal auth-dialog"
@@ -1227,7 +1699,7 @@
             <p class="eyebrow">Sicherheitsanforderung</p>
             <h2 id="changePasswordDialogTitle">Neues Passwort festlegen</h2>
             <p class="modal-subtitle">
-              Das temporäre Passwort muss vor der weiteren Nutzung ersetzt werden.
+              Das bisherige Passwort muss vor der weiteren Nutzung ersetzt werden.
             </p>
           </div>
         </div>
@@ -1430,6 +1902,42 @@
       </div>
     </dialog>
 
+    <dialog
+      class="modal modal-large weekend-simulation-dialog"
+      id="weekendSimulationDialog"
+      aria-labelledby="weekendSimulationTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Unverbindliche Planung</p>
+          <h2 id="weekendSimulationTitle">Ausgeglichene Wochenendverteilung</h2>
+          <p class="modal-subtitle">
+            Eine Übernahme erfolgt erst nach einer zusätzlichen Bestätigung.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="weekendSimulationContent"></div>
+      <div class="modal-footer">
+        <button
+          class="button button-primary"
+          id="applyWeekendSimulationButton"
+          type="button"
+          data-admin-only
+        >
+          <svg><use href="#icon-check"></use></svg>
+          Simulation übernehmen
+        </button>
+        <button class="button button-secondary" id="rerunWeekendSimulationButton" type="button">
+          <svg><use href="#icon-chart"></use></svg>
+          Neu berechnen
+        </button>
+        <button class="button button-ghost" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
     <dialog class="modal modal-large" id="bulkEditDialog" aria-labelledby="bulkEditTitle">
       <form id="bulkEditForm">
         <div class="modal-header">
@@ -1463,8 +1971,8 @@
               <select id="bulkServiceWeekend">
                 <option value="">Nicht ändern</option>
                 <option value="none">Kein festes Dienstwochenende</option>
-                <option value="oli">Oli</option>
-                <option value="claudio">Claudio</option>
+                <option value="weekend_a">Wochenende A</option>
+                <option value="weekend_b">Wochenende B</option>
               </select>
             </label>
             <label class="form-field">
@@ -1640,16 +2148,9 @@
             <div class="form-grid">
               <label class="form-field">
                 <span>Beruf <em>*</em></span>
-                <input
-                  id="profession"
-                  name="profession"
-                  type="text"
-                  list="professionOptions"
-                  maxlength="100"
-                  required
-                  placeholder="z. B. Pflegefachkraft"
-                />
-                <datalist id="professionOptions"></datalist>
+                <select id="profession" name="profession" required>
+                  <option value="">Beruf auswählen</option>
+                </select>
               </label>
               <label class="form-field">
                 <span>Stellenumfang <em>*</em></span>
@@ -1671,9 +2172,10 @@
                 <span>Festes Dienstwochenende</span>
                 <select id="serviceWeekend" name="serviceWeekend">
                   <option value="none">Kein festes Dienstwochenende</option>
-                  <option value="oli">Oli</option>
-                  <option value="claudio">Claudio</option>
+                  <option value="weekend_a">Wochenende A</option>
+                  <option value="weekend_b">Wochenende B</option>
                 </select>
+                <small id="serviceWeekendOwnerHint" class="field-hint" hidden></small>
               </label>
             </div>
             <label class="form-field employee-status-field">
@@ -2110,6 +2612,7 @@
       </form>
     </dialog>
 
+
     <dialog class="modal" id="deviceDialog" aria-labelledby="deviceDialogTitle">
       <form id="deviceForm">
         <div class="modal-header">
@@ -2318,6 +2821,103 @@
       </div>
     </dialog>
 
+
+    <dialog
+      class="modal backup-password-dialog"
+      id="backupPasswordDialog"
+      aria-labelledby="backupPasswordDialogTitle"
+      aria-describedby="backupPasswordDialogDescription"
+    >
+      <form id="backupPasswordForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Geschützte Datensicherung</p>
+            <h2 id="backupPasswordDialogTitle">Sicherung verschlüsseln</h2>
+            <p class="modal-subtitle" id="backupPasswordDialogDescription"></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="backup-password-notice">
+            <svg><use href="#icon-lock"></use></svg>
+            <p id="backupPasswordNotice"></p>
+          </div>
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Passwort</span>
+              <input
+                id="backupPassword"
+                name="backupPassword"
+                type="password"
+                minlength="1"
+                autocomplete="current-password"
+                required
+              />
+            </label>
+            <label class="form-field" id="backupPasswordConfirmationField">
+              <span>Passwort wiederholen</span>
+              <input
+                id="backupPasswordConfirmation"
+                name="backupPasswordConfirmation"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+              />
+            </label>
+            <label class="checkbox-field backup-password-visibility">
+              <input id="showBackupPassword" type="checkbox" />
+              <span>Passwort anzeigen</span>
+            </label>
+          </div>
+          <p class="form-error auth-error" id="backupPasswordError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" id="backupPasswordSubmit" type="submit">
+            Verschlüsselt exportieren
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal phone-list-preview-dialog"
+      id="phoneListPreviewDialog"
+      aria-labelledby="phoneListPreviewTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Druckvorschau</p>
+          <h2 id="phoneListPreviewTitle">Telefonliste</h2>
+          <p class="modal-subtitle" id="phoneListPreviewSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body phone-list-preview-body">
+        <div class="phone-list-preview-canvas" id="phoneListPreviewContent"></div>
+      </div>
+      <div class="modal-footer">
+        <span class="phone-list-preview-hint">
+          DIN A4 Hochformat · für Schwarzweiß-Laserdruck optimiert
+        </span>
+        <button class="button button-ghost" type="button" data-close-dialog>Schließen</button>
+        <button class="button button-primary" id="printEmployeePhoneListButton" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Drucken / PDF
+        </button>
+      </div>
+    </dialog>
+
+    <section
+      class="phone-list-print-surface"
+      id="phoneListPrintSurface"
+      aria-hidden="true"
+    ></section>
+
     <dialog
       class="modal modal-confirm"
       id="confirmDialog"
@@ -2343,6 +2943,8 @@
       </div>
     </noscript>
 
+    <script src="project-meta.js"></script>
+    <script src="state-schema.js"></script>
     <script src="vendor/localforage.min.js"></script>
     <script src="backend-client.js"></script>
     <script src="app.js"></script>

@@ -1,0 +1,520 @@
+        <section class="view" id="devicesView" data-view-panel="devices">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Medizinproduktesicherheit</p>
+              <h1>Geräteeinweisungen</h1>
+              <p class="page-subtitle">
+                Einweisungsnachweise personenbezogen dokumentieren und auswerten.
+              </p>
+            </div>
+            <button class="button button-primary" type="button" data-open-device-instruction>
+              <svg><use href="#icon-check"></use></svg>
+              Einweisung dokumentieren
+            </button>
+          </div>
+
+          <div class="training-summary" id="deviceSummary"></div>
+
+          <section class="panel device-matrix-panel">
+            <div class="device-filter-bar">
+              <label class="search-field device-search-field" for="deviceSearch">
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="deviceSearch"
+                  type="search"
+                  aria-label="Geräte durchsuchen"
+                  placeholder="Gerätename oder Hersteller suchen …"
+                  autocomplete="off"
+                />
+              </label>
+              <label class="compact-field">
+                <span>Gerätebestand</span>
+                <select id="deviceInventoryFilter">
+                  <option value="current">Nur aktuelle Geräte</option>
+                  <option value="former">Nicht mehr im Bestand</option>
+                  <option value="all">Alle Geräte</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Anlage 1</span>
+                <select id="deviceAnnexFilter">
+                  <option value="all">Alle Geräte</option>
+                  <option value="yes">Nur Anlage 1</option>
+                  <option value="no">Ohne Anlage 1</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Gerätekategorie</span>
+                <select id="deviceCategoryFilter">
+                  <option value="all">Alle Kategorien</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Mitarbeiterstatus</span>
+                <select id="deviceEmployeeStatusFilter">
+                  <option value="employed">Aktiv &amp; in Einarbeitung</option>
+                  <option value="active">Aktiv</option>
+                  <option value="onboarding">In Einarbeitung</option>
+                  <option value="inactive">Inaktiv</option>
+                  <option value="all">Alle Status</option>
+                </select>
+              </label>
+              <label class="compact-field device-employee-search-field">
+                <span>Mitarbeiter suchen</span>
+                <input id="deviceEmployeeSearch" type="search" placeholder="Name eingeben" />
+              </label>
+            </div>
+            <div id="deviceInstructionMatrix"></div>
+          </section>
+
+          <section class="device-instruction-log-section">
+            <div class="section-heading device-instruction-log-heading">
+              <div>
+                <p class="eyebrow">Dokumentation</p>
+                <h2>Erfasste Einweisungen</h2>
+              </div>
+              <span>Neueste zuerst</span>
+            </div>
+            <div id="deviceInstructionList"></div>
+          </section>
+        </section>
+
+        <section
+          class="view"
+          id="deviceManagementView"
+          data-view-panel="device-management"
+          data-admin-only
+        >
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Medizinproduktesicherheit</p>
+              <h1>Geräteverwaltung</h1>
+              <p class="page-subtitle">
+                Gerätebestand, Kategorien und Anlage-1-Kennzeichnung verwalten.
+              </p>
+            </div>
+            <button class="button button-primary" type="button" data-open-device>
+              <svg><use href="#icon-plus"></use></svg>
+              Gerät anlegen
+            </button>
+          </div>
+
+          <div class="training-summary" id="deviceManagementSummary"></div>
+
+          <section class="panel device-management-filter-panel">
+            <div class="device-filter-bar">
+              <label class="compact-field">
+                <span>Gerätebestand</span>
+                <select id="deviceManagementInventoryFilter">
+                  <option value="current">Nur aktuelle Geräte</option>
+                  <option value="former">Nicht mehr im Bestand</option>
+                  <option value="all">Alle Geräte</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Anlage 1</span>
+                <select id="deviceManagementAnnexFilter">
+                  <option value="all">Alle Geräte</option>
+                  <option value="yes">Nur Anlage 1</option>
+                  <option value="no">Ohne Anlage 1</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Gerätekategorie</span>
+                <select id="deviceManagementCategoryFilter">
+                  <option value="all">Alle Kategorien</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="device-catalog-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Gerätekatalog</p>
+                <h2>Angelegte Geräte</h2>
+              </div>
+            </div>
+            <div class="training-list" id="deviceCatalog"></div>
+          </section>
+        </section>
+
+        <section class="view" id="settingsView" data-view-panel="settings">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Anwendung</p>
+              <h1>Einstellungen</h1>
+              <p class="page-subtitle">
+                Darstellung, Datenspeicherung und zentrale Verwaltungsfunktionen.
+              </p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <section class="panel settings-card">
+              <div class="settings-card-heading">
+                <span class="settings-card-icon">
+                  <svg><use href="#icon-palette"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Darstellung</p>
+                  <h2>Farbthema</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Das gewählte Erscheinungsbild wird für diesen Datenbestand gespeichert.
+              </p>
+              <label class="settings-field">
+                <span>Aktives Farbthema</span>
+                <select data-theme-select aria-label="Farbthema auswählen">
+                  <option value="standard">Standard</option>
+                  <option value="dark">Dark Mode</option>
+                  <option value="cellitinnen">Cellitinnen</option>
+                  <option value="cellitinnen-red">Cellitinnen Rot</option>
+                </select>
+              </label>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-storage">
+                  <svg><use href="#icon-calendar"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Dienstplanung</p>
+                  <h2>Feste Dienstwochenenden</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Jedem Wochenende wird eine Stationsleitung oder stellvertretende
+                Stationsleitung zugewiesen. Die Bezeichnung entspricht automatisch
+                dem Vornamen der verantwortlichen Person.
+              </p>
+              <div class="settings-weekend-config">
+                <fieldset>
+                  <legend>Wochenende A</legend>
+                  <label class="settings-field">
+                    <span>Bezeichnung (automatisch)</span>
+                    <input id="settingsWeekendNameA" type="text" readonly />
+                  </label>
+                  <label class="settings-field">
+                    <span>Verantwortliche Person</span>
+                    <select id="settingsWeekendOwnerA"></select>
+                  </label>
+                </fieldset>
+                <fieldset>
+                  <legend>Wochenende B</legend>
+                  <label class="settings-field">
+                    <span>Bezeichnung (automatisch)</span>
+                    <input id="settingsWeekendNameB" type="text" readonly />
+                  </label>
+                  <label class="settings-field">
+                    <span>Verantwortliche Person</span>
+                    <select id="settingsWeekendOwnerB"></select>
+                  </label>
+                </fieldset>
+              </div>
+              <div class="settings-actions">
+                <button
+                  class="button button-primary"
+                  id="saveWeekendSettingsButton"
+                  type="button"
+                >
+                  Wochenenden speichern
+                </button>
+              </div>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-storage">
+                  <svg><use href="#icon-lock"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Speicherort</p>
+                  <h2>Datenbank-Backend</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                TeO kann lokal mit localForage oder gemeinsam über den geschützten
+                MariaDB-API-Dienst betrieben werden.
+              </p>
+              <label class="settings-field">
+                <span>Aktiver Datenspeicher</span>
+                <select id="settingsStorageBackend">
+                  <option value="local">Lokaler Browser – localForage / IndexedDB</option>
+                  <option value="mariadb">MariaDB – zentraler TeO-Server</option>
+                </select>
+              </label>
+              <div class="backend-settings-fields" id="mariaDbSettingsFields" hidden>
+                <label class="settings-field">
+                  <span>Adresse des TeO-Servers</span>
+                  <input
+                    id="settingsMariaDbApiUrl"
+                    type="url"
+                    inputmode="url"
+                    placeholder="http://server-name:3000"
+                    autocomplete="url"
+                  />
+                </label>
+                <label class="settings-field">
+                  <span>Aktuelles Administratorpasswort</span>
+                  <input
+                    id="settingsMariaDbPassword"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Nur zum Verbinden erforderlich"
+                  />
+                </label>
+              </div>
+              <p class="settings-backend-hint" id="settingsBackendHint"></p>
+              <span class="settings-status" id="settingsBackendStatus">
+                <i></i>
+                Lokal verbunden
+              </span>
+              <div class="settings-actions backend-settings-actions">
+                <button
+                  class="button button-secondary"
+                  id="testBackendConnectionButton"
+                  type="button"
+                >
+                  <svg><use href="#icon-check"></use></svg>
+                  Verbindung testen
+                </button>
+                <button
+                  class="button button-primary"
+                  id="applyStorageBackendButton"
+                  type="button"
+                >
+                  Backend aktivieren
+                </button>
+              </div>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-admin">
+                  <svg><use href="#icon-edit"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Administration</p>
+                  <h2>Stammdaten &amp; Zugriffe</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Benutzerkonten, Kataloge und die Qualität des Datenbestands zentral verwalten.
+              </p>
+              <div class="settings-actions">
+                <button class="button button-secondary" type="button" data-open-user-management>
+                  <svg><use href="#icon-users"></use></svg>
+                  Benutzer verwalten
+                </button>
+                <button
+                  class="button button-secondary"
+                  type="button"
+                  data-open-catalog-management
+                >
+                  <svg><use href="#icon-edit"></use></svg>
+                  Berufe &amp; Qualifikationen
+                </button>
+                <button class="button button-secondary" type="button" data-open-data-quality>
+                  <svg><use href="#icon-alert"></use></svg>
+                  Datenqualität prüfen
+                </button>
+              </div>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-reminder">
+                  <svg><use href="#icon-alert"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Sicherheit</p>
+                  <h2>Sicherungserinnerung</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                TeO warnt, sobald die letzte Datensicherung länger als der gewählte
+                Zeitraum zurückliegt.
+              </p>
+              <div class="settings-inline-form">
+                <label class="settings-field">
+                  <span>Erinnerung nach</span>
+                  <span class="input-suffix">
+                    <input
+                      id="settingsBackupReminderDays"
+                      type="number"
+                      min="1"
+                      max="365"
+                      step="1"
+                    />
+                    <span>Tagen</span>
+                  </span>
+                </label>
+                <button
+                  class="button button-primary"
+                  id="saveGeneralSettingsButton"
+                  type="button"
+                >
+                  Speichern
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <section
+            class="panel backup-panel settings-backup-panel"
+            aria-labelledby="backupTitle"
+            data-admin-only
+          >
+            <div class="backup-content">
+              <span class="backup-icon" aria-hidden="true">
+                <svg><use href="#icon-lock"></use></svg>
+              </span>
+              <div>
+                <p class="eyebrow">Datensicherung</p>
+                <h2 id="backupTitle">Gesamten Datenbestand sichern</h2>
+                <p class="backup-description">
+                  Exportiert oder ersetzt Mitarbeiter, Termine, Fortbildungen,
+                  Nachweise, Teamsitzungen, Geräteeinweisungen und die
+                  Abwesenheitsplanung gemeinsam.
+                </p>
+                <p class="backup-status" id="backupStatus"></p>
+                <div class="browser-storage-info">
+                  <p class="browser-storage-status" id="browserStorageStatus">
+                    Browserspeicher wird ermittelt …
+                  </p>
+                  <button
+                    class="button button-ghost button-compact"
+                    id="requestPersistentStorageButton"
+                    type="button"
+                  >
+                    <svg><use href="#icon-lock"></use></svg>
+                    Dauerhaften Speicher aktivieren
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="backup-actions">
+              <button class="button button-ghost" id="openAuditLogButton" type="button">
+                <svg><use href="#icon-more"></use></svg>
+                Änderungsprotokoll
+              </button>
+              <button class="button button-secondary" id="validateBackupButton" type="button">
+                <svg><use href="#icon-check"></use></svg>
+                Sicherung prüfen
+              </button>
+              <button class="button button-secondary" id="importDataButton" type="button">
+                <svg><use href="#icon-upload"></use></svg>
+                Sicherung importieren
+              </button>
+              <button class="button button-primary" id="exportDataButton" type="button">
+                <svg><use href="#icon-download"></use></svg>
+                Sicherung exportieren
+              </button>
+              <button class="button button-secondary" id="exportEncryptedDataButton" type="button">
+                <svg><use href="#icon-lock"></use></svg>
+                Verschlüsselt exportieren
+              </button>
+              <input
+                class="sr-only"
+                id="importDataFile"
+                type="file"
+                accept="application/json,.json"
+                aria-label="JSON-Sicherungsdatei auswählen"
+              />
+              <input
+                class="sr-only"
+                id="validateBackupFile"
+                type="file"
+                accept="application/json,.json"
+                aria-label="JSON-Sicherungsdatei zur Prüfung auswählen"
+              />
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="helpView" data-view-panel="help">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Dokumentation</p>
+              <h1>Hilfe</h1>
+              <p class="page-subtitle">
+                Funktionen, Betriebshinweise und Datenschutzinformationen zu TeO.
+              </p>
+            </div>
+          </div>
+          <section class="panel help-search-panel" aria-label="Hilfe durchsuchen">
+            <label class="search-field help-search-field">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="helpSearch"
+                type="search"
+                placeholder="Hilfe durchsuchen, z. B. Urlaub, Sicherung oder Fortbildung …"
+                autocomplete="off"
+              />
+            </label>
+            <span id="helpSearchStatus" aria-live="polite"></span>
+            <button class="button button-ghost button-compact" id="clearHelpSearch" type="button">
+              Suche löschen
+            </button>
+          </section>
+          <div class="panel help-no-results" id="helpNoResults" hidden>
+            <svg><use href="#icon-search"></use></svg>
+            <div>
+              <strong>Kein Hilfethema gefunden</strong>
+              <span>Versuchen Sie einen allgemeineren Suchbegriff.</span>
+            </div>
+          </div>
+          <!-- README_HELP_CONTENT -->
+        </section>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="Mobile Hauptnavigation">
+      <button class="is-active" type="button" data-view="dashboard">
+        <svg><use href="#icon-dashboard"></use></svg>
+        <span>Übersicht</span>
+      </button>
+      <button type="button" data-view="employees">
+        <svg><use href="#icon-users"></use></svg>
+        <span>Mitarbeiter</span>
+      </button>
+      <button type="button" data-view="weekends">
+        <svg><use href="#icon-calendar"></use></svg>
+        <span>Wochenenden</span>
+      </button>
+      <button type="button" data-view="vacations">
+        <svg><use href="#icon-calendar"></use></svg>
+        <span>Urlaub</span>
+      </button>
+      <button type="button" data-view="appointments">
+        <svg><use href="#icon-calendar"></use></svg>
+        <span>Termine</span>
+      </button>
+      <button type="button" data-view="trainings">
+        <svg><use href="#icon-training"></use></svg>
+        <span>Fortbildungen</span>
+      </button>
+      <button type="button" data-view="meetings">
+        <svg><use href="#icon-meeting"></use></svg>
+        <span>Sitzungen</span>
+      </button>
+      <button type="button" data-view="devices">
+        <svg><use href="#icon-empty"></use></svg>
+        <span>Einweisungen</span>
+      </button>
+      <button type="button" data-view="device-management" data-admin-only>
+        <svg><use href="#icon-edit"></use></svg>
+        <span>Geräte</span>
+      </button>
+      <button type="button" data-view="settings">
+        <svg><use href="#icon-settings"></use></svg>
+        <span>Einstellungen</span>
+      </button>
+      <button type="button" data-view="help">
+        <svg><use href="#icon-help"></use></svg>
+        <span>Hilfe</span>
+      </button>
+    </nav>

@@ -20,7 +20,7 @@ gleichzeitig die statischen App-Dateien aus.
 3. Im Ordner `server` die Abhängigkeiten installieren:
 
    ```text
-   npm install
+   npm ci
    ```
 
 4. Den Dienst starten:
@@ -37,6 +37,11 @@ Ist die Datenbank noch leer, überträgt TeO den aktuellen lokalen Datenbestand.
 bereits eingerichtet, wird nach erfolgreicher Anmeldung der vorhandene Serverdatenbestand
 geladen.
 
+Bei einer Aktualisierung eines bestehenden Backends `schema.sql` einmal erneut als
+administrativer MariaDB-Benutzer ausführen. Dadurch erhält das eingeschränkte
+App-Konto auch das für abgelaufene Sitzungen notwendige `DELETE`-Recht. Die
+eigentlichen Tabellenänderungen führt der Server danach versioniert selbst aus.
+
 ## Umgebungsvariablen
 
 | Variable | Bedeutung | Standard |
@@ -44,7 +49,9 @@ geladen.
 | `TEO_HOST` | Bind-Adresse des HTTP-Dienstes | `0.0.0.0` |
 | `TEO_PORT` | HTTP-Port | `3000` |
 | `TEO_SESSION_HOURS` | Laufzeit inaktiver Serversitzungen | `12` |
-| `TEO_CORS_ORIGINS` | Kommagetrennte zusätzlich erlaubte Ursprünge; `*` erlaubt alle | leer |
+| `TEO_CORS_ORIGINS` | Kommagetrennte zusätzlich erlaubte Ursprünge | leer |
+| `TEO_TRUST_PROXY` | genau einen vorgeschalteten Reverse Proxy vertrauen | `false` |
+| `TEO_HTTPS_ONLY` | HSTS senden; erst hinter vollständig eingerichtetem HTTPS aktivieren | `false` |
 | `DB_HOST` | MariaDB-Server | erforderlich |
 | `DB_PORT` | MariaDB-Port | `3306` |
 | `DB_NAME` | Datenbankname | erforderlich |
@@ -57,13 +64,21 @@ geladen.
 
 - MariaDB-Zugangsdaten liegen ausschließlich in der serverseitigen `.env`.
 - Die Anmeldung erfolgt serverseitig mit den bestehenden PBKDF2-Passworthashes.
-- API-Sitzungen verwenden zufällige Bearer-Token und laufen automatisch ab.
+- API-Sitzungen verwenden zufällige Bearer-Token. Nur deren SHA-256-Hashes
+  werden in MariaDB gespeichert; die Sitzungen überleben Serverneustarts und
+  laufen automatisch ab.
 - Fehlgeschlagene Anmeldungen werden pro IP begrenzt.
 - Normale Benutzer dürfen serverseitig nur Fortbildungsnachweise,
   Teamsitzungsteilnahmen, ihr eigenes Passwort und das Farbthema verändern.
 - Revisionsnummern verhindern, dass gleichzeitige Änderungen unbemerkt überschrieben
   werden.
-- Passworthashes anderer Konten werden normalen Benutzern nicht ausgeliefert.
+- Passworthashes werden keinem Browser ausgeliefert und beim Speichern
+  serverseitig geschützt wieder ergänzt.
+- Ein unveränderbares Serverprotokoll in `teo_audit_log` dokumentiert
+  Initialisierung und Datenrevisionen zusätzlich zum fachlichen App-Protokoll.
+- Versionierte Migrationen in `src/migrations.js` aktualisieren das
+  Datenbankschema beim Serverstart und werden in `teo_schema_migrations`
+  protokolliert.
 
 Für einen produktiven Betrieb mit personenbezogenen Daten sind zusätzlich HTTPS,
 geregelte MariaDB-Backups, Betriebssystemhärtung, Zugriffsprotokollierung und die

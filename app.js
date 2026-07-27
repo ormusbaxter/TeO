@@ -1,18 +1,23 @@
+/* Generiert aus src/app/*.js – Änderungen dort vornehmen. */
 (() => {
   "use strict";
 
+  const PROJECT_META = window.TeOProjectMeta;
+  if (!PROJECT_META) {
+    throw new Error("Die TeO-Projektmetadaten konnten nicht geladen werden.");
+  }
   const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
-  const STATE_VERSION = 20;
-  const PROJECT_NAME = "TeO – Team & Employee Organizer";
-  const PROJECT_VERSION = Object.freeze({ major: 2, minor: 9 });
-  const BACKUP_FORMAT = "intensivteam-datensicherung";
-  const BACKUP_FORMAT_VERSION = 1;
+  const STATE_VERSION = PROJECT_META.stateVersion;
+  const PROJECT_NAME = PROJECT_META.name;
+  const PROJECT_VERSION = PROJECT_META.version;
+  const BACKUP_FORMAT = PROJECT_META.backupFormat;
+  const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
   const DEFAULT_VACATION_BASE_DAYS = 30;
-  const DEFAULT_OLI_REFERENCE_SATURDAY = "2026-01-03";
+  const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
   const DEFAULT_WEEKDAY_ABSENCE_LIMIT = 8;
   const DEFAULT_WEEKEND_ABSENCE_LIMIT = 5;
   const DEFAULT_TRAINING_RECURRENCE_MONTHS = 12;
@@ -143,32 +148,6 @@
   };
 
   const PASSWORD_ITERATIONS = 210000;
-  const INITIAL_USERS = [
-    {
-      id: "user-admin",
-      username: "Becke003",
-      role: "admin",
-      passwordSalt: "PRJwiOdOJrDJMnvi9ii+Nw==",
-      passwordHash: "nohBaPFvNb82bZ42kqeReikbLR0LPfsr1j9AxN0Qsdk=",
-      mustChangePassword: false,
-    },
-    {
-      id: "user-botze",
-      username: "Botze003",
-      role: "user",
-      passwordSalt: "Pb5FJQr9W/AYuWWFTFMMJw==",
-      passwordHash: "2ko1h7SMKwvKdWosUnOKb/HP0kc7tF8bk1EZ99RNWzI=",
-      mustChangePassword: true,
-    },
-    {
-      id: "user-ferre",
-      username: "Ferre001",
-      role: "user",
-      passwordSalt: "TkRiTRbHdkRLB00eXtbHIA==",
-      passwordHash: "2rUFkTolfTPNPz7KaVPHTEy/72gBBaxqGYXYJ0SIOy8=",
-      mustChangePassword: true,
-    },
-  ];
   const USER_FIRST_NAME_FALLBACKS = {
     becke003: "Oliver",
     botze003: "Elisabeth",
@@ -176,6 +155,8 @@
   };
 
   const DEFAULT_QUALIFICATIONS = {
+    stationsleitung: "Stationsleitung",
+    stellvertretendeStationsleitung: "Stellvertretende Stationsleitung",
     fachweiterbildungIA: "Fachweiterbildung I/A",
     praxisanleiter: "Praxisanleiter/in",
     hygienebeauftragter: "Hygienebeauftragte/r",
@@ -184,6 +165,10 @@
     brandschutzbeauftragter: "Brandschutzbeauftragte/r",
     medizinproduktebeauftragter: "Medizinproduktebeauftragte/r",
   };
+  const LEADERSHIP_QUALIFICATION_IDS = Object.freeze([
+    "stationsleitung",
+    "stellvertretendeStationsleitung",
+  ]);
 
   const DEFAULT_PROFESSIONS = [
     "Pflegefachkraft",
@@ -197,74 +182,13 @@
     "3-jährig examiniert",
   ]);
 
-  const EMPLOYEE_EMAIL_ASSIGNMENTS = [
-    { names: ["Ali Taghipourlahijani"], email: "ali_P1386@yahoo.com" },
-    { names: ["Alissa Kunn"], email: "alissa.kunn@googlemail.com" },
-    { names: ["Anastasia Derr"], email: "nastiarsk@gmail.com" },
-    { names: ["Anna Peter"], email: "annapeter049@gmail.com" },
-    { names: ["Armin Kallrath"], email: "a.kallrath@gmail.com" },
-    { names: ["Aylin Boran"], email: "aylinboran@gmx.de" },
-    { names: ["Beyza Cicek"], email: "beyza2009@gmx.de" },
-    { names: ["Christian Hirt"], email: "christian.hirt@web.de" },
-    { names: ["Christof Michalski"], email: "stoepselmich@gmail.com" },
-    { names: ["Claudio Ferreira"], email: "claudinofc@web.de" },
-    { names: ["David Baldus"], email: "david.baldus@gmx.de" },
-    { names: ["David Brisch"], email: "davidbrisch9@gmail.com" },
-    { names: ["David Radtke"], email: "davidradtke84@googlemail.com" },
-    { names: ["Edin Moranjkic"], email: "Edin_8c@hotmail.com" },
-    { names: ["Elisabeth Botzet"], email: "elisabethbotzet@yahoo.de" },
-    { names: ["Emina Celikovic"], email: "eminacelikovicc@gmail.com" },
-    { names: ["Ertugrul Erol"], email: "ertugrulerol1995@icloud.com" },
-    { names: ["Eva Sandmann"], email: "evasandmann@gmx.de" },
-    { names: ["Henning Nordmann"], email: "h.nordmann@gmail.com" },
-    { names: ["Isabel Hurtado"], email: "Hurtado.isabel94@gmail.com" },
-    { names: ["Jana Lueken"], email: "jlueken2812@gmail.com" },
-    { names: ["Jana Viertel"], email: "jana.viertel@web.de" },
-    { names: ["Janna Heumann"], email: "heumann.janna@outlook.de" },
-    { names: ["Julian Westermann"], email: "westermannjuli@gmail.com" },
-    { names: ["Juliana Groß"], email: "grosses-julchen@web.de" },
-    { names: ["Karim Keddo"], email: "kkeddo@web.de" },
-    { names: ["Kathrin Quauck"], email: "kquauck@googlemail.com" },
-    { names: ["Lara Holstein"], email: "liholstein@hotmail.de" },
-    { names: ["Lea Ring"], email: "dielearing@web.de" },
-    { names: ["Leah Deneu"], email: "Leah.deneu@gmail.com" },
-    { names: ["Lilija Engels"], email: "lihe031181@gmail.com" },
-    { names: ["Lisa Borjal"], email: "srlisa@hotmail.de" },
-    { names: ["Marco Eßeling"], email: "marco_esseling@web.de" },
-    { names: ["Meral Uzun"], email: "nc-uzunme3@netcologne.de" },
-    { names: ["Michelle Kaiser"], email: "michelle.ksr@web.de" },
-    { names: ["Miriam Ossege"], email: "miriam.ossege@icloud.com" },
-    { names: ["Mladen Derikonja"], email: "derikonjamladen@gmail.com" },
-    { names: ["Mo Golchin"], email: "golchin99@gmail.com" },
-    { names: ["Nadir Kudic"], email: "nadirkudic99@gmail.com" },
-    { names: ["Nico Ohlrogg"], email: "nicoohlrogg@outlook.de" },
-    { names: ["Nils von der Gathen"], email: "nilsvondergathen@web.de" },
-    { names: ["Oliver Becker"], email: "vestine@gmail.com" },
-    { names: ["Pauline Müller"], email: "paulinemueller96@web.de" },
-    { names: ["Ramona Dragu"], email: "ramona26@web.de" },
-    { names: ["Rosa Diniz"], email: "Salinda1827@gmail.com" },
-    { names: ["Negar Sadeghidehnavi"], email: "sadeghinegar84@gmail.com" },
-    { names: ["Sanja Pavicic"], email: "Pavicicsanja1@gmail.com" },
-    { names: ["Sebastian Gertzen"], email: "s.gertzen@gmx.net" },
-    { names: ["Sigrun Ekstein"], email: "sigrun.ekstein@koeln.de" },
-    { names: ["Silke Hönnicke"], email: "SHoennicke@aol.com" },
-    { names: ["Susanne Bauer"], email: "susan.bauer.1987@web.de" },
-    { names: ["Vanessa Ellerbrock"], email: "vanessa.ellerbrock@gmx.de" },
-    { names: ["Viktoria Sarkadi"], email: "sarkadi.viktoria.klara@gmail.com" },
-    { names: ["Wiebke Jost"], email: "wiebke.jost@web.de" },
-    { names: ["Nina Skrijelj"], email: "ninaskrijelj00@gmail.com" },
-    { names: ["Ilef Ayach"], email: "ilef.ayach@gmail.com" },
-    {
-      names: ["Maria Kimiyaei Asadi", "Maria Kimiyaeiasadi"],
-      email: "maria.kimiyaeiasadi@gmail.com",
-    },
-  ];
 
   const SERVICE_WEEKENDS = {
     none: "Kein festes Dienstwochenende",
-    oli: "Oli",
-    claudio: "Claudio",
+    weekend_a: "Wochenende A",
+    weekend_b: "Wochenende B",
   };
+  const SERVICE_WEEKEND_KEYS = Object.freeze(["weekend_a", "weekend_b"]);
 
   // Amtliche Ferienordnung NRW für die Schuljahre 2024/25 bis 2029/30:
   // https://bass.schule.nrw/19662.htm
@@ -381,6 +305,7 @@
     devices: "geraeteeinweisungen",
     "device-management": "geraeteverwaltung",
     settings: "einstellungen",
+    help: "hilfe",
   };
 
   const HASH_VIEWS = Object.fromEntries(
@@ -406,6 +331,7 @@
   let attendanceDraft = new Map();
   let attendanceEmployeeIds = [];
   let confirmCallback = null;
+  let backupPasswordResolver = null;
   let currentUser = null;
   let selectedEmployeeIds = new Set();
   let employeeProfessionFilter = "all";
@@ -413,9 +339,12 @@
   let employeeWeekendFilter = "all";
   let employeeSortKey = "name";
   let employeeSortDirection = "asc";
+  let currentWeekendSimulation = null;
   let trainingRecurrenceManuallyChanged = false;
   let trainingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
+  let databaseSaveReminderArmed = false;
+  let dateInputObserver = null;
   let vacationYear = new Date().getFullYear();
   let vacationMonth = new Date().getMonth() + 1;
   let vacationEntryType = "vacation";
@@ -439,6 +368,17 @@
     navAppointmentCount: document.querySelector("#navAppointmentCount"),
     navDeviceManagementCount: document.querySelector("#navDeviceManagementCount"),
     mobileCreateButton: document.querySelector("#mobileCreateButton"),
+    databaseSaveWarning: document.querySelector("#databaseSaveWarning"),
+    databaseSaveWarningText: document.querySelector(
+      "#databaseSaveWarningText",
+    ),
+    databaseSaveWarningExportButton: document.querySelector(
+      "#databaseSaveWarningExportButton",
+    ),
+    helpSearch: document.querySelector("#helpSearch"),
+    helpSearchStatus: document.querySelector("#helpSearchStatus"),
+    clearHelpSearch: document.querySelector("#clearHelpSearch"),
+    helpNoResults: document.querySelector("#helpNoResults"),
     mobileThemeButton: document.querySelector("#mobileThemeButton"),
     mobileAccountButton: document.querySelector("#mobileAccountButton"),
     currentUsername: document.querySelector("#currentUsername"),
@@ -455,6 +395,12 @@
     employeeSearch: document.querySelector("#employeeSearch"),
     copyActiveEmailsButton: document.querySelector("#copyActiveEmailsButton"),
     copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),
+    exportEmployeePhoneListButton: document.querySelector(
+      "#exportEmployeePhoneListButton",
+    ),
+    exportEmployeePhoneListLabel: document.querySelector(
+      "#exportEmployeePhoneListLabel",
+    ),
     openCatalogManagementButton: document.querySelector("#openCatalogManagementButton"),
     exportDataButton: document.querySelector("#exportDataButton"),
     importDataButton: document.querySelector("#importDataButton"),
@@ -485,6 +431,17 @@
     saveGeneralSettingsButton: document.querySelector(
       "#saveGeneralSettingsButton",
     ),
+    settingsWeekendNameA: document.querySelector("#settingsWeekendNameA"),
+    settingsWeekendOwnerA: document.querySelector("#settingsWeekendOwnerA"),
+    settingsWeekendNameB: document.querySelector(
+      "#settingsWeekendNameB",
+    ),
+    settingsWeekendOwnerB: document.querySelector(
+      "#settingsWeekendOwnerB",
+    ),
+    saveWeekendSettingsButton: document.querySelector(
+      "#saveWeekendSettingsButton",
+    ),
     openAuditLogButton: document.querySelector("#openAuditLogButton"),
     employeeProfessionFilter: document.querySelector("#employeeProfessionFilter"),
     employeeQualificationFilter: document.querySelector("#employeeQualificationFilter"),
@@ -496,6 +453,9 @@
     clearEmployeeSelection: document.querySelector("#clearEmployeeSelection"),
     openWeekendOverviewButton: document.querySelector("#openWeekendOverviewButton"),
     openWeekendPrintButton: document.querySelector("#openWeekendPrintButton"),
+    openWeekendSimulationButton: document.querySelector(
+      "#openWeekendSimulationButton",
+    ),
     weekendDistributionContent: document.querySelector("#weekendDistributionContent"),
     vacationYear: document.querySelector("#vacationYear"),
     vacationMonth: document.querySelector("#vacationMonth"),
@@ -507,8 +467,17 @@
     vacationWeekendAbsenceLimit: document.querySelector(
       "#vacationWeekendAbsenceLimit",
     ),
-    vacationOliReferenceSaturday: document.querySelector(
-      "#vacationOliReferenceSaturday",
+    vacationWeekendAReferenceSaturday: document.querySelector(
+      "#vacationWeekendAReferenceSaturday",
+    ),
+    vacationWeekendAReferenceLabel: document.querySelector(
+      "#vacationWeekendAReferenceLabel",
+    ),
+    vacationWeekendALegend: document.querySelector(
+      "#vacationWeekendALegend",
+    ),
+    vacationWeekendBLegend: document.querySelector(
+      "#vacationWeekendBLegend",
     ),
     saveVacationSettingsButton: document.querySelector("#saveVacationSettingsButton"),
     vacationSummary: document.querySelector("#vacationSummary"),
@@ -547,6 +516,10 @@
     employeeForm: document.querySelector("#employeeForm"),
     employeeDialogTitle: document.querySelector("#employeeDialogTitle"),
     employeeSubmitLabel: document.querySelector("#employeeSubmitLabel"),
+    serviceWeekend: document.querySelector("#serviceWeekend"),
+    serviceWeekendOwnerHint: document.querySelector(
+      "#serviceWeekendOwnerHint",
+    ),
     trainingDialog: document.querySelector("#trainingDialog"),
     trainingForm: document.querySelector("#trainingForm"),
     trainingDialogTitle: document.querySelector("#trainingDialogTitle"),
@@ -572,6 +545,9 @@
     loginDialog: document.querySelector("#loginDialog"),
     loginForm: document.querySelector("#loginForm"),
     loginError: document.querySelector("#loginError"),
+    setupDialog: document.querySelector("#setupDialog"),
+    setupForm: document.querySelector("#setupForm"),
+    setupError: document.querySelector("#setupError"),
     changePasswordDialog: document.querySelector("#changePasswordDialog"),
     changePasswordForm: document.querySelector("#changePasswordForm"),
     changePasswordError: document.querySelector("#changePasswordError"),
@@ -675,6 +651,14 @@
     weekendOverviewDialog: document.querySelector("#weekendOverviewDialog"),
     weekendOverviewContent: document.querySelector("#weekendOverviewContent"),
     printWeekendOverviewButton: document.querySelector("#printWeekendOverviewButton"),
+    weekendSimulationDialog: document.querySelector("#weekendSimulationDialog"),
+    weekendSimulationContent: document.querySelector("#weekendSimulationContent"),
+    rerunWeekendSimulationButton: document.querySelector(
+      "#rerunWeekendSimulationButton",
+    ),
+    applyWeekendSimulationButton: document.querySelector(
+      "#applyWeekendSimulationButton",
+    ),
     bulkEditDialog: document.querySelector("#bulkEditDialog"),
     bulkEditForm: document.querySelector("#bulkEditForm"),
     bulkEditSubtitle: document.querySelector("#bulkEditSubtitle"),
@@ -693,6 +677,30 @@
     confirmMessage: document.querySelector("#confirmMessage"),
     confirmAccept: document.querySelector("#confirmAccept"),
     confirmCancel: document.querySelector("#confirmCancel"),
+    backupPasswordDialog: document.querySelector("#backupPasswordDialog"),
+    backupPasswordForm: document.querySelector("#backupPasswordForm"),
+    backupPasswordDialogTitle: document.querySelector("#backupPasswordDialogTitle"),
+    backupPasswordDialogDescription: document.querySelector(
+      "#backupPasswordDialogDescription",
+    ),
+    backupPasswordNotice: document.querySelector("#backupPasswordNotice"),
+    backupPassword: document.querySelector("#backupPassword"),
+    backupPasswordConfirmationField: document.querySelector(
+      "#backupPasswordConfirmationField",
+    ),
+    backupPasswordConfirmation: document.querySelector(
+      "#backupPasswordConfirmation",
+    ),
+    showBackupPassword: document.querySelector("#showBackupPassword"),
+    backupPasswordError: document.querySelector("#backupPasswordError"),
+    backupPasswordSubmit: document.querySelector("#backupPasswordSubmit"),
+    phoneListPreviewDialog: document.querySelector("#phoneListPreviewDialog"),
+    phoneListPreviewSubtitle: document.querySelector("#phoneListPreviewSubtitle"),
+    phoneListPreviewContent: document.querySelector("#phoneListPreviewContent"),
+    phoneListPrintSurface: document.querySelector("#phoneListPrintSurface"),
+    printEmployeePhoneListButton: document.querySelector(
+      "#printEmployeePhoneListButton",
+    ),
     toastRegion: document.querySelector("#toastRegion"),
   };
 
@@ -718,6 +726,9 @@
     backendConfig = window.TeOBackend.readConfig();
     backendMode = backendConfig.mode;
     state = await loadState();
+    databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    initializeFormattedDateInputs();
     applyTheme(state.settings.theme);
     renderProjectMetadata();
 
@@ -762,9 +773,20 @@
         backupReminderDays: DEFAULT_BACKUP_REMINDER_DAYS,
         meetingAttendanceThreshold: 70,
         vacationBaseDays: DEFAULT_VACATION_BASE_DAYS,
-        vacationOliReferenceSaturday: DEFAULT_OLI_REFERENCE_SATURDAY,
+        vacationWeekendAReferenceSaturday:
+          DEFAULT_WEEKEND_A_REFERENCE_SATURDAY,
         vacationWeekdayAbsenceLimit: DEFAULT_WEEKDAY_ABSENCE_LIMIT,
         vacationWeekendAbsenceLimit: DEFAULT_WEEKEND_ABSENCE_LIMIT,
+        serviceWeekends: {
+          weekend_a: {
+            name: SERVICE_WEEKENDS.weekend_a,
+            ownerId: "",
+          },
+          weekend_b: {
+            name: SERVICE_WEEKENDS.weekend_b,
+            ownerId: "",
+          },
+        },
         deadlineKinds: [...DEADLINE_KINDS],
       },
       users: initialUsers(),
@@ -853,9 +875,6 @@
       }
       assignedEmployeeUsernames.add(normalizedUsername);
     });
-    if ((Number(parsed.version) || 0) < 13) {
-      applyEmployeeEmailAssignments(employees);
-    }
     const trainings = Array.isArray(parsed.trainings)
       ? parsed.trainings.map(normalizeTraining).filter(Boolean)
       : [];
@@ -970,6 +989,78 @@
       });
     });
 
+    const users = normalizeUsers(parsed.users);
+    if ((Number(parsed.version) || 0) < 22) {
+      users
+        .filter((user) => user.role === "admin")
+        .forEach((user) => {
+          user.mustChangePassword = true;
+        });
+    }
+
+    const previousStateVersion = Number(parsed.version) || 0;
+    const legacyWeekendNameFallbacks =
+      previousStateVersion < 23
+        ? { weekend_a: "Oli", weekend_b: "Claudio" }
+        : SERVICE_WEEKENDS;
+    const requestedWeekendAOwnerId =
+      parsed.settings?.serviceWeekends?.weekend_a?.ownerId ||
+      parsed.settings?.serviceWeekendOwnerIds?.oli ||
+      "";
+    const requestedWeekendBOwnerId =
+      parsed.settings?.serviceWeekends?.weekend_b?.ownerId ||
+      parsed.settings?.serviceWeekendOwnerIds?.claudio ||
+      "";
+    const serviceWeekends = {
+      weekend_a: {
+        name: normalizeServiceWeekendName(
+          parsed.settings?.serviceWeekends?.weekend_a?.name ||
+            parsed.settings?.serviceWeekendNames?.oli,
+          legacyWeekendNameFallbacks.weekend_a,
+        ),
+        ownerId: validEmployeeIds.has(requestedWeekendAOwnerId)
+          ? requestedWeekendAOwnerId
+          : "",
+      },
+      weekend_b: {
+        name: normalizeServiceWeekendName(
+          parsed.settings?.serviceWeekends?.weekend_b?.name ||
+            parsed.settings?.serviceWeekendNames?.claudio,
+          legacyWeekendNameFallbacks.weekend_b,
+        ),
+        ownerId:
+          validEmployeeIds.has(requestedWeekendBOwnerId) &&
+          requestedWeekendBOwnerId !== requestedWeekendAOwnerId
+            ? requestedWeekendBOwnerId
+            : "",
+      },
+    };
+    Object.entries(serviceWeekends).forEach(([weekend, configuration]) => {
+      if (!configuration.ownerId) return;
+      const owner = employees.find(
+        (employee) => employee.id === configuration.ownerId,
+      );
+      if (owner) {
+        if (
+          previousStateVersion < 24 &&
+          !LEADERSHIP_QUALIFICATION_IDS.some(
+            (qualificationId) => owner.qualifications[qualificationId],
+          )
+        ) {
+          owner.qualifications[
+            weekend === "weekend_a"
+              ? "stationsleitung"
+              : "stellvertretendeStationsleitung"
+          ] = true;
+        }
+        configuration.name = normalizeServiceWeekendName(
+          owner.firstName,
+          configuration.name,
+        );
+        owner.serviceWeekend = weekend;
+      }
+    });
+
     return {
       version: STATE_VERSION,
       employees,
@@ -1003,8 +1094,9 @@
           60,
           DEFAULT_VACATION_BASE_DAYS,
         ),
-        vacationOliReferenceSaturday: normalizeSaturdayDate(
-          parsed.settings?.vacationOliReferenceSaturday,
+        vacationWeekendAReferenceSaturday: normalizeSaturdayDate(
+          parsed.settings?.vacationWeekendAReferenceSaturday ||
+            parsed.settings?.vacationOliReferenceSaturday,
         ),
         vacationWeekdayAbsenceLimit: Math.round(
           clampNumber(
@@ -1022,9 +1114,10 @@
             DEFAULT_WEEKEND_ABSENCE_LIMIT,
           ),
         ),
+        serviceWeekends,
         deadlineKinds: normalizeDeadlineKinds(parsed.settings?.deadlineKinds),
       },
-      users: normalizeUsers(parsed.users),
+      users,
       auditLog: normalizeAuditLog(parsed.auditLog),
       catalogs,
     };
@@ -1059,6 +1152,9 @@
       const label = String(qualification?.label || "").trim().slice(0, 100);
       if (id && label && !qualificationMap.has(id)) qualificationMap.set(id, label);
     });
+    LEADERSHIP_QUALIFICATION_IDS.forEach((id) => {
+      qualificationMap.set(id, DEFAULT_QUALIFICATIONS[id]);
+    });
     employees.forEach((employee) => {
       Object.keys(employee.qualifications).forEach((id) => {
         if (!qualificationMap.has(id)) {
@@ -1074,7 +1170,7 @@
   }
 
   function initialUsers() {
-    return INITIAL_USERS.map((user) => ({ ...user }));
+    return [];
   }
 
   function normalizeUsers(users) {
@@ -1084,9 +1180,9 @@
       normalized.map((user) => user.username.toLocaleLowerCase("de-DE")),
     );
     if (
-      !normalized.length ||
       normalizedNames.size !== normalized.length ||
-      !normalized.some((user) => user.role === "admin")
+      (normalized.length > 0 &&
+        !normalized.some((user) => user.role === "admin"))
     ) {
       return initialUsers();
     }
@@ -1127,6 +1223,18 @@
     return Object.hasOwn(THEMES, theme) ? theme : "standard";
   }
 
+  function normalizeServiceWeekendName(value, fallback) {
+    return String(value || "").trim().slice(0, 50) || fallback;
+  }
+
+  function normalizeServiceWeekend(value) {
+    const migratedValue =
+      { oli: "weekend_a", claudio: "weekend_b" }[value] || value;
+    return Object.hasOwn(SERVICE_WEEKENDS, migratedValue)
+      ? migratedValue
+      : "none";
+  }
+
   function normalizeProfession(value) {
     const profession = String(value || "").trim().slice(0, 100);
     return CARE_PROFESSION_ALIASES.has(
@@ -1148,23 +1256,6 @@
       .filter(Boolean)
       .sort()
       .join(" ");
-  }
-
-  function applyEmployeeEmailAssignments(employees) {
-    const assignmentsByName = new Map();
-    EMPLOYEE_EMAIL_ASSIGNMENTS.forEach(({ names, email }) => {
-      names.forEach((name) => {
-        assignmentsByName.set(employeeNameSignature(name), email);
-      });
-    });
-
-    employees.forEach((employee) => {
-      const signature = employeeNameSignature(
-        `${employee.firstName} ${employee.lastName}`,
-      );
-      const email = assignmentsByName.get(signature);
-      if (email) employee.email = email;
-    });
   }
 
   function normalizeEmployee(employee) {
@@ -1206,9 +1297,7 @@
       email: String(employee.email || ""),
       employmentPercent: clampNumber(employee.employmentPercent, 1, 100, 100),
       profession: normalizeProfession(employee.profession),
-      serviceWeekend: Object.hasOwn(SERVICE_WEEKENDS, employee.serviceWeekend)
-        ? employee.serviceWeekend
-        : "none",
+      serviceWeekend: normalizeServiceWeekend(employee.serviceWeekend),
       active: employmentStatus !== "inactive",
       employmentStatus,
       qualifications,
@@ -1584,7 +1673,9 @@
   function normalizeSaturdayDate(value) {
     const date = normalizeOptionalDate(value);
     const parsed = parseLocalDate(date);
-    return parsed?.getDay() === 6 ? date : DEFAULT_OLI_REFERENCE_SATURDAY;
+    return parsed?.getDay() === 6
+      ? date
+      : DEFAULT_WEEKEND_A_REFERENCE_SATURDAY;
   }
 
   function normalizeDeadlineKinds(value) {
@@ -1683,6 +1774,7 @@
     appendAuditEntry(describeMutation(previousState, state));
 
     if (await persistState()) {
+      databaseSaveReminderArmed = true;
       renderAll();
       return true;
     }
@@ -1764,6 +1856,14 @@
       button.addEventListener("click", () => showView(button.dataset.goTo));
     });
 
+    document.querySelectorAll("[data-help-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document
+          .getElementById(button.dataset.helpTarget)
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
     window.addEventListener("hashchange", () => {
       const hash = window.location.hash.replace("#", "");
       if (HASH_VIEWS[hash]) showView(HASH_VIEWS[hash], false);
@@ -1775,7 +1875,7 @@
 
     document.body.classList.toggle("is-vacation-view", view === "vacations");
     if (view === "dashboard") renderDashboardGreeting();
-    elements.mobileCreateButton.hidden = view === "settings";
+    elements.mobileCreateButton.hidden = ["settings", "help"].includes(view);
 
     document.querySelectorAll("[data-view-panel]").forEach((panel) => {
       panel.classList.toggle("is-active", panel.dataset.viewPanel === view);
@@ -1877,6 +1977,26 @@
       });
 
     elements.copyActiveEmailsButton.addEventListener("click", copyActiveEmployeeEmails);
+    elements.exportEmployeePhoneListButton.addEventListener(
+      "click",
+      exportEmployeePhoneList,
+    );
+    elements.printEmployeePhoneListButton.addEventListener(
+      "click",
+      printEmployeePhoneList,
+    );
+    elements.openWeekendSimulationButton.addEventListener(
+      "click",
+      openWeekendSimulationDialog,
+    );
+    elements.rerunWeekendSimulationButton.addEventListener(
+      "click",
+      renderWeekendSimulation,
+    );
+    elements.applyWeekendSimulationButton.addEventListener(
+      "click",
+      requestApplyWeekendSimulation,
+    );
     elements.openTrainingMatrixButton.addEventListener("click", openTrainingMatrixDialog);
     elements.trainingDisplayYear.addEventListener("change", () => {
       trainingDisplayYear = Number(elements.trainingDisplayYear.value);
@@ -1900,6 +2020,10 @@
       filter.addEventListener("change", updateDeadlineFilters);
     });
     elements.exportDataButton.addEventListener("click", exportDatabase);
+    elements.databaseSaveWarningExportButton.addEventListener(
+      "click",
+      exportDatabase,
+    );
     elements.exportEncryptedDataButton.addEventListener("click", exportEncryptedDatabase);
     elements.requestPersistentStorageButton.addEventListener(
       "click",
@@ -1945,6 +2069,18 @@
       "click",
       saveGeneralSettings,
     );
+    elements.saveWeekendSettingsButton.addEventListener(
+      "click",
+      saveWeekendSettings,
+    );
+    elements.settingsWeekendOwnerA.addEventListener(
+      "change",
+      updateWeekendNamePreviews,
+    );
+    elements.settingsWeekendOwnerB.addEventListener(
+      "change",
+      updateWeekendNamePreviews,
+    );
     elements.settingsStorageBackend.addEventListener(
       "change",
       renderBackendSelection,
@@ -1963,6 +2099,18 @@
   }
 
   function bindForms() {
+    elements.backupPasswordForm.addEventListener(
+      "submit",
+      handleBackupPasswordSubmit,
+    );
+    elements.backupPasswordDialog.addEventListener(
+      "close",
+      handleBackupPasswordDialogClose,
+    );
+    elements.showBackupPassword.addEventListener(
+      "change",
+      updateBackupPasswordVisibility,
+    );
     elements.employeeForm.addEventListener("submit", handleEmployeeSubmit);
     elements.trainingForm.addEventListener("submit", handleTrainingSubmit);
     elements.completionForm.addEventListener("submit", handleCompletionSubmit);
@@ -2044,6 +2192,13 @@
   }
 
   function bindFilters() {
+    elements.helpSearch.addEventListener("input", filterHelpTopics);
+    elements.clearHelpSearch.addEventListener("click", () => {
+      elements.helpSearch.value = "";
+      filterHelpTopics();
+      elements.helpSearch.focus();
+    });
+
     elements.employeeSearch.addEventListener("input", (event) => {
       employeeSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
       renderEmployees();
@@ -2211,6 +2366,36 @@
     });
   }
 
+  function filterHelpTopics() {
+    const query = normalizeHelpSearch(elements.helpSearch.value);
+    const sections = [...document.querySelectorAll("[data-help-section]")];
+    let visibleCount = 0;
+    sections.forEach((section) => {
+      const matches =
+        !query || normalizeHelpSearch(section.textContent).includes(query);
+      section.hidden = !matches;
+      if (matches) visibleCount += 1;
+      const headingId = section.dataset.helpHeading;
+      document
+        .querySelector(`[data-help-nav-target="${headingId}"]`)
+        ?.toggleAttribute("hidden", !matches);
+    });
+    elements.helpSearchStatus.textContent = query
+      ? `${visibleCount} von ${sections.length} Themen gefunden`
+      : `${sections.length} Hilfethemen`;
+    elements.clearHelpSearch.hidden = !query;
+    elements.helpNoResults.hidden = visibleCount > 0;
+  }
+
+  function normalizeHelpSearch(value) {
+    return String(value || "")
+      .normalize("NFKD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLocaleLowerCase("de-DE")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function bindDelegatedActions() {
     elements.employeeTable.addEventListener("click", handleEmployeeTableAction);
     elements.employeeTable.addEventListener("change", handleEmployeeTableSelection);
@@ -2323,6 +2508,7 @@
   }
 
   function bindAuthentication() {
+    elements.setupForm.addEventListener("submit", handleSetupSubmit);
     elements.loginForm.addEventListener("submit", handleLoginSubmit);
     elements.changePasswordForm.addEventListener("submit", handlePasswordChangeSubmit);
     document.querySelectorAll("[data-logout]").forEach((button) => {
@@ -2414,6 +2600,7 @@
         elements.employeeDossierDialog,
         elements.vacationEmployeeOverviewDialog,
         elements.weekendOverviewDialog,
+        elements.weekendSimulationDialog,
         elements.bulkEditDialog,
         elements.dataQualityDialog,
         elements.auditLogDialog,
@@ -2422,6 +2609,7 @@
       openDialogs.forEach((dialog) => dialog.close());
 
       state = await loadState();
+      databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       applyTheme(state.settings.theme);
       if (currentUser) {
         const refreshedUser = state.users.find((user) => user.id === currentUser.id);
@@ -2483,6 +2671,7 @@
       }
 
       state = normalizeState(result.state);
+      databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       remoteRevision = nextRevision;
       remoteUpdateNoticeRevision = 0;
       const refreshedUser = state.users.find(
@@ -2536,6 +2725,9 @@
     renderDevices();
     renderSettings();
     renderBackupStatus();
+    renderDatabaseSaveWarning();
+    filterHelpTopics();
+    refreshFormattedDateInputs();
     void renderBrowserStorageStatus();
     applyAccessControl();
   }
@@ -2569,6 +2761,10 @@
   }
 
   function restoreAuthenticationSession() {
+    if (!isMariaDbMode() && state.users.length === 0) {
+      showSetupDialog();
+      return;
+    }
     const sessionUserId = sessionStorage.getItem(SESSION_USER_KEY);
     const user = state.users.find((item) => item.id === sessionUserId);
     if (!user) {
@@ -2579,6 +2775,67 @@
       return;
     }
     completeLogin(user);
+  }
+
+  function showSetupDialog() {
+    currentUser = null;
+    sessionStorage.removeItem(SESSION_USER_KEY);
+    document.body.classList.add("is-auth-locked");
+    document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
+    elements.setupForm.reset();
+    elements.setupError.textContent = "";
+    if (!elements.setupDialog.open) elements.setupDialog.showModal();
+    window.setTimeout(() => document.querySelector("#setupUsername").focus(), 0);
+  }
+
+  async function handleSetupSubmit(event) {
+    event.preventDefault();
+    if (isMariaDbMode() || state.users.length > 0) {
+      elements.setupError.textContent =
+        "Die Ersteinrichtung ist für diesen Datenbestand bereits abgeschlossen.";
+      return;
+    }
+
+    const username = document.querySelector("#setupUsername").value.trim();
+    const password = document.querySelector("#setupPassword").value;
+    const confirmation = document.querySelector("#setupPasswordConfirmation").value;
+    elements.setupError.textContent =
+      /^[A-Za-z0-9]{4,40}$/.test(username)
+        ? validateNewPassword(password, confirmation)
+        : "Der Benutzername muss aus 4 bis 40 Buchstaben oder Ziffern bestehen.";
+    if (elements.setupError.textContent) return;
+
+    let credentials;
+    try {
+      credentials = await createPasswordCredentials(password);
+    } catch (error) {
+      console.error("Administratorkonto konnte nicht erstellt werden.", error);
+      elements.setupError.textContent =
+        "Die sichere Passworterstellung ist in diesem Browser nicht verfügbar.";
+      return;
+    }
+
+    const admin = {
+      id: createId(),
+      username,
+      role: "admin",
+      ...credentials,
+      mustChangePassword: false,
+    };
+    state.users = [admin];
+    currentUser = admin;
+    appendAuditEntry("Ersteinrichtung abgeschlossen und Administratorkonto angelegt");
+    if (!(await persistState())) {
+      state.users = [];
+      currentUser = null;
+      elements.setupError.textContent =
+        "Die Ersteinrichtung konnte nicht gespeichert werden.";
+      return;
+    }
+    databaseSaveReminderArmed = true;
+    elements.setupDialog.close();
+    completeLogin(admin);
+    showToast("TeO wurde eingerichtet.");
   }
 
   async function handleLoginSubmit(event) {
@@ -2595,6 +2852,7 @@
           password,
         );
         state = normalizeState(result.state);
+        databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
         remoteRevision = Number(result.revision) || 0;
         backendStartupError = "";
         window.TeOBackend.writeToken(result.token);
@@ -2698,7 +2956,7 @@
     }
     if (await verifyPassword(password, currentUser)) {
       elements.changePasswordError.textContent =
-        "Das neue Passwort muss sich vom temporären Passwort unterscheiden.";
+        "Das neue Passwort muss sich vom bisherigen Passwort unterscheiden.";
       return;
     }
 
@@ -2814,6 +3072,7 @@
     elements.mobileAccountButton.title = currentUser
       ? `Benutzerkonto: ${currentUser.username}`
       : "Benutzerkonto";
+    renderDatabaseSaveWarning();
   }
 
   function openAccountDialog() {
@@ -3032,14 +3291,20 @@
       .join("");
     elements.qualificationCatalogList.innerHTML = state.catalogs.qualifications
       .map(
-        (qualification) => `
+        (qualification) => {
+          const systemQualification =
+            LEADERSHIP_QUALIFICATION_IDS.includes(qualification.id);
+          return `
           <div class="catalog-row" data-qualification-id="${qualification.id}">
             <input type="text" maxlength="100" value="${escapeHtml(
               qualification.label,
             )}" aria-label="Zusatzqualifikation ${escapeHtml(
               qualification.label,
-            )} bearbeiten" />
-            <button class="icon-button" type="button"
+            )} bearbeiten" ${systemQualification ? "readonly" : ""} />
+            ${
+              systemQualification
+                ? '<span class="field-hint catalog-system-role">Systemrolle</span>'
+                : `<button class="icon-button" type="button"
               data-catalog-action="save-qualification"
               aria-label="Änderung speichern" title="Änderung speichern">
               <svg><use href="#icon-check"></use></svg>
@@ -3048,9 +3313,11 @@
               data-catalog-action="delete-qualification"
               aria-label="${escapeHtml(qualification.label)} löschen" title="Löschen">
               <svg><use href="#icon-trash"></use></svg>
-            </button>
+            </button>`
+            }
           </div>
-        `,
+        `;
+        },
       )
       .join("");
   }
@@ -3199,6 +3466,17 @@
     if (!requireAdmin()) return;
     const qualification = state.catalogs.qualifications.find((item) => item.id === id);
     const label = String(nextValue || "").trim();
+    if (
+      LEADERSHIP_QUALIFICATION_IDS.includes(id) &&
+      label !== DEFAULT_QUALIFICATIONS[id]
+    ) {
+      showToast(
+        "Die Leitungsfunktionen sind feste Systemqualifikationen und können nicht umbenannt werden.",
+        "error",
+      );
+      renderCatalogManagement();
+      return;
+    }
     if (!qualification || !label) {
       showToast("Die Bezeichnung darf nicht leer sein.", "error");
       return;
@@ -3227,6 +3505,13 @@
     if (!requireAdmin()) return;
     const qualification = state.catalogs.qualifications.find((item) => item.id === id);
     if (!qualification) return;
+    if (LEADERSHIP_QUALIFICATION_IDS.includes(id)) {
+      showToast(
+        "Die Leitungsfunktionen werden für die Dienstwochenendzuweisung benötigt und können nicht gelöscht werden.",
+        "error",
+      );
+      return;
+    }
     const assignmentCount = state.employees.filter(
       (employee) => employee.qualifications[id],
     ).length;
@@ -3810,6 +4095,500 @@
     elements.weekendOverviewDialog.showModal();
   }
 
+  function openWeekendSimulationDialog() {
+    renderWeekendSimulation();
+    elements.weekendSimulationDialog.showModal();
+  }
+
+  function renderWeekendSimulation() {
+    const simulation = simulateWeekendDistribution();
+    currentWeekendSimulation = simulation;
+    if (simulation.employeeCount === 0) {
+      elements.weekendSimulationContent.innerHTML = renderEmptyState({
+        title: "Keine festen Wochenendzuordnungen",
+        text: "Für die Simulation werden aktive Mitarbeiter mit einem bereits fest zugewiesenen Dienstwochenende benötigt.",
+        compact: true,
+      });
+      return;
+    }
+
+    const metricRows = [
+      ["Mitarbeiter", "headcount", (value) => String(value)],
+      ["Vollzeitäquivalente", "fte", (value) => formatDecimal(value)],
+      ["In Einarbeitung", "onboarding", (value) => String(value)],
+      ["Fachweiterbildung I/A", "fachweiterbildung", (value) => String(value)],
+      ["Praxisanleiter/in", "praxisanleiter", (value) => String(value)],
+    ];
+    const changedAssignments = simulation.assignments.filter(
+      (assignment) => assignment.changeType !== "unchanged",
+    );
+    const improvement = Math.max(
+      0,
+      Math.round(
+        ((simulation.currentBalanceScore - simulation.proposedBalanceScore) /
+          Math.max(simulation.currentBalanceScore, 0.0001)) *
+          100,
+      ),
+    );
+
+    elements.weekendSimulationContent.innerHTML = `
+      <div class="weekend-simulation-summary">
+        <article>
+          <span>Bestehende Wechsel</span>
+          <strong>${simulation.switchedCount}</strong>
+          <small>von ${simulation.fixedAssignmentCount} festen Zuordnungen</small>
+        </article>
+        <article>
+          <span>Nicht zugeordnet</span>
+          <strong>${simulation.unassignedCount}</strong>
+          <small>bleiben ohne festes Wochenende</small>
+        </article>
+        <article>
+          <span>Struktureller Ausgleich</span>
+          <strong>${improvement} %</strong>
+          <small>Verbesserung der gewichteten Abweichung</small>
+        </article>
+      </div>
+
+      <section class="panel weekend-simulation-comparison">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Ist und Simulation</p>
+            <h3>Kennzahlenvergleich</h3>
+          </div>
+          <span class="weekend-comparison-note">
+            VZÄ, Kopfzahl, Einarbeitung und Schlüsselqualifikationen werden gemeinsam gewichtet.
+          </span>
+        </div>
+        <div class="weekend-comparison-scroll">
+          <table class="weekend-comparison-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Kennzahl</th>
+                <th colspan="2">Aktuell</th>
+                <th colspan="2">Simulation</th>
+              </tr>
+              <tr>
+                <th>${escapeHtml(serviceWeekendLabel("weekend_a"))}</th>
+                <th>${escapeHtml(serviceWeekendLabel("weekend_b"))}</th>
+                <th>${escapeHtml(serviceWeekendLabel("weekend_a"))}</th>
+                <th>${escapeHtml(serviceWeekendLabel("weekend_b"))}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${metricRows
+                .map(
+                  ([label, key, formatter]) => `
+                    <tr>
+                      <th scope="row">${escapeHtml(label)}</th>
+                      <td><strong>${formatter(simulation.current.weekend_a[key])}</strong></td>
+                      <td><strong>${formatter(simulation.current.weekend_b[key])}</strong></td>
+                      <td><strong>${formatter(simulation.proposed.weekend_a[key])}</strong></td>
+                      <td><strong>${formatter(simulation.proposed.weekend_b[key])}</strong></td>
+                    </tr>
+                  `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="weekend-simulation-groups">
+        ${SERVICE_WEEKEND_KEYS
+          .map((weekend) => {
+            const assignments = simulation.assignments.filter(
+              (assignment) => assignment.proposedWeekend === weekend,
+            );
+            return `
+              <section class="panel weekend-simulation-group">
+                <div class="weekend-distribution-header">
+                  <div>
+                    <p class="eyebrow">Simulierte Zuordnung</p>
+                    <h2>${escapeHtml(serviceWeekendLabel(weekend))}</h2>
+                  </div>
+                  <strong>${assignments.length} Personen</strong>
+                </div>
+                <div class="weekend-simulation-list">
+                  ${assignments.map(renderWeekendSimulationEmployee).join("")}
+                </div>
+              </section>
+            `;
+          })
+          .join("")}
+      </div>
+
+      <section class="panel weekend-simulation-changes">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Minimale Veränderung</p>
+            <h3>Abweichungen von der heutigen Zuordnung</h3>
+          </div>
+        </div>
+        ${
+          changedAssignments.length
+            ? `<div class="weekend-simulation-change-list">
+                ${changedAssignments
+                  .map(
+                    ({ employee, originalWeekend, proposedWeekend }) => `
+                      <div>
+                        <strong>${escapeHtml(fullName(employee))}</strong>
+                        <span>${escapeHtml(serviceWeekendLabel(originalWeekend))} → ${escapeHtml(
+                          serviceWeekendLabel(proposedWeekend),
+                        )}</span>
+                      </div>
+                    `,
+                  )
+                  .join("")}
+              </div>`
+            : '<p class="weekend-simulation-no-changes">Die bestehende feste Verteilung ist bereits die beste gefundene Lösung.</p>'
+        }
+      </section>
+    `;
+  }
+
+  function requestApplyWeekendSimulation() {
+    if (!requireAdmin()) return;
+    const simulation = currentWeekendSimulation;
+    if (!simulation || simulation.employeeCount === 0) {
+      showToast("Es liegt keine übernehmbare Simulation vor.", "error");
+      return;
+    }
+    if (!weekendSimulationMatchesCurrentState(simulation)) {
+      renderWeekendSimulation();
+      showToast(
+        "Die Mitarbeiterdaten haben sich verändert. Die Simulation wurde neu berechnet.",
+        "error",
+      );
+      return;
+    }
+    const changedCount = simulation.switchedCount;
+    if (changedCount === 0) {
+      showToast("Die Simulation enthält keine geänderten Zuordnungen.");
+      return;
+    }
+
+    requestConfirmation({
+      title: "Wochenendverteilung übernehmen?",
+      message:
+        `${simulation.switchedCount} bestehende Zuordnung${
+          simulation.switchedCount === 1 ? "" : "en"
+        } werden zwischen den beiden Dienstwochenenden gewechselt. Mitarbeiter ohne festes Wochenende bleiben unberührt. Diese Änderung wird gespeichert.`,
+      acceptLabel: "Verteilung übernehmen",
+      tone: "primary",
+      callback: () => applyWeekendSimulation(simulation),
+    });
+  }
+
+  async function applyWeekendSimulation(simulation) {
+    if (!requireAdmin()) return;
+    if (!weekendSimulationMatchesCurrentState(simulation)) {
+      renderWeekendSimulation();
+      showToast(
+        "Die Ausgangsdaten haben sich geändert. Bitte prüfen Sie die neu berechnete Simulation.",
+        "error",
+      );
+      return;
+    }
+    const proposedByEmployeeId = new Map(
+      simulation.assignments.map((assignment) => [
+        assignment.employee.id,
+        assignment.proposedWeekend,
+      ]),
+    );
+    const now = new Date().toISOString();
+    const committed = await commitStateMutation(() => {
+      state.employees.forEach((employee) => {
+        const proposedWeekend = proposedByEmployeeId.get(employee.id);
+        if (
+          !SERVICE_WEEKEND_KEYS.includes(proposedWeekend) ||
+          serviceWeekendOwnerKey(employee.id) ||
+          employee.serviceWeekend === proposedWeekend
+        ) {
+          return;
+        }
+        employee.serviceWeekend = proposedWeekend;
+        employee.updatedAt = now;
+      });
+    });
+    if (!committed) return;
+
+    currentWeekendSimulation = null;
+    if (elements.weekendSimulationDialog.open) {
+      elements.weekendSimulationDialog.close();
+    }
+    showToast(
+      `Die simulierte Verteilung wurde für ${
+        simulation.switchedCount
+      } Mitarbeiter/innen übernommen.`,
+    );
+  }
+
+  function weekendSimulationMatchesCurrentState(simulation) {
+    const activeEmployees = activeEmployeeList().filter((employee) =>
+      SERVICE_WEEKEND_KEYS.includes(employee.serviceWeekend),
+    );
+    if (activeEmployees.length !== simulation.assignments.length) return false;
+    const currentById = new Map(
+      activeEmployees.map((employee) => [employee.id, employee]),
+    );
+    return simulation.assignments.every(
+      ({ employee, originalWeekend, ownerWeekend }) => {
+        const currentEmployee = currentById.get(employee.id);
+        if (!currentEmployee) return false;
+        const normalizedCurrentWeekend = SERVICE_WEEKEND_KEYS.includes(
+          currentEmployee.serviceWeekend,
+        )
+          ? currentEmployee.serviceWeekend
+          : "none";
+        const currentOwnerWeekend = serviceWeekendOwnerKey(currentEmployee.id);
+        return (
+          normalizedCurrentWeekend === originalWeekend &&
+          currentOwnerWeekend === ownerWeekend &&
+          (!currentOwnerWeekend || currentOwnerWeekend === originalWeekend)
+        );
+      },
+    );
+  }
+
+  function simulateWeekendDistribution(employees = activeEmployeeList()) {
+    const unassignedCount = employees.filter(
+      (employee) => !SERVICE_WEEKEND_KEYS.includes(employee.serviceWeekend),
+    ).length;
+    const candidates = employees
+      .filter((employee) =>
+        SERVICE_WEEKEND_KEYS.includes(employee.serviceWeekend),
+      )
+      .sort(sortEmployees);
+    const originalAssignments = new Map(
+      candidates.map((employee) => [
+        employee.id,
+        SERVICE_WEEKEND_KEYS.includes(employee.serviceWeekend)
+          ? employee.serviceWeekend
+          : "none",
+      ]),
+    );
+    const assignments = new Map();
+    candidates.forEach((employee) => {
+      const original = originalAssignments.get(employee.id);
+      if (original !== "none") assignments.set(employee.id, original);
+    });
+
+    let evaluation = evaluateWeekendSimulation(
+      candidates,
+      assignments,
+      originalAssignments,
+    );
+    for (let iteration = 0; iteration < 100; iteration += 1) {
+      let bestAction = null;
+      let bestEvaluation = evaluation;
+
+      candidates.forEach((employee) => {
+        if (serviceWeekendOwnerKey(employee.id)) return;
+        const currentWeekend = assignments.get(employee.id);
+        assignments.set(
+          employee.id,
+          currentWeekend === "weekend_a" ? "weekend_b" : "weekend_a",
+        );
+        const candidateEvaluation = evaluateWeekendSimulation(
+          candidates,
+          assignments,
+          originalAssignments,
+        );
+        assignments.set(employee.id, currentWeekend);
+        if (candidateEvaluation.score < bestEvaluation.score - 0.000001) {
+          bestEvaluation = candidateEvaluation;
+          bestAction = { type: "move", first: employee.id };
+        }
+      });
+
+      for (let leftIndex = 0; leftIndex < candidates.length; leftIndex += 1) {
+        for (
+          let rightIndex = leftIndex + 1;
+          rightIndex < candidates.length;
+          rightIndex += 1
+        ) {
+          const left = candidates[leftIndex];
+          const right = candidates[rightIndex];
+          if (
+            serviceWeekendOwnerKey(left.id) ||
+            serviceWeekendOwnerKey(right.id)
+          ) {
+            continue;
+          }
+          const leftWeekend = assignments.get(left.id);
+          const rightWeekend = assignments.get(right.id);
+          if (leftWeekend === rightWeekend) continue;
+          assignments.set(left.id, rightWeekend);
+          assignments.set(right.id, leftWeekend);
+          const candidateEvaluation = evaluateWeekendSimulation(
+            candidates,
+            assignments,
+            originalAssignments,
+          );
+          assignments.set(left.id, leftWeekend);
+          assignments.set(right.id, rightWeekend);
+          if (candidateEvaluation.score < bestEvaluation.score - 0.000001) {
+            bestEvaluation = candidateEvaluation;
+            bestAction = { type: "swap", first: left.id, second: right.id };
+          }
+        }
+      }
+
+      if (!bestAction) break;
+      if (bestAction.type === "move") {
+        assignments.set(
+          bestAction.first,
+          assignments.get(bestAction.first) === "weekend_a" ? "weekend_b" : "weekend_a",
+        );
+      } else {
+        const firstWeekend = assignments.get(bestAction.first);
+        assignments.set(bestAction.first, assignments.get(bestAction.second));
+        assignments.set(bestAction.second, firstWeekend);
+      }
+      evaluation = bestEvaluation;
+    }
+
+    const currentGroups = {
+      weekend_a: candidates.filter(
+        (employee) => originalAssignments.get(employee.id) === "weekend_a",
+      ),
+      weekend_b: candidates.filter(
+        (employee) => originalAssignments.get(employee.id) === "weekend_b",
+      ),
+    };
+    const current = {
+      weekend_a: weekendSimulationMetrics(currentGroups.weekend_a),
+      weekend_b: weekendSimulationMetrics(currentGroups.weekend_b),
+    };
+    const resultAssignments = candidates
+      .map((employee) => {
+        const originalWeekend = originalAssignments.get(employee.id);
+        const proposedWeekend = assignments.get(employee.id);
+        return {
+          employee,
+          originalWeekend,
+          proposedWeekend,
+          ownerWeekend: serviceWeekendOwnerKey(employee.id),
+          isWeekendOwner: Boolean(serviceWeekendOwnerKey(employee.id)),
+          changeType:
+            originalWeekend === proposedWeekend ? "unchanged" : "switched",
+        };
+      })
+      .sort(
+        (left, right) =>
+          left.proposedWeekend.localeCompare(right.proposedWeekend) ||
+          sortEmployees(left.employee, right.employee),
+      );
+
+    return {
+      employeeCount: candidates.length,
+      unassignedCount,
+      fixedAssignmentCount: resultAssignments.filter(
+        (assignment) => assignment.originalWeekend !== "none",
+      ).length,
+      switchedCount: resultAssignments.filter(
+        (assignment) => assignment.changeType === "switched",
+      ).length,
+      newAssignmentCount: 0,
+      current,
+      proposed: evaluation.metrics,
+      currentBalanceScore: weekendSimulationBalanceScore(current),
+      proposedBalanceScore: evaluation.balanceScore,
+      assignments: resultAssignments,
+    };
+  }
+
+  function evaluateWeekendSimulation(
+    employees,
+    assignments,
+    originalAssignments,
+  ) {
+    const groups = { weekend_a: [], weekend_b: [] };
+    employees.forEach((employee) => {
+      const weekend = assignments.get(employee.id);
+      if (groups[weekend]) groups[weekend].push(employee);
+    });
+    const metrics = {
+      weekend_a: weekendSimulationMetrics(groups.weekend_a),
+      weekend_b: weekendSimulationMetrics(groups.weekend_b),
+    };
+    const switchedCount = employees.filter((employee) => {
+      const original = originalAssignments.get(employee.id);
+      return original !== "none" && original !== assignments.get(employee.id);
+    }).length;
+    const balanceScore = weekendSimulationBalanceScore(metrics);
+    return {
+      metrics,
+      balanceScore,
+      switchedCount,
+      score: balanceScore + switchedCount * 0.75,
+    };
+  }
+
+  function weekendSimulationMetrics(employees) {
+    const employmentPercent = employees.reduce(
+      (sum, employee) => sum + employee.employmentPercent,
+      0,
+    );
+    return {
+      headcount: employees.length,
+      employmentPercent,
+      fte: employmentPercent / 100,
+      onboarding: employees.filter(
+        (employee) => employee.employmentStatus === "onboarding",
+      ).length,
+      fachweiterbildung: employees.filter((employee) =>
+        hasCurrentQualification(employee, "fachweiterbildungIA"),
+      ).length,
+      praxisanleiter: employees.filter((employee) =>
+        hasCurrentQualification(employee, "praxisanleiter"),
+      ).length,
+    };
+  }
+
+  function weekendSimulationBalanceScore(metrics) {
+    const difference = (key) =>
+      Math.abs((metrics.weekend_a[key] || 0) - (metrics.weekend_b[key] || 0));
+    return (
+      difference("headcount") ** 2 +
+      difference("fte") ** 2 * 2 +
+      difference("onboarding") ** 2 * 1.5 +
+      difference("fachweiterbildung") ** 2 * 1.5 +
+      difference("praxisanleiter") ** 2 * 1.5
+    );
+  }
+
+  function renderWeekendSimulationEmployee({
+    employee,
+    originalWeekend,
+    changeType,
+    isWeekendOwner,
+  }) {
+    const changeLabel = {
+      unchanged: isWeekendOwner ? "verantwortlich" : "unverändert",
+      switched: `von ${serviceWeekendLabel(originalWeekend)}`,
+    }[changeType];
+    return `
+      <div class="weekend-simulation-employee">
+        <span class="weekend-employee-identity">
+          ${renderAvatar(employee, true)}
+          <span>
+            <strong>${escapeHtml(fullName(employee))}</strong>
+            <small>${employee.employmentPercent} % · ${escapeHtml(
+              employeeStatusLabel(employee),
+            )}</small>
+          </span>
+        </span>
+        <span class="simulation-change-badge is-${changeType}">${escapeHtml(
+          changeLabel,
+        )}</span>
+        <span>${hasCurrentQualification(employee, "fachweiterbildungIA") ? "FWB" : "–"}</span>
+        <span>${hasCurrentQualification(employee, "praxisanleiter") ? "PA" : "–"}</span>
+      </div>
+    `;
+  }
+
   function renderWeekendDistribution() {
     elements.weekendDistributionContent.innerHTML = renderWeekendDistributionMarkup();
     bindWeekendDistributionActions(elements.weekendDistributionContent);
@@ -3822,9 +4601,9 @@
 
   function renderWeekendDistributionMarkup() {
     const distribution = getWeekendDistributionData();
-    const keys = ["oli", "claudio", "none"];
-    const oli = distribution.oli.metrics;
-    const claudio = distribution.claudio.metrics;
+    const keys = ["weekend_a", "weekend_b", "none"];
+    const weekendA = distribution.weekend_a.metrics;
+    const weekendB = distribution.weekend_b.metrics;
     const comparisonRows = [
       ["Mitarbeiter", "headcount", (value) => String(value)],
       ["Stellenanteil kumuliert", "employmentPercent", (value) => `${value} %`],
@@ -3842,7 +4621,7 @@
             <h2>Struktur der Dienstwochenenden</h2>
           </div>
           <span class="weekend-comparison-note">
-            Oli ↔ Claudio: ${Math.abs(oli.employmentPercent - claudio.employmentPercent)} %
+            ${escapeHtml(serviceWeekendLabel("weekend_a"))} ↔ ${escapeHtml(serviceWeekendLabel("weekend_b"))}: ${Math.abs(weekendA.employmentPercent - weekendB.employmentPercent)} %
             Unterschied beim Stellenanteil
           </span>
         </div>
@@ -3854,7 +4633,7 @@
                 ${keys
                   .map(
                     (key) =>
-                      `<th scope="col">${escapeHtml(SERVICE_WEEKENDS[key])}</th>`,
+                      `<th scope="col">${escapeHtml(serviceWeekendLabel(key))}</th>`,
                   )
                   .join("")}
               </tr>
@@ -3900,7 +4679,7 @@
                 <div class="weekend-distribution-header">
                   <div>
                     <p class="eyebrow">Festes Dienstwochenende</p>
-                    <h2>${escapeHtml(SERVICE_WEEKENDS[key])}</h2>
+                    <h2>${escapeHtml(serviceWeekendLabel(key))}</h2>
                   </div>
                   <button
                     class="button button-ghost button-compact"
@@ -3989,7 +4768,11 @@
           ${renderAvatar(employee, true)}
           <span>
             <strong>${escapeHtml(fullName(employee))}</strong>
-            <small>${escapeHtml(employeeStatusLabel(employee))}</small>
+            <small>${escapeHtml(employeeStatusLabel(employee))}${
+              serviceWeekendOwnerKey(employee.id)
+                ? " · Verantwortliche Person"
+                : ""
+            }</small>
           </span>
         </span>
         <strong class="weekend-employment-percent">${employee.employmentPercent} %</strong>
@@ -4198,8 +4981,14 @@
     elements.vacationWeekendAbsenceLimit.value = String(
       state.settings.vacationWeekendAbsenceLimit,
     );
-    elements.vacationOliReferenceSaturday.value =
-      state.settings.vacationOliReferenceSaturday;
+    elements.vacationWeekendAReferenceSaturday.value =
+      state.settings.vacationWeekendAReferenceSaturday;
+    elements.vacationWeekendAReferenceLabel.textContent =
+      `Referenzsamstag ${serviceWeekendLabel("weekend_a")}`;
+    elements.vacationWeekendALegend.textContent =
+      serviceWeekendLabel("weekend_a");
+    elements.vacationWeekendBLegend.textContent =
+      serviceWeekendLabel("weekend_b");
   }
 
   function renderVacationDayHeader(date, holidays, schoolVacations) {
@@ -4272,7 +5061,7 @@
         <th
           class="vacation-employee-column vacation-employee-weekend-${employee.serviceWeekend}"
           scope="row"
-          title="${escapeHtml(SERVICE_WEEKENDS[employee.serviceWeekend])}"
+          title="${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}"
         >
           <span class="vacation-employee">
             ${renderAvatar(employee, true)}
@@ -4396,8 +5185,8 @@
             `,
           )
           .join("")}
-        <span><i class="vacation-year-weekend-swatch is-oli"></i> Oli-Wochenende</span>
-        <span><i class="vacation-year-weekend-swatch is-claudio"></i> Claudio-Wochenende</span>
+        <span><i class="vacation-year-weekend-swatch is-weekend_a"></i> ${escapeHtml(serviceWeekendLabel("weekend_a"))}</span>
+        <span><i class="vacation-year-weekend-swatch is-weekend_b"></i> ${escapeHtml(serviceWeekendLabel("weekend_b"))}</span>
       </div>
       ${renderVacationYearMatrix(entries, employee)}
     `;
@@ -4486,8 +5275,8 @@
       metadata.schoolVacation ? `${metadata.schoolVacation} NRW` : "",
       metadata.weekendGroup
         ? employee.serviceWeekend === metadata.weekendGroup
-          ? `Eigenes Dienstwochenende ${SERVICE_WEEKENDS[metadata.weekendGroup]}`
-          : `Dienstwochenende ${SERVICE_WEEKENDS[metadata.weekendGroup]}`
+          ? `Eigenes Dienstwochenende ${serviceWeekendLabel(metadata.weekendGroup)}`
+          : `Dienstwochenende ${serviceWeekendLabel(metadata.weekendGroup)}`
         : "",
     ].filter(Boolean);
     return `
@@ -4556,7 +5345,7 @@
           if (entry.type !== "mandatoryDuty") return false;
           const serviceWeekend = getEmployee(entry.employeeId)?.serviceWeekend;
           return (
-            ["oli", "claudio"].includes(serviceWeekend) &&
+            SERVICE_WEEKEND_KEYS.includes(serviceWeekend) &&
             serviceWeekend !== weekendGroup
           );
         }).length
@@ -4723,16 +5512,19 @@
         DEFAULT_WEEKEND_ABSENCE_LIMIT,
       ),
     );
-    const referenceDate = elements.vacationOliReferenceSaturday.value;
+    const referenceDate = elements.vacationWeekendAReferenceSaturday.value;
     const parsedReference = parseLocalDate(referenceDate);
     if (!parsedReference || parsedReference.getDay() !== 6) {
-      showToast("Die Oli-Referenz muss ein Samstag sein.", "error");
-      elements.vacationOliReferenceSaturday.focus();
+      showToast(
+        `Die Referenz für „${serviceWeekendLabel("weekend_a")}“ muss ein Samstag sein.`,
+        "error",
+      );
+      elements.vacationWeekendAReferenceSaturday.focus();
       return;
     }
     const committed = await commitStateMutation(() => {
       state.settings.vacationBaseDays = baseDays;
-      state.settings.vacationOliReferenceSaturday = referenceDate;
+      state.settings.vacationWeekendAReferenceSaturday = referenceDate;
       state.settings.vacationWeekdayAbsenceLimit = weekdayAbsenceLimit;
       state.settings.vacationWeekendAbsenceLimit = weekendAbsenceLimit;
     });
@@ -4759,7 +5551,7 @@
       holiday,
       schoolVacation ? `${schoolVacation} NRW` : "",
       weekendGroup
-        ? `Dienstwochenende ${SERVICE_WEEKENDS[weekendGroup]}`
+        ? `Dienstwochenende ${serviceWeekendLabel(weekendGroup)}`
         : "",
     ].filter(Boolean);
     return {
@@ -4773,7 +5565,7 @@
 
   function getWeekendRotationForDate(date) {
     const parsed = parseLocalDate(date);
-    const reference = parseLocalDate(state.settings.vacationOliReferenceSaturday);
+    const reference = parseLocalDate(state.settings.vacationWeekendAReferenceSaturday);
     if (!parsed || !reference) return "";
     const saturday = new Date(parsed);
     if (saturday.getDay() === 0) saturday.setDate(saturday.getDate() - 1);
@@ -4781,7 +5573,7 @@
     const weekDifference = Math.round(
       (saturday.getTime() - reference.getTime()) / (7 * 86400000),
     );
-    return ((weekDifference % 2) + 2) % 2 === 0 ? "oli" : "claudio";
+    return ((weekDifference % 2) + 2) % 2 === 0 ? "weekend_a" : "weekend_b";
   }
 
   function getNrwHolidays(year) {
@@ -4867,6 +5659,9 @@
           `<option value="${qualification.id}">${escapeHtml(qualification.label)}</option>`,
       ),
     ].join("");
+    elements.bulkServiceWeekend.innerHTML = serviceWeekendOptionsMarkup({
+      includeUnchanged: true,
+    });
     elements.bulkEditDialog.showModal();
     captureCleanForm(elements.bulkEditForm);
   }
@@ -4882,6 +5677,54 @@
     if (!active && !profession && !weekend && !(qualificationId && qualificationState)) {
       showToast("Bitte mindestens eine Änderung auswählen.", "error");
       return;
+    }
+    if (weekend) {
+      const protectedEmployees = [...selectedEmployeeIds]
+        .map(getEmployee)
+        .filter(
+          (employee) =>
+            employee &&
+            serviceWeekendOwnerKey(employee.id) &&
+            serviceWeekendOwnerKey(employee.id) !== weekend,
+        );
+      if (protectedEmployees.length) {
+        showToast(
+          `${protectedEmployees
+            .map(fullName)
+            .join(
+              ", ",
+            )} kann als verantwortliche Person nicht in ein anderes Dienstwochenende verschoben werden.`,
+          "error",
+        );
+        return;
+      }
+    }
+    if (
+      qualificationState === "remove" &&
+      LEADERSHIP_QUALIFICATION_IDS.includes(qualificationId)
+    ) {
+      const protectedEmployees = [...selectedEmployeeIds]
+        .map(getEmployee)
+        .filter(
+          (employee) =>
+            employee &&
+            serviceWeekendOwnerKey(employee.id) &&
+            !LEADERSHIP_QUALIFICATION_IDS.some(
+              (id) =>
+                id !== qualificationId && employee.qualifications[id],
+            ),
+        );
+      if (protectedEmployees.length) {
+        showToast(
+          `Die Leitungsfunktion von ${protectedEmployees
+            .map(fullName)
+            .join(
+              ", ",
+            )} kann erst nach Änderung der Dienstwochenendzuweisung entfernt werden.`,
+          "error",
+        );
+        return;
+      }
     }
     const now = new Date().toISOString();
     const committed = await commitStateMutation(() => {
@@ -5079,53 +5922,9 @@
 
   function renderEmployees() {
     renderEmployeeFilterOptions();
-    const filtered = [...state.employees]
-      .filter((employee) => {
-        if (
-          employeeStatusFilter !== "all" &&
-          employee.employmentStatus !== employeeStatusFilter
-        ) {
-          return false;
-        }
-        if (
-          employeeProfessionFilter !== "all" &&
-          employee.profession !== employeeProfessionFilter
-        ) {
-          return false;
-        }
-        if (
-          employeeQualificationFilter !== "all" &&
-          !employee.qualifications[employeeQualificationFilter]
-        ) {
-          return false;
-        }
-        if (
-          employeeWeekendFilter !== "all" &&
-          employee.serviceWeekend !== employeeWeekendFilter
-        ) {
-          return false;
-        }
-        if (!employeeSearchTerm) return true;
-
-        const qualificationText = Object.entries(employee.qualifications)
-          .filter(([, selected]) => selected)
-          .map(([key]) => qualificationLabel(key))
-          .join(" ");
-        const haystack = [
-          employee.firstName,
-          employee.lastName,
-          employee.username,
-          employee.profession,
-          employee.email,
-          qualificationText,
-          serviceWeekendLabel(employee.serviceWeekend),
-          employeeStatusLabel(employee),
-        ]
-          .join(" ")
-          .toLocaleLowerCase("de-DE");
-        return haystack.includes(employeeSearchTerm);
-      })
-      .sort(compareEmployeesForTable);
+    const filtered = filteredEmployeesForTable();
+    updateEmailExportButton();
+    updatePhoneListExportButton();
 
     updateEmployeeBulkBar();
 
@@ -5179,6 +5978,62 @@
         </table>
       </div>
     `;
+  }
+
+  function filteredEmployeesForTable() {
+    return [...state.employees]
+      .filter((employee) => {
+        if (
+          employeeStatusFilter !== "all" &&
+          employee.employmentStatus !== employeeStatusFilter
+        ) {
+          return false;
+        }
+        if (
+          employeeProfessionFilter !== "all" &&
+          employee.profession !== employeeProfessionFilter
+        ) {
+          return false;
+        }
+        if (
+          employeeQualificationFilter === "none" &&
+          selectedQualificationCount(employee) > 0
+        ) {
+          return false;
+        }
+        if (
+          !["all", "none"].includes(employeeQualificationFilter) &&
+          !employee.qualifications[employeeQualificationFilter]
+        ) {
+          return false;
+        }
+        if (
+          employeeWeekendFilter !== "all" &&
+          employee.serviceWeekend !== employeeWeekendFilter
+        ) {
+          return false;
+        }
+        if (!employeeSearchTerm) return true;
+
+        const qualificationText = Object.entries(employee.qualifications)
+          .filter(([, selected]) => selected)
+          .map(([key]) => qualificationLabel(key))
+          .join(" ");
+        const haystack = [
+          employee.firstName,
+          employee.lastName,
+          employee.username,
+          employee.profession,
+          employee.email,
+          qualificationText,
+          serviceWeekendLabel(employee.serviceWeekend),
+          employeeStatusLabel(employee),
+        ]
+          .join(" ")
+          .toLocaleLowerCase("de-DE");
+        return haystack.includes(employeeSearchTerm);
+      })
+      .sort(compareEmployeesForTable);
   }
 
   function renderEmployeeRow(employee) {
@@ -5374,18 +6229,32 @@
     const qualificationValue = employeeQualificationFilter;
     elements.employeeQualificationFilter.innerHTML = [
       '<option value="all">Alle Qualifikationen</option>',
+      '<option value="none">Keine Qualifikation</option>',
       ...state.catalogs.qualifications.map(
         (qualification) =>
           `<option value="${qualification.id}">${escapeHtml(qualification.label)}</option>`,
       ),
     ].join("");
-    elements.employeeQualificationFilter.value = state.catalogs.qualifications.some(
-      (qualification) => qualification.id === qualificationValue,
-    )
+    elements.employeeQualificationFilter.value =
+      qualificationValue === "none" ||
+      state.catalogs.qualifications.some(
+        (qualification) => qualification.id === qualificationValue,
+      )
       ? qualificationValue
       : "all";
     employeeQualificationFilter = elements.employeeQualificationFilter.value;
-    elements.employeeWeekendFilter.value = employeeWeekendFilter;
+    elements.employeeWeekendFilter.innerHTML = [
+      '<option value="all">Alle Dienstwochenenden</option>',
+      serviceWeekendOptionsMarkup(),
+    ].join("");
+    elements.employeeWeekendFilter.value = [
+      "all",
+      "none",
+      ...SERVICE_WEEKEND_KEYS,
+    ].includes(employeeWeekendFilter)
+      ? employeeWeekendFilter
+      : "all";
+    employeeWeekendFilter = elements.employeeWeekendFilter.value;
   }
 
   function renderTrainings() {
@@ -7080,6 +7949,7 @@
     return `${device.manufacturer} ${device.productName}`.trim();
   }
 
+
   function renderMeetings() {
     const meetingStats = state.meetings.map((meeting) => getMeetingStats(meeting));
     const completedMeetings = meetingStats.filter(
@@ -7719,9 +8589,40 @@
   }
 
   function renderEmployeeCatalogFields(employee = null) {
-    document.querySelector("#professionOptions").innerHTML = state.catalogs.professions
-      .map((profession) => `<option value="${escapeHtml(profession)}"></option>`)
-      .join("");
+    const professions = [...state.catalogs.professions];
+    if (
+      employee?.profession &&
+      !professions.some(
+        (profession) =>
+          profession.toLocaleLowerCase("de-DE") ===
+          employee.profession.toLocaleLowerCase("de-DE"),
+      )
+    ) {
+      professions.push(employee.profession);
+      professions.sort((left, right) => left.localeCompare(right, "de"));
+    }
+    const professionSelect = document.querySelector("#profession");
+    professionSelect.innerHTML = [
+      '<option value="">Beruf auswählen</option>',
+      ...professions.map(
+        (profession) =>
+          `<option value="${escapeHtml(profession)}">${escapeHtml(profession)}</option>`,
+      ),
+    ].join("");
+    professionSelect.value = employee?.profession || "";
+
+    const ownerWeekend = serviceWeekendOwnerKey(employee?.id);
+    elements.serviceWeekend.innerHTML = serviceWeekendOptionsMarkup();
+    elements.serviceWeekend.value =
+      ownerWeekend || employee?.serviceWeekend || "none";
+    elements.serviceWeekend.disabled = Boolean(ownerWeekend);
+    elements.serviceWeekendOwnerHint.hidden = !ownerWeekend;
+    elements.serviceWeekendOwnerHint.textContent = ownerWeekend
+      ? `Als verantwortliche Person fest mit „${serviceWeekendLabel(
+          ownerWeekend,
+        )}“ verbunden.`
+      : "";
+
     document.querySelector("#qualificationFields").innerHTML = state.catalogs.qualifications
       .map(
         (qualification) => `
@@ -7808,6 +8709,19 @@
       )?.value;
       if (qualifications[key] && expiry) qualificationExpiries[key] = expiry;
     });
+    const ownerWeekend = serviceWeekendOwnerKey(existingEmployee?.id);
+    if (
+      ownerWeekend &&
+      !LEADERSHIP_QUALIFICATION_IDS.some(
+        (qualificationId) => qualifications[qualificationId],
+      )
+    ) {
+      showToast(
+        "Die verantwortliche Person muss Stationsleitung oder stellvertretende Stationsleitung bleiben. Bitte zuerst die Dienstwochenendzuweisung ändern.",
+        "error",
+      );
+      return;
+    }
 
     const employee = {
       id: existingEmployee?.id || createId(),
@@ -7824,7 +8738,9 @@
         100,
       ),
       profession: normalizeProfession(professionInput.value),
-      serviceWeekend: document.querySelector("#serviceWeekend").value,
+      serviceWeekend:
+        ownerWeekend ||
+        document.querySelector("#serviceWeekend").value,
       employmentStatus: document.querySelector("#employeeStatus").value,
       active: document.querySelector("#employeeStatus").value !== "inactive",
       qualifications,
@@ -7838,6 +8754,10 @@
         state.employees = state.employees.map((item) =>
           item.id === employee.id ? employee : item,
         );
+        if (ownerWeekend) {
+          state.settings.serviceWeekends[ownerWeekend].name =
+            employee.firstName.slice(0, 50);
+        }
       } else {
         state.employees.push(employee);
       }
@@ -7879,6 +8799,16 @@
     if (!requireAdmin()) return;
     const employee = getEmployee(employeeId);
     if (!employee) return;
+    const ownerWeekend = serviceWeekendOwnerKey(employeeId);
+    if (ownerWeekend) {
+      showToast(
+        `${fullName(employee)} ist für „${serviceWeekendLabel(
+          ownerWeekend,
+        )}“ verantwortlich. Bitte zuerst die verantwortliche Person in den Einstellungen ändern.`,
+        "error",
+      );
+      return;
+    }
     const completionCount = state.completions.filter(
       (completion) => completion.employeeId === employeeId,
     ).length;
@@ -8711,19 +9641,8 @@
 
   async function exportEncryptedDatabase() {
     if (!requireAdmin()) return;
-    const password = window.prompt(
-      "Passwort für die verschlüsselte Sicherung eingeben (mindestens 8 Zeichen):",
-    );
-    if (password === null) return;
-    if (password.length < 8) {
-      showToast("Das Sicherungspasswort muss mindestens 8 Zeichen lang sein.", "error");
-      return;
-    }
-    const confirmation = window.prompt("Passwort zur Bestätigung erneut eingeben:");
-    if (confirmation !== password) {
-      showToast("Die eingegebenen Passwörter stimmen nicht überein.", "error");
-      return;
-    }
+    const password = await requestBackupPassword({ mode: "export" });
+    if (!password) return;
     try {
       await createAndDownloadBackup({ encrypted: true, password });
     } catch (error) {
@@ -8735,6 +9654,82 @@
     }
   }
 
+  function requestBackupPassword({ mode, errorMessage = "" }) {
+    const exporting = mode === "export";
+    elements.backupPasswordForm.reset();
+    elements.backupPasswordDialog.dataset.mode = mode;
+    elements.backupPasswordDialogTitle.textContent = exporting
+      ? "Sicherung verschlüsseln"
+      : "Sicherung entschlüsseln";
+    elements.backupPasswordDialogDescription.textContent = exporting
+      ? "Schützen Sie den vollständigen Datenbestand mit einem eigenen Passwort."
+      : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort ein.";
+    elements.backupPasswordNotice.textContent = exporting
+      ? "Das Passwort wird nicht gespeichert und kann nicht wiederhergestellt werden. Bewahren Sie es getrennt von der Sicherungsdatei auf."
+      : "Das Passwort wird ausschließlich zur Entschlüsselung dieser Datei verwendet und nicht gespeichert.";
+    elements.backupPasswordConfirmationField.hidden = !exporting;
+    elements.backupPasswordConfirmation.required = exporting;
+    elements.backupPassword.minLength = exporting ? 8 : 1;
+    elements.backupPassword.autocomplete = exporting
+      ? "new-password"
+      : "current-password";
+    elements.backupPasswordSubmit.textContent = exporting
+      ? "Verschlüsselt exportieren"
+      : "Sicherung entsperren";
+    elements.backupPasswordError.textContent = errorMessage;
+    updateBackupPasswordVisibility();
+
+    return new Promise((resolve) => {
+      backupPasswordResolver = resolve;
+      elements.backupPasswordDialog.showModal();
+      window.setTimeout(() => elements.backupPassword.focus(), 0);
+    });
+  }
+
+  function handleBackupPasswordSubmit(event) {
+    event.preventDefault();
+    const mode = elements.backupPasswordDialog.dataset.mode;
+    const password = elements.backupPassword.value;
+    if (mode === "export" && password.length < 8) {
+      elements.backupPasswordError.textContent =
+        "Das Sicherungspasswort muss mindestens 8 Zeichen lang sein.";
+      elements.backupPassword.focus();
+      return;
+    }
+    if (
+      mode === "export" &&
+      password !== elements.backupPasswordConfirmation.value
+    ) {
+      elements.backupPasswordError.textContent =
+        "Die eingegebenen Passwörter stimmen nicht überein.";
+      elements.backupPasswordConfirmation.focus();
+      return;
+    }
+    settleBackupPasswordDialog(password);
+  }
+
+  function updateBackupPasswordVisibility() {
+    const inputType = elements.showBackupPassword.checked ? "text" : "password";
+    elements.backupPassword.type = inputType;
+    elements.backupPasswordConfirmation.type = inputType;
+  }
+
+  function settleBackupPasswordDialog(password) {
+    const resolver = backupPasswordResolver;
+    backupPasswordResolver = null;
+    if (elements.backupPasswordDialog.open) {
+      elements.backupPasswordDialog.close();
+    }
+    resolver?.(password);
+  }
+
+  function handleBackupPasswordDialogClose() {
+    if (!backupPasswordResolver) return;
+    const resolver = backupPasswordResolver;
+    backupPasswordResolver = null;
+    resolver(null);
+  }
+
   async function createAndDownloadBackup({
     encrypted = false,
     password = "",
@@ -8742,12 +9737,14 @@
     silent = false,
   } = {}) {
     const exportedAt = new Date();
+    const exportedState = JSON.parse(JSON.stringify(state));
+    exportedState.settings.lastBackupAt = exportedAt.toISOString();
     const backup = {
       format: BACKUP_FORMAT,
       formatVersion: BACKUP_FORMAT_VERSION,
       appVersion: STATE_VERSION,
       exportedAt: exportedAt.toISOString(),
-      data: state,
+      data: exportedState,
     };
     let fileContent = JSON.stringify(backup, null, 2);
     if (encrypted) {
@@ -8767,6 +9764,7 @@
         : "Datensicherung exportiert",
     );
     await persistState();
+    databaseSaveReminderArmed = false;
     renderAll();
     if (!silent) {
       showToast(
@@ -8876,9 +9874,24 @@
       throw new Error("Die ausgewählte Datei enthält kein gültiges JSON.");
     }
     if (envelope?.format === `${BACKUP_FORMAT}-verschluesselt`) {
-      const password = window.prompt("Passwort der verschlüsselten Sicherung eingeben:");
-      if (password === null) throw new Error("Entschlüsselung wurde abgebrochen.");
-      return parseBackup(await decryptBackup(envelope, password));
+      let errorMessage = "";
+      while (true) {
+        const password = await requestBackupPassword({
+          mode: "import",
+          errorMessage,
+        });
+        if (!password) return null;
+        let decryptedContent;
+        try {
+          decryptedContent = await decryptBackup(envelope, password);
+        } catch (error) {
+          errorMessage =
+            error.message ||
+            "Die Sicherung konnte nicht entschlüsselt werden. Bitte Passwort prüfen.";
+          continue;
+        }
+        return parseBackup(decryptedContent);
+      }
     }
     return parseBackup(fileContent);
   }
@@ -8900,6 +9913,7 @@
     let importedState;
     try {
       importedState = await readBackupFile(file);
+      if (!importedState) return;
     } catch (error) {
       console.warn("Sicherungsdatei konnte nicht geprüft werden.", error);
       showToast(error.message || "Die Sicherungsdatei ist ungültig.", "error");
@@ -8947,6 +9961,7 @@
     }
     try {
       const checkedState = await readBackupFile(file);
+      if (!checkedState) return;
       showToast(
         `Sicherung gültig: ${checkedState.employees.length} Mitarbeiter, ${checkedState.trainings.length} Fortbildungen, ${checkedState.meetings.length} Teamsitzungen, ${checkedState.appointments.length} Termine und ${checkedState.devices.length} Geräte.`,
       );
@@ -8974,7 +9989,126 @@
     elements.settingsBackendStatus.innerHTML = isMariaDbMode()
       ? `<i></i> MariaDB verbunden · Revision ${remoteRevision}`
       : "<i></i> Lokal verbunden";
+    renderWeekendSettings();
     renderBackendSelection();
+  }
+
+  function renderWeekendSettings() {
+    const configurationA = state.settings.serviceWeekends.weekend_a;
+    const configurationB = state.settings.serviceWeekends.weekend_b;
+    elements.settingsWeekendNameA.value = configurationA.name;
+    elements.settingsWeekendNameB.value = configurationB.name;
+
+    const selectedOwnerIds = new Set([
+      configurationA.ownerId,
+      configurationB.ownerId,
+    ]);
+    const ownerOptions = state.employees
+      .filter(
+        (employee) =>
+          (employee.employmentStatus !== "inactive" &&
+            isWeekendLeadership(employee)) ||
+          selectedOwnerIds.has(employee.id),
+      )
+      .sort(sortEmployees)
+      .map(
+        (employee) =>
+          `<option value="${escapeHtml(employee.id)}">${escapeHtml(
+            fullName(employee),
+          )}${
+            employee.employmentStatus === "inactive" ? " (inaktiv)" : ""
+          }${
+            !isWeekendLeadership(employee)
+              ? " (keine Leitungsfunktion)"
+              : ""
+          }</option>`,
+      )
+      .join("");
+    const options =
+      '<option value="">Person auswählen</option>' + ownerOptions;
+    elements.settingsWeekendOwnerA.innerHTML = options;
+    elements.settingsWeekendOwnerB.innerHTML = options;
+    elements.settingsWeekendOwnerA.value = configurationA.ownerId;
+    elements.settingsWeekendOwnerB.value = configurationB.ownerId;
+    updateWeekendNamePreviews();
+  }
+
+  function updateWeekendNamePreviews() {
+    const ownerA = getEmployee(elements.settingsWeekendOwnerA.value);
+    const ownerB = getEmployee(elements.settingsWeekendOwnerB.value);
+    elements.settingsWeekendNameA.value = ownerA?.firstName || "";
+    elements.settingsWeekendNameB.value = ownerB?.firstName || "";
+  }
+
+  async function saveWeekendSettings() {
+    if (!requireAdmin()) return;
+    const ownerA = elements.settingsWeekendOwnerA.value;
+    const ownerB = elements.settingsWeekendOwnerB.value;
+    if (!ownerA || !ownerB) {
+      showToast(
+        "Bitte jedem Dienstwochenende eine verantwortliche Person zuweisen.",
+        "error",
+      );
+      (!ownerA
+        ? elements.settingsWeekendOwnerA
+        : elements.settingsWeekendOwnerB
+      ).focus();
+      return;
+    }
+    if (ownerA === ownerB) {
+      showToast(
+        "Die beiden Dienstwochenenden benötigen unterschiedliche verantwortliche Personen.",
+        "error",
+      );
+      elements.settingsWeekendOwnerB.focus();
+      return;
+    }
+    const ownerEmployeeA = getEmployee(ownerA);
+    const ownerEmployeeB = getEmployee(ownerB);
+    if (!ownerEmployeeA || !ownerEmployeeB) {
+      showToast("Eine ausgewählte Person ist nicht mehr vorhanden.", "error");
+      renderWeekendSettings();
+      return;
+    }
+    if (
+      !isWeekendLeadership(ownerEmployeeA) ||
+      !isWeekendLeadership(ownerEmployeeB)
+    ) {
+      showToast(
+        "Als Verantwortliche können nur Stationsleitungen oder stellvertretende Stationsleitungen ausgewählt werden.",
+        "error",
+      );
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const committed = await commitStateMutation(() => {
+      state.settings.serviceWeekends = {
+        weekend_a: {
+          name: ownerEmployeeA.firstName.slice(0, 50),
+          ownerId: ownerA,
+        },
+        weekend_b: {
+          name: ownerEmployeeB.firstName.slice(0, 50),
+          ownerId: ownerB,
+        },
+      };
+      [
+        ["weekend_a", ownerA],
+        ["weekend_b", ownerB],
+      ].forEach(([weekend, ownerId]) => {
+        const owner = state.employees.find(
+          (employee) => employee.id === ownerId,
+        );
+        if (owner && owner.serviceWeekend !== weekend) {
+          owner.serviceWeekend = weekend;
+          owner.updatedAt = now;
+        }
+      });
+    });
+    if (committed) {
+      showToast("Dienstwochenenden und Verantwortliche wurden gespeichert.");
+    }
   }
 
   function renderBackendSelection() {
@@ -9083,6 +10217,7 @@
       remoteRevision = Number(result.revision) || 1;
       window.TeOBackend.writeToken(result.token);
       state = normalizeState(result.state);
+      databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       backendStartupError = "";
       const remoteUser = state.users.find(
         (user) => user.id === result.user?.id,
@@ -9197,6 +10332,15 @@
         "error",
       );
     }
+  }
+
+  function renderDatabaseSaveWarning() {
+    const visible = Boolean(currentUser && databaseSaveReminderArmed);
+    elements.databaseSaveWarning.hidden = !visible;
+    if (!visible) return;
+    elements.databaseSaveWarningText.textContent = isAdmin()
+      ? "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert."
+      : "Änderungen wurden automatisch gespeichert. Bitte den Administrator über die ausstehende Datensicherung informieren.";
   }
 
   async function renderBrowserStorageStatus() {
@@ -9362,6 +10506,19 @@
       throw new Error("Die Sicherungsdatei enthält beschädigte oder unvollständige Datensätze.");
     }
 
+    const validation = window.TeOStateSchema?.validateStateShape(normalizedState, {
+      maxBytes: MAX_BACKUP_FILE_SIZE,
+      requireAdmin: normalizedState.users.length > 0,
+      maxAuditEntries: MAX_AUDIT_LOG_ENTRIES,
+    });
+    if (!validation?.valid) {
+      throw new Error(
+        `Die Sicherungsdatei ist ungültig: ${
+          validation?.issues?.[0] || "Datenprüfung nicht verfügbar."
+        }`,
+      );
+    }
+
     return normalizedState;
   }
 
@@ -9374,6 +10531,7 @@
       renderAll();
       return;
     }
+    databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
     employeeSearchTerm = "";
     completionSearchTerm = "";
@@ -9660,7 +10818,99 @@
   }
 
   function serviceWeekendLabel(value) {
-    return SERVICE_WEEKENDS[value] || SERVICE_WEEKENDS.none;
+    if (value === "none") return SERVICE_WEEKENDS.none;
+    return (
+      state.settings?.serviceWeekends?.[value]?.name ||
+      SERVICE_WEEKENDS[value] ||
+      SERVICE_WEEKENDS.none
+    );
+  }
+
+  function serviceWeekendOwnerKey(employeeId) {
+    if (!employeeId) return "";
+    return (
+      SERVICE_WEEKEND_KEYS.find(
+        (weekend) =>
+          state.settings?.serviceWeekends?.[weekend]?.ownerId === employeeId,
+      ) || ""
+    );
+  }
+
+  function isWeekendLeadership(employee) {
+    return Boolean(
+      employee &&
+        LEADERSHIP_QUALIFICATION_IDS.some(
+          (qualificationId) => employee.qualifications?.[qualificationId],
+        ),
+    );
+  }
+
+  function serviceWeekendOptionsMarkup({
+    includeUnchanged = false,
+    includeNone = true,
+  } = {}) {
+    return [
+      includeUnchanged ? '<option value="">Nicht ändern</option>' : "",
+      includeNone
+        ? `<option value="none">${escapeHtml(SERVICE_WEEKENDS.none)}</option>`
+        : "",
+      ...SERVICE_WEEKEND_KEYS.map(
+        (weekend) =>
+          `<option value="${weekend}">${escapeHtml(
+            serviceWeekendLabel(weekend),
+          )}</option>`,
+      ),
+    ].join("");
+  }
+
+  function handleBeforeUnload(event) {
+    if (!databaseSaveReminderArmed || !isAdmin()) return;
+    event.preventDefault();
+    event.returnValue = "";
+  }
+
+  function shouldRemindBeforeUnload(candidateState = state) {
+    if (!candidateState || typeof candidateState !== "object") return false;
+    const collections = [
+      "employees",
+      "trainings",
+      "completions",
+      "meetings",
+      "meetingAttendances",
+      "appointments",
+      "devices",
+      "deviceInstructions",
+      "vacationEntitlements",
+      "vacationDays",
+      "users",
+    ];
+    const containsData = collections.some(
+      (collection) => candidateState[collection]?.length,
+    );
+    if (!containsData) return false;
+
+    const lastBackupTimestamp = Date.parse(
+      candidateState.settings?.lastBackupAt || "",
+    );
+    if (!Number.isFinite(lastBackupTimestamp)) return true;
+
+    const hasLaterAuditChange = (candidateState.auditLog || []).some(
+      (entry) =>
+        Date.parse(entry?.timestamp || "") > lastBackupTimestamp &&
+        !/Datensicherung exportiert/i.test(String(entry?.action || "")),
+    );
+    if (hasLaterAuditChange) return true;
+
+    return collections
+      .filter((collection) => collection !== "users")
+      .some((collection) =>
+        (candidateState[collection] || []).some((entry) =>
+          ["updatedAt", "createdAt"].some(
+            (property) =>
+              Date.parse(entry?.[property] || "") > lastBackupTimestamp,
+          ),
+        ),
+      );
   }
 
   function employeeStatusLabel(employee) {
@@ -9671,11 +10921,10 @@
     return { active: 0, onboarding: 1, inactive: 2 }[status] ?? 3;
   }
 
-  function getActiveEmployeeEmailAddresses() {
+  function getFilteredEmployeeEmailAddresses() {
     const seenAddresses = new Set();
 
-    return [...activeEmployeeList()]
-      .sort(sortEmployees)
+    return filteredEmployeesForTable()
       .map((employee) => employee.email.trim())
       .filter((email) => {
         if (!email) return false;
@@ -9686,28 +10935,130 @@
       });
   }
 
-  function getActiveEmployeeEmailExport() {
-    return getActiveEmployeeEmailAddresses().join(";");
+  function getFilteredEmployeeEmailExport() {
+    return getFilteredEmployeeEmailAddresses().join(";");
   }
 
   function updateEmailExportButton() {
-    const emailCount = getActiveEmployeeEmailAddresses().length;
+    const emailCount = getFilteredEmployeeEmailAddresses().length;
     elements.copyActiveEmailsLabel.textContent = emailCount
       ? `E-Mails kopieren (${emailCount})`
       : "E-Mails kopieren";
     elements.copyActiveEmailsButton.setAttribute(
       "aria-label",
       emailCount
-        ? `${emailCount} E-Mail-Adressen aktiver Mitarbeiter kopieren`
-        : "E-Mail-Adressen aktiver Mitarbeiter kopieren",
+        ? `${emailCount} E-Mail-Adressen der aktuell gefilterten Mitarbeiter kopieren`
+        : "E-Mail-Adressen der aktuell gefilterten Mitarbeiter kopieren",
+    );
+  }
+
+  function getFilteredEmployeePhoneListRows() {
+    return filteredEmployeesForTable()
+      .sort(sortEmployees)
+      .map((employee) => [fullName(employee), employee.phone]);
+  }
+
+  function updatePhoneListExportButton() {
+    const employeeCount = getFilteredEmployeePhoneListRows().length;
+    elements.exportEmployeePhoneListLabel.textContent = employeeCount
+      ? `Telefonliste drucken (${employeeCount})`
+      : "Telefonliste drucken";
+    elements.exportEmployeePhoneListButton.setAttribute(
+      "aria-label",
+      employeeCount
+        ? `Telefonliste für ${employeeCount} aktuell gefilterte Mitarbeiter drucken`
+        : "Telefonliste der aktuell gefilterten Mitarbeiter drucken",
+    );
+  }
+
+  function splitPhoneListIntoColumns(rows) {
+    const columnCount = rows.length > 72 ? 3 : rows.length > 28 ? 2 : 1;
+    const rowsPerColumn = Math.ceil(rows.length / columnCount);
+    return Array.from({ length: columnCount }, (_, index) =>
+      rows.slice(index * rowsPerColumn, (index + 1) * rowsPerColumn),
+    ).filter((column) => column.length > 0);
+  }
+
+  function buildEmployeePhoneListPrintHtml(rows) {
+    const columns = splitPhoneListIntoColumns(rows);
+    const maximumRows = Math.max(...columns.map((column) => column.length));
+    const fontSize = maximumRows > 32 ? "9pt" : maximumRows > 28 ? "10pt" : "10.5pt";
+    const cellPadding =
+      maximumRows > 32
+        ? "1.1mm"
+        : maximumRows > 30
+          ? "1.65mm"
+          : maximumRows > 28
+            ? "2mm"
+            : "2.5mm";
+    const tables = columns
+      .map(
+        (column) => `
+          <table>
+            <thead><tr><th>Name</th><th>Nummer</th></tr></thead>
+            <tbody>
+              ${column
+                .map(
+                  ([name, phone]) => `
+                    <tr>
+                      <td>${escapeHtml(name)}</td>
+                      <td>${escapeHtml(phone || "")}</td>
+                    </tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>`,
+      )
+      .join("");
+    return `
+      <article
+        class="phone-list-document"
+        style="--phone-columns: ${columns.length}; --phone-font-size: ${fontSize}; --phone-cell-padding: ${cellPadding}"
+      >
+        <header class="phone-list-document-header">
+          <h1>Telefonliste</h1>
+          <span>${rows.length} Mitarbeiter · Stand ${formatDate(new Date().toISOString().slice(0, 10))}</span>
+        </header>
+        <div class="phone-list-document-grid">${tables}</div>
+      </article>`;
+  }
+
+  function exportEmployeePhoneList() {
+    if (!requireAdmin()) return;
+    const rows = getFilteredEmployeePhoneListRows();
+    if (rows.length === 0) {
+      showToast(
+        "Die aktuellen Mitarbeiterfilter liefern keine Einträge für die Telefonliste.",
+        "error",
+      );
+      return;
+    }
+    const previewMarkup = buildEmployeePhoneListPrintHtml(rows);
+    elements.phoneListPreviewContent.innerHTML = previewMarkup;
+    elements.phoneListPrintSurface.innerHTML = previewMarkup;
+    elements.phoneListPreviewSubtitle.textContent =
+      `${rows.length} gefilterte Mitarbeiter · DIN A4 Hochformat`;
+    elements.phoneListPreviewDialog.showModal();
+  }
+
+  function printEmployeePhoneList() {
+    if (!elements.phoneListPreviewDialog.open) return;
+    document.body.classList.add("print-phone-list");
+    window.print();
+    window.setTimeout(
+      () => document.body.classList.remove("print-phone-list"),
+      0,
     );
   }
 
   async function copyActiveEmployeeEmails() {
     if (!requireAdmin()) return;
-    const emailAddresses = getActiveEmployeeEmailAddresses();
+    const emailAddresses = getFilteredEmployeeEmailAddresses();
     if (emailAddresses.length === 0) {
-      showToast("Für aktive Mitarbeiter sind keine E-Mail-Adressen hinterlegt.", "error");
+      showToast(
+        "Für die aktuell gefilterten Mitarbeiter sind keine E-Mail-Adressen hinterlegt.",
+        "error",
+      );
       return;
     }
 
@@ -9903,6 +11254,64 @@
       String(date.getMonth() + 1).padStart(2, "0"),
       String(date.getFullYear()).padStart(4, "0"),
     ].join(".");
+  }
+
+  function formatDateInputValue(dateString) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateString || ""))) return "";
+    const [year, month, day] = dateString.split("-");
+    return `${day}.${month}.${year}`;
+  }
+
+  function initializeFormattedDateInputs() {
+    refreshFormattedDateInputs();
+    document.addEventListener("input", handleFormattedDateInput, true);
+    document.addEventListener("change", handleFormattedDateInput, true);
+    dateInputObserver = new MutationObserver(() => {
+      refreshFormattedDateInputs();
+    });
+    dateInputObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["open"],
+    });
+  }
+
+  function refreshFormattedDateInputs() {
+    document.querySelectorAll('input[type="date"]').forEach((input) => {
+      let shell = input.closest(".formatted-date-shell");
+      if (!shell) {
+        shell = document.createElement("span");
+        shell.className = "formatted-date-shell";
+        input.before(shell);
+        shell.append(input);
+        const display = document.createElement("span");
+        display.className = "formatted-date-display";
+        display.setAttribute("aria-hidden", "true");
+        shell.append(display);
+        input.classList.add("formatted-date-input");
+      }
+      updateFormattedDateInput(input);
+    });
+  }
+
+  function handleFormattedDateInput(event) {
+    if (event.target?.matches?.('input[type="date"]')) {
+      updateFormattedDateInput(event.target);
+    }
+  }
+
+  function updateFormattedDateInput(input) {
+    const display = input
+      .closest(".formatted-date-shell")
+      ?.querySelector(".formatted-date-display");
+    if (!display) return;
+    const formattedValue = formatDateInputValue(input.value);
+    const displayValue = formattedValue || "TT.MM.JJJJ";
+    if (display.textContent !== displayValue) {
+      display.textContent = displayValue;
+    }
+    display.classList.toggle("is-placeholder", !formattedValue);
   }
 
   function formatTime(timeString) {

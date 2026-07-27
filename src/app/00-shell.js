@@ -1,0 +1,706 @@
+(() => {
+  "use strict";
+
+  const PROJECT_META = window.TeOProjectMeta;
+  if (!PROJECT_META) {
+    throw new Error("Die TeO-Projektmetadaten konnten nicht geladen werden.");
+  }
+  const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
+  const SESSION_USER_KEY = "intensivteam-session-user-v1";
+  const STATE_VERSION = PROJECT_META.stateVersion;
+  const PROJECT_NAME = PROJECT_META.name;
+  const PROJECT_VERSION = PROJECT_META.version;
+  const BACKUP_FORMAT = PROJECT_META.backupFormat;
+  const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
+  const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
+  const MAX_AUDIT_LOG_ENTRIES = 1000;
+  const DEFAULT_BACKUP_REMINDER_DAYS = 14;
+  const DEFAULT_VACATION_BASE_DAYS = 30;
+  const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
+  const DEFAULT_WEEKDAY_ABSENCE_LIMIT = 8;
+  const DEFAULT_WEEKEND_ABSENCE_LIMIT = 5;
+  const DEFAULT_TRAINING_RECURRENCE_MONTHS = 12;
+  const VIOLENCE_PREVENTION_RECURRENCE_MONTHS = 60;
+  const DEADLINE_KINDS = Object.freeze([
+    "appointment",
+    "birthday",
+    "training",
+    "qualification",
+  ]);
+  const DEADLINE_KIND_LABELS = Object.freeze({
+    appointment: "Termine",
+    birthday: "Geburtstage",
+    training: "Fortbildungen",
+    qualification: "Qualifikationen",
+  });
+  const DEFAULT_DEVICE_CATALOG_TIMESTAMP = "2026-07-26T00:00:00.000Z";
+  const DEFAULT_DEVICE_CATALOG = Object.freeze([
+    ["Abbot", "ID-Now", "POCT-Gerät", true, false],
+    ["Abiomed", "Impella", "Herzunterstützungspumpe", true, true],
+    ["Aerogen", "USB-Controller", "Ultraschallvernebler", true, true],
+    ["AKS", "Goliath", "Patientenlifter", false, false],
+    ["Anandic", "Mistral Air", "Wärmegebläse", true, false],
+    ["Arjo", "Sara 3000", "Steh- und Aufrichthilfe", false, false],
+    ["Barkey", "Plasmatherm", "Nicht kategorisiert", true, false],
+    ["BD", "Arctic Sun 5000", "Nicht kategorisiert", true, true],
+    ["Boston Scientific", "EKOS", "Nicht kategorisiert", true, true],
+    ["Braun", "Infusomat Space", "Nicht kategorisiert", true, true],
+    ["Braun", "Pefusor Space", "Nicht kategorisiert", true, true],
+    ["Corpuls", "C3", "Nicht kategorisiert", false, true],
+    ["Covidien", "Genius 3", "Ohrthermometer", true, false],
+    ["Customed", "EKG-Gerät + Software", "Nicht kategorisiert", true, false],
+    [
+      "Dahlhausen / TIM",
+      "Mirus incl. Lisa & ORS",
+      "Nicht kategorisiert",
+      true,
+      true,
+    ],
+    [
+      "Dedalus",
+      "Orbis incl. ICU-Manager, Medication & Flycicle Vision",
+      "Nicht kategorisiert",
+      true,
+      true,
+    ],
+    ["Dräger", "Aquapor H300", "Nicht kategorisiert", true, true],
+    ["Dräger", "Carina", "Nicht kategorisiert", true, true],
+    ["Dräger", "M540", "Nicht kategorisiert", true, true],
+    ["Dräger", "Oxylog 3000", "Nicht kategorisiert", true, true],
+    ["Dräger", "V500", "Nicht kategorisiert", true, true],
+    ["Dräger", "V600 / V800", "Nicht kategorisiert", true, true],
+    ["Dräger", "Zentrale", "Nicht kategorisiert", true, true],
+    ["Eden Medical", "PiCCO2 Monitor", "Nicht kategorisiert", true, true],
+    ["Fisher & Paykel", "AirVo 2", "Nicht kategorisiert", true, true],
+    ["Fresenius", "5008S + Aqua C uno", "Nicht kategorisiert", true, true],
+    ["Fresenius", "Multifiltrate Pro", "Nicht kategorisiert", true, true],
+    ["Getinge", "PulsioFlex Monitor", "Nicht kategorisiert", true, true],
+    ["Hamilton", "MR1", "Nicht kategorisiert", true, true],
+    ["Helmer", "Agitator", "Nicht kategorisiert", true, false],
+    ["Hemochron", "Signature Elite", "Nicht kategorisiert", true, false],
+    ["Hill Rom", "Progressa", "Therapiebett", true, false],
+    ["Hypercom Gematik", "Medline", "Kartenlesegerät", true, false],
+    [
+      "Instrumentation Laboratory",
+      "GEM Premier 5000",
+      "Nicht kategorisiert",
+      true,
+      false,
+    ],
+    ["KCI", "Acti-VAC", "Nicht kategorisiert", true, false],
+    [
+      "Kirsch",
+      "BL-300",
+      "Blutkonserven- und Medikamentenkühlschrank",
+      true,
+      false,
+    ],
+    ["Marquet", "Cardiohelp", "ECMO", true, true],
+    ["Medela", "Thopaz (+)", "Nicht kategorisiert", true, true],
+    ["Medical Econet", "Palmcare Pro", "Pulsoxymeter", true, false],
+    ["Medior", "Mobilizer", "Nicht kategorisiert", true, false],
+    ["Meiko", "Topline", "Spülanlage", true, false],
+    ["Mindray", "PM-60", "Pulsoxymeter", true, false],
+    ["Narcotrend", "Compact-M", "Nicht kategorisiert", true, false],
+    ["Nova Biomeidical", "StatStrip", "Blutzuckermessgerät", true, false],
+    ["NovaLung", "NovaFlow", "ILA", true, true],
+    ["Nutricia", "Flocare", "Ernährungspumpe", true, false],
+    [
+      "Physiocontrol / Stryker",
+      "Lifepack 20 / 20e",
+      "Nicht kategorisiert",
+      true,
+      true,
+    ],
+    [
+      "Physiocontrol / Stryker",
+      "Lifepak 10",
+      "Nicht kategorisiert",
+      true,
+      true,
+    ],
+    ["Roche", "Accu-Chek", "BZ-Gerät", true, false],
+    ["Roche", "CoaguChek", "Nicht kategorisiert", true, false],
+    ["Seca", "Secura 959", "Patientenwaage", true, false],
+    ["SLK Medical", "Pain & Therapy", "Nicht kategorisiert", true, false],
+    ["Smiths Medical", "CADD", "Nicht kategorisiert", true, true],
+    ["Stiegelmeyer", "Krankenhausbett gelb", "Nicht kategorisiert", true, false],
+    [
+      "Stiegelmeyer",
+      "Stiegelmeyer Krankenhausbett braun",
+      "Nicht kategorisiert",
+      true,
+      false,
+    ],
+    ["Teleflex", "EZ-IO G3", "Intraossärbohrer", true, true],
+    ["TriMedika", "Tritemp TR1", "Ohrthermometer", true, false],
+    ["Völker", "S962-2 / S 982", "Krankenhausbett", true, false],
+    ["Weihmann", "Accuvac Pro", "Nicht kategorisiert", true, false],
+    ["Zoll", "X-Series", "Nicht kategorisiert", true, true],
+  ]);
+
+  const THEMES = {
+    standard: "Standard",
+    dark: "Dark Mode",
+    cellitinnen: "Cellitinnen",
+    "cellitinnen-red": "Cellitinnen Rot",
+  };
+
+  const PASSWORD_ITERATIONS = 210000;
+  const USER_FIRST_NAME_FALLBACKS = {
+    becke003: "Oliver",
+    botze003: "Elisabeth",
+    ferre001: "Claudio",
+  };
+
+  const DEFAULT_QUALIFICATIONS = {
+    stationsleitung: "Stationsleitung",
+    stellvertretendeStationsleitung: "Stellvertretende Stationsleitung",
+    fachweiterbildungIA: "Fachweiterbildung I/A",
+    praxisanleiter: "Praxisanleiter/in",
+    hygienebeauftragter: "Hygienebeauftragte/r",
+    wundexperte: "Wundexperte/in",
+    demenzexperte: "Demenzexperte/in",
+    brandschutzbeauftragter: "Brandschutzbeauftragte/r",
+    medizinproduktebeauftragter: "Medizinproduktebeauftragte/r",
+  };
+  const LEADERSHIP_QUALIFICATION_IDS = Object.freeze([
+    "stationsleitung",
+    "stellvertretendeStationsleitung",
+  ]);
+
+  const DEFAULT_PROFESSIONS = [
+    "Pflegefachkraft",
+    "Pflegefachassistenz",
+    "Medizinische/r Fachangestellte/r",
+    "Stationsassistenz",
+    "Arzt/Ärztin",
+  ];
+  const CARE_PROFESSION_ALIASES = new Set([
+    "gesundheits- und krankenpfleger/in",
+    "3-jährig examiniert",
+  ]);
+
+
+  const SERVICE_WEEKENDS = {
+    none: "Kein festes Dienstwochenende",
+    weekend_a: "Wochenende A",
+    weekend_b: "Wochenende B",
+  };
+  const SERVICE_WEEKEND_KEYS = Object.freeze(["weekend_a", "weekend_b"]);
+
+  // Amtliche Ferienordnung NRW für die Schuljahre 2024/25 bis 2029/30:
+  // https://bass.schule.nrw/19662.htm
+  const NRW_SCHOOL_VACATION_PERIODS = [
+    { start: "2024-12-23", end: "2025-01-06", label: "Weihnachtsferien" },
+    { start: "2025-04-14", end: "2025-04-26", label: "Osterferien" },
+    { start: "2025-06-10", end: "2025-06-10", label: "Pfingstferien" },
+    { start: "2025-07-14", end: "2025-08-26", label: "Sommerferien" },
+    { start: "2025-10-13", end: "2025-10-25", label: "Herbstferien" },
+    { start: "2025-12-22", end: "2026-01-06", label: "Weihnachtsferien" },
+    { start: "2026-03-30", end: "2026-04-11", label: "Osterferien" },
+    { start: "2026-05-26", end: "2026-05-26", label: "Pfingstferien" },
+    { start: "2026-07-20", end: "2026-09-01", label: "Sommerferien" },
+    { start: "2026-10-17", end: "2026-10-31", label: "Herbstferien" },
+    { start: "2026-12-23", end: "2027-01-06", label: "Weihnachtsferien" },
+    { start: "2027-03-22", end: "2027-04-03", label: "Osterferien" },
+    { start: "2027-05-18", end: "2027-05-18", label: "Pfingstferien" },
+    { start: "2027-07-19", end: "2027-08-31", label: "Sommerferien" },
+    { start: "2027-10-23", end: "2027-11-06", label: "Herbstferien" },
+    { start: "2027-12-24", end: "2028-01-08", label: "Weihnachtsferien" },
+    { start: "2028-04-10", end: "2028-04-22", label: "Osterferien" },
+    { start: "2028-07-10", end: "2028-08-22", label: "Sommerferien" },
+    { start: "2028-10-23", end: "2028-11-04", label: "Herbstferien" },
+    { start: "2028-12-21", end: "2029-01-05", label: "Weihnachtsferien" },
+    { start: "2029-03-26", end: "2029-04-07", label: "Osterferien" },
+    { start: "2029-05-22", end: "2029-05-22", label: "Pfingstferien" },
+    { start: "2029-07-02", end: "2029-08-14", label: "Sommerferien" },
+    { start: "2029-10-15", end: "2029-10-27", label: "Herbstferien" },
+    { start: "2029-12-20", end: "2030-01-04", label: "Weihnachtsferien" },
+    { start: "2030-04-15", end: "2030-04-27", label: "Osterferien" },
+  ];
+  const NRW_SCHOOL_VACATION_FULL_YEARS = new Set([2025, 2026, 2027, 2028, 2029]);
+
+  const EMPLOYMENT_STATUSES = {
+    active: "Aktiv",
+    onboarding: "In Einarbeitung",
+    inactive: "Inaktiv",
+  };
+
+  const PLANNER_ENTRY_TYPES = {
+    vacation: {
+      label: "Urlaub",
+      shortLabel: "U",
+      isAbsence: true,
+      countsVacationEntitlement: true,
+    },
+    onboardingVacation: {
+      label: "Urlaub Einarbeitung",
+      shortLabel: "UE",
+      isAbsence: false,
+      countsVacationEntitlement: true,
+    },
+    school: {
+      label: "Schule / Weiterbildung / Uni",
+      shortLabel: "S",
+      isAbsence: true,
+      countsVacationEntitlement: false,
+    },
+    unpaid: {
+      label: "Unbezahlter Urlaub",
+      shortLabel: "UN",
+      isAbsence: true,
+      countsVacationEntitlement: false,
+    },
+    external: {
+      label: "Externer Einsatz",
+      shortLabel: "E",
+      isAbsence: true,
+      countsVacationEntitlement: false,
+    },
+    plannedOff: {
+      label: "Frei geplant",
+      shortLabel: "FP",
+      isAbsence: true,
+      countsVacationEntitlement: false,
+    },
+    mandatoryDuty: {
+      label: "Verpflichtende Dienstzusage",
+      shortLabel: "D",
+      isAbsence: false,
+      countsVacationEntitlement: false,
+    },
+  };
+
+  const ATTENDANCE_STATUSES = {
+    teilgenommen: { label: "Teilgenommen", tone: "green" },
+    urlaub: { label: "Urlaub", tone: "blue" },
+    dienst: { label: "Dienst", tone: "purple" },
+    krankheit: { label: "Krankheit", tone: "red" },
+    schule: { label: "Schule", tone: "teal" },
+    entschuldigt: { label: "Entschuldigt", tone: "orange" },
+    unentschuldigt: { label: "Unentschuldigt", tone: "dark-red" },
+  };
+
+  const ATTENDANCE_CHART_COLORS = {
+    teilgenommen: "#2b9b68",
+    urlaub: "#4f8fdf",
+    dienst: "#805bad",
+    krankheit: "#d2525d",
+    schule: "#25a29d",
+    entschuldigt: "#dc8a31",
+    unentschuldigt: "#9f2731",
+    open: "#cdd5dd",
+  };
+
+  const VIEW_HASHES = {
+    dashboard: "uebersicht",
+    employees: "mitarbeiter",
+    weekends: "wochenendverteilung",
+    vacations: "urlaubsplanung",
+    appointments: "terminkalender",
+    trainings: "pflichtfortbildungen",
+    meetings: "teamsitzungen",
+    devices: "geraeteeinweisungen",
+    "device-management": "geraeteverwaltung",
+    settings: "einstellungen",
+    help: "hilfe",
+  };
+
+  const HASH_VIEWS = Object.fromEntries(
+    Object.entries(VIEW_HASHES).map(([view, hash]) => [hash, view]),
+  );
+
+  let state = emptyState();
+  let dataStore = null;
+  let dataSyncChannel = null;
+  let backendConfig = { mode: "local", apiUrl: "" };
+  let backendMode = "local";
+  let remoteRevision = 0;
+  let pendingRemoteConflictState = null;
+  let backendStartupError = "";
+  let remoteSyncTimer = null;
+  let remoteUpdateNoticeRevision = 0;
+  let employeeStatusFilter = "all";
+  let employeeSearchTerm = "";
+  let completionSearchTerm = "";
+  let selectedCompletionEmployeeIds = new Set();
+  let attendanceSearchTerm = "";
+  let attendanceStatusFilter = "all";
+  let attendanceDraft = new Map();
+  let attendanceEmployeeIds = [];
+  let confirmCallback = null;
+  let backupPasswordResolver = null;
+  let currentUser = null;
+  let selectedEmployeeIds = new Set();
+  let employeeProfessionFilter = "all";
+  let employeeQualificationFilter = "all";
+  let employeeWeekendFilter = "all";
+  let employeeSortKey = "name";
+  let employeeSortDirection = "asc";
+  let currentWeekendSimulation = null;
+  let trainingRecurrenceManuallyChanged = false;
+  let trainingDisplayYear = new Date().getFullYear();
+  let backupReminderShown = false;
+  let databaseSaveReminderArmed = false;
+  let dateInputObserver = null;
+  let vacationYear = new Date().getFullYear();
+  let vacationMonth = new Date().getMonth() + 1;
+  let vacationEntryType = "vacation";
+  let deviceInventoryFilter = "current";
+  let deviceAnnexFilter = "all";
+  let deviceCategoryFilter = "all";
+  let deviceSearchTerm = "";
+  let deviceManagementInventoryFilter = "current";
+  let deviceManagementAnnexFilter = "all";
+  let deviceManagementCategoryFilter = "all";
+  let deviceEmployeeStatusFilter = "employed";
+  let deviceEmployeeSearchTerm = "";
+  let deviceParticipantSearchTerm = "";
+  let deviceParticipantDraft = new Map();
+  const cleanFormSnapshots = new WeakMap();
+
+  const elements = {
+    navEmployeeCount: document.querySelector("#navEmployeeCount"),
+    navTrainingCount: document.querySelector("#navTrainingCount"),
+    navMeetingCount: document.querySelector("#navMeetingCount"),
+    navAppointmentCount: document.querySelector("#navAppointmentCount"),
+    navDeviceManagementCount: document.querySelector("#navDeviceManagementCount"),
+    mobileCreateButton: document.querySelector("#mobileCreateButton"),
+    databaseSaveWarning: document.querySelector("#databaseSaveWarning"),
+    databaseSaveWarningText: document.querySelector(
+      "#databaseSaveWarningText",
+    ),
+    databaseSaveWarningExportButton: document.querySelector(
+      "#databaseSaveWarningExportButton",
+    ),
+    helpSearch: document.querySelector("#helpSearch"),
+    helpSearchStatus: document.querySelector("#helpSearchStatus"),
+    clearHelpSearch: document.querySelector("#clearHelpSearch"),
+    helpNoResults: document.querySelector("#helpNoResults"),
+    mobileThemeButton: document.querySelector("#mobileThemeButton"),
+    mobileAccountButton: document.querySelector("#mobileAccountButton"),
+    currentUsername: document.querySelector("#currentUsername"),
+    currentUserRole: document.querySelector("#currentUserRole"),
+    dashboardStats: document.querySelector("#dashboardStats"),
+    dashboardTrainingProgress: document.querySelector("#dashboardTrainingProgress"),
+    dashboardGreeting: document.querySelector("#dashboardGreeting"),
+    projectBuildLabel: document.querySelector("#projectBuildLabel"),
+    deadlineOverview: document.querySelector("#deadlineOverview"),
+    deadlineHorizon: document.querySelector("#deadlineHorizon"),
+    deadlineFilters: [...document.querySelectorAll("[data-deadline-filter]")],
+    recentEmployees: document.querySelector("#recentEmployees"),
+    employeeTable: document.querySelector("#employeeTable"),
+    employeeSearch: document.querySelector("#employeeSearch"),
+    copyActiveEmailsButton: document.querySelector("#copyActiveEmailsButton"),
+    copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),
+    exportEmployeePhoneListButton: document.querySelector(
+      "#exportEmployeePhoneListButton",
+    ),
+    exportEmployeePhoneListLabel: document.querySelector(
+      "#exportEmployeePhoneListLabel",
+    ),
+    openCatalogManagementButton: document.querySelector("#openCatalogManagementButton"),
+    exportDataButton: document.querySelector("#exportDataButton"),
+    importDataButton: document.querySelector("#importDataButton"),
+    importDataFile: document.querySelector("#importDataFile"),
+    validateBackupButton: document.querySelector("#validateBackupButton"),
+    validateBackupFile: document.querySelector("#validateBackupFile"),
+    exportEncryptedDataButton: document.querySelector("#exportEncryptedDataButton"),
+    backupStatus: document.querySelector("#backupStatus"),
+    browserStorageStatus: document.querySelector("#browserStorageStatus"),
+    requestPersistentStorageButton: document.querySelector(
+      "#requestPersistentStorageButton",
+    ),
+    settingsStorageBackend: document.querySelector("#settingsStorageBackend"),
+    mariaDbSettingsFields: document.querySelector("#mariaDbSettingsFields"),
+    settingsMariaDbApiUrl: document.querySelector("#settingsMariaDbApiUrl"),
+    settingsMariaDbPassword: document.querySelector("#settingsMariaDbPassword"),
+    settingsBackendHint: document.querySelector("#settingsBackendHint"),
+    settingsBackendStatus: document.querySelector("#settingsBackendStatus"),
+    testBackendConnectionButton: document.querySelector(
+      "#testBackendConnectionButton",
+    ),
+    applyStorageBackendButton: document.querySelector(
+      "#applyStorageBackendButton",
+    ),
+    settingsBackupReminderDays: document.querySelector(
+      "#settingsBackupReminderDays",
+    ),
+    saveGeneralSettingsButton: document.querySelector(
+      "#saveGeneralSettingsButton",
+    ),
+    settingsWeekendNameA: document.querySelector("#settingsWeekendNameA"),
+    settingsWeekendOwnerA: document.querySelector("#settingsWeekendOwnerA"),
+    settingsWeekendNameB: document.querySelector(
+      "#settingsWeekendNameB",
+    ),
+    settingsWeekendOwnerB: document.querySelector(
+      "#settingsWeekendOwnerB",
+    ),
+    saveWeekendSettingsButton: document.querySelector(
+      "#saveWeekendSettingsButton",
+    ),
+    openAuditLogButton: document.querySelector("#openAuditLogButton"),
+    employeeProfessionFilter: document.querySelector("#employeeProfessionFilter"),
+    employeeQualificationFilter: document.querySelector("#employeeQualificationFilter"),
+    employeeWeekendFilter: document.querySelector("#employeeWeekendFilter"),
+    resetEmployeeFilters: document.querySelector("#resetEmployeeFilters"),
+    employeeBulkBar: document.querySelector("#employeeBulkBar"),
+    employeeBulkCount: document.querySelector("#employeeBulkCount"),
+    openBulkEditButton: document.querySelector("#openBulkEditButton"),
+    clearEmployeeSelection: document.querySelector("#clearEmployeeSelection"),
+    openWeekendOverviewButton: document.querySelector("#openWeekendOverviewButton"),
+    openWeekendPrintButton: document.querySelector("#openWeekendPrintButton"),
+    openWeekendSimulationButton: document.querySelector(
+      "#openWeekendSimulationButton",
+    ),
+    weekendDistributionContent: document.querySelector("#weekendDistributionContent"),
+    vacationYear: document.querySelector("#vacationYear"),
+    vacationMonth: document.querySelector("#vacationMonth"),
+    vacationEntryType: document.querySelector("#vacationEntryType"),
+    vacationBaseDays: document.querySelector("#vacationBaseDays"),
+    vacationWeekdayAbsenceLimit: document.querySelector(
+      "#vacationWeekdayAbsenceLimit",
+    ),
+    vacationWeekendAbsenceLimit: document.querySelector(
+      "#vacationWeekendAbsenceLimit",
+    ),
+    vacationWeekendAReferenceSaturday: document.querySelector(
+      "#vacationWeekendAReferenceSaturday",
+    ),
+    vacationWeekendAReferenceLabel: document.querySelector(
+      "#vacationWeekendAReferenceLabel",
+    ),
+    vacationWeekendALegend: document.querySelector(
+      "#vacationWeekendALegend",
+    ),
+    vacationWeekendBLegend: document.querySelector(
+      "#vacationWeekendBLegend",
+    ),
+    saveVacationSettingsButton: document.querySelector("#saveVacationSettingsButton"),
+    vacationSummary: document.querySelector("#vacationSummary"),
+    vacationPlanner: document.querySelector("#vacationPlanner"),
+    openDataQualityButton: document.querySelector("#openDataQualityButton"),
+    trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
+    trainingSummary: document.querySelector("#trainingSummary"),
+    trainingList: document.querySelector("#trainingList"),
+    openTrainingMatrixButton: document.querySelector("#openTrainingMatrixButton"),
+    meetingSummary: document.querySelector("#meetingSummary"),
+    meetingList: document.querySelector("#meetingList"),
+    openMeetingStatsButton: document.querySelector("#openMeetingStatsButton"),
+    appointmentSummary: document.querySelector("#appointmentSummary"),
+    appointmentList: document.querySelector("#appointmentList"),
+    deviceSummary: document.querySelector("#deviceSummary"),
+    deviceManagementSummary: document.querySelector("#deviceManagementSummary"),
+    deviceCatalog: document.querySelector("#deviceCatalog"),
+    deviceInstructionMatrix: document.querySelector("#deviceInstructionMatrix"),
+    deviceInstructionList: document.querySelector("#deviceInstructionList"),
+    deviceInventoryFilter: document.querySelector("#deviceInventoryFilter"),
+    deviceAnnexFilter: document.querySelector("#deviceAnnexFilter"),
+    deviceCategoryFilter: document.querySelector("#deviceCategoryFilter"),
+    deviceSearch: document.querySelector("#deviceSearch"),
+    deviceManagementInventoryFilter: document.querySelector(
+      "#deviceManagementInventoryFilter",
+    ),
+    deviceManagementAnnexFilter: document.querySelector(
+      "#deviceManagementAnnexFilter",
+    ),
+    deviceManagementCategoryFilter: document.querySelector(
+      "#deviceManagementCategoryFilter",
+    ),
+    deviceEmployeeStatusFilter: document.querySelector("#deviceEmployeeStatusFilter"),
+    deviceEmployeeSearch: document.querySelector("#deviceEmployeeSearch"),
+    employeeDialog: document.querySelector("#employeeDialog"),
+    employeeForm: document.querySelector("#employeeForm"),
+    employeeDialogTitle: document.querySelector("#employeeDialogTitle"),
+    employeeSubmitLabel: document.querySelector("#employeeSubmitLabel"),
+    serviceWeekend: document.querySelector("#serviceWeekend"),
+    serviceWeekendOwnerHint: document.querySelector(
+      "#serviceWeekendOwnerHint",
+    ),
+    trainingDialog: document.querySelector("#trainingDialog"),
+    trainingForm: document.querySelector("#trainingForm"),
+    trainingDialogTitle: document.querySelector("#trainingDialogTitle"),
+    trainingSubmitLabel: document.querySelector("#trainingSubmitLabel"),
+    completionDialog: document.querySelector("#completionDialog"),
+    completionForm: document.querySelector("#completionForm"),
+    completionTraining: document.querySelector("#completionTraining"),
+    completionDate: document.querySelector("#completionDate"),
+    completionEmployeeSearch: document.querySelector("#completionEmployeeSearch"),
+    completionEmployeeList: document.querySelector("#completionEmployeeList"),
+    completionEmployeeError: document.querySelector("#completionEmployeeError"),
+    completionSelectionCount: document.querySelector("#completionSelectionCount"),
+    toggleAllEmployees: document.querySelector("#toggleAllEmployees"),
+    trainingMatrixDialog: document.querySelector("#trainingMatrixDialog"),
+    trainingMatrixDialogTitle: document.querySelector("#trainingMatrixDialogTitle"),
+    trainingMatrixYear: document.querySelector("#trainingMatrixYear"),
+    trainingMatrixSummary: document.querySelector("#trainingMatrixSummary"),
+    trainingMatrixContent: document.querySelector("#trainingMatrixContent"),
+    exportTrainingMatrixCsvButton: document.querySelector(
+      "#exportTrainingMatrixCsvButton",
+    ),
+    printTrainingMatrixButton: document.querySelector("#printTrainingMatrixButton"),
+    loginDialog: document.querySelector("#loginDialog"),
+    loginForm: document.querySelector("#loginForm"),
+    loginError: document.querySelector("#loginError"),
+    setupDialog: document.querySelector("#setupDialog"),
+    setupForm: document.querySelector("#setupForm"),
+    setupError: document.querySelector("#setupError"),
+    changePasswordDialog: document.querySelector("#changePasswordDialog"),
+    changePasswordForm: document.querySelector("#changePasswordForm"),
+    changePasswordError: document.querySelector("#changePasswordError"),
+    accountDialog: document.querySelector("#accountDialog"),
+    accountDialogTitle: document.querySelector("#accountDialogTitle"),
+    accountDialogRole: document.querySelector("#accountDialogRole"),
+    userManagementDialog: document.querySelector("#userManagementDialog"),
+    userManagementList: document.querySelector("#userManagementList"),
+    temporaryPasswordResult: document.querySelector("#temporaryPasswordResult"),
+    temporaryPasswordUsername: document.querySelector("#temporaryPasswordUsername"),
+    temporaryPasswordValue: document.querySelector("#temporaryPasswordValue"),
+    copyTemporaryPassword: document.querySelector("#copyTemporaryPassword"),
+    catalogManagementDialog: document.querySelector("#catalogManagementDialog"),
+    professionCatalogList: document.querySelector("#professionCatalogList"),
+    qualificationCatalogList: document.querySelector("#qualificationCatalogList"),
+    newProfession: document.querySelector("#newProfession"),
+    newQualification: document.querySelector("#newQualification"),
+    addProfessionButton: document.querySelector("#addProfessionButton"),
+    addQualificationButton: document.querySelector("#addQualificationButton"),
+    meetingDialog: document.querySelector("#meetingDialog"),
+    meetingForm: document.querySelector("#meetingForm"),
+    meetingDialogTitle: document.querySelector("#meetingDialogTitle"),
+    meetingSubmitLabel: document.querySelector("#meetingSubmitLabel"),
+    appointmentDialog: document.querySelector("#appointmentDialog"),
+    appointmentForm: document.querySelector("#appointmentForm"),
+    appointmentDialogTitle: document.querySelector("#appointmentDialogTitle"),
+    appointmentSubmitLabel: document.querySelector("#appointmentSubmitLabel"),
+    deviceDialog: document.querySelector("#deviceDialog"),
+    deviceForm: document.querySelector("#deviceForm"),
+    deviceDialogTitle: document.querySelector("#deviceDialogTitle"),
+    deviceSubmitLabel: document.querySelector("#deviceSubmitLabel"),
+    deviceInstructionDialog: document.querySelector("#deviceInstructionDialog"),
+    deviceInstructionForm: document.querySelector("#deviceInstructionForm"),
+    deviceInstructionDialogTitle: document.querySelector(
+      "#deviceInstructionDialogTitle",
+    ),
+    deviceInstructionId: document.querySelector("#deviceInstructionId"),
+    deviceInstructionSubmitLabel: document.querySelector(
+      "#deviceInstructionSubmitLabel",
+    ),
+    deviceInstructionDevice: document.querySelector("#deviceInstructionDevice"),
+    deviceInstructionDate: document.querySelector("#deviceInstructionDate"),
+    deviceInstructorType: document.querySelector("#deviceInstructorType"),
+    externalInstructorField: document.querySelector("#externalInstructorField"),
+    externalInstructorName: document.querySelector("#externalInstructorName"),
+    employeeInstructorFields: document.querySelector("#employeeInstructorFields"),
+    employeeInstructor: document.querySelector("#employeeInstructor"),
+    employeeInstructorMpoConfirmation: document.querySelector(
+      "#employeeInstructorMpoConfirmation",
+    ),
+    deviceParticipantSearch: document.querySelector("#deviceParticipantSearch"),
+    toggleAllDeviceParticipants: document.querySelector(
+      "#toggleAllDeviceParticipants",
+    ),
+    deviceParticipantList: document.querySelector("#deviceParticipantList"),
+    deviceParticipantError: document.querySelector("#deviceParticipantError"),
+    deviceParticipantCount: document.querySelector("#deviceParticipantCount"),
+    deviceInstructionHistoryDialog: document.querySelector(
+      "#deviceInstructionHistoryDialog",
+    ),
+    deviceInstructionHistoryTitle: document.querySelector(
+      "#deviceInstructionHistoryTitle",
+    ),
+    deviceInstructionHistorySubtitle: document.querySelector(
+      "#deviceInstructionHistorySubtitle",
+    ),
+    deviceInstructionHistoryContent: document.querySelector(
+      "#deviceInstructionHistoryContent",
+    ),
+    attendanceDialog: document.querySelector("#attendanceDialog"),
+    attendanceForm: document.querySelector("#attendanceForm"),
+    attendanceMeetingMeta: document.querySelector("#attendanceMeetingMeta"),
+    attendanceSearch: document.querySelector("#attendanceSearch"),
+    attendanceFilter: document.querySelector("#attendanceFilter"),
+    attendanceBulkStatus: document.querySelector("#attendanceBulkStatus"),
+    applyBulkAttendance: document.querySelector("#applyBulkAttendance"),
+    attendanceList: document.querySelector("#attendanceList"),
+    attendanceProgress: document.querySelector("#attendanceProgress"),
+    meetingStatsDialog: document.querySelector("#meetingStatsDialog"),
+    meetingStatsYear: document.querySelector("#meetingStatsYear"),
+    meetingStatsContent: document.querySelector("#meetingStatsContent"),
+    meetingAttendanceThreshold: document.querySelector("#meetingAttendanceThreshold"),
+    exportMeetingStatsCsvButton: document.querySelector("#exportMeetingStatsCsvButton"),
+    employeeDossierDialog: document.querySelector("#employeeDossierDialog"),
+    employeeDossierTitle: document.querySelector("#employeeDossierTitle"),
+    employeeDossierSubtitle: document.querySelector("#employeeDossierSubtitle"),
+    employeeDossierContent: document.querySelector("#employeeDossierContent"),
+    printEmployeeDossierButton: document.querySelector("#printEmployeeDossierButton"),
+    vacationEmployeeOverviewDialog: document.querySelector(
+      "#vacationEmployeeOverviewDialog",
+    ),
+    vacationEmployeeOverviewTitle: document.querySelector(
+      "#vacationEmployeeOverviewTitle",
+    ),
+    vacationEmployeeOverviewSubtitle: document.querySelector(
+      "#vacationEmployeeOverviewSubtitle",
+    ),
+    vacationEmployeeOverviewContent: document.querySelector(
+      "#vacationEmployeeOverviewContent",
+    ),
+    weekendOverviewDialog: document.querySelector("#weekendOverviewDialog"),
+    weekendOverviewContent: document.querySelector("#weekendOverviewContent"),
+    printWeekendOverviewButton: document.querySelector("#printWeekendOverviewButton"),
+    weekendSimulationDialog: document.querySelector("#weekendSimulationDialog"),
+    weekendSimulationContent: document.querySelector("#weekendSimulationContent"),
+    rerunWeekendSimulationButton: document.querySelector(
+      "#rerunWeekendSimulationButton",
+    ),
+    applyWeekendSimulationButton: document.querySelector(
+      "#applyWeekendSimulationButton",
+    ),
+    bulkEditDialog: document.querySelector("#bulkEditDialog"),
+    bulkEditForm: document.querySelector("#bulkEditForm"),
+    bulkEditSubtitle: document.querySelector("#bulkEditSubtitle"),
+    bulkActive: document.querySelector("#bulkActive"),
+    bulkProfession: document.querySelector("#bulkProfession"),
+    bulkServiceWeekend: document.querySelector("#bulkServiceWeekend"),
+    bulkQualification: document.querySelector("#bulkQualification"),
+    bulkQualificationState: document.querySelector("#bulkQualificationState"),
+    dataQualityDialog: document.querySelector("#dataQualityDialog"),
+    dataQualityContent: document.querySelector("#dataQualityContent"),
+    auditLogDialog: document.querySelector("#auditLogDialog"),
+    auditLogContent: document.querySelector("#auditLogContent"),
+    exportAuditLogCsvButton: document.querySelector("#exportAuditLogCsvButton"),
+    confirmDialog: document.querySelector("#confirmDialog"),
+    confirmTitle: document.querySelector("#confirmTitle"),
+    confirmMessage: document.querySelector("#confirmMessage"),
+    confirmAccept: document.querySelector("#confirmAccept"),
+    confirmCancel: document.querySelector("#confirmCancel"),
+    backupPasswordDialog: document.querySelector("#backupPasswordDialog"),
+    backupPasswordForm: document.querySelector("#backupPasswordForm"),
+    backupPasswordDialogTitle: document.querySelector("#backupPasswordDialogTitle"),
+    backupPasswordDialogDescription: document.querySelector(
+      "#backupPasswordDialogDescription",
+    ),
+    backupPasswordNotice: document.querySelector("#backupPasswordNotice"),
+    backupPassword: document.querySelector("#backupPassword"),
+    backupPasswordConfirmationField: document.querySelector(
+      "#backupPasswordConfirmationField",
+    ),
+    backupPasswordConfirmation: document.querySelector(
+      "#backupPasswordConfirmation",
+    ),
+    showBackupPassword: document.querySelector("#showBackupPassword"),
+    backupPasswordError: document.querySelector("#backupPasswordError"),
+    backupPasswordSubmit: document.querySelector("#backupPasswordSubmit"),
+    phoneListPreviewDialog: document.querySelector("#phoneListPreviewDialog"),
+    phoneListPreviewSubtitle: document.querySelector("#phoneListPreviewSubtitle"),
+    phoneListPreviewContent: document.querySelector("#phoneListPreviewContent"),
+    phoneListPrintSurface: document.querySelector("#phoneListPrintSurface"),
+    printEmployeePhoneListButton: document.querySelector(
+      "#printEmployeePhoneListButton",
+    ),
+    toastRegion: document.querySelector("#toastRegion"),
+  };
+
+  initialize().catch(handleInitializationError);
