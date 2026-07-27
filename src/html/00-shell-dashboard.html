@@ -8,6 +8,12 @@
       content="Lokale Mitarbeiter- und Pflichtfortbildungsverwaltung für die Intensivstation"
     />
     <title>TeO – Team &amp; Employee Organizer</title>
+    <meta name="application-name" content="TeO" />
+    <meta name="theme-color" content="#0b65c7" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icons/teo-favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/teo-favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/icons/teo-apple-touch-icon.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="is-auth-locked">
@@ -210,6 +216,36 @@
               <svg><use href="#icon-close"></use></svg>
             </button>
           </div>
+        </section>
+
+        <section
+          class="sidebar-system-status"
+          id="sidebarSystemStatus"
+          aria-label="Verbindungs- und Backendstatus"
+        >
+          <div class="sidebar-system-status-header">
+            <span class="sidebar-system-status-dot" aria-hidden="true"></span>
+            <strong id="sidebarConnectionLabel">Status wird geprüft</strong>
+          </div>
+          <dl>
+            <div>
+              <dt>Backend</dt>
+              <dd id="sidebarBackendLabel">–</dd>
+            </div>
+            <div>
+              <dt>Server</dt>
+              <dd id="sidebarServerLabel">–</dd>
+            </div>
+            <div>
+              <dt>Revision</dt>
+              <dd id="sidebarRevisionLabel">–</dd>
+            </div>
+            <div>
+              <dt>DB-Schema</dt>
+              <dd id="sidebarSchemaLabel">–</dd>
+            </div>
+          </dl>
+          <small id="sidebarSyncLabel">Verbindungsstatus wird ermittelt.</small>
         </section>
 
         <div class="sidebar-note">

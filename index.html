@@ -9,6 +9,12 @@
       content="Lokale Mitarbeiter- und Pflichtfortbildungsverwaltung für die Intensivstation"
     />
     <title>TeO – Team &amp; Employee Organizer</title>
+    <meta name="application-name" content="TeO" />
+    <meta name="theme-color" content="#0b65c7" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icons/teo-favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/icons/teo-favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/icons/teo-apple-touch-icon.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="is-auth-locked">
@@ -211,6 +217,36 @@
               <svg><use href="#icon-close"></use></svg>
             </button>
           </div>
+        </section>
+
+        <section
+          class="sidebar-system-status"
+          id="sidebarSystemStatus"
+          aria-label="Verbindungs- und Backendstatus"
+        >
+          <div class="sidebar-system-status-header">
+            <span class="sidebar-system-status-dot" aria-hidden="true"></span>
+            <strong id="sidebarConnectionLabel">Status wird geprüft</strong>
+          </div>
+          <dl>
+            <div>
+              <dt>Backend</dt>
+              <dd id="sidebarBackendLabel">–</dd>
+            </div>
+            <div>
+              <dt>Server</dt>
+              <dd id="sidebarServerLabel">–</dd>
+            </div>
+            <div>
+              <dt>Revision</dt>
+              <dd id="sidebarRevisionLabel">–</dd>
+            </div>
+            <div>
+              <dt>DB-Schema</dt>
+              <dd id="sidebarSchemaLabel">–</dd>
+            </div>
+          </dl>
+          <small id="sidebarSyncLabel">Verbindungsstatus wird ermittelt.</small>
         </section>
 
         <div class="sidebar-note">
@@ -1274,6 +1310,9 @@
 <h3 id="hilfe-grundprinzip-der-speicherung">Grundprinzip der Speicherung</h3>
 <p>Änderungen werden im lokalen Modus automatisch in localForage beziehungsweise IndexedDB gespeichert. Im MariaDB-Modus werden sie an den zentralen Server übertragen. Der zusätzliche <strong>Sicherungsexport</strong> ist trotzdem erforderlich, damit eine unabhängige Wiederherstellungsdatei vorhanden ist.</p>
 <p>Nach Änderungen zeigt TeO deshalb oben im Inhaltsbereich eine Warnleiste an. Sie verschwindet erst nach einem erfolgreichen Sicherungsexport.</p>
+<h3 id="hilfe-installation-als-app">Installation als App</h3>
+<p>Chrome und Edge können TeO über das Browsermenü als eigenständige Web-App installieren. Die installierte Anwendung verwendet das TeO-App-Icon und öffnet sich in einem eigenen Fenster. Sie bleibt technisch mit derselben Serveradresse verbunden; deshalb sollte TeO immer über exakt dieselbe URL installiert und gestartet werden.</p>
+<p>Nach einer Änderung des App-Icons kann eine Neuinstallation erforderlich sein. Beim Deinstallieren darf <strong>Daten auch aus Chrome löschen</strong> nicht ausgewählt werden, wenn lokale Einstellungen oder ein lokaler Datenbestand erhalten bleiben sollen.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-navigation-und-bedienung">
 <h2 id="hilfe-navigation-und-bedienung">Navigation und Bedienung</h2>
@@ -1452,6 +1491,7 @@
 <p>Wichtig:</p>
 <ul><li>Ein Netzlaufwerk mit derselben <code>index.html</code> teilt nicht automatisch den IndexedDB-Datenbestand zwischen Arbeitsplätzen.</li><li>Jeder Browser und jedes Browserprofil besitzt seinen eigenen lokalen Speicher.</li><li>Browserbereinigung oder ein Profilwechsel kann lokale Daten entfernen.</li><li>Regelmäßige JSON-Sicherungen bleiben erforderlich.</li></ul>
 <p>Unter <strong>Einstellungen</strong> zeigt TeO den belegten und geschätzten verfügbaren Browserspeicher an. Dauerhafter Speicher kann beim Browser angefordert werden.</p>
+<p>Der Browser entscheidet selbst, ob er die Anforderung für dauerhaften Browserspeicher freigibt. Chrome und Edge treffen diese Entscheidung normalerweise automatisch und zeigen keinen Berechtigungsdialog. Eine Ablehnung löscht keine vorhandenen Daten; sie verbleiben als Best-Effort-Speicher und könnten nur bei erheblichem Speicherdruck oder durch das bewusste Löschen der Websitedaten entfernt werden. TeO sollte über HTTPS oder <code>localhost</code> aufgerufen werden. Unabhängige Sicherungsexporte bleiben auch bei freigegebenem dauerhaftem Speicher erforderlich.</p>
 <h3 id="hilfe-mariadb-modus">MariaDB-Modus</h3>
 <p>Für gemeinsames Arbeiten mehrerer Arbeitsplätze wird der separate TeO-API-Dienst verwendet. Datenbankzugangsdaten werden nicht an den Browser ausgeliefert.</p>
 <p>Beim ersten Verbinden kann der lokale Datenbestand kontrolliert auf den Server übertragen werden. Anschließend:</p>

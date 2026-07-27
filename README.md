@@ -41,6 +41,19 @@ damit eine unabhängige Wiederherstellungsdatei vorhanden ist.
 Nach Änderungen zeigt TeO deshalb oben im Inhaltsbereich eine Warnleiste an.
 Sie verschwindet erst nach einem erfolgreichen Sicherungsexport.
 
+### Installation als App
+
+Chrome und Edge können TeO über das Browsermenü als eigenständige Web-App
+installieren. Die installierte Anwendung verwendet das TeO-App-Icon und öffnet
+sich in einem eigenen Fenster. Sie bleibt technisch mit derselben
+Serveradresse verbunden; deshalb sollte TeO immer über exakt dieselbe URL
+installiert und gestartet werden.
+
+Nach einer Änderung des App-Icons kann eine Neuinstallation erforderlich sein.
+Beim Deinstallieren darf **Daten auch aus Chrome löschen** nicht ausgewählt
+werden, wenn lokale Einstellungen oder ein lokaler Datenbestand erhalten
+bleiben sollen.
+
 ## Navigation und Bedienung
 
 ### Hauptnavigation
@@ -544,6 +557,15 @@ Wichtig:
 
 Unter **Einstellungen** zeigt TeO den belegten und geschätzten verfügbaren
 Browserspeicher an. Dauerhafter Speicher kann beim Browser angefordert werden.
+
+Der Browser entscheidet selbst, ob er die Anforderung für dauerhaften
+Browserspeicher freigibt. Chrome und Edge treffen diese Entscheidung
+normalerweise automatisch und zeigen keinen Berechtigungsdialog. Eine
+Ablehnung löscht keine vorhandenen Daten; sie verbleiben als
+Best-Effort-Speicher und könnten nur bei erheblichem Speicherdruck oder durch
+das bewusste Löschen der Websitedaten entfernt werden. TeO sollte über HTTPS
+oder `localhost` aufgerufen werden. Unabhängige Sicherungsexporte bleiben auch
+bei freigegebenem dauerhaftem Speicher erforderlich.
 
 ### MariaDB-Modus
 

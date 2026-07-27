@@ -519,12 +519,18 @@
     setBackendButtonsBusy(true);
     try {
       const health = await window.TeOBackend.health(apiUrl);
+      if (isMariaDbMode() && apiUrl === backendConfig.apiUrl) {
+        markBackendConnected({ health });
+      }
       elements.settingsBackendStatus.classList.remove("is-error");
       elements.settingsBackendStatus.innerHTML = health.initialized
         ? `<i></i> Server erreichbar · Datenrevision ${health.revision}`
         : "<i></i> Server erreichbar · noch nicht eingerichtet";
       showToast("Verbindung zum TeO-Server wurde erfolgreich geprüft.");
     } catch (error) {
+      if (isMariaDbMode() && apiUrl === backendConfig.apiUrl) {
+        markBackendConnectionError(error);
+      }
       elements.settingsBackendStatus.classList.add("is-error");
       elements.settingsBackendStatus.innerHTML =
         "<i></i> Server nicht erreichbar";
@@ -590,6 +596,7 @@
       });
       backendMode = "mariadb";
       remoteRevision = Number(result.revision) || 1;
+      markBackendConnected({ health, synchronized: true });
       window.TeOBackend.writeToken(result.token);
       state = normalizeState(result.state);
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
@@ -751,7 +758,7 @@
         : "bei unbekanntem Kontingent";
       const persistenceLabel = persistent
         ? "dauerhaft geschützt"
-        : "Best-Effort-Speicher";
+        : browserPersistenceNotice || "Best-Effort-Speicher";
 
       elements.browserStorageStatus.textContent =
         `Browserspeicher: ${usage} ${quota} verwendet · ${persistenceLabel}.`;
@@ -781,14 +788,14 @@
     elements.requestPersistentStorageButton.disabled = true;
     try {
       const granted = await browserStorage.persist();
-      await renderBrowserStorageStatus();
       if (granted) {
+        browserPersistenceNotice = "";
+        await renderBrowserStorageStatus();
         showToast("Dauerhafter Browserspeicher wurde aktiviert.");
       } else {
-        showToast(
-          "Der Browser hat dauerhaften Speicher nicht freigegeben.",
-          "error",
-        );
+        browserPersistenceNotice = persistentStorageDenialExplanation();
+        await renderBrowserStorageStatus();
+        showToast(browserPersistenceNotice, "warning");
       }
     } catch (error) {
       console.warn(
@@ -802,6 +809,13 @@
       );
       await renderBrowserStorageStatus();
     }
+  }
+
+  function persistentStorageDenialExplanation() {
+    if (!window.isSecureContext) {
+      return "Nicht dauerhaft geschützt: Bitte TeO über HTTPS oder localhost aufrufen.";
+    }
+    return "Nicht dauerhaft geschützt: Der Browser hat automatisch entschieden und keine Freigabe erteilt.";
   }
 
   function parseBackup(fileContent) {

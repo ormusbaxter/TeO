@@ -392,8 +392,13 @@ app.use("/vendor", express.static(path.join(projectRoot, "vendor"), {
   etag: true,
   maxAge: 0,
 }));
+app.use("/assets", express.static(path.join(projectRoot, "assets"), {
+  etag: true,
+  maxAge: "1d",
+}));
 for (const fileName of [
   "index.html",
+  "manifest.webmanifest",
   "styles.css",
   "project-meta.js",
   "state-schema.js",

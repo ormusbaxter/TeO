@@ -808,6 +808,7 @@
         backendConfig.apiUrl,
         window.TeOBackend.readToken(),
       );
+      markBackendConnected({ synchronized: true });
       const nextRevision = Number(result.revision) || 0;
       if (nextRevision <= remoteRevision) return;
 
@@ -846,9 +847,11 @@
       showToast("Änderungen von einem anderen Arbeitsplatz wurden geladen.");
     } catch (error) {
       if (error.status === 401) {
+        markBackendConnected();
         window.TeOBackend.writeToken("");
         showLoginDialog();
       } else {
+        markBackendConnectionError(error);
         console.warn("MariaDB-Synchronisierung vorübergehend nicht verfügbar.", error);
       }
     }
@@ -881,6 +884,7 @@
     refreshFormattedDateInputs();
     void renderBrowserStorageStatus();
     applyAccessControl();
+    renderSidebarSystemStatus();
   }
 
   async function changeTheme(theme) {
@@ -1006,6 +1010,7 @@
         databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
         remoteRevision = Number(result.revision) || 0;
         backendStartupError = "";
+        markBackendConnected({ synchronized: true });
         window.TeOBackend.writeToken(result.token);
         const remoteUser = state.users.find(
           (item) => item.id === result.user?.id,
@@ -1016,6 +1021,8 @@
         completeLogin(remoteUser);
       } catch (error) {
         console.error("Serveranmeldung fehlgeschlagen.", error);
+        if (error.status) markBackendConnected();
+        else markBackendConnectionError(error);
         elements.loginError.textContent =
           error.message || "Die Anmeldung am TeO-Server ist fehlgeschlagen.";
         document.querySelector("#loginPassword").value = "";
@@ -1750,4 +1757,119 @@
 
   function renderProjectMetadata() {
     elements.projectBuildLabel.textContent = `${PROJECT_NAME} - ${projectBuildNumber()}`;
+  }
+
+  function renderSidebarSystemStatus() {
+    if (!elements.sidebarSystemStatus) return;
+    const localMode = !isMariaDbMode();
+    const status = localMode ? "local" : backendConnectionStatus;
+    elements.sidebarSystemStatus.classList.toggle("is-local", status === "local");
+    elements.sidebarSystemStatus.classList.toggle(
+      "is-connected",
+      status === "connected",
+    );
+    elements.sidebarSystemStatus.classList.toggle("is-error", status === "error");
+
+    if (localMode) {
+      elements.sidebarConnectionLabel.textContent = "Lokal bereit";
+      elements.sidebarBackendLabel.textContent = "Browser · localForage";
+      elements.sidebarServerLabel.textContent = "Dieses Browserprofil";
+      elements.sidebarRevisionLabel.textContent = "lokal";
+      elements.sidebarSchemaLabel.textContent = "IndexedDB";
+      elements.sidebarSyncLabel.textContent = "Automatische lokale Speicherung";
+      elements.sidebarServerLabel.title = "";
+      elements.sidebarSyncLabel.title = "";
+      return;
+    }
+
+    const statusLabels = {
+      checking: "Verbindung wird geprüft",
+      connected: "MariaDB verbunden",
+      warning: "Backend prüfen",
+      error: "Server nicht erreichbar",
+    };
+    elements.sidebarConnectionLabel.textContent =
+      statusLabels[status] || "MariaDB konfiguriert";
+    elements.sidebarBackendLabel.textContent =
+      backendHealth?.storageModel === "relational"
+        ? "MariaDB · relational"
+        : "MariaDB";
+    const serverLabel = backendServerLabel();
+    elements.sidebarServerLabel.textContent = serverLabel;
+    elements.sidebarServerLabel.title = backendConfig.apiUrl || serverLabel;
+    elements.sidebarRevisionLabel.textContent =
+      remoteRevision || backendHealth?.revision
+        ? String(remoteRevision || backendHealth.revision)
+        : "–";
+    elements.sidebarSchemaLabel.textContent =
+      backendHealth?.databaseSchemaVersion == null
+        ? "–"
+        : String(backendHealth.databaseSchemaVersion);
+
+    let detail = "Noch kein Serverkontakt";
+    if (status === "checking") detail = "Serverstatus wird abgerufen …";
+    else if (status === "error") {
+      detail = backendConnectionError || "Verbindung fehlgeschlagen";
+    } else if (backendLastSyncAt) {
+      detail = `Letzter Abgleich ${formatSidebarStatusTime(backendLastSyncAt)}`;
+    } else if (backendLastContactAt) {
+      detail = `Server geprüft ${formatSidebarStatusTime(backendLastContactAt)}`;
+    }
+    elements.sidebarSyncLabel.textContent = detail;
+    elements.sidebarSyncLabel.title = detail;
+  }
+
+  function backendServerLabel() {
+    try {
+      return new URL(backendConfig.apiUrl).host;
+    } catch {
+      return backendConfig.apiUrl || "nicht konfiguriert";
+    }
+  }
+
+  function formatSidebarStatusTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "–";
+    return date.toLocaleTimeString("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }
+
+  function markBackendConnected({ health = null, synchronized = false } = {}) {
+    if (health) backendHealth = health;
+    backendConnectionStatus =
+      backendHealth &&
+      (backendHealth.storageModel !== "relational" ||
+        !Number.isSafeInteger(Number(backendHealth.databaseSchemaVersion)))
+        ? "warning"
+        : "connected";
+    backendConnectionError = "";
+    backendLastContactAt = new Date().toISOString();
+    if (synchronized) backendLastSyncAt = backendLastContactAt;
+    renderSidebarSystemStatus();
+  }
+
+  function markBackendConnectionError(error) {
+    backendConnectionStatus = "error";
+    backendConnectionError =
+      error?.message || "Der TeO-Server ist nicht erreichbar.";
+    renderSidebarSystemStatus();
+  }
+
+  async function refreshBackendHealth() {
+    if (!isMariaDbMode()) {
+      backendConnectionStatus = "local";
+      renderSidebarSystemStatus();
+      return;
+    }
+    backendConnectionStatus = "checking";
+    renderSidebarSystemStatus();
+    try {
+      const health = await window.TeOBackend.health(backendConfig.apiUrl);
+      markBackendConnected({ health });
+    } catch (error) {
+      markBackendConnectionError(error);
+    }
   }

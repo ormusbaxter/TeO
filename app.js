@@ -320,6 +320,11 @@
   let remoteRevision = 0;
   let pendingRemoteConflictState = null;
   let backendStartupError = "";
+  let backendHealth = null;
+  let backendConnectionStatus = "local";
+  let backendLastContactAt = "";
+  let backendLastSyncAt = "";
+  let backendConnectionError = "";
   let remoteSyncTimer = null;
   let remoteUpdateNoticeRevision = 0;
   let employeeStatusFilter = "all";
@@ -344,6 +349,7 @@
   let trainingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let databaseSaveReminderArmed = false;
+  let browserPersistenceNotice = "";
   let dateInputObserver = null;
   let vacationYear = new Date().getFullYear();
   let vacationMonth = new Date().getMonth() + 1;
@@ -383,6 +389,13 @@
     mobileAccountButton: document.querySelector("#mobileAccountButton"),
     currentUsername: document.querySelector("#currentUsername"),
     currentUserRole: document.querySelector("#currentUserRole"),
+    sidebarSystemStatus: document.querySelector("#sidebarSystemStatus"),
+    sidebarConnectionLabel: document.querySelector("#sidebarConnectionLabel"),
+    sidebarBackendLabel: document.querySelector("#sidebarBackendLabel"),
+    sidebarServerLabel: document.querySelector("#sidebarServerLabel"),
+    sidebarRevisionLabel: document.querySelector("#sidebarRevisionLabel"),
+    sidebarSchemaLabel: document.querySelector("#sidebarSchemaLabel"),
+    sidebarSyncLabel: document.querySelector("#sidebarSyncLabel"),
     dashboardStats: document.querySelector("#dashboardStats"),
     dashboardTrainingProgress: document.querySelector("#dashboardTrainingProgress"),
     dashboardGreeting: document.querySelector("#dashboardGreeting"),
@@ -725,6 +738,7 @@
     ]);
     backendConfig = window.TeOBackend.readConfig();
     backendMode = backendConfig.mode;
+    backendConnectionStatus = isMariaDbMode() ? "checking" : "local";
     state = await loadState();
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -752,6 +766,7 @@
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
     restoreAuthenticationSession();
+    void refreshBackendHealth();
   }
 
   function emptyState() {
@@ -846,13 +861,18 @@
     if (!token) return emptyState();
 
     try {
-      const result = await window.TeOBackend.load(backendConfig.apiUrl, token);
+      const [health, result] = await Promise.all([
+        window.TeOBackend.health(backendConfig.apiUrl),
+        window.TeOBackend.load(backendConfig.apiUrl, token),
+      ]);
+      markBackendConnected({ health, synchronized: true });
       remoteRevision = Number(result.revision) || 0;
       backendStartupError = "";
       return normalizeState(result.state);
     } catch (error) {
       console.warn("MariaDB-Datenbestand konnte nicht geladen werden.", error);
       backendStartupError = error.message || "Der TeO-Server ist nicht erreichbar.";
+      markBackendConnectionError(error);
       if (error.status === 401) {
         window.TeOBackend.writeToken("");
         sessionStorage.removeItem(SESSION_USER_KEY);
@@ -1722,9 +1742,12 @@
           remoteRevision,
         );
         remoteRevision = Number(result.revision) || remoteRevision + 1;
+        markBackendConnected({ synchronized: true });
         pendingRemoteConflictState = null;
       } catch (error) {
         console.error("MariaDB-Datenbestand konnte nicht gespeichert werden.", error);
+        if (error.status) markBackendConnected();
+        else markBackendConnectionError(error);
         if (error.code === "revision_conflict" && error.details?.state) {
           remoteRevision = Number(error.details.revision) || remoteRevision;
           pendingRemoteConflictState = normalizeState(error.details.state);
@@ -2657,6 +2680,7 @@
         backendConfig.apiUrl,
         window.TeOBackend.readToken(),
       );
+      markBackendConnected({ synchronized: true });
       const nextRevision = Number(result.revision) || 0;
       if (nextRevision <= remoteRevision) return;
 
@@ -2695,9 +2719,11 @@
       showToast("Änderungen von einem anderen Arbeitsplatz wurden geladen.");
     } catch (error) {
       if (error.status === 401) {
+        markBackendConnected();
         window.TeOBackend.writeToken("");
         showLoginDialog();
       } else {
+        markBackendConnectionError(error);
         console.warn("MariaDB-Synchronisierung vorübergehend nicht verfügbar.", error);
       }
     }
@@ -2730,6 +2756,7 @@
     refreshFormattedDateInputs();
     void renderBrowserStorageStatus();
     applyAccessControl();
+    renderSidebarSystemStatus();
   }
 
   async function changeTheme(theme) {
@@ -2855,6 +2882,7 @@
         databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
         remoteRevision = Number(result.revision) || 0;
         backendStartupError = "";
+        markBackendConnected({ synchronized: true });
         window.TeOBackend.writeToken(result.token);
         const remoteUser = state.users.find(
           (item) => item.id === result.user?.id,
@@ -2865,6 +2893,8 @@
         completeLogin(remoteUser);
       } catch (error) {
         console.error("Serveranmeldung fehlgeschlagen.", error);
+        if (error.status) markBackendConnected();
+        else markBackendConnectionError(error);
         elements.loginError.textContent =
           error.message || "Die Anmeldung am TeO-Server ist fehlgeschlagen.";
         document.querySelector("#loginPassword").value = "";
@@ -3599,6 +3629,121 @@
 
   function renderProjectMetadata() {
     elements.projectBuildLabel.textContent = `${PROJECT_NAME} - ${projectBuildNumber()}`;
+  }
+
+  function renderSidebarSystemStatus() {
+    if (!elements.sidebarSystemStatus) return;
+    const localMode = !isMariaDbMode();
+    const status = localMode ? "local" : backendConnectionStatus;
+    elements.sidebarSystemStatus.classList.toggle("is-local", status === "local");
+    elements.sidebarSystemStatus.classList.toggle(
+      "is-connected",
+      status === "connected",
+    );
+    elements.sidebarSystemStatus.classList.toggle("is-error", status === "error");
+
+    if (localMode) {
+      elements.sidebarConnectionLabel.textContent = "Lokal bereit";
+      elements.sidebarBackendLabel.textContent = "Browser · localForage";
+      elements.sidebarServerLabel.textContent = "Dieses Browserprofil";
+      elements.sidebarRevisionLabel.textContent = "lokal";
+      elements.sidebarSchemaLabel.textContent = "IndexedDB";
+      elements.sidebarSyncLabel.textContent = "Automatische lokale Speicherung";
+      elements.sidebarServerLabel.title = "";
+      elements.sidebarSyncLabel.title = "";
+      return;
+    }
+
+    const statusLabels = {
+      checking: "Verbindung wird geprüft",
+      connected: "MariaDB verbunden",
+      warning: "Backend prüfen",
+      error: "Server nicht erreichbar",
+    };
+    elements.sidebarConnectionLabel.textContent =
+      statusLabels[status] || "MariaDB konfiguriert";
+    elements.sidebarBackendLabel.textContent =
+      backendHealth?.storageModel === "relational"
+        ? "MariaDB · relational"
+        : "MariaDB";
+    const serverLabel = backendServerLabel();
+    elements.sidebarServerLabel.textContent = serverLabel;
+    elements.sidebarServerLabel.title = backendConfig.apiUrl || serverLabel;
+    elements.sidebarRevisionLabel.textContent =
+      remoteRevision || backendHealth?.revision
+        ? String(remoteRevision || backendHealth.revision)
+        : "–";
+    elements.sidebarSchemaLabel.textContent =
+      backendHealth?.databaseSchemaVersion == null
+        ? "–"
+        : String(backendHealth.databaseSchemaVersion);
+
+    let detail = "Noch kein Serverkontakt";
+    if (status === "checking") detail = "Serverstatus wird abgerufen …";
+    else if (status === "error") {
+      detail = backendConnectionError || "Verbindung fehlgeschlagen";
+    } else if (backendLastSyncAt) {
+      detail = `Letzter Abgleich ${formatSidebarStatusTime(backendLastSyncAt)}`;
+    } else if (backendLastContactAt) {
+      detail = `Server geprüft ${formatSidebarStatusTime(backendLastContactAt)}`;
+    }
+    elements.sidebarSyncLabel.textContent = detail;
+    elements.sidebarSyncLabel.title = detail;
+  }
+
+  function backendServerLabel() {
+    try {
+      return new URL(backendConfig.apiUrl).host;
+    } catch {
+      return backendConfig.apiUrl || "nicht konfiguriert";
+    }
+  }
+
+  function formatSidebarStatusTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "–";
+    return date.toLocaleTimeString("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }
+
+  function markBackendConnected({ health = null, synchronized = false } = {}) {
+    if (health) backendHealth = health;
+    backendConnectionStatus =
+      backendHealth &&
+      (backendHealth.storageModel !== "relational" ||
+        !Number.isSafeInteger(Number(backendHealth.databaseSchemaVersion)))
+        ? "warning"
+        : "connected";
+    backendConnectionError = "";
+    backendLastContactAt = new Date().toISOString();
+    if (synchronized) backendLastSyncAt = backendLastContactAt;
+    renderSidebarSystemStatus();
+  }
+
+  function markBackendConnectionError(error) {
+    backendConnectionStatus = "error";
+    backendConnectionError =
+      error?.message || "Der TeO-Server ist nicht erreichbar.";
+    renderSidebarSystemStatus();
+  }
+
+  async function refreshBackendHealth() {
+    if (!isMariaDbMode()) {
+      backendConnectionStatus = "local";
+      renderSidebarSystemStatus();
+      return;
+    }
+    backendConnectionStatus = "checking";
+    renderSidebarSystemStatus();
+    try {
+      const health = await window.TeOBackend.health(backendConfig.apiUrl);
+      markBackendConnected({ health });
+    } catch (error) {
+      markBackendConnectionError(error);
+    }
   }
 
   function renderDashboard() {
@@ -10148,12 +10293,18 @@
     setBackendButtonsBusy(true);
     try {
       const health = await window.TeOBackend.health(apiUrl);
+      if (isMariaDbMode() && apiUrl === backendConfig.apiUrl) {
+        markBackendConnected({ health });
+      }
       elements.settingsBackendStatus.classList.remove("is-error");
       elements.settingsBackendStatus.innerHTML = health.initialized
         ? `<i></i> Server erreichbar · Datenrevision ${health.revision}`
         : "<i></i> Server erreichbar · noch nicht eingerichtet";
       showToast("Verbindung zum TeO-Server wurde erfolgreich geprüft.");
     } catch (error) {
+      if (isMariaDbMode() && apiUrl === backendConfig.apiUrl) {
+        markBackendConnectionError(error);
+      }
       elements.settingsBackendStatus.classList.add("is-error");
       elements.settingsBackendStatus.innerHTML =
         "<i></i> Server nicht erreichbar";
@@ -10219,6 +10370,7 @@
       });
       backendMode = "mariadb";
       remoteRevision = Number(result.revision) || 1;
+      markBackendConnected({ health, synchronized: true });
       window.TeOBackend.writeToken(result.token);
       state = normalizeState(result.state);
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
@@ -10380,7 +10532,7 @@
         : "bei unbekanntem Kontingent";
       const persistenceLabel = persistent
         ? "dauerhaft geschützt"
-        : "Best-Effort-Speicher";
+        : browserPersistenceNotice || "Best-Effort-Speicher";
 
       elements.browserStorageStatus.textContent =
         `Browserspeicher: ${usage} ${quota} verwendet · ${persistenceLabel}.`;
@@ -10410,14 +10562,14 @@
     elements.requestPersistentStorageButton.disabled = true;
     try {
       const granted = await browserStorage.persist();
-      await renderBrowserStorageStatus();
       if (granted) {
+        browserPersistenceNotice = "";
+        await renderBrowserStorageStatus();
         showToast("Dauerhafter Browserspeicher wurde aktiviert.");
       } else {
-        showToast(
-          "Der Browser hat dauerhaften Speicher nicht freigegeben.",
-          "error",
-        );
+        browserPersistenceNotice = persistentStorageDenialExplanation();
+        await renderBrowserStorageStatus();
+        showToast(browserPersistenceNotice, "warning");
       }
     } catch (error) {
       console.warn(
@@ -10431,6 +10583,13 @@
       );
       await renderBrowserStorageStatus();
     }
+  }
+
+  function persistentStorageDenialExplanation() {
+    if (!window.isSecureContext) {
+      return "Nicht dauerhaft geschützt: Bitte TeO über HTTPS oder localhost aufrufen.";
+    }
+    return "Nicht dauerhaft geschützt: Der Browser hat automatisch entschieden und keine Freigabe erteilt.";
   }
 
   function parseBackup(fileContent) {
@@ -11360,7 +11519,7 @@
     toast.className = "toast";
     toast.innerHTML = `
       <span class="toast-icon" aria-hidden="true">
-        <svg><use href="#icon-${type === "error" ? "alert" : "check"}"></use></svg>
+        <svg><use href="#icon-${type === "success" ? "check" : "alert"}"></use></svg>
       </span>
       <span></span>
     `;
@@ -11368,6 +11527,9 @@
     if (type === "error") {
       toast.querySelector(".toast-icon").style.color = "#ffabb2";
       toast.querySelector(".toast-icon").style.background = "rgb(230 88 101 / 15%)";
+    } else if (type === "warning") {
+      toast.querySelector(".toast-icon").style.color = "#f4c86d";
+      toast.querySelector(".toast-icon").style.background = "rgb(230 170 66 / 15%)";
     }
 
     elements.toastRegion.append(toast);

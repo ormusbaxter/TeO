@@ -319,6 +319,11 @@
   let remoteRevision = 0;
   let pendingRemoteConflictState = null;
   let backendStartupError = "";
+  let backendHealth = null;
+  let backendConnectionStatus = "local";
+  let backendLastContactAt = "";
+  let backendLastSyncAt = "";
+  let backendConnectionError = "";
   let remoteSyncTimer = null;
   let remoteUpdateNoticeRevision = 0;
   let employeeStatusFilter = "all";
@@ -343,6 +348,7 @@
   let trainingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let databaseSaveReminderArmed = false;
+  let browserPersistenceNotice = "";
   let dateInputObserver = null;
   let vacationYear = new Date().getFullYear();
   let vacationMonth = new Date().getMonth() + 1;
@@ -382,6 +388,13 @@
     mobileAccountButton: document.querySelector("#mobileAccountButton"),
     currentUsername: document.querySelector("#currentUsername"),
     currentUserRole: document.querySelector("#currentUserRole"),
+    sidebarSystemStatus: document.querySelector("#sidebarSystemStatus"),
+    sidebarConnectionLabel: document.querySelector("#sidebarConnectionLabel"),
+    sidebarBackendLabel: document.querySelector("#sidebarBackendLabel"),
+    sidebarServerLabel: document.querySelector("#sidebarServerLabel"),
+    sidebarRevisionLabel: document.querySelector("#sidebarRevisionLabel"),
+    sidebarSchemaLabel: document.querySelector("#sidebarSchemaLabel"),
+    sidebarSyncLabel: document.querySelector("#sidebarSyncLabel"),
     dashboardStats: document.querySelector("#dashboardStats"),
     dashboardTrainingProgress: document.querySelector("#dashboardTrainingProgress"),
     dashboardGreeting: document.querySelector("#dashboardGreeting"),

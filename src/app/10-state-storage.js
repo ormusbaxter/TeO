@@ -17,6 +17,7 @@
     ]);
     backendConfig = window.TeOBackend.readConfig();
     backendMode = backendConfig.mode;
+    backendConnectionStatus = isMariaDbMode() ? "checking" : "local";
     state = await loadState();
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -44,6 +45,7 @@
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
     restoreAuthenticationSession();
+    void refreshBackendHealth();
   }
 
   function emptyState() {
@@ -138,13 +140,18 @@
     if (!token) return emptyState();
 
     try {
-      const result = await window.TeOBackend.load(backendConfig.apiUrl, token);
+      const [health, result] = await Promise.all([
+        window.TeOBackend.health(backendConfig.apiUrl),
+        window.TeOBackend.load(backendConfig.apiUrl, token),
+      ]);
+      markBackendConnected({ health, synchronized: true });
       remoteRevision = Number(result.revision) || 0;
       backendStartupError = "";
       return normalizeState(result.state);
     } catch (error) {
       console.warn("MariaDB-Datenbestand konnte nicht geladen werden.", error);
       backendStartupError = error.message || "Der TeO-Server ist nicht erreichbar.";
+      markBackendConnectionError(error);
       if (error.status === 401) {
         window.TeOBackend.writeToken("");
         sessionStorage.removeItem(SESSION_USER_KEY);
@@ -1014,9 +1021,12 @@
           remoteRevision,
         );
         remoteRevision = Number(result.revision) || remoteRevision + 1;
+        markBackendConnected({ synchronized: true });
         pendingRemoteConflictState = null;
       } catch (error) {
         console.error("MariaDB-Datenbestand konnte nicht gespeichert werden.", error);
+        if (error.status) markBackendConnected();
+        else markBackendConnectionError(error);
         if (error.code === "revision_conflict" && error.details?.state) {
           remoteRevision = Number(error.details.revision) || remoteRevision;
           pendingRemoteConflictState = normalizeState(error.details.state);

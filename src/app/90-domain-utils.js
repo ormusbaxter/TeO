@@ -805,7 +805,7 @@
     toast.className = "toast";
     toast.innerHTML = `
       <span class="toast-icon" aria-hidden="true">
-        <svg><use href="#icon-${type === "error" ? "alert" : "check"}"></use></svg>
+        <svg><use href="#icon-${type === "success" ? "check" : "alert"}"></use></svg>
       </span>
       <span></span>
     `;
@@ -813,6 +813,9 @@
     if (type === "error") {
       toast.querySelector(".toast-icon").style.color = "#ffabb2";
       toast.querySelector(".toast-icon").style.background = "rgb(230 88 101 / 15%)";
+    } else if (type === "warning") {
+      toast.querySelector(".toast-icon").style.color = "#f4c86d";
+      toast.querySelector(".toast-icon").style.background = "rgb(230 170 66 / 15%)";
     }
 
     elements.toastRegion.append(toast);

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">TeO maskierbares App-Icon</title>
+  <defs>
+    <linearGradient id="background" x1="24" y1="0" x2="488" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#163f68"/>
+      <stop offset="0.52" stop-color="#0b65c7"/>
+      <stop offset="1" stop-color="#06335f"/>
+    </linearGradient>
+    <radialGradient id="highlight" cx="0" cy="0" r="1" gradientTransform="translate(146 68) rotate(48) scale(390)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67b8ff" stop-opacity=".42"/>
+      <stop offset=".72" stop-color="#67b8ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#00172d" flood-opacity=".35"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="url(#background)"/>
+  <rect width="512" height="512" fill="url(#highlight)"/>
+  <circle cx="256" cy="256" r="202" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="3"/>
+  <g filter="url(#shadow)">
+    <text x="256" y="242" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="139" font-weight="750" letter-spacing="-8" text-anchor="middle">TeO</text>
+    <path d="M105 321h61l23-57 47 113 33-82 22 26h116" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+  </g>
+  <circle cx="105" cy="321" r="8" fill="#fff"/>
+  <circle cx="407" cy="321" r="8" fill="#fff"/>
+</svg>
