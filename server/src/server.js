@@ -649,7 +649,11 @@ function containsRequiredPasswordChange(before, after, userId) {
   );
 }
 
-const ADMIN_ONLY_SETTINGS = ["backupReminderDays", "closeDialogOnOutsideClick"];
+const ADMIN_ONLY_SETTINGS = [
+  "backupReminderDays",
+  "closeDialogOnOutsideClick",
+  "schoolVacationPeriods",
+];
 
 function isPermittedSettingsMutation(before, after) {
   return ADMIN_ONLY_SETTINGS.every((key) =>

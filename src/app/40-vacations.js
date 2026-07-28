@@ -15,13 +15,9 @@
       month: "long",
       year: "numeric",
     }).format(new Date(vacationYear, vacationMonth - 1, 1, 12));
-    const schoolVacationCoverageNote = NRW_SCHOOL_VACATION_FULL_YEARS.has(
-      vacationYear,
-    )
-      ? "Amtliche NRW-Schulferien sind berücksichtigt; bewegliche Ferientage sind nicht enthalten."
-      : schoolVacations.size
-        ? "Für dieses Jahr sind nur die bereits amtlich veröffentlichten NRW-Schulferien markiert."
-        : "Für dieses Jahr sind noch keine amtlichen NRW-Schulferientermine hinterlegt.";
+    const schoolVacationCoverageNote = schoolVacations.size
+      ? "Hinterlegte Schulferien sind berücksichtigt; bewegliche Ferientage sind nicht enthalten."
+      : "Für dieses Jahr sind keine Schulferien hinterlegt. Sie lassen sich unter Einstellungen → Schulferien ergänzen.";
     const monthEntries = state.vacationDays.filter(
       (vacationDay) =>
         getEmployee(vacationDay.employeeId)?.active &&
@@ -82,9 +78,7 @@
           festen Wochenende einen Urlaub auf dem eigenen Wochenende aus.
         </span>
         <span class="${
-          NRW_SCHOOL_VACATION_FULL_YEARS.has(vacationYear)
-            ? ""
-            : "is-warning"
+          schoolVacations.size ? "" : "is-warning"
         }">${schoolVacationCoverageNote}</span>
       </div>
       <div class="vacation-table-scroll">
@@ -133,6 +127,12 @@
       vacationYear,
       ...state.vacationEntitlements.map((entry) => entry.year),
       ...state.vacationDays.map((entry) => Number(entry.date.slice(0, 4))),
+      // Jahre, fuer die Schulferien hinterlegt sind, muessen aufrufbar sein -
+      // sonst liessen sich weit vorausgeplante Ferien nie ansehen.
+      ...schoolVacationPeriods().flatMap((period) => [
+        Number(period.start.slice(0, 4)),
+        Number(period.end.slice(0, 4)),
+      ]),
     ]);
     elements.vacationYear.innerHTML = [...availableYears]
       .filter((year) => Number.isInteger(year) && year >= 2000 && year <= 2100)
@@ -657,6 +657,152 @@
     container.scrollTop = position.top;
   }
 
+  function schoolVacationPeriods() {
+    return state.settings.schoolVacationPeriods || [];
+  }
+
+  function renderSchoolVacationSettings() {
+    const periods = schoolVacationPeriods();
+    elements.schoolVacationCount.textContent = periods.length
+      ? `${periods.length} ${
+          periods.length === 1 ? "Zeitraum" : "Zeiträume"
+        } hinterlegt · bis ${formatDate(periods[periods.length - 1].end)}`
+      : "Keine Zeiträume hinterlegt";
+
+    elements.schoolVacationList.innerHTML = periods.length
+      ? periods
+          .map(
+            (period, index) => `
+              <article class="school-vacation-row">
+                <div>
+                  <strong>${escapeHtml(period.label)}</strong>
+                  <small>${formatDate(period.start)} – ${formatDate(period.end)}</small>
+                </div>
+                <button
+                  class="icon-button danger"
+                  type="button"
+                  data-delete-school-vacation="${index}"
+                  aria-label="${escapeHtml(
+                    `${period.label} vom ${formatDate(period.start)} bis ${formatDate(period.end)} entfernen`,
+                  )}"
+                  title="Zeitraum entfernen"
+                >
+                  <svg><use href="#icon-trash"></use></svg>
+                </button>
+              </article>
+            `,
+          )
+          .join("")
+      : renderEmptyState({
+          title: "Keine Schulferien hinterlegt",
+          text: "Ergänzen Sie Zeiträume oder setzen Sie die amtliche NRW-Liste ein.",
+          compact: true,
+        });
+  }
+
+  async function addSchoolVacationPeriod(event) {
+    event.preventDefault();
+    if (!requireAdmin()) return;
+
+    const start = elements.newSchoolVacationStart.value;
+    const end = elements.newSchoolVacationEnd.value;
+    const label = elements.newSchoolVacationLabel.value.trim();
+
+    if (!parseLocalDate(start) || !parseLocalDate(end)) {
+      showToast("Bitte Beginn und Ende als vollständiges Datum angeben.", "error");
+      return;
+    }
+    if (end < start) {
+      showToast("Das Ende darf nicht vor dem Beginn liegen.", "error");
+      elements.newSchoolVacationEnd.focus();
+      return;
+    }
+    if (!label) {
+      showToast("Bitte eine Bezeichnung angeben, etwa „Sommerferien“.", "error");
+      elements.newSchoolVacationLabel.focus();
+      return;
+    }
+    if (schoolVacationPeriods().length >= MAX_SCHOOL_VACATION_PERIODS) {
+      showToast(
+        `Es sind höchstens ${MAX_SCHOOL_VACATION_PERIODS} Zeiträume möglich.`,
+        "error",
+      );
+      return;
+    }
+    if (
+      schoolVacationPeriods().some(
+        (period) =>
+          period.start === start && period.end === end && period.label === label,
+      )
+    ) {
+      showToast("Dieser Zeitraum ist bereits hinterlegt.", "error");
+      return;
+    }
+
+    const committed = await commitStateMutation(() => {
+      state.settings.schoolVacationPeriods = sortSchoolVacationPeriods([
+        ...schoolVacationPeriods(),
+        { start, end, label: label.slice(0, 60) },
+      ]);
+    });
+    if (!committed) return;
+
+    elements.schoolVacationForm.reset();
+    renderSchoolVacationSettings();
+    showToast(`„${label}“ wurde hinterlegt.`);
+  }
+
+  async function deleteSchoolVacationPeriod(index) {
+    if (!requireAdmin()) return;
+    const period = schoolVacationPeriods()[index];
+    if (!period) return;
+
+    const committed = await commitStateMutation(() => {
+      state.settings.schoolVacationPeriods = schoolVacationPeriods().filter(
+        (_, position) => position !== index,
+      );
+    });
+    if (!committed) return;
+
+    renderSchoolVacationSettings();
+    showToast(`„${period.label}“ wurde entfernt.`);
+  }
+
+  async function restoreOfficialSchoolVacations() {
+    if (!requireAdmin()) return;
+    const vorhandene = new Set(
+      schoolVacationPeriods().map(
+        (period) => `${period.start}|${period.end}|${period.label}`,
+      ),
+    );
+    const fehlende = NRW_SCHOOL_VACATION_PERIODS.filter(
+      (period) => !vorhandene.has(`${period.start}|${period.end}|${period.label}`),
+    );
+    if (fehlende.length === 0) {
+      showToast("Alle amtlichen NRW-Termine sind bereits hinterlegt.");
+      return;
+    }
+
+    const committed = await commitStateMutation(() => {
+      state.settings.schoolVacationPeriods = sortSchoolVacationPeriods([
+        ...schoolVacationPeriods(),
+        ...fehlende,
+      ]).slice(0, MAX_SCHOOL_VACATION_PERIODS);
+    });
+    if (!committed) return;
+
+    renderSchoolVacationSettings();
+    showToast(
+      `${fehlende.length} amtliche NRW-Zeiträume wurden ergänzt. Eigene Einträge blieben erhalten.`,
+    );
+  }
+
+  function sortSchoolVacationPeriods(periods) {
+    return [...periods].sort(
+      (a, b) => a.start.localeCompare(b.start) || a.end.localeCompare(b.end),
+    );
+  }
+
   async function saveVacationSettings() {
     const baseDays =
       Math.round(clampNumber(elements.vacationBaseDays.value, 1, 60, 30) * 2) /
@@ -767,7 +913,7 @@
 
   function getNrwSchoolVacations(year) {
     const vacationDays = new Map();
-    NRW_SCHOOL_VACATION_PERIODS.forEach((period) => {
+    schoolVacationPeriods().forEach((period) => {
       let date = parseLocalDate(period.start);
       const end = parseLocalDate(period.end);
       while (date && end && date <= end) {

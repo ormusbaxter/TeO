@@ -124,6 +124,7 @@ Administratoren dürfen zusätzlich drei Einstellungen ändern:
 - **Benutzer verwalten** – siehe unten
 - **Sicherungserinnerung** – nach wie vielen Tagen TeO zur Sicherung mahnt
 - **Dialoge schließen** – ob ein Klick neben einen Dialog diesen schließt
+- **Schulferien** – die in der Urlaubsplanung markierten Ferienzeiträume
 
 Zusätzlich ist das **Änderungsprotokoll** Administratoren vorbehalten, weil es
 die Tätigkeit der übrigen Konten nachvollziehbar macht.
@@ -148,6 +149,31 @@ In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten
 Eingaben, fragt TeO vorher nach. Die drei Anmeldedialoge – Ersteinrichtung,
 Anmeldung und Passwortänderung – bleiben von der Einstellung unberührt und
 lassen sich weder per Klick daneben noch per Escape schließen.
+
+### Schulferien pflegen
+
+Unter **Einstellungen → Schulferien** werden die Zeiträume gepflegt, die die
+Urlaubsplanung farblich markiert. Jeder Eintrag besteht aus Beginn, Ende und
+einer Bezeichnung wie „Sommerferien“.
+
+Bei der ersten Verwendung ist die amtliche Ferienordnung NRW für die Schuljahre
+2024/25 bis 2029/30 hinterlegt – 26 Zeiträume bis April 2030. Weitere Jahre
+lassen sich ohne Obergrenze ergänzen; ein Programmwechsel ist dafür nicht mehr
+nötig.
+
+- **Hinzufügen** – Beginn darf nicht nach dem Ende liegen, die Bezeichnung ist
+  Pflicht. Bereits vorhandene Zeiträume werden nicht doppelt aufgenommen.
+- **Entfernen** – über das Papierkorbsymbol der jeweiligen Zeile.
+- **Amtliche NRW-Termine ergänzen** – fügt fehlende Zeiträume der mitgelieferten
+  Liste hinzu, ohne eigene Einträge zu verändern.
+
+Jahre, für die Ferien hinterlegt sind, erscheinen automatisch in der
+Jahresauswahl der Urlaubsplanung. Bewegliche Ferientage sind nicht enthalten,
+da jede Schule sie selbst festlegt.
+
+Die Zeiträume sind Teil des Datenbestands und damit in jeder Sicherung
+enthalten. Gesetzliche Feiertage werden dagegen weiterhin für jedes Jahr
+berechnet und müssen nicht gepflegt werden.
 
 ### Benutzer verwalten
 
@@ -404,9 +430,13 @@ Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix:
 
 ### Feiertage und Schulferien
 
-Gesetzliche Feiertage in Nordrhein-Westfalen werden automatisch berechnet.
-Die amtlich festgelegten NRW-Schulferien werden angezeigt. Örtlich
-unterschiedliche bewegliche Ferientage sind nicht enthalten.
+Gesetzliche Feiertage in Nordrhein-Westfalen werden für jedes Jahr automatisch
+berechnet und müssen nicht gepflegt werden.
+
+Die Schulferien stammen dagegen aus **Einstellungen → Schulferien** und lassen
+sich dort für beliebige Jahre ergänzen; vorbelegt ist die amtliche
+Ferienordnung NRW bis April 2030. Örtlich unterschiedliche bewegliche
+Ferientage sind nicht enthalten.
 
 ## Terminkalender und Fristenmonitor
 
@@ -838,6 +868,26 @@ npm run verify
 
 `npm run verify` erzeugt die verteilbaren Dateien neu, prüft die Struktur und
 führt alle automatisierten Tests aus.
+
+### Buildnummer
+
+Die Buildnummer folgt dem Muster `major.minor.patch` mit je drei Stellen und
+wird unten in der Seitenleiste angezeigt. Sie steht an genau einer Stelle:
+[`src/meta/project-meta.mjs`](src/meta/project-meta.mjs). Die Dateien
+`project-meta.js` und `app.js` entstehen daraus beim Build.
+
+Jede Auslieferung erhöht die Nummer:
+
+| Anlass | Befehl | Wirkung |
+| --- | --- | --- |
+| Neue Funktion | `npm run version:feature` | `minor` + 1, `patch` auf 0 |
+| Fehlerbehebung | `npm run version:fix` | `patch` + 1 |
+| Umbruch | `npm run version:major` | `major` + 1, Rest auf 0 |
+
+Enthält eine Auslieferung sowohl neue Funktionen als auch Fehlerbehebungen,
+zählt sie als Funktion. Der Befehl passt zugleich die Version in `package.json`
+an; anschließend ist `npm run build` nötig. `npm run check` bricht ab, wenn
+beide Versionen auseinanderlaufen oder das Format nicht stimmt.
 
 Die mitgelieferte localForage-Version `1.10.0` befindet sich zusammen mit ihrer
 Lizenz im Ordner `vendor`.

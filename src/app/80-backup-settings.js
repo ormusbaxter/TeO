@@ -345,6 +345,7 @@
       .closeDialogOnOutsideClick
       ? "on"
       : "off";
+    renderSchoolVacationSettings();
     elements.settingsStorageBackend.value = backendMode;
     elements.settingsMariaDbApiUrl.value =
       backendConfig.apiUrl ||

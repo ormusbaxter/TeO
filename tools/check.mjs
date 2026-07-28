@@ -25,6 +25,7 @@ const [
     read("project-meta.js"),
     read("state-schema.js"),
   ]);
+const packageJson = JSON.parse(await read("package.json"));
 
 new vm.Script(appSource, { filename: "app.js" });
 new vm.Script(backendSource, { filename: "backend-client.js" });
@@ -78,6 +79,7 @@ for (const [elementId, label] of [
   ["settingsStorageBackend", "Speicherort"],
   ["settingsBackupReminderDays", "Sicherungserinnerung"],
   ["settingsCloseDialogOnOutsideClick", "Dialoge schließen"],
+  ["schoolVacationForm", "Schulferien"],
 ]) {
   assert.match(
     settingsCardFor(elementId),
@@ -130,6 +132,30 @@ assert.deepEqual(
   JSON.parse(JSON.stringify(metaContext.window.TeOProjectMeta)),
   JSON.parse(JSON.stringify(PROJECT_META)),
   "Die generierten Projektmetadaten sind nicht aktuell",
+);
+// Die Buildnummer wird an zwei Stellen gebildet: in src/meta fuer Werkzeuge
+// und in der Anwendung selbst. Beide muessen dasselbe Format liefern.
+for (const teil of ["major", "minor", "patch"]) {
+  assert.ok(
+    Number.isInteger(PROJECT_META.version[teil]) &&
+      PROJECT_META.version[teil] >= 0,
+    `Der Versionsteil ${teil} muss eine nicht negative ganze Zahl sein`,
+  );
+}
+assert.match(
+  projectBuildNumber(PROJECT_META),
+  /^\d{3}\.\d{3}\.\d{3}$/,
+  "Die Buildnummer muss dem Format major.minor.patch mit je drei Stellen folgen",
+);
+assert.match(
+  appSource,
+  /PROJECT_VERSION\.major,\s*PROJECT_VERSION\.minor,\s*PROJECT_VERSION\.patch/,
+  "Die Anwendung muss alle drei Versionsteile anzeigen",
+);
+assert.equal(
+  packageJson.version,
+  `${PROJECT_META.version.major}.${PROJECT_META.version.minor}.${PROJECT_META.version.patch}`,
+  "package.json und src/meta/project-meta.mjs nennen unterschiedliche Versionen",
 );
 
 console.log(`TeO ${projectBuildNumber(PROJECT_META)}: Strukturprüfung erfolgreich.`);

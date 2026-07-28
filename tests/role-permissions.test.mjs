@@ -72,6 +72,9 @@ function createServerState(overrides = {}) {
       theme: "standard",
       backupReminderDays: 14,
       closeDialogOnOutsideClick: false,
+      schoolVacationPeriods: [
+        { start: "2026-07-20", end: "2026-09-01", label: "Sommerferien" },
+      ],
       deadlineKinds: ["training"],
       meetingAttendanceThreshold: 70,
     },
@@ -144,6 +147,11 @@ test("Normale Konten dürfen Sicherungserinnerung und fremde Konten nicht änder
     },
     "Schließverhalten der Dialoge": (next) => {
       next.settings.closeDialogOnOutsideClick = true;
+    },
+    Schulferien: (next) => {
+      next.settings.schoolVacationPeriods = [
+        { start: "2031-07-01", end: "2031-08-12", label: "Sommerferien" },
+      ];
     },
     "fremdes Konto": (next) => {
       next.users[1].passwordHash = "hash-fremd";
@@ -274,6 +282,10 @@ test("Der Client sperrt genau dieselben drei Bereiche wie der Server", async () 
       // Sicherungserinnerung und Schliessverhalten der Dialoge
       "saveGeneralSettings",
       "saveCloseDialogOnOutsideClick",
+      // Schulferien
+      "addSchoolVacationPeriod",
+      "deleteSchoolVacationPeriod",
+      "restoreOfficialSchoolVacations",
       // Änderungsprotokoll als Kontrollinstrument
       "exportAuditLogCsv",
       "openAuditLogDialog",

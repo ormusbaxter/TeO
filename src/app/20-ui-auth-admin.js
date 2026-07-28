@@ -226,6 +226,22 @@
         void saveCloseDialogOnOutsideClick(event.target.value === "on");
       },
     );
+    elements.schoolVacationForm.addEventListener(
+      "submit",
+      addSchoolVacationPeriod,
+    );
+    elements.schoolVacationList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-delete-school-vacation]");
+      if (button) {
+        void deleteSchoolVacationPeriod(
+          Number(button.dataset.deleteSchoolVacation),
+        );
+      }
+    });
+    elements.restoreOfficialSchoolVacationsButton.addEventListener(
+      "click",
+      restoreOfficialSchoolVacations,
+    );
     elements.saveGeneralSettingsButton.addEventListener(
       "click",
       saveGeneralSettings,
@@ -1896,8 +1912,8 @@
   }
 
   function projectBuildNumber() {
-    return [PROJECT_VERSION.major, PROJECT_VERSION.minor]
-      .map((part) => String(part).padStart(3, "0"))
+    return [PROJECT_VERSION.major, PROJECT_VERSION.minor, PROJECT_VERSION.patch]
+      .map((part) => String(part || 0).padStart(3, "0"))
       .join(".");
   }
 

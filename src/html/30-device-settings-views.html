@@ -406,6 +406,64 @@
                 </label>
               </div>
             </section>
+
+            <section
+              class="panel settings-card settings-card-wide"
+              data-admin-only
+            >
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-storage">
+                  <svg><use href="#icon-calendar"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Urlaubsplanung</p>
+                  <h2>Schulferien</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                In der Urlaubsplanung markierte Ferienzeiträume. Die
+                Voreinstellung folgt der amtlichen Ferienordnung NRW bis
+                April 2030; weitere Jahre lassen sich beliebig ergänzen.
+                Bewegliche Ferientage sind nicht enthalten.
+              </p>
+              <p class="settings-status" id="schoolVacationCount"></p>
+              <form class="school-vacation-form" id="schoolVacationForm">
+                <label class="settings-field">
+                  <span>Beginn</span>
+                  <input id="newSchoolVacationStart" type="date" required />
+                </label>
+                <label class="settings-field">
+                  <span>Ende</span>
+                  <input id="newSchoolVacationEnd" type="date" required />
+                </label>
+                <label class="settings-field">
+                  <span>Bezeichnung</span>
+                  <input
+                    id="newSchoolVacationLabel"
+                    type="text"
+                    maxlength="60"
+                    placeholder="z. B. Sommerferien"
+                    autocomplete="off"
+                    required
+                  />
+                </label>
+                <button class="button button-primary" type="submit">
+                  <svg><use href="#icon-plus"></use></svg>
+                  Hinzufügen
+                </button>
+              </form>
+              <div class="school-vacation-list" id="schoolVacationList"></div>
+              <div class="settings-actions">
+                <button
+                  class="button button-secondary"
+                  id="restoreOfficialSchoolVacationsButton"
+                  type="button"
+                >
+                  <svg><use href="#icon-check"></use></svg>
+                  Amtliche NRW-Termine ergänzen
+                </button>
+              </div>
+            </section>
           </div>
 
           <section

@@ -66,6 +66,9 @@
         lastBackupAt: "",
         backupReminderDays: DEFAULT_BACKUP_REMINDER_DAYS,
         closeDialogOnOutsideClick: false,
+        schoolVacationPeriods: normalizeSchoolVacationPeriods(
+          NRW_SCHOOL_VACATION_PERIODS,
+        ),
         meetingAttendanceThreshold: 70,
         vacationBaseDays: DEFAULT_VACATION_BASE_DAYS,
         vacationWeekendAReferenceSaturday:
@@ -387,6 +390,14 @@
         closeDialogOnOutsideClick: Boolean(
           parsed.settings?.closeDialogOnOutsideClick,
         ),
+        // Fehlt der Schluessel ganz, stammt der Datenbestand aus einer
+        // aelteren Fassung und wird mit der amtlichen NRW-Liste vorbelegt.
+        // Eine leere Liste bleibt dagegen leer - sie kann bewusst gesetzt sein.
+        schoolVacationPeriods: normalizeSchoolVacationPeriods(
+          parsed.settings?.schoolVacationPeriods === undefined
+            ? NRW_SCHOOL_VACATION_PERIODS
+            : parsed.settings.schoolVacationPeriods,
+        ),
         meetingAttendanceThreshold: clampNumber(
           parsed.settings?.meetingAttendanceThreshold,
           1,
@@ -476,6 +487,30 @@
 
   function initialUsers() {
     return [];
+  }
+
+  function normalizeSchoolVacationPeriods(periods) {
+    if (!Array.isArray(periods)) return [];
+    const seen = new Set();
+    return periods
+      .map((period) => {
+        const start = String(period?.start || "");
+        const end = String(period?.end || "");
+        const label = String(period?.label || "").trim().slice(0, 60);
+        if (!parseLocalDate(start) || !parseLocalDate(end)) return null;
+        if (end < start) return null;
+        if (!label) return null;
+        return { start, end, label };
+      })
+      .filter((period) => {
+        if (!period) return false;
+        const key = `${period.start}|${period.end}|${period.label}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => a.start.localeCompare(b.start) || a.end.localeCompare(b.end))
+      .slice(0, MAX_SCHOOL_VACATION_PERIODS);
   }
 
   function normalizeUsers(users) {

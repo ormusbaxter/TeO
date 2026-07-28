@@ -1228,6 +1228,64 @@
                 </label>
               </div>
             </section>
+
+            <section
+              class="panel settings-card settings-card-wide"
+              data-admin-only
+            >
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-storage">
+                  <svg><use href="#icon-calendar"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Urlaubsplanung</p>
+                  <h2>Schulferien</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                In der Urlaubsplanung markierte Ferienzeiträume. Die
+                Voreinstellung folgt der amtlichen Ferienordnung NRW bis
+                April 2030; weitere Jahre lassen sich beliebig ergänzen.
+                Bewegliche Ferientage sind nicht enthalten.
+              </p>
+              <p class="settings-status" id="schoolVacationCount"></p>
+              <form class="school-vacation-form" id="schoolVacationForm">
+                <label class="settings-field">
+                  <span>Beginn</span>
+                  <input id="newSchoolVacationStart" type="date" required />
+                </label>
+                <label class="settings-field">
+                  <span>Ende</span>
+                  <input id="newSchoolVacationEnd" type="date" required />
+                </label>
+                <label class="settings-field">
+                  <span>Bezeichnung</span>
+                  <input
+                    id="newSchoolVacationLabel"
+                    type="text"
+                    maxlength="60"
+                    placeholder="z. B. Sommerferien"
+                    autocomplete="off"
+                    required
+                  />
+                </label>
+                <button class="button button-primary" type="submit">
+                  <svg><use href="#icon-plus"></use></svg>
+                  Hinzufügen
+                </button>
+              </form>
+              <div class="school-vacation-list" id="schoolVacationList"></div>
+              <div class="settings-actions">
+                <button
+                  class="button button-secondary"
+                  id="restoreOfficialSchoolVacationsButton"
+                  type="button"
+                >
+                  <svg><use href="#icon-check"></use></svg>
+                  Amtliche NRW-Termine ergänzen
+                </button>
+              </div>
+            </section>
           </div>
 
           <section
@@ -1383,13 +1441,19 @@
 <ul><li>Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen</li><li>Berufe und Zusatzqualifikationen verwalten</li><li>Pflichtfortbildungen, Fortbildungsreihen und Nachweise verwalten</li><li>Teamsitzungen, Teilnahmen und Termine verwalten</li><li>Geräte und Geräteeinweisungen verwalten</li><li>Urlaubsansprüche und Abwesenheitsplanung bearbeiten</li><li>Dienstwochenenden konfigurieren und Simulationen übernehmen</li><li>Datenqualität prüfen, Telefonliste und E-Mail-Adressen exportieren</li><li>Daten sichern, prüfen und Sicherungen importieren</li><li>das eigene Passwort und das Farbthema ändern</li></ul>
 <h3 id="hilfe-administratoren">Administratoren</h3>
 <p>Administratoren dürfen zusätzlich drei Einstellungen ändern:</p>
-<ul><li><strong>Speicherort</strong> – zwischen lokalem Browserspeicher und MariaDB wechseln</li><li><strong>Benutzer verwalten</strong> – siehe unten</li><li><strong>Sicherungserinnerung</strong> – nach wie vielen Tagen TeO zur Sicherung mahnt</li><li><strong>Dialoge schließen</strong> – ob ein Klick neben einen Dialog diesen schließt</li></ul>
+<ul><li><strong>Speicherort</strong> – zwischen lokalem Browserspeicher und MariaDB wechseln</li><li><strong>Benutzer verwalten</strong> – siehe unten</li><li><strong>Sicherungserinnerung</strong> – nach wie vielen Tagen TeO zur Sicherung mahnt</li><li><strong>Dialoge schließen</strong> – ob ein Klick neben einen Dialog diesen schließt</li><li><strong>Schulferien</strong> – die in der Urlaubsplanung markierten Ferienzeiträume</li></ul>
 <p>Zusätzlich ist das <strong>Änderungsprotokoll</strong> Administratoren vorbehalten, weil es die Tätigkeit der übrigen Konten nachvollziehbar macht.</p>
 <p>Diese Aufteilung gilt im lokalen Modus und im MariaDB-Modus gleichermaßen. Im MariaDB-Modus setzt der Server sie unabhängig vom Browser durch: Ein normales Konto kann Benutzerkonten und die Sicherungserinnerung auch dann nicht verändern, wenn der Client umgangen wird.</p>
 <h3 id="hilfe-dialoge-schlie-en">Dialoge schließen</h3>
 <p>Unter <strong>Einstellungen → Dialoge schließen</strong> wird festgelegt, wie sich ein Klick neben einen geöffneten Dialog auswirkt:</p>
 <ul><li><strong>Schließt den Dialog nicht</strong> (Voreinstellung) – Dialoge lassen sich nur über ihre Schaltflächen oder die Escape-Taste verlassen. Das verhindert, dass ein versehentlicher Klick eine begonnene Eingabe beendet.</li><li><strong>Schließt den Dialog</strong> – ein Klick auf die abgedunkelte Fläche schließt den Dialog.</li></ul>
 <p>In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten Eingaben, fragt TeO vorher nach. Die drei Anmeldedialoge – Ersteinrichtung, Anmeldung und Passwortänderung – bleiben von der Einstellung unberührt und lassen sich weder per Klick daneben noch per Escape schließen.</p>
+<h3 id="hilfe-schulferien-pflegen">Schulferien pflegen</h3>
+<p>Unter <strong>Einstellungen → Schulferien</strong> werden die Zeiträume gepflegt, die die Urlaubsplanung farblich markiert. Jeder Eintrag besteht aus Beginn, Ende und einer Bezeichnung wie „Sommerferien“.</p>
+<p>Bei der ersten Verwendung ist die amtliche Ferienordnung NRW für die Schuljahre 2024/25 bis 2029/30 hinterlegt – 26 Zeiträume bis April 2030. Weitere Jahre lassen sich ohne Obergrenze ergänzen; ein Programmwechsel ist dafür nicht mehr nötig.</p>
+<ul><li><strong>Hinzufügen</strong> – Beginn darf nicht nach dem Ende liegen, die Bezeichnung ist Pflicht. Bereits vorhandene Zeiträume werden nicht doppelt aufgenommen.</li><li><strong>Entfernen</strong> – über das Papierkorbsymbol der jeweiligen Zeile.</li><li><strong>Amtliche NRW-Termine ergänzen</strong> – fügt fehlende Zeiträume der mitgelieferten Liste hinzu, ohne eigene Einträge zu verändern.</li></ul>
+<p>Jahre, für die Ferien hinterlegt sind, erscheinen automatisch in der Jahresauswahl der Urlaubsplanung. Bewegliche Ferientage sind nicht enthalten, da jede Schule sie selbst festlegt.</p>
+<p>Die Zeiträume sind Teil des Datenbestands und damit in jeder Sicherung enthalten. Gesetzliche Feiertage werden dagegen weiterhin für jedes Jahr berechnet und müssen nicht gepflegt werden.</p>
 <h3 id="hilfe-benutzer-verwalten">Benutzer verwalten</h3>
 <p>Über <strong>Einstellungen → Stammdaten &amp; Zugriffe → Benutzer verwalten</strong> stehen Administratoren zur Verfügung:</p>
 <ul><li><strong>Konto anlegen</strong> – Benutzername und Rolle wählen. TeO erzeugt ein einmalig angezeigtes temporäres Passwort; beim ersten Anmelden muss der Benutzer ein eigenes Passwort festlegen.</li><li><strong>Benutzername ändern</strong> – 4 bis 40 Buchstaben oder Ziffern, eindeutig.</li><li><strong>Passwort zurücksetzen</strong> – für jedes andere Konto, auch für weitere Administratoren. Es entsteht wieder ein temporäres Passwort. Das eigene Passwort wird stattdessen über <strong>Konto → Passwort ändern</strong> geändert.</li><li><strong>Konto löschen</strong> – dauerhaft; der fachliche Datenbestand bleibt unberührt.</li></ul>
@@ -1469,7 +1533,8 @@
 <p>Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix:</p>
 <ul><li>Monate in der ersten Spalte</li><li>Kalendertage in der Kopfzeile</li><li>Wochenenden und Dienstwochenenden farblich markiert</li><li>alle Abwesenheiten und Dienstzusagen tageweise sichtbar</li></ul>
 <h3 id="hilfe-feiertage-und-schulferien">Feiertage und Schulferien</h3>
-<p>Gesetzliche Feiertage in Nordrhein-Westfalen werden automatisch berechnet. Die amtlich festgelegten NRW-Schulferien werden angezeigt. Örtlich unterschiedliche bewegliche Ferientage sind nicht enthalten.</p>
+<p>Gesetzliche Feiertage in Nordrhein-Westfalen werden für jedes Jahr automatisch berechnet und müssen nicht gepflegt werden.</p>
+<p>Die Schulferien stammen dagegen aus <strong>Einstellungen → Schulferien</strong> und lassen sich dort für beliebige Jahre ergänzen; vorbelegt ist die amtliche Ferienordnung NRW bis April 2030. Örtlich unterschiedliche bewegliche Ferientage sind nicht enthalten.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-terminkalender-und-fristenmonitor">
 <h2 id="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</h2>
@@ -1622,6 +1687,11 @@ tools/         Build, Strukturprüfung und Demo-Datengenerator</code></pre>
 <pre><code>npm ci
 npm run verify</code></pre>
 <p><code>npm run verify</code> erzeugt die verteilbaren Dateien neu, prüft die Struktur und führt alle automatisierten Tests aus.</p>
+<h3 id="hilfe-buildnummer">Buildnummer</h3>
+<p>Die Buildnummer folgt dem Muster <code>major.minor.patch</code> mit je drei Stellen und wird unten in der Seitenleiste angezeigt. Sie steht an genau einer Stelle: <a href="src/meta/project-meta.mjs" target="_blank" rel="noopener noreferrer"><code>src/meta/project-meta.mjs</code></a>. Die Dateien <code>project-meta.js</code> und <code>app.js</code> entstehen daraus beim Build.</p>
+<p>Jede Auslieferung erhöht die Nummer:</p>
+<p>| Anlass | Befehl | Wirkung | | --- | --- | --- | | Neue Funktion | <code>npm run version:feature</code> | <code>minor</code> + 1, <code>patch</code> auf 0 | | Fehlerbehebung | <code>npm run version:fix</code> | <code>patch</code> + 1 | | Umbruch | <code>npm run version:major</code> | <code>major</code> + 1, Rest auf 0 |</p>
+<p>Enthält eine Auslieferung sowohl neue Funktionen als auch Fehlerbehebungen, zählt sie als Funktion. Der Befehl passt zugleich die Version in <code>package.json</code> an; anschließend ist <code>npm run build</code> nötig. <code>npm run check</code> bricht ab, wenn beide Versionen auseinanderlaufen oder das Format nicht stimmt.</p>
 <p>Die mitgelieferte localForage-Version <code>1.10.0</code> befindet sich zusammen mit ihrer Lizenz im Ordner <code>vendor</code>.</p>
 </section>
             </article>

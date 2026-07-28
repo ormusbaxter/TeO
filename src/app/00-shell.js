@@ -189,8 +189,10 @@
   };
   const SERVICE_WEEKEND_KEYS = Object.freeze(["weekend_a", "weekend_b"]);
 
-  // Amtliche Ferienordnung NRW für die Schuljahre 2024/25 bis 2029/30:
-  // https://bass.schule.nrw/19662.htm
+  // Vorbelegung nach der amtlichen Ferienordnung NRW für die Schuljahre
+  // 2024/25 bis 2029/30: https://bass.schule.nrw/19662.htm
+  // Massgeblich ist zur Laufzeit settings.schoolVacationPeriods; diese Liste
+  // dient nur der Erstbefuellung und dem Wiedereinsetzen in den Einstellungen.
   const NRW_SCHOOL_VACATION_PERIODS = [
     { start: "2024-12-23", end: "2025-01-06", label: "Weihnachtsferien" },
     { start: "2025-04-14", end: "2025-04-26", label: "Osterferien" },
@@ -219,7 +221,7 @@
     { start: "2029-12-20", end: "2030-01-04", label: "Weihnachtsferien" },
     { start: "2030-04-15", end: "2030-04-27", label: "Osterferien" },
   ];
-  const NRW_SCHOOL_VACATION_FULL_YEARS = new Set([2025, 2026, 2027, 2028, 2029]);
+  const MAX_SCHOOL_VACATION_PERIODS = 500;
 
   const EMPLOYMENT_STATUSES = {
     active: "Aktiv",
@@ -445,6 +447,15 @@
     ),
     settingsCloseDialogOnOutsideClick: document.querySelector(
       "#settingsCloseDialogOnOutsideClick",
+    ),
+    schoolVacationCount: document.querySelector("#schoolVacationCount"),
+    schoolVacationForm: document.querySelector("#schoolVacationForm"),
+    schoolVacationList: document.querySelector("#schoolVacationList"),
+    newSchoolVacationStart: document.querySelector("#newSchoolVacationStart"),
+    newSchoolVacationEnd: document.querySelector("#newSchoolVacationEnd"),
+    newSchoolVacationLabel: document.querySelector("#newSchoolVacationLabel"),
+    restoreOfficialSchoolVacationsButton: document.querySelector(
+      "#restoreOfficialSchoolVacationsButton",
     ),
     saveGeneralSettingsButton: document.querySelector(
       "#saveGeneralSettingsButton",
