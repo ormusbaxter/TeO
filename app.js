@@ -28,6 +28,8 @@
     "training",
     "qualification",
   ]);
+  // So viele Fristen bleiben im Monitor sichtbar, weitere sind scrollbar.
+  const VISIBLE_DEADLINE_ROWS = 6;
   const DEADLINE_KIND_LABELS = Object.freeze({
     appointment: "Termine",
     birthday: "Geburtstage",
@@ -224,6 +226,23 @@
   ];
   const MAX_SCHOOL_VACATION_PERIODS = 500;
 
+  // Optionale Terminkategorie. Der leere Schluessel bleibt zulaessig: Termine
+  // ohne Kategorie behalten das allgemeine Kalendersymbol.
+  const APPOINTMENT_CATEGORIES = Object.freeze({
+    geraeteeinweisung: { label: "Geräteeinweisung", icon: "device" },
+    teamsitzung: { label: "Teamsitzung", icon: "meeting" },
+    meeting: { label: "Meeting", icon: "users" },
+    stationsleiterkonferenz: {
+      label: "Stationsleiterkonferenz",
+      icon: "star",
+    },
+    begehung: { label: "Begehung", icon: "search" },
+    hospitation: { label: "Hospitation", icon: "eye" },
+    pruefung: { label: "Prüfung", icon: "clipboard-check" },
+    schulung: { label: "Schulung", icon: "training" },
+  });
+  const APPOINTMENT_CATEGORY_FALLBACK_ICON = "calendar";
+
   const EMPLOYMENT_STATUSES = {
     active: "Aktiv",
     onboarding: "In Einarbeitung",
@@ -410,6 +429,10 @@
     employeeTable: document.querySelector("#employeeTable"),
     employeeSearch: document.querySelector("#employeeSearch"),
     copyActiveEmailsButton: document.querySelector("#copyActiveEmailsButton"),
+    appointmentCategory: document.querySelector("#appointmentCategory"),
+    mainNav: document.querySelector("#mainNav"),
+    resetSidebarOrderButton: document.querySelector("#resetSidebarOrderButton"),
+    sidebarOrderStatus: document.querySelector("#sidebarOrderStatus"),
     copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),
     copyUsernamesButton: document.querySelector("#copyUsernamesButton"),
     copyUsernamesLabel: document.querySelector("#copyUsernamesLabel"),
@@ -773,6 +796,7 @@
     elements.deviceInstructionDate.max = today;
 
     bindNavigation();
+    bindSidebarOrder();
     bindDialogTriggers();
     bindForms();
     bindFilters();
@@ -1515,12 +1539,16 @@
     let endTime = normalizeTimeValue(appointment.endTime);
     if (!startTime || (endTime && endTime <= startTime)) endTime = "";
 
+    const category = String(appointment.category || "");
+
     return {
       id,
       title,
       date,
       startTime,
       endTime,
+      // Unbekannte Kategorien werden verworfen, statt den Termin zu verlieren.
+      category: Object.hasOwn(APPOINTMENT_CATEGORIES, category) ? category : "",
       location: String(appointment.location || "").trim().slice(0, 160),
       description: String(appointment.description || "").trim().slice(0, 1000),
       createdAt: validTimestamp(appointment.createdAt),
@@ -1965,6 +1993,9 @@
     document.querySelectorAll("[data-view-panel]").forEach((panel) => {
       panel.classList.toggle("is-active", panel.dataset.viewPanel === view);
     });
+
+    // Erst jetzt ist das Dashboard vermessbar.
+    if (view === "dashboard") limitDeadlineListHeight();
 
     document.querySelectorAll("[data-view]").forEach((button) => {
       const active = button.dataset.view === view;
@@ -3970,6 +4001,234 @@
     }
   }
 
+  // Reihenfolge der Hauptnavigation. Sie ist eine persoenliche Vorliebe und
+  // gehoert deshalb nicht in den geteilten Datenbestand: Im MariaDB-Modus
+  // wuerde sie sonst fuer alle gelten, und ein normales Konto koennte sie
+  // wegen der Admin-Vorbehalte an den Einstellungen gar nicht mehr aendern.
+  // Sie liegt darum im Browserprofil und ist nicht Teil der Sicherung.
+  const SIDEBAR_ORDER_KEY = "teo-sidebar-order-v1";
+  const DRAG_THRESHOLD_PX = 6;
+
+  let sidebarDragState = null;
+  let suppressNextNavClick = false;
+
+  function sidebarNavItems() {
+    if (!elements.mainNav) return [];
+    return [...elements.mainNav.querySelectorAll(".nav-item[data-view]")];
+  }
+
+  function defaultSidebarOrder() {
+    return sidebarNavItems().map((item) => item.dataset.view);
+  }
+
+  function readStoredSidebarOrder() {
+    try {
+      const raw = localStorage.getItem(SIDEBAR_ORDER_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.filter((view) => typeof view === "string") : [];
+    } catch (error) {
+      console.warn("Die gespeicherte Navigationsreihenfolge ist unlesbar.", error);
+      return [];
+    }
+  }
+
+  // Gespeicherte Reihenfolge und tatsaechlich vorhandene Eintraege koennen
+  // auseinanderlaufen, etwa nach einer neuen Programmversion. Bekannte
+  // Eintraege behalten ihre Position, entfallene werden verworfen, neue
+  // haengen sich in ihrer Standardreihenfolge hinten an.
+  function mergeSidebarOrder(gespeichert, vorhanden) {
+    const gesehen = new Set();
+    const uebernommen = (Array.isArray(gespeichert) ? gespeichert : []).filter(
+      (view) => {
+        if (!vorhanden.includes(view) || gesehen.has(view)) return false;
+        gesehen.add(view);
+        return true;
+      },
+    );
+    return [...uebernommen, ...vorhanden.filter((view) => !gesehen.has(view))];
+  }
+
+  function resolveSidebarOrder() {
+    return mergeSidebarOrder(readStoredSidebarOrder(), defaultSidebarOrder());
+  }
+
+  function hasCustomSidebarOrder() {
+    const standard = defaultSidebarOrder();
+    const aktuell = resolveSidebarOrder();
+    return aktuell.some((view, index) => view !== standard[index]);
+  }
+
+  function applySidebarOrder(order = resolveSidebarOrder()) {
+    sidebarNavItems().forEach((item) => {
+      const position = order.indexOf(item.dataset.view);
+      item.style.order = String(position < 0 ? order.length : position);
+    });
+    if (elements.resetSidebarOrderButton) {
+      elements.resetSidebarOrderButton.hidden = !hasCustomSidebarOrder();
+    }
+  }
+
+  function persistSidebarOrder(order) {
+    try {
+      if (order.join("|") === defaultSidebarOrder().join("|")) {
+        localStorage.removeItem(SIDEBAR_ORDER_KEY);
+      } else {
+        localStorage.setItem(SIDEBAR_ORDER_KEY, JSON.stringify(order));
+      }
+    } catch (error) {
+      console.warn("Die Navigationsreihenfolge konnte nicht gespeichert werden.", error);
+      showToast(
+        "Die Reihenfolge konnte nicht dauerhaft gespeichert werden.",
+        "error",
+      );
+    }
+    applySidebarOrder(order);
+  }
+
+  function announceSidebarOrder(item, order) {
+    if (!elements.sidebarOrderStatus) return;
+    const label = item.querySelector("span")?.textContent.trim() || item.dataset.view;
+    elements.sidebarOrderStatus.textContent =
+      `${label} steht jetzt an Position ${order.indexOf(item.dataset.view) + 1} von ${order.length}.`;
+  }
+
+  function moveSidebarItem(view, richtung) {
+    const order = resolveSidebarOrder();
+    const index = order.indexOf(view);
+    const ziel = index + richtung;
+    if (index < 0 || ziel < 0 || ziel >= order.length) return false;
+    order.splice(ziel, 0, ...order.splice(index, 1));
+    persistSidebarOrder(order);
+    return true;
+  }
+
+  function resetSidebarOrder() {
+    persistSidebarOrder(defaultSidebarOrder());
+    if (elements.sidebarOrderStatus) {
+      elements.sidebarOrderStatus.textContent =
+        "Die ursprüngliche Reihenfolge der Navigation ist wiederhergestellt.";
+    }
+    showToast("Die ursprüngliche Reihenfolge wurde wiederhergestellt.");
+  }
+
+  // Zielposition aus der Zeigerhoehe: Der gezogene Eintrag landet vor dem
+  // ersten Eintrag, dessen Mitte unterhalb des Zeigers liegt.
+  function sidebarDropIndex(clientY, gezogen) {
+    const andere = sidebarNavItems()
+      .filter((item) => item !== gezogen)
+      .sort(
+        (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top,
+      );
+    let index = andere.length;
+    for (let position = 0; position < andere.length; position += 1) {
+      const box = andere[position].getBoundingClientRect();
+      if (clientY < box.top + box.height / 2) {
+        index = position;
+        break;
+      }
+    }
+    const order = andere.map((item) => item.dataset.view);
+    order.splice(index, 0, gezogen.dataset.view);
+    return order;
+  }
+
+  function beginSidebarDrag(event) {
+    const item = event.target.closest(".nav-item[data-view]");
+    if (!item || event.button !== 0 || !elements.mainNav.contains(item)) return;
+    sidebarDragState = {
+      item,
+      startY: event.clientY,
+      pointerId: event.pointerId,
+      aktiv: false,
+      order: resolveSidebarOrder(),
+    };
+  }
+
+  function updateSidebarDrag(event) {
+    if (!sidebarDragState || event.pointerId !== sidebarDragState.pointerId) return;
+    const { item } = sidebarDragState;
+
+    if (!sidebarDragState.aktiv) {
+      // Erst ab einer Mindestbewegung wird gezogen - sonst bliebe kein
+      // gewoehnlicher Klick zum Wechseln der Ansicht mehr moeglich.
+      if (Math.abs(event.clientY - sidebarDragState.startY) < DRAG_THRESHOLD_PX) return;
+      sidebarDragState.aktiv = true;
+      item.classList.add("is-dragging");
+      elements.mainNav.classList.add("is-reordering");
+      item.setPointerCapture(event.pointerId);
+    }
+
+    event.preventDefault();
+    sidebarDragState.order = sidebarDropIndex(event.clientY, item);
+    applySidebarOrder(sidebarDragState.order);
+  }
+
+  function endSidebarDrag(event) {
+    if (!sidebarDragState || event.pointerId !== sidebarDragState.pointerId) return;
+    const { item, aktiv, order } = sidebarDragState;
+    sidebarDragState = null;
+    item.classList.remove("is-dragging");
+    elements.mainNav.classList.remove("is-reordering");
+    if (!aktiv) return;
+
+    suppressNextNavClick = true;
+    persistSidebarOrder(order);
+    announceSidebarOrder(item, order);
+  }
+
+  function cancelSidebarDrag() {
+    if (!sidebarDragState) return;
+    const { item, aktiv } = sidebarDragState;
+    sidebarDragState = null;
+    item.classList.remove("is-dragging");
+    elements.mainNav.classList.remove("is-reordering");
+    if (aktiv) {
+      suppressNextNavClick = true;
+      applySidebarOrder();
+    }
+  }
+
+  function handleSidebarOrderKeydown(event) {
+    if (!event.altKey || (event.key !== "ArrowUp" && event.key !== "ArrowDown")) return;
+    const item = event.target.closest(".nav-item[data-view]");
+    if (!item) return;
+    event.preventDefault();
+    if (moveSidebarItem(item.dataset.view, event.key === "ArrowUp" ? -1 : 1)) {
+      item.focus();
+      announceSidebarOrder(item, resolveSidebarOrder());
+    }
+  }
+
+  function bindSidebarOrder() {
+    if (!elements.mainNav) return;
+    applySidebarOrder();
+
+    elements.mainNav.addEventListener("pointerdown", beginSidebarDrag);
+    elements.mainNav.addEventListener("pointermove", updateSidebarDrag);
+    elements.mainNav.addEventListener("pointerup", endSidebarDrag);
+    elements.mainNav.addEventListener("pointercancel", cancelSidebarDrag);
+    elements.mainNav.addEventListener("keydown", handleSidebarOrderKeydown);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") cancelSidebarDrag();
+    });
+
+    // Der Klick nach einem Ziehen darf die Ansicht nicht wechseln. Die Sperre
+    // liegt in der Erfassungsphase, damit sie vor bindNavigation greift.
+    elements.mainNav.addEventListener(
+      "click",
+      (event) => {
+        if (!suppressNextNavClick) return;
+        suppressNextNavClick = false;
+        event.preventDefault();
+        event.stopPropagation();
+      },
+      true,
+    );
+
+    elements.resetSidebarOrderButton?.addEventListener("click", resetSidebarOrder);
+  }
+
   function renderDashboard() {
     renderDashboardGreeting();
     const activeEmployees = activeEmployeeList();
@@ -3977,44 +4236,15 @@
     const onboardingCount = state.employees.filter(
       (employee) => employee.employmentStatus === "onboarding",
     ).length;
-    const totalAssignments = activeEmployees.length * state.trainings.length;
-    const currentAssignments = state.trainings.reduce(
-      (sum, training) => sum + getTrainingStats(training).current,
-      0,
-    );
-    const openAssignments = Math.max(0, totalAssignments - currentAssignments);
-
+    // Eine einzelne Kennzahl: aktive Mitarbeiter als Zahl, die uebrigen
+    // Personalstaende als Aufschluesselung darunter.
     const stats = [
       {
         label: "Aktive Mitarbeiter",
         value: activeEmployees.length,
-        detail: `${onboardingCount} in Einarbeitung · ${inactiveCount} inaktiv`,
+        detail: `${onboardingCount} in Einarbeitung · ${inactiveCount} inaktiv · ${state.employees.length} gesamt`,
         icon: "users",
         className: "",
-      },
-      {
-        label: "Mitarbeiter gesamt",
-        value: state.employees.length,
-        detail: "gespeicherte Personalakten",
-        icon: "dashboard",
-        className: "stat-teal",
-      },
-      {
-        label: "Pflichtfortbildungen",
-        value: state.trainings.length,
-        detail: "im Fortbildungskatalog",
-        icon: "training",
-        className: "stat-orange",
-      },
-      {
-        label: "Offene Nachweise",
-        value: openAssignments,
-        detail:
-          totalAssignments > 0
-            ? `${currentAssignments} von ${totalAssignments} aktuell`
-            : "noch keine Zuordnungen",
-        icon: "alert",
-        className: openAssignments > 0 ? "stat-red" : "stat-teal",
       },
     ];
 
@@ -4054,10 +4284,16 @@
       return;
     }
 
-    const sortedTrainings = [...state.trainings]
+    // Alle aktiven Pflichten: trainingObligations fasst Fortbildungsreihen auf
+    // ihren aktuellen Jahrgang zusammen, sodass vergangene Jahrgaenge derselben
+    // Reihe nicht mehrfach erscheinen.
+    const sortedTrainings = trainingObligations()
       .map((training) => ({ training, stats: getTrainingStats(training) }))
-      .sort((a, b) => a.stats.percent - b.stats.percent || a.training.title.localeCompare(b.training.title))
-      .slice(0, 5);
+      .sort(
+        (a, b) =>
+          a.stats.percent - b.stats.percent ||
+          a.training.title.localeCompare(b.training.title, "de"),
+      );
 
     elements.dashboardTrainingProgress.innerHTML = `
       <div class="progress-list">
@@ -4164,7 +4400,13 @@
               >
                 <span>${
                   item.kind === "appointment"
-                    ? '<span class="deadline-calendar-icon"><svg><use href="#icon-calendar"></use></svg></span>'
+                    ? `<span class="deadline-calendar-icon" ${
+                        appointmentCategoryLabel(item.appointment)
+                          ? `title="${escapeHtml(appointmentCategoryLabel(item.appointment))}"`
+                          : ""
+                      }><svg><use href="#icon-${appointmentCategoryIcon(
+                        item.appointment,
+                      )}"></use></svg></span>`
                     : renderAvatar(item.employee, true)
                 }</span>
                 <span>
@@ -4202,6 +4444,7 @@
           : ""
       }
     `;
+    limitDeadlineListHeight();
     elements.deadlineOverview
       .querySelectorAll("[data-deadline-employee]")
       .forEach((button) => {
@@ -4221,6 +4464,34 @@
             ?.scrollIntoView({ block: "center", behavior: "smooth" });
         });
       });
+  }
+
+  // Die sichtbare Hoehe wird an der ersten ueberzaehligen Zeile gemessen statt
+  // aus einer angenommenen Zeilenhoehe gerechnet - Titel koennen umbrechen,
+  // und Termine bringen andere Zeilenhoehen mit als Geburtstage.
+  function limitDeadlineListHeight() {
+    const list = elements.deadlineOverview.querySelector(".deadline-list");
+    if (!list) return;
+    list.style.maxHeight = "";
+    list.scrollTop = 0;
+
+    // Waehrend das Dashboard ausgeblendet ist, liefern alle Masse 0. Die
+    // Begrenzung wird dann uebersprungen und von showView nachgeholt, sobald
+    // die Ansicht wieder sichtbar ist.
+    if (!list.offsetParent) {
+      list.classList.remove("is-scrollable");
+      return;
+    }
+
+    const rows = [...list.querySelectorAll(".deadline-row")];
+    if (rows.length <= VISIBLE_DEADLINE_ROWS) {
+      list.classList.remove("is-scrollable");
+      return;
+    }
+    const oberkante = list.getBoundingClientRect().top;
+    const grenze = rows[VISIBLE_DEADLINE_ROWS].getBoundingClientRect().top;
+    list.style.maxHeight = `${Math.round(grenze - oberkante)}px`;
+    list.classList.add("is-scrollable");
   }
 
   async function updateDeadlineFilters() {
@@ -4297,7 +4568,7 @@
         employee: null,
         appointment,
         title: appointment.title,
-        type: "Termin",
+        type: appointmentCategoryLabel(appointment) || "Termin",
         kind: "appointment",
         dueDate: appointment.date,
         daysUntil,
@@ -7306,6 +7577,28 @@
     `;
   }
 
+  function appointmentCategoryIcon(appointment) {
+    return (
+      APPOINTMENT_CATEGORIES[appointment?.category]?.icon ||
+      APPOINTMENT_CATEGORY_FALLBACK_ICON
+    );
+  }
+
+  function appointmentCategoryLabel(appointment) {
+    return APPOINTMENT_CATEGORIES[appointment?.category]?.label || "";
+  }
+
+  function renderAppointmentCategoryOptions() {
+    if (!elements.appointmentCategory) return;
+    elements.appointmentCategory.innerHTML = [
+      '<option value="">Ohne Kategorie</option>',
+      ...Object.entries(APPOINTMENT_CATEGORIES).map(
+        ([key, { label }]) =>
+          `<option value="${key}">${escapeHtml(label)}</option>`,
+      ),
+    ].join("");
+  }
+
   function sortAppointments(a, b) {
     return (
       a.date.localeCompare(b.date) ||
@@ -7320,6 +7613,7 @@
       parseLocalDate(appointment.date),
     );
     const timeLabel = formatAppointmentTime(appointment);
+    const kategorie = appointmentCategoryLabel(appointment);
     const meta = [
       formatDate(appointment.date),
       timeLabel,
@@ -7332,11 +7626,18 @@
       >
         <div class="meeting-card-main">
           <div class="training-title-row">
-            <span class="training-icon appointment-icon">
-              <svg><use href="#icon-calendar"></use></svg>
+            <span
+              class="training-icon appointment-icon"
+              ${kategorie ? `title="${escapeHtml(kategorie)}"` : ""}
+            >
+              <svg><use href="#icon-${appointmentCategoryIcon(appointment)}"></use></svg>
             </span>
             <div>
-              <h2>${escapeHtml(appointment.title)}</h2>
+              <h2>${escapeHtml(appointment.title)}${
+                kategorie
+                  ? ` <span class="appointment-category-tag">${escapeHtml(kategorie)}</span>`
+                  : ""
+              }</h2>
               <p>${escapeHtml(appointment.description || "Keine Beschreibung hinterlegt.")}</p>
               <span class="training-meta">
                 <svg><use href="#icon-calendar"></use></svg>
@@ -9519,6 +9820,7 @@
   }
 
   function openAppointmentDialog(appointmentId = null) {
+    renderAppointmentCategoryOptions();
     elements.appointmentForm.reset();
     document.querySelector("#appointmentId").value = "";
     document.querySelector("#appointmentTitle").setCustomValidity("");
@@ -9539,6 +9841,7 @@
       document.querySelector("#appointmentDate").value = appointment.date;
       document.querySelector("#appointmentStartTime").value = appointment.startTime;
       document.querySelector("#appointmentEndTime").value = appointment.endTime;
+      elements.appointmentCategory.value = appointment.category || "";
       document.querySelector("#appointmentLocation").value = appointment.location;
       document.querySelector("#appointmentDescription").value = appointment.description;
     }
@@ -9581,6 +9884,7 @@
       date: document.querySelector("#appointmentDate").value,
       startTime: document.querySelector("#appointmentStartTime").value,
       endTime: document.querySelector("#appointmentEndTime").value,
+      category: elements.appointmentCategory.value,
       location: document.querySelector("#appointmentLocation").value.trim(),
       description: document.querySelector("#appointmentDescription").value.trim(),
       createdAt: existingAppointment?.createdAt || now,

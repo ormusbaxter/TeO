@@ -27,6 +27,8 @@
     "training",
     "qualification",
   ]);
+  // So viele Fristen bleiben im Monitor sichtbar, weitere sind scrollbar.
+  const VISIBLE_DEADLINE_ROWS = 6;
   const DEADLINE_KIND_LABELS = Object.freeze({
     appointment: "Termine",
     birthday: "Geburtstage",
@@ -223,6 +225,23 @@
   ];
   const MAX_SCHOOL_VACATION_PERIODS = 500;
 
+  // Optionale Terminkategorie. Der leere Schluessel bleibt zulaessig: Termine
+  // ohne Kategorie behalten das allgemeine Kalendersymbol.
+  const APPOINTMENT_CATEGORIES = Object.freeze({
+    geraeteeinweisung: { label: "Geräteeinweisung", icon: "device" },
+    teamsitzung: { label: "Teamsitzung", icon: "meeting" },
+    meeting: { label: "Meeting", icon: "users" },
+    stationsleiterkonferenz: {
+      label: "Stationsleiterkonferenz",
+      icon: "star",
+    },
+    begehung: { label: "Begehung", icon: "search" },
+    hospitation: { label: "Hospitation", icon: "eye" },
+    pruefung: { label: "Prüfung", icon: "clipboard-check" },
+    schulung: { label: "Schulung", icon: "training" },
+  });
+  const APPOINTMENT_CATEGORY_FALLBACK_ICON = "calendar";
+
   const EMPLOYMENT_STATUSES = {
     active: "Aktiv",
     onboarding: "In Einarbeitung",
@@ -409,6 +428,10 @@
     employeeTable: document.querySelector("#employeeTable"),
     employeeSearch: document.querySelector("#employeeSearch"),
     copyActiveEmailsButton: document.querySelector("#copyActiveEmailsButton"),
+    appointmentCategory: document.querySelector("#appointmentCategory"),
+    mainNav: document.querySelector("#mainNav"),
+    resetSidebarOrderButton: document.querySelector("#resetSidebarOrderButton"),
+    sidebarOrderStatus: document.querySelector("#sidebarOrderStatus"),
     copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),
     copyUsernamesButton: document.querySelector("#copyUsernamesButton"),
     copyUsernamesLabel: document.querySelector("#copyUsernamesLabel"),

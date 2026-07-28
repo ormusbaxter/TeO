@@ -96,6 +96,24 @@ funktionieren.
 
 Uhrzeiten werden im 24-Stunden-Format `HH:MM` angezeigt.
 
+### Reihenfolge der Navigation anpassen
+
+Die Einträge der Seitenleiste lassen sich in eine eigene Reihenfolge bringen:
+
+- **Ziehen** – einen Eintrag anfassen und nach oben oder unten schieben. Ein
+  gewöhnlicher Klick wechselt weiterhin die Ansicht; als Ziehen zählt erst eine
+  Bewegung von mehr als sechs Bildpunkten.
+- **Tastatur** – Eintrag anwählen und mit **Alt + Pfeil hoch** beziehungsweise
+  **Alt + Pfeil runter** verschieben.
+- **Zurücksetzen** – die Schaltfläche unter der Navigation erscheint nur, wenn
+  eine eigene Reihenfolge gesetzt ist.
+
+Die Reihenfolge ist eine persönliche Einstellung. Sie wird im Browserprofil
+gespeichert, gilt also nur für diesen Rechner und diesen Benutzer, verändert
+den gemeinsamen Datenbestand nicht und ist deshalb auch **nicht** Teil der
+Datensicherung. Ändert sich das Menü in einer neuen Programmversion, bleiben
+bekannte Einträge an ihrem Platz und neue erscheinen am Ende.
+
 ## Benutzerkonten und Berechtigungen
 
 Jedes angemeldete Konto bedient TeO vollständig. Die Rollentrennung betrifft
@@ -447,11 +465,23 @@ Ein Termin benötigt mindestens:
 - Titel
 - Datum
 
-Optional können Uhrzeit von/bis, Ort und Beschreibung hinterlegt werden.
+Optional können Uhrzeit von/bis, Ort, Beschreibung und eine **Kategorie**
+hinterlegt werden.
+
+Zur Auswahl stehen Geräteeinweisung, Teamsitzung, Meeting,
+Stationsleiterkonferenz, Begehung, Hospitation, Prüfung und Schulung. Jede Kategorie hat
+ein eigenes Symbol, das in der Terminübersicht und im Fristenmonitor anstelle
+des allgemeinen Kalendersymbols erscheint; im Fristenmonitor ersetzt die
+Kategorie zusätzlich die Bezeichnung „Termin“. Termine ohne Kategorie behalten
+das Kalendersymbol.
 
 ### Fristenmonitor
 
-Der Fristenmonitor auf der Übersichtsseite zeigt:
+Der Fristenmonitor steht auf der Übersichtsseite direkt unter den Kennzahlen.
+Sechs Einträge bleiben sichtbar, weitere sind innerhalb des Bereichs
+scrollbar.
+
+Er zeigt:
 
 - anstehende Termine
 - Geburtstage

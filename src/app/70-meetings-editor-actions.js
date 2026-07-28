@@ -1053,6 +1053,7 @@
   }
 
   function openAppointmentDialog(appointmentId = null) {
+    renderAppointmentCategoryOptions();
     elements.appointmentForm.reset();
     document.querySelector("#appointmentId").value = "";
     document.querySelector("#appointmentTitle").setCustomValidity("");
@@ -1073,6 +1074,7 @@
       document.querySelector("#appointmentDate").value = appointment.date;
       document.querySelector("#appointmentStartTime").value = appointment.startTime;
       document.querySelector("#appointmentEndTime").value = appointment.endTime;
+      elements.appointmentCategory.value = appointment.category || "";
       document.querySelector("#appointmentLocation").value = appointment.location;
       document.querySelector("#appointmentDescription").value = appointment.description;
     }
@@ -1115,6 +1117,7 @@
       date: document.querySelector("#appointmentDate").value,
       startTime: document.querySelector("#appointmentStartTime").value,
       endTime: document.querySelector("#appointmentEndTime").value,
+      category: elements.appointmentCategory.value,
       location: document.querySelector("#appointmentLocation").value.trim(),
       description: document.querySelector("#appointmentDescription").value.trim(),
       createdAt: existingAppointment?.createdAt || now,

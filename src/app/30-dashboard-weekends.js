@@ -5,44 +5,15 @@
     const onboardingCount = state.employees.filter(
       (employee) => employee.employmentStatus === "onboarding",
     ).length;
-    const totalAssignments = activeEmployees.length * state.trainings.length;
-    const currentAssignments = state.trainings.reduce(
-      (sum, training) => sum + getTrainingStats(training).current,
-      0,
-    );
-    const openAssignments = Math.max(0, totalAssignments - currentAssignments);
-
+    // Eine einzelne Kennzahl: aktive Mitarbeiter als Zahl, die uebrigen
+    // Personalstaende als Aufschluesselung darunter.
     const stats = [
       {
         label: "Aktive Mitarbeiter",
         value: activeEmployees.length,
-        detail: `${onboardingCount} in Einarbeitung · ${inactiveCount} inaktiv`,
+        detail: `${onboardingCount} in Einarbeitung · ${inactiveCount} inaktiv · ${state.employees.length} gesamt`,
         icon: "users",
         className: "",
-      },
-      {
-        label: "Mitarbeiter gesamt",
-        value: state.employees.length,
-        detail: "gespeicherte Personalakten",
-        icon: "dashboard",
-        className: "stat-teal",
-      },
-      {
-        label: "Pflichtfortbildungen",
-        value: state.trainings.length,
-        detail: "im Fortbildungskatalog",
-        icon: "training",
-        className: "stat-orange",
-      },
-      {
-        label: "Offene Nachweise",
-        value: openAssignments,
-        detail:
-          totalAssignments > 0
-            ? `${currentAssignments} von ${totalAssignments} aktuell`
-            : "noch keine Zuordnungen",
-        icon: "alert",
-        className: openAssignments > 0 ? "stat-red" : "stat-teal",
       },
     ];
 
@@ -82,10 +53,16 @@
       return;
     }
 
-    const sortedTrainings = [...state.trainings]
+    // Alle aktiven Pflichten: trainingObligations fasst Fortbildungsreihen auf
+    // ihren aktuellen Jahrgang zusammen, sodass vergangene Jahrgaenge derselben
+    // Reihe nicht mehrfach erscheinen.
+    const sortedTrainings = trainingObligations()
       .map((training) => ({ training, stats: getTrainingStats(training) }))
-      .sort((a, b) => a.stats.percent - b.stats.percent || a.training.title.localeCompare(b.training.title))
-      .slice(0, 5);
+      .sort(
+        (a, b) =>
+          a.stats.percent - b.stats.percent ||
+          a.training.title.localeCompare(b.training.title, "de"),
+      );
 
     elements.dashboardTrainingProgress.innerHTML = `
       <div class="progress-list">
@@ -192,7 +169,13 @@
               >
                 <span>${
                   item.kind === "appointment"
-                    ? '<span class="deadline-calendar-icon"><svg><use href="#icon-calendar"></use></svg></span>'
+                    ? `<span class="deadline-calendar-icon" ${
+                        appointmentCategoryLabel(item.appointment)
+                          ? `title="${escapeHtml(appointmentCategoryLabel(item.appointment))}"`
+                          : ""
+                      }><svg><use href="#icon-${appointmentCategoryIcon(
+                        item.appointment,
+                      )}"></use></svg></span>`
                     : renderAvatar(item.employee, true)
                 }</span>
                 <span>
@@ -230,6 +213,7 @@
           : ""
       }
     `;
+    limitDeadlineListHeight();
     elements.deadlineOverview
       .querySelectorAll("[data-deadline-employee]")
       .forEach((button) => {
@@ -249,6 +233,34 @@
             ?.scrollIntoView({ block: "center", behavior: "smooth" });
         });
       });
+  }
+
+  // Die sichtbare Hoehe wird an der ersten ueberzaehligen Zeile gemessen statt
+  // aus einer angenommenen Zeilenhoehe gerechnet - Titel koennen umbrechen,
+  // und Termine bringen andere Zeilenhoehen mit als Geburtstage.
+  function limitDeadlineListHeight() {
+    const list = elements.deadlineOverview.querySelector(".deadline-list");
+    if (!list) return;
+    list.style.maxHeight = "";
+    list.scrollTop = 0;
+
+    // Waehrend das Dashboard ausgeblendet ist, liefern alle Masse 0. Die
+    // Begrenzung wird dann uebersprungen und von showView nachgeholt, sobald
+    // die Ansicht wieder sichtbar ist.
+    if (!list.offsetParent) {
+      list.classList.remove("is-scrollable");
+      return;
+    }
+
+    const rows = [...list.querySelectorAll(".deadline-row")];
+    if (rows.length <= VISIBLE_DEADLINE_ROWS) {
+      list.classList.remove("is-scrollable");
+      return;
+    }
+    const oberkante = list.getBoundingClientRect().top;
+    const grenze = rows[VISIBLE_DEADLINE_ROWS].getBoundingClientRect().top;
+    list.style.maxHeight = `${Math.round(grenze - oberkante)}px`;
+    list.classList.add("is-scrollable");
   }
 
   async function updateDeadlineFilters() {
@@ -325,7 +337,7 @@
         employee: null,
         appointment,
         title: appointment.title,
-        type: "Termin",
+        type: appointmentCategoryLabel(appointment) || "Termin",
         kind: "appointment",
         dueDate: appointment.date,
         daysUntil,

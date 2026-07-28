@@ -31,6 +31,7 @@
     elements.deviceInstructionDate.max = today;
 
     bindNavigation();
+    bindSidebarOrder();
     bindDialogTriggers();
     bindForms();
     bindFilters();
@@ -773,12 +774,16 @@
     let endTime = normalizeTimeValue(appointment.endTime);
     if (!startTime || (endTime && endTime <= startTime)) endTime = "";
 
+    const category = String(appointment.category || "");
+
     return {
       id,
       title,
       date,
       startTime,
       endTime,
+      // Unbekannte Kategorien werden verworfen, statt den Termin zu verlieren.
+      category: Object.hasOwn(APPOINTMENT_CATEGORIES, category) ? category : "",
       location: String(appointment.location || "").trim().slice(0, 160),
       description: String(appointment.description || "").trim().slice(0, 1000),
       createdAt: validTimestamp(appointment.createdAt),

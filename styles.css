@@ -234,12 +234,70 @@ svg {
 }
 
 .nav-label {
+  /* Ueberschrift und Zuruecksetzen rahmen die per order sortierten
+     Navigationseintraege ein und bleiben deshalb fest oben beziehungsweise
+     unten. */
+  order: -1;
   margin: 0 12px 8px;
   color: #7890a5;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.11em;
   text-transform: uppercase;
+}
+
+.nav-label small {
+  display: block;
+  margin-top: 4px;
+  color: #6b8299;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.nav-item.is-dragging {
+  z-index: 1;
+  color: #fff;
+  background: rgb(255 255 255 / 14%);
+  box-shadow: var(--shadow-md);
+  cursor: grabbing;
+}
+
+.main-nav.is-reordering .nav-item:not(.is-dragging) {
+  transition: none;
+}
+
+.main-nav.is-reordering {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.nav-order-reset {
+  display: flex;
+  order: 999;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+  padding: 8px 13px;
+  cursor: pointer;
+  color: #8fa4b8;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-align: left;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.nav-order-reset:hover {
+  color: #dce7f1;
+  background: rgb(255 255 255 / 8%);
+}
+
+.nav-order-reset svg {
+  width: 14px;
+  height: 14px;
 }
 
 .nav-item {
@@ -250,6 +308,9 @@ svg {
   width: 100%;
   padding: 12px 13px;
   cursor: pointer;
+  /* Senkrechtes Wischen bleibt dem Scrollen vorbehalten, waagerechtes
+     Ziehen meldet der Browser als Pointer-Ereignis. */
+  touch-action: pan-y;
   color: #afc0cf;
   text-align: left;
   border: 0;
@@ -964,6 +1025,8 @@ svg {
   justify-content: flex-end;
 }
 
+/* Die vier Spuren entstehen unabhaengig von der Kartenzahl. Die derzeit
+   einzelne Kennzahl behaelt dadurch ihre gewohnte Breite. */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1060,6 +1123,11 @@ svg {
 
 .dashboard-grid {
   display: grid;
+  /* Wie .deadline-panel und .recent-panel bringt der Block seinen eigenen
+     Abstand nach oben mit. Zuvor stand das Raster direkt unter der
+     Kennzahlenreihe und lebte von deren margin-bottom; seit der
+     Fristenmonitor davor liegt, fehlte der Abstand. */
+  margin-top: 22px;
   grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.75fr);
   gap: 22px;
 }
@@ -4977,9 +5045,29 @@ legend {
   grid-template-columns: repeat(auto-fit, minmax(110px, 180px));
 }
 
+.appointment-category-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  color: var(--blue-700);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  border-radius: 999px;
+  background: var(--blue-100);
+}
+
 .deadline-list {
   display: grid;
   border-top: 1px solid var(--slate-100);
+}
+
+/* Die Hoehe setzt renderDeadlineOverview auf sechs Zeilen. */
+.deadline-list.is-scrollable {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .deadline-row {

@@ -51,6 +51,28 @@
     `;
   }
 
+  function appointmentCategoryIcon(appointment) {
+    return (
+      APPOINTMENT_CATEGORIES[appointment?.category]?.icon ||
+      APPOINTMENT_CATEGORY_FALLBACK_ICON
+    );
+  }
+
+  function appointmentCategoryLabel(appointment) {
+    return APPOINTMENT_CATEGORIES[appointment?.category]?.label || "";
+  }
+
+  function renderAppointmentCategoryOptions() {
+    if (!elements.appointmentCategory) return;
+    elements.appointmentCategory.innerHTML = [
+      '<option value="">Ohne Kategorie</option>',
+      ...Object.entries(APPOINTMENT_CATEGORIES).map(
+        ([key, { label }]) =>
+          `<option value="${key}">${escapeHtml(label)}</option>`,
+      ),
+    ].join("");
+  }
+
   function sortAppointments(a, b) {
     return (
       a.date.localeCompare(b.date) ||
@@ -65,6 +87,7 @@
       parseLocalDate(appointment.date),
     );
     const timeLabel = formatAppointmentTime(appointment);
+    const kategorie = appointmentCategoryLabel(appointment);
     const meta = [
       formatDate(appointment.date),
       timeLabel,
@@ -77,11 +100,18 @@
       >
         <div class="meeting-card-main">
           <div class="training-title-row">
-            <span class="training-icon appointment-icon">
-              <svg><use href="#icon-calendar"></use></svg>
+            <span
+              class="training-icon appointment-icon"
+              ${kategorie ? `title="${escapeHtml(kategorie)}"` : ""}
+            >
+              <svg><use href="#icon-${appointmentCategoryIcon(appointment)}"></use></svg>
             </span>
             <div>
-              <h2>${escapeHtml(appointment.title)}</h2>
+              <h2>${escapeHtml(appointment.title)}${
+                kategorie
+                  ? ` <span class="appointment-category-tag">${escapeHtml(kategorie)}</span>`
+                  : ""
+              }</h2>
               <p>${escapeHtml(appointment.description || "Keine Beschreibung hinterlegt.")}</p>
               <span class="training-meta">
                 <svg><use href="#icon-calendar"></use></svg>

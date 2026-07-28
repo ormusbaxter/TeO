@@ -32,6 +32,9 @@
       panel.classList.toggle("is-active", panel.dataset.viewPanel === view);
     });
 
+    // Erst jetzt ist das Dashboard vermessbar.
+    if (view === "dashboard") limitDeadlineListHeight();
+
     document.querySelectorAll("[data-view]").forEach((button) => {
       const active = button.dataset.view === view;
       button.classList.toggle("is-active", active);

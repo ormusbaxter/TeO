@@ -123,6 +123,22 @@
         <circle cx="12" cy="12" r="9" />
         <path d="M9.8 9a2.4 2.4 0 1 1 3.7 2c-1 .7-1.5 1.2-1.5 2.5M12 17h.01" />
       </symbol>
+      <symbol id="icon-device" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="12" rx="2" />
+        <path d="M8 20h8M12 16v4M7 8h4M7 11h2" />
+      </symbol>
+      <symbol id="icon-star" viewBox="0 0 24 24">
+        <path d="m12 3 2.6 5.6 6 .8-4.4 4.2 1.1 6.1L12 16.8 6.7 19.7l1.1-6.1L3.4 9.4l6-.8Z" />
+      </symbol>
+      <symbol id="icon-eye" viewBox="0 0 24 24">
+        <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" />
+        <circle cx="12" cy="12" r="2.8" />
+      </symbol>
+      <symbol id="icon-clipboard-check" viewBox="0 0 24 24">
+        <path d="M9 4h6v3H9z" />
+        <path d="M15 5.5h2.5A1.5 1.5 0 0 1 19 7v12.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5V7a1.5 1.5 0 0 1 1.5-1.5H9" />
+        <path d="m9 13.5 2 2 4-4" />
+      </symbol>
     </svg>
 
     <div class="app-layout">
@@ -137,8 +153,11 @@
           </span>
         </a>
 
-        <nav class="main-nav">
-          <p class="nav-label">Verwaltung</p>
+        <nav class="main-nav" id="mainNav">
+          <p class="nav-label">
+            Verwaltung
+            <small>Zum Sortieren ziehen oder Alt + Pfeiltaste</small>
+          </p>
           <button class="nav-item is-active" type="button" data-view="dashboard">
             <svg><use href="#icon-dashboard"></use></svg>
             <span>Übersicht</span>
@@ -192,6 +211,16 @@
             <svg><use href="#icon-help"></use></svg>
             <span>Hilfe</span>
           </button>
+          <button
+            class="nav-order-reset"
+            id="resetSidebarOrderButton"
+            type="button"
+            hidden
+          >
+            <svg><use href="#icon-close"></use></svg>
+            <span>Reihenfolge zurücksetzen</span>
+          </button>
+          <p class="sr-only" id="sidebarOrderStatus" role="status" aria-live="polite"></p>
         </nav>
 
         <section class="user-session" aria-label="Angemeldeter Benutzer">
@@ -327,17 +356,48 @@
               <h1 id="dashboardGreeting">Guten Tag!</h1>
               <p class="page-subtitle">Personal und Pflichtfortbildungen kompakt im Blick.</p>
             </div>
-            <button
-              class="button button-primary desktop-only-flex"
-              type="button"
-              data-open-employee
-            >
-              <svg><use href="#icon-plus"></use></svg>
-              Mitarbeiter anlegen
-            </button>
           </div>
 
           <div class="stats-grid" id="dashboardStats" aria-label="Kennzahlen"></div>
+
+          <section class="panel deadline-panel" aria-labelledby="deadlineOverviewTitle">
+            <div class="panel-header deadline-panel-header">
+              <div>
+                <p class="eyebrow">Fristenmonitor</p>
+                <h2 id="deadlineOverviewTitle">Anstehende und überfällige Fristen</h2>
+              </div>
+              <div class="deadline-controls">
+                <fieldset class="deadline-filter-group">
+                  <legend>Anzeigen</legend>
+                  <label class="deadline-filter-chip">
+                    <input type="checkbox" value="appointment" data-deadline-filter checked />
+                    <span>Termine</span>
+                  </label>
+                  <label class="deadline-filter-chip">
+                    <input type="checkbox" value="birthday" data-deadline-filter checked />
+                    <span>Geburtstage</span>
+                  </label>
+                  <label class="deadline-filter-chip">
+                    <input type="checkbox" value="training" data-deadline-filter checked />
+                    <span>Fortbildungen</span>
+                  </label>
+                  <label class="deadline-filter-chip">
+                    <input type="checkbox" value="qualification" data-deadline-filter checked />
+                    <span>Qualifikationen</span>
+                  </label>
+                </fieldset>
+                <label class="compact-field">
+                  <span>Zeitraum</span>
+                  <select id="deadlineHorizon">
+                    <option value="30">30 Tage</option>
+                    <option value="60">60 Tage</option>
+                    <option value="90" selected>90 Tage</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div id="deadlineOverview"></div>
+          </section>
 
           <div class="dashboard-grid">
             <section class="panel panel-large">
@@ -406,44 +466,6 @@
             </section>
           </div>
 
-          <section class="panel deadline-panel" aria-labelledby="deadlineOverviewTitle">
-            <div class="panel-header deadline-panel-header">
-              <div>
-                <p class="eyebrow">Fristenmonitor</p>
-                <h2 id="deadlineOverviewTitle">Anstehende und überfällige Fristen</h2>
-              </div>
-              <div class="deadline-controls">
-                <fieldset class="deadline-filter-group">
-                  <legend>Anzeigen</legend>
-                  <label class="deadline-filter-chip">
-                    <input type="checkbox" value="appointment" data-deadline-filter checked />
-                    <span>Termine</span>
-                  </label>
-                  <label class="deadline-filter-chip">
-                    <input type="checkbox" value="birthday" data-deadline-filter checked />
-                    <span>Geburtstage</span>
-                  </label>
-                  <label class="deadline-filter-chip">
-                    <input type="checkbox" value="training" data-deadline-filter checked />
-                    <span>Fortbildungen</span>
-                  </label>
-                  <label class="deadline-filter-chip">
-                    <input type="checkbox" value="qualification" data-deadline-filter checked />
-                    <span>Qualifikationen</span>
-                  </label>
-                </fieldset>
-                <label class="compact-field">
-                  <span>Zeitraum</span>
-                  <select id="deadlineHorizon">
-                    <option value="30">30 Tage</option>
-                    <option value="60">60 Tage</option>
-                    <option value="90" selected>90 Tage</option>
-                  </select>
-                </label>
-              </div>
-            </div>
-            <div id="deadlineOverview"></div>
-          </section>
 
           <section class="panel recent-panel">
             <div class="panel-header">
@@ -1432,6 +1454,10 @@
 <h3 id="hilfe-datums-und-zeitangaben">Datums- und Zeitangaben</h3>
 <p>Datumswerte werden einheitlich als <code>TT.MM.JJJJ</code> dargestellt. Intern speichert TeO Datumswerte im ISO-Format, damit Sortierung und Berechnung zuverlässig funktionieren.</p>
 <p>Uhrzeiten werden im 24-Stunden-Format <code>HH:MM</code> angezeigt.</p>
+<h3 id="hilfe-reihenfolge-der-navigation-anpassen">Reihenfolge der Navigation anpassen</h3>
+<p>Die Einträge der Seitenleiste lassen sich in eine eigene Reihenfolge bringen:</p>
+<ul><li><strong>Ziehen</strong> – einen Eintrag anfassen und nach oben oder unten schieben. Ein gewöhnlicher Klick wechselt weiterhin die Ansicht; als Ziehen zählt erst eine Bewegung von mehr als sechs Bildpunkten.</li><li><strong>Tastatur</strong> – Eintrag anwählen und mit <strong>Alt + Pfeil hoch</strong> beziehungsweise <strong>Alt + Pfeil runter</strong> verschieben.</li><li><strong>Zurücksetzen</strong> – die Schaltfläche unter der Navigation erscheint nur, wenn eine eigene Reihenfolge gesetzt ist.</li></ul>
+<p>Die Reihenfolge ist eine persönliche Einstellung. Sie wird im Browserprofil gespeichert, gilt also nur für diesen Rechner und diesen Benutzer, verändert den gemeinsamen Datenbestand nicht und ist deshalb auch <strong>nicht</strong> Teil der Datensicherung. Ändert sich das Menü in einer neuen Programmversion, bleiben bekannte Einträge an ihrem Platz und neue erscheinen am Ende.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-benutzerkonten-und-berechtigungen">
 <h2 id="hilfe-benutzerkonten-und-berechtigungen">Benutzerkonten und Berechtigungen</h2>
@@ -1541,9 +1567,11 @@
 <h3 id="hilfe-termine-anlegen">Termine anlegen</h3>
 <p>Ein Termin benötigt mindestens:</p>
 <ul><li>Titel</li><li>Datum</li></ul>
-<p>Optional können Uhrzeit von/bis, Ort und Beschreibung hinterlegt werden.</p>
+<p>Optional können Uhrzeit von/bis, Ort, Beschreibung und eine <strong>Kategorie</strong> hinterlegt werden.</p>
+<p>Zur Auswahl stehen Geräteeinweisung, Teamsitzung, Meeting, Stationsleiterkonferenz, Begehung, Hospitation, Prüfung und Schulung. Jede Kategorie hat ein eigenes Symbol, das in der Terminübersicht und im Fristenmonitor anstelle des allgemeinen Kalendersymbols erscheint; im Fristenmonitor ersetzt die Kategorie zusätzlich die Bezeichnung „Termin“. Termine ohne Kategorie behalten das Kalendersymbol.</p>
 <h3 id="hilfe-fristenmonitor">Fristenmonitor</h3>
-<p>Der Fristenmonitor auf der Übersichtsseite zeigt:</p>
+<p>Der Fristenmonitor steht auf der Übersichtsseite direkt unter den Kennzahlen. Sechs Einträge bleiben sichtbar, weitere sind innerhalb des Bereichs scrollbar.</p>
+<p>Er zeigt:</p>
 <ul><li>anstehende Termine</li><li>Geburtstage</li><li>fällige und überfällige Pflichtfortbildungen</li><li>ablaufende Zusatzqualifikationen</li></ul>
 <p>Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien lassen sich einzeln ein- oder ausblenden.</p>
 <p>Geburtstage erscheinen mit Name, erreichtem Lebensjahr und vollständigem Geburtsdatum.</p>
@@ -2638,6 +2666,12 @@ npm run verify</code></pre>
             <label class="form-field">
               <span>Datum <em>*</em></span>
               <input id="appointmentDate" name="date" type="date" required />
+            </label>
+            <label class="form-field">
+              <span>Kategorie</span>
+              <select id="appointmentCategory" name="category">
+                <option value="">Ohne Kategorie</option>
+              </select>
             </label>
             <label class="form-field">
               <span>Ort</span>
