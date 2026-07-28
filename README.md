@@ -123,6 +123,7 @@ Administratoren dürfen zusätzlich drei Einstellungen ändern:
 - **Speicherort** – zwischen lokalem Browserspeicher und MariaDB wechseln
 - **Benutzer verwalten** – siehe unten
 - **Sicherungserinnerung** – nach wie vielen Tagen TeO zur Sicherung mahnt
+- **Dialoge schließen** – ob ein Klick neben einen Dialog diesen schließt
 
 Zusätzlich ist das **Änderungsprotokoll** Administratoren vorbehalten, weil es
 die Tätigkeit der übrigen Konten nachvollziehbar macht.
@@ -131,6 +132,22 @@ Diese Aufteilung gilt im lokalen Modus und im MariaDB-Modus gleichermaßen. Im
 MariaDB-Modus setzt der Server sie unabhängig vom Browser durch: Ein normales
 Konto kann Benutzerkonten und die Sicherungserinnerung auch dann nicht
 verändern, wenn der Client umgangen wird.
+
+### Dialoge schließen
+
+Unter **Einstellungen → Dialoge schließen** wird festgelegt, wie sich ein Klick
+neben einen geöffneten Dialog auswirkt:
+
+- **Schließt den Dialog nicht** (Voreinstellung) – Dialoge lassen sich nur über
+  ihre Schaltflächen oder die Escape-Taste verlassen. Das verhindert, dass ein
+  versehentlicher Klick eine begonnene Eingabe beendet.
+- **Schließt den Dialog** – ein Klick auf die abgedunkelte Fläche schließt den
+  Dialog.
+
+In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten
+Eingaben, fragt TeO vorher nach. Die drei Anmeldedialoge – Ersteinrichtung,
+Anmeldung und Passwortänderung – bleiben von der Einstellung unberührt und
+lassen sich weder per Klick daneben noch per Escape schließen.
 
 ### Benutzer verwalten
 
@@ -241,12 +258,25 @@ Ein Klick auf einen Mitarbeiter öffnet die Gesamtakte mit:
 einzelnen String. Die Adressen werden durch Semikolon getrennt und direkt in
 die Zwischenablage kopiert.
 
+### Benutzernamen exportieren
+
+**Benutzernamen kopieren** arbeitet nach demselben Prinzip und kopiert die
+Benutzernamen der aktuell gefilterten Mitarbeiter, ebenfalls durch Semikolon
+getrennt. Mitarbeiter ohne hinterlegten Benutzernamen werden übersprungen,
+doppelte Namen nur einmal aufgenommen. Beide Schaltflächen zeigen die Anzahl
+der betroffenen Einträge an.
+
 ### Telefonliste drucken
 
 **Telefonliste drucken** öffnet eine integrierte DIN-A4-Druckvorschau innerhalb
 von TeO. Es wird kein separates Browser- oder `about:blank`-Fenster benötigt.
 Die Liste ist alphabetisch nach Nachname und Vorname sortiert und enthält
 ausschließlich die Spalten **Name** und **Nummer**.
+
+Die Telefonliste enthält immer alle Mitarbeiter mit dem Status **Aktiv** oder
+**In Einarbeitung** – unabhängig davon, welche Filter in der Mitarbeiterübersicht
+gerade gesetzt sind. Sie ist als Aushang gedacht und soll jede im Dienst
+erreichbare Person führen. Inaktive Mitarbeiter erscheinen nicht.
 
 Abhängig von der Anzahl der Mitarbeiter verteilt TeO die Liste automatisch
 auf einen, zwei oder drei nebeneinanderliegende Tabellenblöcke. Rund 60
@@ -440,9 +470,15 @@ Historische Nachweise können anschließend korrigiert oder gelöscht werden.
 Die Jahresmatrix zeigt:
 
 - aktive Mitarbeiter in der ersten Spalte
-- Pflichtfortbildungen in der Kopfzeile
+- Pflichtfortbildungen in der Kopfzeile, darunter jeweils der
+  Komplettierungsgrad in Prozent
 - grünes Häkchen für erfüllt
 - rotes Kreuz für offen
+
+Der Komplettierungsgrad gibt an, welcher Anteil der aktiven Mitarbeiter diese
+Pflicht zum Jahresende erfüllt. Die Farbskala entspricht der Einweisungsmatrix:
+bis 65 Prozent rot, bis 80 Prozent orange, darüber grün. Der Tooltip nennt die
+absoluten Zahlen.
 
 Mehrjährig gültige Nachweise erfüllen auch nachfolgende Auswertungsjahre.
 Die Matrix kann gedruckt, als PDF gespeichert oder Excel-kompatibel als CSV
@@ -495,6 +531,11 @@ Im Gerätekatalog werden verwaltet:
 
 Der Katalog ist alphabetisch nach Gerätenamen sortiert. Standardmäßig werden
 nur Geräte aus dem aktuellen Bestand angezeigt.
+
+Über das Suchfeld der Geräteverwaltung lässt sich der Katalog nach **Geräte-
+oder Herstellername** durchsuchen. Die Suche unterscheidet keine Groß- und
+Kleinschreibung und wirkt zusätzlich zu den Filtern für Bestand, Anlage 1 und
+Kategorie.
 
 ### Einweisung dokumentieren
 

@@ -503,6 +503,14 @@
               </button>
               <button
                 class="button button-secondary"
+                id="copyUsernamesButton"
+                type="button"
+              >
+                <svg><use href="#icon-copy"></use></svg>
+                <span id="copyUsernamesLabel">Benutzernamen kopieren</span>
+              </button>
+              <button
+                class="button button-secondary"
                 id="exportEmployeePhoneListButton"
                 type="button"
               >
@@ -916,6 +924,19 @@
 
           <section class="panel device-management-filter-panel">
             <div class="device-filter-bar">
+              <label
+                class="search-field device-search-field"
+                for="deviceManagementSearch"
+              >
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="deviceManagementSearch"
+                  type="search"
+                  aria-label="Geräte im Katalog durchsuchen"
+                  placeholder="Gerätename oder Hersteller suchen …"
+                  autocomplete="off"
+                />
+              </label>
               <label class="compact-field">
                 <span>Gerätebestand</span>
                 <select id="deviceManagementInventoryFilter">
@@ -1180,6 +1201,33 @@
                 </button>
               </div>
             </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-admin">
+                  <svg><use href="#icon-edit"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Bedienung</p>
+                  <h2>Dialoge schließen</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Legt fest, ob ein Klick neben einen geöffneten Dialog diesen
+                schließt. Ist die Einstellung aus, lassen sich Dialoge nur über
+                ihre Schaltflächen oder die Escape-Taste verlassen. Bei
+                ungespeicherten Eingaben wird in beiden Fällen nachgefragt.
+              </p>
+              <div class="settings-inline-form">
+                <label class="settings-field">
+                  <span>Klick neben den Dialog</span>
+                  <select id="settingsCloseDialogOnOutsideClick">
+                    <option value="off">Schließt den Dialog nicht</option>
+                    <option value="on">Schließt den Dialog</option>
+                  </select>
+                </label>
+              </div>
+            </section>
           </div>
 
           <section
@@ -1335,9 +1383,13 @@
 <ul><li>Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen</li><li>Berufe und Zusatzqualifikationen verwalten</li><li>Pflichtfortbildungen, Fortbildungsreihen und Nachweise verwalten</li><li>Teamsitzungen, Teilnahmen und Termine verwalten</li><li>Geräte und Geräteeinweisungen verwalten</li><li>Urlaubsansprüche und Abwesenheitsplanung bearbeiten</li><li>Dienstwochenenden konfigurieren und Simulationen übernehmen</li><li>Datenqualität prüfen, Telefonliste und E-Mail-Adressen exportieren</li><li>Daten sichern, prüfen und Sicherungen importieren</li><li>das eigene Passwort und das Farbthema ändern</li></ul>
 <h3 id="hilfe-administratoren">Administratoren</h3>
 <p>Administratoren dürfen zusätzlich drei Einstellungen ändern:</p>
-<ul><li><strong>Speicherort</strong> – zwischen lokalem Browserspeicher und MariaDB wechseln</li><li><strong>Benutzer verwalten</strong> – siehe unten</li><li><strong>Sicherungserinnerung</strong> – nach wie vielen Tagen TeO zur Sicherung mahnt</li></ul>
+<ul><li><strong>Speicherort</strong> – zwischen lokalem Browserspeicher und MariaDB wechseln</li><li><strong>Benutzer verwalten</strong> – siehe unten</li><li><strong>Sicherungserinnerung</strong> – nach wie vielen Tagen TeO zur Sicherung mahnt</li><li><strong>Dialoge schließen</strong> – ob ein Klick neben einen Dialog diesen schließt</li></ul>
 <p>Zusätzlich ist das <strong>Änderungsprotokoll</strong> Administratoren vorbehalten, weil es die Tätigkeit der übrigen Konten nachvollziehbar macht.</p>
 <p>Diese Aufteilung gilt im lokalen Modus und im MariaDB-Modus gleichermaßen. Im MariaDB-Modus setzt der Server sie unabhängig vom Browser durch: Ein normales Konto kann Benutzerkonten und die Sicherungserinnerung auch dann nicht verändern, wenn der Client umgangen wird.</p>
+<h3 id="hilfe-dialoge-schlie-en">Dialoge schließen</h3>
+<p>Unter <strong>Einstellungen → Dialoge schließen</strong> wird festgelegt, wie sich ein Klick neben einen geöffneten Dialog auswirkt:</p>
+<ul><li><strong>Schließt den Dialog nicht</strong> (Voreinstellung) – Dialoge lassen sich nur über ihre Schaltflächen oder die Escape-Taste verlassen. Das verhindert, dass ein versehentlicher Klick eine begonnene Eingabe beendet.</li><li><strong>Schließt den Dialog</strong> – ein Klick auf die abgedunkelte Fläche schließt den Dialog.</li></ul>
+<p>In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten Eingaben, fragt TeO vorher nach. Die drei Anmeldedialoge – Ersteinrichtung, Anmeldung und Passwortänderung – bleiben von der Einstellung unberührt und lassen sich weder per Klick daneben noch per Escape schließen.</p>
 <h3 id="hilfe-benutzer-verwalten">Benutzer verwalten</h3>
 <p>Über <strong>Einstellungen → Stammdaten &amp; Zugriffe → Benutzer verwalten</strong> stehen Administratoren zur Verfügung:</p>
 <ul><li><strong>Konto anlegen</strong> – Benutzername und Rolle wählen. TeO erzeugt ein einmalig angezeigtes temporäres Passwort; beim ersten Anmelden muss der Benutzer ein eigenes Passwort festlegen.</li><li><strong>Benutzername ändern</strong> – 4 bis 40 Buchstaben oder Ziffern, eindeutig.</li><li><strong>Passwort zurücksetzen</strong> – für jedes andere Konto, auch für weitere Administratoren. Es entsteht wieder ein temporäres Passwort. Das eigene Passwort wird stattdessen über <strong>Konto → Passwort ändern</strong> geändert.</li><li><strong>Konto löschen</strong> – dauerhaft; der fachliche Datenbestand bleibt unberührt.</li></ul>
@@ -1370,8 +1422,11 @@
 <ul><li>Stammdaten und Kontaktdaten</li><li>Beschäftigungsstatus und Stellenanteil</li><li>Qualifikationen und Ablaufdaten</li><li>Pflichtfortbildungsstatus</li><li>Teamsitzungsteilnahmen</li><li>Druckansicht</li></ul>
 <h3 id="hilfe-e-mail-adressen-exportieren">E-Mail-Adressen exportieren</h3>
 <p><strong>E-Mails kopieren</strong> erzeugt aus den sichtbaren, aktiven Mitarbeitern einen einzelnen String. Die Adressen werden durch Semikolon getrennt und direkt in die Zwischenablage kopiert.</p>
+<h3 id="hilfe-benutzernamen-exportieren">Benutzernamen exportieren</h3>
+<p><strong>Benutzernamen kopieren</strong> arbeitet nach demselben Prinzip und kopiert die Benutzernamen der aktuell gefilterten Mitarbeiter, ebenfalls durch Semikolon getrennt. Mitarbeiter ohne hinterlegten Benutzernamen werden übersprungen, doppelte Namen nur einmal aufgenommen. Beide Schaltflächen zeigen die Anzahl der betroffenen Einträge an.</p>
 <h3 id="hilfe-telefonliste-drucken">Telefonliste drucken</h3>
 <p><strong>Telefonliste drucken</strong> öffnet eine integrierte DIN-A4-Druckvorschau innerhalb von TeO. Es wird kein separates Browser- oder <code>about:blank</code>-Fenster benötigt. Die Liste ist alphabetisch nach Nachname und Vorname sortiert und enthält ausschließlich die Spalten <strong>Name</strong> und <strong>Nummer</strong>.</p>
+<p>Die Telefonliste enthält immer alle Mitarbeiter mit dem Status <strong>Aktiv</strong> oder <strong>In Einarbeitung</strong> – unabhängig davon, welche Filter in der Mitarbeiterübersicht gerade gesetzt sind. Sie ist als Aushang gedacht und soll jede im Dienst erreichbare Person führen. Inaktive Mitarbeiter erscheinen nicht.</p>
 <p>Abhängig von der Anzahl der Mitarbeiter verteilt TeO die Liste automatisch auf einen, zwei oder drei nebeneinanderliegende Tabellenblöcke. Rund 60 Mitarbeiter werden auf zwei breite Blöcke mit jeweils ungefähr 30 Zeilen verteilt. Schriftgröße und Zeilenhöhe passen sich an die Listenlänge an, damit die DIN-A4-Seite innerhalb eines umlaufenden Randes von 15 mm möglichst vollständig genutzt wird. Über den Browser-Druckdialog kann sie gedruckt oder als PDF gespeichert werden. Mitarbeiter ohne Telefonnummer bleiben mit einem leeren Eintrag sichtbar.</p>
 <p>Der Seitenrand ist Bestandteil der Druckfläche und damit unabhängig von den Randvorgaben des Browsers oder Druckertreibers sichtbar.</p>
 <p>Die Druckgestaltung ist für einen Schwarzweiß-Laserdrucker ausgelegt. Informationen werden nicht ausschließlich über Farbe vermittelt. Schwarze Trennlinien, kontrastreiche Tabellenköpfe und sparsame Grauflächen sorgen auch ohne aktivierten Farbdruck für eine gut lesbare Liste.</p>
@@ -1441,7 +1496,8 @@
 <p>Historische Nachweise können anschließend korrigiert oder gelöscht werden.</p>
 <h3 id="hilfe-jahresauswertung">Jahresauswertung</h3>
 <p>Die Jahresmatrix zeigt:</p>
-<ul><li>aktive Mitarbeiter in der ersten Spalte</li><li>Pflichtfortbildungen in der Kopfzeile</li><li>grünes Häkchen für erfüllt</li><li>rotes Kreuz für offen</li></ul>
+<ul><li>aktive Mitarbeiter in der ersten Spalte</li><li>Pflichtfortbildungen in der Kopfzeile, darunter jeweils der Komplettierungsgrad in Prozent</li><li>grünes Häkchen für erfüllt</li><li>rotes Kreuz für offen</li></ul>
+<p>Der Komplettierungsgrad gibt an, welcher Anteil der aktiven Mitarbeiter diese Pflicht zum Jahresende erfüllt. Die Farbskala entspricht der Einweisungsmatrix: bis 65 Prozent rot, bis 80 Prozent orange, darüber grün. Der Tooltip nennt die absoluten Zahlen.</p>
 <p>Mehrjährig gültige Nachweise erfüllen auch nachfolgende Auswertungsjahre. Die Matrix kann gedruckt, als PDF gespeichert oder Excel-kompatibel als CSV exportiert werden.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-teamsitzungen">
@@ -1462,6 +1518,7 @@
 <p>Im Gerätekatalog werden verwaltet:</p>
 <ul><li>Hersteller</li><li>Produkt- oder Modellname</li><li>Gerätekategorie</li><li>aktueller Gerätebestand</li><li>Medizinprodukt der Anlage 1</li></ul>
 <p>Der Katalog ist alphabetisch nach Gerätenamen sortiert. Standardmäßig werden nur Geräte aus dem aktuellen Bestand angezeigt.</p>
+<p>Über das Suchfeld der Geräteverwaltung lässt sich der Katalog nach <strong>Geräte- oder Herstellername</strong> durchsuchen. Die Suche unterscheidet keine Groß- und Kleinschreibung und wirkt zusätzlich zu den Filtern für Bestand, Anlage 1 und Kategorie.</p>
 <h3 id="hilfe-einweisung-dokumentieren">Einweisung dokumentieren</h3>
 <p>Eine Geräteeinweisung enthält:</p>
 <ul><li>Gerät</li><li>Einweisungsdatum</li><li>einen oder mehrere Teilnehmer</li><li>Einweisenden</li></ul>

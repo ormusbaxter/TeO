@@ -24,13 +24,25 @@ async function loadServerPermissionChecks() {
     "isPermittedOwnUserMutation",
     "deepEqual",
   ];
-  const extracted = names.map((name) => {
-    const start = source.indexOf(`function ${name}(`);
-    assert.notEqual(start, -1, `${name} wurde in server.js nicht gefunden`);
-    const end = source.indexOf("\n}\n", start);
-    assert.notEqual(end, -1, `Ende von ${name} wurde nicht gefunden`);
-    return source.slice(start, end + 2);
-  });
+  // Konstanten, auf die diese Funktionen zugreifen
+  const constants = ["ADMIN_ONLY_SETTINGS"];
+
+  const extracted = [
+    ...constants.map((name) => {
+      const start = source.indexOf(`const ${name} =`);
+      assert.notEqual(start, -1, `${name} wurde in server.js nicht gefunden`);
+      const end = source.indexOf(";\n", start);
+      assert.notEqual(end, -1, `Ende von ${name} wurde nicht gefunden`);
+      return source.slice(start, end + 1);
+    }),
+    ...names.map((name) => {
+      const start = source.indexOf(`function ${name}(`);
+      assert.notEqual(start, -1, `${name} wurde in server.js nicht gefunden`);
+      const end = source.indexOf("\n}\n", start);
+      assert.notEqual(end, -1, `Ende von ${name} wurde nicht gefunden`);
+      return source.slice(start, end + 2);
+    }),
+  ];
   const context = { structuredClone, JSON };
   context.globalThis = context;
   vm.createContext(context);
@@ -59,6 +71,7 @@ function createServerState(overrides = {}) {
     settings: {
       theme: "standard",
       backupReminderDays: 14,
+      closeDialogOnOutsideClick: false,
       deadlineKinds: ["training"],
       meetingAttendanceThreshold: 70,
     },
@@ -128,6 +141,9 @@ test("Normale Konten dürfen Sicherungserinnerung und fremde Konten nicht änder
   const forbidden = {
     Sicherungserinnerung: (next) => {
       next.settings.backupReminderDays = 30;
+    },
+    "Schließverhalten der Dialoge": (next) => {
+      next.settings.closeDialogOnOutsideClick = true;
     },
     "fremdes Konto": (next) => {
       next.users[1].passwordHash = "hash-fremd";
@@ -255,8 +271,9 @@ test("Der Client sperrt genau dieselben drei Bereiche wie der Server", async () 
       // Speicherort
       "applyStorageBackend",
       "testBackendConnection",
-      // Sicherungserinnerung
+      // Sicherungserinnerung und Schliessverhalten der Dialoge
       "saveGeneralSettings",
+      "saveCloseDialogOnOutsideClick",
       // Änderungsprotokoll als Kontrollinstrument
       "exportAuditLogCsv",
       "openAuditLogDialog",

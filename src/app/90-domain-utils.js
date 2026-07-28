@@ -388,6 +388,20 @@
     return getFilteredEmployeeEmailAddresses().join(";");
   }
 
+  function getFilteredEmployeeUsernames() {
+    const seenUsernames = new Set();
+
+    return filteredEmployeesForTable()
+      .map((employee) => employee.username.trim())
+      .filter((username) => {
+        if (!username) return false;
+        const normalizedUsername = username.toLocaleLowerCase("de-DE");
+        if (seenUsernames.has(normalizedUsername)) return false;
+        seenUsernames.add(normalizedUsername);
+        return true;
+      });
+  }
+
   function updateEmailExportButton() {
     const emailCount = getFilteredEmployeeEmailAddresses().length;
     elements.copyActiveEmailsLabel.textContent = emailCount
@@ -401,8 +415,32 @@
     );
   }
 
+  function updateUsernameExportButton() {
+    const usernameCount = getFilteredEmployeeUsernames().length;
+    elements.copyUsernamesLabel.textContent = usernameCount
+      ? `Benutzernamen kopieren (${usernameCount})`
+      : "Benutzernamen kopieren";
+    elements.copyUsernamesButton.setAttribute(
+      "aria-label",
+      usernameCount
+        ? `${usernameCount} Benutzernamen der aktuell gefilterten Mitarbeiter kopieren`
+        : "Benutzernamen der aktuell gefilterten Mitarbeiter kopieren",
+    );
+  }
+
+  // Die Telefonliste haengt bewusst nicht an den Tabellenfiltern: Sie wird
+  // ausgehaengt und soll jede Person enthalten, die im Dienst erreichbar ist.
+  // Das sind alle aktiven und alle in Einarbeitung befindlichen Mitarbeiter.
+  const PHONE_LIST_EMPLOYMENT_STATUSES = ["active", "onboarding"];
+
+  function employeesForPhoneList() {
+    return state.employees.filter((employee) =>
+      PHONE_LIST_EMPLOYMENT_STATUSES.includes(employee.employmentStatus),
+    );
+  }
+
   function getFilteredEmployeePhoneListRows() {
-    return filteredEmployeesForTable()
+    return employeesForPhoneList()
       .sort(sortEmployees)
       .map((employee) => [fullName(employee), employee.phone]);
   }
@@ -415,8 +453,8 @@
     elements.exportEmployeePhoneListButton.setAttribute(
       "aria-label",
       employeeCount
-        ? `Telefonliste für ${employeeCount} aktuell gefilterte Mitarbeiter drucken`
-        : "Telefonliste der aktuell gefilterten Mitarbeiter drucken",
+        ? `Telefonliste für ${employeeCount} aktive und einzuarbeitende Mitarbeiter drucken`
+        : "Telefonliste der aktiven und einzuarbeitenden Mitarbeiter drucken",
     );
   }
 
@@ -476,7 +514,7 @@
     const rows = getFilteredEmployeePhoneListRows();
     if (rows.length === 0) {
       showToast(
-        "Die aktuellen Mitarbeiterfilter liefern keine Einträge für die Telefonliste.",
+        "Es sind keine aktiven oder einzuarbeitenden Mitarbeiter erfasst.",
         "error",
       );
       return;
@@ -485,7 +523,7 @@
     elements.phoneListPreviewContent.innerHTML = previewMarkup;
     elements.phoneListPrintSurface.innerHTML = previewMarkup;
     elements.phoneListPreviewSubtitle.textContent =
-      `${rows.length} gefilterte Mitarbeiter · DIN A4 Hochformat`;
+      `${rows.length} aktive und einzuarbeitende Mitarbeiter · DIN A4 Hochformat`;
     elements.phoneListPreviewDialog.showModal();
   }
 
@@ -499,6 +537,31 @@
     );
   }
 
+  async function copyListToClipboard(werte, { erfolg, fehlerProtokoll }) {
+    const exportText = werte.join(";");
+    const meldung = erfolg(werte.length);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(exportText);
+      } else {
+        copyTextWithFallback(exportText);
+      }
+      showToast(meldung);
+    } catch (error) {
+      try {
+        copyTextWithFallback(exportText);
+        showToast(meldung);
+      } catch (fallbackError) {
+        console.error(fehlerProtokoll, error, fallbackError);
+        showToast(
+          "Die Zwischenablage ist nicht verfügbar. Bitte prüfen Sie die Browserberechtigung.",
+          "error",
+        );
+      }
+    }
+  }
+
   async function copyActiveEmployeeEmails() {
     const emailAddresses = getFilteredEmployeeEmailAddresses();
     if (emailAddresses.length === 0) {
@@ -509,36 +572,32 @@
       return;
     }
 
-    const exportText = emailAddresses.join(";");
-
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(exportText);
-      } else {
-        copyTextWithFallback(exportText);
-      }
-
-      showToast(
-        `${emailAddresses.length} E-Mail-Adresse${
-          emailAddresses.length === 1 ? "" : "n"
+    await copyListToClipboard(emailAddresses, {
+      erfolg: (anzahl) =>
+        `${anzahl} E-Mail-Adresse${
+          anzahl === 1 ? "" : "n"
         } wurden in die Zwischenablage kopiert.`,
+      fehlerProtokoll: "E-Mail-Adressen konnten nicht kopiert werden.",
+    });
+  }
+
+  async function copyFilteredEmployeeUsernames() {
+    const usernames = getFilteredEmployeeUsernames();
+    if (usernames.length === 0) {
+      showToast(
+        "Für die aktuell gefilterten Mitarbeiter sind keine Benutzernamen hinterlegt.",
+        "error",
       );
-    } catch (error) {
-      try {
-        copyTextWithFallback(exportText);
-        showToast(
-          `${emailAddresses.length} E-Mail-Adresse${
-            emailAddresses.length === 1 ? "" : "n"
-          } wurden in die Zwischenablage kopiert.`,
-        );
-      } catch (fallbackError) {
-        console.error("E-Mail-Adressen konnten nicht kopiert werden.", error, fallbackError);
-        showToast(
-          "Die Zwischenablage ist nicht verfügbar. Bitte prüfen Sie die Browserberechtigung.",
-          "error",
-        );
-      }
+      return;
     }
+
+    await copyListToClipboard(usernames, {
+      erfolg: (anzahl) =>
+        `${anzahl} Benutzername${
+          anzahl === 1 ? "" : "n"
+        } wurden in die Zwischenablage kopiert.`,
+      fehlerProtokoll: "Benutzernamen konnten nicht kopiert werden.",
+    });
   }
 
   function copyTextWithFallback(text) {

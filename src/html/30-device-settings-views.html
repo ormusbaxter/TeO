@@ -102,6 +102,19 @@
 
           <section class="panel device-management-filter-panel">
             <div class="device-filter-bar">
+              <label
+                class="search-field device-search-field"
+                for="deviceManagementSearch"
+              >
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="deviceManagementSearch"
+                  type="search"
+                  aria-label="Geräte im Katalog durchsuchen"
+                  placeholder="Gerätename oder Hersteller suchen …"
+                  autocomplete="off"
+                />
+              </label>
               <label class="compact-field">
                 <span>Gerätebestand</span>
                 <select id="deviceManagementInventoryFilter">
@@ -364,6 +377,33 @@
                 >
                   Speichern
                 </button>
+              </div>
+            </section>
+
+            <section class="panel settings-card" data-admin-only>
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-admin">
+                  <svg><use href="#icon-edit"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Bedienung</p>
+                  <h2>Dialoge schließen</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Legt fest, ob ein Klick neben einen geöffneten Dialog diesen
+                schließt. Ist die Einstellung aus, lassen sich Dialoge nur über
+                ihre Schaltflächen oder die Escape-Taste verlassen. Bei
+                ungespeicherten Eingaben wird in beiden Fällen nachgefragt.
+              </p>
+              <div class="settings-inline-form">
+                <label class="settings-field">
+                  <span>Klick neben den Dialog</span>
+                  <select id="settingsCloseDialogOnOutsideClick">
+                    <option value="off">Schließt den Dialog nicht</option>
+                    <option value="on">Schließt den Dialog</option>
+                  </select>
+                </label>
               </div>
             </section>
           </div>

@@ -59,6 +59,58 @@ test("Der E-Mail-Export verwendet alle aktuellen Mitarbeiterfilter", async () =>
   );
 });
 
+test("Der Benutzernamen-Export folgt denselben Filtern wie der E-Mail-Export", async () => {
+  const app = await loadAppFunctions([
+    "normalizeState",
+    "getFilteredEmployeeUsernames",
+  ]);
+  const anna = {
+    ...createEmployee("employee-anna"),
+    firstName: "Anna",
+    lastName: "Aktiv",
+    username: "Anna001",
+  };
+  const bert = {
+    ...createEmployee("employee-bert"),
+    firstName: "Bert",
+    lastName: "Inaktiv",
+    username: "Bert001",
+    active: false,
+    employmentStatus: "inactive",
+  };
+  const clara = {
+    ...createEmployee("employee-clara"),
+    firstName: "Clara",
+    lastName: "Ohnekonto",
+    username: "",
+  };
+  app.setState(
+    app.normalizeState(createMinimalState({ employees: [anna, bert, clara] })),
+  );
+
+  // Ohne Filter: alle mit hinterlegtem Benutzernamen, auch inaktive
+  app.setEmployeeFilters({});
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(app.getFilteredEmployeeUsernames())),
+    ["Anna001", "Bert001"],
+    "Mitarbeiter ohne Benutzernamen dürfen nicht erscheinen",
+  );
+
+  app.setEmployeeFilters({ status: "active" });
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(app.getFilteredEmployeeUsernames())),
+    ["Anna001"],
+    "Der Statusfilter muss wirken",
+  );
+
+  app.setEmployeeFilters({ search: "bert" });
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(app.getFilteredEmployeeUsernames())),
+    ["Bert001"],
+    "Die Suche muss wirken",
+  );
+});
+
 test("Der Mitarbeiterfilter findet Personen ohne Qualifikation", async () => {
   const app = await loadAppFunctions([
     "normalizeState",
@@ -95,7 +147,7 @@ test("Der Mitarbeiterfilter findet Personen ohne Qualifikation", async () => {
   assert.equal(app.getFilteredEmployeeEmailExport(), "ohne@example.invalid");
 });
 
-test("Die Telefonliste verwendet Filter, alphabetische Sortierung und nur zwei Spalten", async () => {
+test("Die Telefonliste zeigt aktive und einzuarbeitende Mitarbeiter unabhängig von den Filtern", async () => {
   const app = await loadAppFunctions([
     "normalizeState",
     "getFilteredEmployeePhoneListRows",
@@ -122,22 +174,47 @@ test("Die Telefonliste verwendet Filter, alphabetische Sortierung und nur zwei S
     active: false,
     employmentStatus: "inactive",
   };
+  const onboarding = {
+    ...createEmployee("employee-onboarding"),
+    firstName: "Cara",
+    lastName: "Neu",
+    phone: "0221 555555",
+    employmentStatus: "onboarding",
+  };
   app.setState(
     app.normalizeState(
       createMinimalState({
-        employees: [anna, inactive, zora],
+        employees: [anna, inactive, zora, onboarding],
       }),
     ),
   );
-  app.setEmployeeFilters({ status: "active" });
 
+  const erwartet = [
+    ["Zora Abel", ""],
+    ["Cara Neu", "0221 555555"],
+    ["Anna Ziegler", "+49 221 123456"],
+  ];
+
+  // Ohne Filter: aktive und einzuarbeitende Mitarbeiter, keine inaktiven
   assert.deepEqual(
     JSON.parse(JSON.stringify(app.getFilteredEmployeePhoneListRows())),
-    [
-      ["Zora Abel", ""],
-      ["Anna Ziegler", "+49 221 123456"],
-    ],
+    erwartet,
   );
+
+  // Auch ein enger Tabellenfilter darf die Liste nicht verkuerzen
+  for (const filter of [
+    { status: "active" },
+    { status: "inactive" },
+    { profession: "Stationsassistenz" },
+    { search: "Ziegler" },
+  ]) {
+    app.setEmployeeFilters(filter);
+    assert.deepEqual(
+      JSON.parse(JSON.stringify(app.getFilteredEmployeePhoneListRows())),
+      erwartet,
+      `Filter ${JSON.stringify(filter)} darf die Telefonliste nicht beeinflussen`,
+    );
+  }
 
   const sixtyRows = Array.from(
     { length: 60 },

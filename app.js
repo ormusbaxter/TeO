@@ -358,6 +358,7 @@
   let deviceAnnexFilter = "all";
   let deviceCategoryFilter = "all";
   let deviceSearchTerm = "";
+  let deviceManagementSearchTerm = "";
   let deviceManagementInventoryFilter = "current";
   let deviceManagementAnnexFilter = "all";
   let deviceManagementCategoryFilter = "all";
@@ -408,6 +409,8 @@
     employeeSearch: document.querySelector("#employeeSearch"),
     copyActiveEmailsButton: document.querySelector("#copyActiveEmailsButton"),
     copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),
+    copyUsernamesButton: document.querySelector("#copyUsernamesButton"),
+    copyUsernamesLabel: document.querySelector("#copyUsernamesLabel"),
     exportEmployeePhoneListButton: document.querySelector(
       "#exportEmployeePhoneListButton",
     ),
@@ -440,6 +443,9 @@
     ),
     settingsBackupReminderDays: document.querySelector(
       "#settingsBackupReminderDays",
+    ),
+    settingsCloseDialogOnOutsideClick: document.querySelector(
+      "#settingsCloseDialogOnOutsideClick",
     ),
     saveGeneralSettingsButton: document.querySelector(
       "#saveGeneralSettingsButton",
@@ -514,6 +520,7 @@
     deviceAnnexFilter: document.querySelector("#deviceAnnexFilter"),
     deviceCategoryFilter: document.querySelector("#deviceCategoryFilter"),
     deviceSearch: document.querySelector("#deviceSearch"),
+    deviceManagementSearch: document.querySelector("#deviceManagementSearch"),
     deviceManagementInventoryFilter: document.querySelector(
       "#deviceManagementInventoryFilter",
     ),
@@ -789,6 +796,7 @@
         theme: "standard",
         lastBackupAt: "",
         backupReminderDays: DEFAULT_BACKUP_REMINDER_DAYS,
+        closeDialogOnOutsideClick: false,
         meetingAttendanceThreshold: 70,
         vacationBaseDays: DEFAULT_VACATION_BASE_DAYS,
         vacationWeekendAReferenceSaturday:
@@ -1104,6 +1112,11 @@
           1,
           365,
           DEFAULT_BACKUP_REMINDER_DAYS,
+        ),
+        // Standardmaessig aus: Ein Klick neben den Dialog schliesst ihn nicht,
+        // damit versehentliches Schliessen ausgeschlossen ist.
+        closeDialogOnOutsideClick: Boolean(
+          parsed.settings?.closeDialogOnOutsideClick,
         ),
         meetingAttendanceThreshold: clampNumber(
           parsed.settings?.meetingAttendanceThreshold,
@@ -2003,6 +2016,10 @@
       });
 
     elements.copyActiveEmailsButton.addEventListener("click", copyActiveEmployeeEmails);
+    elements.copyUsernamesButton.addEventListener(
+      "click",
+      copyFilteredEmployeeUsernames,
+    );
     elements.exportEmployeePhoneListButton.addEventListener(
       "click",
       exportEmployeePhoneList,
@@ -2091,6 +2108,12 @@
     document.querySelectorAll("[data-open-data-quality]").forEach((button) => {
       button.addEventListener("click", openDataQualityDialog);
     });
+    elements.settingsCloseDialogOnOutsideClick.addEventListener(
+      "change",
+      (event) => {
+        void saveCloseDialogOnOutsideClick(event.target.value === "on");
+      },
+    );
     elements.saveGeneralSettingsButton.addEventListener(
       "click",
       saveGeneralSettings,
@@ -2350,6 +2373,12 @@
         .toLocaleLowerCase("de-DE");
       renderDeviceInstructionMatrix();
     });
+    elements.deviceManagementSearch.addEventListener("input", (event) => {
+      deviceManagementSearchTerm = event.target.value
+        .trim()
+        .toLocaleLowerCase("de-DE");
+      renderDevices();
+    });
     elements.deviceManagementInventoryFilter.addEventListener(
       "change",
       (event) => {
@@ -2465,6 +2494,9 @@
         requestDialogClose(dialog);
       });
       dialog.addEventListener("click", (event) => {
+        // Die Einstellung wird bei jedem Klick gelesen, damit ein Umschalten
+        // sofort wirkt und die Dialoge nicht neu verdrahtet werden muessen.
+        if (!state.settings.closeDialogOnOutsideClick) return;
         if (event.target !== dialog) return;
         const bounds = dialog.getBoundingClientRect();
         const inside =
@@ -2749,6 +2781,7 @@
       state.devices.filter((device) => device.currentInventory).length,
     );
     updateEmailExportButton();
+    updateUsernameExportButton();
     renderDashboard();
     renderDeadlineOverview();
     renderEmployees();
@@ -6192,6 +6225,7 @@
     renderEmployeeFilterOptions();
     const filtered = filteredEmployeesForTable();
     updateEmailExportButton();
+    updateUsernameExportButton();
     updatePhoneListExportButton();
 
     updateEmployeeBulkBar();
@@ -6685,12 +6719,19 @@
           <thead>
             <tr>
               <th scope="col">Aktive Mitarbeiter</th>
-              ${matrix.trainings
+              ${matrix.trainingColumns
                 .map(
-                  (training) =>
-                    `<th scope="col" title="${escapeHtml(training.title)}">${escapeHtml(
-                      training.title,
-                    )}</th>`,
+                  ({ training, completedCount, completionRate }) => `
+                    <th scope="col" title="${escapeHtml(training.title)}">
+                      <span>${escapeHtml(training.title)}</span>
+                      <small
+                        class="completion-progress ${completionProgressTone(completionRate)}"
+                        title="${completedCount} von ${matrix.employees.length} aktiven Mitarbeitern erfüllen diese Pflicht zum Jahresende"
+                      >
+                        ${completionRate}&thinsp;% erfüllt
+                      </small>
+                    </th>
+                  `,
                 )
                 .join("")}
             </tr>
@@ -6798,9 +6839,10 @@
       .sort((a, b) => a.title.localeCompare(b.title, "de"));
     const employees = [...activeEmployeeList()].sort(sortEmployees);
     let completedAssignments = 0;
+    const completedPerTraining = trainings.map(() => 0);
     const rows = employees.map((employee) => ({
       employee,
-      statuses: trainings.map((training) => {
+      statuses: trainings.map((training, trainingIndex) => {
         const latest = latestCompletionForTraining(
           employee.id,
           training,
@@ -6811,7 +6853,10 @@
             (!training.recurrenceMonths ||
               addMonths(latest.completedOn, training.recurrenceMonths) >= referenceDate),
         );
-        if (completed) completedAssignments += 1;
+        if (completed) {
+          completedAssignments += 1;
+          completedPerTraining[trainingIndex] += 1;
+        }
         return { training, completed, completion: latest || null };
       }),
     }));
@@ -6820,6 +6865,13 @@
     return {
       year,
       trainings,
+      // Je Fortbildung, wie viele der aktiven Mitarbeiter sie zum Jahresende
+      // erfuellt haben - Grundlage fuer den Komplettierungsgrad in der Spalte.
+      trainingColumns: trainings.map((training, trainingIndex) => ({
+        training,
+        completedCount: completedPerTraining[trainingIndex],
+        completionRate: percentage(completedPerTraining[trainingIndex], employees.length),
+      })),
       employees,
       rows,
       completedAssignments,
@@ -7226,7 +7278,7 @@
       inventoryFilter: deviceManagementInventoryFilter,
       annexFilter: deviceManagementAnnexFilter,
       categoryFilter: deviceManagementCategoryFilter,
-      searchTerm: "",
+      searchTerm: deviceManagementSearchTerm,
     });
     if (!state.devices.length) {
       elements.deviceCatalog.innerHTML = `
@@ -7247,7 +7299,9 @@
         <section class="panel">
           ${renderEmptyState({
             title: "Keine Geräte für diese Filter",
-            text: "Passen Sie Anlage-1- oder Kategoriefilter an.",
+            text: deviceManagementSearchTerm
+              ? "Passen Sie den Suchbegriff oder die Filter an."
+              : "Passen Sie Anlage-1- oder Kategoriefilter an.",
             compact: true,
           })}
         </section>
@@ -7419,7 +7473,7 @@
                     <th scope="col" title="${escapeHtml(deviceLabel(device))}">
                       <span>${escapeHtml(device.manufacturer)}</span>
                       <strong>${escapeHtml(device.productName)}</strong>
-                      <small class="device-instruction-progress ${deviceInstructionProgressTone(
+                      <small class="completion-progress ${completionProgressTone(
                         instructionPercentage,
                       )}">
                         ${instructionPercentage} % eingewiesen
@@ -7572,7 +7626,9 @@
     return Math.round((instructedCount / employees.length) * 100);
   }
 
-  function deviceInstructionProgressTone(percentage) {
+  // Gemeinsam genutzt von der Einweisungsmatrix und der Jahresauswertung der
+  // Pflichtfortbildungen, damit beide denselben Farbmassstab verwenden.
+  function completionProgressTone(percentage) {
     if (percentage <= 65) return "is-low";
     if (percentage <= 80) return "is-medium";
     return "is-high";
@@ -10198,6 +10254,10 @@
     elements.settingsBackupReminderDays.value = String(
       state.settings.backupReminderDays,
     );
+    elements.settingsCloseDialogOnOutsideClick.value = state.settings
+      .closeDialogOnOutsideClick
+      ? "on"
+      : "off";
     elements.settingsStorageBackend.value = backendMode;
     elements.settingsMariaDbApiUrl.value =
       backendConfig.apiUrl ||
@@ -10499,6 +10559,27 @@
     elements.testBackendConnectionButton.disabled = busy;
     elements.applyStorageBackendButton.disabled = busy;
     elements.settingsStorageBackend.disabled = busy;
+  }
+
+  async function saveCloseDialogOnOutsideClick(aktiviert) {
+    if (!requireAdmin()) {
+      renderSettings();
+      return;
+    }
+    if (aktiviert === state.settings.closeDialogOnOutsideClick) return;
+
+    const committed = await commitStateMutation(() => {
+      state.settings.closeDialogOnOutsideClick = aktiviert;
+    });
+    if (!committed) {
+      renderSettings();
+      return;
+    }
+    showToast(
+      aktiviert
+        ? "Ein Klick neben einen Dialog schließt ihn wieder."
+        : "Dialoge bleiben bei einem Klick daneben geöffnet.",
+    );
   }
 
   async function saveGeneralSettings() {
@@ -11190,6 +11271,20 @@
     return getFilteredEmployeeEmailAddresses().join(";");
   }
 
+  function getFilteredEmployeeUsernames() {
+    const seenUsernames = new Set();
+
+    return filteredEmployeesForTable()
+      .map((employee) => employee.username.trim())
+      .filter((username) => {
+        if (!username) return false;
+        const normalizedUsername = username.toLocaleLowerCase("de-DE");
+        if (seenUsernames.has(normalizedUsername)) return false;
+        seenUsernames.add(normalizedUsername);
+        return true;
+      });
+  }
+
   function updateEmailExportButton() {
     const emailCount = getFilteredEmployeeEmailAddresses().length;
     elements.copyActiveEmailsLabel.textContent = emailCount
@@ -11203,8 +11298,32 @@
     );
   }
 
+  function updateUsernameExportButton() {
+    const usernameCount = getFilteredEmployeeUsernames().length;
+    elements.copyUsernamesLabel.textContent = usernameCount
+      ? `Benutzernamen kopieren (${usernameCount})`
+      : "Benutzernamen kopieren";
+    elements.copyUsernamesButton.setAttribute(
+      "aria-label",
+      usernameCount
+        ? `${usernameCount} Benutzernamen der aktuell gefilterten Mitarbeiter kopieren`
+        : "Benutzernamen der aktuell gefilterten Mitarbeiter kopieren",
+    );
+  }
+
+  // Die Telefonliste haengt bewusst nicht an den Tabellenfiltern: Sie wird
+  // ausgehaengt und soll jede Person enthalten, die im Dienst erreichbar ist.
+  // Das sind alle aktiven und alle in Einarbeitung befindlichen Mitarbeiter.
+  const PHONE_LIST_EMPLOYMENT_STATUSES = ["active", "onboarding"];
+
+  function employeesForPhoneList() {
+    return state.employees.filter((employee) =>
+      PHONE_LIST_EMPLOYMENT_STATUSES.includes(employee.employmentStatus),
+    );
+  }
+
   function getFilteredEmployeePhoneListRows() {
-    return filteredEmployeesForTable()
+    return employeesForPhoneList()
       .sort(sortEmployees)
       .map((employee) => [fullName(employee), employee.phone]);
   }
@@ -11217,8 +11336,8 @@
     elements.exportEmployeePhoneListButton.setAttribute(
       "aria-label",
       employeeCount
-        ? `Telefonliste für ${employeeCount} aktuell gefilterte Mitarbeiter drucken`
-        : "Telefonliste der aktuell gefilterten Mitarbeiter drucken",
+        ? `Telefonliste für ${employeeCount} aktive und einzuarbeitende Mitarbeiter drucken`
+        : "Telefonliste der aktiven und einzuarbeitenden Mitarbeiter drucken",
     );
   }
 
@@ -11278,7 +11397,7 @@
     const rows = getFilteredEmployeePhoneListRows();
     if (rows.length === 0) {
       showToast(
-        "Die aktuellen Mitarbeiterfilter liefern keine Einträge für die Telefonliste.",
+        "Es sind keine aktiven oder einzuarbeitenden Mitarbeiter erfasst.",
         "error",
       );
       return;
@@ -11287,7 +11406,7 @@
     elements.phoneListPreviewContent.innerHTML = previewMarkup;
     elements.phoneListPrintSurface.innerHTML = previewMarkup;
     elements.phoneListPreviewSubtitle.textContent =
-      `${rows.length} gefilterte Mitarbeiter · DIN A4 Hochformat`;
+      `${rows.length} aktive und einzuarbeitende Mitarbeiter · DIN A4 Hochformat`;
     elements.phoneListPreviewDialog.showModal();
   }
 
@@ -11301,6 +11420,31 @@
     );
   }
 
+  async function copyListToClipboard(werte, { erfolg, fehlerProtokoll }) {
+    const exportText = werte.join(";");
+    const meldung = erfolg(werte.length);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(exportText);
+      } else {
+        copyTextWithFallback(exportText);
+      }
+      showToast(meldung);
+    } catch (error) {
+      try {
+        copyTextWithFallback(exportText);
+        showToast(meldung);
+      } catch (fallbackError) {
+        console.error(fehlerProtokoll, error, fallbackError);
+        showToast(
+          "Die Zwischenablage ist nicht verfügbar. Bitte prüfen Sie die Browserberechtigung.",
+          "error",
+        );
+      }
+    }
+  }
+
   async function copyActiveEmployeeEmails() {
     const emailAddresses = getFilteredEmployeeEmailAddresses();
     if (emailAddresses.length === 0) {
@@ -11311,36 +11455,32 @@
       return;
     }
 
-    const exportText = emailAddresses.join(";");
-
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(exportText);
-      } else {
-        copyTextWithFallback(exportText);
-      }
-
-      showToast(
-        `${emailAddresses.length} E-Mail-Adresse${
-          emailAddresses.length === 1 ? "" : "n"
+    await copyListToClipboard(emailAddresses, {
+      erfolg: (anzahl) =>
+        `${anzahl} E-Mail-Adresse${
+          anzahl === 1 ? "" : "n"
         } wurden in die Zwischenablage kopiert.`,
+      fehlerProtokoll: "E-Mail-Adressen konnten nicht kopiert werden.",
+    });
+  }
+
+  async function copyFilteredEmployeeUsernames() {
+    const usernames = getFilteredEmployeeUsernames();
+    if (usernames.length === 0) {
+      showToast(
+        "Für die aktuell gefilterten Mitarbeiter sind keine Benutzernamen hinterlegt.",
+        "error",
       );
-    } catch (error) {
-      try {
-        copyTextWithFallback(exportText);
-        showToast(
-          `${emailAddresses.length} E-Mail-Adresse${
-            emailAddresses.length === 1 ? "" : "n"
-          } wurden in die Zwischenablage kopiert.`,
-        );
-      } catch (fallbackError) {
-        console.error("E-Mail-Adressen konnten nicht kopiert werden.", error, fallbackError);
-        showToast(
-          "Die Zwischenablage ist nicht verfügbar. Bitte prüfen Sie die Browserberechtigung.",
-          "error",
-        );
-      }
+      return;
     }
+
+    await copyListToClipboard(usernames, {
+      erfolg: (anzahl) =>
+        `${anzahl} Benutzername${
+          anzahl === 1 ? "" : "n"
+        } wurden in die Zwischenablage kopiert.`,
+      fehlerProtokoll: "Benutzernamen konnten nicht kopiert werden.",
+    });
   }
 
   function copyTextWithFallback(text) {

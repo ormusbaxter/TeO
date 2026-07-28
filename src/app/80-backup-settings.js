@@ -341,6 +341,10 @@
     elements.settingsBackupReminderDays.value = String(
       state.settings.backupReminderDays,
     );
+    elements.settingsCloseDialogOnOutsideClick.value = state.settings
+      .closeDialogOnOutsideClick
+      ? "on"
+      : "off";
     elements.settingsStorageBackend.value = backendMode;
     elements.settingsMariaDbApiUrl.value =
       backendConfig.apiUrl ||
@@ -642,6 +646,27 @@
     elements.testBackendConnectionButton.disabled = busy;
     elements.applyStorageBackendButton.disabled = busy;
     elements.settingsStorageBackend.disabled = busy;
+  }
+
+  async function saveCloseDialogOnOutsideClick(aktiviert) {
+    if (!requireAdmin()) {
+      renderSettings();
+      return;
+    }
+    if (aktiviert === state.settings.closeDialogOnOutsideClick) return;
+
+    const committed = await commitStateMutation(() => {
+      state.settings.closeDialogOnOutsideClick = aktiviert;
+    });
+    if (!committed) {
+      renderSettings();
+      return;
+    }
+    showToast(
+      aktiviert
+        ? "Ein Klick neben einen Dialog schließt ihn wieder."
+        : "Dialoge bleiben bei einem Klick daneben geöffnet.",
+    );
   }
 
   async function saveGeneralSettings() {

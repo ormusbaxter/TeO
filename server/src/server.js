@@ -358,7 +358,7 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
       return response.status(403).json({
         code: "forbidden_mutation",
         message:
-          "Benutzerkonten und die Sicherungserinnerung können nur von einem Administrator geändert werden.",
+          "Benutzerkonten, die Sicherungserinnerung und das Schließverhalten der Dialoge können nur von einem Administrator geändert werden.",
       });
     }
 
@@ -628,9 +628,9 @@ function clearFailedLogins(ip) {
 }
 
 // Normale Benutzerkonten dürfen den gesamten fachlichen Datenbestand pflegen.
-// Administratoren vorbehalten sind ausschließlich die Benutzerverwaltung und
-// die Sicherungserinnerung; der Speicherort ist reine Clientkonfiguration und
-// gar nicht Teil des Datenbestands.
+// Administratoren vorbehalten sind ausschließlich die Benutzerverwaltung, die
+// Sicherungserinnerung und das Schließverhalten der Dialoge; der Speicherort
+// ist reine Clientkonfiguration und gar nicht Teil des Datenbestands.
 function isPermittedUserMutation(before, after, userId) {
   if (!isPermittedSettingsMutation(before.settings, after.settings)) return false;
   if (!isPermittedOwnUserMutation(before.users, after.users, userId)) return false;
@@ -649,10 +649,11 @@ function containsRequiredPasswordChange(before, after, userId) {
   );
 }
 
+const ADMIN_ONLY_SETTINGS = ["backupReminderDays", "closeDialogOnOutsideClick"];
+
 function isPermittedSettingsMutation(before, after) {
-  return deepEqual(
-    (before || {}).backupReminderDays,
-    (after || {}).backupReminderDays,
+  return ADMIN_ONLY_SETTINGS.every((key) =>
+    deepEqual((before || {})[key], (after || {})[key]),
   );
 }
 

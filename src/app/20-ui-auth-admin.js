@@ -128,6 +128,10 @@
       });
 
     elements.copyActiveEmailsButton.addEventListener("click", copyActiveEmployeeEmails);
+    elements.copyUsernamesButton.addEventListener(
+      "click",
+      copyFilteredEmployeeUsernames,
+    );
     elements.exportEmployeePhoneListButton.addEventListener(
       "click",
       exportEmployeePhoneList,
@@ -216,6 +220,12 @@
     document.querySelectorAll("[data-open-data-quality]").forEach((button) => {
       button.addEventListener("click", openDataQualityDialog);
     });
+    elements.settingsCloseDialogOnOutsideClick.addEventListener(
+      "change",
+      (event) => {
+        void saveCloseDialogOnOutsideClick(event.target.value === "on");
+      },
+    );
     elements.saveGeneralSettingsButton.addEventListener(
       "click",
       saveGeneralSettings,
@@ -475,6 +485,12 @@
         .toLocaleLowerCase("de-DE");
       renderDeviceInstructionMatrix();
     });
+    elements.deviceManagementSearch.addEventListener("input", (event) => {
+      deviceManagementSearchTerm = event.target.value
+        .trim()
+        .toLocaleLowerCase("de-DE");
+      renderDevices();
+    });
     elements.deviceManagementInventoryFilter.addEventListener(
       "change",
       (event) => {
@@ -590,6 +606,9 @@
         requestDialogClose(dialog);
       });
       dialog.addEventListener("click", (event) => {
+        // Die Einstellung wird bei jedem Klick gelesen, damit ein Umschalten
+        // sofort wirkt und die Dialoge nicht neu verdrahtet werden muessen.
+        if (!state.settings.closeDialogOnOutsideClick) return;
         if (event.target !== dialog) return;
         const bounds = dialog.getBoundingClientRect();
         const inside =
@@ -874,6 +893,7 @@
       state.devices.filter((device) => device.currentInventory).length,
     );
     updateEmailExportButton();
+    updateUsernameExportButton();
     renderDashboard();
     renderDeadlineOverview();
     renderEmployees();

@@ -63,9 +63,10 @@ assert.doesNotMatch(
   "Das Berufsfeld darf kein schwer bedienbares Datalist-Eingabefeld verwenden",
 );
 // Rollenmodell: Administratoren unterscheiden sich ausschließlich durch
-// Speicherort, Benutzerverwaltung und Sicherungserinnerung (dazu das
-// Änderungsprotokoll als Kontrollinstrument). Alles Übrige gehört zur normalen
-// Bedienung und steht jedem angemeldeten Konto offen.
+// Speicherort, Benutzerverwaltung, Sicherungserinnerung und das
+// Schließverhalten der Dialoge (dazu das Änderungsprotokoll als
+// Kontrollinstrument). Alles Übrige gehört zur normalen Bedienung und steht
+// jedem angemeldeten Konto offen.
 const settingsCardFor = (elementId) => {
   const cards = htmlSource.split("<section");
   const card = cards.find((chunk) => chunk.includes(`id="${elementId}"`));
@@ -76,6 +77,7 @@ const settingsCardFor = (elementId) => {
 for (const [elementId, label] of [
   ["settingsStorageBackend", "Speicherort"],
   ["settingsBackupReminderDays", "Sicherungserinnerung"],
+  ["settingsCloseDialogOnOutsideClick", "Dialoge schließen"],
 ]) {
   assert.match(
     settingsCardFor(elementId),

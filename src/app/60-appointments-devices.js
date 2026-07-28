@@ -231,7 +231,7 @@
       inventoryFilter: deviceManagementInventoryFilter,
       annexFilter: deviceManagementAnnexFilter,
       categoryFilter: deviceManagementCategoryFilter,
-      searchTerm: "",
+      searchTerm: deviceManagementSearchTerm,
     });
     if (!state.devices.length) {
       elements.deviceCatalog.innerHTML = `
@@ -252,7 +252,9 @@
         <section class="panel">
           ${renderEmptyState({
             title: "Keine Geräte für diese Filter",
-            text: "Passen Sie Anlage-1- oder Kategoriefilter an.",
+            text: deviceManagementSearchTerm
+              ? "Passen Sie den Suchbegriff oder die Filter an."
+              : "Passen Sie Anlage-1- oder Kategoriefilter an.",
             compact: true,
           })}
         </section>
@@ -424,7 +426,7 @@
                     <th scope="col" title="${escapeHtml(deviceLabel(device))}">
                       <span>${escapeHtml(device.manufacturer)}</span>
                       <strong>${escapeHtml(device.productName)}</strong>
-                      <small class="device-instruction-progress ${deviceInstructionProgressTone(
+                      <small class="completion-progress ${completionProgressTone(
                         instructionPercentage,
                       )}">
                         ${instructionPercentage} % eingewiesen
@@ -577,7 +579,9 @@
     return Math.round((instructedCount / employees.length) * 100);
   }
 
-  function deviceInstructionProgressTone(percentage) {
+  // Gemeinsam genutzt von der Einweisungsmatrix und der Jahresauswertung der
+  // Pflichtfortbildungen, damit beide denselben Farbmassstab verwenden.
+  function completionProgressTone(percentage) {
     if (percentage <= 65) return "is-low";
     if (percentage <= 80) return "is-medium";
     return "is-high";

@@ -293,6 +293,25 @@ html[data-theme="dark"] .efficiency-hint {
   background: #172c41;
 }
 
+/* Die Warnleiste setzt ihre Schrift- und Randfarbe fest auf dunkles Braun.
+   Im dunklen Schema wird --orange-100 zur dunklen Flaeche, sodass Text auf
+   Hintergrund kaum noch zu unterscheiden waere. */
+html[data-theme="dark"] .database-save-warning {
+  color: #f6dcbb;
+  border-color: #7c5730;
+}
+
+html[data-theme="dark"] .database-save-warning-action {
+  color: #2f1d06;
+  border-color: var(--orange-700);
+  background: var(--orange-700);
+}
+
+html[data-theme="dark"] .database-save-warning-action:hover {
+  color: #2f1d06;
+  background: #f7c286;
+}
+
 html[data-theme="dark"] input {
   color-scheme: dark;
 }

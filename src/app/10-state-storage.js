@@ -65,6 +65,7 @@
         theme: "standard",
         lastBackupAt: "",
         backupReminderDays: DEFAULT_BACKUP_REMINDER_DAYS,
+        closeDialogOnOutsideClick: false,
         meetingAttendanceThreshold: 70,
         vacationBaseDays: DEFAULT_VACATION_BASE_DAYS,
         vacationWeekendAReferenceSaturday:
@@ -380,6 +381,11 @@
           1,
           365,
           DEFAULT_BACKUP_REMINDER_DAYS,
+        ),
+        // Standardmaessig aus: Ein Klick neben den Dialog schliesst ihn nicht,
+        // damit versehentliches Schliessen ausgeschlossen ist.
+        closeDialogOnOutsideClick: Boolean(
+          parsed.settings?.closeDialogOnOutsideClick,
         ),
         meetingAttendanceThreshold: clampNumber(
           parsed.settings?.meetingAttendanceThreshold,

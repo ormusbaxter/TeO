@@ -357,6 +357,7 @@
   let deviceAnnexFilter = "all";
   let deviceCategoryFilter = "all";
   let deviceSearchTerm = "";
+  let deviceManagementSearchTerm = "";
   let deviceManagementInventoryFilter = "current";
   let deviceManagementAnnexFilter = "all";
   let deviceManagementCategoryFilter = "all";
@@ -407,6 +408,8 @@
     employeeSearch: document.querySelector("#employeeSearch"),
     copyActiveEmailsButton: document.querySelector("#copyActiveEmailsButton"),
     copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),
+    copyUsernamesButton: document.querySelector("#copyUsernamesButton"),
+    copyUsernamesLabel: document.querySelector("#copyUsernamesLabel"),
     exportEmployeePhoneListButton: document.querySelector(
       "#exportEmployeePhoneListButton",
     ),
@@ -439,6 +442,9 @@
     ),
     settingsBackupReminderDays: document.querySelector(
       "#settingsBackupReminderDays",
+    ),
+    settingsCloseDialogOnOutsideClick: document.querySelector(
+      "#settingsCloseDialogOnOutsideClick",
     ),
     saveGeneralSettingsButton: document.querySelector(
       "#saveGeneralSettingsButton",
@@ -513,6 +519,7 @@
     deviceAnnexFilter: document.querySelector("#deviceAnnexFilter"),
     deviceCategoryFilter: document.querySelector("#deviceCategoryFilter"),
     deviceSearch: document.querySelector("#deviceSearch"),
+    deviceManagementSearch: document.querySelector("#deviceManagementSearch"),
     deviceManagementInventoryFilter: document.querySelector(
       "#deviceManagementInventoryFilter",
     ),

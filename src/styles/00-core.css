@@ -2480,8 +2480,7 @@ svg {
 }
 
 .meeting-stats-body {
-  max-height: calc(88vh - 154px);
-  overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .meeting-stats-year {
@@ -2796,14 +2795,23 @@ svg {
   position: sticky;
   z-index: 2;
   top: 0;
+  /* Kopfzeile traegt Titel und Komplettierungsgrad und darf deshalb ueber die
+     feste Zeilenhoehe der Datenzellen hinauswachsen. */
+  height: auto;
   width: 132px;
   min-width: 132px;
   max-width: 132px;
+  padding-bottom: 10px;
   color: var(--slate-700);
   font-size: 0.62rem;
   line-height: 1.3;
+  vertical-align: top;
   overflow-wrap: anywhere;
   background: var(--slate-50);
+}
+
+.training-matrix-table thead th > span {
+  display: block;
 }
 
 .training-matrix-table th:first-child {
@@ -2899,6 +2907,24 @@ svg {
   border-radius: var(--radius-xl);
   background: white;
   box-shadow: var(--shadow-lg);
+}
+
+/* Kopf und Fuss behalten ihre Hoehe, der Koerper nimmt den Rest und scrollt.
+   Ohne diese Aufteilung waechst ein langer Koerper ueber die Dialoghoehe
+   hinaus, .modal { overflow: hidden } schneidet ihn ab, und weil die Hoehe
+   unbegrenzt bleibt, greift auch das Scrollen des Koerpers nicht - der Fuss
+   mit den Schaltflaechen ist dann nicht mehr erreichbar.
+   Die Regel gilt bewusst nur fuer [open]: Ein display-Wert ohne diese
+   Bedingung wuerde das UA-eigene dialog:not([open]) { display: none }
+   aushebeln und geschlossene Dialoge sichtbar machen. */
+.modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal[open] > form {
+  min-height: 0;
+  flex: 1 1 auto;
 }
 
 .modal-large {
@@ -3349,8 +3375,11 @@ svg {
 }
 
 .modal-body {
+  min-height: 0;
+  flex: 1 1 auto;
   padding: 23px 28px 28px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal-footer {
@@ -5077,7 +5106,8 @@ legend {
   font-weight: 750;
 }
 
-.device-matrix-table thead th .device-instruction-progress {
+.device-matrix-table thead th .completion-progress,
+.training-matrix-table thead th .completion-progress {
   display: inline-block;
   margin-top: 5px;
   padding: 3px 6px;
@@ -5086,17 +5116,17 @@ legend {
   border-radius: 999px;
 }
 
-.device-instruction-progress.is-low {
+.completion-progress.is-low {
   color: var(--red-700);
   background: var(--red-100);
 }
 
-.device-instruction-progress.is-medium {
+.completion-progress.is-medium {
   color: var(--orange-700);
   background: var(--orange-100);
 }
 
-.device-instruction-progress.is-high {
+.completion-progress.is-high {
   color: var(--green-700);
   background: var(--green-100);
 }

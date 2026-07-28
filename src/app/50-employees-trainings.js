@@ -280,6 +280,7 @@
     renderEmployeeFilterOptions();
     const filtered = filteredEmployeesForTable();
     updateEmailExportButton();
+    updateUsernameExportButton();
     updatePhoneListExportButton();
 
     updateEmployeeBulkBar();
@@ -773,12 +774,19 @@
           <thead>
             <tr>
               <th scope="col">Aktive Mitarbeiter</th>
-              ${matrix.trainings
+              ${matrix.trainingColumns
                 .map(
-                  (training) =>
-                    `<th scope="col" title="${escapeHtml(training.title)}">${escapeHtml(
-                      training.title,
-                    )}</th>`,
+                  ({ training, completedCount, completionRate }) => `
+                    <th scope="col" title="${escapeHtml(training.title)}">
+                      <span>${escapeHtml(training.title)}</span>
+                      <small
+                        class="completion-progress ${completionProgressTone(completionRate)}"
+                        title="${completedCount} von ${matrix.employees.length} aktiven Mitarbeitern erfüllen diese Pflicht zum Jahresende"
+                      >
+                        ${completionRate}&thinsp;% erfüllt
+                      </small>
+                    </th>
+                  `,
                 )
                 .join("")}
             </tr>
@@ -886,9 +894,10 @@
       .sort((a, b) => a.title.localeCompare(b.title, "de"));
     const employees = [...activeEmployeeList()].sort(sortEmployees);
     let completedAssignments = 0;
+    const completedPerTraining = trainings.map(() => 0);
     const rows = employees.map((employee) => ({
       employee,
-      statuses: trainings.map((training) => {
+      statuses: trainings.map((training, trainingIndex) => {
         const latest = latestCompletionForTraining(
           employee.id,
           training,
@@ -899,7 +908,10 @@
             (!training.recurrenceMonths ||
               addMonths(latest.completedOn, training.recurrenceMonths) >= referenceDate),
         );
-        if (completed) completedAssignments += 1;
+        if (completed) {
+          completedAssignments += 1;
+          completedPerTraining[trainingIndex] += 1;
+        }
         return { training, completed, completion: latest || null };
       }),
     }));
@@ -908,6 +920,13 @@
     return {
       year,
       trainings,
+      // Je Fortbildung, wie viele der aktiven Mitarbeiter sie zum Jahresende
+      // erfuellt haben - Grundlage fuer den Komplettierungsgrad in der Spalte.
+      trainingColumns: trainings.map((training, trainingIndex) => ({
+        training,
+        completedCount: completedPerTraining[trainingIndex],
+        completionRate: percentage(completedPerTraining[trainingIndex], employees.length),
+      })),
       employees,
       rows,
       completedAssignments,
