@@ -183,6 +183,17 @@
     "gesundheits- und krankenpfleger/in",
     "3-jährig examiniert",
   ]);
+  // Diese Berufsgruppen gehoeren nicht zum Pflegepool, der die Tagesgrenze der
+  // Urlaubsplanung traegt. Ihre Abwesenheiten bleiben sichtbar, zaehlen aber
+  // nicht gegen die Zahl der gleichzeitig moeglichen Urlaube. Verglichen wird
+  // eine normalisierte Schreibweise, damit Varianten wie „Medizinische
+  // Fachangestellte“ oder „Med. Fachangestellter“ ebenfalls erkannt werden.
+  const ABSENCE_LIMIT_EXEMPT_PROFESSION_PATTERNS = Object.freeze([
+    "fachangestellt",
+    "mfa",
+    "pflegefachassisten",
+    "stationsassisten",
+  ]);
 
 
   const SERVICE_WEEKENDS = {
@@ -282,7 +293,7 @@
     },
     plannedOff: {
       label: "Frei geplant",
-      shortLabel: "FP",
+      shortLabel: "×",
       isAbsence: true,
       countsVacationEntitlement: false,
     },
@@ -293,6 +304,27 @@
       countsVacationEntitlement: false,
     },
   };
+
+  // Tastenbelegung der Planungstabelle. Die Kuerzel in den Feldern sind als
+  // Taste mehrdeutig (U, UE und UN begaennen alle mit U), deshalb eine eigene
+  // eindeutige Zuordnung.
+  const PLANNER_ENTRY_KEYS = Object.freeze({
+    u: "vacation",
+    a: "onboardingVacation",
+    s: "school",
+    n: "unpaid",
+    e: "external",
+    f: "plannedOff",
+    d: "mandatoryDuty",
+  });
+  const PLANNER_NAVIGATION_KEYS = Object.freeze([
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowUp",
+    "ArrowDown",
+    "Home",
+    "End",
+  ]);
 
   const ATTENDANCE_STATUSES = {
     teilgenommen: { label: "Teilgenommen", tone: "green" },
@@ -375,6 +407,15 @@
   let vacationYear = new Date().getFullYear();
   let vacationMonth = new Date().getMonth() + 1;
   let vacationEntryType = "vacation";
+  let vacationEmployeeSearchTerm = "";
+  // Tastaturbedienung der Planungstabelle: zuletzt angesteuertes Feld als
+  // Zeilen-/Spaltenindex sowie der Ankerpunkt einer mit Umschalt aufgezogenen
+  // Bereichsmarkierung. Die beiden Listen halten die aktuell gezeichneten
+  // Koordinaten, damit die Navigation zum Namensfilter passt.
+  let vacationFocus = null;
+  let vacationSelectionAnchor = null;
+  let vacationVisibleEmployeeIds = [];
+  let vacationVisibleDates = [];
   let deviceInventoryFilter = "current";
   let deviceAnnexFilter = "all";
   let deviceCategoryFilter = "all";
@@ -522,6 +563,7 @@
     vacationYear: document.querySelector("#vacationYear"),
     vacationMonth: document.querySelector("#vacationMonth"),
     vacationEntryType: document.querySelector("#vacationEntryType"),
+    vacationEmployeeSearch: document.querySelector("#vacationEmployeeSearch"),
     vacationBaseDays: document.querySelector("#vacationBaseDays"),
     vacationWeekdayAbsenceLimit: document.querySelector(
       "#vacationWeekdayAbsenceLimit",
@@ -542,6 +584,9 @@
       "#vacationWeekendBLegend",
     ),
     saveVacationSettingsButton: document.querySelector("#saveVacationSettingsButton"),
+    openVacationConflictsButton: document.querySelector(
+      "#openVacationConflictsButton",
+    ),
     vacationSummary: document.querySelector("#vacationSummary"),
     vacationPlanner: document.querySelector("#vacationPlanner"),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
@@ -729,6 +774,12 @@
     vacationEmployeeOverviewContent: document.querySelector(
       "#vacationEmployeeOverviewContent",
     ),
+    printVacationEmployeeOverviewButton: document.querySelector(
+      "#printVacationEmployeeOverviewButton",
+    ),
+    vacationConflictDialog: document.querySelector("#vacationConflictDialog"),
+    vacationConflictSubtitle: document.querySelector("#vacationConflictSubtitle"),
+    vacationConflictContent: document.querySelector("#vacationConflictContent"),
     weekendOverviewDialog: document.querySelector("#weekendOverviewDialog"),
     weekendOverviewContent: document.querySelector("#weekendOverviewContent"),
     printWeekendOverviewButton: document.querySelector("#printWeekendOverviewButton"),
@@ -2200,6 +2251,27 @@
         ? elements.vacationEntryType.value
         : "vacation";
     });
+    elements.vacationEmployeeSearch.addEventListener("input", () => {
+      vacationEmployeeSearchTerm = elements.vacationEmployeeSearch.value;
+      renderVacationPlanner();
+    });
+    elements.openVacationConflictsButton.addEventListener(
+      "click",
+      openVacationConflictOverview,
+    );
+    elements.vacationConflictContent.addEventListener("click", (event) => {
+      const dateButton = event.target.closest("[data-vacation-conflict-date]");
+      if (!dateButton) return;
+      const date = dateButton.dataset.vacationConflictDate;
+      vacationYear = Number(date.slice(0, 4));
+      vacationMonth = Number(date.slice(5, 7));
+      elements.vacationConflictDialog.close();
+      renderVacationPlanner();
+    });
+    elements.printVacationEmployeeOverviewButton.addEventListener(
+      "click",
+      printVacationEmployeeOverview,
+    );
     elements.saveVacationSettingsButton.addEventListener(
       "click",
       saveVacationSettings,
@@ -2590,6 +2662,10 @@
     elements.employeeTable.addEventListener("change", handleEmployeeTableSelection);
     elements.vacationPlanner.addEventListener("click", handleVacationPlannerClick);
     elements.vacationPlanner.addEventListener("change", handleVacationPlannerChange);
+    elements.vacationPlanner.addEventListener(
+      "keydown",
+      handleVacationPlannerKeydown,
+    );
     elements.recentEmployees.addEventListener("click", handleRecentEmployeeAction);
     elements.trainingList.addEventListener("click", handleTrainingAction);
     elements.meetingList.addEventListener("click", handleMeetingAction);
@@ -2797,6 +2873,7 @@
         elements.catalogManagementDialog,
         elements.employeeDossierDialog,
         elements.vacationEmployeeOverviewDialog,
+        elements.vacationConflictDialog,
         elements.weekendOverviewDialog,
         elements.weekendSimulationDialog,
         elements.bulkEditDialog,
@@ -5511,7 +5588,8 @@
 
   function renderVacationPlanner() {
     renderVacationControls();
-    const employees = activeEmployeeList().sort(sortEmployees);
+    const allEmployees = activeEmployeeList().sort(sortEmployees);
+    const employees = filterVacationEmployees(allEmployees);
     const daysInMonth = new Date(vacationYear, vacationMonth, 0).getDate();
     const dates = Array.from({ length: daysInMonth }, (_, index) =>
       [
@@ -5520,6 +5598,8 @@
         String(index + 1).padStart(2, "0"),
       ].join("-"),
     );
+    vacationVisibleEmployeeIds = employees.map((employee) => employee.id);
+    vacationVisibleDates = dates;
     const holidays = getNrwHolidays(vacationYear);
     const schoolVacations = getNrwSchoolVacations(vacationYear);
     const selectedMonthLabel = new Intl.DateTimeFormat("de-DE", {
@@ -5546,11 +5626,13 @@
       const stats = getPlannerDayStats(date, holidays);
       return stats.absenceCount >= stats.limit;
     }).length;
-    const totalEntitlement = employees.reduce(
+    // Die Kennzahlen beschreiben immer das gesamte Team. Ein Namensfilter
+    // schraenkt nur die sichtbaren Zeilen ein, nicht die Auslastung des Monats.
+    const totalEntitlement = allEmployees.reduce(
       (sum, employee) => sum + getVacationEntitlement(employee, vacationYear).total,
       0,
     );
-    const totalPlanned = employees.reduce(
+    const totalPlanned = allEmployees.reduce(
       (sum, employee) => sum + getPlannedVacationDays(employee.id, vacationYear),
       0,
     );
@@ -5568,10 +5650,19 @@
       )}
     `;
 
-    if (employees.length === 0) {
+    if (allEmployees.length === 0) {
       elements.vacationPlanner.innerHTML = renderEmptyState({
         title: "Keine aktiven Mitarbeiter",
         text: "Aktive Mitarbeiter und Mitarbeiter in Einarbeitung erscheinen hier automatisch.",
+        compact: true,
+      });
+      return;
+    }
+
+    if (employees.length === 0) {
+      elements.vacationPlanner.innerHTML = renderEmptyState({
+        title: "Kein Mitarbeiter gefunden",
+        text: `Zur Suche „${vacationEmployeeSearchTerm}“ gibt es keinen Treffer. Leeren Sie das Suchfeld, um wieder alle ${allEmployees.length} Mitarbeiter zu sehen.`,
         compact: true,
       });
       return;
@@ -5588,9 +5679,19 @@
           Dienstwochenende gleicht die Zusage eines Mitarbeiters vom jeweils anderen
           festen Wochenende einen Urlaub auf dem eigenen Wochenende aus.
         </span>
+        <span>
+          Abwesenheiten von ${escapeHtml(absenceLimitExemptProfessionNote())}
+          bleiben sichtbar, zählen aber nicht gegen die Tagesgrenze.
+        </span>
+        <span>${escapeHtml(plannerKeyboardHintText())}</span>
         <span class="${
           schoolVacations.size ? "" : "is-warning"
         }">${schoolVacationCoverageNote}</span>
+        ${
+          employees.length === allEmployees.length
+            ? ""
+            : `<span class="is-warning">Namensfilter aktiv: ${employees.length} von ${allEmployees.length} Mitarbeitern sichtbar. Die Tagesgrenzen berücksichtigen weiterhin das gesamte Team.</span>`
+        }
       </div>
       <div class="vacation-table-scroll">
         <table class="vacation-table">
@@ -5627,6 +5728,17 @@
       </div>
     `;
     applyAccessControl();
+    restoreVacationFocus();
+  }
+
+  function plannerKeyboardHintText() {
+    const shortcuts = Object.entries(PLANNER_ENTRY_KEYS)
+      .map(
+        ([key, type]) =>
+          `${key.toLocaleUpperCase("de-DE")} ${PLANNER_ENTRY_TYPES[type].label}`,
+      )
+      .join(", ");
+    return `Tastatur: ${shortcuts}. Pfeiltasten wechseln das Feld, Pos 1 und Ende springen an den Monatsrand, Bild auf und Bild ab wechseln den Monat, Umschalt und Pfeil markieren einen Bereich, Entf oder Rücktaste löscht.`;
   }
 
   function renderVacationControls() {
@@ -5692,6 +5804,11 @@
             stats.dutyCount === 1 ? "" : "n"
           }`
         : "",
+      stats.exemptAbsenceCount
+        ? `${stats.exemptAbsenceCount} Abwesenheit${
+            stats.exemptAbsenceCount === 1 ? "" : "en"
+          } ohne Anrechnung auf die Tagesgrenze`
+        : "",
     ]
       .filter(Boolean)
       .join(" · ");
@@ -5726,6 +5843,43 @@
     `;
   }
 
+  function filterVacationEmployees(employees) {
+    const searchTerm = vacationEmployeeSearchTerm.trim().toLocaleLowerCase("de-DE");
+    if (!searchTerm) return employees;
+    return employees.filter((employee) =>
+      [
+        fullName(employee),
+        employee.lastName,
+        employee.firstName,
+        employee.username,
+      ]
+        .join(" ")
+        .toLocaleLowerCase("de-DE")
+        .includes(searchTerm),
+    );
+  }
+
+  // Der Beschaeftigungsgrad bleibt in der Mitarbeiterzeile stehen; statt des
+  // Beschaeftigungsstatus interessiert bei der Urlaubsplanung das feste
+  // Dienstwochenende. „Kein festes Dienstwochenende“ waere in der schmalen
+  // Spalte zu lang und wird deshalb gekuerzt.
+  function vacationServiceWeekendLabel(employee) {
+    return employee.serviceWeekend === "none"
+      ? "Kein festes WE"
+      : serviceWeekendLabel(employee.serviceWeekend);
+  }
+
+  // Faellt der Geburtstag auf den 29. Februar, wird er in Nicht-Schaltjahren
+  // wie im Fristenmonitor am 28. Februar gefuehrt.
+  function employeeBirthdayAt(employee, date) {
+    const birth = parseLocalDate(employee.birthDate);
+    if (!birth) return null;
+    const year = Number(date.slice(0, 4));
+    const observed = birthdayDateForYear(year, birth.getMonth() + 1, birth.getDate());
+    if (localDateToIso(observed) !== date) return null;
+    return { age: year - birth.getFullYear() };
+  }
+
   function renderVacationEmployeeRow(employee, dates, holidays, schoolVacations) {
     const entitlement = getVacationEntitlement(employee, vacationYear);
     const planned = getPlannedVacationDays(employee.id, vacationYear);
@@ -5740,7 +5894,13 @@
         <th
           class="vacation-employee-column vacation-employee-weekend-${employee.serviceWeekend}"
           scope="row"
-          title="${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}"
+          title="${escapeHtml(
+            [
+              serviceWeekendLabel(employee.serviceWeekend),
+              employeeStatusLabel(employee),
+              `${employee.employmentPercent} %`,
+            ].join(" · "),
+          )}"
         >
           <span class="vacation-employee">
             ${renderAvatar(employee, true)}
@@ -5751,7 +5911,9 @@
                 data-vacation-employee-overview="${employee.id}"
                 aria-label="Jahresabwesenheiten von ${escapeHtml(fullName(employee))} öffnen"
               >${escapeHtml(fullName(employee))}</button>
-              <small>${escapeHtml(employeeStatusLabel(employee))} · ${employee.employmentPercent} %</small>
+              <small>${escapeHtml(
+                vacationServiceWeekendLabel(employee),
+              )} · ${employee.employmentPercent} %</small>
             </span>
           </span>
         </th>
@@ -5770,27 +5932,45 @@
             const ownWeekend =
               metadata.weekendGroup &&
               employee.serviceWeekend === metadata.weekendGroup;
+            const birthday = employeeBirthdayAt(employee, date);
+            const birthdayNote = birthday
+              ? `${birthday.age}. Geburtstag`
+              : "";
             return `
               <td class="vacation-day-cell ${metadata.className} ${
                 dayStats.isOverLimit ? "is-over-limit" : ""
               } ${
                 ownWeekend ? "is-own-weekend" : ""
-              }">
+              } ${birthday ? "is-birthday" : ""}">
                 <button
                   type="button"
                   data-vacation-employee="${employee.id}"
                   data-vacation-date="${date}"
                   aria-pressed="${Boolean(entry)}"
-                  aria-label="${escapeHtml(fullName(employee))}: ${
-                    entryType
-                      ? `${entryType.label} am ${formatDate(date)}`
-                      : `Eintrag am ${formatDate(date)} anlegen`
-                  }"
+                  aria-label="${escapeHtml(
+                    [
+                      `${fullName(employee)}: ${
+                        entryType
+                          ? `${entryType.label} am ${formatDate(date)}`
+                          : `Eintrag am ${formatDate(date)} anlegen`
+                      }`,
+                      birthdayNote,
+                    ]
+                      .filter(Boolean)
+                      .join(" · "),
+                  )}"
                   title="${escapeHtml(
-                    [entryType?.label, metadata.title].filter(Boolean).join(" · "),
+                    [entryType?.label, birthdayNote, metadata.title]
+                      .filter(Boolean)
+                      .join(" · "),
                   )}"
                   class="${entry ? `planner-entry-${entry.type}` : ""}"
                 >${entryType?.shortLabel || ""}</button>
+                ${
+                  birthday
+                    ? '<span class="vacation-birthday-marker" aria-hidden="true"></span>'
+                    : ""
+                }
               </td>
             `;
           })
@@ -5814,6 +5994,416 @@
           remaining < 0 ? "vacation-negative" : ""
         }"><strong>${formatVacationNumber(remaining)}</strong></td>
       </tr>
+    `;
+  }
+
+  // Reine Koordinatenrechnung. Bewusst ohne DOM, damit die Navigation ohne
+  // Browserumgebung pruefbar bleibt.
+  function nextPlannerPosition(position, key, bounds) {
+    const row = clampPlannerIndex(position.row, bounds.rowCount);
+    const column = clampPlannerIndex(position.column, bounds.columnCount);
+    switch (key) {
+      case "ArrowLeft":
+        return { row, column: Math.max(0, column - 1) };
+      case "ArrowRight":
+        return { row, column: clampPlannerIndex(column + 1, bounds.columnCount) };
+      case "ArrowUp":
+        return { row: Math.max(0, row - 1), column };
+      case "ArrowDown":
+        return { row: clampPlannerIndex(row + 1, bounds.rowCount), column };
+      case "Home":
+        return { row, column: 0 };
+      case "End":
+        return { row, column: clampPlannerIndex(bounds.columnCount, bounds.columnCount) };
+      default:
+        return { row, column };
+    }
+  }
+
+  function clampPlannerIndex(value, count) {
+    return Math.min(Math.max(value, 0), Math.max(0, count - 1));
+  }
+
+  // Anker und aktuelles Feld spannen ein Rechteck auf, unabhaengig davon, in
+  // welche Richtung markiert wurde.
+  function plannerSelectionBounds(anchor, focus) {
+    return {
+      rowStart: Math.min(anchor.row, focus.row),
+      rowEnd: Math.max(anchor.row, focus.row),
+      columnStart: Math.min(anchor.column, focus.column),
+      columnEnd: Math.max(anchor.column, focus.column),
+    };
+  }
+
+  function plannerSelectionPositions(anchor, focus) {
+    const bounds = plannerSelectionBounds(anchor, focus);
+    const positions = [];
+    for (let row = bounds.rowStart; row <= bounds.rowEnd; row += 1) {
+      for (
+        let column = bounds.columnStart;
+        column <= bounds.columnEnd;
+        column += 1
+      ) {
+        positions.push({ row, column });
+      }
+    }
+    return positions;
+  }
+
+  function plannerBounds() {
+    return {
+      rowCount: vacationVisibleEmployeeIds.length,
+      columnCount: vacationVisibleDates.length,
+    };
+  }
+
+  function plannerPositionOf(employeeId, date) {
+    const row = vacationVisibleEmployeeIds.indexOf(employeeId);
+    const column = vacationVisibleDates.indexOf(date);
+    return row < 0 || column < 0 ? null : { row, column };
+  }
+
+  function plannerCoordinates(position) {
+    return {
+      employeeId: vacationVisibleEmployeeIds[position.row],
+      date: vacationVisibleDates[position.column],
+    };
+  }
+
+  function plannerCellButton(position) {
+    const { employeeId, date } = plannerCoordinates(position);
+    if (!employeeId || !date) return null;
+    return elements.vacationPlanner.querySelector(
+      `[data-vacation-employee="${employeeId}"][data-vacation-date="${date}"]`,
+    );
+  }
+
+  function currentPlannerSelection() {
+    if (!vacationFocus) return [];
+    return plannerSelectionPositions(
+      vacationSelectionAnchor || vacationFocus,
+      vacationFocus,
+    );
+  }
+
+  function applyVacationSelectionHighlight() {
+    elements.vacationPlanner
+      .querySelectorAll(".vacation-day-cell.is-selected")
+      .forEach((cell) => cell.classList.remove("is-selected"));
+    // Ein einzelnes Feld zeigt der Fokusrahmen an; hervorgehoben wird nur ein
+    // wirklich aufgezogener Bereich.
+    if (!vacationSelectionAnchor) return;
+    currentPlannerSelection().forEach((position) => {
+      plannerCellButton(position)?.closest("td")?.classList.add("is-selected");
+    });
+  }
+
+  function focusVacationCell(position, { keepSelection = false } = {}) {
+    const button = plannerCellButton(position);
+    if (!button) return;
+    vacationFocus = position;
+    if (!keepSelection) vacationSelectionAnchor = null;
+    button.focus();
+    applyVacationSelectionHighlight();
+  }
+
+  // Das Neuzeichnen ersetzt die Tabelle vollstaendig, der Fokus faellt dabei
+  // auf den Body zurueck. Nur dann wird er zurueckgeholt - liegt er inzwischen
+  // im Suchfeld oder in einem Dialog, bleibt er dort.
+  function restoreVacationFocus() {
+    applyVacationSelectionHighlight();
+    if (!vacationFocus) return;
+    const active = document.activeElement;
+    if (active && active !== document.body) return;
+    plannerCellButton(vacationFocus)?.focus({ preventScroll: true });
+  }
+
+  function handleVacationPlannerKeydown(event) {
+    const button = event.target.closest(
+      "[data-vacation-employee][data-vacation-date]",
+    );
+    if (!button || event.altKey || event.ctrlKey || event.metaKey) return;
+    const position = plannerPositionOf(
+      button.dataset.vacationEmployee,
+      button.dataset.vacationDate,
+    );
+    if (!position) return;
+    vacationFocus = position;
+
+    if (PLANNER_NAVIGATION_KEYS.includes(event.key)) {
+      event.preventDefault();
+      if (event.shiftKey && !vacationSelectionAnchor) {
+        vacationSelectionAnchor = position;
+      }
+      focusVacationCell(nextPlannerPosition(position, event.key, plannerBounds()), {
+        keepSelection: event.shiftKey,
+      });
+      return;
+    }
+
+    if (event.key === "PageUp" || event.key === "PageDown") {
+      event.preventDefault();
+      shiftVacationMonth(event.key === "PageUp" ? -1 : 1, position);
+      return;
+    }
+
+    if (event.key === "Escape" && vacationSelectionAnchor) {
+      event.preventDefault();
+      vacationSelectionAnchor = null;
+      applyVacationSelectionHighlight();
+      return;
+    }
+
+    if (event.key === "Delete" || event.key === "Backspace") {
+      event.preventDefault();
+      void applyVacationEntryToSelection("");
+      return;
+    }
+
+    const key = event.key.toLocaleLowerCase("de-DE");
+    if (!Object.hasOwn(PLANNER_ENTRY_KEYS, key)) return;
+    event.preventDefault();
+    void applyVacationEntryToSelection(PLANNER_ENTRY_KEYS[key]);
+  }
+
+  function shiftVacationMonth(offset, position) {
+    const target = new Date(vacationYear, vacationMonth - 1 + offset, 1, 12);
+    vacationYear = target.getFullYear();
+    vacationMonth = target.getMonth() + 1;
+    // Der Tag im Monat entspricht dem Spaltenindex; kuerzere Monate werden
+    // abgeschnitten.
+    const daysInMonth = new Date(vacationYear, vacationMonth, 0).getDate();
+    vacationFocus = {
+      row: position.row,
+      column: Math.min(position.column, daysInMonth - 1),
+    };
+    vacationSelectionAnchor = null;
+    renderVacationPlanner();
+  }
+
+  // Buchstaben weisen zu, statt umzuschalten: Beim Durchtippen einer Reihe
+  // waere ein Umschalten bei gleicher Eintragsart unerwartet. Entfernt wird
+  // ausschliesslich mit Entf oder Rücktaste.
+  async function applyVacationEntryToSelection(entryType) {
+    const cells = currentPlannerSelection()
+      .map(plannerCoordinates)
+      .filter((cell) => cell.employeeId && cell.date);
+    if (!cells.length) return;
+
+    // Die Eintragsart der Steuerleiste zieht mit, damit Klick und Taste
+    // dieselbe Auswahl verwenden.
+    if (entryType) {
+      vacationEntryType = entryType;
+      elements.vacationEntryType.value = entryType;
+    }
+
+    const changed = cells.filter((cell) => {
+      const existing = findVacationDay(cell.employeeId, cell.date);
+      return entryType ? existing?.type !== entryType : Boolean(existing);
+    });
+    if (!changed.length) return;
+
+    const now = new Date().toISOString();
+    const scrollPosition = captureVacationScrollPosition();
+    const committed = await commitStateMutation(() => {
+      const removableIds = new Set();
+      changed.forEach((cell) => {
+        const existing = findVacationDay(cell.employeeId, cell.date);
+        if (!entryType) {
+          if (existing) removableIds.add(existing.id);
+          return;
+        }
+        if (existing) {
+          existing.type = entryType;
+          existing.updatedAt = now;
+          return;
+        }
+        state.vacationDays.push({
+          id: createId(),
+          employeeId: cell.employeeId,
+          date: cell.date,
+          type: entryType,
+          createdAt: now,
+          updatedAt: now,
+        });
+      });
+      if (removableIds.size) {
+        state.vacationDays = state.vacationDays.filter(
+          (vacationDay) => !removableIds.has(vacationDay.id),
+        );
+      }
+    });
+    restoreVacationScrollPosition(scrollPosition);
+    if (!committed) return;
+    warnAboutVacationLimit([...new Set(changed.map((cell) => cell.date))]);
+  }
+
+  function findVacationDay(employeeId, date) {
+    return state.vacationDays.find(
+      (vacationDay) =>
+        vacationDay.employeeId === employeeId && vacationDay.date === date,
+    );
+  }
+
+  // Eine Bereichseingabe kann viele Tage auf einmal ueberplanen. Einzelne
+  // Meldungen wuerden den Bildschirm fluten, deshalb eine Sammelmeldung.
+  function warnAboutVacationLimit(dates) {
+    const overLimitDates = dates
+      .filter((date) => getPlannerDayStats(date).isOverLimit)
+      .sort((a, b) => a.localeCompare(b));
+    if (!overLimitDates.length) return;
+
+    if (overLimitDates.length > 1) {
+      showToast(
+        `Warnung: An ${overLimitDates.length} Tagen ist die Abwesenheitsgrenze überschritten, zuerst am ${formatDate(overLimitDates[0])}.`,
+        "error",
+      );
+      return;
+    }
+
+    const stats = getPlannerDayStats(overLimitDates[0]);
+    const compensationNote = stats.compensatedAbsenceCount
+      ? ` (${stats.absenceCount} eingetragen, ${stats.compensatedAbsenceCount} ausgeglichen)`
+      : "";
+    showToast(
+      `Warnung: Am ${formatDate(overLimitDates[0])} bestehen ${stats.effectiveAbsenceCount} wirksame Abwesenheiten${compensationNote}, vorgesehen sind maximal ${stats.limit}.`,
+      "error",
+    );
+  }
+
+  function absenceLimitExemptProfessionNote() {
+    const professions = [
+      ...new Set(
+        activeEmployeeList()
+          .map((employee) => employee.profession)
+          .filter(isAbsenceLimitExemptProfession),
+      ),
+    ].sort((a, b) => a.localeCompare(b, "de"));
+    return professions.length
+      ? professions.join(", ")
+      : "Medizinischen Fachangestellten, Pflegefachassistenz und Stationsassistenz";
+  }
+
+  // Sammelt alle Tage des Planungsjahres, an denen die Tagesgrenze
+  // ueberschritten ist, und nennt die dabei beteiligten Mitarbeiter.
+  function collectVacationConflicts(year) {
+    const holidaysByYear = new Map();
+    const dates = [
+      ...new Set(
+        state.vacationDays
+          .filter((entry) => Number(entry.date.slice(0, 4)) === year)
+          .map((entry) => entry.date),
+      ),
+    ].sort((a, b) => a.localeCompare(b));
+
+    return dates
+      .map((date) => {
+        const entryYear = Number(date.slice(0, 4));
+        if (!holidaysByYear.has(entryYear)) {
+          holidaysByYear.set(entryYear, getNrwHolidays(entryYear));
+        }
+        const stats = getPlannerDayStats(date, holidaysByYear.get(entryYear));
+        if (!stats.isOverLimit) return null;
+        const participants = state.vacationDays
+          .filter((entry) => entry.date === date)
+          .map((entry) => ({ entry, employee: getEmployee(entry.employeeId) }))
+          .filter(
+            ({ entry, employee }) =>
+              employee?.active && PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
+          )
+          .sort((a, b) => sortEmployees(a.employee, b.employee));
+        return { date, stats, participants };
+      })
+      .filter(Boolean);
+  }
+
+  function openVacationConflictOverview() {
+    const conflicts = collectVacationConflicts(vacationYear);
+    elements.vacationConflictSubtitle.textContent = conflicts.length
+      ? `${conflicts.length} überplante Tage im Jahr ${vacationYear}`
+      : `Keine überplanten Tage im Jahr ${vacationYear}`;
+
+    elements.vacationConflictContent.innerHTML = conflicts.length
+      ? `
+        <p class="vacation-conflict-note">
+          Aufgeführt sind alle Tage, an denen die wirksamen Abwesenheiten über
+          der Tagesgrenze liegen. Abwesenheiten von
+          ${escapeHtml(absenceLimitExemptProfessionNote())} sind darin nicht
+          enthalten. Ein Klick auf einen Tag öffnet den zugehörigen Monat.
+        </p>
+        <div class="vacation-conflict-list">
+          ${conflicts.map(renderVacationConflictRow).join("")}
+        </div>
+      `
+      : renderEmptyState({
+          title: "Keine Überschneidungen",
+          text: `Im Jahr ${vacationYear} bleibt jeder Tag innerhalb der hinterlegten Tagesgrenzen.`,
+          compact: true,
+        });
+    elements.vacationConflictDialog.showModal();
+  }
+
+  function renderVacationConflictRow({ date, stats, participants }) {
+    const weekday = new Intl.DateTimeFormat("de-DE", {
+      weekday: "long",
+    }).format(parseLocalDate(date));
+    const metadata = getVacationDayMetadata(date);
+    return `
+      <article class="vacation-conflict-row">
+        <header>
+          <button
+            class="vacation-conflict-date"
+            type="button"
+            data-vacation-conflict-date="${date}"
+          >${escapeHtml(`${weekday}, ${formatDate(date)}`)}</button>
+          <span class="vacation-conflict-count">
+            ${stats.effectiveAbsenceCount} von ${stats.limit} abwesend
+          </span>
+        </header>
+        <p class="vacation-conflict-context">
+          ${escapeHtml(
+            [
+              metadata.holiday,
+              metadata.schoolVacation ? `${metadata.schoolVacation} NRW` : "",
+              metadata.weekendGroup
+                ? `Dienstwochenende ${serviceWeekendLabel(metadata.weekendGroup)}`
+                : "",
+              stats.compensatedAbsenceCount
+                ? `${stats.absenceCount} eingetragen, ${stats.compensatedAbsenceCount} durch fremde Dienstzusage ausgeglichen`
+                : "",
+              stats.exemptAbsenceCount
+                ? `${stats.exemptAbsenceCount} nicht angerechnete Abwesenheit${
+                    stats.exemptAbsenceCount === 1 ? "" : "en"
+                  }`
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" · "),
+          )}
+        </p>
+        <ul class="vacation-conflict-participants">
+          ${participants
+            .map(
+              ({ entry, employee }) => `
+                <li class="${
+                  countsTowardsAbsenceLimit(employee) ? "" : "is-exempt"
+                }">
+                  <strong>${escapeHtml(fullName(employee))}</strong>
+                  <span>${escapeHtml(
+                    [
+                      PLANNER_ENTRY_TYPES[entry.type].label,
+                      employee.profession,
+                      vacationServiceWeekendLabel(employee),
+                    ]
+                      .filter(Boolean)
+                      .join(" · "),
+                  )}</span>
+                </li>
+              `,
+            )
+            .join("")}
+        </ul>
+      </article>
     `;
   }
 
@@ -5868,6 +6458,17 @@
       ${renderVacationYearMatrix(entries, employee)}
     `;
     elements.vacationEmployeeOverviewDialog.showModal();
+  }
+
+  // Die Jahresmatrix ist breiter als hoch und wird deshalb quer gedruckt.
+  function printVacationEmployeeOverview() {
+    if (!elements.vacationEmployeeOverviewDialog.open) return;
+    document.body.classList.add("print-vacation-overview");
+    window.print();
+    window.setTimeout(
+      () => document.body.classList.remove("print-vacation-overview"),
+      0,
+    );
   }
 
   function renderVacationYearMatrix(entries, employee) {
@@ -6000,9 +6601,17 @@
       (entry) =>
         entry.date === date && getEmployee(entry.employeeId)?.active,
     );
-    const absenceCount = entries.filter(
+    // Berufsgruppen ausserhalb des Pflegepools bleiben aus jeder Berechnung der
+    // Tagesgrenze heraus - auch aus dem Ausgleich am Dienstwochenende.
+    const limitEntries = entries.filter((entry) =>
+      countsTowardsAbsenceLimit(getEmployee(entry.employeeId)),
+    );
+    const absenceCount = limitEntries.filter(
       (entry) => PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
     ).length;
+    const exemptAbsenceCount =
+      entries.filter((entry) => PLANNER_ENTRY_TYPES[entry.type]?.isAbsence)
+        .length - absenceCount;
     const dutyCount = entries.filter(
       (entry) => entry.type === "mandatoryDuty",
     ).length;
@@ -6012,13 +6621,13 @@
         ? getWeekendRotationForDate(date)
         : "";
     const ownWeekendVacationCount = weekendGroup
-      ? entries.filter((entry) => {
+      ? limitEntries.filter((entry) => {
           if (entry.type !== "vacation") return false;
           return getEmployee(entry.employeeId)?.serviceWeekend === weekendGroup;
         }).length
       : 0;
     const foreignWeekendDutyCount = weekendGroup
-      ? entries.filter((entry) => {
+      ? limitEntries.filter((entry) => {
           if (entry.type !== "mandatoryDuty") return false;
           const serviceWeekend = getEmployee(entry.employeeId)?.serviceWeekend;
           return (
@@ -6043,6 +6652,7 @@
       : state.settings.vacationWeekdayAbsenceLimit;
     return {
       absenceCount,
+      exemptAbsenceCount,
       effectiveAbsenceCount,
       dutyCount,
       ownWeekendVacationCount,
@@ -6081,10 +6691,14 @@
     const scrollPosition = captureVacationScrollPosition();
     const employeeId = button.dataset.vacationEmployee;
     const date = button.dataset.vacationDate;
-    const existing = state.vacationDays.find(
-      (vacationDay) =>
-        vacationDay.employeeId === employeeId && vacationDay.date === date,
-    );
+    // Ein Klick setzt den Ausgangspunkt der Tastaturnavigation und beendet
+    // eine bestehende Bereichsmarkierung.
+    const clickedPosition = plannerPositionOf(employeeId, date);
+    if (clickedPosition) {
+      vacationFocus = clickedPosition;
+      vacationSelectionAnchor = null;
+    }
+    const existing = findVacationDay(employeeId, date);
     const selectedType = Object.hasOwn(
       PLANNER_ENTRY_TYPES,
       vacationEntryType,
@@ -6113,16 +6727,7 @@
     });
     restoreVacationScrollPosition(scrollPosition);
     if (!committed) return;
-    const updatedStats = getPlannerDayStats(date);
-    if (updatedStats.isOverLimit) {
-      const compensationNote = updatedStats.compensatedAbsenceCount
-        ? ` (${updatedStats.absenceCount} eingetragen, ${updatedStats.compensatedAbsenceCount} ausgeglichen)`
-        : "";
-      showToast(
-        `Warnung: Am ${formatDate(date)} bestehen ${updatedStats.effectiveAbsenceCount} wirksame Abwesenheiten${compensationNote}, vorgesehen sind maximal ${updatedStats.limit}.`,
-        "error",
-      );
-    }
+    warnAboutVacationLimit([date]);
   }
 
   async function handleVacationPlannerChange(event) {
@@ -11857,6 +12462,30 @@
       SERVICE_WEEKENDS[value] ||
       SERVICE_WEEKENDS.none
     );
+  }
+
+  // Die Tagesgrenze der Urlaubsplanung beschreibt den Pflegepool, der sich
+  // gegenseitig vertritt. Medizinische Fachangestellte, Pflegefachassistenz
+  // und Stationsassistenz gehoeren nicht dazu; ihre Abwesenheiten bleiben
+  // sichtbar, belegen aber keinen der gleichzeitig moeglichen Urlaube.
+  function countsTowardsAbsenceLimit(employee) {
+    return !isAbsenceLimitExemptProfession(employee?.profession);
+  }
+
+  function isAbsenceLimitExemptProfession(profession) {
+    const signature = professionSignature(profession);
+    if (!signature) return false;
+    return ABSENCE_LIMIT_EXEMPT_PROFESSION_PATTERNS.some((pattern) =>
+      signature.includes(pattern),
+    );
+  }
+
+  function professionSignature(value) {
+    return String(value || "")
+      .normalize("NFKD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLocaleLowerCase("de-DE")
+      .replace(/[^a-z]/g, "");
   }
 
   function serviceWeekendOwnerKey(employeeId) {

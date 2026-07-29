@@ -275,6 +275,30 @@
     );
   }
 
+  // Die Tagesgrenze der Urlaubsplanung beschreibt den Pflegepool, der sich
+  // gegenseitig vertritt. Medizinische Fachangestellte, Pflegefachassistenz
+  // und Stationsassistenz gehoeren nicht dazu; ihre Abwesenheiten bleiben
+  // sichtbar, belegen aber keinen der gleichzeitig moeglichen Urlaube.
+  function countsTowardsAbsenceLimit(employee) {
+    return !isAbsenceLimitExemptProfession(employee?.profession);
+  }
+
+  function isAbsenceLimitExemptProfession(profession) {
+    const signature = professionSignature(profession);
+    if (!signature) return false;
+    return ABSENCE_LIMIT_EXEMPT_PROFESSION_PATTERNS.some((pattern) =>
+      signature.includes(pattern),
+    );
+  }
+
+  function professionSignature(value) {
+    return String(value || "")
+      .normalize("NFKD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLocaleLowerCase("de-DE")
+      .replace(/[^a-z]/g, "");
+  }
+
   function serviceWeekendOwnerKey(employeeId) {
     if (!employeeId) return "";
     return (

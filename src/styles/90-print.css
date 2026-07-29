@@ -3,6 +3,12 @@
   margin: 0;
 }
 
+/* Die Jahresmatrix hat 31 Tagesspalten und passt nur quer auf ein Blatt. */
+@page vacation-overview {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
 @media print {
   * {
     print-color-adjust: exact;
@@ -178,12 +184,14 @@
 
   body.print-phone-list > #trainingMatrixDialog,
   body.print-employee-dossier > #trainingMatrixDialog,
-  body.print-weekend-overview > #trainingMatrixDialog {
+  body.print-weekend-overview > #trainingMatrixDialog,
+  body.print-vacation-overview > #trainingMatrixDialog {
     display: none !important;
   }
 
   body.print-employee-dossier > #employeeDossierDialog,
-  body.print-weekend-overview > #weekendOverviewDialog {
+  body.print-weekend-overview > #weekendOverviewDialog,
+  body.print-vacation-overview > #vacationEmployeeOverviewDialog {
     position: static;
     display: block !important;
     width: 100%;
@@ -198,22 +206,84 @@
   }
 
   body.print-employee-dossier #employeeDossierDialog .modal-header,
-  body.print-weekend-overview #weekendOverviewDialog .modal-header {
+  body.print-weekend-overview #weekendOverviewDialog .modal-header,
+  body.print-vacation-overview #vacationEmployeeOverviewDialog .modal-header {
     padding: 0 0 5mm;
     border-bottom: 1px solid #cdd5dd;
   }
 
   body.print-employee-dossier #employeeDossierDialog .modal-body,
-  body.print-weekend-overview #weekendOverviewDialog .modal-body {
+  body.print-weekend-overview #weekendOverviewDialog .modal-body,
+  body.print-vacation-overview #vacationEmployeeOverviewDialog .modal-body {
     padding: 5mm 0 0;
     overflow: visible;
   }
 
   body.print-employee-dossier #employeeDossierDialog .modal-footer,
   body.print-weekend-overview #weekendOverviewDialog .modal-footer,
+  body.print-vacation-overview #vacationEmployeeOverviewDialog .modal-footer,
   body.print-employee-dossier #employeeDossierDialog .icon-button,
-  body.print-weekend-overview #weekendOverviewDialog .icon-button {
+  body.print-weekend-overview #weekendOverviewDialog .icon-button,
+  body.print-vacation-overview #vacationEmployeeOverviewDialog .icon-button {
     display: none !important;
+  }
+
+  body.print-vacation-overview > #vacationEmployeeOverviewDialog {
+    page: vacation-overview;
+    height: auto;
+  }
+
+  body.print-vacation-overview .vacation-overview-summary > div,
+  body.print-vacation-overview .vacation-year-matrix-scroll {
+    color: #182230;
+    border-color: #cdd5dd;
+    background: white;
+    break-inside: avoid;
+  }
+
+  body.print-vacation-overview .vacation-year-matrix-scroll {
+    margin-top: 4mm;
+    overflow: visible;
+  }
+
+  /* 22 mm + 31 × 7.5 mm bleiben innerhalb der bedruckbaren Querformatbreite. */
+  body.print-vacation-overview .vacation-year-matrix th,
+  body.print-vacation-overview .vacation-year-matrix td {
+    width: 7.5mm;
+    min-width: 0;
+    height: auto;
+    padding: 1mm 0.5mm;
+    color: #182230;
+    border-color: #cdd5dd;
+    background: white;
+    font-size: 6.5pt;
+  }
+
+  body.print-vacation-overview .vacation-year-matrix .vacation-year-month-column {
+    position: static;
+    width: 22mm;
+    min-width: 22mm;
+    font-size: 6.5pt;
+    background: #eef1f4;
+    box-shadow: none;
+  }
+
+  body.print-vacation-overview .vacation-year-matrix thead th {
+    position: static;
+    background: #eef1f4;
+  }
+
+  body.print-vacation-overview .vacation-year-entry {
+    width: 5mm;
+    height: 5mm;
+    font-size: 5.5pt;
+    box-shadow: none;
+  }
+
+  body.print-vacation-overview .vacation-year-legend {
+    margin-top: 4mm;
+    color: #29384a;
+    font-size: 6.5pt;
   }
 
   body.print-employee-dossier :is(

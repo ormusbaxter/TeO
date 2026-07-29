@@ -69,8 +69,10 @@
   background: #805bad;
 }
 
+/* „Frei geplant“ nutzt bewusst dieselbe Farbe wie Urlaub und unterscheidet
+   sich nur durch das Zeichen im Feld. */
 .legend-planner-planned-off {
-  background: #526273;
+  background: var(--green-700);
 }
 
 .legend-planner-duty {
@@ -104,6 +106,21 @@
   background:
     linear-gradient(#e7b900 0 4px, transparent 4px),
     #fff8cf;
+}
+
+.legend-birthday {
+  border-color: #c79414 !important;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgb(199 148 20 / 62%) 0 3px,
+      transparent 3px 8px
+    ),
+    var(--white);
+}
+
+.vacation-search-field {
+  min-width: 190px;
 }
 
 .vacation-summary {
@@ -399,6 +416,32 @@ body.is-vacation-view .main-content {
   background: #d8a800;
 }
 
+/* Geburtstage bleiben auch dann erkennbar, wenn im Feld bereits ein
+   Planungseintrag steht: der Punkt sitzt in der Ecke der Zelle. */
+.vacation-day-cell.is-birthday {
+  position: relative;
+}
+
+/* Die Schraffur liegt als eigene Ebene ueber dem Feld. So bleiben Wochenend-,
+   Feiertags- und Ueberplanungsfarben erhalten, die ihren Hintergrund mit
+   !important setzen. */
+.vacation-birthday-marker {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    135deg,
+    rgb(199 148 20 / 62%) 0 3px,
+    transparent 3px 8px
+  );
+}
+
+.vacation-day-cell.is-birthday button {
+  position: relative;
+  z-index: 1;
+}
+
 .vacation-day-cell button {
   display: grid;
   width: 28px;
@@ -412,6 +455,26 @@ body.is-vacation-view .main-content {
   border: 1px solid transparent;
   border-radius: 7px;
   background: rgb(255 255 255 / 48%);
+}
+
+/* Der globale Fokusrahmen liegt 2 px ausserhalb und wuerde in der dichten
+   Matrix die Nachbarfelder ueberdecken. Die Scrollraender halten das Feld beim
+   Navigieren unter der fixierten Kopfzeile und neben der Namensspalte frei. */
+.vacation-day-cell button:focus-visible {
+  outline-offset: -1px;
+}
+
+.vacation-day-cell button {
+  scroll-margin-top: 112px;
+  scroll-margin-left: 194px;
+}
+
+.vacation-day-cell.is-selected {
+  box-shadow:
+    inset 2px 0 var(--blue-700),
+    inset -2px 0 var(--blue-700),
+    inset 0 2px var(--blue-700),
+    inset 0 -2px var(--blue-700);
 }
 
 .vacation-day-cell button:hover:not(:disabled) {
@@ -462,8 +525,9 @@ body.is-vacation-view .main-content {
 }
 
 .vacation-day-cell button.planner-entry-plannedOff {
-  border-color: #526273;
-  background: #526273;
+  border-color: var(--green-700);
+  background: var(--green-700);
+  font-size: 0.85rem;
 }
 
 .vacation-day-cell button.planner-entry-mandatoryDuty {
@@ -552,6 +616,95 @@ body.is-vacation-view .main-content {
   min-height: 0;
   flex: 1 1 auto;
   overflow: auto;
+}
+
+.vacation-conflict-note {
+  margin: 0 0 16px;
+  color: var(--slate-600);
+  font-size: 0.8rem;
+}
+
+.vacation-conflict-list {
+  display: grid;
+  gap: 12px;
+}
+
+.vacation-conflict-row {
+  padding: 14px 16px;
+  border: 1px solid var(--red-700);
+  border-radius: 13px;
+  background: var(--red-100);
+}
+
+.vacation-conflict-row header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.vacation-conflict-date {
+  padding: 0;
+  cursor: pointer;
+  color: var(--slate-900);
+  font-size: 0.92rem;
+  font-weight: 800;
+  border: 0;
+  background: transparent;
+}
+
+.vacation-conflict-date:hover {
+  color: var(--red-700);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.vacation-conflict-count {
+  color: var(--red-700);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.vacation-conflict-context {
+  margin: 4px 0 0;
+  color: var(--slate-600);
+  font-size: 0.73rem;
+  font-weight: 600;
+}
+
+.vacation-conflict-participants {
+  display: grid;
+  gap: 7px;
+  margin: 12px 0 0;
+  padding: 0;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  list-style: none;
+}
+
+.vacation-conflict-participants li {
+  display: grid;
+  gap: 2px;
+  padding: 8px 11px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  background: var(--white);
+}
+
+.vacation-conflict-participants li.is-exempt {
+  opacity: 0.7;
+  border-style: dashed;
+}
+
+.vacation-conflict-participants strong {
+  color: var(--slate-900);
+  font-size: 0.79rem;
+}
+
+.vacation-conflict-participants span {
+  color: var(--slate-500);
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 .vacation-year-legend {
@@ -697,7 +850,7 @@ body.is-vacation-view .main-content {
 }
 
 .vacation-year-entry.planner-entry-plannedOff {
-  background: #526273;
+  background: var(--green-700);
 }
 
 .vacation-year-entry.planner-entry-mandatoryDuty {

@@ -407,7 +407,8 @@ Folgende Eintragsarten stehen zur Verfügung:
 **Urlaub Einarbeitung** wird nicht auf die tägliche Abwesenheitsgrenze und
 nicht auf den regulären Urlaubsverbrauch angerechnet.
 
-**Frei geplant** zählt als Abwesenheit, verbraucht aber keinen Urlaubstag.
+**Frei geplant** zählt als Abwesenheit, verbraucht aber keinen Urlaubstag. Der
+Eintrag erscheint als **×** im selben Grün wie der Urlaub.
 
 ### Monatsplanung
 
@@ -421,6 +422,55 @@ Die Kopfzeile bleibt beim vertikalen Scrollen sichtbar. Wochenenden,
 Feiertage, Schulferien und die beiden Dienstwochenenden werden farblich
 unterschieden.
 
+Unter dem Namen des Mitarbeiters stehen das feste **Dienstwochenende** und der
+Beschäftigungsgrad. Der Beschäftigungsstatus bleibt im Tooltip der Zeile
+sichtbar.
+
+Ein **Geburtstag** ist an der goldenen Schraffur des Tagesfeldes erkennbar; der
+Tooltip nennt das erreichte Lebensjahr. Fällt der Geburtstag auf den
+29. Februar, wird er in Nicht-Schaltjahren am 28. Februar angezeigt.
+
+### Tastaturbedienung der Planungstabelle
+
+Ein Klick auf ein Tagesfeld setzt den Ausgangspunkt; danach lässt sich die
+Tabelle vollständig über die Tastatur ausfüllen.
+
+| Taste | Wirkung |
+| --- | --- |
+| `U` | Urlaub |
+| `A` | Urlaub Einarbeitung |
+| `S` | Schule / Weiterbildung / Uni |
+| `N` | Unbezahlter Urlaub |
+| `E` | Externer Einsatz |
+| `F` | Frei geplant |
+| `D` | Verpflichtende Dienstzusage |
+| `Entf` oder `Rücktaste` | Eintrag entfernen |
+| Pfeiltasten | Feld wechseln |
+| `Pos 1` / `Ende` | an den Monatsanfang oder das Monatsende springen |
+| `Bild auf` / `Bild ab` | Monat wechseln, Zeile und Tag bleiben erhalten |
+| `Umschalt` + Pfeil | Bereich über mehrere Tage und Zeilen markieren |
+| `Esc` | Bereichsmarkierung aufheben |
+
+Ein Buchstabe **weist zu** und schaltet nicht um: Wird derselbe Eintrag erneut
+getippt, bleibt er stehen. Entfernt wird ausschließlich mit `Entf` oder der
+Rücktaste. Die Auswahl **Eintragsart** in der Steuerleiste übernimmt den zuletzt
+getippten Buchstaben, damit Klick und Tastatur dieselbe Eintragsart verwenden.
+
+Eine mit `Umschalt` markierte Fläche wird in einem Zug beschrieben – das ergibt
+einen einzigen Eintrag im Änderungsprotokoll und eine einzige Sammelmeldung,
+falls dabei Abwesenheitsgrenzen überschritten werden.
+
+Die Navigation folgt der sichtbaren Tabelle: Ist ein Namensfilter gesetzt,
+springen die Pfeiltasten nur zwischen den angezeigten Zeilen.
+
+### Nach Mitarbeitern filtern
+
+Das Suchfeld **Mitarbeiter** blendet alle Zeilen aus, die nicht zum Suchbegriff
+passen; gesucht wird in Vor- und Nachname sowie im Benutzernamen. Die
+Kennzahlen über der Tabelle und sämtliche Tagesgrenzen beziehen sich weiterhin
+auf das gesamte Team, damit ein Filter die Auslastung nicht verfälscht. Ist ein
+Filter aktiv, weist ein Hinweis über der Tabelle darauf hin.
+
 ### Abwesenheitsgrenzen
 
 Standardmäßig gelten:
@@ -430,6 +480,30 @@ Standardmäßig gelten:
 
 Beide Grenzwerte sind konfigurierbar. Eine Überplanung bleibt möglich, wird
 aber deutlich rot markiert.
+
+Die Grenze beschreibt den Pflegepool, der sich gegenseitig vertritt. Nicht
+mitgezählt werden Abwesenheiten von
+
+- Medizinischen Fachangestellten
+- Pflegefachassistenz
+- Stationsassistenz
+
+Diese Einträge bleiben in der Tabelle sichtbar und werden im Tooltip des Tages
+gesondert ausgewiesen, belegen aber keinen der gleichzeitig möglichen Urlaube –
+auch nicht beim Ausgleich am Dienstwochenende.
+
+### Überschneidungen prüfen
+
+Die Schaltfläche **Überschneidungen prüfen** öffnet eine Liste aller Tage des
+Planungsjahres, an denen die Tagesgrenze überschritten ist. Zu jedem Tag
+erscheinen:
+
+- wirksame Abwesenheiten und geltende Grenze
+- Feiertag, Schulferien und Dienstwochenende des Tages
+- alle beteiligten Mitarbeiter mit Eintragsart, Beruf und Dienstwochenende
+
+Nicht angerechnete Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das
+Datum springt in den zugehörigen Monat der Planungstabelle.
 
 ### Dienstwochenenden und Kompensation
 
@@ -445,6 +519,9 @@ Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix:
 - Kalendertage in der Kopfzeile
 - Wochenenden und Dienstwochenenden farblich markiert
 - alle Abwesenheiten und Dienstzusagen tageweise sichtbar
+
+**Jahr drucken** gibt die Matrix aus. Da sie 31 Tagesspalten hat, ist das
+Querformat voreingestellt.
 
 ### Feiertage und Schulferien
 
@@ -858,7 +935,13 @@ Gerätekategorie und Anlage-1-Filter prüfen.
 ### Warum ist ein Tag in der Urlaubsplanung rot?
 
 Die konfigurierte Abwesenheitsgrenze wurde überschritten. Die Planung ist
-bewusst weiterhin möglich, muss aber organisatorisch geprüft werden.
+bewusst weiterhin möglich, muss aber organisatorisch geprüft werden. Die
+Schaltfläche **Überschneidungen prüfen** listet alle betroffenen Tage des
+Jahres samt beteiligter Mitarbeiter auf.
+
+Abwesenheiten von Medizinischen Fachangestellten, Pflegefachassistenz und
+Stationsassistenz zählen dabei nicht mit – ein Tag kann also mehr Einträge
+zeigen, als die Grenze zulässt, ohne rot zu werden.
 
 ### Was tun, wenn der Import abgelehnt wird?
 

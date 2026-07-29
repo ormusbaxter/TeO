@@ -170,10 +170,29 @@
                 monatsweise für das gesamte Team eintragen.
               </p>
             </div>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="openVacationConflictsButton"
+                type="button"
+              >
+                <svg><use href="#icon-alert"></use></svg>
+                Überschneidungen prüfen
+              </button>
+            </div>
           </div>
 
           <section class="panel vacation-controls-panel">
             <div class="vacation-controls">
+              <label class="compact-field vacation-search-field">
+                <span>Mitarbeiter</span>
+                <input
+                  id="vacationEmployeeSearch"
+                  type="search"
+                  placeholder="Name suchen …"
+                  autocomplete="off"
+                />
+              </label>
               <label class="compact-field">
                 <span>Planungsjahr</span>
                 <select id="vacationYear"></select>
@@ -264,6 +283,7 @@
               <span><i class="legend-weekend-weekend_b"></i> <span id="vacationWeekendBLegend">Wochenende B</span></span>
               <span><i class="legend-holiday"></i> Feiertag NRW</span>
               <span><i class="legend-school-vacation"></i> Schulferien NRW</span>
+              <span><i class="legend-birthday"></i> Geburtstag</span>
             </div>
           </section>
 

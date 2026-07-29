@@ -182,6 +182,17 @@
     "gesundheits- und krankenpfleger/in",
     "3-jährig examiniert",
   ]);
+  // Diese Berufsgruppen gehoeren nicht zum Pflegepool, der die Tagesgrenze der
+  // Urlaubsplanung traegt. Ihre Abwesenheiten bleiben sichtbar, zaehlen aber
+  // nicht gegen die Zahl der gleichzeitig moeglichen Urlaube. Verglichen wird
+  // eine normalisierte Schreibweise, damit Varianten wie „Medizinische
+  // Fachangestellte“ oder „Med. Fachangestellter“ ebenfalls erkannt werden.
+  const ABSENCE_LIMIT_EXEMPT_PROFESSION_PATTERNS = Object.freeze([
+    "fachangestellt",
+    "mfa",
+    "pflegefachassisten",
+    "stationsassisten",
+  ]);
 
 
   const SERVICE_WEEKENDS = {
@@ -281,7 +292,7 @@
     },
     plannedOff: {
       label: "Frei geplant",
-      shortLabel: "FP",
+      shortLabel: "×",
       isAbsence: true,
       countsVacationEntitlement: false,
     },
@@ -292,6 +303,27 @@
       countsVacationEntitlement: false,
     },
   };
+
+  // Tastenbelegung der Planungstabelle. Die Kuerzel in den Feldern sind als
+  // Taste mehrdeutig (U, UE und UN begaennen alle mit U), deshalb eine eigene
+  // eindeutige Zuordnung.
+  const PLANNER_ENTRY_KEYS = Object.freeze({
+    u: "vacation",
+    a: "onboardingVacation",
+    s: "school",
+    n: "unpaid",
+    e: "external",
+    f: "plannedOff",
+    d: "mandatoryDuty",
+  });
+  const PLANNER_NAVIGATION_KEYS = Object.freeze([
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowUp",
+    "ArrowDown",
+    "Home",
+    "End",
+  ]);
 
   const ATTENDANCE_STATUSES = {
     teilgenommen: { label: "Teilgenommen", tone: "green" },
@@ -374,6 +406,15 @@
   let vacationYear = new Date().getFullYear();
   let vacationMonth = new Date().getMonth() + 1;
   let vacationEntryType = "vacation";
+  let vacationEmployeeSearchTerm = "";
+  // Tastaturbedienung der Planungstabelle: zuletzt angesteuertes Feld als
+  // Zeilen-/Spaltenindex sowie der Ankerpunkt einer mit Umschalt aufgezogenen
+  // Bereichsmarkierung. Die beiden Listen halten die aktuell gezeichneten
+  // Koordinaten, damit die Navigation zum Namensfilter passt.
+  let vacationFocus = null;
+  let vacationSelectionAnchor = null;
+  let vacationVisibleEmployeeIds = [];
+  let vacationVisibleDates = [];
   let deviceInventoryFilter = "current";
   let deviceAnnexFilter = "all";
   let deviceCategoryFilter = "all";
@@ -521,6 +562,7 @@
     vacationYear: document.querySelector("#vacationYear"),
     vacationMonth: document.querySelector("#vacationMonth"),
     vacationEntryType: document.querySelector("#vacationEntryType"),
+    vacationEmployeeSearch: document.querySelector("#vacationEmployeeSearch"),
     vacationBaseDays: document.querySelector("#vacationBaseDays"),
     vacationWeekdayAbsenceLimit: document.querySelector(
       "#vacationWeekdayAbsenceLimit",
@@ -541,6 +583,9 @@
       "#vacationWeekendBLegend",
     ),
     saveVacationSettingsButton: document.querySelector("#saveVacationSettingsButton"),
+    openVacationConflictsButton: document.querySelector(
+      "#openVacationConflictsButton",
+    ),
     vacationSummary: document.querySelector("#vacationSummary"),
     vacationPlanner: document.querySelector("#vacationPlanner"),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
@@ -728,6 +773,12 @@
     vacationEmployeeOverviewContent: document.querySelector(
       "#vacationEmployeeOverviewContent",
     ),
+    printVacationEmployeeOverviewButton: document.querySelector(
+      "#printVacationEmployeeOverviewButton",
+    ),
+    vacationConflictDialog: document.querySelector("#vacationConflictDialog"),
+    vacationConflictSubtitle: document.querySelector("#vacationConflictSubtitle"),
+    vacationConflictContent: document.querySelector("#vacationConflictContent"),
     weekendOverviewDialog: document.querySelector("#weekendOverviewDialog"),
     weekendOverviewContent: document.querySelector("#weekendOverviewContent"),
     printWeekendOverviewButton: document.querySelector("#printWeekendOverviewButton"),

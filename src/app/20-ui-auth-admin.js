@@ -214,6 +214,27 @@
         ? elements.vacationEntryType.value
         : "vacation";
     });
+    elements.vacationEmployeeSearch.addEventListener("input", () => {
+      vacationEmployeeSearchTerm = elements.vacationEmployeeSearch.value;
+      renderVacationPlanner();
+    });
+    elements.openVacationConflictsButton.addEventListener(
+      "click",
+      openVacationConflictOverview,
+    );
+    elements.vacationConflictContent.addEventListener("click", (event) => {
+      const dateButton = event.target.closest("[data-vacation-conflict-date]");
+      if (!dateButton) return;
+      const date = dateButton.dataset.vacationConflictDate;
+      vacationYear = Number(date.slice(0, 4));
+      vacationMonth = Number(date.slice(5, 7));
+      elements.vacationConflictDialog.close();
+      renderVacationPlanner();
+    });
+    elements.printVacationEmployeeOverviewButton.addEventListener(
+      "click",
+      printVacationEmployeeOverview,
+    );
     elements.saveVacationSettingsButton.addEventListener(
       "click",
       saveVacationSettings,
@@ -604,6 +625,10 @@
     elements.employeeTable.addEventListener("change", handleEmployeeTableSelection);
     elements.vacationPlanner.addEventListener("click", handleVacationPlannerClick);
     elements.vacationPlanner.addEventListener("change", handleVacationPlannerChange);
+    elements.vacationPlanner.addEventListener(
+      "keydown",
+      handleVacationPlannerKeydown,
+    );
     elements.recentEmployees.addEventListener("click", handleRecentEmployeeAction);
     elements.trainingList.addEventListener("click", handleTrainingAction);
     elements.meetingList.addEventListener("click", handleMeetingAction);
@@ -811,6 +836,7 @@
         elements.catalogManagementDialog,
         elements.employeeDossierDialog,
         elements.vacationEmployeeOverviewDialog,
+        elements.vacationConflictDialog,
         elements.weekendOverviewDialog,
         elements.weekendSimulationDialog,
         elements.bulkEditDialog,

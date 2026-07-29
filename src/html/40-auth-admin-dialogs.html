@@ -300,6 +300,35 @@
       </div>
       <div class="modal-body" id="vacationEmployeeOverviewContent"></div>
       <div class="modal-footer">
+        <button
+          class="button button-secondary"
+          id="printVacationEmployeeOverviewButton"
+          type="button"
+        >
+          <svg><use href="#icon-print"></use></svg>
+          Jahr drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="vacationConflictDialog"
+      aria-labelledby="vacationConflictTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Urlaubsplanung</p>
+          <h2 id="vacationConflictTitle">Überschneidungen bei Überplanung</h2>
+          <p class="modal-subtitle" id="vacationConflictSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="vacationConflictContent"></div>
+      <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
     </dialog>

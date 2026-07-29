@@ -655,10 +655,29 @@
                 monatsweise für das gesamte Team eintragen.
               </p>
             </div>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="openVacationConflictsButton"
+                type="button"
+              >
+                <svg><use href="#icon-alert"></use></svg>
+                Überschneidungen prüfen
+              </button>
+            </div>
           </div>
 
           <section class="panel vacation-controls-panel">
             <div class="vacation-controls">
+              <label class="compact-field vacation-search-field">
+                <span>Mitarbeiter</span>
+                <input
+                  id="vacationEmployeeSearch"
+                  type="search"
+                  placeholder="Name suchen …"
+                  autocomplete="off"
+                />
+              </label>
               <label class="compact-field">
                 <span>Planungsjahr</span>
                 <select id="vacationYear"></select>
@@ -749,6 +768,7 @@
               <span><i class="legend-weekend-weekend_b"></i> <span id="vacationWeekendBLegend">Wochenende B</span></span>
               <span><i class="legend-holiday"></i> Feiertag NRW</span>
               <span><i class="legend-school-vacation"></i> Schulferien NRW</span>
+              <span><i class="legend-birthday"></i> Geburtstag</span>
             </div>
           </section>
 
@@ -1551,19 +1571,38 @@
 <p>Folgende Eintragsarten stehen zur Verfügung:</p>
 <ul><li>Urlaub</li><li>Urlaub Einarbeitung</li><li>Schule, Weiterbildung oder Universität</li><li>unbezahlter Urlaub</li><li>externer Einsatz</li><li>frei geplant</li><li>verpflichtende Dienstzusage</li></ul>
 <p><strong>Urlaub Einarbeitung</strong> wird nicht auf die tägliche Abwesenheitsgrenze und nicht auf den regulären Urlaubsverbrauch angerechnet.</p>
-<p><strong>Frei geplant</strong> zählt als Abwesenheit, verbraucht aber keinen Urlaubstag.</p>
+<p><strong>Frei geplant</strong> zählt als Abwesenheit, verbraucht aber keinen Urlaubstag. Der Eintrag erscheint als <strong>×</strong> im selben Grün wie der Urlaub.</p>
 <h3 id="hilfe-monatsplanung">Monatsplanung</h3>
 <ol><li>Jahr und Monat auswählen.</li><li>Gewünschte Eintragsart festlegen.</li><li>In der Zeile des Mitarbeiters auf den entsprechenden Tag klicken.</li><li>Ein erneuter Klick beziehungsweise die Auswahl „Kein Eintrag“ entfernt den Planungseintrag.</li></ol>
 <p>Die Kopfzeile bleibt beim vertikalen Scrollen sichtbar. Wochenenden, Feiertage, Schulferien und die beiden Dienstwochenenden werden farblich unterschieden.</p>
+<p>Unter dem Namen des Mitarbeiters stehen das feste <strong>Dienstwochenende</strong> und der Beschäftigungsgrad. Der Beschäftigungsstatus bleibt im Tooltip der Zeile sichtbar.</p>
+<p>Ein <strong>Geburtstag</strong> ist an der goldenen Schraffur des Tagesfeldes erkennbar; der Tooltip nennt das erreichte Lebensjahr. Fällt der Geburtstag auf den</p>
+<ol><li>Februar, wird er in Nicht-Schaltjahren am 28. Februar angezeigt.</li></ol>
+<h3 id="hilfe-tastaturbedienung-der-planungstabelle">Tastaturbedienung der Planungstabelle</h3>
+<p>Ein Klick auf ein Tagesfeld setzt den Ausgangspunkt; danach lässt sich die Tabelle vollständig über die Tastatur ausfüllen.</p>
+<p>| Taste | Wirkung | | --- | --- | | <code>U</code> | Urlaub | | <code>A</code> | Urlaub Einarbeitung | | <code>S</code> | Schule / Weiterbildung / Uni | | <code>N</code> | Unbezahlter Urlaub | | <code>E</code> | Externer Einsatz | | <code>F</code> | Frei geplant | | <code>D</code> | Verpflichtende Dienstzusage | | <code>Entf</code> oder <code>Rücktaste</code> | Eintrag entfernen | | Pfeiltasten | Feld wechseln | | <code>Pos 1</code> / <code>Ende</code> | an den Monatsanfang oder das Monatsende springen | | <code>Bild auf</code> / <code>Bild ab</code> | Monat wechseln, Zeile und Tag bleiben erhalten | | <code>Umschalt</code> + Pfeil | Bereich über mehrere Tage und Zeilen markieren | | <code>Esc</code> | Bereichsmarkierung aufheben |</p>
+<p>Ein Buchstabe <strong>weist zu</strong> und schaltet nicht um: Wird derselbe Eintrag erneut getippt, bleibt er stehen. Entfernt wird ausschließlich mit <code>Entf</code> oder der Rücktaste. Die Auswahl <strong>Eintragsart</strong> in der Steuerleiste übernimmt den zuletzt getippten Buchstaben, damit Klick und Tastatur dieselbe Eintragsart verwenden.</p>
+<p>Eine mit <code>Umschalt</code> markierte Fläche wird in einem Zug beschrieben – das ergibt einen einzigen Eintrag im Änderungsprotokoll und eine einzige Sammelmeldung, falls dabei Abwesenheitsgrenzen überschritten werden.</p>
+<p>Die Navigation folgt der sichtbaren Tabelle: Ist ein Namensfilter gesetzt, springen die Pfeiltasten nur zwischen den angezeigten Zeilen.</p>
+<h3 id="hilfe-nach-mitarbeitern-filtern">Nach Mitarbeitern filtern</h3>
+<p>Das Suchfeld <strong>Mitarbeiter</strong> blendet alle Zeilen aus, die nicht zum Suchbegriff passen; gesucht wird in Vor- und Nachname sowie im Benutzernamen. Die Kennzahlen über der Tabelle und sämtliche Tagesgrenzen beziehen sich weiterhin auf das gesamte Team, damit ein Filter die Auslastung nicht verfälscht. Ist ein Filter aktiv, weist ein Hinweis über der Tabelle darauf hin.</p>
 <h3 id="hilfe-abwesenheitsgrenzen">Abwesenheitsgrenzen</h3>
 <p>Standardmäßig gelten:</p>
 <ul><li>Werktage: höchstens 8 gleichzeitig abwesende Mitarbeiter</li><li>Wochenenden und Feiertage: höchstens 5 gleichzeitig abwesende Mitarbeiter</li></ul>
 <p>Beide Grenzwerte sind konfigurierbar. Eine Überplanung bleibt möglich, wird aber deutlich rot markiert.</p>
+<p>Die Grenze beschreibt den Pflegepool, der sich gegenseitig vertritt. Nicht mitgezählt werden Abwesenheiten von</p>
+<ul><li>Medizinischen Fachangestellten</li><li>Pflegefachassistenz</li><li>Stationsassistenz</li></ul>
+<p>Diese Einträge bleiben in der Tabelle sichtbar und werden im Tooltip des Tages gesondert ausgewiesen, belegen aber keinen der gleichzeitig möglichen Urlaube – auch nicht beim Ausgleich am Dienstwochenende.</p>
+<h3 id="hilfe-uberschneidungen-prufen">Überschneidungen prüfen</h3>
+<p>Die Schaltfläche <strong>Überschneidungen prüfen</strong> öffnet eine Liste aller Tage des Planungsjahres, an denen die Tagesgrenze überschritten ist. Zu jedem Tag erscheinen:</p>
+<ul><li>wirksame Abwesenheiten und geltende Grenze</li><li>Feiertag, Schulferien und Dienstwochenende des Tages</li><li>alle beteiligten Mitarbeiter mit Eintragsart, Beruf und Dienstwochenende</li></ul>
+<p>Nicht angerechnete Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das Datum springt in den zugehörigen Monat der Planungstabelle.</p>
 <h3 id="hilfe-dienstwochenenden-und-kompensation">Dienstwochenenden und Kompensation</h3>
 <p>Urlaub auf dem eigenen Dienstwochenende wirkt auf die Abwesenheitsberechnung. Eine verpflichtende Dienstzusage eines Mitarbeiters aus dem jeweils anderen Wochenende kann diesen Effekt kompensieren.</p>
 <h3 id="hilfe-jahresubersicht-je-mitarbeiter">Jahresübersicht je Mitarbeiter</h3>
 <p>Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix:</p>
 <ul><li>Monate in der ersten Spalte</li><li>Kalendertage in der Kopfzeile</li><li>Wochenenden und Dienstwochenenden farblich markiert</li><li>alle Abwesenheiten und Dienstzusagen tageweise sichtbar</li></ul>
+<p><strong>Jahr drucken</strong> gibt die Matrix aus. Da sie 31 Tagesspalten hat, ist das Querformat voreingestellt.</p>
 <h3 id="hilfe-feiertage-und-schulferien">Feiertage und Schulferien</h3>
 <p>Gesetzliche Feiertage in Nordrhein-Westfalen werden für jedes Jahr automatisch berechnet und müssen nicht gepflegt werden.</p>
 <p>Die Schulferien stammen dagegen aus <strong>Einstellungen → Schulferien</strong> und lassen sich dort für beliebige Jahre ergänzen; vorbelegt ist die amtliche Ferienordnung NRW bis April 2030. Örtlich unterschiedliche bewegliche Ferientage sind nicht enthalten.</p>
@@ -1700,7 +1739,8 @@
 <h3 id="hilfe-warum-kann-ein-gerat-nicht-gefunden-werden">Warum kann ein Gerät nicht gefunden werden?</h3>
 <p>Der Filter steht möglicherweise auf „aktueller Bestand“. Für ausgemusterte Geräte den Bestandsfilter erweitern und zusätzlich Suchbegriff, Gerätekategorie und Anlage-1-Filter prüfen.</p>
 <h3 id="hilfe-warum-ist-ein-tag-in-der-urlaubsplanung-rot">Warum ist ein Tag in der Urlaubsplanung rot?</h3>
-<p>Die konfigurierte Abwesenheitsgrenze wurde überschritten. Die Planung ist bewusst weiterhin möglich, muss aber organisatorisch geprüft werden.</p>
+<p>Die konfigurierte Abwesenheitsgrenze wurde überschritten. Die Planung ist bewusst weiterhin möglich, muss aber organisatorisch geprüft werden. Die Schaltfläche <strong>Überschneidungen prüfen</strong> listet alle betroffenen Tage des Jahres samt beteiligter Mitarbeiter auf.</p>
+<p>Abwesenheiten von Medizinischen Fachangestellten, Pflegefachassistenz und Stationsassistenz zählen dabei nicht mit – ein Tag kann also mehr Einträge zeigen, als die Grenze zulässt, ohne rot zu werden.</p>
 <h3 id="hilfe-was-tun-wenn-der-import-abgelehnt-wird">Was tun, wenn der Import abgelehnt wird?</h3>
 <ol><li>Datei über <strong>Sicherung prüfen</strong> untersuchen.</li><li>Sicherstellen, dass es sich um eine vollständige TeO-JSON-Sicherung handelt.</li><li>Bei verschlüsselten Dateien das korrekte Passwort verwenden.</li><li>Keine manuell bearbeiteten oder abgeschnittenen JSON-Dateien importieren.</li><li>Bei Sicherungen aus einer neueren TeO-Version zunächst die Anwendung aktualisieren.</li></ol>
 <p>Bei einer verschlüsselten Datei zeigt TeO einen eigenen Entschlüsselungsdialog. Ein falsches Passwort kann dort erneut eingegeben werden, ohne die Datei noch einmal auswählen zu müssen.</p>
@@ -2090,6 +2130,35 @@ npm run verify</code></pre>
         </button>
       </div>
       <div class="modal-body" id="vacationEmployeeOverviewContent"></div>
+      <div class="modal-footer">
+        <button
+          class="button button-secondary"
+          id="printVacationEmployeeOverviewButton"
+          type="button"
+        >
+          <svg><use href="#icon-print"></use></svg>
+          Jahr drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="vacationConflictDialog"
+      aria-labelledby="vacationConflictTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Urlaubsplanung</p>
+          <h2 id="vacationConflictTitle">Überschneidungen bei Überplanung</h2>
+          <p class="modal-subtitle" id="vacationConflictSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="vacationConflictContent"></div>
       <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
