@@ -917,7 +917,13 @@
                 <p class="eyebrow">Dokumentation</p>
                 <h2>Erfasste Einweisungen</h2>
               </div>
-              <span>Neueste zuerst</span>
+              <label class="compact-field">
+                <span>Sortierung</span>
+                <select id="deviceInstructionSort">
+                  <option value="date">Einweisungsdatum, neueste zuerst</option>
+                  <option value="createdAt">Eingabedatum, zuletzt erfasste zuerst</option>
+                </select>
+              </label>
             </div>
             <div id="deviceInstructionList"></div>
           </section>
@@ -1614,8 +1620,16 @@
 <p>Über das Suchfeld der Geräteverwaltung lässt sich der Katalog nach <strong>Geräte- oder Herstellername</strong> durchsuchen. Die Suche unterscheidet keine Groß- und Kleinschreibung und wirkt zusätzlich zu den Filtern für Bestand, Anlage 1 und Kategorie.</p>
 <h3 id="hilfe-einweisung-dokumentieren">Einweisung dokumentieren</h3>
 <p>Eine Geräteeinweisung enthält:</p>
-<ul><li>Gerät</li><li>Einweisungsdatum</li><li>einen oder mehrere Teilnehmer</li><li>Einweisenden</li></ul>
+<ul><li>ein oder mehrere Geräte</li><li>Einweisungsdatum</li><li>einen oder mehrere Teilnehmer</li><li>Einweisenden</li></ul>
 <p>Einweisende können externe, vom Hersteller beauftragte Personen oder interne Medizinproduktebeauftragte sein. Der Status zum Zeitpunkt der Einweisung wird historisch festgehalten.</p>
+<p>Das <strong>Einweisungsdatum ist nicht vorbelegt</strong>. Einweisungen werden häufig nachträglich erfasst; ein voreingetragenes Tagesdatum würde leicht übersehen.</p>
+<p>Die Geräteauswahl ist durchsuchbar – nach Geräte- oder Herstellername, ohne Beachtung der Groß- und Kleinschreibung – und alphabetisch nach Hersteller, dann nach Gerätename sortiert. Geräte, die nicht mehr im Bestand sind, werden entsprechend gekennzeichnet.</p>
+<p>Beim Anlegen lassen sich <strong>mehrere Geräte gleichzeitig</strong> auswählen. Alle erhalten dieselben Angaben zu Datum, Art der Einweisung, einweisender Person und Teilnehmern; gespeichert wird je Gerät ein eigener Nachweis, sodass Verlauf und Matrix unverändert arbeiten. <strong>Sichtbare auswählen</strong> übernimmt alle Geräte der aktuellen Suche auf einmal.</p>
+<p>Beim Bearbeiten eines vorhandenen Nachweises bleibt es bei genau einem Gerät – ein Nachweis gehört immer zu einem Gerät.</p>
+<h3 id="hilfe-erfasste-einweisungen-sortieren">Erfasste Einweisungen sortieren</h3>
+<p>Die Liste <strong>Erfasste Einweisungen</strong> lässt sich auf zwei Arten ordnen:</p>
+<ul><li><strong>Einweisungsdatum, neueste zuerst</strong> (Voreinstellung) – zeigt den fachlichen Verlauf.</li><li><strong>Eingabedatum, zuletzt erfasste zuerst</strong> – zeigt, was zuletzt dokumentiert wurde. Das hilft beim Nacherfassen älterer Einweisungen, die sonst weit hinten stünden. In dieser Ansicht steht unter dem Einweisungsdatum zusätzlich das Erfassungsdatum.</li></ul>
+<p>Bei gleichem Wert entscheidet jeweils das andere Datum, damit die Reihenfolge stabil bleibt.</p>
 <h3 id="hilfe-einweisungsmatrix">Einweisungsmatrix</h3>
 <p>Die Matrix zeigt Mitarbeiter in den Zeilen und Geräte in den Spalten. Filterbar sind unter anderem:</p>
 <ul><li>Anlage 1</li><li>Gerätekategorie</li><li>aktueller Gerätebestand</li><li>Mitarbeiterstatus</li><li>Mitarbeitername</li><li>Gerätename</li></ul>
@@ -2926,11 +2940,37 @@ npm run verify</code></pre>
         </div>
         <div class="modal-body">
           <input id="deviceInstructionId" type="hidden" />
+
+          <section class="device-selection-section">
+            <div class="selection-toolbar">
+              <label class="search-field">
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="deviceInstructionDeviceSearch"
+                  type="search"
+                  placeholder="Gerät oder Hersteller suchen"
+                  aria-label="Geräte für die Einweisung suchen"
+                />
+              </label>
+              <button
+                class="text-button"
+                id="toggleAllInstructionDevices"
+                type="button"
+              >
+                Sichtbare auswählen
+              </button>
+            </div>
+            <div class="device-selection-heading" aria-hidden="true">
+              <span id="deviceSelectionHeadingLabel">Geräte</span>
+            </div>
+            <div
+              class="selection-list device-selection-list"
+              id="deviceInstructionDeviceList"
+            ></div>
+            <p class="form-error" id="deviceInstructionDeviceError"></p>
+          </section>
+
           <div class="form-grid">
-            <label class="form-field">
-              <span>Gerät <em>*</em></span>
-              <select id="deviceInstructionDevice" required></select>
-            </label>
             <label class="form-field">
               <span>Einweisungsdatum <em>*</em></span>
               <input id="deviceInstructionDate" type="date" required />

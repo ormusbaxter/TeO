@@ -73,11 +73,37 @@
         </div>
         <div class="modal-body">
           <input id="deviceInstructionId" type="hidden" />
+
+          <section class="device-selection-section">
+            <div class="selection-toolbar">
+              <label class="search-field">
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="deviceInstructionDeviceSearch"
+                  type="search"
+                  placeholder="Gerät oder Hersteller suchen"
+                  aria-label="Geräte für die Einweisung suchen"
+                />
+              </label>
+              <button
+                class="text-button"
+                id="toggleAllInstructionDevices"
+                type="button"
+              >
+                Sichtbare auswählen
+              </button>
+            </div>
+            <div class="device-selection-heading" aria-hidden="true">
+              <span id="deviceSelectionHeadingLabel">Geräte</span>
+            </div>
+            <div
+              class="selection-list device-selection-list"
+              id="deviceInstructionDeviceList"
+            ></div>
+            <p class="form-error" id="deviceInstructionDeviceError"></p>
+          </section>
+
           <div class="form-grid">
-            <label class="form-field">
-              <span>Gerät <em>*</em></span>
-              <select id="deviceInstructionDevice" required></select>
-            </label>
             <label class="form-field">
               <span>Einweisungsdatum <em>*</em></span>
               <input id="deviceInstructionDate" type="date" required />

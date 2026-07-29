@@ -601,7 +601,7 @@ Kategorie.
 
 Eine Geräteeinweisung enthält:
 
-- Gerät
+- ein oder mehrere Geräte
 - Einweisungsdatum
 - einen oder mehrere Teilnehmer
 - Einweisenden
@@ -609,6 +609,37 @@ Eine Geräteeinweisung enthält:
 Einweisende können externe, vom Hersteller beauftragte Personen oder interne
 Medizinproduktebeauftragte sein. Der Status zum Zeitpunkt der Einweisung wird
 historisch festgehalten.
+
+Das **Einweisungsdatum ist nicht vorbelegt**. Einweisungen werden häufig
+nachträglich erfasst; ein voreingetragenes Tagesdatum würde leicht übersehen.
+
+Die Geräteauswahl ist durchsuchbar – nach Geräte- oder Herstellername, ohne
+Beachtung der Groß- und Kleinschreibung – und alphabetisch nach Hersteller,
+dann nach Gerätename sortiert. Geräte, die nicht mehr im Bestand sind, werden
+entsprechend gekennzeichnet.
+
+Beim Anlegen lassen sich **mehrere Geräte gleichzeitig** auswählen. Alle
+erhalten dieselben Angaben zu Datum, Art der Einweisung, einweisender Person
+und Teilnehmern; gespeichert wird je Gerät ein eigener Nachweis, sodass Verlauf
+und Matrix unverändert arbeiten. **Sichtbare auswählen** übernimmt alle Geräte
+der aktuellen Suche auf einmal.
+
+Beim Bearbeiten eines vorhandenen Nachweises bleibt es bei genau einem Gerät –
+ein Nachweis gehört immer zu einem Gerät.
+
+### Erfasste Einweisungen sortieren
+
+Die Liste **Erfasste Einweisungen** lässt sich auf zwei Arten ordnen:
+
+- **Einweisungsdatum, neueste zuerst** (Voreinstellung) – zeigt den fachlichen
+  Verlauf.
+- **Eingabedatum, zuletzt erfasste zuerst** – zeigt, was zuletzt dokumentiert
+  wurde. Das hilft beim Nacherfassen älterer Einweisungen, die sonst weit
+  hinten stünden. In dieser Ansicht steht unter dem Einweisungsdatum
+  zusätzlich das Erfassungsdatum.
+
+Bei gleichem Wert entscheidet jeweils das andere Datum, damit die Reihenfolge
+stabil bleibt.
 
 ### Einweisungsmatrix
 

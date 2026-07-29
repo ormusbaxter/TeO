@@ -387,6 +387,15 @@
   let deviceEmployeeSearchTerm = "";
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
+  // Sortierung der erfassten Einweisungen: nach Einweisungsdatum oder danach,
+  // wann der Nachweis erfasst wurde.
+  let deviceInstructionSortKey = "date";
+  // So viele Geraete bleiben in der Auswahl sichtbar, weitere sind scrollbar.
+  const VISIBLE_INSTRUCTION_DEVICES = 5;
+  // Mehrere Geraete koennen mit denselben Angaben auf einmal dokumentiert
+  // werden; beim Bearbeiten bleibt es bei genau einem Geraet.
+  let deviceInstructionDeviceDraft = new Set();
+  let deviceInstructionDeviceSearchTerm = "";
   const cleanFormSnapshots = new WeakMap();
 
   const elements = {
@@ -645,7 +654,6 @@
     deviceInstructionSubmitLabel: document.querySelector(
       "#deviceInstructionSubmitLabel",
     ),
-    deviceInstructionDevice: document.querySelector("#deviceInstructionDevice"),
     deviceInstructionDate: document.querySelector("#deviceInstructionDate"),
     deviceInstructorType: document.querySelector("#deviceInstructorType"),
     externalInstructorField: document.querySelector("#externalInstructorField"),
@@ -660,6 +668,22 @@
       "#toggleAllDeviceParticipants",
     ),
     deviceParticipantList: document.querySelector("#deviceParticipantList"),
+    deviceInstructionSort: document.querySelector("#deviceInstructionSort"),
+    deviceInstructionDeviceSearch: document.querySelector(
+      "#deviceInstructionDeviceSearch",
+    ),
+    deviceInstructionDeviceList: document.querySelector(
+      "#deviceInstructionDeviceList",
+    ),
+    deviceInstructionDeviceError: document.querySelector(
+      "#deviceInstructionDeviceError",
+    ),
+    deviceSelectionHeadingLabel: document.querySelector(
+      "#deviceSelectionHeadingLabel",
+    ),
+    toggleAllInstructionDevices: document.querySelector(
+      "#toggleAllInstructionDevices",
+    ),
     deviceParticipantError: document.querySelector("#deviceParticipantError"),
     deviceParticipantCount: document.querySelector("#deviceParticipantCount"),
     deviceInstructionHistoryDialog: document.querySelector(
@@ -2511,6 +2535,23 @@
     });
     elements.toggleAllDeviceParticipants.addEventListener("click", () => {
       toggleVisibleDeviceParticipants();
+    });
+    elements.deviceInstructionSort.addEventListener("change", (event) => {
+      deviceInstructionSortKey =
+        event.target.value === "createdAt" ? "createdAt" : "date";
+      renderDeviceInstructionList();
+    });
+    elements.deviceInstructionDeviceSearch.addEventListener("input", (event) => {
+      deviceInstructionDeviceSearchTerm = event.target.value
+        .trim()
+        .toLocaleLowerCase("de-DE");
+      renderInstructionDeviceList();
+    });
+    elements.deviceInstructionDeviceList.addEventListener("change", (event) => {
+      handleInstructionDeviceChange(event);
+    });
+    elements.toggleAllInstructionDevices.addEventListener("click", () => {
+      toggleVisibleInstructionDevices();
     });
   }
 
@@ -8026,10 +8067,16 @@
   }
 
   function renderDeviceInstructionList() {
-    const instructions = [...state.deviceInstructions].sort(
-      (a, b) =>
-        b.date.localeCompare(a.date) ||
-        b.createdAt.localeCompare(a.createdAt),
+    elements.deviceInstructionSort.value = deviceInstructionSortKey;
+    // Beide Sortierungen fallen auf das jeweils andere Datum zurueck, damit
+    // gleichzeitig erfasste Nachweise eine stabile Reihenfolge behalten.
+    const nachEingabe = deviceInstructionSortKey === "createdAt";
+    const instructions = [...state.deviceInstructions].sort((a, b) =>
+      nachEingabe
+        ? b.createdAt.localeCompare(a.createdAt) ||
+          b.date.localeCompare(a.date)
+        : b.date.localeCompare(a.date) ||
+          b.createdAt.localeCompare(a.createdAt),
     );
     if (!instructions.length) {
       elements.deviceInstructionList.innerHTML = `
@@ -8065,6 +8112,13 @@
               <article class="device-instruction-log-row">
                 <time datetime="${instruction.date}">
                   ${formatDate(instruction.date)}
+                  ${
+                    nachEingabe
+                      ? `<small>erfasst ${formatDate(
+                          instruction.createdAt.slice(0, 10),
+                        )}</small>`
+                      : ""
+                  }
                 </time>
                 <div class="device-instruction-log-device">
                   <strong>${escapeHtml(device.productName)}</strong>
@@ -8383,25 +8437,26 @@
     elements.externalInstructorName.setCustomValidity("");
     elements.employeeInstructor.setCustomValidity("");
     elements.employeeInstructorMpoConfirmation.setCustomValidity("");
-    elements.deviceInstructionDate.value = todayIso();
-    elements.deviceInstructionDevice.innerHTML = [...state.devices]
-      .sort(
-        (a, b) =>
-          Number(b.currentInventory) - Number(a.currentInventory) ||
-          a.productName.localeCompare(b.productName, "de") ||
-          a.manufacturer.localeCompare(b.manufacturer, "de"),
-      )
-      .map(
-        (device) =>
-          `<option value="${device.id}">${escapeHtml(deviceLabel(device))}${
-            device.currentInventory ? "" : " · nicht mehr im Bestand"
-          }</option>`,
-      )
-      .join("");
+    // Bewusst kein Vorgabedatum: Einweisungen werden haeufig nachtraeglich
+    // erfasst, ein voreingetragenes Heute wuerde leicht uebersehen.
+    elements.deviceInstructionDate.value = "";
+    elements.deviceInstructionDeviceSearch.value = "";
+    elements.deviceInstructionDeviceError.textContent = "";
+    deviceInstructionDeviceSearchTerm = "";
+    deviceInstructionDeviceDraft = new Set();
+
     const selectedDeviceId = existingInstruction?.deviceId || deviceId;
     if (selectedDeviceId && getDevice(selectedDeviceId)) {
-      elements.deviceInstructionDevice.value = selectedDeviceId;
+      deviceInstructionDeviceDraft.add(selectedDeviceId);
     }
+
+    // Beim Bearbeiten gehoert der Nachweis zu genau einem Geraet; das
+    // Sammelanlegen gibt es nur beim Neuanlegen.
+    const einzelauswahl = Boolean(existingInstruction);
+    elements.toggleAllInstructionDevices.hidden = einzelauswahl;
+    elements.deviceSelectionHeadingLabel.textContent = einzelauswahl
+      ? "Gerät"
+      : "Geräte · Mehrfachauswahl möglich";
     elements.employeeInstructor.innerHTML = `
       <option value="">Bitte auswählen</option>
       ${[...state.employees]
@@ -8442,10 +8497,126 @@
       elements.deviceInstructorType.value = "manufacturer";
     }
     updateDeviceInstructorFields();
+    renderInstructionDeviceList();
     renderDeviceParticipantList();
     elements.deviceInstructionDialog.showModal();
+    // Erst jetzt ist die Liste vermessbar.
+    limitInstructionDeviceListHeight();
     captureCleanForm(elements.deviceInstructionForm);
-    window.setTimeout(() => elements.deviceInstructionDevice.focus(), 0);
+    window.setTimeout(() => elements.deviceInstructionDeviceSearch.focus(), 0);
+  }
+
+  function instructionDeviceSingleSelect() {
+    return Boolean(elements.deviceInstructionId.value);
+  }
+
+  function filteredInstructionDevices() {
+    return [...state.devices]
+      .filter(
+        (device) =>
+          !deviceInstructionDeviceSearchTerm ||
+          `${device.manufacturer} ${device.productName}`
+            .toLocaleLowerCase("de-DE")
+            .includes(deviceInstructionDeviceSearchTerm),
+      )
+      .sort(
+        (a, b) =>
+          a.manufacturer.localeCompare(b.manufacturer, "de") ||
+          a.productName.localeCompare(b.productName, "de"),
+      );
+  }
+
+  function renderInstructionDeviceList() {
+    const devices = filteredInstructionDevices();
+    const einzelauswahl = instructionDeviceSingleSelect();
+    elements.deviceInstructionDeviceList.innerHTML = devices.length
+      ? devices
+          .map(
+            (device) => `
+              <label class="selection-card">
+                <input
+                  type="${einzelauswahl ? "radio" : "checkbox"}"
+                  ${einzelauswahl ? 'name="deviceInstructionDeviceChoice"' : ""}
+                  data-instruction-device="${device.id}"
+                  ${deviceInstructionDeviceDraft.has(device.id) ? "checked" : ""}
+                />
+                <span class="device-selection-icon">
+                  <svg><use href="#icon-device"></use></svg>
+                </span>
+                <span>
+                  <strong>${escapeHtml(device.productName)}</strong>
+                  <small>${escapeHtml(device.manufacturer)}${
+                    device.annex1 ? " · Anlage 1" : ""
+                  }${device.currentInventory ? "" : " · nicht mehr im Bestand"}</small>
+                </span>
+              </label>
+            `,
+          )
+          .join("")
+      : '<p class="completion-empty">Keine Geräte für diese Suche gefunden.</p>';
+    limitInstructionDeviceListHeight();
+    updateInstructionDeviceCount();
+  }
+
+  // Fuenf Eintraege bleiben sichtbar. Die Hoehe wird an der ersten
+  // ueberzaehligen Karte gemessen, weil lange Geraetenamen umbrechen koennen.
+  // Solange der Dialog geschlossen ist, liefern alle Masse 0; die Begrenzung
+  // wird dann beim Oeffnen nachgeholt.
+  function limitInstructionDeviceListHeight() {
+    const list = elements.deviceInstructionDeviceList;
+    list.style.maxHeight = "";
+    if (!list.offsetParent) return;
+
+    const cards = [...list.querySelectorAll(".selection-card")];
+    if (cards.length <= VISIBLE_INSTRUCTION_DEVICES) return;
+    // Bis zur Unterkante der letzten sichtbaren Karte, zuzueglich des unteren
+    // Innenabstands. Ueber die Oberkante der naechsten Karte gerechnet waere
+    // der Rasterabstand doppelt gezaehlt und die fuenfte Karte abgeschnitten.
+    // offsetTop/offsetHeight statt getBoundingClientRect: Der Dialog faehrt
+    // beim Oeffnen skaliert ein, wodurch gemessene Rechtecke zu klein waeren.
+    const letzte = cards[VISIBLE_INSTRUCTION_DEVICES - 1];
+    const innenabstand =
+      Number.parseFloat(getComputedStyle(list).paddingBottom) || 0;
+    list.style.maxHeight = `${
+      letzte.offsetTop + letzte.offsetHeight + innenabstand
+    }px`;
+  }
+
+  function updateInstructionDeviceCount() {
+    const anzahl = deviceInstructionDeviceDraft.size;
+    elements.toggleAllInstructionDevices.textContent =
+      anzahl && filteredInstructionDevices().every((device) =>
+        deviceInstructionDeviceDraft.has(device.id),
+      )
+        ? "Sichtbare abwählen"
+        : "Sichtbare auswählen";
+    if (anzahl) elements.deviceInstructionDeviceError.textContent = "";
+  }
+
+  function handleInstructionDeviceChange(event) {
+    const checkbox = event.target.closest("[data-instruction-device]");
+    if (!checkbox) return;
+    const deviceId = checkbox.dataset.instructionDevice;
+    if (instructionDeviceSingleSelect()) {
+      deviceInstructionDeviceDraft = new Set([deviceId]);
+    } else if (checkbox.checked) {
+      deviceInstructionDeviceDraft.add(deviceId);
+    } else {
+      deviceInstructionDeviceDraft.delete(deviceId);
+    }
+    updateInstructionDeviceCount();
+  }
+
+  function toggleVisibleInstructionDevices() {
+    const devices = filteredInstructionDevices();
+    const alleGewaehlt = devices.every((device) =>
+      deviceInstructionDeviceDraft.has(device.id),
+    );
+    devices.forEach((device) => {
+      if (alleGewaehlt) deviceInstructionDeviceDraft.delete(device.id);
+      else deviceInstructionDeviceDraft.add(device.id);
+    });
+    renderInstructionDeviceList();
   }
 
   function updateDeviceInstructorFields() {
@@ -8599,6 +8770,12 @@
         : "",
     );
     if (!elements.deviceInstructionForm.reportValidity()) return;
+    if (!deviceInstructionDeviceDraft.size) {
+      elements.deviceInstructionDeviceError.textContent =
+        "Bitte mindestens ein Gerät auswählen.";
+      elements.deviceInstructionDeviceSearch.focus();
+      return;
+    }
     if (!deviceParticipantDraft.size) {
       elements.deviceParticipantError.textContent =
         "Bitte mindestens einen Einweisungsteilnehmer auswählen.";
@@ -8620,9 +8797,9 @@
           (item) => item.id === instructionId,
         )
       : null;
-    const instruction = {
-      id: existingInstruction?.id || createId(),
-      deviceId: elements.deviceInstructionDevice.value,
+    // Alle ausgewaehlten Geraete erhalten denselben Nachweis - je Geraet ein
+    // eigener Datensatz, damit Verlauf und Matrix unveraendert funktionieren.
+    const gemeinsameAngaben = {
       date,
       instructorType: isEmployee ? "employee" : "manufacturer",
       instructorEmployeeId: instructorEmployee?.id || "",
@@ -8636,26 +8813,37 @@
           wasMedicalProductsOfficer,
         }),
       ),
-      createdAt: existingInstruction?.createdAt || new Date().toISOString(),
     };
+    const erstellt = new Date().toISOString();
+    const instructions = [...deviceInstructionDeviceDraft].map((deviceId) => ({
+      id: existingInstruction?.id || createId(),
+      deviceId,
+      ...gemeinsameAngaben,
+      createdAt: existingInstruction?.createdAt || erstellt,
+    }));
+
     const committed = await commitStateMutation(() => {
       if (existingInstruction) {
         state.deviceInstructions = state.deviceInstructions.map((item) =>
-          item.id === instruction.id ? instruction : item,
+          item.id === instructions[0].id ? instructions[0] : item,
         );
       } else {
-        state.deviceInstructions.push(instruction);
+        state.deviceInstructions.push(...instructions);
       }
     });
     if (!committed) return;
     markFormClean(elements.deviceInstructionForm);
     elements.deviceInstructionDialog.close();
+    const teilnehmerzahl = gemeinsameAngaben.participants.length;
+    const teilnehmerText = `${teilnehmerzahl} Mitarbeiter/in${
+      teilnehmerzahl === 1 ? "" : "nen"
+    }`;
     showToast(
       existingInstruction
         ? "Einweisung wurde aktualisiert."
-        : `Einweisung wurde für ${instruction.participants.length} Mitarbeiter/in${
-            instruction.participants.length === 1 ? "" : "nen"
-          } gespeichert.`,
+        : instructions.length === 1
+          ? `Einweisung wurde für ${teilnehmerText} gespeichert.`
+          : `${instructions.length} Einweisungen wurden für ${teilnehmerText} gespeichert.`,
     );
   }
 

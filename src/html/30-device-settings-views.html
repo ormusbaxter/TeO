@@ -73,7 +73,13 @@
                 <p class="eyebrow">Dokumentation</p>
                 <h2>Erfasste Einweisungen</h2>
               </div>
-              <span>Neueste zuerst</span>
+              <label class="compact-field">
+                <span>Sortierung</span>
+                <select id="deviceInstructionSort">
+                  <option value="date">Einweisungsdatum, neueste zuerst</option>
+                  <option value="createdAt">Eingabedatum, zuletzt erfasste zuerst</option>
+                </select>
+              </label>
             </div>
             <div id="deviceInstructionList"></div>
           </section>

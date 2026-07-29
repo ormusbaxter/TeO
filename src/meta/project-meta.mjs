@@ -7,7 +7,7 @@ export const PROJECT_META = Object.freeze({
   name: "TeO – Team & Employee Organizer",
   version: Object.freeze({
     major: 4,
-    minor: 9,
+    minor: 10,
     patch: 0,
   }),
   stateVersion: 24,

@@ -5044,6 +5044,57 @@ legend {
   grid-template-columns: repeat(auto-fit, minmax(110px, 180px));
 }
 
+.device-instruction-log-row time small {
+  display: block;
+  margin-top: 2px;
+  color: var(--slate-500);
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
+.device-selection-section {
+  margin-bottom: 18px;
+}
+
+.device-selection-heading {
+  margin: 12px 2px 7px;
+  color: var(--slate-600);
+  font-size: 0.61rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Wie .device-participant-list. Die Hoehe fuer fuenf Eintraege setzt
+   renderInstructionDeviceList, weil Geraetenamen unterschiedlich hoch
+   umbrechen koennen. */
+.device-selection-list {
+  /* position: relative macht die Liste zum Bezugspunkt fuer offsetTop der
+     Karten - so laesst sich die Hoehe ohne getBoundingClientRect messen. */
+  position: relative;
+  display: grid;
+  gap: 7px;
+  margin-top: 6px;
+  padding: 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.device-selection-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: var(--blue-700);
+  border-radius: 9px;
+  background: var(--blue-100);
+}
+
+.device-selection-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
 .appointment-category-tag {
   display: inline-block;
   margin-left: 8px;

@@ -550,6 +550,23 @@
     elements.toggleAllDeviceParticipants.addEventListener("click", () => {
       toggleVisibleDeviceParticipants();
     });
+    elements.deviceInstructionSort.addEventListener("change", (event) => {
+      deviceInstructionSortKey =
+        event.target.value === "createdAt" ? "createdAt" : "date";
+      renderDeviceInstructionList();
+    });
+    elements.deviceInstructionDeviceSearch.addEventListener("input", (event) => {
+      deviceInstructionDeviceSearchTerm = event.target.value
+        .trim()
+        .toLocaleLowerCase("de-DE");
+      renderInstructionDeviceList();
+    });
+    elements.deviceInstructionDeviceList.addEventListener("change", (event) => {
+      handleInstructionDeviceChange(event);
+    });
+    elements.toggleAllInstructionDevices.addEventListener("click", () => {
+      toggleVisibleInstructionDevices();
+    });
   }
 
   function filterHelpTopics() {

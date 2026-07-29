@@ -386,6 +386,15 @@
   let deviceEmployeeSearchTerm = "";
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
+  // Sortierung der erfassten Einweisungen: nach Einweisungsdatum oder danach,
+  // wann der Nachweis erfasst wurde.
+  let deviceInstructionSortKey = "date";
+  // So viele Geraete bleiben in der Auswahl sichtbar, weitere sind scrollbar.
+  const VISIBLE_INSTRUCTION_DEVICES = 5;
+  // Mehrere Geraete koennen mit denselben Angaben auf einmal dokumentiert
+  // werden; beim Bearbeiten bleibt es bei genau einem Geraet.
+  let deviceInstructionDeviceDraft = new Set();
+  let deviceInstructionDeviceSearchTerm = "";
   const cleanFormSnapshots = new WeakMap();
 
   const elements = {
@@ -644,7 +653,6 @@
     deviceInstructionSubmitLabel: document.querySelector(
       "#deviceInstructionSubmitLabel",
     ),
-    deviceInstructionDevice: document.querySelector("#deviceInstructionDevice"),
     deviceInstructionDate: document.querySelector("#deviceInstructionDate"),
     deviceInstructorType: document.querySelector("#deviceInstructorType"),
     externalInstructorField: document.querySelector("#externalInstructorField"),
@@ -659,6 +667,22 @@
       "#toggleAllDeviceParticipants",
     ),
     deviceParticipantList: document.querySelector("#deviceParticipantList"),
+    deviceInstructionSort: document.querySelector("#deviceInstructionSort"),
+    deviceInstructionDeviceSearch: document.querySelector(
+      "#deviceInstructionDeviceSearch",
+    ),
+    deviceInstructionDeviceList: document.querySelector(
+      "#deviceInstructionDeviceList",
+    ),
+    deviceInstructionDeviceError: document.querySelector(
+      "#deviceInstructionDeviceError",
+    ),
+    deviceSelectionHeadingLabel: document.querySelector(
+      "#deviceSelectionHeadingLabel",
+    ),
+    toggleAllInstructionDevices: document.querySelector(
+      "#toggleAllInstructionDevices",
+    ),
     deviceParticipantError: document.querySelector("#deviceParticipantError"),
     deviceParticipantCount: document.querySelector("#deviceParticipantCount"),
     deviceInstructionHistoryDialog: document.querySelector(
