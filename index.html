@@ -154,10 +154,6 @@
         </a>
 
         <nav class="main-nav" id="mainNav">
-          <p class="nav-label">
-            Verwaltung
-            <small>Zum Sortieren ziehen oder Alt + Pfeiltaste</small>
-          </p>
           <button class="nav-item is-active" type="button" data-view="dashboard">
             <svg><use href="#icon-dashboard"></use></svg>
             <span>Übersicht</span>
@@ -211,6 +207,11 @@
             <svg><use href="#icon-help"></use></svg>
             <span>Hilfe</span>
           </button>
+          <p class="sr-only" id="sidebarOrderStatus" role="status" aria-live="polite"></p>
+        </nav>
+
+        <div class="nav-order-tools">
+          <p class="nav-order-hint">Zum Sortieren ziehen oder Alt + Pfeiltaste</p>
           <button
             class="nav-order-reset"
             id="resetSidebarOrderButton"
@@ -220,8 +221,7 @@
             <svg><use href="#icon-close"></use></svg>
             <span>Reihenfolge zurücksetzen</span>
           </button>
-          <p class="sr-only" id="sidebarOrderStatus" role="status" aria-live="polite"></p>
-        </nav>
+        </div>
 
         <section class="user-session" aria-label="Angemeldeter Benutzer">
           <span class="user-session-icon">

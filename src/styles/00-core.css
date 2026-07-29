@@ -232,27 +232,22 @@ svg {
   margin-top: 48px;
 }
 
-.nav-label {
-  /* Ueberschrift und Zuruecksetzen rahmen die per order sortierten
-     Navigationseintraege ein und bleiben deshalb fest oben beziehungsweise
-     unten. */
-  order: -1;
-  margin: 0 12px 8px;
-  color: #7890a5;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
+/* Sortierhinweis und Zuruecksetzen stehen unmittelbar ueber den
+   Anmeldeinformationen. Der Block nimmt die freie Hoehe der Seitenleiste auf -
+   diese Aufgabe hatte zuvor die Benutzerkarte. */
+.nav-order-tools {
+  display: grid;
+  gap: 2px;
+  margin-top: auto;
+  padding-top: 12px;
 }
 
-.nav-label small {
-  display: block;
-  margin-top: 4px;
+.nav-order-hint {
+  margin: 0 13px;
   color: #6b8299;
   font-size: 0.58rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  text-transform: none;
 }
 
 .nav-item.is-dragging {
@@ -274,10 +269,8 @@ svg {
 
 .nav-order-reset {
   display: flex;
-  order: 999;
   gap: 8px;
   align-items: center;
-  margin-top: 10px;
   padding: 8px 13px;
   cursor: pointer;
   color: #8fa4b8;
@@ -482,7 +475,7 @@ svg {
   grid-template-columns: 30px minmax(0, 1fr) auto;
   gap: 9px;
   align-items: center;
-  margin-top: auto;
+  margin-top: 8px;
   margin-bottom: 10px;
   padding: 11px;
   border: 1px solid rgb(255 255 255 / 9%);
