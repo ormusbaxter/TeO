@@ -251,6 +251,7 @@
     hospitation: { label: "Hospitation", icon: "eye" },
     pruefung: { label: "Prüfung", icon: "clipboard-check" },
     schulung: { label: "Schulung", icon: "training" },
+    baumassnahme: { label: "Baumaßnahme", icon: "construction" },
   });
   const APPOINTMENT_CATEGORY_FALLBACK_ICON = "calendar";
 
@@ -2982,7 +2983,9 @@
   }
 
   function renderAll() {
-    elements.navEmployeeCount.textContent = String(state.employees.length);
+    // Nur Mitarbeiter, die tatsaechlich im Dienst stehen. Ausgetretene sollen
+    // die Zahl in der Seitenleiste nicht dauerhaft aufblaehen.
+    elements.navEmployeeCount.textContent = String(activeEmployeeList().length);
     elements.navTrainingCount.textContent = String(state.trainings.length);
     elements.navMeetingCount.textContent = String(state.meetings.length);
     elements.navAppointmentCount.textContent = String(

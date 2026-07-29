@@ -75,6 +75,11 @@ Folgende Bereiche stehen zur Verfügung:
 - **Einstellungen:** Darstellung, Datenbank, Sicherungen und Stammdaten
 - **Hilfe:** Dieses Benutzerhandbuch mit Volltextsuche
 
+Die Zahl neben einem Eintrag nennt bei **Mitarbeitern** die aktiven und die in
+Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei
+**Terminen** die noch bevorstehenden und bei der **Geräteverwaltung** die
+Geräte im aktuellen Bestand.
+
 ### Suche und Filter
 
 Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können
@@ -105,8 +110,8 @@ Die Einträge der Seitenleiste lassen sich in eine eigene Reihenfolge bringen:
   Bewegung von mehr als sechs Bildpunkten.
 - **Tastatur** – Eintrag anwählen und mit **Alt + Pfeil hoch** beziehungsweise
   **Alt + Pfeil runter** verschieben.
-- **Zurücksetzen** – die Schaltfläche unter der Navigation erscheint nur, wenn
-  eine eigene Reihenfolge gesetzt ist.
+- **Zurücksetzen** – die Schaltfläche über den Anmeldeinformationen erscheint
+  nur, wenn eine eigene Reihenfolge gesetzt ist.
 
 Die Reihenfolge ist eine persönliche Einstellung. Sie wird im Browserprofil
 gespeichert, gilt also nur für diesen Rechner und diesen Benutzer, verändert
@@ -546,7 +551,8 @@ Optional können Uhrzeit von/bis, Ort, Beschreibung und eine **Kategorie**
 hinterlegt werden.
 
 Zur Auswahl stehen Geräteeinweisung, Teamsitzung, Meeting,
-Stationsleiterkonferenz, Begehung, Hospitation, Prüfung und Schulung. Jede Kategorie hat
+Stationsleiterkonferenz, Begehung, Hospitation, Prüfung, Schulung und
+Baumaßnahme. Jede Kategorie hat
 ein eigenes Symbol, das in der Terminübersicht und im Fristenmonitor anstelle
 des allgemeinen Kalendersymbols erscheint; im Fristenmonitor ersetzt die
 Kategorie zusätzlich die Bezeichnung „Termin“. Termine ohne Kategorie behalten

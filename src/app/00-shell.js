@@ -250,6 +250,7 @@
     hospitation: { label: "Hospitation", icon: "eye" },
     pruefung: { label: "Prüfung", icon: "clipboard-check" },
     schulung: { label: "Schulung", icon: "training" },
+    baumassnahme: { label: "Baumaßnahme", icon: "construction" },
   });
   const APPOINTMENT_CATEGORY_FALLBACK_ICON = "calendar";
 

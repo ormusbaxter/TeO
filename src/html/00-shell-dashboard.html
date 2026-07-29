@@ -138,6 +138,11 @@
         <path d="M15 5.5h2.5A1.5 1.5 0 0 1 19 7v12.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5V7a1.5 1.5 0 0 1 1.5-1.5H9" />
         <path d="m9 13.5 2 2 4-4" />
       </symbol>
+      <symbol id="icon-construction" viewBox="0 0 24 24">
+        <path d="M3 20h18v-2a1.5 1.5 0 0 0-1.5-1.5h-15A1.5 1.5 0 0 0 3 18Z" />
+        <path d="M10 16.5V5a1.1 1.1 0 0 1 1.1-1.1h1.8A1.1 1.1 0 0 1 14 5v11.5" />
+        <path d="M5.5 16.5v-3A5.5 5.5 0 0 1 10 8.1M14 8.1a5.5 5.5 0 0 1 4.5 5.4v3" />
+      </symbol>
     </svg>
 
     <div class="app-layout">
@@ -160,7 +165,11 @@
           <button class="nav-item" type="button" data-view="employees">
             <svg><use href="#icon-users"></use></svg>
             <span>Mitarbeiter</span>
-            <span class="nav-count" id="navEmployeeCount">0</span>
+            <span
+              class="nav-count"
+              id="navEmployeeCount"
+              title="Aktive Mitarbeiter und Mitarbeiter in Einarbeitung"
+            >0</span>
           </button>
           <button class="nav-item" type="button" data-view="weekends">
             <svg><use href="#icon-calendar"></use></svg>

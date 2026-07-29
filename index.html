@@ -139,6 +139,11 @@
         <path d="M15 5.5h2.5A1.5 1.5 0 0 1 19 7v12.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5V7a1.5 1.5 0 0 1 1.5-1.5H9" />
         <path d="m9 13.5 2 2 4-4" />
       </symbol>
+      <symbol id="icon-construction" viewBox="0 0 24 24">
+        <path d="M3 20h18v-2a1.5 1.5 0 0 0-1.5-1.5h-15A1.5 1.5 0 0 0 3 18Z" />
+        <path d="M10 16.5V5a1.1 1.1 0 0 1 1.1-1.1h1.8A1.1 1.1 0 0 1 14 5v11.5" />
+        <path d="M5.5 16.5v-3A5.5 5.5 0 0 1 10 8.1M14 8.1a5.5 5.5 0 0 1 4.5 5.4v3" />
+      </symbol>
     </svg>
 
     <div class="app-layout">
@@ -161,7 +166,11 @@
           <button class="nav-item" type="button" data-view="employees">
             <svg><use href="#icon-users"></use></svg>
             <span>Mitarbeiter</span>
-            <span class="nav-count" id="navEmployeeCount">0</span>
+            <span
+              class="nav-count"
+              id="navEmployeeCount"
+              title="Aktive Mitarbeiter und Mitarbeiter in Einarbeitung"
+            >0</span>
           </button>
           <button class="nav-item" type="button" data-view="weekends">
             <svg><use href="#icon-calendar"></use></svg>
@@ -1473,6 +1482,7 @@
 <p>Die Desktop-Navigation befindet sich links. Auf kleinen Bildschirmen wird am unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.</p>
 <p>Folgende Bereiche stehen zur Verfügung:</p>
 <ul><li><strong>Übersicht:</strong> Kennzahlen, Fristenmonitor und zuletzt bearbeitete Daten</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
+<p>Die Zahl neben einem Eintrag nennt bei <strong>Mitarbeitern</strong> die aktiven und die in Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei <strong>Terminen</strong> die noch bevorstehenden und bei der <strong>Geräteverwaltung</strong> die Geräte im aktuellen Bestand.</p>
 <h3 id="hilfe-suche-und-filter">Suche und Filter</h3>
 <p>Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können kombiniert werden. Filter beziehen sich immer auf die aktuell sichtbare Ansicht.</p>
 <p>In der Mitarbeiterverwaltung berücksichtigt auch <strong>E-Mails kopieren</strong> nur die aktuell gefilterte Liste.</p>
@@ -1482,7 +1492,7 @@
 <p>Uhrzeiten werden im 24-Stunden-Format <code>HH:MM</code> angezeigt.</p>
 <h3 id="hilfe-reihenfolge-der-navigation-anpassen">Reihenfolge der Navigation anpassen</h3>
 <p>Die Einträge der Seitenleiste lassen sich in eine eigene Reihenfolge bringen:</p>
-<ul><li><strong>Ziehen</strong> – einen Eintrag anfassen und nach oben oder unten schieben. Ein gewöhnlicher Klick wechselt weiterhin die Ansicht; als Ziehen zählt erst eine Bewegung von mehr als sechs Bildpunkten.</li><li><strong>Tastatur</strong> – Eintrag anwählen und mit <strong>Alt + Pfeil hoch</strong> beziehungsweise <strong>Alt + Pfeil runter</strong> verschieben.</li><li><strong>Zurücksetzen</strong> – die Schaltfläche unter der Navigation erscheint nur, wenn eine eigene Reihenfolge gesetzt ist.</li></ul>
+<ul><li><strong>Ziehen</strong> – einen Eintrag anfassen und nach oben oder unten schieben. Ein gewöhnlicher Klick wechselt weiterhin die Ansicht; als Ziehen zählt erst eine Bewegung von mehr als sechs Bildpunkten.</li><li><strong>Tastatur</strong> – Eintrag anwählen und mit <strong>Alt + Pfeil hoch</strong> beziehungsweise <strong>Alt + Pfeil runter</strong> verschieben.</li><li><strong>Zurücksetzen</strong> – die Schaltfläche über den Anmeldeinformationen erscheint nur, wenn eine eigene Reihenfolge gesetzt ist.</li></ul>
 <p>Die Reihenfolge ist eine persönliche Einstellung. Sie wird im Browserprofil gespeichert, gilt also nur für diesen Rechner und diesen Benutzer, verändert den gemeinsamen Datenbestand nicht und ist deshalb auch <strong>nicht</strong> Teil der Datensicherung. Ändert sich das Menü in einer neuen Programmversion, bleiben bekannte Einträge an ihrem Platz und neue erscheinen am Ende.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-benutzerkonten-und-berechtigungen">
@@ -1613,7 +1623,7 @@
 <p>Ein Termin benötigt mindestens:</p>
 <ul><li>Titel</li><li>Datum</li></ul>
 <p>Optional können Uhrzeit von/bis, Ort, Beschreibung und eine <strong>Kategorie</strong> hinterlegt werden.</p>
-<p>Zur Auswahl stehen Geräteeinweisung, Teamsitzung, Meeting, Stationsleiterkonferenz, Begehung, Hospitation, Prüfung und Schulung. Jede Kategorie hat ein eigenes Symbol, das in der Terminübersicht und im Fristenmonitor anstelle des allgemeinen Kalendersymbols erscheint; im Fristenmonitor ersetzt die Kategorie zusätzlich die Bezeichnung „Termin“. Termine ohne Kategorie behalten das Kalendersymbol.</p>
+<p>Zur Auswahl stehen Geräteeinweisung, Teamsitzung, Meeting, Stationsleiterkonferenz, Begehung, Hospitation, Prüfung, Schulung und Baumaßnahme. Jede Kategorie hat ein eigenes Symbol, das in der Terminübersicht und im Fristenmonitor anstelle des allgemeinen Kalendersymbols erscheint; im Fristenmonitor ersetzt die Kategorie zusätzlich die Bezeichnung „Termin“. Termine ohne Kategorie behalten das Kalendersymbol.</p>
 <h3 id="hilfe-fristenmonitor">Fristenmonitor</h3>
 <p>Der Fristenmonitor steht auf der Übersichtsseite direkt unter den Kennzahlen. Sechs Einträge bleiben sichtbar, weitere sind innerhalb des Bereichs scrollbar.</p>
 <p>Er zeigt:</p>
