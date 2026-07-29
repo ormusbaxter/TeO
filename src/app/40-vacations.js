@@ -14,7 +14,7 @@
     vacationVisibleDates = dates;
     const holidays = getNrwHolidays(vacationYear);
     const schoolVacations = getNrwSchoolVacations(vacationYear);
-    const selectedMonthLabel = new Intl.DateTimeFormat("de-DE", {
+    const selectedMonthLabel = dateFormat({
       month: "long",
       year: "numeric",
     }).format(new Date(vacationYear, vacationMonth - 1, 1, 12));
@@ -198,7 +198,7 @@
     const day = parseLocalDate(date);
     const metadata = getVacationDayMetadata(date, holidays, schoolVacations);
     const stats = getPlannerDayStats(date, holidays);
-    const weekday = new Intl.DateTimeFormat("de-DE", { weekday: "short" })
+    const weekday = dateFormat({ weekday: "short" })
       .format(day)
       .replace(".", "");
     const capacityClass = stats.isOverLimit
@@ -650,11 +650,53 @@
     warnAboutVacationLimit([...new Set(changed.map((cell) => cell.date))]);
   }
 
+  // Die Urlaubsmatrix befragt denselben Bestand aus drei Richtungen: je Tag
+  // fuer die Tagesgrenze, je Mitarbeiter und Tag fuer den Zelleninhalt und je
+  // Mitarbeiter fuer den Jahresverbrauch. Ohne Vorsortierung durchsucht jede
+  // dieser Fragen den gesamten Bestand; bei einer gefuellten Jahresplanung
+  // summiert sich das zu Millionen Vergleichen je Aufbau der Ansicht.
+  //
+  // Der Zwischenspeicher folgt derselben Regel wie indexById: Er gilt, solange
+  // Feld und Laenge unveraendert sind. Eintraege werden ausschliesslich per
+  // push ergaenzt oder per filter entfernt, beides faellt dadurch auf.
+  const vacationIndexes = new WeakMap();
+
+  function vacationIndex() {
+    const collection = state.vacationDays;
+    const cached = vacationIndexes.get(collection);
+    if (cached && cached.size === collection.length) return cached.index;
+    const byDate = new Map();
+    const byEmployee = new Map();
+    const byEmployeeAndDate = new Map();
+    for (const entry of collection) {
+      const dayEntries = byDate.get(entry.date);
+      if (dayEntries) dayEntries.push(entry);
+      else byDate.set(entry.date, [entry]);
+
+      const employeeEntries = byEmployee.get(entry.employeeId);
+      if (employeeEntries) employeeEntries.push(entry);
+      else byEmployee.set(entry.employeeId, [entry]);
+
+      // Doppelte Eintraege zu einem Tag sind nicht vorgesehen; sollte es sie
+      // doch geben, gewinnt der erste - wie zuvor bei der Suche mit find().
+      const key = `${entry.employeeId}|${entry.date}`;
+      if (!byEmployeeAndDate.has(key)) byEmployeeAndDate.set(key, entry);
+    }
+    const index = { byDate, byEmployee, byEmployeeAndDate };
+    vacationIndexes.set(collection, { size: collection.length, index });
+    return index;
+  }
+
+  function vacationDaysOn(date) {
+    return vacationIndex().byDate.get(date) || [];
+  }
+
+  function vacationDaysOf(employeeId) {
+    return vacationIndex().byEmployee.get(employeeId) || [];
+  }
+
   function findVacationDay(employeeId, date) {
-    return state.vacationDays.find(
-      (vacationDay) =>
-        vacationDay.employeeId === employeeId && vacationDay.date === date,
-    );
+    return vacationIndex().byEmployeeAndDate.get(`${employeeId}|${date}`);
   }
 
   // Eine Bereichseingabe kann viele Tage auf einmal ueberplanen. Einzelne
@@ -756,9 +798,7 @@
   }
 
   function renderVacationConflictRow({ date, stats, participants }) {
-    const weekday = new Intl.DateTimeFormat("de-DE", {
-      weekday: "long",
-    }).format(parseLocalDate(date));
+    const weekday = dateFormat({ weekday: "long" }).format(parseLocalDate(date));
     const metadata = getVacationDayMetadata(date);
     return `
       <article class="vacation-conflict-row">
@@ -913,9 +953,9 @@
   }
 
   function renderVacationYearMonthRow(month, days, entriesByDate, employee) {
-    const monthLabel = new Intl.DateTimeFormat("de-DE", {
-      month: "long",
-    }).format(new Date(vacationYear, month - 1, 1, 12));
+    const monthLabel = dateFormat({ month: "long" }).format(
+      new Date(vacationYear, month - 1, 1, 12),
+    );
     const daysInMonth = new Date(vacationYear, month, 0).getDate();
     return `
       <tr>
@@ -954,9 +994,7 @@
     const entryType = entry ? PLANNER_ENTRY_TYPES[entry.type] : null;
     const metadata = getVacationDayMetadata(date);
     const parsedDate = parseLocalDate(date);
-    const weekday = new Intl.DateTimeFormat("de-DE", {
-      weekday: "long",
-    }).format(parsedDate);
+    const weekday = dateFormat({ weekday: "long" }).format(parsedDate);
     const details = [
       formatDate(date),
       weekday,
@@ -997,9 +1035,8 @@
   }
 
   function getPlannedVacationDays(employeeId, year) {
-    return state.vacationDays.filter(
+    return vacationDaysOf(employeeId).filter(
       (vacationDay) =>
-        vacationDay.employeeId === employeeId &&
         Number(vacationDay.date.slice(0, 4)) === year &&
         PLANNER_ENTRY_TYPES[vacationDay.type]?.countsVacationEntitlement,
     ).length;
@@ -1009,9 +1046,8 @@
     date,
     holidays = getNrwHolidays(Number(date.slice(0, 4))),
   ) {
-    const entries = state.vacationDays.filter(
-      (entry) =>
-        entry.date === date && getEmployee(entry.employeeId)?.active,
+    const entries = vacationDaysOn(date).filter(
+      (entry) => getEmployee(entry.employeeId)?.active,
     );
     // Berufsgruppen ausserhalb des Pflegepools bleiben aus jeder Berechnung der
     // Tagesgrenze heraus - auch aus dem Ausgleich am Dienstwochenende.
@@ -1079,7 +1115,7 @@
   }
 
   function formatVacationNumber(value) {
-    return new Intl.NumberFormat("de-DE", {
+    return numberFormat({
       minimumFractionDigits: Number.isInteger(value) ? 0 : 1,
       maximumFractionDigits: 1,
     }).format(value);

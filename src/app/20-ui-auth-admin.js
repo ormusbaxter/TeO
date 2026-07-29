@@ -23,6 +23,7 @@
 
   function showView(view, updateHash = true) {
     if (!VIEW_HASHES[view]) view = "dashboard";
+    activeView = view;
 
     document.body.classList.toggle("is-vacation-view", view === "vacations");
     if (view === "dashboard") renderDashboardGreeting();
@@ -31,6 +32,11 @@
     document.querySelectorAll("[data-view-panel]").forEach((panel) => {
       panel.classList.toggle("is-active", panel.dataset.viewPanel === view);
     });
+
+    // Aenderungen, die waehrend der Abwesenheit dieser Ansicht entstanden
+    // sind, werden jetzt nachgezogen - noch vor jeder Vermessung, damit das
+    // Dashboard seine endgueltige Hoehe misst.
+    if (staleViews.has(view)) renderView(view);
 
     // Erst jetzt ist das Dashboard vermessbar.
     if (view === "dashboard") limitDeadlineListHeight();
@@ -944,6 +950,34 @@
     }
   }
 
+  // Welche Renderfunktionen den Inhalt einer Ansicht aufbauen. Die
+  // Geraeteliste versorgt beide Geraeteansichten, deshalb steht sie zweimal.
+  // Inhalte von Dialogen stehen bewusst nicht hier: Sie werden beim Oeffnen
+  // des Dialogs aufgebaut und sind dadurch immer aktuell.
+  const VIEW_RENDERERS = {
+    dashboard: [renderDashboard, renderDeadlineOverview],
+    employees: [renderEmployees],
+    weekends: [renderWeekendDistribution],
+    vacations: [renderVacationPlanner],
+    appointments: [renderAppointments],
+    trainings: [renderTrainings],
+    meetings: [renderMeetings],
+    devices: [renderDevices],
+    "device-management": [renderDevices],
+    settings: [renderSettings],
+    help: [filterHelpTopics],
+  };
+
+  function renderView(view) {
+    staleViews.delete(view);
+    for (const render of VIEW_RENDERERS[view] || []) render();
+  }
+
+  // Eine Aenderung betrifft selten mehr als eine Ansicht, aufgebaut wurden
+  // bisher aber alle - auch die verdeckten. Allein Geraeteliste und
+  // Urlaubsmatrix kosten zusammen ein halbes Zehntel einer Sekunde, das
+  // niemand zu sehen bekommt. Verdeckte Ansichten werden deshalb nur
+  // vorgemerkt; showView() holt sie beim Wechsel nach.
   function renderAll() {
     // Nur Mitarbeiter, die tatsaechlich im Dienst stehen. Ausgetretene sollen
     // die Zahl in der Seitenleiste nicht dauerhaft aufblaehen.
@@ -958,19 +992,12 @@
     );
     updateEmailExportButton();
     updateUsernameExportButton();
-    renderDashboard();
-    renderDeadlineOverview();
-    renderEmployees();
-    renderWeekendDistribution();
-    renderVacationPlanner();
-    renderTrainings();
-    renderMeetings();
-    renderAppointments();
-    renderDevices();
-    renderSettings();
+    for (const view of Object.keys(VIEW_RENDERERS)) {
+      if (view !== activeView) staleViews.add(view);
+    }
+    renderView(activeView);
     renderBackupStatus();
     renderDatabaseSaveWarning();
-    filterHelpTopics();
     refreshFormattedDateInputs();
     void renderBrowserStorageStatus();
     applyAccessControl();

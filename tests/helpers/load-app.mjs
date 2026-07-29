@@ -10,7 +10,7 @@ const projectRoot = path.resolve(
   "../..",
 );
 
-export async function loadAppFunctions(names) {
+export async function loadAppFunctions(names, { withDom = false } = {}) {
   const source = await fs.readFile(path.join(projectRoot, "app.js"), "utf8");
   const exposed = names.join(", ");
   const instrumented = source.replace(
@@ -20,6 +20,8 @@ export async function loadAppFunctions(names) {
       setState(value) { state = value; },
       getState() { return state; },
       setCurrentUser(value) { currentUser = value; },
+      setActiveView(value) { activeView = value; },
+      getActiveView() { return activeView; },
       setEmployeeFilters(value = {}) {
         employeeStatusFilter = value.status || "all";
         employeeProfessionFilter = value.profession || "all";
@@ -33,6 +35,7 @@ export async function loadAppFunctions(names) {
     throw new Error("Der Testeinsprung konnte in app.js nicht gefunden werden.");
   }
 
+  const dom = withDom ? createDomStub() : null;
   const emptyElement = () => null;
   const context = {
     console,
@@ -45,23 +48,129 @@ export async function loadAppFunctions(names) {
     URL,
     clearTimeout,
     setTimeout,
-    document: {
-      querySelector: emptyElement,
-      querySelectorAll: () => [],
-    },
+    document: dom
+      ? dom.document
+      : {
+          querySelector: emptyElement,
+          querySelectorAll: () => [],
+        },
     localStorage: {},
     navigator: {},
     sessionStorage: {},
     window: {
       TeOProjectMeta: PROJECT_META,
       TeOStateSchema: { validateStateShape },
+      ...(dom ? dom.window : {}),
     },
   };
   context.globalThis = context;
   context.window.window = context.window;
   vm.createContext(context);
   new vm.Script(instrumented, { filename: "app.js" }).runInContext(context);
-  return context.__teoTest;
+  return dom ? { ...context.__teoTest, dom } : context.__teoTest;
+}
+
+// Eine Bedienoberflaeche laesst sich ohne Browser nicht nachbauen, wohl aber
+// die Frage, welche Ansicht ueberhaupt aufgebaut wurde. Der Ersatz merkt sich
+// dazu je Kennung, wie viel Markup hineingeschrieben wurde.
+function createDomStub() {
+  const markup = new Map();
+  const elements = new Map();
+
+  const createElement = (selector = "") => {
+    const target = {
+      tagName: "DIV",
+      id: selector.replace(/^#/, ""),
+      value: "",
+      textContent: "",
+      innerHTML: "",
+      checked: false,
+      disabled: false,
+      hidden: false,
+      open: false,
+      max: "",
+      min: "",
+      children: [],
+      options: [],
+      files: [],
+      style: {},
+      dataset: {},
+      classList: {
+        add() {},
+        remove() {},
+        toggle() {},
+        contains: () => false,
+      },
+    };
+    return new Proxy(target, {
+      get(object, property) {
+        if (property === Symbol.toPrimitive) return () => "";
+        if (property === Symbol.iterator) return [][Symbol.iterator].bind([]);
+        if (property === "then") return undefined;
+        if (property in object) return object[property];
+        return (...args) => {
+          void args;
+          if (property === "querySelectorAll") return [];
+          if (property === "getAttribute") return null;
+          if (property === "hasAttribute" || property === "matches") {
+            return false;
+          }
+          return createElement();
+        };
+      },
+      set(object, property, value) {
+        if (property === "innerHTML" && selector) {
+          markup.set(selector, String(value).length);
+        }
+        object[property] = value;
+        return true;
+      },
+    });
+  };
+
+  const querySelector = (selector) => {
+    let element = elements.get(selector);
+    if (!element) {
+      element = createElement(selector);
+      elements.set(selector, element);
+    }
+    return element;
+  };
+
+  return {
+    document: {
+      documentElement: createElement(),
+      body: createElement(),
+      head: createElement(),
+      querySelector,
+      querySelectorAll: () => [],
+      getElementById: (id) => querySelector(`#${id}`),
+      createElement: () => createElement(),
+      createDocumentFragment: () => createElement(),
+      addEventListener() {},
+      removeEventListener() {},
+    },
+    window: {
+      location: { hash: "", href: "http://localhost/" },
+      history: { pushState() {} },
+      matchMedia: () => ({ matches: false, addEventListener() {} }),
+      addEventListener() {},
+      removeEventListener() {},
+      scrollTo() {},
+      getComputedStyle: () => ({ getPropertyValue: () => "" }),
+      setTimeout,
+      clearTimeout,
+      requestAnimationFrame: (callback) => setTimeout(callback, 0),
+    },
+    // Wie viel Markup zuletzt in dieses Element geschrieben wurde. Null
+    // bedeutet: seit dem Zuruecksetzen wurde es nicht aufgebaut.
+    markupLength(selector) {
+      return markup.get(selector) || 0;
+    },
+    resetMarkup() {
+      markup.clear();
+    },
+  };
 }
 
 export function createMinimalState(overrides = {}) {

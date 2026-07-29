@@ -367,6 +367,11 @@
   );
 
   let state = emptyState();
+  // Sichtbare Ansicht und die Ansichten, deren Inhalt seit der letzten
+  // Aenderung veraltet ist. Verdeckte Ansichten werden nicht mitgerendert,
+  // sondern erst beim Wechsel dorthin nachgezogen.
+  let activeView = "dashboard";
+  const staleViews = new Set();
   let dataStore = null;
   let dataSyncChannel = null;
   let backendConfig = { mode: "local", apiUrl: "" };
@@ -2061,6 +2066,7 @@
 
   function showView(view, updateHash = true) {
     if (!VIEW_HASHES[view]) view = "dashboard";
+    activeView = view;
 
     document.body.classList.toggle("is-vacation-view", view === "vacations");
     if (view === "dashboard") renderDashboardGreeting();
@@ -2069,6 +2075,11 @@
     document.querySelectorAll("[data-view-panel]").forEach((panel) => {
       panel.classList.toggle("is-active", panel.dataset.viewPanel === view);
     });
+
+    // Aenderungen, die waehrend der Abwesenheit dieser Ansicht entstanden
+    // sind, werden jetzt nachgezogen - noch vor jeder Vermessung, damit das
+    // Dashboard seine endgueltige Hoehe misst.
+    if (staleViews.has(view)) renderView(view);
 
     // Erst jetzt ist das Dashboard vermessbar.
     if (view === "dashboard") limitDeadlineListHeight();
@@ -2982,6 +2993,34 @@
     }
   }
 
+  // Welche Renderfunktionen den Inhalt einer Ansicht aufbauen. Die
+  // Geraeteliste versorgt beide Geraeteansichten, deshalb steht sie zweimal.
+  // Inhalte von Dialogen stehen bewusst nicht hier: Sie werden beim Oeffnen
+  // des Dialogs aufgebaut und sind dadurch immer aktuell.
+  const VIEW_RENDERERS = {
+    dashboard: [renderDashboard, renderDeadlineOverview],
+    employees: [renderEmployees],
+    weekends: [renderWeekendDistribution],
+    vacations: [renderVacationPlanner],
+    appointments: [renderAppointments],
+    trainings: [renderTrainings],
+    meetings: [renderMeetings],
+    devices: [renderDevices],
+    "device-management": [renderDevices],
+    settings: [renderSettings],
+    help: [filterHelpTopics],
+  };
+
+  function renderView(view) {
+    staleViews.delete(view);
+    for (const render of VIEW_RENDERERS[view] || []) render();
+  }
+
+  // Eine Aenderung betrifft selten mehr als eine Ansicht, aufgebaut wurden
+  // bisher aber alle - auch die verdeckten. Allein Geraeteliste und
+  // Urlaubsmatrix kosten zusammen ein halbes Zehntel einer Sekunde, das
+  // niemand zu sehen bekommt. Verdeckte Ansichten werden deshalb nur
+  // vorgemerkt; showView() holt sie beim Wechsel nach.
   function renderAll() {
     // Nur Mitarbeiter, die tatsaechlich im Dienst stehen. Ausgetretene sollen
     // die Zahl in der Seitenleiste nicht dauerhaft aufblaehen.
@@ -2996,19 +3035,12 @@
     );
     updateEmailExportButton();
     updateUsernameExportButton();
-    renderDashboard();
-    renderDeadlineOverview();
-    renderEmployees();
-    renderWeekendDistribution();
-    renderVacationPlanner();
-    renderTrainings();
-    renderMeetings();
-    renderAppointments();
-    renderDevices();
-    renderSettings();
+    for (const view of Object.keys(VIEW_RENDERERS)) {
+      if (view !== activeView) staleViews.add(view);
+    }
+    renderView(activeView);
     renderBackupStatus();
     renderDatabaseSaveWarning();
-    filterHelpTopics();
     refreshFormattedDateInputs();
     void renderBrowserStorageStatus();
     applyAccessControl();
@@ -5605,7 +5637,7 @@
     vacationVisibleDates = dates;
     const holidays = getNrwHolidays(vacationYear);
     const schoolVacations = getNrwSchoolVacations(vacationYear);
-    const selectedMonthLabel = new Intl.DateTimeFormat("de-DE", {
+    const selectedMonthLabel = dateFormat({
       month: "long",
       year: "numeric",
     }).format(new Date(vacationYear, vacationMonth - 1, 1, 12));
@@ -5789,7 +5821,7 @@
     const day = parseLocalDate(date);
     const metadata = getVacationDayMetadata(date, holidays, schoolVacations);
     const stats = getPlannerDayStats(date, holidays);
-    const weekday = new Intl.DateTimeFormat("de-DE", { weekday: "short" })
+    const weekday = dateFormat({ weekday: "short" })
       .format(day)
       .replace(".", "");
     const capacityClass = stats.isOverLimit
@@ -6241,11 +6273,53 @@
     warnAboutVacationLimit([...new Set(changed.map((cell) => cell.date))]);
   }
 
+  // Die Urlaubsmatrix befragt denselben Bestand aus drei Richtungen: je Tag
+  // fuer die Tagesgrenze, je Mitarbeiter und Tag fuer den Zelleninhalt und je
+  // Mitarbeiter fuer den Jahresverbrauch. Ohne Vorsortierung durchsucht jede
+  // dieser Fragen den gesamten Bestand; bei einer gefuellten Jahresplanung
+  // summiert sich das zu Millionen Vergleichen je Aufbau der Ansicht.
+  //
+  // Der Zwischenspeicher folgt derselben Regel wie indexById: Er gilt, solange
+  // Feld und Laenge unveraendert sind. Eintraege werden ausschliesslich per
+  // push ergaenzt oder per filter entfernt, beides faellt dadurch auf.
+  const vacationIndexes = new WeakMap();
+
+  function vacationIndex() {
+    const collection = state.vacationDays;
+    const cached = vacationIndexes.get(collection);
+    if (cached && cached.size === collection.length) return cached.index;
+    const byDate = new Map();
+    const byEmployee = new Map();
+    const byEmployeeAndDate = new Map();
+    for (const entry of collection) {
+      const dayEntries = byDate.get(entry.date);
+      if (dayEntries) dayEntries.push(entry);
+      else byDate.set(entry.date, [entry]);
+
+      const employeeEntries = byEmployee.get(entry.employeeId);
+      if (employeeEntries) employeeEntries.push(entry);
+      else byEmployee.set(entry.employeeId, [entry]);
+
+      // Doppelte Eintraege zu einem Tag sind nicht vorgesehen; sollte es sie
+      // doch geben, gewinnt der erste - wie zuvor bei der Suche mit find().
+      const key = `${entry.employeeId}|${entry.date}`;
+      if (!byEmployeeAndDate.has(key)) byEmployeeAndDate.set(key, entry);
+    }
+    const index = { byDate, byEmployee, byEmployeeAndDate };
+    vacationIndexes.set(collection, { size: collection.length, index });
+    return index;
+  }
+
+  function vacationDaysOn(date) {
+    return vacationIndex().byDate.get(date) || [];
+  }
+
+  function vacationDaysOf(employeeId) {
+    return vacationIndex().byEmployee.get(employeeId) || [];
+  }
+
   function findVacationDay(employeeId, date) {
-    return state.vacationDays.find(
-      (vacationDay) =>
-        vacationDay.employeeId === employeeId && vacationDay.date === date,
-    );
+    return vacationIndex().byEmployeeAndDate.get(`${employeeId}|${date}`);
   }
 
   // Eine Bereichseingabe kann viele Tage auf einmal ueberplanen. Einzelne
@@ -6347,9 +6421,7 @@
   }
 
   function renderVacationConflictRow({ date, stats, participants }) {
-    const weekday = new Intl.DateTimeFormat("de-DE", {
-      weekday: "long",
-    }).format(parseLocalDate(date));
+    const weekday = dateFormat({ weekday: "long" }).format(parseLocalDate(date));
     const metadata = getVacationDayMetadata(date);
     return `
       <article class="vacation-conflict-row">
@@ -6504,9 +6576,9 @@
   }
 
   function renderVacationYearMonthRow(month, days, entriesByDate, employee) {
-    const monthLabel = new Intl.DateTimeFormat("de-DE", {
-      month: "long",
-    }).format(new Date(vacationYear, month - 1, 1, 12));
+    const monthLabel = dateFormat({ month: "long" }).format(
+      new Date(vacationYear, month - 1, 1, 12),
+    );
     const daysInMonth = new Date(vacationYear, month, 0).getDate();
     return `
       <tr>
@@ -6545,9 +6617,7 @@
     const entryType = entry ? PLANNER_ENTRY_TYPES[entry.type] : null;
     const metadata = getVacationDayMetadata(date);
     const parsedDate = parseLocalDate(date);
-    const weekday = new Intl.DateTimeFormat("de-DE", {
-      weekday: "long",
-    }).format(parsedDate);
+    const weekday = dateFormat({ weekday: "long" }).format(parsedDate);
     const details = [
       formatDate(date),
       weekday,
@@ -6588,9 +6658,8 @@
   }
 
   function getPlannedVacationDays(employeeId, year) {
-    return state.vacationDays.filter(
+    return vacationDaysOf(employeeId).filter(
       (vacationDay) =>
-        vacationDay.employeeId === employeeId &&
         Number(vacationDay.date.slice(0, 4)) === year &&
         PLANNER_ENTRY_TYPES[vacationDay.type]?.countsVacationEntitlement,
     ).length;
@@ -6600,9 +6669,8 @@
     date,
     holidays = getNrwHolidays(Number(date.slice(0, 4))),
   ) {
-    const entries = state.vacationDays.filter(
-      (entry) =>
-        entry.date === date && getEmployee(entry.employeeId)?.active,
+    const entries = vacationDaysOn(date).filter(
+      (entry) => getEmployee(entry.employeeId)?.active,
     );
     // Berufsgruppen ausserhalb des Pflegepools bleiben aus jeder Berechnung der
     // Tagesgrenze heraus - auch aus dem Ausgleich am Dienstwochenende.
@@ -6670,7 +6738,7 @@
   }
 
   function formatVacationNumber(value) {
-    return new Intl.NumberFormat("de-DE", {
+    return numberFormat({
       minimumFractionDigits: Number.isInteger(value) ? 0 : 1,
       maximumFractionDigits: 1,
     }).format(value);
@@ -12439,8 +12507,35 @@
     return total ? Math.round((value / total) * 100) : 0;
   }
 
+  // Das Anlegen eines Intl-Formatierers ist deutlich teurer als seine
+  // Anwendung. In den Matrizen entstehen sonst tausende gleichartige
+  // Formatierer je Aufbau, deshalb werden sie nach ihren Einstellungen abgelegt
+  // und wiederverwendet.
+  const numberFormats = new Map();
+  const dateFormats = new Map();
+
+  function numberFormat(options) {
+    const key = JSON.stringify(options);
+    let format = numberFormats.get(key);
+    if (!format) {
+      format = new Intl.NumberFormat("de-DE", options);
+      numberFormats.set(key, format);
+    }
+    return format;
+  }
+
+  function dateFormat(options) {
+    const key = JSON.stringify(options);
+    let format = dateFormats.get(key);
+    if (!format) {
+      format = new Intl.DateTimeFormat("de-DE", options);
+      dateFormats.set(key, format);
+    }
+    return format;
+  }
+
   function formatDecimal(value) {
-    return new Intl.NumberFormat("de-DE", {
+    return numberFormat({
       minimumFractionDigits: 1,
       maximumFractionDigits: 1,
     }).format(value);
@@ -12483,12 +12578,23 @@
     );
   }
 
+  // Die Normalisierung laeuft je Urlaubseintrag, obwohl es nur eine Handvoll
+  // Berufsbezeichnungen gibt. Da die Umwandlung allein vom Text abhaengt, ist
+  // ihr Ergebnis dauerhaft ablegbar.
+  const professionSignatures = new Map();
+
   function professionSignature(value) {
-    return String(value || "")
-      .normalize("NFKD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLocaleLowerCase("de-DE")
-      .replace(/[^a-z]/g, "");
+    const text = String(value || "");
+    let signature = professionSignatures.get(text);
+    if (signature === undefined) {
+      signature = text
+        .normalize("NFKD")
+        .replace(/\p{Diacritic}/gu, "")
+        .toLocaleLowerCase("de-DE")
+        .replace(/[^a-z]/g, "");
+      professionSignatures.set(text, signature);
+    }
+    return signature;
   }
 
   function serviceWeekendOwnerKey(employeeId) {
@@ -12837,26 +12943,56 @@
     if (!copied) throw new Error("Fallback-Kopiervorgang wurde vom Browser abgelehnt.");
   }
 
+  // Das Nachschlagen ueber die Kennung ist der haeufigste Zugriff der gesamten
+  // Anwendung: Ein einziger Aufbau der Urlaubsmatrix fragt zehntausende Male
+  // nach einem Mitarbeiter. Als lineare Suche summiert sich das zu Millionen
+  // Vergleichen je Klick, deshalb liegt hinter jeder Sammlung eine
+  // Zuordnungstabelle.
+  //
+  // Der Zwischenspeicher haelt sich an zwei Merkmale der Sammlung: an das Feld
+  // selbst und an dessen Laenge. Jede Bestandsaenderung faellt dadurch auf,
+  // denn sie ersetzt entweder das Feld (map, filter, Neuaufbau des Zustands)
+  // oder aendert die Laenge (push). Aenderungen innerhalb eines Datensatzes
+  // brauchen keine Erneuerung, weil die Tabelle auf dieselben Objekte zeigt.
+  // Diese Aenderungsarten deckt tests/lookup-index.test.mjs ab.
+  //
+  // Nicht erkennbar waere ein Austausch eines Datensatzes an Ort und Stelle
+  // bei gleicher Laenge (etwa state.employees[0] = anderer). So etwas kommt in
+  // der Anwendung nicht vor; wer es einfuehrt, muss diese Stelle anpassen.
+  const collectionIndexes = new WeakMap();
+
+  function indexById(collection) {
+    if (!Array.isArray(collection)) return new Map();
+    const cached = collectionIndexes.get(collection);
+    if (cached && cached.size === collection.length) return cached.index;
+    const index = new Map();
+    for (const item of collection) {
+      // Bei doppelten Kennungen gewinnt der erste Datensatz, genau wie zuvor
+      // bei der Suche mit find().
+      if (!index.has(item.id)) index.set(item.id, item);
+    }
+    collectionIndexes.set(collection, { size: collection.length, index });
+    return index;
+  }
+
   function getEmployee(employeeId) {
-    return state.employees.find((employee) => employee.id === employeeId);
+    return indexById(state.employees).get(employeeId);
   }
 
   function getTraining(trainingId) {
-    return state.trainings.find((training) => training.id === trainingId);
+    return indexById(state.trainings).get(trainingId);
   }
 
   function getMeeting(meetingId) {
-    return state.meetings.find((meeting) => meeting.id === meetingId);
+    return indexById(state.meetings).get(meetingId);
   }
 
   function getAppointment(appointmentId) {
-    return state.appointments.find(
-      (appointment) => appointment.id === appointmentId,
-    );
+    return indexById(state.appointments).get(appointmentId);
   }
 
   function getDevice(deviceId) {
-    return state.devices.find((device) => device.id === deviceId);
+    return indexById(state.devices).get(deviceId);
   }
 
   function recurrenceLabel(training) {
@@ -12918,9 +13054,9 @@
     );
     const amount = value / 1000 ** unitIndex;
     const maximumFractionDigits = unitIndex === 0 ? 0 : 1;
-    const formattedAmount = new Intl.NumberFormat("de-DE", {
-      maximumFractionDigits,
-    }).format(amount);
+    const formattedAmount = numberFormat({ maximumFractionDigits }).format(
+      amount,
+    );
 
     return `${formattedAmount} ${units[unitIndex]}`;
   }

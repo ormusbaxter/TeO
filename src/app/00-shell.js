@@ -366,6 +366,11 @@
   );
 
   let state = emptyState();
+  // Sichtbare Ansicht und die Ansichten, deren Inhalt seit der letzten
+  // Aenderung veraltet ist. Verdeckte Ansichten werden nicht mitgerendert,
+  // sondern erst beim Wechsel dorthin nachgezogen.
+  let activeView = "dashboard";
+  const staleViews = new Set();
   let dataStore = null;
   let dataSyncChannel = null;
   let backendConfig = { mode: "local", apiUrl: "" };

@@ -247,8 +247,35 @@
     return total ? Math.round((value / total) * 100) : 0;
   }
 
+  // Das Anlegen eines Intl-Formatierers ist deutlich teurer als seine
+  // Anwendung. In den Matrizen entstehen sonst tausende gleichartige
+  // Formatierer je Aufbau, deshalb werden sie nach ihren Einstellungen abgelegt
+  // und wiederverwendet.
+  const numberFormats = new Map();
+  const dateFormats = new Map();
+
+  function numberFormat(options) {
+    const key = JSON.stringify(options);
+    let format = numberFormats.get(key);
+    if (!format) {
+      format = new Intl.NumberFormat("de-DE", options);
+      numberFormats.set(key, format);
+    }
+    return format;
+  }
+
+  function dateFormat(options) {
+    const key = JSON.stringify(options);
+    let format = dateFormats.get(key);
+    if (!format) {
+      format = new Intl.DateTimeFormat("de-DE", options);
+      dateFormats.set(key, format);
+    }
+    return format;
+  }
+
   function formatDecimal(value) {
-    return new Intl.NumberFormat("de-DE", {
+    return numberFormat({
       minimumFractionDigits: 1,
       maximumFractionDigits: 1,
     }).format(value);
@@ -291,12 +318,23 @@
     );
   }
 
+  // Die Normalisierung laeuft je Urlaubseintrag, obwohl es nur eine Handvoll
+  // Berufsbezeichnungen gibt. Da die Umwandlung allein vom Text abhaengt, ist
+  // ihr Ergebnis dauerhaft ablegbar.
+  const professionSignatures = new Map();
+
   function professionSignature(value) {
-    return String(value || "")
-      .normalize("NFKD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLocaleLowerCase("de-DE")
-      .replace(/[^a-z]/g, "");
+    const text = String(value || "");
+    let signature = professionSignatures.get(text);
+    if (signature === undefined) {
+      signature = text
+        .normalize("NFKD")
+        .replace(/\p{Diacritic}/gu, "")
+        .toLocaleLowerCase("de-DE")
+        .replace(/[^a-z]/g, "");
+      professionSignatures.set(text, signature);
+    }
+    return signature;
   }
 
   function serviceWeekendOwnerKey(employeeId) {
@@ -645,26 +683,56 @@
     if (!copied) throw new Error("Fallback-Kopiervorgang wurde vom Browser abgelehnt.");
   }
 
+  // Das Nachschlagen ueber die Kennung ist der haeufigste Zugriff der gesamten
+  // Anwendung: Ein einziger Aufbau der Urlaubsmatrix fragt zehntausende Male
+  // nach einem Mitarbeiter. Als lineare Suche summiert sich das zu Millionen
+  // Vergleichen je Klick, deshalb liegt hinter jeder Sammlung eine
+  // Zuordnungstabelle.
+  //
+  // Der Zwischenspeicher haelt sich an zwei Merkmale der Sammlung: an das Feld
+  // selbst und an dessen Laenge. Jede Bestandsaenderung faellt dadurch auf,
+  // denn sie ersetzt entweder das Feld (map, filter, Neuaufbau des Zustands)
+  // oder aendert die Laenge (push). Aenderungen innerhalb eines Datensatzes
+  // brauchen keine Erneuerung, weil die Tabelle auf dieselben Objekte zeigt.
+  // Diese Aenderungsarten deckt tests/lookup-index.test.mjs ab.
+  //
+  // Nicht erkennbar waere ein Austausch eines Datensatzes an Ort und Stelle
+  // bei gleicher Laenge (etwa state.employees[0] = anderer). So etwas kommt in
+  // der Anwendung nicht vor; wer es einfuehrt, muss diese Stelle anpassen.
+  const collectionIndexes = new WeakMap();
+
+  function indexById(collection) {
+    if (!Array.isArray(collection)) return new Map();
+    const cached = collectionIndexes.get(collection);
+    if (cached && cached.size === collection.length) return cached.index;
+    const index = new Map();
+    for (const item of collection) {
+      // Bei doppelten Kennungen gewinnt der erste Datensatz, genau wie zuvor
+      // bei der Suche mit find().
+      if (!index.has(item.id)) index.set(item.id, item);
+    }
+    collectionIndexes.set(collection, { size: collection.length, index });
+    return index;
+  }
+
   function getEmployee(employeeId) {
-    return state.employees.find((employee) => employee.id === employeeId);
+    return indexById(state.employees).get(employeeId);
   }
 
   function getTraining(trainingId) {
-    return state.trainings.find((training) => training.id === trainingId);
+    return indexById(state.trainings).get(trainingId);
   }
 
   function getMeeting(meetingId) {
-    return state.meetings.find((meeting) => meeting.id === meetingId);
+    return indexById(state.meetings).get(meetingId);
   }
 
   function getAppointment(appointmentId) {
-    return state.appointments.find(
-      (appointment) => appointment.id === appointmentId,
-    );
+    return indexById(state.appointments).get(appointmentId);
   }
 
   function getDevice(deviceId) {
-    return state.devices.find((device) => device.id === deviceId);
+    return indexById(state.devices).get(deviceId);
   }
 
   function recurrenceLabel(training) {
@@ -726,9 +794,9 @@
     );
     const amount = value / 1000 ** unitIndex;
     const maximumFractionDigits = unitIndex === 0 ? 0 : 1;
-    const formattedAmount = new Intl.NumberFormat("de-DE", {
-      maximumFractionDigits,
-    }).format(amount);
+    const formattedAmount = numberFormat({ maximumFractionDigits }).format(
+      amount,
+    );
 
     return `${formattedAmount} ${units[unitIndex]}`;
   }
