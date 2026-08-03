@@ -1,0 +1,19 @@
+{
+  "name": "teo-team-employee-organizer",
+  "version": "4.13.1",
+  "private": true,
+  "type": "module",
+  "description": "Mitarbeiter- und Organisationsverwaltung für eine Intensivstation",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "check": "node tools/check.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "verify": "npm run build && npm run check && npm test",
+    "version:major": "node tools/bump-version.mjs major",
+    "version:feature": "node tools/bump-version.mjs feature",
+    "version:fix": "node tools/bump-version.mjs fix"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
