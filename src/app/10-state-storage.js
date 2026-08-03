@@ -19,6 +19,7 @@
     backendMode = backendConfig.mode;
     backendConnectionStatus = isMariaDbMode() ? "checking" : "local";
     state = await loadState();
+    await loadAutomaticBackupConfiguration();
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     window.addEventListener("beforeunload", handleBeforeUnload);
     initializeFormattedDateInputs();
@@ -1124,6 +1125,7 @@
     if (await persistState()) {
       databaseSaveReminderArmed = true;
       renderAll();
+      scheduleAutomaticBackup();
       return true;
     }
 

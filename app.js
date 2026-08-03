@@ -8,6 +8,8 @@
   }
   const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
+  const AUTO_BACKUP_CONFIG_KEY = "intensivteam-auto-backup-config-v1";
+  const AUTO_BACKUP_DIRECTORY_KEY = "intensivteam-auto-backup-directory-v1";
   const STATE_VERSION = PROJECT_META.stateVersion;
   const PROJECT_NAME = PROJECT_META.name;
   const PROJECT_VERSION = PROJECT_META.version;
@@ -16,6 +18,9 @@
   const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
+  const DEFAULT_AUTO_BACKUP_INTERVAL_HOURS = 24;
+  const DEFAULT_AUTO_BACKUP_RETENTION_COUNT = 30;
+  const AUTO_BACKUP_FILE_PREFIX = "teo-autosicherung_";
   const DEFAULT_VACATION_BASE_DAYS = 30;
   const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
   const DEFAULT_WEEKDAY_ABSENCE_LIMIT = 8;
@@ -408,6 +413,12 @@
   let trainingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let databaseSaveReminderArmed = false;
+  let automaticBackupSettings = null;
+  let automaticBackupDirectoryHandle = null;
+  let automaticBackupTimer = null;
+  let automaticBackupRunning = false;
+  let automaticBackupRetryAt = 0;
+  let automaticBackupNotice = "";
   let browserPersistenceNotice = "";
   let dateInputObserver = null;
   let vacationYear = new Date().getFullYear();
@@ -507,6 +518,19 @@
     validateBackupFile: document.querySelector("#validateBackupFile"),
     exportEncryptedDataButton: document.querySelector("#exportEncryptedDataButton"),
     backupStatus: document.querySelector("#backupStatus"),
+    automaticBackupStatus: document.querySelector("#automaticBackupStatus"),
+    automaticBackupInterval: document.querySelector("#automaticBackupInterval"),
+    automaticBackupRetention: document.querySelector("#automaticBackupRetention"),
+    saveAutomaticBackupSettingsButton: document.querySelector(
+      "#saveAutomaticBackupSettingsButton",
+    ),
+    selectAutomaticBackupDirectoryButton: document.querySelector(
+      "#selectAutomaticBackupDirectoryButton",
+    ),
+    runAutomaticBackupButton: document.querySelector("#runAutomaticBackupButton"),
+    removeAutomaticBackupDirectoryButton: document.querySelector(
+      "#removeAutomaticBackupDirectoryButton",
+    ),
     browserStorageStatus: document.querySelector("#browserStorageStatus"),
     requestPersistentStorageButton: document.querySelector(
       "#requestPersistentStorageButton",
@@ -876,6 +900,7 @@
     backendMode = backendConfig.mode;
     backendConnectionStatus = isMariaDbMode() ? "checking" : "local";
     state = await loadState();
+    await loadAutomaticBackupConfiguration();
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     window.addEventListener("beforeunload", handleBeforeUnload);
     initializeFormattedDateInputs();
@@ -1981,6 +2006,7 @@
     if (await persistState()) {
       databaseSaveReminderArmed = true;
       renderAll();
+      scheduleAutomaticBackup();
       return true;
     }
 
@@ -2244,6 +2270,22 @@
       exportDatabase,
     );
     elements.exportEncryptedDataButton.addEventListener("click", exportEncryptedDatabase);
+    elements.selectAutomaticBackupDirectoryButton.addEventListener(
+      "click",
+      selectAutomaticBackupDirectory,
+    );
+    elements.runAutomaticBackupButton.addEventListener(
+      "click",
+      () => void runAutomaticBackup({ force: true, requestPermission: true }),
+    );
+    elements.removeAutomaticBackupDirectoryButton.addEventListener(
+      "click",
+      removeAutomaticBackupDirectory,
+    );
+    elements.saveAutomaticBackupSettingsButton.addEventListener(
+      "click",
+      saveAutomaticBackupSettings,
+    );
     elements.requestPersistentStorageButton.addEventListener(
       "click",
       requestPersistentBrowserStorage,
@@ -3057,9 +3099,11 @@
     }
     renderView(activeView);
     renderBackupStatus();
+    renderAutomaticBackupStatus();
     renderDatabaseSaveWarning();
     refreshFormattedDateInputs();
     void renderBrowserStorageStatus();
+    scheduleAutomaticBackup();
     applyAccessControl();
     renderSidebarSystemStatus();
   }
@@ -3249,10 +3293,12 @@
 
     document.body.classList.remove("is-auth-locked");
     if (elements.changePasswordDialog.open) elements.changePasswordDialog.close();
+    scheduleAutomaticBackup();
   }
 
   function showLoginDialog() {
     currentUser = null;
+    clearAutomaticBackupTimer();
     backupReminderShown = false;
     sessionStorage.removeItem(SESSION_USER_KEY);
     document.body.classList.add("is-auth-locked");
@@ -11377,6 +11423,417 @@
     confirmCallback = callback;
     elements.confirmDialog.showModal();
     window.setTimeout(() => elements.confirmCancel.focus(), 0);
+  }
+
+  function normalizeAutomaticBackupSettings(value = {}) {
+    const allowedIntervals = [1, 6, 12, 24, 168];
+    const intervalHours = allowedIntervals.includes(Number(value.intervalHours))
+      ? Number(value.intervalHours)
+      : DEFAULT_AUTO_BACKUP_INTERVAL_HOURS;
+    const retention = Number(value.retentionCount);
+    const retentionCount = Number.isInteger(retention)
+      ? Math.min(365, Math.max(1, retention))
+      : DEFAULT_AUTO_BACKUP_RETENTION_COUNT;
+    const parsedLastBackupAt = Date.parse(value.lastBackupAt);
+    return {
+      enabled: Boolean(value.enabled),
+      intervalHours,
+      retentionCount,
+      lastBackupAt: Number.isFinite(parsedLastBackupAt)
+        ? new Date(parsedLastBackupAt).toISOString()
+        : "",
+      directoryName: String(value.directoryName || "").trim().slice(0, 200),
+    };
+  }
+
+  async function loadAutomaticBackupConfiguration() {
+    automaticBackupSettings = normalizeAutomaticBackupSettings();
+    try {
+      const [savedSettings, savedHandle] = await Promise.all([
+        dataStore.getItem(AUTO_BACKUP_CONFIG_KEY),
+        dataStore.getItem(AUTO_BACKUP_DIRECTORY_KEY),
+      ]);
+      automaticBackupSettings = normalizeAutomaticBackupSettings(savedSettings);
+      automaticBackupDirectoryHandle =
+        savedHandle?.kind === "directory" ? savedHandle : null;
+      if (!automaticBackupDirectoryHandle) {
+        automaticBackupSettings.enabled = false;
+      } else {
+        automaticBackupSettings.directoryName =
+          automaticBackupDirectoryHandle.name ||
+          automaticBackupSettings.directoryName;
+      }
+    } catch (error) {
+      console.warn(
+        "Die Konfiguration der automatischen Sicherung konnte nicht geladen werden.",
+        error,
+      );
+      automaticBackupDirectoryHandle = null;
+      automaticBackupSettings.enabled = false;
+      automaticBackupNotice =
+        "Die gespeicherte Ordnerverknüpfung konnte nicht geladen werden.";
+    }
+  }
+
+  async function persistAutomaticBackupConfiguration() {
+    await dataStore.setItem(AUTO_BACKUP_CONFIG_KEY, automaticBackupSettings);
+  }
+
+  async function selectAutomaticBackupDirectory() {
+    if (typeof window.showDirectoryPicker !== "function") {
+      automaticBackupNotice =
+        "Dieser Browser unterstützt keine direkte Ordnerfreigabe. Verwenden Sie Chrome oder Edge über HTTPS beziehungsweise localhost.";
+      renderAutomaticBackupStatus();
+      showToast(automaticBackupNotice, "error");
+      return;
+    }
+
+    try {
+      const handle = await window.showDirectoryPicker({
+        id: "teo-automatic-backup",
+        mode: "readwrite",
+      });
+      await dataStore.setItem(AUTO_BACKUP_DIRECTORY_KEY, handle);
+      automaticBackupDirectoryHandle = handle;
+      automaticBackupSettings = normalizeAutomaticBackupSettings({
+        ...automaticBackupSettings,
+        enabled: true,
+        directoryName: handle.name,
+      });
+      automaticBackupNotice = "";
+      await persistAutomaticBackupConfiguration();
+      renderAutomaticBackupStatus();
+      await runAutomaticBackup({ force: true, requestPermission: true });
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+      console.error("Der Sicherungsordner konnte nicht gespeichert werden.", error);
+      automaticBackupNotice =
+        "Der Sicherungsordner konnte nicht verknüpft werden.";
+      renderAutomaticBackupStatus();
+      showToast(automaticBackupNotice, "error");
+    }
+  }
+
+  async function removeAutomaticBackupDirectory() {
+    clearAutomaticBackupTimer();
+    automaticBackupDirectoryHandle = null;
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      enabled: false,
+      directoryName: "",
+    });
+    try {
+      await Promise.all([
+        dataStore.removeItem(AUTO_BACKUP_DIRECTORY_KEY),
+        persistAutomaticBackupConfiguration(),
+      ]);
+      automaticBackupNotice = "";
+      renderAutomaticBackupStatus();
+      showToast(
+        "Die Ordnerverknüpfung wurde entfernt. Vorhandene Sicherungsdateien bleiben erhalten.",
+      );
+    } catch (error) {
+      console.error("Die Ordnerverknüpfung konnte nicht entfernt werden.", error);
+      showToast("Die Ordnerverknüpfung konnte nicht entfernt werden.", "error");
+    }
+  }
+
+  async function saveAutomaticBackupSettings() {
+    const intervalHours = Number(elements.automaticBackupInterval.value);
+    const retentionCount = Number(elements.automaticBackupRetention.value);
+    if (
+      ![1, 6, 12, 24, 168].includes(intervalHours) ||
+      !Number.isInteger(retentionCount) ||
+      retentionCount < 1 ||
+      retentionCount > 365
+    ) {
+      showToast(
+        "Bitte wählen Sie ein gültiges Intervall und 1 bis 365 Sicherungsdateien.",
+        "error",
+      );
+      return;
+    }
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      enabled: Boolean(automaticBackupDirectoryHandle),
+      intervalHours,
+      retentionCount,
+    });
+    try {
+      await persistAutomaticBackupConfiguration();
+      automaticBackupNotice = "";
+      scheduleAutomaticBackup();
+      renderAutomaticBackupStatus();
+      showToast("Die Einstellungen der automatischen Sicherung wurden gespeichert.");
+    } catch (error) {
+      console.error("Die Sicherungseinstellungen konnten nicht gespeichert werden.", error);
+      showToast("Die Sicherungseinstellungen konnten nicht gespeichert werden.", "error");
+    }
+  }
+
+  function renderAutomaticBackupStatus() {
+    if (!automaticBackupSettings) return;
+    elements.automaticBackupInterval.value = String(
+      automaticBackupSettings.intervalHours,
+    );
+    elements.automaticBackupRetention.value = String(
+      automaticBackupSettings.retentionCount,
+    );
+    const supported = typeof window.showDirectoryPicker === "function";
+    const connected = Boolean(
+      automaticBackupSettings.enabled && automaticBackupDirectoryHandle,
+    );
+    elements.selectAutomaticBackupDirectoryButton.disabled = !supported;
+    elements.runAutomaticBackupButton.disabled = !connected || automaticBackupRunning;
+    elements.removeAutomaticBackupDirectoryButton.hidden = !automaticBackupDirectoryHandle;
+    elements.saveAutomaticBackupSettingsButton.disabled = !supported;
+
+    if (!supported) {
+      elements.automaticBackupStatus.textContent =
+        "Nicht unterstützt – Chrome oder Edge über HTTPS beziehungsweise localhost verwenden.";
+      return;
+    }
+    if (automaticBackupRunning) {
+      elements.automaticBackupStatus.textContent = "Datensicherung wird geschrieben …";
+      return;
+    }
+    if (automaticBackupNotice) {
+      elements.automaticBackupStatus.textContent = automaticBackupNotice;
+      return;
+    }
+    if (!connected) {
+      elements.automaticBackupStatus.textContent =
+        "Noch kein Sicherungsordner ausgewählt.";
+      return;
+    }
+    const lastBackup = automaticBackupSettings.lastBackupAt
+      ? ` · zuletzt ${formatDateTime(automaticBackupSettings.lastBackupAt)}`
+      : " · noch keine automatische Sicherung";
+    elements.automaticBackupStatus.textContent =
+      `Ordner: ${automaticBackupSettings.directoryName}` + lastBackup;
+  }
+
+  function automaticBackupReferenceTime() {
+    const timestamps = [
+      automaticBackupSettings?.lastBackupAt,
+      state?.settings?.lastBackupAt,
+    ]
+      .map((value) => Date.parse(value))
+      .filter(Number.isFinite);
+    return timestamps.length ? Math.max(...timestamps) : 0;
+  }
+
+  function automaticBackupIsDue(now = Date.now()) {
+    const reference = automaticBackupReferenceTime();
+    if (!reference) return true;
+    return (
+      now - reference >=
+      automaticBackupSettings.intervalHours * 60 * 60 * 1000
+    );
+  }
+
+  function clearAutomaticBackupTimer() {
+    if (automaticBackupTimer) window.clearTimeout(automaticBackupTimer);
+    automaticBackupTimer = null;
+  }
+
+  function scheduleAutomaticBackup() {
+    clearAutomaticBackupTimer();
+    if (
+      !currentUser ||
+      currentUser.mustChangePassword ||
+      !databaseSaveReminderArmed ||
+      !automaticBackupSettings?.enabled ||
+      !automaticBackupDirectoryHandle
+    ) {
+      return;
+    }
+    const reference = automaticBackupReferenceTime();
+    const intervalMs = automaticBackupSettings.intervalHours * 60 * 60 * 1000;
+    const dueDelay = reference
+      ? Math.max(250, reference + intervalMs - Date.now())
+      : 250;
+    const retryDelay = Math.max(0, automaticBackupRetryAt - Date.now());
+    const delay = Math.max(dueDelay, retryDelay);
+    automaticBackupTimer = window.setTimeout(() => {
+      automaticBackupTimer = null;
+      void runAutomaticBackup();
+    }, Math.min(delay, 2147483647));
+  }
+
+  async function automaticBackupPermissionGranted(requestPermission = false) {
+    const handle = automaticBackupDirectoryHandle;
+    if (!handle) return false;
+    const descriptor = { mode: "readwrite" };
+    if (typeof handle.queryPermission !== "function") return true;
+    let permission = await handle.queryPermission(descriptor);
+    if (
+      permission !== "granted" &&
+      requestPermission &&
+      typeof handle.requestPermission === "function"
+    ) {
+      permission = await handle.requestPermission(descriptor);
+    }
+    return permission === "granted";
+  }
+
+  async function runAutomaticBackup({
+    force = false,
+    requestPermission = false,
+  } = {}) {
+    const execute = () =>
+      performAutomaticBackup({ force, requestPermission });
+    if (typeof navigator.locks?.request === "function") {
+      return navigator.locks.request("teo-automatic-backup", execute);
+    }
+    return execute();
+  }
+
+  async function performAutomaticBackup({
+    force = false,
+    requestPermission = false,
+  } = {}) {
+    if (automaticBackupRunning) return false;
+    if (!automaticBackupDirectoryHandle) {
+      showToast("Bitte wählen Sie zuerst einen Sicherungsordner aus.", "error");
+      return false;
+    }
+    if (force) {
+      automaticBackupRetryAt = 0;
+    } else {
+      try {
+        const storedSettings = normalizeAutomaticBackupSettings(
+          await dataStore.getItem(AUTO_BACKUP_CONFIG_KEY),
+        );
+        if (
+          (Date.parse(storedSettings.lastBackupAt) || 0) >
+          (Date.parse(automaticBackupSettings.lastBackupAt) || 0)
+        ) {
+          automaticBackupSettings.lastBackupAt = storedSettings.lastBackupAt;
+        }
+      } catch (error) {
+        console.warn("Der Sicherungszeitpunkt konnte nicht abgeglichen werden.", error);
+      }
+      if (!databaseSaveReminderArmed || !automaticBackupIsDue()) {
+        scheduleAutomaticBackup();
+        return false;
+      }
+    }
+
+    let permissionGranted = false;
+    try {
+      permissionGranted = await automaticBackupPermissionGranted(requestPermission);
+    } catch (error) {
+      console.warn("Die Ordnerberechtigung konnte nicht geprüft werden.", error);
+    }
+    if (!permissionGranted) {
+      automaticBackupRetryAt = Date.now() + 60 * 60 * 1000;
+      automaticBackupNotice =
+        "Ordnerzugriff muss erneut bestätigt werden – „Jetzt automatisch sichern“ wählen.";
+      renderAutomaticBackupStatus();
+      if (requestPermission) showToast(automaticBackupNotice, "error");
+      scheduleAutomaticBackup();
+      return false;
+    }
+
+    automaticBackupRunning = true;
+    automaticBackupNotice = "";
+    renderAutomaticBackupStatus();
+    try {
+      const exportedAt = new Date();
+      const exportedState = JSON.parse(JSON.stringify(state));
+      exportedState.settings.lastBackupAt = exportedAt.toISOString();
+      const backup = {
+        format: BACKUP_FORMAT,
+        formatVersion: BACKUP_FORMAT_VERSION,
+        appVersion: STATE_VERSION,
+        exportedAt: exportedAt.toISOString(),
+        data: exportedState,
+      };
+      const filename = `${AUTO_BACKUP_FILE_PREFIX}${fileTimestamp(exportedAt)}.json`;
+      await writeAutomaticBackupFile(
+        automaticBackupDirectoryHandle,
+        filename,
+        JSON.stringify(backup, null, 2),
+      );
+      let cleanupWarning = "";
+      try {
+        await pruneAutomaticBackupFiles(
+          automaticBackupDirectoryHandle,
+          automaticBackupSettings.retentionCount,
+        );
+      } catch (error) {
+        console.warn(
+          "Ältere automatische Sicherungen konnten nicht bereinigt werden.",
+          error,
+        );
+        cleanupWarning =
+          "Sicherung erstellt, ältere Autosicherungen konnten jedoch nicht entfernt werden.";
+      }
+
+      state.settings.lastBackupAt = exportedAt.toISOString();
+      appendAuditEntry("Automatische Datensicherung exportiert");
+      await persistState();
+      automaticBackupSettings.lastBackupAt = exportedAt.toISOString();
+      await persistAutomaticBackupConfiguration();
+      automaticBackupRetryAt = 0;
+      automaticBackupNotice = cleanupWarning;
+      databaseSaveReminderArmed = false;
+      renderAll();
+      if (cleanupWarning) {
+        showToast(cleanupWarning, "error");
+      } else {
+        showToast(`Automatische Datensicherung „${filename}“ wurde erstellt.`);
+      }
+      return true;
+    } catch (error) {
+      console.error("Die automatische Datensicherung ist fehlgeschlagen.", error);
+      automaticBackupRetryAt = Date.now() + 60 * 60 * 1000;
+      automaticBackupNotice =
+        "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
+      showToast(automaticBackupNotice, "error");
+      return false;
+    } finally {
+      automaticBackupRunning = false;
+      renderAutomaticBackupStatus();
+      scheduleAutomaticBackup();
+    }
+  }
+
+  async function writeAutomaticBackupFile(directoryHandle, filename, content) {
+    const fileHandle = await directoryHandle.getFileHandle(filename, {
+      create: true,
+    });
+    const writable = await fileHandle.createWritable();
+    try {
+      await writable.write(content);
+      await writable.close();
+    } catch (error) {
+      await writable.abort?.();
+      throw error;
+    }
+  }
+
+  function automaticBackupFilesToRemove(fileNames, retentionCount) {
+    const automaticBackupPattern =
+      /^teo-autosicherung_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/;
+    return fileNames
+      .filter((fileName) => automaticBackupPattern.test(fileName))
+      .sort((a, b) => b.localeCompare(a))
+      .slice(Math.max(1, retentionCount));
+  }
+
+  async function pruneAutomaticBackupFiles(directoryHandle, retentionCount) {
+    const fileNames = [];
+    for await (const [name, entry] of directoryHandle.entries()) {
+      if (entry.kind === "file") fileNames.push(name);
+    }
+    for (const fileName of automaticBackupFilesToRemove(
+      fileNames,
+      retentionCount,
+    )) {
+      await directoryHandle.removeEntry(fileName);
+    }
   }
 
   async function exportDatabase() {

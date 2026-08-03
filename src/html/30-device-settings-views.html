@@ -489,6 +489,73 @@
                   Abwesenheitsplanung gemeinsam.
                 </p>
                 <p class="backup-status" id="backupStatus"></p>
+                <div class="automatic-backup-panel">
+                  <div>
+                    <strong>Automatische Sicherung</strong>
+                    <p class="browser-storage-status" id="automaticBackupStatus"></p>
+                  </div>
+                  <div class="automatic-backup-fields">
+                    <label class="settings-field">
+                      <span>Frühestens alle</span>
+                      <select id="automaticBackupInterval">
+                        <option value="1">1 Stunde</option>
+                        <option value="6">6 Stunden</option>
+                        <option value="12">12 Stunden</option>
+                        <option value="24">24 Stunden</option>
+                        <option value="168">7 Tage</option>
+                      </select>
+                    </label>
+                    <label class="settings-field">
+                      <span>Sicherungen behalten</span>
+                      <span class="input-suffix">
+                        <input
+                          id="automaticBackupRetention"
+                          type="number"
+                          min="1"
+                          max="365"
+                          step="1"
+                        />
+                        <span>Dateien</span>
+                      </span>
+                    </label>
+                  </div>
+                  <div class="automatic-backup-actions">
+                    <button
+                      class="button button-secondary"
+                      id="selectAutomaticBackupDirectoryButton"
+                      type="button"
+                    >
+                      <svg><use href="#icon-download"></use></svg>
+                      Sicherungsordner auswählen
+                    </button>
+                    <button
+                      class="button button-secondary"
+                      id="saveAutomaticBackupSettingsButton"
+                      type="button"
+                    >
+                      Einstellungen speichern
+                    </button>
+                    <button
+                      class="button button-primary"
+                      id="runAutomaticBackupButton"
+                      type="button"
+                    >
+                      <svg><use href="#icon-download"></use></svg>
+                      Jetzt automatisch sichern
+                    </button>
+                    <button
+                      class="button button-ghost"
+                      id="removeAutomaticBackupDirectoryButton"
+                      type="button"
+                    >
+                      Ordnerverknüpfung entfernen
+                    </button>
+                  </div>
+                  <p class="field-hint">
+                    Die Ordnerfreigabe gilt nur für dieses Browserprofil. Automatische
+                    Sicherungen sind unverschlüsselt; wählen Sie einen geschützten Ordner.
+                  </p>
+                </div>
                 <div class="browser-storage-info">
                   <p class="browser-storage-status" id="browserStorageStatus">
                     Browserspeicher wird ermittelt …
