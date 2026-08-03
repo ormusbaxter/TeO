@@ -1,3 +1,57 @@
+  function toggleVacationPlannerMaximized() {
+    setVacationPlannerMaximized(
+      !elements.vacationPlannerWidget.classList.contains("is-maximized"),
+    );
+  }
+
+  function setVacationPlannerMaximized(maximized) {
+    const active = Boolean(maximized);
+    const widget = elements.vacationPlannerWidget;
+    if (active && !vacationPlannerWidgetAnchor) {
+      vacationPlannerWidgetAnchor = document.createComment(
+        "vacation-planner-widget-anchor",
+      );
+      widget.parentNode.insertBefore(vacationPlannerWidgetAnchor, widget);
+      document.body.append(widget);
+    } else if (!active && vacationPlannerWidgetAnchor) {
+      vacationPlannerWidgetAnchor.parentNode?.insertBefore(
+        widget,
+        vacationPlannerWidgetAnchor,
+      );
+      vacationPlannerWidgetAnchor.remove();
+      vacationPlannerWidgetAnchor = null;
+    }
+    widget.classList.toggle("is-maximized", active);
+    document.body.classList.toggle("is-vacation-planner-maximized", active);
+    elements.toggleVacationPlannerMaximizeButton.setAttribute(
+      "aria-pressed",
+      String(active),
+    );
+    elements.toggleVacationPlannerMaximizeButton.title = active
+      ? "Planungstabelle verkleinern (Esc)"
+      : "Planungstabelle maximieren";
+    elements.vacationPlannerMaximizeLabel.textContent = active
+      ? "Verkleinern"
+      : "Maximieren";
+    elements.vacationPlannerMaximizeIcon.setAttribute(
+      "href",
+      active ? "#icon-minimize" : "#icon-maximize",
+    );
+  }
+
+  function handleVacationPlannerMaximizeKeydown(event) {
+    if (
+      event.key !== "Escape" ||
+      !elements.vacationPlannerWidget.classList.contains("is-maximized") ||
+      document.querySelector("dialog[open]")
+    ) {
+      return;
+    }
+    event.preventDefault();
+    setVacationPlannerMaximized(false);
+    elements.toggleVacationPlannerMaximizeButton.focus();
+  }
+
   function renderVacationPlanner() {
     renderVacationControls();
     const allEmployees = activeEmployeeList().sort(sortEmployees);

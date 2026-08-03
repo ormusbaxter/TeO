@@ -288,5 +288,27 @@
           </section>
 
           <div class="training-summary vacation-summary" id="vacationSummary"></div>
-          <section class="panel vacation-planner-panel" id="vacationPlanner"></section>
+          <section
+            class="panel vacation-planner-panel"
+            id="vacationPlannerWidget"
+            aria-labelledby="vacationPlannerWidgetTitle"
+          >
+            <header class="vacation-planner-widget-header">
+              <div>
+                <p class="eyebrow">Monatsübersicht</p>
+                <h2 id="vacationPlannerWidgetTitle">Planungstabelle</h2>
+              </div>
+              <button
+                class="button button-secondary button-compact"
+                id="toggleVacationPlannerMaximizeButton"
+                type="button"
+                aria-controls="vacationPlanner"
+                aria-pressed="false"
+              >
+                <svg><use id="vacationPlannerMaximizeIcon" href="#icon-maximize"></use></svg>
+                <span id="vacationPlannerMaximizeLabel">Maximieren</span>
+              </button>
+            </header>
+            <div class="vacation-planner-content" id="vacationPlanner"></div>
+          </section>
         </section>

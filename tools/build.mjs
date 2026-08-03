@@ -78,10 +78,15 @@ for (const [source, output, banner] of manifests) {
             readmeHelp,
           )
         : content.join("\n");
-    await fs.writeFile(
-      path.join(projectRoot, output),
-      `${banner}${generatedContent}`,
-      "utf8",
+    const outputs = output === "index.html" ? ["index.html", "app.html"] : [output];
+    await Promise.all(
+      outputs.map((fileName) =>
+        fs.writeFile(
+          path.join(projectRoot, fileName),
+          `${banner}${generatedContent}`,
+          "utf8",
+        ),
+      ),
     );
   } catch (error) {
     if (error.code !== "ENOENT") throw error;

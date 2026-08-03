@@ -23,6 +23,7 @@
 
   function showView(view, updateHash = true) {
     if (!VIEW_HASHES[view]) view = "dashboard";
+    if (view !== "vacations") setVacationPlannerMaximized(false);
     activeView = view;
 
     document.body.classList.toggle("is-vacation-view", view === "vacations");
@@ -228,6 +229,11 @@
       "click",
       openVacationConflictOverview,
     );
+    elements.toggleVacationPlannerMaximizeButton.addEventListener(
+      "click",
+      toggleVacationPlannerMaximized,
+    );
+    document.addEventListener("keydown", handleVacationPlannerMaximizeKeydown);
     elements.vacationConflictContent.addEventListener("click", (event) => {
       const dateButton = event.target.closest("[data-vacation-conflict-date]");
       if (!dateButton) return;

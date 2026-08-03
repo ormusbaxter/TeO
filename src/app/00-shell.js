@@ -421,6 +421,7 @@
   let vacationSelectionAnchor = null;
   let vacationVisibleEmployeeIds = [];
   let vacationVisibleDates = [];
+  let vacationPlannerWidgetAnchor = null;
   let deviceInventoryFilter = "current";
   let deviceAnnexFilter = "all";
   let deviceCategoryFilter = "all";
@@ -593,7 +594,17 @@
       "#openVacationConflictsButton",
     ),
     vacationSummary: document.querySelector("#vacationSummary"),
+    vacationPlannerWidget: document.querySelector("#vacationPlannerWidget"),
     vacationPlanner: document.querySelector("#vacationPlanner"),
+    toggleVacationPlannerMaximizeButton: document.querySelector(
+      "#toggleVacationPlannerMaximizeButton",
+    ),
+    vacationPlannerMaximizeIcon: document.querySelector(
+      "#vacationPlannerMaximizeIcon",
+    ),
+    vacationPlannerMaximizeLabel: document.querySelector(
+      "#vacationPlannerMaximizeLabel",
+    ),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),

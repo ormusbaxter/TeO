@@ -9,10 +9,12 @@ test("Die Online-Hilfe enthält die beim Build eingebettete README", async () =>
     path.dirname(fileURLToPath(import.meta.url)),
     "..",
   );
-  const indexHtml = await fs.readFile(
-    path.join(projectRoot, "index.html"),
-    "utf8",
-  );
+  const [indexHtml, appHtml] = await Promise.all([
+    fs.readFile(path.join(projectRoot, "index.html"), "utf8"),
+    fs.readFile(path.join(projectRoot, "app.html"), "utf8"),
+  ]);
+
+assert.equal(appHtml, indexHtml);
 
 assert.match(indexHtml, /data-view-panel="help"/);
 assert.match(indexHtml, /id="helpSearch"/);
