@@ -4512,7 +4512,7 @@
       filter.checked = activeKinds.has(filter.value);
     });
     const deadlines = getDeadlineItems().filter(
-      (item) => activeKinds.has(item.kind) && item.daysUntil <= horizon,
+      (item) => activeKinds.has(deadlineFilterKind(item)) && item.daysUntil <= horizon,
     );
     const overdue = deadlines.filter((item) => item.daysUntil < 0);
     const upcoming = deadlines.filter((item) => item.daysUntil >= 0);
@@ -4547,7 +4547,7 @@
           .map(
             (kind) => `
               <span class="summary-chip ${kind === "birthday" ? "summary-teal" : ""}">
-                <strong>${deadlines.filter((item) => item.kind === kind).length}</strong>
+                <strong>${deadlines.filter((item) => deadlineFilterKind(item) === kind).length}</strong>
                 <small>${DEADLINE_KIND_LABELS[kind]}</small>
               </span>
             `,
@@ -4679,6 +4679,16 @@
     await commitStateMutation(() => {
       state.settings.deadlineKinds = selectedKinds;
     });
+  }
+
+  function deadlineFilterKind(item) {
+    if (
+      item?.kind === "appointment" &&
+      ["schulung", "geraeteeinweisung"].includes(item.appointment?.category)
+    ) {
+      return "training";
+    }
+    return item?.kind || "";
   }
 
   function getDeadlineItems() {

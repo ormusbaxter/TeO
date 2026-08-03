@@ -566,7 +566,8 @@ scrollbar.
 
 Er zeigt:
 
-- anstehende Termine
+- anstehende Termine; Schulungen und Geräteeinweisungen aus dem Terminkalender
+  werden dabei dem Filter **Fortbildungen** zugeordnet
 - Geburtstage
 - fällige und überfällige Pflichtfortbildungen
 - ablaufende Zusatzqualifikationen
