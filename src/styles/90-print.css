@@ -9,6 +9,12 @@
   margin: 10mm;
 }
 
+/* Vergleichstabelle und Mitarbeiterlisten brauchen die Breite des Querformats. */
+@page weekend-overview {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
 @media print {
   * {
     print-color-adjust: exact;
@@ -233,6 +239,11 @@
     height: auto;
   }
 
+  body.print-weekend-overview > #weekendOverviewDialog {
+    page: weekend-overview;
+    height: auto;
+  }
+
   body.print-vacation-overview .vacation-overview-summary > div,
   body.print-vacation-overview .vacation-year-matrix-scroll {
     color: #182230;
@@ -310,8 +321,50 @@
     overflow: visible;
   }
 
+  body.print-weekend-overview .weekend-comparison-scroll {
+    overflow: visible;
+  }
+
+  body.print-weekend-overview .weekend-comparison-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  body.print-weekend-overview .weekend-comparison-table th,
+  body.print-weekend-overview .weekend-comparison-table td {
+    padding: 2mm 3mm;
+  }
+
   body.print-weekend-overview .weekend-distribution-groups {
+    display: block;
+  }
+
+  body.print-weekend-overview .weekend-distribution-group {
+    margin-bottom: 5mm;
+    break-inside: auto;
+  }
+
+  body.print-weekend-overview .weekend-distribution-header,
+  body.print-weekend-overview .weekend-group-metrics {
+    break-inside: avoid;
+  }
+
+  body.print-weekend-overview .weekend-distribution-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 3mm;
+  }
+
+  body.print-weekend-overview .weekend-distribution-employee {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    padding: 2mm;
+    cursor: default;
+  }
+
+  body.print-weekend-overview .weekend-employee-identity strong,
+  body.print-weekend-overview .weekend-employee-identity small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   body.print-weekend-overview .weekend-distribution-header .button {

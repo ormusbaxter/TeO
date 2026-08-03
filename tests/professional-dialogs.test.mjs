@@ -27,6 +27,22 @@ test("Sicherungen und Telefonliste verwenden integrierte TeO-Dialoge", async () 
   );
   assert.match(
     styles,
+    /@page weekend-overview\s*\{[^}]*size: A4 landscape;[^}]*margin: 10mm;/s,
+  );
+  assert.match(
+    styles,
+    /body\.print-weekend-overview > #weekendOverviewDialog\s*\{[^}]*page: weekend-overview;[^}]*height: auto;/s,
+  );
+  assert.match(
+    styles,
+    /body\.print-weekend-overview \.weekend-comparison-table\s*\{[^}]*min-width: 0;[^}]*table-layout: fixed;/s,
+  );
+  assert.match(
+    styles,
+    /body\.print-weekend-overview \.weekend-distribution-list\s*\{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/s,
+  );
+  assert.match(
+    styles,
     /\.phone-list-preview-canvas \.phone-list-document\s*\{[^}]*padding: 15mm;/s,
   );
   assert.match(

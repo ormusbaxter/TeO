@@ -6898,6 +6898,71 @@ body.is-vacation-view .main-content {
   overflow: hidden;
 }
 
+.vacation-planner-widget-header {
+  display: flex;
+  min-height: 64px;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--slate-200);
+  background: var(--white);
+}
+
+.vacation-planner-widget-header h2 {
+  margin: 3px 0 0;
+  color: var(--slate-900);
+  font-size: 1rem;
+}
+
+.vacation-planner-content {
+  min-width: 0;
+}
+
+body.is-vacation-planner-maximized {
+  overflow: hidden;
+}
+
+.vacation-planner-panel.is-maximized {
+  position: fixed;
+  z-index: 100;
+  inset: clamp(6px, 1.2vw, 18px);
+  display: flex;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  min-height: 0;
+  margin: 0;
+  flex-direction: column;
+  border-color: var(--slate-300);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow:
+    0 0 0 100vmax rgb(9 23 38 / 62%),
+    0 24px 60px rgb(9 23 38 / 28%);
+}
+
+.vacation-planner-panel.is-maximized .vacation-planner-widget-header {
+  flex: 0 0 auto;
+}
+
+.vacation-planner-panel.is-maximized .vacation-planner-content {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.vacation-planner-panel.is-maximized .vacation-table-note {
+  flex: 0 0 auto;
+}
+
+.vacation-planner-panel.is-maximized .vacation-table-scroll {
+  max-height: none;
+  flex: 1 1 auto;
+}
+
 .vacation-table-note {
   display: grid;
   gap: 5px;
@@ -7639,6 +7704,17 @@ html[data-theme="dark"] :is(
 }
 
 @media (max-width: 720px) {
+  .vacation-planner-panel.is-maximized {
+    inset: 0;
+    border-width: 0;
+    border-radius: 0;
+  }
+
+  .vacation-planner-widget-header {
+    min-height: 56px;
+    padding: 10px 12px;
+  }
+
   .vacation-controls-panel {
     padding: 16px;
   }
@@ -7703,7 +7779,6 @@ html[data-theme="dark"] :is(
   }
 }
 
-
 @page phone-list {
   size: A4 portrait;
   margin: 0;
@@ -7711,6 +7786,12 @@ html[data-theme="dark"] :is(
 
 /* Die Jahresmatrix hat 31 Tagesspalten und passt nur quer auf ein Blatt. */
 @page vacation-overview {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
+/* Vergleichstabelle und Mitarbeiterlisten brauchen die Breite des Querformats. */
+@page weekend-overview {
   size: A4 landscape;
   margin: 10mm;
 }
@@ -7939,6 +8020,11 @@ html[data-theme="dark"] :is(
     height: auto;
   }
 
+  body.print-weekend-overview > #weekendOverviewDialog {
+    page: weekend-overview;
+    height: auto;
+  }
+
   body.print-vacation-overview .vacation-overview-summary > div,
   body.print-vacation-overview .vacation-year-matrix-scroll {
     color: #182230;
@@ -8016,8 +8102,50 @@ html[data-theme="dark"] :is(
     overflow: visible;
   }
 
+  body.print-weekend-overview .weekend-comparison-scroll {
+    overflow: visible;
+  }
+
+  body.print-weekend-overview .weekend-comparison-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  body.print-weekend-overview .weekend-comparison-table th,
+  body.print-weekend-overview .weekend-comparison-table td {
+    padding: 2mm 3mm;
+  }
+
   body.print-weekend-overview .weekend-distribution-groups {
+    display: block;
+  }
+
+  body.print-weekend-overview .weekend-distribution-group {
+    margin-bottom: 5mm;
+    break-inside: auto;
+  }
+
+  body.print-weekend-overview .weekend-distribution-header,
+  body.print-weekend-overview .weekend-group-metrics {
+    break-inside: avoid;
+  }
+
+  body.print-weekend-overview .weekend-distribution-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 3mm;
+  }
+
+  body.print-weekend-overview .weekend-distribution-employee {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    padding: 2mm;
+    cursor: default;
+  }
+
+  body.print-weekend-overview .weekend-employee-identity strong,
+  body.print-weekend-overview .weekend-employee-identity small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   body.print-weekend-overview .weekend-distribution-header .button {

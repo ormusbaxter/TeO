@@ -88,6 +88,12 @@
       <symbol id="icon-close" viewBox="0 0 24 24">
         <path d="M18 6 6 18M6 6l12 12" />
       </symbol>
+      <symbol id="icon-maximize" viewBox="0 0 24 24">
+        <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
+      </symbol>
+      <symbol id="icon-minimize" viewBox="0 0 24 24">
+        <path d="M8 8H3V3M16 8h5V3M8 16H3v5M16 16h5v5" />
+      </symbol>
       <symbol id="icon-more" viewBox="0 0 24 24">
         <circle cx="5" cy="12" r="1" />
         <circle cx="12" cy="12" r="1" />
@@ -782,7 +788,29 @@
           </section>
 
           <div class="training-summary vacation-summary" id="vacationSummary"></div>
-          <section class="panel vacation-planner-panel" id="vacationPlanner"></section>
+          <section
+            class="panel vacation-planner-panel"
+            id="vacationPlannerWidget"
+            aria-labelledby="vacationPlannerWidgetTitle"
+          >
+            <header class="vacation-planner-widget-header">
+              <div>
+                <p class="eyebrow">Monatsübersicht</p>
+                <h2 id="vacationPlannerWidgetTitle">Planungstabelle</h2>
+              </div>
+              <button
+                class="button button-secondary button-compact"
+                id="toggleVacationPlannerMaximizeButton"
+                type="button"
+                aria-controls="vacationPlanner"
+                aria-pressed="false"
+              >
+                <svg><use id="vacationPlannerMaximizeIcon" href="#icon-maximize"></use></svg>
+                <span id="vacationPlannerMaximizeLabel">Maximieren</span>
+              </button>
+            </header>
+            <div class="vacation-planner-content" id="vacationPlanner"></div>
+          </section>
         </section>
 
         <section class="view" id="appointmentsView" data-view-panel="appointments">
@@ -1765,7 +1793,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>TeO pflegt keine separate Versionsdatei. Die Änderungshistorie wird beim Build direkt aus der Git-Commit-Historie erzeugt und unten chronologisch aufgelistet, neueste Änderung zuerst.</p>
-<ul><li><strong>29.07.2026</strong> <code>9fd2f78</code> Version auf 004.013.001 gehoben</li><li><strong>29.07.2026</strong> <code>e6c6a73</code> Renderaufwand je Aenderung gesenkt</li><li><strong>29.07.2026</strong> <code>3fbe552</code> Mitarbeiterzahl ohne Ausgetretene, Terminkategorie Baumassnahme</li><li><strong>29.07.2026</strong> <code>14ccf5a</code> Sortierhinweis der Seitenleiste ueber die Anmeldeinformationen</li><li><strong>29.07.2026</strong> <code>86ca171</code> Urlaubsplanung: Tastaturbedienung, Filter und Ueberschneidungen</li><li><strong>29.07.2026</strong> <code>03d63ad</code> Geraeteeinweisungen: Mehrfachauswahl, Suche und Sortierung</li><li><strong>28.07.2026</strong> <code>8860d8a</code> Navigation sortierbar, Uebersicht gestrafft, Terminkategorien ergaenzt</li><li><strong>28.07.2026</strong> <code>09088d6</code> Schulferien in den Einstellungen pflegbar, Buildnummer dreistellig</li><li><strong>28.07.2026</strong> <code>8329cc4</code> Anzeigefehler beheben, Auswertungen ergaenzen, Dialogschliessen konfigurierbar</li><li><strong>27.07.2026</strong> <code>236c8db</code> Rollenmodell auf normale Bedienung oeffnen und Benutzerverwaltung ergaenzen</li><li><strong>27.07.2026</strong> <code>d7c016f</code> Eindeutige Vor- und Nachnamen im Demo-Datenbestand</li><li><strong>27.07.2026</strong> <code>4c50339</code> Update app features, styles, and add tests for web manifest and sidebar</li><li><strong>27.07.2026</strong> <code>06ca7a7</code> feat: normalize MariaDB relationships</li><li><strong>27.07.2026</strong> <code>f277f2f</code> Refactor TeO and harden administrative workflows</li><li><strong>26.07.2026</strong> <code>7ddd0ea</code> Add training catalog series and demo dataset</li><li><strong>26.07.2026</strong> <code>f6bdbd5</code> Harden MariaDB backend synchronization</li><li><strong>26.07.2026</strong> <code>dce6f64</code> first commit</li></ul>
+<ul><li><strong>03.08.2026</strong> <code>142585d</code> Merge pull request #1 from ormusbaxter/selektives-rendern-und-nachschlagetabellen</li><li><strong>03.08.2026</strong> <code>c022902</code> Historien von main zusammenführen</li><li><strong>03.08.2026</strong> <code>cbba877</code> Änderungshistorie aus Git-Commits erzeugen</li><li><strong>03.08.2026</strong> <code>896c2c8</code> Add files via upload</li><li><strong>29.07.2026</strong> <code>9fd2f78</code> Version auf 004.013.001 gehoben</li><li><strong>29.07.2026</strong> <code>e6c6a73</code> Renderaufwand je Aenderung gesenkt</li><li><strong>29.07.2026</strong> <code>3fbe552</code> Mitarbeiterzahl ohne Ausgetretene, Terminkategorie Baumassnahme</li><li><strong>29.07.2026</strong> <code>14ccf5a</code> Sortierhinweis der Seitenleiste ueber die Anmeldeinformationen</li><li><strong>29.07.2026</strong> <code>86ca171</code> Urlaubsplanung: Tastaturbedienung, Filter und Ueberschneidungen</li><li><strong>29.07.2026</strong> <code>03d63ad</code> Geraeteeinweisungen: Mehrfachauswahl, Suche und Sortierung</li><li><strong>28.07.2026</strong> <code>8860d8a</code> Navigation sortierbar, Uebersicht gestrafft, Terminkategorien ergaenzt</li><li><strong>28.07.2026</strong> <code>09088d6</code> Schulferien in den Einstellungen pflegbar, Buildnummer dreistellig</li><li><strong>28.07.2026</strong> <code>8329cc4</code> Anzeigefehler beheben, Auswertungen ergaenzen, Dialogschliessen konfigurierbar</li><li><strong>27.07.2026</strong> <code>236c8db</code> Rollenmodell auf normale Bedienung oeffnen und Benutzerverwaltung ergaenzen</li><li><strong>27.07.2026</strong> <code>d7c016f</code> Eindeutige Vor- und Nachnamen im Demo-Datenbestand</li><li><strong>27.07.2026</strong> <code>4c50339</code> Update app features, styles, and add tests for web manifest and sidebar</li><li><strong>27.07.2026</strong> <code>06ca7a7</code> feat: normalize MariaDB relationships</li><li><strong>27.07.2026</strong> <code>f277f2f</code> Refactor TeO and harden administrative workflows</li><li><strong>26.07.2026</strong> <code>7ddd0ea</code> Add training catalog series and demo dataset</li><li><strong>26.07.2026</strong> <code>f6bdbd5</code> Harden MariaDB backend synchronization</li><li><strong>26.07.2026</strong> <code>dce6f64</code> first commit</li></ul>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-entwicklung-und-projektstruktur">
 <h2 id="hilfe-entwicklung-und-projektstruktur">Entwicklung und Projektstruktur</h2>
