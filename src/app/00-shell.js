@@ -7,6 +7,8 @@
   }
   const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
+  const AUTO_BACKUP_CONFIG_KEY = "intensivteam-auto-backup-config-v1";
+  const AUTO_BACKUP_DIRECTORY_KEY = "intensivteam-auto-backup-directory-v1";
   const STATE_VERSION = PROJECT_META.stateVersion;
   const PROJECT_NAME = PROJECT_META.name;
   const PROJECT_VERSION = PROJECT_META.version;
@@ -15,6 +17,9 @@
   const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
+  const DEFAULT_AUTO_BACKUP_INTERVAL_HOURS = 24;
+  const DEFAULT_AUTO_BACKUP_RETENTION_COUNT = 30;
+  const AUTO_BACKUP_FILE_PREFIX = "teo-autosicherung_";
   const DEFAULT_VACATION_BASE_DAYS = 30;
   const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
   const DEFAULT_WEEKDAY_ABSENCE_LIMIT = 8;
@@ -407,6 +412,12 @@
   let trainingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let databaseSaveReminderArmed = false;
+  let automaticBackupSettings = null;
+  let automaticBackupDirectoryHandle = null;
+  let automaticBackupTimer = null;
+  let automaticBackupRunning = false;
+  let automaticBackupRetryAt = 0;
+  let automaticBackupNotice = "";
   let browserPersistenceNotice = "";
   let dateInputObserver = null;
   let vacationYear = new Date().getFullYear();
@@ -506,6 +517,19 @@
     validateBackupFile: document.querySelector("#validateBackupFile"),
     exportEncryptedDataButton: document.querySelector("#exportEncryptedDataButton"),
     backupStatus: document.querySelector("#backupStatus"),
+    automaticBackupStatus: document.querySelector("#automaticBackupStatus"),
+    automaticBackupInterval: document.querySelector("#automaticBackupInterval"),
+    automaticBackupRetention: document.querySelector("#automaticBackupRetention"),
+    saveAutomaticBackupSettingsButton: document.querySelector(
+      "#saveAutomaticBackupSettingsButton",
+    ),
+    selectAutomaticBackupDirectoryButton: document.querySelector(
+      "#selectAutomaticBackupDirectoryButton",
+    ),
+    runAutomaticBackupButton: document.querySelector("#runAutomaticBackupButton"),
+    removeAutomaticBackupDirectoryButton: document.querySelector(
+      "#removeAutomaticBackupDirectoryButton",
+    ),
     browserStorageStatus: document.querySelector("#browserStorageStatus"),
     requestPersistentStorageButton: document.querySelector(
       "#requestPersistentStorageButton",

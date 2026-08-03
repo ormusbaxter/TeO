@@ -190,6 +190,22 @@
       exportDatabase,
     );
     elements.exportEncryptedDataButton.addEventListener("click", exportEncryptedDatabase);
+    elements.selectAutomaticBackupDirectoryButton.addEventListener(
+      "click",
+      selectAutomaticBackupDirectory,
+    );
+    elements.runAutomaticBackupButton.addEventListener(
+      "click",
+      () => void runAutomaticBackup({ force: true, requestPermission: true }),
+    );
+    elements.removeAutomaticBackupDirectoryButton.addEventListener(
+      "click",
+      removeAutomaticBackupDirectory,
+    );
+    elements.saveAutomaticBackupSettingsButton.addEventListener(
+      "click",
+      saveAutomaticBackupSettings,
+    );
     elements.requestPersistentStorageButton.addEventListener(
       "click",
       requestPersistentBrowserStorage,
@@ -1003,9 +1019,11 @@
     }
     renderView(activeView);
     renderBackupStatus();
+    renderAutomaticBackupStatus();
     renderDatabaseSaveWarning();
     refreshFormattedDateInputs();
     void renderBrowserStorageStatus();
+    scheduleAutomaticBackup();
     applyAccessControl();
     renderSidebarSystemStatus();
   }
@@ -1195,10 +1213,12 @@
 
     document.body.classList.remove("is-auth-locked");
     if (elements.changePasswordDialog.open) elements.changePasswordDialog.close();
+    scheduleAutomaticBackup();
   }
 
   function showLoginDialog() {
     currentUser = null;
+    clearAutomaticBackupTimer();
     backupReminderShown = false;
     sessionStorage.removeItem(SESSION_USER_KEY);
     document.body.classList.add("is-auth-locked");

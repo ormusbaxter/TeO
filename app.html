@@ -1390,6 +1390,73 @@
                   Abwesenheitsplanung gemeinsam.
                 </p>
                 <p class="backup-status" id="backupStatus"></p>
+                <div class="automatic-backup-panel">
+                  <div>
+                    <strong>Automatische Sicherung</strong>
+                    <p class="browser-storage-status" id="automaticBackupStatus"></p>
+                  </div>
+                  <div class="automatic-backup-fields">
+                    <label class="settings-field">
+                      <span>Frühestens alle</span>
+                      <select id="automaticBackupInterval">
+                        <option value="1">1 Stunde</option>
+                        <option value="6">6 Stunden</option>
+                        <option value="12">12 Stunden</option>
+                        <option value="24">24 Stunden</option>
+                        <option value="168">7 Tage</option>
+                      </select>
+                    </label>
+                    <label class="settings-field">
+                      <span>Sicherungen behalten</span>
+                      <span class="input-suffix">
+                        <input
+                          id="automaticBackupRetention"
+                          type="number"
+                          min="1"
+                          max="365"
+                          step="1"
+                        />
+                        <span>Dateien</span>
+                      </span>
+                    </label>
+                  </div>
+                  <div class="automatic-backup-actions">
+                    <button
+                      class="button button-secondary"
+                      id="selectAutomaticBackupDirectoryButton"
+                      type="button"
+                    >
+                      <svg><use href="#icon-download"></use></svg>
+                      Sicherungsordner auswählen
+                    </button>
+                    <button
+                      class="button button-secondary"
+                      id="saveAutomaticBackupSettingsButton"
+                      type="button"
+                    >
+                      Einstellungen speichern
+                    </button>
+                    <button
+                      class="button button-primary"
+                      id="runAutomaticBackupButton"
+                      type="button"
+                    >
+                      <svg><use href="#icon-download"></use></svg>
+                      Jetzt automatisch sichern
+                    </button>
+                    <button
+                      class="button button-ghost"
+                      id="removeAutomaticBackupDirectoryButton"
+                      type="button"
+                    >
+                      Ordnerverknüpfung entfernen
+                    </button>
+                  </div>
+                  <p class="field-hint">
+                    Die Ordnerfreigabe gilt nur für dieses Browserprofil. Automatische
+                    Sicherungen sind unverschlüsselt; wählen Sie einen geschützten Ordner.
+                  </p>
+                </div>
                 <div class="browser-storage-info">
                   <p class="browser-storage-status" id="browserStorageStatus">
                     Browserspeicher wird ermittelt …
@@ -1724,6 +1791,9 @@
 <h3 id="hilfe-sicherung-exportieren">Sicherung exportieren</h3>
 <ol><li>In der Warnleiste <strong>Jetzt exportieren</strong> wählen oder <strong>Einstellungen → Sicherung exportieren</strong> öffnen.</li><li>Die JSON-Datei an einem geschützten Ort speichern.</li><li>Prüfen, ob die Datei vollständig heruntergeladen wurde.</li></ol>
 <p>Optional kann die Sicherung mit Passwort, PBKDF2 und AES-GCM verschlüsselt werden. TeO verwendet dafür einen eigenen Passwortdialog mit Wiederholung, Eingabeprüfung und optionaler Passwortanzeige. Das Passwort kann nicht aus der Datei wiederhergestellt werden.</p>
+<h3 id="hilfe-automatische-sicherung-in-einen-ordner">Automatische Sicherung in einen Ordner</h3>
+<p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach erneut, sobald Änderungen vorliegen und das gewählte Intervall erreicht ist. Das Intervall lässt sich zwischen einer Stunde und sieben Tagen einstellen. Außerdem kann festgelegt werden, wie viele der automatisch erzeugten Dateien erhalten bleiben; ältere TeO-Autosicherungen werden aus diesem Ordner entfernt.</p>
+<p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist, und werden unverschlüsselt geschrieben; der gewählte Ordner muss daher angemessen geschützt sein. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
 <h3 id="hilfe-sicherung-prufen">Sicherung prüfen</h3>
 <p>Über <strong>Sicherung prüfen</strong> wird eine Datei validiert, ohne den aktuellen Datenbestand zu verändern.</p>
 <h3 id="hilfe-sicherung-importieren">Sicherung importieren</h3>
@@ -1793,7 +1863,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>TeO pflegt keine separate Versionsdatei. Die Änderungshistorie wird beim Build direkt aus der Git-Commit-Historie erzeugt und unten chronologisch aufgelistet, neueste Änderung zuerst.</p>
-<ul><li><strong>03.08.2026</strong> <code>290642e</code> Merge pull request #2 from ormusbaxter/agent/vacation-planner-maximize-print</li><li><strong>03.08.2026</strong> <code>2769e60</code> Druckansicht und Urlaubsplanung optimieren</li><li><strong>03.08.2026</strong> <code>142585d</code> Merge pull request #1 from ormusbaxter/selektives-rendern-und-nachschlagetabellen</li><li><strong>03.08.2026</strong> <code>c022902</code> Historien von main zusammenführen</li><li><strong>03.08.2026</strong> <code>cbba877</code> Änderungshistorie aus Git-Commits erzeugen</li><li><strong>03.08.2026</strong> <code>896c2c8</code> Add files via upload</li><li><strong>29.07.2026</strong> <code>9fd2f78</code> Version auf 004.013.001 gehoben</li><li><strong>29.07.2026</strong> <code>e6c6a73</code> Renderaufwand je Aenderung gesenkt</li><li><strong>29.07.2026</strong> <code>3fbe552</code> Mitarbeiterzahl ohne Ausgetretene, Terminkategorie Baumassnahme</li><li><strong>29.07.2026</strong> <code>14ccf5a</code> Sortierhinweis der Seitenleiste ueber die Anmeldeinformationen</li><li><strong>29.07.2026</strong> <code>86ca171</code> Urlaubsplanung: Tastaturbedienung, Filter und Ueberschneidungen</li><li><strong>29.07.2026</strong> <code>03d63ad</code> Geraeteeinweisungen: Mehrfachauswahl, Suche und Sortierung</li><li><strong>28.07.2026</strong> <code>8860d8a</code> Navigation sortierbar, Uebersicht gestrafft, Terminkategorien ergaenzt</li><li><strong>28.07.2026</strong> <code>09088d6</code> Schulferien in den Einstellungen pflegbar, Buildnummer dreistellig</li><li><strong>28.07.2026</strong> <code>8329cc4</code> Anzeigefehler beheben, Auswertungen ergaenzen, Dialogschliessen konfigurierbar</li><li><strong>27.07.2026</strong> <code>236c8db</code> Rollenmodell auf normale Bedienung oeffnen und Benutzerverwaltung ergaenzen</li><li><strong>27.07.2026</strong> <code>d7c016f</code> Eindeutige Vor- und Nachnamen im Demo-Datenbestand</li><li><strong>27.07.2026</strong> <code>4c50339</code> Update app features, styles, and add tests for web manifest and sidebar</li><li><strong>27.07.2026</strong> <code>06ca7a7</code> feat: normalize MariaDB relationships</li><li><strong>27.07.2026</strong> <code>f277f2f</code> Refactor TeO and harden administrative workflows</li><li><strong>26.07.2026</strong> <code>7ddd0ea</code> Add training catalog series and demo dataset</li><li><strong>26.07.2026</strong> <code>f6bdbd5</code> Harden MariaDB backend synchronization</li><li><strong>26.07.2026</strong> <code>dce6f64</code> first commit</li></ul>
+<ul><li><strong>03.08.2026</strong> <code>b7058aa</code> Merge pull request #3 from ormusbaxter/agent/fristenmonitor-fortbildungstermine</li><li><strong>03.08.2026</strong> <code>f805abb</code> Fristenmonitor um Fortbildungstermine erweitern</li><li><strong>03.08.2026</strong> <code>290642e</code> Merge pull request #2 from ormusbaxter/agent/vacation-planner-maximize-print</li><li><strong>03.08.2026</strong> <code>2769e60</code> Druckansicht und Urlaubsplanung optimieren</li><li><strong>03.08.2026</strong> <code>142585d</code> Merge pull request #1 from ormusbaxter/selektives-rendern-und-nachschlagetabellen</li><li><strong>03.08.2026</strong> <code>c022902</code> Historien von main zusammenführen</li><li><strong>03.08.2026</strong> <code>cbba877</code> Änderungshistorie aus Git-Commits erzeugen</li><li><strong>03.08.2026</strong> <code>896c2c8</code> Add files via upload</li><li><strong>29.07.2026</strong> <code>9fd2f78</code> Version auf 004.013.001 gehoben</li><li><strong>29.07.2026</strong> <code>e6c6a73</code> Renderaufwand je Aenderung gesenkt</li><li><strong>29.07.2026</strong> <code>3fbe552</code> Mitarbeiterzahl ohne Ausgetretene, Terminkategorie Baumassnahme</li><li><strong>29.07.2026</strong> <code>14ccf5a</code> Sortierhinweis der Seitenleiste ueber die Anmeldeinformationen</li><li><strong>29.07.2026</strong> <code>86ca171</code> Urlaubsplanung: Tastaturbedienung, Filter und Ueberschneidungen</li><li><strong>29.07.2026</strong> <code>03d63ad</code> Geraeteeinweisungen: Mehrfachauswahl, Suche und Sortierung</li><li><strong>28.07.2026</strong> <code>8860d8a</code> Navigation sortierbar, Uebersicht gestrafft, Terminkategorien ergaenzt</li><li><strong>28.07.2026</strong> <code>09088d6</code> Schulferien in den Einstellungen pflegbar, Buildnummer dreistellig</li><li><strong>28.07.2026</strong> <code>8329cc4</code> Anzeigefehler beheben, Auswertungen ergaenzen, Dialogschliessen konfigurierbar</li><li><strong>27.07.2026</strong> <code>236c8db</code> Rollenmodell auf normale Bedienung oeffnen und Benutzerverwaltung ergaenzen</li><li><strong>27.07.2026</strong> <code>d7c016f</code> Eindeutige Vor- und Nachnamen im Demo-Datenbestand</li><li><strong>27.07.2026</strong> <code>4c50339</code> Update app features, styles, and add tests for web manifest and sidebar</li><li><strong>27.07.2026</strong> <code>06ca7a7</code> feat: normalize MariaDB relationships</li><li><strong>27.07.2026</strong> <code>f277f2f</code> Refactor TeO and harden administrative workflows</li><li><strong>26.07.2026</strong> <code>7ddd0ea</code> Add training catalog series and demo dataset</li><li><strong>26.07.2026</strong> <code>f6bdbd5</code> Harden MariaDB backend synchronization</li><li><strong>26.07.2026</strong> <code>dce6f64</code> first commit</li></ul>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-entwicklung-und-projektstruktur">
 <h2 id="hilfe-entwicklung-und-projektstruktur">Entwicklung und Projektstruktur</h2>
