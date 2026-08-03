@@ -1,0 +1,19 @@
+{
+  "name": "teo-mariadb-backend",
+  "version": "3.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MariaDB-API und Webserver für TeO – Team & Employee Organizer",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node --check src/server.js && node --check src/session-store.js && node --check src/migrations.js && node --check src/relational-state-store.js"
+  },
+  "dependencies": {
+    "dotenv": "17.4.2",
+    "express": "5.2.1",
+    "mariadb": "3.5.3"
+  }
+}

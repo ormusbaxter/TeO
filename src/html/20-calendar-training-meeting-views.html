@@ -1,0 +1,85 @@
+        <section class="view" id="appointmentsView" data-view-panel="appointments">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Organisation</p>
+              <h1>Terminkalender</h1>
+              <p class="page-subtitle">
+                Anstehende und vergangene Termine zentral verwalten.
+              </p>
+            </div>
+            <button
+              class="button button-primary"
+              type="button"
+              data-open-appointment
+            >
+              <svg><use href="#icon-plus"></use></svg>
+              Termin anlegen
+            </button>
+          </div>
+
+          <div class="training-summary" id="appointmentSummary"></div>
+          <section class="meeting-list" id="appointmentList"></section>
+        </section>
+
+        <section class="view" id="trainingsView" data-view-panel="trainings">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Qualität &amp; Sicherheit</p>
+              <h1>Pflichtfortbildungen</h1>
+              <p class="page-subtitle">
+                Fortbildungen anlegen und absolvierte Nachweise dokumentieren.
+              </p>
+            </div>
+            <div class="header-actions">
+              <button class="button button-secondary" id="openTrainingMatrixButton" type="button">
+                <svg><use href="#icon-chart"></use></svg>
+                Jahresauswertung
+              </button>
+              <button class="button button-secondary" type="button" data-open-completion>
+                <svg><use href="#icon-check"></use></svg>
+                Abschluss eintragen
+              </button>
+              <button class="button button-primary" type="button" data-open-training>
+                <svg><use href="#icon-plus"></use></svg>
+                Fortbildung anlegen
+              </button>
+            </div>
+          </div>
+
+          <div class="training-page-toolbar">
+            <label class="compact-field" for="trainingDisplayYear">
+              <span>Anzuzeigendes Jahr</span>
+              <select id="trainingDisplayYear" aria-label="Fortbildungsjahr anzeigen"></select>
+            </label>
+          </div>
+
+          <div class="training-summary" id="trainingSummary"></div>
+
+          <section class="training-list" id="trainingList"></section>
+        </section>
+
+        <section class="view" id="meetingsView" data-view-panel="meetings">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Teamkommunikation</p>
+              <h1>Teamsitzungen</h1>
+              <p class="page-subtitle">
+                Sitzungen planen und die Teilnahme des aktiven Teams effizient dokumentieren.
+              </p>
+            </div>
+            <div class="header-actions">
+              <button class="button button-secondary" id="openMeetingStatsButton" type="button">
+                <svg><use href="#icon-chart"></use></svg>
+                Statistische Auswertung
+              </button>
+              <button class="button button-primary" type="button" data-open-meeting>
+                <svg><use href="#icon-plus"></use></svg>
+                Teamsitzung anlegen
+              </button>
+            </div>
+          </div>
+
+          <div class="training-summary" id="meetingSummary"></div>
+          <section class="meeting-list" id="meetingList"></section>
+        </section>
+

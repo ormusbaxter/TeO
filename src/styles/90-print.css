@@ -1,0 +1,320 @@
+@page phone-list {
+  size: A4 portrait;
+  margin: 0;
+}
+
+/* Die Jahresmatrix hat 31 Tagesspalten und passt nur quer auf ein Blatt. */
+@page vacation-overview {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
+@media print {
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  html,
+  body {
+    min-width: 0;
+    background: white;
+  }
+
+  body > .icon-library,
+  body > .app-layout,
+  body > .mobile-nav,
+  body > dialog:not(#trainingMatrixDialog),
+  body > .toast-region,
+  body > noscript {
+    display: none !important;
+  }
+
+  body.print-phone-list > * {
+    display: none !important;
+  }
+
+  body.print-phone-list > #phoneListPrintSurface {
+    page: phone-list;
+    display: block !important;
+    width: 100%;
+    min-height: 297mm;
+    padding: 15mm;
+    color: #111;
+    background: white;
+  }
+
+  body.print-phone-list #phoneListPrintSurface .phone-list-document {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  #trainingMatrixDialog {
+    position: static;
+    display: block !important;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    overflow: visible;
+    color: #182230;
+    border-radius: 0;
+    background: white;
+    box-shadow: none;
+  }
+
+  #trainingMatrixDialog::backdrop {
+    display: none;
+  }
+
+  #trainingMatrixDialog .modal-header {
+    padding: 0 0 5mm;
+    border-bottom: 1px solid #cdd5dd;
+  }
+
+  #trainingMatrixDialog :is(
+      .modal-header h2,
+      .training-matrix-summary strong,
+      .training-matrix-summary span,
+      .training-matrix-legend
+    ) {
+    color: #182230;
+  }
+
+  #trainingMatrixDialog .modal-header .icon-button,
+  #trainingMatrixDialog .modal-subtitle,
+  #trainingMatrixDialog .training-matrix-toolbar .compact-field,
+  #trainingMatrixDialog .training-matrix-horizontal-scroll,
+  #trainingMatrixDialog .modal-footer .button {
+    display: none !important;
+  }
+
+  #trainingMatrixDialog .training-matrix-body {
+    max-height: none;
+    padding: 5mm 0 0;
+    overflow: visible;
+  }
+
+  #trainingMatrixDialog #trainingMatrixContent {
+    display: block;
+  }
+
+  #trainingMatrixDialog .training-matrix-toolbar {
+    display: block;
+    margin-bottom: 4mm;
+  }
+
+  #trainingMatrixDialog .training-matrix-summary {
+    align-items: flex-start;
+  }
+
+  #trainingMatrixDialog .training-matrix-scroll {
+    max-height: none;
+    overflow: visible;
+    border-color: #9ba6b2;
+    border-radius: 0;
+  }
+
+  #trainingMatrixDialog .training-matrix-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 7pt;
+  }
+
+  #trainingMatrixDialog .training-matrix-table th,
+  #trainingMatrixDialog .training-matrix-table td {
+    position: static;
+    height: auto;
+    min-width: 0;
+    max-width: none;
+    padding: 2.2mm 1.2mm;
+    color: #29384a;
+    border-color: #cdd5dd;
+    background: white;
+  }
+
+  #trainingMatrixDialog .training-matrix-table thead {
+    display: table-header-group;
+  }
+
+  #trainingMatrixDialog .training-matrix-table thead th {
+    overflow: visible;
+    font-size: 6.5pt;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    white-space: normal;
+    background: #eef1f4;
+  }
+
+  #trainingMatrixDialog .training-matrix-table th:first-child {
+    width: 38mm;
+    min-width: 38mm;
+    max-width: 38mm;
+    box-shadow: none;
+  }
+
+  #trainingMatrixDialog .training-matrix-table tbody tr {
+    break-inside: avoid;
+  }
+
+  #trainingMatrixDialog .matrix-status {
+    width: 6mm;
+    height: 6mm;
+    font-size: 11pt;
+  }
+
+  #trainingMatrixDialog .modal-footer {
+    padding: 4mm 0 0;
+    border-top: 0;
+  }
+
+  #trainingMatrixDialog .training-matrix-legend {
+    font-size: 7pt;
+  }
+
+  #trainingMatrixDialog .training-matrix-legend .matrix-status {
+    width: 5mm;
+    height: 5mm;
+    font-size: 9pt;
+  }
+
+  body.print-phone-list > #trainingMatrixDialog,
+  body.print-employee-dossier > #trainingMatrixDialog,
+  body.print-weekend-overview > #trainingMatrixDialog,
+  body.print-vacation-overview > #trainingMatrixDialog {
+    display: none !important;
+  }
+
+  body.print-employee-dossier > #employeeDossierDialog,
+  body.print-weekend-overview > #weekendOverviewDialog,
+  body.print-vacation-overview > #vacationEmployeeOverviewDialog {
+    position: static;
+    display: block !important;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    overflow: visible;
+    color: #182230;
+    border-radius: 0;
+    background: white;
+    box-shadow: none;
+  }
+
+  body.print-employee-dossier #employeeDossierDialog .modal-header,
+  body.print-weekend-overview #weekendOverviewDialog .modal-header,
+  body.print-vacation-overview #vacationEmployeeOverviewDialog .modal-header {
+    padding: 0 0 5mm;
+    border-bottom: 1px solid #cdd5dd;
+  }
+
+  body.print-employee-dossier #employeeDossierDialog .modal-body,
+  body.print-weekend-overview #weekendOverviewDialog .modal-body,
+  body.print-vacation-overview #vacationEmployeeOverviewDialog .modal-body {
+    padding: 5mm 0 0;
+    overflow: visible;
+  }
+
+  body.print-employee-dossier #employeeDossierDialog .modal-footer,
+  body.print-weekend-overview #weekendOverviewDialog .modal-footer,
+  body.print-vacation-overview #vacationEmployeeOverviewDialog .modal-footer,
+  body.print-employee-dossier #employeeDossierDialog .icon-button,
+  body.print-weekend-overview #weekendOverviewDialog .icon-button,
+  body.print-vacation-overview #vacationEmployeeOverviewDialog .icon-button {
+    display: none !important;
+  }
+
+  body.print-vacation-overview > #vacationEmployeeOverviewDialog {
+    page: vacation-overview;
+    height: auto;
+  }
+
+  body.print-vacation-overview .vacation-overview-summary > div,
+  body.print-vacation-overview .vacation-year-matrix-scroll {
+    color: #182230;
+    border-color: #cdd5dd;
+    background: white;
+    break-inside: avoid;
+  }
+
+  body.print-vacation-overview .vacation-year-matrix-scroll {
+    margin-top: 4mm;
+    overflow: visible;
+  }
+
+  /* 22 mm + 31 × 7.5 mm bleiben innerhalb der bedruckbaren Querformatbreite. */
+  body.print-vacation-overview .vacation-year-matrix th,
+  body.print-vacation-overview .vacation-year-matrix td {
+    width: 7.5mm;
+    min-width: 0;
+    height: auto;
+    padding: 1mm 0.5mm;
+    color: #182230;
+    border-color: #cdd5dd;
+    background: white;
+    font-size: 6.5pt;
+  }
+
+  body.print-vacation-overview .vacation-year-matrix .vacation-year-month-column {
+    position: static;
+    width: 22mm;
+    min-width: 22mm;
+    font-size: 6.5pt;
+    background: #eef1f4;
+    box-shadow: none;
+  }
+
+  body.print-vacation-overview .vacation-year-matrix thead th {
+    position: static;
+    background: #eef1f4;
+  }
+
+  body.print-vacation-overview .vacation-year-entry {
+    width: 5mm;
+    height: 5mm;
+    font-size: 5.5pt;
+    box-shadow: none;
+  }
+
+  body.print-vacation-overview .vacation-year-legend {
+    margin-top: 4mm;
+    color: #29384a;
+    font-size: 6.5pt;
+  }
+
+  body.print-employee-dossier :is(
+      .dossier-summary-grid > div,
+      .dossier-list,
+      .dossier-list-row
+    ),
+  body.print-weekend-overview :is(
+      .meeting-stat-card,
+      .catalog-section,
+      .weekend-employee-list button,
+      .weekend-comparison-panel,
+      .weekend-distribution-group,
+      .weekend-distribution-employee
+    ) {
+    color: #182230;
+    border-color: #cdd5dd;
+    background: white;
+    break-inside: avoid;
+  }
+
+  body.print-weekend-overview .weekend-distribution-list {
+    max-height: none;
+    overflow: visible;
+  }
+
+  body.print-weekend-overview .weekend-distribution-groups {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  body.print-weekend-overview .weekend-distribution-header .button {
+    display: none;
+  }
+}

@@ -1,0 +1,556 @@
+    <dialog
+      class="modal auth-dialog"
+      id="setupDialog"
+      aria-labelledby="setupDialogTitle"
+      data-persistent-dialog
+    >
+      <form id="setupForm">
+        <div class="modal-header auth-dialog-header">
+          <span class="brand-mark">
+            <svg><use href="#icon-logo"></use></svg>
+          </span>
+          <div>
+            <p class="eyebrow">Sichere Ersteinrichtung</p>
+            <h2 id="setupDialogTitle">Administrator anlegen</h2>
+            <p class="modal-subtitle">
+              Legen Sie das erste Administratorkonto für diesen Datenbestand fest.
+            </p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Benutzername</span>
+              <input
+                id="setupUsername"
+                name="username"
+                type="text"
+                minlength="4"
+                maxlength="40"
+                pattern="[A-Za-z0-9]+"
+                autocomplete="username"
+                autocapitalize="none"
+                required
+              />
+            </label>
+            <label class="form-field">
+              <span>Passwort</span>
+              <input
+                id="setupPassword"
+                name="password"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+              <small class="field-hint">
+                Mindestens 8 Zeichen mit Groß- und Kleinbuchstaben sowie einer Zahl.
+              </small>
+            </label>
+            <label class="form-field">
+              <span>Passwort wiederholen</span>
+              <input
+                id="setupPasswordConfirmation"
+                name="passwordConfirmation"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+            </label>
+          </div>
+          <p class="form-error auth-error" id="setupError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-primary" type="submit">TeO einrichten</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
+      id="loginDialog"
+      aria-labelledby="loginDialogTitle"
+      data-persistent-dialog
+    >
+      <form id="loginForm">
+        <div class="modal-header auth-dialog-header">
+          <span class="brand-mark">
+            <svg><use href="#icon-logo"></use></svg>
+          </span>
+          <div>
+            <p class="eyebrow">TeO – Team &amp; Employee Organizer</p>
+            <h2 id="loginDialogTitle">Anmelden</h2>
+            <p class="modal-subtitle">Bitte mit Ihrem persönlichen Benutzerkonto anmelden.</p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Benutzername</span>
+              <input
+                id="loginUsername"
+                name="username"
+                type="text"
+                autocomplete="username"
+                autocapitalize="none"
+                required
+              />
+            </label>
+            <label class="form-field">
+              <span>Passwort</span>
+              <input
+                id="loginPassword"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+            </label>
+          </div>
+          <p class="form-error auth-error" id="loginError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-primary" type="submit">Anmelden</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
+      id="changePasswordDialog"
+      aria-labelledby="changePasswordDialogTitle"
+      data-persistent-dialog
+    >
+      <form id="changePasswordForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Sicherheitsanforderung</p>
+            <h2 id="changePasswordDialogTitle">Neues Passwort festlegen</h2>
+            <p class="modal-subtitle">
+              Das bisherige Passwort muss vor der weiteren Nutzung ersetzt werden.
+            </p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Neues Passwort</span>
+              <input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+              <small class="field-hint">
+                Mindestens 8 Zeichen mit Groß- und Kleinbuchstaben sowie einer Zahl.
+              </small>
+            </label>
+            <label class="form-field">
+              <span>Passwort wiederholen</span>
+              <input
+                id="confirmNewPassword"
+                name="confirmNewPassword"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                required
+              />
+            </label>
+          </div>
+          <p class="form-error auth-error" id="changePasswordError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-logout>Abmelden</button>
+          <button class="button button-primary" type="submit">Passwort speichern</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="accountDialog" aria-labelledby="accountDialogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Benutzerkonto</p>
+          <h2 id="accountDialogTitle">Angemeldet</h2>
+          <p class="modal-subtitle" id="accountDialogRole"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button
+          class="button button-secondary"
+          type="button"
+          data-open-user-management
+          data-admin-only
+        >
+          Benutzer verwalten
+        </button>
+        <button class="button button-danger" type="button" data-logout>Abmelden</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="catalogManagementDialog"
+      aria-labelledby="catalogManagementDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Stammdaten-Kataloge</p>
+          <h2 id="catalogManagementDialogTitle">Berufe &amp; Zusatzqualifikationen</h2>
+          <p class="modal-subtitle">
+            Einträge ergänzen, umbenennen oder unbenutzte Einträge löschen.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="catalog-management-grid">
+          <section class="catalog-section" aria-labelledby="professionCatalogTitle">
+            <div>
+              <p class="eyebrow">Berufskatalog</p>
+              <h3 id="professionCatalogTitle">Berufe</h3>
+            </div>
+            <div class="catalog-add-row">
+              <input
+                id="newProfession"
+                type="text"
+                maxlength="100"
+                placeholder="Neuen Beruf eingeben"
+                aria-label="Neuen Beruf eingeben"
+              />
+              <button class="button button-primary" id="addProfessionButton" type="button">
+                Hinzufügen
+              </button>
+            </div>
+            <div class="catalog-list" id="professionCatalogList"></div>
+          </section>
+
+          <section class="catalog-section" aria-labelledby="qualificationCatalogTitle">
+            <div>
+              <p class="eyebrow">Qualifikationskatalog</p>
+              <h3 id="qualificationCatalogTitle">Zusatzqualifikationen</h3>
+            </div>
+            <div class="catalog-add-row">
+              <input
+                id="newQualification"
+                type="text"
+                maxlength="100"
+                placeholder="Neue Qualifikation eingeben"
+                aria-label="Neue Zusatzqualifikation eingeben"
+              />
+              <button class="button button-primary" id="addQualificationButton" type="button">
+                Hinzufügen
+              </button>
+            </div>
+            <div class="catalog-list" id="qualificationCatalogList"></div>
+          </section>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large dossier-dialog"
+      id="employeeDossierDialog"
+      aria-labelledby="employeeDossierTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Mitarbeiterakte</p>
+          <h2 id="employeeDossierTitle">Mitarbeiterübersicht</h2>
+          <p class="modal-subtitle" id="employeeDossierSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="employeeDossierContent"></div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="printEmployeeDossierButton" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Akte drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large vacation-overview-dialog"
+      id="vacationEmployeeOverviewDialog"
+      aria-labelledby="vacationEmployeeOverviewTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Jahresabwesenheiten</p>
+          <h2 id="vacationEmployeeOverviewTitle">Geplante Abwesenheiten</h2>
+          <p class="modal-subtitle" id="vacationEmployeeOverviewSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="vacationEmployeeOverviewContent"></div>
+      <div class="modal-footer">
+        <button
+          class="button button-secondary"
+          id="printVacationEmployeeOverviewButton"
+          type="button"
+        >
+          <svg><use href="#icon-print"></use></svg>
+          Jahr drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="vacationConflictDialog"
+      aria-labelledby="vacationConflictTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Urlaubsplanung</p>
+          <h2 id="vacationConflictTitle">Überschneidungen bei Überplanung</h2>
+          <p class="modal-subtitle" id="vacationConflictSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="vacationConflictContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="weekendOverviewDialog"
+      aria-labelledby="weekendOverviewTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Personalverteilung</p>
+          <h2 id="weekendOverviewTitle">Feste Dienstwochenenden</h2>
+          <p class="modal-subtitle">
+            Stellenanteile, Einarbeitung, Fachweiterbildung I/A und Praxisanleitung
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="weekendOverviewContent"></div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="printWeekendOverviewButton" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Liste drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large weekend-simulation-dialog"
+      id="weekendSimulationDialog"
+      aria-labelledby="weekendSimulationTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Unverbindliche Planung</p>
+          <h2 id="weekendSimulationTitle">Ausgeglichene Wochenendverteilung</h2>
+          <p class="modal-subtitle">
+            Eine Übernahme erfolgt erst nach einer zusätzlichen Bestätigung.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="weekendSimulationContent"></div>
+      <div class="modal-footer">
+        <button
+          class="button button-primary"
+          id="applyWeekendSimulationButton"
+          type="button"
+        >
+          <svg><use href="#icon-check"></use></svg>
+          Simulation übernehmen
+        </button>
+        <button class="button button-secondary" id="rerunWeekendSimulationButton" type="button">
+          <svg><use href="#icon-chart"></use></svg>
+          Neu berechnen
+        </button>
+        <button class="button button-ghost" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal modal-large" id="bulkEditDialog" aria-labelledby="bulkEditTitle">
+      <form id="bulkEditForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Sammelbearbeitung</p>
+            <h2 id="bulkEditTitle">Ausgewählte Mitarbeiter bearbeiten</h2>
+            <p class="modal-subtitle" id="bulkEditSubtitle"></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="field-hint">Leere Felder bleiben unverändert.</p>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Mitarbeiterstatus</span>
+              <select id="bulkActive">
+                <option value="">Nicht ändern</option>
+                <option value="active">Aktiv</option>
+                <option value="onboarding">In Einarbeitung</option>
+                <option value="inactive">Inaktiv</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Beruf</span>
+              <select id="bulkProfession"></select>
+            </label>
+            <label class="form-field">
+              <span>Dienstwochenende</span>
+              <select id="bulkServiceWeekend">
+                <option value="">Nicht ändern</option>
+                <option value="none">Kein festes Dienstwochenende</option>
+                <option value="weekend_a">Wochenende A</option>
+                <option value="weekend_b">Wochenende B</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Zusatzqualifikation</span>
+              <select id="bulkQualification"></select>
+            </label>
+            <label class="form-field">
+              <span>Qualifikation setzen</span>
+              <select id="bulkQualificationState">
+                <option value="">Nicht ändern</option>
+                <option value="add">Zuweisen</option>
+                <option value="remove">Entfernen</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">Änderungen anwenden</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal modal-large" id="dataQualityDialog" aria-labelledby="dataQualityTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Plausibilitätsprüfung</p>
+          <h2 id="dataQualityTitle">Datenqualität</h2>
+          <p class="modal-subtitle">Mögliche Dubletten und unvollständige Kontaktdaten</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="dataQualityContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal modal-large" id="auditLogDialog" aria-labelledby="auditLogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Nachvollziehbarkeit</p>
+          <h2 id="auditLogTitle">Änderungsprotokoll</h2>
+          <p class="modal-subtitle">Lokales Arbeitsprotokoll der letzten 1.000 Änderungen</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="auditLogContent"></div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="exportAuditLogCsvButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          CSV exportieren
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="userManagementDialog"
+      aria-labelledby="userManagementDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Administration</p>
+          <h2 id="userManagementDialogTitle">Benutzer verwalten</h2>
+          <p class="modal-subtitle">
+            Konten anlegen und löschen, Benutzernamen bearbeiten und Passwörter
+            zurücksetzen.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="user-management-create" id="createUserForm">
+          <label class="user-management-create-field">
+            <span>Neuer Benutzername</span>
+            <input
+              id="newUserUsername"
+              type="text"
+              maxlength="40"
+              pattern="[A-Za-z0-9]{4,40}"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="4 bis 40 Buchstaben oder Ziffern"
+              required
+            />
+          </label>
+          <label class="user-management-create-field">
+            <span>Rolle</span>
+            <select id="newUserRole">
+              <option value="user">Normaler Benutzer</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </label>
+          <button class="button button-primary" id="createUserButton" type="submit">
+            <svg><use href="#icon-plus"></use></svg>
+            Benutzer anlegen
+          </button>
+        </form>
+        <div class="user-management-list" id="userManagementList"></div>
+        <section class="temporary-password" id="temporaryPasswordResult" hidden>
+          <p class="eyebrow">Temporäres Passwort – nur einmal sichtbar</p>
+          <strong id="temporaryPasswordUsername"></strong>
+          <div>
+            <input id="temporaryPasswordValue" type="text" readonly />
+            <button class="button button-secondary" id="copyTemporaryPassword" type="button">
+              <svg><use href="#icon-copy"></use></svg>
+              Kopieren
+            </button>
+          </div>
+          <p>Beim nächsten Login muss der Benutzer ein neues Passwort festlegen.</p>
+        </section>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>

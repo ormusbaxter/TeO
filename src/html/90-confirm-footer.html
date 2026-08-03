@@ -1,0 +1,128 @@
+    <dialog
+      class="modal backup-password-dialog"
+      id="backupPasswordDialog"
+      aria-labelledby="backupPasswordDialogTitle"
+      aria-describedby="backupPasswordDialogDescription"
+    >
+      <form id="backupPasswordForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Geschützte Datensicherung</p>
+            <h2 id="backupPasswordDialogTitle">Sicherung verschlüsseln</h2>
+            <p class="modal-subtitle" id="backupPasswordDialogDescription"></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="backup-password-notice">
+            <svg><use href="#icon-lock"></use></svg>
+            <p id="backupPasswordNotice"></p>
+          </div>
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Passwort</span>
+              <input
+                id="backupPassword"
+                name="backupPassword"
+                type="password"
+                minlength="1"
+                autocomplete="current-password"
+                required
+              />
+            </label>
+            <label class="form-field" id="backupPasswordConfirmationField">
+              <span>Passwort wiederholen</span>
+              <input
+                id="backupPasswordConfirmation"
+                name="backupPasswordConfirmation"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+              />
+            </label>
+            <label class="checkbox-field backup-password-visibility">
+              <input id="showBackupPassword" type="checkbox" />
+              <span>Passwort anzeigen</span>
+            </label>
+          </div>
+          <p class="form-error auth-error" id="backupPasswordError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" id="backupPasswordSubmit" type="submit">
+            Verschlüsselt exportieren
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal phone-list-preview-dialog"
+      id="phoneListPreviewDialog"
+      aria-labelledby="phoneListPreviewTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Druckvorschau</p>
+          <h2 id="phoneListPreviewTitle">Telefonliste</h2>
+          <p class="modal-subtitle" id="phoneListPreviewSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body phone-list-preview-body">
+        <div class="phone-list-preview-canvas" id="phoneListPreviewContent"></div>
+      </div>
+      <div class="modal-footer">
+        <span class="phone-list-preview-hint">
+          DIN A4 Hochformat · für Schwarzweiß-Laserdruck optimiert
+        </span>
+        <button class="button button-ghost" type="button" data-close-dialog>Schließen</button>
+        <button class="button button-primary" id="printEmployeePhoneListButton" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Drucken / PDF
+        </button>
+      </div>
+    </dialog>
+
+    <section
+      class="phone-list-print-surface"
+      id="phoneListPrintSurface"
+      aria-hidden="true"
+    ></section>
+
+    <dialog
+      class="modal modal-confirm"
+      id="confirmDialog"
+      aria-labelledby="confirmTitle"
+      aria-describedby="confirmMessage"
+    >
+      <div class="confirm-icon">
+        <svg><use href="#icon-alert"></use></svg>
+      </div>
+      <h2 id="confirmTitle">Eintrag löschen?</h2>
+      <p id="confirmMessage"></p>
+      <div class="modal-footer">
+        <button class="button button-ghost" id="confirmCancel" type="button">Abbrechen</button>
+        <button class="button button-danger" id="confirmAccept" type="button">Löschen</button>
+      </div>
+    </dialog>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+    <noscript>
+      <div class="noscript-message">
+        Für diese Anwendung muss JavaScript im Browser aktiviert sein.
+      </div>
+    </noscript>
+
+    <script src="project-meta.js"></script>
+    <script src="state-schema.js"></script>
+    <script src="vendor/localforage.min.js"></script>
+    <script src="backend-client.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

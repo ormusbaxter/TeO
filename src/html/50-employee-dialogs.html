@@ -1,0 +1,137 @@
+    <dialog
+      class="modal modal-large"
+      id="employeeDialog"
+      aria-labelledby="employeeDialogTitle"
+    >
+      <form id="employeeForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Personalakte</p>
+            <h2 id="employeeDialogTitle">Mitarbeiter anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <input id="employeeId" type="hidden" />
+
+          <fieldset>
+            <legend>Persönliche Daten</legend>
+            <div class="form-grid">
+              <label class="form-field">
+                <span>Vorname <em>*</em></span>
+                <input id="firstName" name="firstName" type="text" maxlength="80" required />
+              </label>
+              <label class="form-field">
+                <span>Nachname <em>*</em></span>
+                <input id="lastName" name="lastName" type="text" maxlength="80" required />
+              </label>
+              <label class="form-field">
+                <span>Geburtsdatum</span>
+                <input id="birthDate" name="birthDate" type="date" />
+              </label>
+              <label class="form-field">
+                <span>Handynummer</span>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  maxlength="40"
+                  autocomplete="tel"
+                  placeholder="+49 …"
+                />
+              </label>
+              <label class="form-field">
+                <span>Benutzername</span>
+                <input
+                  id="employeeUsername"
+                  name="employeeUsername"
+                  type="text"
+                  maxlength="40"
+                  pattern="[A-Za-z0-9]{4,40}"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="z. B. Muste001"
+                />
+              </label>
+              <label class="form-field">
+                <span>E-Mail-Adresse</span>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  maxlength="160"
+                  autocomplete="email"
+                  placeholder="name@klinik.de"
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Beschäftigung</legend>
+            <div class="form-grid">
+              <label class="form-field">
+                <span>Beruf <em>*</em></span>
+                <select id="profession" name="profession" required>
+                  <option value="">Beruf auswählen</option>
+                </select>
+              </label>
+              <label class="form-field">
+                <span>Stellenumfang <em>*</em></span>
+                <span class="input-suffix">
+                  <input
+                    id="employmentPercent"
+                    name="employmentPercent"
+                    type="number"
+                    min="1"
+                    max="100"
+                    step="1"
+                    value="100"
+                    required
+                  />
+                  <span>%</span>
+                </span>
+              </label>
+              <label class="form-field form-field-wide">
+                <span>Festes Dienstwochenende</span>
+                <select id="serviceWeekend" name="serviceWeekend">
+                  <option value="none">Kein festes Dienstwochenende</option>
+                  <option value="weekend_a">Wochenende A</option>
+                  <option value="weekend_b">Wochenende B</option>
+                </select>
+                <small id="serviceWeekendOwnerHint" class="field-hint" hidden></small>
+              </label>
+            </div>
+            <label class="form-field employee-status-field">
+              <span>Mitarbeiterstatus</span>
+              <select id="employeeStatus" name="employmentStatus">
+                <option value="active">Aktiv</option>
+                <option value="onboarding">In Einarbeitung</option>
+                <option value="inactive">Inaktiv</option>
+              </select>
+              <small>
+                Aktive Mitarbeiter und Mitarbeiter in Einarbeitung stehen für
+                Fortbildungen und Teamsitzungen zur Verfügung.
+              </small>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Zusatzqualifikationen</legend>
+            <p class="field-hint">Alle zutreffenden Qualifikationen auswählen.</p>
+            <div class="qualification-grid" id="qualificationFields"></div>
+          </fieldset>
+        </div>
+
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="employeeSubmitLabel">Mitarbeiter speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>

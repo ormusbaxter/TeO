@@ -1,0 +1,409 @@
+    <dialog class="modal" id="trainingDialog" aria-labelledby="trainingDialogTitle">
+      <form id="trainingForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Fortbildungskatalog</p>
+            <h2 id="trainingDialogTitle">Pflichtfortbildung anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="trainingId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field form-field-wide">
+              <span>Bezeichnung <em>*</em></span>
+              <input
+                id="trainingTitle"
+                name="title"
+                type="text"
+                maxlength="120"
+                required
+                placeholder="z. B. Brandschutzunterweisung"
+              />
+            </label>
+            <label class="form-field">
+              <span>Im Katalog seit <em>*</em></span>
+              <input
+                id="trainingYear"
+                name="year"
+                type="number"
+                min="2000"
+                max="2100"
+                step="1"
+                required
+              />
+              <small class="field-hint">
+                Ab diesem Jahr gehört die Fortbildung zum Pflichtkatalog.
+              </small>
+            </label>
+            <label class="form-field">
+              <span>Wiederholung</span>
+              <select id="trainingRecurrence" name="recurrenceMonths">
+                <option value="">Einmalig / ohne Ablauf</option>
+                <option value="6">Alle 6 Monate</option>
+                <option value="12">Jährlich</option>
+                <option value="24">Alle 2 Jahre</option>
+                <option value="36">Alle 3 Jahre</option>
+                <option value="60">Alle 5 Jahre</option>
+              </select>
+              <small class="field-hint">
+                Standard: jährlich; Gewaltprävention wird mit fünf Jahren vorbelegt.
+              </small>
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Beschreibung</span>
+              <textarea
+                id="trainingDescription"
+                name="description"
+                rows="4"
+                maxlength="500"
+                placeholder="Optionale Hinweise oder Inhalte der Fortbildung"
+              ></textarea>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="trainingSubmitLabel">Fortbildung speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal modal-large"
+      id="completionDialog"
+      aria-labelledby="completionDialogTitle"
+    >
+      <form id="completionForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Teilnahmenachweis</p>
+            <h2 id="completionDialogTitle">Abschluss eintragen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Pflichtfortbildung <em>*</em></span>
+              <select id="completionTraining" name="trainingId" required></select>
+            </label>
+            <label class="form-field">
+              <span>Abschlussdatum <em>*</em></span>
+              <input id="completionDate" name="completedOn" type="date" required />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Bemerkung</span>
+              <input
+                id="completionNote"
+                name="note"
+                type="text"
+                maxlength="200"
+                placeholder="Optional, z. B. Schulungsanbieter"
+              />
+            </label>
+          </div>
+
+          <div
+            class="selection-group"
+            role="group"
+            aria-labelledby="completionEmployeesLabel"
+            aria-describedby="completionEmployeeHelp completionEmployeeError"
+            aria-required="true"
+          >
+            <div class="selection-heading">
+              <div>
+                <strong id="completionEmployeesLabel">Aktive Mitarbeiter auswählen <em>*</em></strong>
+                <p id="completionEmployeeHelp">
+                  Ein Nachweis kann für mehrere Personen gleichzeitig erfasst werden.
+                </p>
+              </div>
+              <button class="text-button" id="toggleAllEmployees" type="button">
+                Alle auswählen
+              </button>
+            </div>
+            <label class="search-field search-field-modal" for="completionEmployeeSearch">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="completionEmployeeSearch"
+                type="search"
+                aria-label="Aktive Mitarbeiter durchsuchen"
+                placeholder="Mitarbeiter suchen …"
+                autocomplete="off"
+              />
+            </label>
+            <div class="employee-selection" id="completionEmployeeList"></div>
+            <p class="form-error" id="completionEmployeeError" role="alert"></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <span class="selection-count" id="completionSelectionCount">0 ausgewählt</span>
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            Abschluss speichern
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal training-matrix-dialog"
+      id="trainingMatrixDialog"
+      aria-labelledby="trainingMatrixDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Jahresauswertung</p>
+          <h2 id="trainingMatrixDialogTitle">Status der Pflichtfortbildungen</h2>
+          <p class="modal-subtitle">Alle aktiven Mitarbeiter und Fortbildungen im Überblick</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body training-matrix-body">
+        <div class="training-matrix-toolbar">
+          <label class="compact-field">
+            <span>Fortbildungsjahr</span>
+            <select id="trainingMatrixYear"></select>
+          </label>
+          <div class="training-matrix-summary" id="trainingMatrixSummary"></div>
+        </div>
+        <div id="trainingMatrixContent"></div>
+      </div>
+      <div class="modal-footer">
+        <span class="training-matrix-legend">
+          <span class="matrix-status matrix-complete" aria-hidden="true">✓</span> absolviert
+          <span class="matrix-status matrix-open" aria-hidden="true">×</span> offen
+        </span>
+        <button class="button button-secondary" id="exportTrainingMatrixCsvButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          CSV für Excel
+        </button>
+        <button class="button button-secondary" id="printTrainingMatrixButton" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Auswertung drucken
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="appointmentDialog" aria-labelledby="appointmentDialogTitle">
+      <form id="appointmentForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Terminkalender</p>
+            <h2 id="appointmentDialogTitle">Termin anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="appointmentId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field form-field-wide">
+              <span>Titel / Name <em>*</em></span>
+              <input
+                id="appointmentTitle"
+                name="title"
+                type="text"
+                maxlength="120"
+                required
+              />
+            </label>
+            <label class="form-field">
+              <span>Datum <em>*</em></span>
+              <input id="appointmentDate" name="date" type="date" required />
+            </label>
+            <label class="form-field">
+              <span>Kategorie</span>
+              <select id="appointmentCategory" name="category">
+                <option value="">Ohne Kategorie</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Ort</span>
+              <input id="appointmentLocation" name="location" type="text" maxlength="160" />
+            </label>
+            <label class="form-field">
+              <span>Uhrzeit von</span>
+              <input id="appointmentStartTime" name="startTime" type="time" step="60" />
+            </label>
+            <label class="form-field">
+              <span>Uhrzeit bis</span>
+              <input id="appointmentEndTime" name="endTime" type="time" step="60" />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Beschreibung</span>
+              <textarea
+                id="appointmentDescription"
+                name="description"
+                rows="5"
+                maxlength="1000"
+                placeholder="Optionale Hinweise zum Termin"
+              ></textarea>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="appointmentSubmitLabel">Termin speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="meetingDialog" aria-labelledby="meetingDialogTitle">
+      <form id="meetingForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Teamkommunikation</p>
+            <h2 id="meetingDialogTitle">Teamsitzung anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="meetingId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field form-field-wide">
+              <span>Bezeichnung <em>*</em></span>
+              <input
+                id="meetingTitle"
+                name="title"
+                type="text"
+                maxlength="120"
+                value="Teamsitzung"
+                required
+              />
+            </label>
+            <label class="form-field">
+              <span>Datum <em>*</em></span>
+              <input id="meetingDate" name="date" type="date" required />
+            </label>
+            <label class="form-field">
+              <span>Uhrzeit</span>
+              <input id="meetingTime" name="time" type="time" step="60" />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Bemerkung</span>
+              <textarea
+                id="meetingNotes"
+                name="notes"
+                rows="4"
+                maxlength="500"
+                placeholder="Optionale Hinweise oder Themen der Sitzung"
+              ></textarea>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="meetingSubmitLabel">Teamsitzung speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal modal-attendance"
+      id="attendanceDialog"
+      aria-labelledby="attendanceDialogTitle"
+    >
+      <form id="attendanceForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Sammelerfassung</p>
+            <h2 id="attendanceDialogTitle">Teilnahmen dokumentieren</h2>
+            <p class="modal-subtitle" id="attendanceMeetingMeta"></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body attendance-modal-body">
+          <input id="attendanceMeetingId" type="hidden" />
+
+          <div class="efficiency-hint">
+            <span class="efficiency-hint-icon">
+              <svg><use href="#icon-check"></use></svg>
+            </span>
+            <p>
+              <strong>Schneller erfassen:</strong> Zuerst alle sichtbaren Mitarbeiter gesammelt
+              auf „Teilgenommen“ setzen, danach nur Urlaub, Dienst oder andere Ausnahmen ändern.
+            </p>
+          </div>
+
+          <div class="attendance-tools">
+            <label class="search-field" for="attendanceSearch">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="attendanceSearch"
+                type="search"
+                aria-label="Mitarbeiter in der Teilnahmeliste suchen"
+                placeholder="Mitarbeiter suchen …"
+                autocomplete="off"
+              />
+            </label>
+            <label class="compact-field">
+              <span>Anzeige</span>
+              <select id="attendanceFilter">
+                <option value="all">Alle Mitarbeiter</option>
+                <option value="open">Nur noch offen</option>
+                <option value="documented">Nur dokumentiert</option>
+                <option value="absent">Nur nicht teilgenommen</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="bulk-attendance-bar">
+            <div>
+              <strong>Sammelstatus für sichtbare Mitarbeiter</strong>
+              <small>Die Auswahl kann anschließend pro Person angepasst werden.</small>
+            </div>
+            <select id="attendanceBulkStatus" aria-label="Status für sichtbare Mitarbeiter">
+              <option value="teilgenommen">Teilgenommen</option>
+              <option value="urlaub">Urlaub</option>
+              <option value="dienst">Dienst</option>
+              <option value="krankheit">Krankheit</option>
+              <option value="schule">Schule</option>
+              <option value="entschuldigt">Entschuldigt</option>
+              <option value="unentschuldigt">Unentschuldigt</option>
+              <option value="">Status entfernen</option>
+            </select>
+            <button class="button button-secondary" id="applyBulkAttendance" type="button">
+              Auf sichtbare anwenden
+            </button>
+          </div>
+
+          <div class="attendance-list-heading" aria-hidden="true">
+            <span>Mitarbeiter</span>
+            <span>Teilnahmestatus</span>
+          </div>
+          <div class="attendance-list" id="attendanceList"></div>
+        </div>
+        <div class="modal-footer">
+          <span class="selection-count" id="attendanceProgress">0 von 0 dokumentiert</span>
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            Erfassung speichern
+          </button>
+        </div>
+      </form>
+    </dialog>
+

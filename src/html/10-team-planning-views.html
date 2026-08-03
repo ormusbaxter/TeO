@@ -1,0 +1,292 @@
+        <section class="view" id="employeesView" data-view-panel="employees">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Teamverwaltung</p>
+              <h1>Mitarbeiter</h1>
+              <p class="page-subtitle">Stammdaten, Status und Zusatzqualifikationen verwalten.</p>
+            </div>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="openCatalogManagementButton"
+                type="button"
+              >
+                <svg><use href="#icon-edit"></use></svg>
+                Berufe &amp; Qualifikationen
+              </button>
+              <button
+                class="button button-secondary"
+                id="openWeekendOverviewButton"
+                type="button"
+              >
+                <svg><use href="#icon-calendar"></use></svg>
+                Dienstwochenenden
+              </button>
+              <button
+                class="button button-secondary"
+                id="openDataQualityButton"
+                type="button"
+              >
+                <svg><use href="#icon-alert"></use></svg>
+                Datenqualität
+              </button>
+              <button
+                class="button button-secondary"
+                id="copyActiveEmailsButton"
+                type="button"
+              >
+                <svg><use href="#icon-copy"></use></svg>
+                <span id="copyActiveEmailsLabel">E-Mails kopieren</span>
+              </button>
+              <button
+                class="button button-secondary"
+                id="copyUsernamesButton"
+                type="button"
+              >
+                <svg><use href="#icon-copy"></use></svg>
+                <span id="copyUsernamesLabel">Benutzernamen kopieren</span>
+              </button>
+              <button
+                class="button button-secondary"
+                id="exportEmployeePhoneListButton"
+                type="button"
+              >
+                <svg><use href="#icon-print"></use></svg>
+                <span id="exportEmployeePhoneListLabel">Telefonliste drucken</span>
+              </button>
+              <button class="button button-primary" type="button" data-open-employee>
+                <svg><use href="#icon-plus"></use></svg>
+                Mitarbeiter anlegen
+              </button>
+            </div>
+          </div>
+
+          <section class="panel table-panel">
+            <div class="toolbar">
+              <label class="search-field" for="employeeSearch">
+                <svg><use href="#icon-search"></use></svg>
+                <input
+                  id="employeeSearch"
+                  type="search"
+                  aria-label="Mitarbeiter durchsuchen"
+                  placeholder="Name, Benutzername, Beruf oder Qualifikation suchen …"
+                  autocomplete="off"
+                />
+              </label>
+              <div
+                class="segmented-control"
+                role="group"
+                aria-label="Mitarbeiter nach Status filtern"
+              >
+                <button
+                  class="is-active"
+                  type="button"
+                  data-status-filter="all"
+                  aria-pressed="true"
+                >
+                  Alle
+                </button>
+                <button type="button" data-status-filter="active" aria-pressed="false">
+                  Aktiv
+                </button>
+                <button type="button" data-status-filter="onboarding" aria-pressed="false">
+                  In Einarbeitung
+                </button>
+                <button type="button" data-status-filter="inactive" aria-pressed="false">
+                  Inaktiv
+                </button>
+              </div>
+            </div>
+            <div class="employee-filter-bar">
+              <label class="compact-field">
+                <span>Beruf</span>
+                <select id="employeeProfessionFilter"></select>
+              </label>
+              <label class="compact-field">
+                <span>Qualifikation</span>
+                <select id="employeeQualificationFilter"></select>
+              </label>
+              <label class="compact-field">
+                <span>Dienstwochenende</span>
+                <select id="employeeWeekendFilter">
+                  <option value="all">Alle</option>
+                  <option value="none">Kein festes</option>
+                  <option value="weekend_a">Wochenende A</option>
+                  <option value="weekend_b">Wochenende B</option>
+                </select>
+              </label>
+              <button class="button button-ghost" id="resetEmployeeFilters" type="button">
+                Filter zurücksetzen
+              </button>
+            </div>
+            <div class="employee-bulk-bar" id="employeeBulkBar" hidden>
+              <strong id="employeeBulkCount">0 ausgewählt</strong>
+              <button class="button button-secondary" id="openBulkEditButton" type="button">
+                Auswahl bearbeiten
+              </button>
+              <button class="button button-ghost" id="clearEmployeeSelection" type="button">
+                Auswahl aufheben
+              </button>
+            </div>
+            <div id="employeeTable"></div>
+          </section>
+        </section>
+
+        <section class="view" id="weekendsView" data-view-panel="weekends">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Personalverteilung</p>
+              <h1>Wochenendverteilung</h1>
+              <p class="page-subtitle">
+                Stellenanteile, Einarbeitung und Schlüsselqualifikationen der festen
+                Dienstwochenenden vergleichen.
+              </p>
+            </div>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="openWeekendSimulationButton"
+                type="button"
+              >
+                <svg><use href="#icon-chart"></use></svg>
+                Verteilung simulieren
+              </button>
+              <button class="button button-secondary" id="openWeekendPrintButton" type="button">
+                <svg><use href="#icon-print"></use></svg>
+                Druckansicht
+              </button>
+            </div>
+          </div>
+          <div id="weekendDistributionContent"></div>
+        </section>
+
+        <section class="view" id="vacationsView" data-view-panel="vacations">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Jahresplanung</p>
+              <h1>Urlaubs- und Abwesenheitsplanung</h1>
+              <p class="page-subtitle">
+                Urlaub, weitere Abwesenheiten und verpflichtende Dienstzusagen
+                monatsweise für das gesamte Team eintragen.
+              </p>
+            </div>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="openVacationConflictsButton"
+                type="button"
+              >
+                <svg><use href="#icon-alert"></use></svg>
+                Überschneidungen prüfen
+              </button>
+            </div>
+          </div>
+
+          <section class="panel vacation-controls-panel">
+            <div class="vacation-controls">
+              <label class="compact-field vacation-search-field">
+                <span>Mitarbeiter</span>
+                <input
+                  id="vacationEmployeeSearch"
+                  type="search"
+                  placeholder="Name suchen …"
+                  autocomplete="off"
+                />
+              </label>
+              <label class="compact-field">
+                <span>Planungsjahr</span>
+                <select id="vacationYear"></select>
+              </label>
+              <label class="compact-field">
+                <span>Monat</span>
+                <select id="vacationMonth">
+                  <option value="1">Januar</option>
+                  <option value="2">Februar</option>
+                  <option value="3">März</option>
+                  <option value="4">April</option>
+                  <option value="5">Mai</option>
+                  <option value="6">Juni</option>
+                  <option value="7">Juli</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Dezember</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Eintragsart</span>
+                <select id="vacationEntryType">
+                  <option value="vacation">Urlaub</option>
+                  <option value="onboardingVacation">Urlaub Einarbeitung</option>
+                  <option value="school">Schule / Weiterbildung / Uni</option>
+                  <option value="unpaid">Unbezahlter Urlaub</option>
+                  <option value="external">Externer Einsatz</option>
+                  <option value="plannedOff">Frei geplant</option>
+                  <option value="mandatoryDuty">Verpflichtende Dienstzusage</option>
+                </select>
+              </label>
+              <label class="compact-field">
+                <span>Vollzeit-Grundurlaub</span>
+                <span class="input-suffix compact-input-suffix">
+                  <input
+                    id="vacationBaseDays"
+                    type="number"
+                    min="1"
+                    max="60"
+                    step="0.5"
+                  />
+                  <span>Tage</span>
+                </span>
+              </label>
+              <label class="compact-field">
+                <span>Max. abwesend werktags</span>
+                <input
+                  id="vacationWeekdayAbsenceLimit"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="1"
+                />
+              </label>
+              <label class="compact-field">
+                <span>Max. Wochenende / Feiertag</span>
+                <input
+                  id="vacationWeekendAbsenceLimit"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="1"
+                />
+              </label>
+              <label class="compact-field">
+                <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
+                <input id="vacationWeekendAReferenceSaturday" type="date" />
+              </label>
+              <button
+                class="button button-secondary"
+                id="saveVacationSettingsButton"
+                type="button"
+              >
+                Einstellungen speichern
+              </button>
+            </div>
+            <div class="vacation-legend" aria-label="Legende">
+              <span><i class="legend-vacation"></i> Urlaub</span>
+              <span><i class="legend-planner-onboarding-vacation"></i> Urlaub Einarbeitung</span>
+              <span><i class="legend-planner-school"></i> Schule / Weiterbildung / Uni</span>
+              <span><i class="legend-planner-unpaid"></i> Unbezahlter Urlaub</span>
+              <span><i class="legend-planner-external"></i> Externer Einsatz</span>
+              <span><i class="legend-planner-planned-off"></i> Frei geplant</span>
+              <span><i class="legend-planner-duty"></i> Dienstzusage</span>
+              <span><i class="legend-weekend-weekend_a"></i> <span id="vacationWeekendALegend">Wochenende A</span></span>
+              <span><i class="legend-weekend-weekend_b"></i> <span id="vacationWeekendBLegend">Wochenende B</span></span>
+              <span><i class="legend-holiday"></i> Feiertag NRW</span>
+              <span><i class="legend-school-vacation"></i> Schulferien NRW</span>
+              <span><i class="legend-birthday"></i> Geburtstag</span>
+            </div>
+          </section>
+
+          <div class="training-summary vacation-summary" id="vacationSummary"></div>
+          <section class="panel vacation-planner-panel" id="vacationPlanner"></section>
+        </section>
