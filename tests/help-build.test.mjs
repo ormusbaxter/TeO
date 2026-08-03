@@ -23,5 +23,10 @@ assert.match(indexHtml, /Datensicherung und Wiederherstellung/);
 assert.match(indexHtml, /Häufige Fragen und Problemlösung/);
 assert.match(indexHtml, /Datenschutz und IT-Sicherheit/);
 assert.match(indexHtml, /<strong>Telefonliste drucken<\/strong>/);
+assert.match(indexHtml, /id="hilfe-anderungshistorie">Änderungshistorie/);
+assert.match(
+  indexHtml,
+  /<section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">[\s\S]*?<li>/,
+);
 assert.doesNotMatch(indexHtml, /README_HELP_CONTENT/);
 });

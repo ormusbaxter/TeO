@@ -985,6 +985,14 @@ Mindestens erforderlich sind:
 Unverschlüsselte JSON-Sicherungen enthalten den vollständigen Datenbestand und
 müssen entsprechend geschützt gespeichert und übertragen werden.
 
+## Änderungshistorie
+
+TeO pflegt keine separate Versionsdatei. Die Änderungshistorie wird beim Build
+direkt aus der Git-Commit-Historie erzeugt und unten chronologisch aufgelistet,
+neueste Änderung zuerst.
+
+<!-- CHANGELOG_ENTRIES -->
+
 ## Entwicklung und Projektstruktur
 
 Die aktuelle Projekt- und Datenformatversion wird zentral in

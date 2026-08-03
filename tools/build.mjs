@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { PROJECT_META } from "../src/meta/project-meta.mjs";
 
@@ -8,7 +9,12 @@ const readmeMarkdown = await fs.readFile(
   path.join(projectRoot, "README.md"),
   "utf8",
 );
-const readmeHelp = renderMarkdownHelp(readmeMarkdown);
+const readmeHelp = renderMarkdownHelp(
+  readmeMarkdown.replace(
+    "<!-- CHANGELOG_ENTRIES -->",
+    renderChangelogMarkdown(projectRoot),
+  ),
+);
 
 const generatedProjectMeta = `(function exposeTeoProjectMeta(global) {
   "use strict";
@@ -213,6 +219,27 @@ function renderMarkdownHelp(markdown) {
               ${html.join("\n")}
             </article>
           </div>`;
+}
+
+function renderChangelogMarkdown(root) {
+  try {
+    const output = execFileSync(
+      "git",
+      ["log", "--date=format:%d.%m.%Y", "--pretty=format:%h%x1f%ad%x1f%s"],
+      { cwd: root, encoding: "utf8" },
+    );
+    const entries = output
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => {
+        const [hash, date, subject] = line.split("\x1f");
+        return `- **${date}** \`${hash}\` ${subject}`;
+      });
+    if (!entries.length) throw new Error("keine Commits gefunden");
+    return entries.join("\n");
+  } catch {
+    return "Die Änderungshistorie ist in dieser Auslieferung nicht verfügbar, da kein Git-Repository vorliegt.";
+  }
 }
 
 function renderInlineMarkdown(value) {
