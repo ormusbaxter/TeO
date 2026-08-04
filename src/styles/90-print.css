@@ -264,6 +264,7 @@
   }
 
   body.print-phone-list > #trainingMatrixDialog,
+  body.print-appointment > #trainingMatrixDialog,
   body.print-employee-dossier > #trainingMatrixDialog,
   body.print-weekend-overview > #trainingMatrixDialog,
   body.print-vacation-overview > #trainingMatrixDialog {
