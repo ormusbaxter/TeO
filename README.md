@@ -412,6 +412,7 @@ Folgende Eintragsarten stehen zur Verfügung:
 - Urlaub Einarbeitung
 - Schule, Weiterbildung oder Universität
 - unbezahlter Urlaub
+- Nachtdienst
 - externer Einsatz
 - frei geplant
 - verpflichtende Dienstzusage
@@ -421,6 +422,8 @@ nicht auf den regulären Urlaubsverbrauch angerechnet.
 
 **Frei geplant** zählt als Abwesenheit, verbraucht aber keinen Urlaubstag. Der
 Eintrag erscheint als **×** im selben Grün wie der Urlaub.
+
+**Nachtdienst** ist keine Abwesenheit und verbraucht keinen Urlaubstag.
 
 ### Monatsplanung
 
@@ -457,7 +460,8 @@ Tabelle vollständig über die Tastatur ausfüllen.
 | `U` | Urlaub |
 | `A` | Urlaub Einarbeitung |
 | `S` | Schule / Weiterbildung / Uni |
-| `N` | Unbezahlter Urlaub |
+| `B` | Unbezahlter Urlaub |
+| `N` | Nachtdienst |
 | `E` | Externer Einsatz |
 | `F` | Frei geplant |
 | `D` | Verpflichtende Dienstzusage |

@@ -288,8 +288,14 @@
     },
     unpaid: {
       label: "Unbezahlter Urlaub",
-      shortLabel: "UN",
+      shortLabel: "uU",
       isAbsence: true,
+      countsVacationEntitlement: false,
+    },
+    nightDuty: {
+      label: "Nachtdienst",
+      shortLabel: "N",
+      isAbsence: false,
       countsVacationEntitlement: false,
     },
     external: {
@@ -313,13 +319,14 @@
   };
 
   // Tastenbelegung der Planungstabelle. Die Kuerzel in den Feldern sind als
-  // Taste mehrdeutig (U, UE und UN begaennen alle mit U), deshalb eine eigene
-  // eindeutige Zuordnung.
+  // Taste und Feldkuerzel sind voneinander unabhaengig, damit alle Eintragsarten
+  // eine eindeutige Tastaturzuordnung besitzen.
   const PLANNER_ENTRY_KEYS = Object.freeze({
     u: "vacation",
     a: "onboardingVacation",
     s: "school",
-    n: "unpaid",
+    b: "unpaid",
+    n: "nightDuty",
     e: "external",
     f: "plannedOff",
     d: "mandatoryDuty",

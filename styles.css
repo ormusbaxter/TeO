@@ -6886,6 +6886,10 @@ html[data-theme="dark"] input {
   background: var(--red-700);
 }
 
+.legend-planner-night-duty {
+  background: var(--slate-700);
+}
+
 .legend-planner-external {
   background: #805bad;
 }
@@ -7126,6 +7130,11 @@ body.is-vacation-planner-maximized {
 .vacation-shortcut-symbol.planner-entry-unpaid {
   border-color: var(--red-700);
   background: var(--red-700);
+}
+
+.vacation-shortcut-symbol.planner-entry-nightDuty {
+  border-color: var(--slate-700);
+  background: var(--slate-700);
 }
 
 .vacation-shortcut-symbol.planner-entry-external {
@@ -7485,6 +7494,7 @@ body.is-vacation-planner-maximized {
     .planner-entry-onboardingVacation,
     .planner-entry-school,
     .planner-entry-unpaid,
+    .planner-entry-nightDuty,
     .planner-entry-external,
     .planner-entry-plannedOff
   ) {
@@ -7510,6 +7520,11 @@ body.is-vacation-planner-maximized {
 .vacation-day-cell button.planner-entry-unpaid {
   border-color: var(--red-700);
   background: var(--red-700);
+}
+
+.vacation-day-cell button.planner-entry-nightDuty {
+  border-color: var(--slate-700);
+  background: var(--slate-700);
 }
 
 .vacation-day-cell button.planner-entry-external {
@@ -7836,6 +7851,10 @@ body.is-vacation-planner-maximized {
 
 .vacation-year-entry.planner-entry-unpaid {
   background: var(--red-700);
+}
+
+.vacation-year-entry.planner-entry-nightDuty {
+  background: var(--slate-700);
 }
 
 .vacation-year-entry.planner-entry-external {

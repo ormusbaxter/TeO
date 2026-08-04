@@ -211,8 +211,8 @@ test("Die Tastenbelegung ist eindeutig und deckt alle Eintragsarten ab", async (
   assert.equal(new Set(arten).size, arten.length, "Keine doppelte Eintragsart");
   assert.deepEqual(
     [...tasten].sort().join(""),
-    "adefnsu",
-    "Belegung: U, A, S, N, E, F, D",
+    "abdefnsu",
+    "Belegung: U, A, S, B, N, E, F, D",
   );
   for (const art of arten) {
     assert.ok(
@@ -225,6 +225,24 @@ test("Die Tastenbelegung ist eindeutig und deckt alle Eintragsarten ab", async (
     Object.keys(app.PLANNER_ENTRY_TYPES).length,
     "Jede Eintragsart braucht ein Tastenkuerzel",
   );
+  assert.equal(app.PLANNER_ENTRY_TYPES.unpaid.shortLabel, "uU");
+  assert.equal(app.PLANNER_ENTRY_KEYS.b, "unpaid");
+  assert.equal(app.PLANNER_ENTRY_KEYS.n, "nightDuty");
+  assert.equal(app.PLANNER_ENTRY_TYPES.nightDuty.countsVacationEntitlement, false);
+  assert.equal(app.PLANNER_ENTRY_TYPES.nightDuty.isAbsence, false);
+});
+
+test("Nachtdienst verbraucht keinen Urlaubstag und zaehlt nicht als Abwesenheit", async () => {
+  const app = await loadAppFunctions([
+    "getPlannedVacationDays",
+    "getPlannerDayStats",
+    "normalizeState",
+  ]);
+  const employee = mitarbeiter("pflege-1", "Pflegefachkraft");
+  mitMitarbeitern(app, [employee], [urlaub(employee.id, WERKTAG, "nightDuty")]);
+
+  assert.equal(app.getPlannedVacationDays(employee.id, 2026), 0);
+  assert.equal(app.getPlannerDayStats(WERKTAG).absenceCount, 0);
 });
 
 test("Ueberschreitungen der Tagesgrenze werden mit Beteiligten aufgelistet", async () => {

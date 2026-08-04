@@ -1,3 +1,8 @@
+### 004.019.000 – Urlaubsplanung
+
+- **Neu:** Nachtdienst als Planungseintrag ohne Urlaubsverbrauch
+- **Verbessert:** Unbezahlter Urlaub mit Kürzel „uU“ und Tastenkürzel B
+
 ### 004.018.000 – Fristenmonitor
 
 - **Neu:** Filter zum Ausblenden überfälliger Einträge im Fristenmonitor
