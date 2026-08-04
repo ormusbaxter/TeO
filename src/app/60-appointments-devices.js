@@ -97,6 +97,8 @@
       <article
         class="meeting-card appointment-card ${daysUntil < 0 ? "is-past" : ""}"
         data-appointment-card="${appointment.id}"
+        tabindex="0"
+        aria-label="Termindetails zu ${escapeHtml(appointment.title)} öffnen"
       >
         <div class="meeting-card-main">
           <div class="training-title-row">
@@ -1384,4 +1386,3 @@
   function deviceLabel(device) {
     return `${device.manufacturer} ${device.productName}`.trim();
   }
-

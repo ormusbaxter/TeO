@@ -252,11 +252,20 @@
                 placeholder="Optionale Hinweise zum Termin"
               ></textarea>
             </label>
+            <label class="check-card form-field-wide appointment-participant-list-option">
+              <input id="appointmentParticipantList" name="participantList" type="checkbox" />
+              <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
+              <span>Teilnehmerliste mit Leerzeilen drucken</span>
+            </label>
           </div>
         </div>
         <div class="modal-footer">
           <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
-          <button class="button button-primary" type="submit">
+          <button class="button button-secondary" type="submit" name="submitAction" value="print">
+            <svg><use href="#icon-print"></use></svg>
+            Speichern &amp; Drucken
+          </button>
+          <button class="button button-primary" type="submit" name="submitAction" value="save">
             <svg><use href="#icon-check"></use></svg>
             <span id="appointmentSubmitLabel">Termin speichern</span>
           </button>
@@ -406,4 +415,3 @@
         </div>
       </form>
     </dialog>
-

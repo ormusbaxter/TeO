@@ -2430,6 +2430,22 @@ svg {
   grid-template-columns: minmax(280px, 1fr) auto auto;
 }
 
+.appointment-card {
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.appointment-card:hover,
+.appointment-card:focus-visible {
+  border-color: var(--blue-300);
+  box-shadow: 0 12px 28px rgb(24 66 108 / 12%);
+  transform: translateY(-1px);
+}
+
+.appointment-participant-list-option {
+  margin-top: 4px;
+}
+
 .appointment-card.is-past {
   opacity: 0.78;
 }
@@ -6961,6 +6977,21 @@ body.is-vacation-view .main-content {
   font-size: 1rem;
 }
 
+.vacation-planner-widget-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.vacation-month-navigation svg {
+  width: 16px;
+  height: 16px;
+}
+
+.vacation-month-previous svg {
+  transform: rotate(180deg);
+}
+
 .vacation-planner-content {
   min-width: 0;
 }
@@ -7004,6 +7035,10 @@ body.is-vacation-planner-maximized {
   flex: 0 0 auto;
 }
 
+.vacation-planner-panel.is-maximized .vacation-note-detail {
+  display: none;
+}
+
 .vacation-planner-panel.is-maximized .vacation-table-scroll {
   max-height: none;
   flex: 1 1 auto;
@@ -7022,6 +7057,94 @@ body.is-vacation-planner-maximized {
 .vacation-table-note .is-warning {
   color: var(--orange-700);
   font-weight: 700;
+}
+
+.vacation-keyboard-hint,
+.vacation-shortcut-list,
+.vacation-shortcut {
+  display: flex;
+  align-items: center;
+}
+
+.vacation-keyboard-hint {
+  flex-wrap: wrap;
+  gap: 7px 10px;
+}
+
+.vacation-shortcut-list {
+  flex-wrap: wrap;
+  gap: 5px 10px;
+}
+
+.vacation-shortcut {
+  gap: 4px;
+}
+
+.vacation-shortcut kbd {
+  min-width: 20px;
+  padding: 1px 4px;
+  color: var(--slate-700);
+  font: inherit;
+  font-weight: 900;
+  text-align: center;
+  border: 1px solid var(--slate-300);
+  border-radius: 4px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--slate-300);
+}
+
+.vacation-shortcut-symbol {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  color: var(--white);
+  font-size: 0.63rem;
+  font-style: normal;
+  font-weight: 900;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  box-shadow: 0 3px 9px rgb(16 34 54 / 20%);
+}
+
+.vacation-shortcut-symbol.planner-entry-vacation,
+.vacation-shortcut-symbol.planner-entry-plannedOff {
+  border-color: var(--green-700);
+  background: var(--green-700);
+}
+
+.vacation-shortcut-symbol.planner-entry-onboardingVacation {
+  border-color: #087f9c;
+  background: #0891b2;
+}
+
+.vacation-shortcut-symbol.planner-entry-school {
+  border-color: var(--blue-700);
+  background: var(--blue-700);
+}
+
+.vacation-shortcut-symbol.planner-entry-unpaid {
+  border-color: var(--red-700);
+  background: var(--red-700);
+}
+
+.vacation-shortcut-symbol.planner-entry-external {
+  border-color: #805bad;
+  background: #805bad;
+}
+
+.vacation-shortcut-symbol.planner-entry-mandatoryDuty {
+  color: var(--orange-700);
+  border: 2px solid var(--orange-700);
+  background: var(--orange-100);
+}
+
+.vacation-navigation-hint {
+  color: var(--slate-500);
+}
+
+.vacation-settings-form {
+  align-items: end;
 }
 
 .vacation-table-scroll {
@@ -7842,6 +7965,15 @@ html[data-theme="dark"] :is(
   margin: 10mm;
 }
 
+@page appointment {
+  size: A4 portrait;
+  margin: 18mm;
+}
+
+.appointment-print-surface {
+  display: none;
+}
+
 @media print {
   * {
     print-color-adjust: exact;
@@ -7875,6 +8007,72 @@ html[data-theme="dark"] :is(
     padding: 15mm;
     color: #111;
     background: white;
+  }
+
+  body.print-appointment > * {
+    display: none !important;
+  }
+
+  body.print-appointment > #appointmentPrintSurface {
+    page: appointment;
+    display: block !important;
+    width: 100%;
+    min-height: 261mm;
+    color: #111;
+    background: white;
+  }
+
+  .appointment-print-document,
+  .appointment-print-document * {
+    box-sizing: border-box;
+    color: #111;
+    text-align: center;
+  }
+
+  .appointment-print-document header {
+    display: grid;
+    gap: 5mm;
+    justify-items: center;
+    padding-top: 18mm;
+  }
+
+  .appointment-print-document :is(h1, h2, p) {
+    margin: 0;
+  }
+
+  .appointment-print-document h1 {
+    font-size: 24pt;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .appointment-print-document header p {
+    min-height: 1.2em;
+    font-size: 14pt;
+  }
+
+  .appointment-print-category {
+    font-size: 12pt !important;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .appointment-print-participants {
+    display: grid;
+    gap: 4mm;
+    margin-top: 18mm;
+  }
+
+  .appointment-print-participants h2 {
+    margin-bottom: 2mm;
+    font-size: 14pt;
+  }
+
+  .appointment-print-participants span {
+    display: block;
+    height: 7mm;
+    border-bottom: 0.35mm solid #555;
   }
 
   body.print-phone-list #phoneListPrintSurface .phone-list-document {

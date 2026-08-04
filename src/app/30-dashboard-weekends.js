@@ -224,14 +224,9 @@
     elements.deadlineOverview
       .querySelectorAll("[data-deadline-appointment]")
       .forEach((button) => {
-        button.addEventListener("click", () => {
-          showView("appointments");
-          elements.appointmentList
-            .querySelector(
-              `[data-appointment-card="${button.dataset.deadlineAppointment}"]`,
-            )
-            ?.scrollIntoView({ block: "center", behavior: "smooth" });
-        });
+        button.addEventListener("click", () =>
+          openAppointmentDialog(button.dataset.deadlineAppointment),
+        );
       });
   }
 

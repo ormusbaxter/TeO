@@ -243,6 +243,48 @@
               </div>
             </section>
 
+            <section class="panel settings-card settings-card-wide">
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-storage">
+                  <svg><use href="#icon-calendar"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Urlaub</p>
+                  <h2>Urlaubsplanung</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Grundurlaub, tägliche Abwesenheitsgrenzen und die Zuordnung der
+                festen Dienstwochenenden für die Urlaubsplanung festlegen.
+              </p>
+              <div class="settings-inline-form vacation-settings-form">
+                <label class="settings-field">
+                  <span>Vollzeit-Grundurlaub</span>
+                  <span class="input-suffix">
+                    <input id="vacationBaseDays" type="number" min="1" max="60" step="0.5" />
+                    <span>Tage</span>
+                  </span>
+                </label>
+                <label class="settings-field">
+                  <span>Max. abwesend werktags</span>
+                  <input id="vacationWeekdayAbsenceLimit" type="number" min="1" max="100" step="1" />
+                </label>
+                <label class="settings-field">
+                  <span>Max. Wochenende / Feiertag</span>
+                  <input id="vacationWeekendAbsenceLimit" type="number" min="1" max="100" step="1" />
+                </label>
+                <label class="settings-field">
+                  <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
+                  <input id="vacationWeekendAReferenceSaturday" type="date" />
+                </label>
+              </div>
+              <div class="settings-actions">
+                <button class="button button-primary" id="saveVacationSettingsButton" type="button">
+                  Urlaubseinstellungen speichern
+                </button>
+              </div>
+            </section>
+
             <section class="panel settings-card" data-admin-only>
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">

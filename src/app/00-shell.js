@@ -9,6 +9,7 @@
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
   const AUTO_BACKUP_CONFIG_KEY = "intensivteam-auto-backup-config-v1";
   const AUTO_BACKUP_DIRECTORY_KEY = "intensivteam-auto-backup-directory-v1";
+  const VACATION_VIEW_KEY = "intensivteam-vacation-view-v1";
   const STATE_VERSION = PROJECT_META.stateVersion;
   const PROJECT_NAME = PROJECT_META.name;
   const PROJECT_VERSION = PROJECT_META.version;
@@ -420,8 +421,9 @@
   let automaticBackupNotice = "";
   let browserPersistenceNotice = "";
   let dateInputObserver = null;
-  let vacationYear = new Date().getFullYear();
-  let vacationMonth = new Date().getMonth() + 1;
+  const savedVacationView = readVacationViewPreference();
+  let vacationYear = savedVacationView.year;
+  let vacationMonth = savedVacationView.month;
   let vacationEntryType = "vacation";
   let vacationEmployeeSearchTerm = "";
   // Tastaturbedienung der Planungstabelle: zuletzt angesteuertes Feld als
@@ -629,6 +631,10 @@
     vacationPlannerMaximizeLabel: document.querySelector(
       "#vacationPlannerMaximizeLabel",
     ),
+    previousVacationMonthButton: document.querySelector(
+      "#previousVacationMonthButton",
+    ),
+    nextVacationMonthButton: document.querySelector("#nextVacationMonthButton"),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),
@@ -726,6 +732,9 @@
     appointmentForm: document.querySelector("#appointmentForm"),
     appointmentDialogTitle: document.querySelector("#appointmentDialogTitle"),
     appointmentSubmitLabel: document.querySelector("#appointmentSubmitLabel"),
+    appointmentParticipantList: document.querySelector(
+      "#appointmentParticipantList",
+    ),
     deviceDialog: document.querySelector("#deviceDialog"),
     deviceForm: document.querySelector("#deviceForm"),
     deviceDialogTitle: document.querySelector("#deviceDialogTitle"),
@@ -870,6 +879,7 @@
     phoneListPreviewSubtitle: document.querySelector("#phoneListPreviewSubtitle"),
     phoneListPreviewContent: document.querySelector("#phoneListPreviewContent"),
     phoneListPrintSurface: document.querySelector("#phoneListPrintSurface"),
+    appointmentPrintSurface: document.querySelector("#appointmentPrintSurface"),
     printEmployeePhoneListButton: document.querySelector(
       "#printEmployeePhoneListButton",
     ),

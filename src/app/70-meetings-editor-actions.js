@@ -576,11 +576,20 @@
 
   function handleAppointmentAction(event) {
     const button = event.target.closest("[data-action][data-id]");
-    if (!button) return;
+    if (button) {
+      if (event.type === "keydown") return;
+      const { action, id } = button.dataset;
+      if (action === "edit-appointment") openAppointmentDialog(id);
+      if (action === "delete-appointment") requestDeleteAppointment(id);
+      return;
+    }
 
-    const { action, id } = button.dataset;
-    if (action === "edit-appointment") openAppointmentDialog(id);
-    if (action === "delete-appointment") requestDeleteAppointment(id);
+    const card = event.target.closest("[data-appointment-card]");
+    if (!card || (event.type === "keydown" && !["Enter", " "].includes(event.key))) {
+      return;
+    }
+    if (event.type === "keydown") event.preventDefault();
+    openAppointmentDialog(card.dataset.appointmentCard);
   }
 
   function openEmployeeDialog(employeeId = null) {
@@ -1059,6 +1068,7 @@
     document.querySelector("#appointmentTitle").setCustomValidity("");
     document.querySelector("#appointmentEndTime").setCustomValidity("");
     document.querySelector("#appointmentDate").value = todayIso();
+    elements.appointmentParticipantList.checked = false;
 
     const appointment = appointmentId ? getAppointment(appointmentId) : null;
     elements.appointmentDialogTitle.textContent = appointment
@@ -1077,6 +1087,7 @@
       elements.appointmentCategory.value = appointment.category || "";
       document.querySelector("#appointmentLocation").value = appointment.location;
       document.querySelector("#appointmentDescription").value = appointment.description;
+      elements.appointmentParticipantList.checked = Boolean(appointment.participantList);
     }
 
     elements.appointmentDialog.showModal();
@@ -1099,6 +1110,7 @@
 
   async function handleAppointmentSubmit(event) {
     event.preventDefault();
+    const shouldPrint = event.submitter?.value === "print";
     const titleInput = document.querySelector("#appointmentTitle");
     titleInput.setCustomValidity(
       titleInput.value.trim() ? "" : "Bitte einen Titel eingeben.",
@@ -1120,6 +1132,7 @@
       category: elements.appointmentCategory.value,
       location: document.querySelector("#appointmentLocation").value.trim(),
       description: document.querySelector("#appointmentDescription").value.trim(),
+      participantList: elements.appointmentParticipantList.checked,
       createdAt: existingAppointment?.createdAt || now,
       updatedAt: now,
     };
@@ -1139,6 +1152,32 @@
     showToast(
       existingAppointment ? "Termin wurde aktualisiert." : "Termin wurde angelegt.",
     );
+    if (shouldPrint) printAppointment(appointment);
+  }
+
+  function printAppointment(appointment) {
+    const category = appointmentCategoryLabel(appointment);
+    const time = formatAppointmentTime(appointment);
+    const participantRows = appointment.participantList
+      ? `<section class="appointment-print-participants">
+          <h2>Teilnehmerliste</h2>
+          ${Array.from({ length: 14 }, () => "<span></span>").join("")}
+        </section>`
+      : "";
+    elements.appointmentPrintSurface.innerHTML = `
+      <article class="appointment-print-document">
+        <header>
+          ${category ? `<p class="appointment-print-category">${escapeHtml(category)}</p>` : ""}
+          <h1>${escapeHtml(appointment.title)}</h1>
+          <p>${formatDate(appointment.date)}</p>
+          <p>${escapeHtml(time || " ")}</p>
+          <p>${escapeHtml(appointment.location || " ")}</p>
+        </header>
+        ${participantRows}
+      </article>`;
+    document.body.classList.add("print-appointment");
+    window.print();
+    window.setTimeout(() => document.body.classList.remove("print-appointment"), 0);
   }
 
   function requestDeleteAppointment(appointmentId) {

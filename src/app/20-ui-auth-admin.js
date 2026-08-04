@@ -223,10 +223,12 @@
     elements.openWeekendPrintButton.addEventListener("click", openWeekendOverviewDialog);
     elements.vacationYear.addEventListener("change", () => {
       vacationYear = Number(elements.vacationYear.value);
+      saveVacationViewPreference();
       renderVacationPlanner();
     });
     elements.vacationMonth.addEventListener("change", () => {
       vacationMonth = Number(elements.vacationMonth.value);
+      saveVacationViewPreference();
       renderVacationPlanner();
     });
     elements.vacationEntryType.addEventListener("change", () => {
@@ -249,6 +251,12 @@
       "click",
       toggleVacationPlannerMaximized,
     );
+    elements.previousVacationMonthButton.addEventListener("click", () =>
+      shiftVacationMonth(-1),
+    );
+    elements.nextVacationMonthButton.addEventListener("click", () =>
+      shiftVacationMonth(1),
+    );
     document.addEventListener("keydown", handleVacationPlannerMaximizeKeydown);
     elements.vacationConflictContent.addEventListener("click", (event) => {
       const dateButton = event.target.closest("[data-vacation-conflict-date]");
@@ -256,6 +264,7 @@
       const date = dateButton.dataset.vacationConflictDate;
       vacationYear = Number(date.slice(0, 4));
       vacationMonth = Number(date.slice(5, 7));
+      saveVacationViewPreference();
       elements.vacationConflictDialog.close();
       renderVacationPlanner();
     });
@@ -661,6 +670,7 @@
     elements.trainingList.addEventListener("click", handleTrainingAction);
     elements.meetingList.addEventListener("click", handleMeetingAction);
     elements.appointmentList.addEventListener("click", handleAppointmentAction);
+    elements.appointmentList.addEventListener("keydown", handleAppointmentAction);
     elements.deviceCatalog.addEventListener("click", handleDeviceAction);
     elements.deviceInstructionMatrix.addEventListener(
       "click",

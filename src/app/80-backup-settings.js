@@ -757,6 +757,7 @@
       ? "on"
       : "off";
     renderSchoolVacationSettings();
+    renderVacationSettingsControls();
     elements.settingsStorageBackend.value = backendMode;
     elements.settingsMariaDbApiUrl.value =
       backendConfig.apiUrl ||

@@ -136,7 +136,7 @@
 
     elements.vacationPlanner.innerHTML = `
       <div class="vacation-table-note">
-        <span>
+        <span class="vacation-note-detail">
           „Urlaub“ und „Urlaub Einarbeitung“ werden vom Jahresanspruch abgezogen.
           Urlaub Einarbeitung und Dienstzusagen zählen nicht gegen die Tagesgrenze
           (${state.settings.vacationWeekdayAbsenceLimit} werktags,
@@ -145,18 +145,18 @@
           Dienstwochenende gleicht die Zusage eines Mitarbeiters vom jeweils anderen
           festen Wochenende einen Urlaub auf dem eigenen Wochenende aus.
         </span>
-        <span>
+        <span class="vacation-note-detail">
           Abwesenheiten von ${escapeHtml(absenceLimitExemptProfessionNote())}
           bleiben sichtbar, zählen aber nicht gegen die Tagesgrenze.
         </span>
-        <span>${escapeHtml(plannerKeyboardHintText())}</span>
-        <span class="${
+        ${renderPlannerKeyboardHint()}
+        <span class="vacation-note-detail ${
           schoolVacations.size ? "" : "is-warning"
         }">${schoolVacationCoverageNote}</span>
         ${
           employees.length === allEmployees.length
             ? ""
-            : `<span class="is-warning">Namensfilter aktiv: ${employees.length} von ${allEmployees.length} Mitarbeitern sichtbar. Die Tagesgrenzen berücksichtigen weiterhin das gesamte Team.</span>`
+            : `<span class="vacation-note-detail is-warning">Namensfilter aktiv: ${employees.length} von ${allEmployees.length} Mitarbeitern sichtbar. Die Tagesgrenzen berücksichtigen weiterhin das gesamte Team.</span>`
         }
       </div>
       <div class="vacation-table-scroll">
@@ -197,14 +197,53 @@
     restoreVacationFocus();
   }
 
-  function plannerKeyboardHintText() {
+  function renderPlannerKeyboardHint() {
     const shortcuts = Object.entries(PLANNER_ENTRY_KEYS)
-      .map(
-        ([key, type]) =>
-          `${key.toLocaleUpperCase("de-DE")} ${PLANNER_ENTRY_TYPES[type].label}`,
-      )
-      .join(", ");
-    return `Tastatur: ${shortcuts}. Pfeiltasten wechseln das Feld, Pos 1 und Ende springen an den Monatsrand, Bild auf und Bild ab wechseln den Monat, Umschalt und Pfeil markieren einen Bereich, Entf oder Rücktaste löscht.`;
+      .map(([key, type]) => {
+        const definition = PLANNER_ENTRY_TYPES[type];
+        return `<span class="vacation-shortcut">
+          <kbd>${key.toLocaleUpperCase("de-DE")}</kbd>
+          <i class="vacation-shortcut-symbol planner-entry-${type}" aria-hidden="true">${definition.shortLabel}</i>
+          <span>${escapeHtml(definition.label)}</span>
+        </span>`;
+      })
+      .join("");
+    return `<div class="vacation-keyboard-hint">
+      <strong>Tastatur:</strong>
+      <span class="vacation-shortcut-list">${shortcuts}</span>
+      <span class="vacation-navigation-hint">Pfeiltasten wechseln das Feld · Pos 1/Ende springen an den Monatsrand · Bild auf/ab wechseln den Monat · Umschalt + Pfeil markiert · Entf/Rücktaste löscht</span>
+    </div>`;
+  }
+
+  function readVacationViewPreference() {
+    const fallback = {
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+    };
+    try {
+      const raw = window.localStorage?.getItem?.(VACATION_VIEW_KEY);
+      if (!raw) return fallback;
+      const value = JSON.parse(raw);
+      const year = Number(value?.year);
+      const month = Number(value?.month);
+      return {
+        year: Number.isInteger(year) && year >= 2000 && year <= 2100 ? year : fallback.year,
+        month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : fallback.month,
+      };
+    } catch {
+      return fallback;
+    }
+  }
+
+  function saveVacationViewPreference() {
+    try {
+      window.localStorage?.setItem?.(
+        VACATION_VIEW_KEY,
+        JSON.stringify({ year: vacationYear, month: vacationMonth }),
+      );
+    } catch {
+      // Die Planung bleibt auch ohne verfügbaren Browserspeicher bedienbar.
+    }
   }
 
   function renderVacationControls() {
@@ -231,6 +270,14 @@
     elements.vacationYear.value = String(vacationYear);
     elements.vacationMonth.value = String(vacationMonth);
     elements.vacationEntryType.value = vacationEntryType;
+    renderVacationSettingsControls();
+    elements.vacationWeekendALegend.textContent =
+      serviceWeekendLabel("weekend_a");
+    elements.vacationWeekendBLegend.textContent =
+      serviceWeekendLabel("weekend_b");
+  }
+
+  function renderVacationSettingsControls() {
     elements.vacationBaseDays.value = String(state.settings.vacationBaseDays);
     elements.vacationWeekdayAbsenceLimit.value = String(
       state.settings.vacationWeekdayAbsenceLimit,
@@ -242,10 +289,6 @@
       state.settings.vacationWeekendAReferenceSaturday;
     elements.vacationWeekendAReferenceLabel.textContent =
       `Referenzsamstag ${serviceWeekendLabel("weekend_a")}`;
-    elements.vacationWeekendALegend.textContent =
-      serviceWeekendLabel("weekend_a");
-    elements.vacationWeekendBLegend.textContent =
-      serviceWeekendLabel("weekend_b");
   }
 
   function renderVacationDayHeader(date, holidays, schoolVacations) {
@@ -636,12 +679,14 @@
     const target = new Date(vacationYear, vacationMonth - 1 + offset, 1, 12);
     vacationYear = target.getFullYear();
     vacationMonth = target.getMonth() + 1;
+    saveVacationViewPreference();
     // Der Tag im Monat entspricht dem Spaltenindex; kuerzere Monate werden
     // abgeschnitten.
     const daysInMonth = new Date(vacationYear, vacationMonth, 0).getDate();
+    const nextPosition = position || vacationFocus || { row: 0, column: 0 };
     vacationFocus = {
-      row: position.row,
-      column: Math.min(position.column, daysInMonth - 1),
+      row: nextPosition.row,
+      column: Math.min(nextPosition.column, daysInMonth - 1),
     };
     vacationSelectionAnchor = null;
     renderVacationPlanner();
