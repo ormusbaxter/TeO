@@ -110,8 +110,13 @@
     elements.deadlineFilters.forEach((filter) => {
       filter.checked = activeKinds.has(filter.value);
     });
-    const deadlines = getDeadlineItems().filter(
-      (item) => activeKinds.has(deadlineFilterKind(item)) && item.daysUntil <= horizon,
+    const hideOverdue = Boolean(state.settings.deadlineHideOverdue);
+    elements.deadlineHideOverdue.checked = hideOverdue;
+    const deadlines = filterDeadlineItems(
+      getDeadlineItems(),
+      activeKinds,
+      horizon,
+      hideOverdue,
     );
     const overdue = deadlines.filter((item) => item.daysUntil < 0);
     const upcoming = deadlines.filter((item) => item.daysUntil >= 0);
@@ -125,7 +130,9 @@
           ? `Keine passenden Fristen innerhalb von ${horizon} Tagen`
           : "Keine Kategorien ausgewählt",
         text: activeKinds.size
-          ? `Für die Auswahl ${formatList(selectedLabels)} sind innerhalb dieses Zeitraums keine Einträge vorhanden.`
+          ? `Für die Auswahl ${formatList(selectedLabels)} sind innerhalb dieses Zeitraums keine ${
+              hideOverdue ? "anstehenden " : ""
+            }Einträge vorhanden.`
           : "Wählen Sie mindestens eine Kategorie aus, die im Fristenmonitor angezeigt werden soll.",
         compact: true,
       });
@@ -273,6 +280,26 @@
     await commitStateMutation(() => {
       state.settings.deadlineKinds = selectedKinds;
     });
+  }
+
+  async function updateDeadlineOverdueFilter() {
+    const hideOverdue = elements.deadlineHideOverdue.checked;
+    if (hideOverdue === Boolean(state.settings.deadlineHideOverdue)) {
+      renderDeadlineOverview();
+      return;
+    }
+    await commitStateMutation(() => {
+      state.settings.deadlineHideOverdue = hideOverdue;
+    });
+  }
+
+  function filterDeadlineItems(items, activeKinds, horizon, hideOverdue = false) {
+    return items.filter(
+      (item) =>
+        activeKinds.has(deadlineFilterKind(item)) &&
+        item.daysUntil <= horizon &&
+        (!hideOverdue || item.daysUntil >= 0),
+    );
   }
 
   function deadlineFilterKind(item) {

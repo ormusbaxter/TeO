@@ -592,6 +592,8 @@ Er zeigt:
 
 Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien
 lassen sich einzeln ein- oder ausblenden.
+Der zusätzliche Filter **Überfällige ausblenden** zeigt nur aktuell anstehende
+Einträge und wird gemeinsam mit den Kategorie-Filtern gespeichert.
 
 Geburtstage erscheinen mit Name, erreichtem Lebensjahr und vollständigem
 Geburtsdatum.

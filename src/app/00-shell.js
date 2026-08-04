@@ -494,6 +494,7 @@
     deadlineOverview: document.querySelector("#deadlineOverview"),
     deadlineHorizon: document.querySelector("#deadlineHorizon"),
     deadlineFilters: [...document.querySelectorAll("[data-deadline-filter]")],
+    deadlineHideOverdue: document.querySelector("#deadlineHideOverdue"),
     recentEmployees: document.querySelector("#recentEmployees"),
     employeeTable: document.querySelector("#employeeTable"),
     employeeSearch: document.querySelector("#employeeSearch"),

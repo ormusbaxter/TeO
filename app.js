@@ -495,6 +495,7 @@
     deadlineOverview: document.querySelector("#deadlineOverview"),
     deadlineHorizon: document.querySelector("#deadlineHorizon"),
     deadlineFilters: [...document.querySelectorAll("[data-deadline-filter]")],
+    deadlineHideOverdue: document.querySelector("#deadlineHideOverdue"),
     recentEmployees: document.querySelector("#recentEmployees"),
     employeeTable: document.querySelector("#employeeTable"),
     employeeSearch: document.querySelector("#employeeSearch"),
@@ -979,6 +980,7 @@
           },
         },
         deadlineKinds: [...DEADLINE_KINDS],
+        deadlineHideOverdue: false,
       },
       users: initialUsers(),
       auditLog: [],
@@ -1325,6 +1327,7 @@
         ),
         serviceWeekends,
         deadlineKinds: normalizeDeadlineKinds(parsed.settings?.deadlineKinds),
+        deadlineHideOverdue: Boolean(parsed.settings?.deadlineHideOverdue),
       },
       users,
       auditLog: normalizeAuditLog(parsed.auditLog),
@@ -2275,6 +2278,10 @@
     elements.deadlineFilters.forEach((filter) => {
       filter.addEventListener("change", updateDeadlineFilters);
     });
+    elements.deadlineHideOverdue.addEventListener(
+      "change",
+      updateDeadlineOverdueFilter,
+    );
     elements.exportDataButton.addEventListener("click", exportDatabase);
     elements.databaseSaveWarningExportButton.addEventListener(
       "click",
@@ -4578,8 +4585,13 @@
     elements.deadlineFilters.forEach((filter) => {
       filter.checked = activeKinds.has(filter.value);
     });
-    const deadlines = getDeadlineItems().filter(
-      (item) => activeKinds.has(deadlineFilterKind(item)) && item.daysUntil <= horizon,
+    const hideOverdue = Boolean(state.settings.deadlineHideOverdue);
+    elements.deadlineHideOverdue.checked = hideOverdue;
+    const deadlines = filterDeadlineItems(
+      getDeadlineItems(),
+      activeKinds,
+      horizon,
+      hideOverdue,
     );
     const overdue = deadlines.filter((item) => item.daysUntil < 0);
     const upcoming = deadlines.filter((item) => item.daysUntil >= 0);
@@ -4593,7 +4605,9 @@
           ? `Keine passenden Fristen innerhalb von ${horizon} Tagen`
           : "Keine Kategorien ausgewählt",
         text: activeKinds.size
-          ? `Für die Auswahl ${formatList(selectedLabels)} sind innerhalb dieses Zeitraums keine Einträge vorhanden.`
+          ? `Für die Auswahl ${formatList(selectedLabels)} sind innerhalb dieses Zeitraums keine ${
+              hideOverdue ? "anstehenden " : ""
+            }Einträge vorhanden.`
           : "Wählen Sie mindestens eine Kategorie aus, die im Fristenmonitor angezeigt werden soll.",
         compact: true,
       });
@@ -4741,6 +4755,26 @@
     await commitStateMutation(() => {
       state.settings.deadlineKinds = selectedKinds;
     });
+  }
+
+  async function updateDeadlineOverdueFilter() {
+    const hideOverdue = elements.deadlineHideOverdue.checked;
+    if (hideOverdue === Boolean(state.settings.deadlineHideOverdue)) {
+      renderDeadlineOverview();
+      return;
+    }
+    await commitStateMutation(() => {
+      state.settings.deadlineHideOverdue = hideOverdue;
+    });
+  }
+
+  function filterDeadlineItems(items, activeKinds, horizon, hideOverdue = false) {
+    return items.filter(
+      (item) =>
+        activeKinds.has(deadlineFilterKind(item)) &&
+        item.daysUntil <= horizon &&
+        (!hideOverdue || item.daysUntil >= 0),
+    );
   }
 
   function deadlineFilterKind(item) {

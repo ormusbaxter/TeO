@@ -184,6 +184,10 @@
     elements.deadlineFilters.forEach((filter) => {
       filter.addEventListener("change", updateDeadlineFilters);
     });
+    elements.deadlineHideOverdue.addEventListener(
+      "change",
+      updateDeadlineOverdueFilter,
+    );
     elements.exportDataButton.addEventListener("click", exportDatabase);
     elements.databaseSaveWarningExportButton.addEventListener(
       "click",
