@@ -82,6 +82,16 @@ test("Urlaubseinstellungen und Termin-Druckablauf sind vollständig verdrahtet",
   assert.match(footerHtml, /id="appointmentPrintSurface"/);
   assert.match(appSource, /openAppointmentDialog\(button\.dataset\.deadlineAppointment\)/);
   assert.match(printCss, /@page appointment\s*{[^}]*size: A4 portrait;/s);
+  assert.match(printCss, /@page appointment\s*{[^}]*margin: 10mm;/s);
+  assert.doesNotMatch(
+    printCss,
+    /body\.print-appointment > #appointmentPrintSurface\s*{[^}]*min-height:/s,
+    "Der Termindruck darf keine volle Seitenhöhe erzwingen",
+  );
+  assert.match(
+    printCss,
+    /\.appointment-print-participants\s*{[^}]*gap: 2mm;[^}]*margin-top: 10mm;/s,
+  );
   assert.match(printCss, /\.appointment-print-document,\s*\.appointment-print-document \*\s*{[^}]*text-align: center;/s);
   assert.match(
     printCss,

@@ -1,3 +1,7 @@
+### 004.017.001 – Fehlerbehebung
+
+- **Fix:** Termin mit Teilnehmerliste passt auch bei Windows-Standardrändern auf eine A4-Seite
+
 ### 004.017.000 – Änderungshistorie
 
 - **Verbessert:** Kuratierte Änderungshistorie mit kurzen deutschen Stichpunkten
