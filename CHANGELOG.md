@@ -1,3 +1,7 @@
+### 004.018.000 – Fristenmonitor
+
+- **Neu:** Filter zum Ausblenden überfälliger Einträge im Fristenmonitor
+
 ### 004.017.001 – Fehlerbehebung
 
 - **Fix:** Termin mit Teilnehmerliste passt auch bei Windows-Standardrändern auf eine A4-Seite

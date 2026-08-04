@@ -401,6 +401,10 @@
                     <span>Qualifikationen</span>
                   </label>
                 </fieldset>
+                <label class="deadline-filter-chip deadline-overdue-filter">
+                  <input id="deadlineHideOverdue" type="checkbox" />
+                  <span>Überfällige ausblenden</span>
+                </label>
                 <label class="compact-field">
                   <span>Zeitraum</span>
                   <select id="deadlineHorizon">
@@ -1748,7 +1752,7 @@
 <p>Der Fristenmonitor steht auf der Übersichtsseite direkt unter den Kennzahlen. Sechs Einträge bleiben sichtbar, weitere sind innerhalb des Bereichs scrollbar.</p>
 <p>Er zeigt:</p>
 <ul><li>anstehende Termine; Schulungen und Geräteeinweisungen aus dem Terminkalender werden dabei dem Filter <strong>Fortbildungen</strong> zugeordnet</li><li>Geburtstage</li><li>fällige und überfällige Pflichtfortbildungen</li><li>ablaufende Zusatzqualifikationen</li></ul>
-<p>Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien lassen sich einzeln ein- oder ausblenden.</p>
+<p>Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien lassen sich einzeln ein- oder ausblenden. Der zusätzliche Filter <strong>Überfällige ausblenden</strong> zeigt nur aktuell anstehende Einträge und wird gemeinsam mit den Kategorie-Filtern gespeichert.</p>
 <p>Geburtstage erscheinen mit Name, erreichtem Lebensjahr und vollständigem Geburtsdatum.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-pflichtfortbildungen">
@@ -1888,6 +1892,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-018-000-fristenmonitor">004.018.000 – Fristenmonitor</h3>
+<ul><li><strong>Neu:</strong> Filter zum Ausblenden überfälliger Einträge im Fristenmonitor</li></ul>
 <h3 id="hilfe-004-017-001-fehlerbehebung">004.017.001 – Fehlerbehebung</h3>
 <ul><li><strong>Fix:</strong> Termin mit Teilnehmerliste passt auch bei Windows-Standardrändern auf eine A4-Seite</li></ul>
 <h3 id="hilfe-004-017-000-anderungshistorie">004.017.000 – Änderungshistorie</h3>

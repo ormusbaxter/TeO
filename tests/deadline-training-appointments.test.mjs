@@ -35,3 +35,22 @@ test("Andere Termine behalten im Fristenmonitor den Terminfilter", async () => {
   }
   assert.equal(app.deadlineFilterKind({ kind: "training" }), "training");
 });
+
+test("Überfällige Einträge lassen sich unabhängig von der Kategorie ausblenden", async () => {
+  const app = await loadAppFunctions(["filterDeadlineItems"]);
+  const deadlines = [
+    { kind: "training", daysUntil: -2, title: "Überfällig" },
+    { kind: "training", daysUntil: 5, title: "Anstehend" },
+    { kind: "qualification", daysUntil: 3, title: "Andere Kategorie" },
+  ];
+  const activeKinds = new Set(["training"]);
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(app.filterDeadlineItems(deadlines, activeKinds, 30, true))),
+    [deadlines[1]],
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(app.filterDeadlineItems(deadlines, activeKinds, 30, false))),
+    deadlines.slice(0, 2),
+  );
+});
