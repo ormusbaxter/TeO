@@ -83,4 +83,9 @@ test("Urlaubseinstellungen und Termin-Druckablauf sind vollständig verdrahtet",
   assert.match(appSource, /openAppointmentDialog\(button\.dataset\.deadlineAppointment\)/);
   assert.match(printCss, /@page appointment\s*{[^}]*size: A4 portrait;/s);
   assert.match(printCss, /\.appointment-print-document,\s*\.appointment-print-document \*\s*{[^}]*text-align: center;/s);
+  assert.match(
+    printCss,
+    /body\.print-appointment > #trainingMatrixDialog,[\s\S]{0,240}\{[^}]*display: none !important;/,
+    "Die Fortbildungs-Jahresauswertung darf beim Termindruck nicht erscheinen",
+  );
 });
