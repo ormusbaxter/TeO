@@ -30,5 +30,8 @@ assert.match(
   indexHtml,
   /<section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">[\s\S]*?<li>/,
 );
+assert.match(indexHtml, /004\.017\.000/);
+assert.match(indexHtml, /Termindruck ohne Pflichtfortbildungs-Jahresauswertung/);
+assert.doesNotMatch(indexHtml, /Merge branch|Merge pull request|<code>[0-9a-f]{7}<\/code>/);
 assert.doesNotMatch(indexHtml, /README_HELP_CONTENT/);
 });

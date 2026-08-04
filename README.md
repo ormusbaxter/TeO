@@ -1024,9 +1024,9 @@ müssen entsprechend geschützt gespeichert und übertragen werden.
 
 ## Änderungshistorie
 
-TeO pflegt keine separate Versionsdatei. Die Änderungshistorie wird beim Build
-direkt aus der Git-Commit-Historie erzeugt und unten chronologisch aufgelistet,
-neueste Änderung zuerst.
+Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und
+Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst.
+Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.
 
 <!-- CHANGELOG_ENTRIES -->
 
@@ -1034,6 +1034,8 @@ neueste Änderung zuerst.
 
 Die aktuelle Projekt- und Datenformatversion wird zentral in
 [`src/meta/project-meta.mjs`](src/meta/project-meta.mjs) gepflegt.
+Sichtbare Neuerungen und Korrekturen werden pro Version kurz und auf Deutsch in
+[`CHANGELOG.md`](CHANGELOG.md) ergänzt; Merge-Commits gehören nicht in diese Liste.
 
 Die Buildnummer besteht aus einer dreistelligen Major- und Minor-Nummer.
 Strukturelle Änderungen erhöhen die Major-Nummer; Funktionen und Korrekturen
