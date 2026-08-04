@@ -7967,7 +7967,8 @@ html[data-theme="dark"] :is(
 
 @page appointment {
   size: A4 portrait;
-  margin: 18mm;
+  /* Genug Reserve für zusätzliche Standardränder des Windows-Druckdialogs. */
+  margin: 10mm;
 }
 
 .appointment-print-surface {
@@ -8017,7 +8018,6 @@ html[data-theme="dark"] :is(
     page: appointment;
     display: block !important;
     width: 100%;
-    min-height: 261mm;
     color: #111;
     background: white;
   }
@@ -8031,9 +8031,9 @@ html[data-theme="dark"] :is(
 
   .appointment-print-document header {
     display: grid;
-    gap: 5mm;
+    gap: 3mm;
     justify-items: center;
-    padding-top: 18mm;
+    padding-top: 6mm;
   }
 
   .appointment-print-document :is(h1, h2, p) {
@@ -8060,18 +8060,18 @@ html[data-theme="dark"] :is(
 
   .appointment-print-participants {
     display: grid;
-    gap: 4mm;
-    margin-top: 18mm;
+    gap: 2mm;
+    margin-top: 10mm;
   }
 
   .appointment-print-participants h2 {
-    margin-bottom: 2mm;
+    margin-bottom: 1mm;
     font-size: 14pt;
   }
 
   .appointment-print-participants span {
     display: block;
-    height: 7mm;
+    height: 6mm;
     border-bottom: 0.35mm solid #555;
   }
 
