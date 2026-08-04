@@ -728,6 +728,7 @@
                   <option value="onboardingVacation">Urlaub Einarbeitung</option>
                   <option value="school">Schule / Weiterbildung / Uni</option>
                   <option value="unpaid">Unbezahlter Urlaub</option>
+                  <option value="nightDuty">Nachtdienst</option>
                   <option value="external">Externer Einsatz</option>
                   <option value="plannedOff">Frei geplant</option>
                   <option value="mandatoryDuty">Verpflichtende Dienstzusage</option>
@@ -739,6 +740,7 @@
               <span><i class="legend-planner-onboarding-vacation"></i> Urlaub Einarbeitung</span>
               <span><i class="legend-planner-school"></i> Schule / Weiterbildung / Uni</span>
               <span><i class="legend-planner-unpaid"></i> Unbezahlter Urlaub</span>
+              <span><i class="legend-planner-night-duty"></i> Nachtdienst</span>
               <span><i class="legend-planner-external"></i> Externer Einsatz</span>
               <span><i class="legend-planner-planned-off"></i> Frei geplant</span>
               <span><i class="legend-planner-duty"></i> Dienstzusage</span>
@@ -1701,9 +1703,10 @@
 <p>Die fünf Summenspalten <strong>Basis</strong>, <strong>Zusatz</strong>, <strong>Anspruch</strong>, <strong>Geplant</strong> und <strong>Rest</strong> bleiben beim horizontalen Scrollen fixiert.</p>
 <h3 id="hilfe-planungseintrage">Planungseinträge</h3>
 <p>Folgende Eintragsarten stehen zur Verfügung:</p>
-<ul><li>Urlaub</li><li>Urlaub Einarbeitung</li><li>Schule, Weiterbildung oder Universität</li><li>unbezahlter Urlaub</li><li>externer Einsatz</li><li>frei geplant</li><li>verpflichtende Dienstzusage</li></ul>
+<ul><li>Urlaub</li><li>Urlaub Einarbeitung</li><li>Schule, Weiterbildung oder Universität</li><li>unbezahlter Urlaub</li><li>Nachtdienst</li><li>externer Einsatz</li><li>frei geplant</li><li>verpflichtende Dienstzusage</li></ul>
 <p><strong>Urlaub Einarbeitung</strong> wird nicht auf die tägliche Abwesenheitsgrenze und nicht auf den regulären Urlaubsverbrauch angerechnet.</p>
 <p><strong>Frei geplant</strong> zählt als Abwesenheit, verbraucht aber keinen Urlaubstag. Der Eintrag erscheint als <strong>×</strong> im selben Grün wie der Urlaub.</p>
+<p><strong>Nachtdienst</strong> ist keine Abwesenheit und verbraucht keinen Urlaubstag.</p>
 <h3 id="hilfe-monatsplanung">Monatsplanung</h3>
 <ol><li>Jahr und Monat auswählen.</li><li>Gewünschte Eintragsart festlegen.</li><li>In der Zeile des Mitarbeiters auf den entsprechenden Tag klicken.</li><li>Ein erneuter Klick beziehungsweise die Auswahl „Kein Eintrag“ entfernt den Planungseintrag.</li></ol>
 <p>Der zuletzt gewählte Monat und das Planungsjahr werden im Browser gespeichert. In der maximierten Planung blättern die Pfeilschaltflächen über der Tabelle durch die Monate; dort bleibt oberhalb der Tabelle nur die kompakte, mit den farbigen Tabellensymbolen dargestellte Tastaturbelegung sichtbar.</p>
@@ -1713,7 +1716,7 @@
 <ol><li>Februar, wird er in Nicht-Schaltjahren am 28. Februar angezeigt.</li></ol>
 <h3 id="hilfe-tastaturbedienung-der-planungstabelle">Tastaturbedienung der Planungstabelle</h3>
 <p>Ein Klick auf ein Tagesfeld setzt den Ausgangspunkt; danach lässt sich die Tabelle vollständig über die Tastatur ausfüllen.</p>
-<p>| Taste | Wirkung | | --- | --- | | <code>U</code> | Urlaub | | <code>A</code> | Urlaub Einarbeitung | | <code>S</code> | Schule / Weiterbildung / Uni | | <code>N</code> | Unbezahlter Urlaub | | <code>E</code> | Externer Einsatz | | <code>F</code> | Frei geplant | | <code>D</code> | Verpflichtende Dienstzusage | | <code>Entf</code> oder <code>Rücktaste</code> | Eintrag entfernen | | Pfeiltasten | Feld wechseln | | <code>Pos 1</code> / <code>Ende</code> | an den Monatsanfang oder das Monatsende springen | | <code>Bild auf</code> / <code>Bild ab</code> | Monat wechseln, Zeile und Tag bleiben erhalten | | <code>Umschalt</code> + Pfeil | Bereich über mehrere Tage und Zeilen markieren | | <code>Esc</code> | Bereichsmarkierung aufheben |</p>
+<p>| Taste | Wirkung | | --- | --- | | <code>U</code> | Urlaub | | <code>A</code> | Urlaub Einarbeitung | | <code>S</code> | Schule / Weiterbildung / Uni | | <code>B</code> | Unbezahlter Urlaub | | <code>N</code> | Nachtdienst | | <code>E</code> | Externer Einsatz | | <code>F</code> | Frei geplant | | <code>D</code> | Verpflichtende Dienstzusage | | <code>Entf</code> oder <code>Rücktaste</code> | Eintrag entfernen | | Pfeiltasten | Feld wechseln | | <code>Pos 1</code> / <code>Ende</code> | an den Monatsanfang oder das Monatsende springen | | <code>Bild auf</code> / <code>Bild ab</code> | Monat wechseln, Zeile und Tag bleiben erhalten | | <code>Umschalt</code> + Pfeil | Bereich über mehrere Tage und Zeilen markieren | | <code>Esc</code> | Bereichsmarkierung aufheben |</p>
 <p>Ein Buchstabe <strong>weist zu</strong> und schaltet nicht um: Wird derselbe Eintrag erneut getippt, bleibt er stehen. Entfernt wird ausschließlich mit <code>Entf</code> oder der Rücktaste. Die Auswahl <strong>Eintragsart</strong> in der Steuerleiste übernimmt den zuletzt getippten Buchstaben, damit Klick und Tastatur dieselbe Eintragsart verwenden.</p>
 <p>Eine mit <code>Umschalt</code> markierte Fläche wird in einem Zug beschrieben – das ergibt einen einzigen Eintrag im Änderungsprotokoll und eine einzige Sammelmeldung, falls dabei Abwesenheitsgrenzen überschritten werden.</p>
 <p>Die Navigation folgt der sichtbaren Tabelle: Ist ein Namensfilter gesetzt, springen die Pfeiltasten nur zwischen den angezeigten Zeilen.</p>
@@ -1892,6 +1895,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-019-000-urlaubsplanung">004.019.000 – Urlaubsplanung</h3>
+<ul><li><strong>Neu:</strong> Nachtdienst als Planungseintrag ohne Urlaubsverbrauch</li><li><strong>Verbessert:</strong> Unbezahlter Urlaub mit Kürzel „uU“ und Tastenkürzel B</li></ul>
 <h3 id="hilfe-004-018-000-fristenmonitor">004.018.000 – Fristenmonitor</h3>
 <ul><li><strong>Neu:</strong> Filter zum Ausblenden überfälliger Einträge im Fristenmonitor</li></ul>
 <h3 id="hilfe-004-017-001-fehlerbehebung">004.017.001 – Fehlerbehebung</h3>
