@@ -10,6 +10,7 @@
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
   const AUTO_BACKUP_CONFIG_KEY = "intensivteam-auto-backup-config-v1";
   const AUTO_BACKUP_DIRECTORY_KEY = "intensivteam-auto-backup-directory-v1";
+  const VACATION_VIEW_KEY = "intensivteam-vacation-view-v1";
   const STATE_VERSION = PROJECT_META.stateVersion;
   const PROJECT_NAME = PROJECT_META.name;
   const PROJECT_VERSION = PROJECT_META.version;
@@ -421,8 +422,9 @@
   let automaticBackupNotice = "";
   let browserPersistenceNotice = "";
   let dateInputObserver = null;
-  let vacationYear = new Date().getFullYear();
-  let vacationMonth = new Date().getMonth() + 1;
+  const savedVacationView = readVacationViewPreference();
+  let vacationYear = savedVacationView.year;
+  let vacationMonth = savedVacationView.month;
   let vacationEntryType = "vacation";
   let vacationEmployeeSearchTerm = "";
   // Tastaturbedienung der Planungstabelle: zuletzt angesteuertes Feld als
@@ -630,6 +632,10 @@
     vacationPlannerMaximizeLabel: document.querySelector(
       "#vacationPlannerMaximizeLabel",
     ),
+    previousVacationMonthButton: document.querySelector(
+      "#previousVacationMonthButton",
+    ),
+    nextVacationMonthButton: document.querySelector("#nextVacationMonthButton"),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),
@@ -727,6 +733,9 @@
     appointmentForm: document.querySelector("#appointmentForm"),
     appointmentDialogTitle: document.querySelector("#appointmentDialogTitle"),
     appointmentSubmitLabel: document.querySelector("#appointmentSubmitLabel"),
+    appointmentParticipantList: document.querySelector(
+      "#appointmentParticipantList",
+    ),
     deviceDialog: document.querySelector("#deviceDialog"),
     deviceForm: document.querySelector("#deviceForm"),
     deviceDialogTitle: document.querySelector("#deviceDialogTitle"),
@@ -871,6 +880,7 @@
     phoneListPreviewSubtitle: document.querySelector("#phoneListPreviewSubtitle"),
     phoneListPreviewContent: document.querySelector("#phoneListPreviewContent"),
     phoneListPrintSurface: document.querySelector("#phoneListPrintSurface"),
+    appointmentPrintSurface: document.querySelector("#appointmentPrintSurface"),
     printEmployeePhoneListButton: document.querySelector(
       "#printEmployeePhoneListButton",
     ),
@@ -1668,6 +1678,7 @@
       category: Object.hasOwn(APPOINTMENT_CATEGORIES, category) ? category : "",
       location: String(appointment.location || "").trim().slice(0, 160),
       description: String(appointment.description || "").trim().slice(0, 1000),
+      participantList: Boolean(appointment.participantList),
       createdAt: validTimestamp(appointment.createdAt),
       updatedAt: validTimestamp(appointment.updatedAt || appointment.createdAt),
     };
@@ -2303,10 +2314,12 @@
     elements.openWeekendPrintButton.addEventListener("click", openWeekendOverviewDialog);
     elements.vacationYear.addEventListener("change", () => {
       vacationYear = Number(elements.vacationYear.value);
+      saveVacationViewPreference();
       renderVacationPlanner();
     });
     elements.vacationMonth.addEventListener("change", () => {
       vacationMonth = Number(elements.vacationMonth.value);
+      saveVacationViewPreference();
       renderVacationPlanner();
     });
     elements.vacationEntryType.addEventListener("change", () => {
@@ -2329,6 +2342,12 @@
       "click",
       toggleVacationPlannerMaximized,
     );
+    elements.previousVacationMonthButton.addEventListener("click", () =>
+      shiftVacationMonth(-1),
+    );
+    elements.nextVacationMonthButton.addEventListener("click", () =>
+      shiftVacationMonth(1),
+    );
     document.addEventListener("keydown", handleVacationPlannerMaximizeKeydown);
     elements.vacationConflictContent.addEventListener("click", (event) => {
       const dateButton = event.target.closest("[data-vacation-conflict-date]");
@@ -2336,6 +2355,7 @@
       const date = dateButton.dataset.vacationConflictDate;
       vacationYear = Number(date.slice(0, 4));
       vacationMonth = Number(date.slice(5, 7));
+      saveVacationViewPreference();
       elements.vacationConflictDialog.close();
       renderVacationPlanner();
     });
@@ -2741,6 +2761,7 @@
     elements.trainingList.addEventListener("click", handleTrainingAction);
     elements.meetingList.addEventListener("click", handleMeetingAction);
     elements.appointmentList.addEventListener("click", handleAppointmentAction);
+    elements.appointmentList.addEventListener("keydown", handleAppointmentAction);
     elements.deviceCatalog.addEventListener("click", handleDeviceAction);
     elements.deviceInstructionMatrix.addEventListener(
       "click",
@@ -4671,14 +4692,9 @@
     elements.deadlineOverview
       .querySelectorAll("[data-deadline-appointment]")
       .forEach((button) => {
-        button.addEventListener("click", () => {
-          showView("appointments");
-          elements.appointmentList
-            .querySelector(
-              `[data-appointment-card="${button.dataset.deadlineAppointment}"]`,
-            )
-            ?.scrollIntoView({ block: "center", behavior: "smooth" });
-        });
+        button.addEventListener("click", () =>
+          openAppointmentDialog(button.dataset.deadlineAppointment),
+        );
       });
   }
 
@@ -5832,7 +5848,7 @@
 
     elements.vacationPlanner.innerHTML = `
       <div class="vacation-table-note">
-        <span>
+        <span class="vacation-note-detail">
           „Urlaub“ und „Urlaub Einarbeitung“ werden vom Jahresanspruch abgezogen.
           Urlaub Einarbeitung und Dienstzusagen zählen nicht gegen die Tagesgrenze
           (${state.settings.vacationWeekdayAbsenceLimit} werktags,
@@ -5841,18 +5857,18 @@
           Dienstwochenende gleicht die Zusage eines Mitarbeiters vom jeweils anderen
           festen Wochenende einen Urlaub auf dem eigenen Wochenende aus.
         </span>
-        <span>
+        <span class="vacation-note-detail">
           Abwesenheiten von ${escapeHtml(absenceLimitExemptProfessionNote())}
           bleiben sichtbar, zählen aber nicht gegen die Tagesgrenze.
         </span>
-        <span>${escapeHtml(plannerKeyboardHintText())}</span>
-        <span class="${
+        ${renderPlannerKeyboardHint()}
+        <span class="vacation-note-detail ${
           schoolVacations.size ? "" : "is-warning"
         }">${schoolVacationCoverageNote}</span>
         ${
           employees.length === allEmployees.length
             ? ""
-            : `<span class="is-warning">Namensfilter aktiv: ${employees.length} von ${allEmployees.length} Mitarbeitern sichtbar. Die Tagesgrenzen berücksichtigen weiterhin das gesamte Team.</span>`
+            : `<span class="vacation-note-detail is-warning">Namensfilter aktiv: ${employees.length} von ${allEmployees.length} Mitarbeitern sichtbar. Die Tagesgrenzen berücksichtigen weiterhin das gesamte Team.</span>`
         }
       </div>
       <div class="vacation-table-scroll">
@@ -5893,14 +5909,53 @@
     restoreVacationFocus();
   }
 
-  function plannerKeyboardHintText() {
+  function renderPlannerKeyboardHint() {
     const shortcuts = Object.entries(PLANNER_ENTRY_KEYS)
-      .map(
-        ([key, type]) =>
-          `${key.toLocaleUpperCase("de-DE")} ${PLANNER_ENTRY_TYPES[type].label}`,
-      )
-      .join(", ");
-    return `Tastatur: ${shortcuts}. Pfeiltasten wechseln das Feld, Pos 1 und Ende springen an den Monatsrand, Bild auf und Bild ab wechseln den Monat, Umschalt und Pfeil markieren einen Bereich, Entf oder Rücktaste löscht.`;
+      .map(([key, type]) => {
+        const definition = PLANNER_ENTRY_TYPES[type];
+        return `<span class="vacation-shortcut">
+          <kbd>${key.toLocaleUpperCase("de-DE")}</kbd>
+          <i class="vacation-shortcut-symbol planner-entry-${type}" aria-hidden="true">${definition.shortLabel}</i>
+          <span>${escapeHtml(definition.label)}</span>
+        </span>`;
+      })
+      .join("");
+    return `<div class="vacation-keyboard-hint">
+      <strong>Tastatur:</strong>
+      <span class="vacation-shortcut-list">${shortcuts}</span>
+      <span class="vacation-navigation-hint">Pfeiltasten wechseln das Feld · Pos 1/Ende springen an den Monatsrand · Bild auf/ab wechseln den Monat · Umschalt + Pfeil markiert · Entf/Rücktaste löscht</span>
+    </div>`;
+  }
+
+  function readVacationViewPreference() {
+    const fallback = {
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+    };
+    try {
+      const raw = window.localStorage?.getItem?.(VACATION_VIEW_KEY);
+      if (!raw) return fallback;
+      const value = JSON.parse(raw);
+      const year = Number(value?.year);
+      const month = Number(value?.month);
+      return {
+        year: Number.isInteger(year) && year >= 2000 && year <= 2100 ? year : fallback.year,
+        month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : fallback.month,
+      };
+    } catch {
+      return fallback;
+    }
+  }
+
+  function saveVacationViewPreference() {
+    try {
+      window.localStorage?.setItem?.(
+        VACATION_VIEW_KEY,
+        JSON.stringify({ year: vacationYear, month: vacationMonth }),
+      );
+    } catch {
+      // Die Planung bleibt auch ohne verfügbaren Browserspeicher bedienbar.
+    }
   }
 
   function renderVacationControls() {
@@ -5927,6 +5982,14 @@
     elements.vacationYear.value = String(vacationYear);
     elements.vacationMonth.value = String(vacationMonth);
     elements.vacationEntryType.value = vacationEntryType;
+    renderVacationSettingsControls();
+    elements.vacationWeekendALegend.textContent =
+      serviceWeekendLabel("weekend_a");
+    elements.vacationWeekendBLegend.textContent =
+      serviceWeekendLabel("weekend_b");
+  }
+
+  function renderVacationSettingsControls() {
     elements.vacationBaseDays.value = String(state.settings.vacationBaseDays);
     elements.vacationWeekdayAbsenceLimit.value = String(
       state.settings.vacationWeekdayAbsenceLimit,
@@ -5938,10 +6001,6 @@
       state.settings.vacationWeekendAReferenceSaturday;
     elements.vacationWeekendAReferenceLabel.textContent =
       `Referenzsamstag ${serviceWeekendLabel("weekend_a")}`;
-    elements.vacationWeekendALegend.textContent =
-      serviceWeekendLabel("weekend_a");
-    elements.vacationWeekendBLegend.textContent =
-      serviceWeekendLabel("weekend_b");
   }
 
   function renderVacationDayHeader(date, holidays, schoolVacations) {
@@ -6332,12 +6391,14 @@
     const target = new Date(vacationYear, vacationMonth - 1 + offset, 1, 12);
     vacationYear = target.getFullYear();
     vacationMonth = target.getMonth() + 1;
+    saveVacationViewPreference();
     // Der Tag im Monat entspricht dem Spaltenindex; kuerzere Monate werden
     // abgeschnitten.
     const daysInMonth = new Date(vacationYear, vacationMonth, 0).getDate();
+    const nextPosition = position || vacationFocus || { row: 0, column: 0 };
     vacationFocus = {
-      row: position.row,
-      column: Math.min(position.column, daysInMonth - 1),
+      row: nextPosition.row,
+      column: Math.min(nextPosition.column, daysInMonth - 1),
     };
     vacationSelectionAnchor = null;
     renderVacationPlanner();
@@ -7610,7 +7671,9 @@
       .filter((employee) => {
         if (
           employeeStatusFilter !== "all" &&
-          employee.employmentStatus !== employeeStatusFilter
+          (employeeStatusFilter === "employed"
+            ? employee.employmentStatus === "inactive"
+            : employee.employmentStatus !== employeeStatusFilter)
         ) {
           return false;
         }
@@ -7640,19 +7703,9 @@
         }
         if (!employeeSearchTerm) return true;
 
-        const qualificationText = Object.entries(employee.qualifications)
-          .filter(([, selected]) => selected)
-          .map(([key]) => qualificationLabel(key))
-          .join(" ");
         const haystack = [
           employee.firstName,
           employee.lastName,
-          employee.username,
-          employee.profession,
-          employee.email,
-          qualificationText,
-          serviceWeekendLabel(employee.serviceWeekend),
-          employeeStatusLabel(employee),
         ]
           .join(" ")
           .toLocaleLowerCase("de-DE");
@@ -8467,6 +8520,8 @@
       <article
         class="meeting-card appointment-card ${daysUntil < 0 ? "is-past" : ""}"
         data-appointment-card="${appointment.id}"
+        tabindex="0"
+        aria-label="Termindetails zu ${escapeHtml(appointment.title)} öffnen"
       >
         <div class="meeting-card-main">
           <div class="training-title-row">
@@ -9755,7 +9810,6 @@
     return `${device.manufacturer} ${device.productName}`.trim();
   }
 
-
   function renderMeetings() {
     const meetingStats = state.meetings.map((meeting) => getMeetingStats(meeting));
     const completedMeetings = meetingStats.filter(
@@ -10334,11 +10388,20 @@
 
   function handleAppointmentAction(event) {
     const button = event.target.closest("[data-action][data-id]");
-    if (!button) return;
+    if (button) {
+      if (event.type === "keydown") return;
+      const { action, id } = button.dataset;
+      if (action === "edit-appointment") openAppointmentDialog(id);
+      if (action === "delete-appointment") requestDeleteAppointment(id);
+      return;
+    }
 
-    const { action, id } = button.dataset;
-    if (action === "edit-appointment") openAppointmentDialog(id);
-    if (action === "delete-appointment") requestDeleteAppointment(id);
+    const card = event.target.closest("[data-appointment-card]");
+    if (!card || (event.type === "keydown" && !["Enter", " "].includes(event.key))) {
+      return;
+    }
+    if (event.type === "keydown") event.preventDefault();
+    openAppointmentDialog(card.dataset.appointmentCard);
   }
 
   function openEmployeeDialog(employeeId = null) {
@@ -10817,6 +10880,7 @@
     document.querySelector("#appointmentTitle").setCustomValidity("");
     document.querySelector("#appointmentEndTime").setCustomValidity("");
     document.querySelector("#appointmentDate").value = todayIso();
+    elements.appointmentParticipantList.checked = false;
 
     const appointment = appointmentId ? getAppointment(appointmentId) : null;
     elements.appointmentDialogTitle.textContent = appointment
@@ -10835,6 +10899,7 @@
       elements.appointmentCategory.value = appointment.category || "";
       document.querySelector("#appointmentLocation").value = appointment.location;
       document.querySelector("#appointmentDescription").value = appointment.description;
+      elements.appointmentParticipantList.checked = Boolean(appointment.participantList);
     }
 
     elements.appointmentDialog.showModal();
@@ -10857,6 +10922,7 @@
 
   async function handleAppointmentSubmit(event) {
     event.preventDefault();
+    const shouldPrint = event.submitter?.value === "print";
     const titleInput = document.querySelector("#appointmentTitle");
     titleInput.setCustomValidity(
       titleInput.value.trim() ? "" : "Bitte einen Titel eingeben.",
@@ -10878,6 +10944,7 @@
       category: elements.appointmentCategory.value,
       location: document.querySelector("#appointmentLocation").value.trim(),
       description: document.querySelector("#appointmentDescription").value.trim(),
+      participantList: elements.appointmentParticipantList.checked,
       createdAt: existingAppointment?.createdAt || now,
       updatedAt: now,
     };
@@ -10897,6 +10964,32 @@
     showToast(
       existingAppointment ? "Termin wurde aktualisiert." : "Termin wurde angelegt.",
     );
+    if (shouldPrint) printAppointment(appointment);
+  }
+
+  function printAppointment(appointment) {
+    const category = appointmentCategoryLabel(appointment);
+    const time = formatAppointmentTime(appointment);
+    const participantRows = appointment.participantList
+      ? `<section class="appointment-print-participants">
+          <h2>Teilnehmerliste</h2>
+          ${Array.from({ length: 14 }, () => "<span></span>").join("")}
+        </section>`
+      : "";
+    elements.appointmentPrintSurface.innerHTML = `
+      <article class="appointment-print-document">
+        <header>
+          ${category ? `<p class="appointment-print-category">${escapeHtml(category)}</p>` : ""}
+          <h1>${escapeHtml(appointment.title)}</h1>
+          <p>${formatDate(appointment.date)}</p>
+          <p>${escapeHtml(time || " ")}</p>
+          <p>${escapeHtml(appointment.location || " ")}</p>
+        </header>
+        ${participantRows}
+      </article>`;
+    document.body.classList.add("print-appointment");
+    window.print();
+    window.setTimeout(() => document.body.classList.remove("print-appointment"), 0);
   }
 
   function requestDeleteAppointment(appointmentId) {
@@ -12173,6 +12266,7 @@
       ? "on"
       : "off";
     renderSchoolVacationSettings();
+    renderVacationSettingsControls();
     elements.settingsStorageBackend.value = backendMode;
     elements.settingsMariaDbApiUrl.value =
       backendConfig.apiUrl ||

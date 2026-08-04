@@ -342,7 +342,9 @@
       .filter((employee) => {
         if (
           employeeStatusFilter !== "all" &&
-          employee.employmentStatus !== employeeStatusFilter
+          (employeeStatusFilter === "employed"
+            ? employee.employmentStatus === "inactive"
+            : employee.employmentStatus !== employeeStatusFilter)
         ) {
           return false;
         }
@@ -372,19 +374,9 @@
         }
         if (!employeeSearchTerm) return true;
 
-        const qualificationText = Object.entries(employee.qualifications)
-          .filter(([, selected]) => selected)
-          .map(([key]) => qualificationLabel(key))
-          .join(" ");
         const haystack = [
           employee.firstName,
           employee.lastName,
-          employee.username,
-          employee.profession,
-          employee.email,
-          qualificationText,
-          serviceWeekendLabel(employee.serviceWeekend),
-          employeeStatusLabel(employee),
         ]
           .join(" ")
           .toLocaleLowerCase("de-DE");

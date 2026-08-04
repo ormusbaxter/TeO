@@ -89,6 +89,10 @@ Ansicht.
 In der Mitarbeiterverwaltung berücksichtigt auch **E-Mails kopieren** nur die
 aktuell gefilterte Liste.
 
+Die Mitarbeitersuche durchsucht ausschließlich Vor- und Nachnamen. Mit dem
+Statusfilter **Aktiv + In Einarbeitung** lassen sich alle aktuell beschäftigten
+Personen gemeinsam anzeigen.
+
 Der Qualifikationsfilter bietet zusätzlich **Keine Qualifikation**. Damit
 lassen sich gezielt Mitarbeiter anzeigen, denen aktuell keine
 Zusatzqualifikation zugewiesen ist.
@@ -394,6 +398,9 @@ Der Jahresanspruch setzt sich zusammen aus:
 - Stellenanteil des Mitarbeiters
 - individuell erarbeitetem Zusatzurlaub durch Schichtdienst
 
+Grundurlaub, Abwesenheitsgrenzen und Referenzsamstag werden unter
+**Einstellungen → Urlaub** gepflegt.
+
 Die fünf Summenspalten **Basis**, **Zusatz**, **Anspruch**, **Geplant** und
 **Rest** bleiben beim horizontalen Scrollen fixiert.
 
@@ -422,6 +429,11 @@ Eintrag erscheint als **×** im selben Grün wie der Urlaub.
 3. In der Zeile des Mitarbeiters auf den entsprechenden Tag klicken.
 4. Ein erneuter Klick beziehungsweise die Auswahl „Kein Eintrag“ entfernt
    den Planungseintrag.
+
+Der zuletzt gewählte Monat und das Planungsjahr werden im Browser gespeichert.
+In der maximierten Planung blättern die Pfeilschaltflächen über der Tabelle
+durch die Monate; dort bleibt oberhalb der Tabelle nur die kompakte, mit den
+farbigen Tabellensymbolen dargestellte Tastaturbelegung sichtbar.
 
 Die Kopfzeile bleibt beim vertikalen Scrollen sichtbar. Wochenenden,
 Feiertage, Schulferien und die beiden Dienstwochenenden werden farblich
@@ -549,6 +561,12 @@ Ein Termin benötigt mindestens:
 
 Optional können Uhrzeit von/bis, Ort, Beschreibung und eine **Kategorie**
 hinterlegt werden.
+
+**Speichern & Drucken** legt den Termin an und öffnet eine mittig gesetzte
+DIN-A4-Druckansicht. Ist **Teilnehmerliste** aktiviert, enthält sie zusätzliche
+Leerzeilen zur handschriftlichen Eintragung. Angelegte Termine lassen sich in
+der Terminübersicht und im Fristenmonitor anklicken; beide Wege öffnen denselben
+Detaildialog zum Ansehen oder Bearbeiten.
 
 Zur Auswahl stehen Geräteeinweisung, Teamsitzung, Meeting,
 Stationsleiterkonferenz, Begehung, Hospitation, Prüfung, Schulung und

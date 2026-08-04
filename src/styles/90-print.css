@@ -15,6 +15,15 @@
   margin: 10mm;
 }
 
+@page appointment {
+  size: A4 portrait;
+  margin: 18mm;
+}
+
+.appointment-print-surface {
+  display: none;
+}
+
 @media print {
   * {
     print-color-adjust: exact;
@@ -48,6 +57,72 @@
     padding: 15mm;
     color: #111;
     background: white;
+  }
+
+  body.print-appointment > * {
+    display: none !important;
+  }
+
+  body.print-appointment > #appointmentPrintSurface {
+    page: appointment;
+    display: block !important;
+    width: 100%;
+    min-height: 261mm;
+    color: #111;
+    background: white;
+  }
+
+  .appointment-print-document,
+  .appointment-print-document * {
+    box-sizing: border-box;
+    color: #111;
+    text-align: center;
+  }
+
+  .appointment-print-document header {
+    display: grid;
+    gap: 5mm;
+    justify-items: center;
+    padding-top: 18mm;
+  }
+
+  .appointment-print-document :is(h1, h2, p) {
+    margin: 0;
+  }
+
+  .appointment-print-document h1 {
+    font-size: 24pt;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .appointment-print-document header p {
+    min-height: 1.2em;
+    font-size: 14pt;
+  }
+
+  .appointment-print-category {
+    font-size: 12pt !important;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .appointment-print-participants {
+    display: grid;
+    gap: 4mm;
+    margin-top: 18mm;
+  }
+
+  .appointment-print-participants h2 {
+    margin-bottom: 2mm;
+    font-size: 14pt;
+  }
+
+  .appointment-print-participants span {
+    display: block;
+    height: 7mm;
+    border-bottom: 0.35mm solid #555;
   }
 
   body.print-phone-list #phoneListPrintSurface .phone-list-document {

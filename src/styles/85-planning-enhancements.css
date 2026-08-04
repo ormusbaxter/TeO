@@ -156,6 +156,21 @@ body.is-vacation-view .main-content {
   font-size: 1rem;
 }
 
+.vacation-planner-widget-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.vacation-month-navigation svg {
+  width: 16px;
+  height: 16px;
+}
+
+.vacation-month-previous svg {
+  transform: rotate(180deg);
+}
+
 .vacation-planner-content {
   min-width: 0;
 }
@@ -199,6 +214,10 @@ body.is-vacation-planner-maximized {
   flex: 0 0 auto;
 }
 
+.vacation-planner-panel.is-maximized .vacation-note-detail {
+  display: none;
+}
+
 .vacation-planner-panel.is-maximized .vacation-table-scroll {
   max-height: none;
   flex: 1 1 auto;
@@ -217,6 +236,94 @@ body.is-vacation-planner-maximized {
 .vacation-table-note .is-warning {
   color: var(--orange-700);
   font-weight: 700;
+}
+
+.vacation-keyboard-hint,
+.vacation-shortcut-list,
+.vacation-shortcut {
+  display: flex;
+  align-items: center;
+}
+
+.vacation-keyboard-hint {
+  flex-wrap: wrap;
+  gap: 7px 10px;
+}
+
+.vacation-shortcut-list {
+  flex-wrap: wrap;
+  gap: 5px 10px;
+}
+
+.vacation-shortcut {
+  gap: 4px;
+}
+
+.vacation-shortcut kbd {
+  min-width: 20px;
+  padding: 1px 4px;
+  color: var(--slate-700);
+  font: inherit;
+  font-weight: 900;
+  text-align: center;
+  border: 1px solid var(--slate-300);
+  border-radius: 4px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--slate-300);
+}
+
+.vacation-shortcut-symbol {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  color: var(--white);
+  font-size: 0.63rem;
+  font-style: normal;
+  font-weight: 900;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  box-shadow: 0 3px 9px rgb(16 34 54 / 20%);
+}
+
+.vacation-shortcut-symbol.planner-entry-vacation,
+.vacation-shortcut-symbol.planner-entry-plannedOff {
+  border-color: var(--green-700);
+  background: var(--green-700);
+}
+
+.vacation-shortcut-symbol.planner-entry-onboardingVacation {
+  border-color: #087f9c;
+  background: #0891b2;
+}
+
+.vacation-shortcut-symbol.planner-entry-school {
+  border-color: var(--blue-700);
+  background: var(--blue-700);
+}
+
+.vacation-shortcut-symbol.planner-entry-unpaid {
+  border-color: var(--red-700);
+  background: var(--red-700);
+}
+
+.vacation-shortcut-symbol.planner-entry-external {
+  border-color: #805bad;
+  background: #805bad;
+}
+
+.vacation-shortcut-symbol.planner-entry-mandatoryDuty {
+  color: var(--orange-700);
+  border: 2px solid var(--orange-700);
+  background: var(--orange-100);
+}
+
+.vacation-navigation-hint {
+  color: var(--slate-500);
+}
+
+.vacation-settings-form {
+  align-items: end;
 }
 
 .vacation-table-scroll {
