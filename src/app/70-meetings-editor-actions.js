@@ -1001,6 +1001,7 @@
       title: titleInput.value.trim(),
       year: trainingYear,
       recurrenceMonths,
+      targetMinutes: existingTraining?.targetMinutes || null,
       seriesId: recurrenceMonths
         ? existingTraining?.seriesId ||
           matchingSeries?.seriesId ||

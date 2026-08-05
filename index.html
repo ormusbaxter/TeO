@@ -831,6 +831,10 @@
               </p>
             </div>
             <div class="header-actions">
+              <button class="button button-secondary" id="openTrainingTimeCalculatorButton" type="button">
+                <svg><use href="#icon-chart"></use></svg>
+                Zeiten berechnen
+              </button>
               <button class="button button-secondary" id="openTrainingMatrixButton" type="button">
                 <svg><use href="#icon-chart"></use></svg>
                 Jahresauswertung
@@ -882,7 +886,6 @@
           <div class="training-summary" id="meetingSummary"></div>
           <section class="meeting-list" id="meetingList"></section>
         </section>
-
 
         <section class="view" id="devicesView" data-view-panel="devices">
           <div class="page-header">
@@ -1167,6 +1170,28 @@
               <div class="settings-actions">
                 <button class="button button-primary" id="saveVacationSettingsButton" type="button">
                   Urlaubseinstellungen speichern
+                </button>
+              </div>
+            </section>
+
+            <section class="panel settings-card settings-card-wide">
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-storage">
+                  <svg><use href="#icon-training"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Pflichtfortbildungen</p>
+                  <h2>Soll-Zeiten</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Optionale Dauer je Pflichtfortbildung in Minuten. Fortbildungen mit
+                Soll-Zeit werden im Rechner für die anrechenbare Arbeitszeit angeboten.
+              </p>
+              <div class="training-duration-settings" id="trainingDurationSettings"></div>
+              <div class="settings-actions">
+                <button class="button button-primary" id="saveTrainingDurationsButton" type="button">
+                  Soll-Zeiten speichern
                 </button>
               </div>
             </section>
@@ -1763,6 +1788,11 @@
 <h3 id="hilfe-fortbildungskatalog">Fortbildungskatalog</h3>
 <p>Beim Anlegen einer Pflichtfortbildung werden Titel, Einführungsjahr, Beschreibung und Wiederholungsintervall festgelegt.</p>
 <p>Das angegebene Jahr ist das Einführungsjahr im Pflichtkatalog. Eine Fortbildung steht ab diesem Jahr auch in späteren Jahren zur Verfügung.</p>
+<p>Unter <strong>Einstellungen → Pflichtfortbildungen</strong> kann für jede Fortbildung optional eine Soll-Zeit in Minuten hinterlegt werden.</p>
+<h3 id="hilfe-zeiten-berechnen">Zeiten berechnen</h3>
+<p>Über <strong>Pflichtfortbildungen → Zeiten berechnen</strong> öffnet sich ein Rechner mit zwei Bereichen:</p>
+<ul><li>Bis zu 20 Zeitspannen in Stunden und Minuten werden live addiert.</li><li>Alle Fortbildungen mit hinterlegter Soll-Zeit werden aufgelistet. Je Fortbildung kann die tatsächlich anzurechnende Arbeitszeit in Minuten eingegeben werden.</li></ul>
+<p>Beide Summen werden als Minutenwert und zusätzlich im Format <code>hh:mm</code> angezeigt.</p>
 <h3 id="hilfe-wiederholungsintervalle">Wiederholungsintervalle</h3>
 <p>Standardmäßig gilt eine jährliche Wiederholung. Für Gewaltprävention sind standardmäßig fünf Jahre vorgesehen. Andere Intervalle können ebenfalls festgelegt werden.</p>
 <p>Wiederkehrende Einträge desselben Themas werden zu einer Fortbildungsreihe verbunden. Der neueste gültige Nachweis bestimmt die nächste Fälligkeit der gesamten Reihe.</p>
@@ -1895,6 +1925,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-020-000-pflichtfortbildungszeiten">004.020.000 – Pflichtfortbildungszeiten</h3>
+<ul><li><strong>Neu:</strong> Optionale Soll-Zeiten je Pflichtfortbildung in den Einstellungen</li><li><strong>Neu:</strong> Rechner für bis zu 20 Zeitspannen und anrechenbare Fortbildungszeit</li></ul>
 <h3 id="hilfe-004-019-000-urlaubsplanung">004.019.000 – Urlaubsplanung</h3>
 <ul><li><strong>Neu:</strong> Nachtdienst als Planungseintrag ohne Urlaubsverbrauch</li><li><strong>Verbessert:</strong> Unbezahlter Urlaub mit Kürzel „uU“ und Tastenkürzel B</li></ul>
 <h3 id="hilfe-004-018-000-fristenmonitor">004.018.000 – Fristenmonitor</h3>
@@ -2882,6 +2914,59 @@ npm run verify</code></pre>
           <svg><use href="#icon-print"></use></svg>
           Auswertung drucken
         </button>
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large training-time-calculator-dialog"
+      id="trainingTimeCalculatorDialog"
+      aria-labelledby="trainingTimeCalculatorDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Arbeitszeit</p>
+          <h2 id="trainingTimeCalculatorDialogTitle">Zeiten berechnen</h2>
+          <p class="modal-subtitle">Zeitspannen und anrechenbare Fortbildungszeiten addieren</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body training-time-calculator-body">
+        <section class="time-calculator-section" aria-labelledby="timeSpanCalculatorTitle">
+          <div class="time-calculator-heading">
+            <div>
+              <h3 id="timeSpanCalculatorTitle">Zeitspannen addieren</h3>
+              <p>Bis zu 20 Angaben in Stunden und Minuten. Leere Zeilen werden ignoriert.</p>
+            </div>
+            <button class="button button-secondary" id="resetTimeSpansButton" type="button">Eingaben leeren</button>
+          </div>
+          <div class="time-span-list" id="timeSpanList"></div>
+          <div class="time-calculator-result" aria-live="polite">
+            <span>Summe</span>
+            <strong id="timeSpanTotalMinutes">0 Minuten</strong>
+            <output id="timeSpanTotalFormatted">00:00</output>
+          </div>
+        </section>
+
+        <section class="time-calculator-section" aria-labelledby="creditedTrainingTimeTitle">
+          <div class="time-calculator-heading">
+            <div>
+              <h3 id="creditedTrainingTimeTitle">Anrechenbare Arbeitszeit</h3>
+              <p>Tatsächlich anzurechnende Minuten je Pflichtfortbildung eintragen.</p>
+            </div>
+            <button class="button button-secondary" id="resetCreditedTrainingTimesButton" type="button">Eingaben leeren</button>
+          </div>
+          <div class="credited-training-time-list" id="creditedTrainingTimeList"></div>
+          <div class="time-calculator-result" aria-live="polite">
+            <span>Anrechenbare Summe</span>
+            <strong id="creditedTrainingTotalMinutes">0 Minuten</strong>
+            <output id="creditedTrainingTotalFormatted">00:00</output>
+          </div>
+        </section>
+      </div>
+      <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
     </dialog>

@@ -756,6 +756,7 @@
       .closeDialogOnOutsideClick
       ? "on"
       : "off";
+    renderTrainingDurationSettings();
     renderSchoolVacationSettings();
     renderVacationSettingsControls();
     elements.settingsStorageBackend.value = backendMode;
@@ -775,6 +776,87 @@
       : "<i></i> Lokal verbunden";
     renderWeekendSettings();
     renderBackendSelection();
+  }
+
+  function renderTrainingDurationSettings() {
+    const trainings = [...state.trainings].sort(
+      (trainingA, trainingB) =>
+        trainingA.title.localeCompare(trainingB.title, "de") ||
+        trainingB.year - trainingA.year,
+    );
+    elements.trainingDurationSettings.innerHTML = trainings.length
+      ? trainings
+          .map(
+            (training) => `
+              <label class="training-duration-setting-row">
+                <span>
+                  <strong>${escapeHtml(training.title)}</strong>
+                  <small>Im Katalog seit ${training.year}</small>
+                </span>
+                <span class="input-suffix">
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    inputmode="numeric"
+                    value="${training.targetMinutes || ""}"
+                    placeholder="Optional"
+                    data-training-duration="${training.id}"
+                    aria-label="Soll-Zeit für ${escapeHtml(training.title)} in Minuten"
+                  />
+                  <span>Min.</span>
+                </span>
+              </label>
+            `,
+          )
+          .join("")
+      : `<p class="settings-empty-copy">Legen Sie zuerst eine Pflichtfortbildung an.</p>`;
+    elements.saveTrainingDurationsButton.disabled = trainings.length === 0;
+  }
+
+  async function saveTrainingDurations() {
+    const inputs = [...elements.trainingDurationSettings.querySelectorAll(
+      "[data-training-duration]",
+    )];
+    const invalidInput = inputs.find(
+      (input) =>
+        input.value.trim() &&
+        (!Number.isInteger(Number(input.value)) || Number(input.value) < 1),
+    );
+    if (invalidInput) {
+      invalidInput.setCustomValidity("Bitte ganze Minuten ab 1 eingeben oder das Feld leer lassen.");
+      invalidInput.reportValidity();
+      invalidInput.setCustomValidity("");
+      return;
+    }
+
+    const targetMinutesById = new Map(
+      inputs.map((input) => [
+        input.dataset.trainingDuration,
+        input.value.trim() ? Number(input.value) : null,
+      ]),
+    );
+    const changed = state.trainings.some(
+      (training) =>
+        (training.targetMinutes || null) !== targetMinutesById.get(training.id),
+    );
+    if (!changed) {
+      showToast("Die Soll-Zeiten sind bereits aktuell.");
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const committed = await commitStateMutation(() => {
+      state.trainings = state.trainings.map((training) => ({
+        ...training,
+        targetMinutes: targetMinutesById.get(training.id),
+        updatedAt:
+          (training.targetMinutes || null) === targetMinutesById.get(training.id)
+            ? training.updatedAt
+            : now,
+      }));
+    });
+    if (committed) showToast("Soll-Zeiten wurden gespeichert.");
   }
 
   function renderWeekendSettings() {

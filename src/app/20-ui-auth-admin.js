@@ -163,6 +163,27 @@
       requestApplyWeekendSimulation,
     );
     elements.openTrainingMatrixButton.addEventListener("click", openTrainingMatrixDialog);
+    elements.openTrainingTimeCalculatorButton.addEventListener(
+      "click",
+      openTrainingTimeCalculator,
+    );
+    elements.timeSpanList.addEventListener("input", updateTimeSpanTotal);
+    elements.creditedTrainingTimeList.addEventListener(
+      "input",
+      updateCreditedTrainingTimeTotal,
+    );
+    elements.resetTimeSpansButton.addEventListener("click", () => {
+      elements.timeSpanList.querySelectorAll("input").forEach((input) => {
+        input.value = "";
+      });
+      updateTimeSpanTotal();
+    });
+    elements.resetCreditedTrainingTimesButton.addEventListener("click", () => {
+      elements.creditedTrainingTimeList.querySelectorAll("input").forEach((input) => {
+        input.value = "";
+      });
+      updateCreditedTrainingTimeTotal();
+    });
     elements.trainingDisplayYear.addEventListener("change", () => {
       trainingDisplayYear = Number(elements.trainingDisplayYear.value);
       renderTrainings();
@@ -310,6 +331,10 @@
     elements.saveGeneralSettingsButton.addEventListener(
       "click",
       saveGeneralSettings,
+    );
+    elements.saveTrainingDurationsButton.addEventListener(
+      "click",
+      saveTrainingDurations,
     );
     elements.saveWeekendSettingsButton.addEventListener(
       "click",

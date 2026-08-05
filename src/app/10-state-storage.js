@@ -655,6 +655,7 @@
     const id = normalizeId(training?.id);
     if (!training || !id) return null;
     const recurrence = Number(training.recurrenceMonths);
+    const targetMinutes = Number(training.targetMinutes);
     const createdAt = validTimestamp(training.createdAt);
     const storedYear = Number(training.year);
     const fallbackYear = new Date(createdAt).getFullYear();
@@ -668,6 +669,8 @@
           ? storedYear
           : fallbackYear,
       recurrenceMonths: Number.isFinite(recurrence) && recurrence > 0 ? recurrence : null,
+      targetMinutes:
+        Number.isInteger(targetMinutes) && targetMinutes > 0 ? targetMinutes : null,
       seriesId: normalizeId(training.seriesId) || "",
       createdAt,
       updatedAt: validTimestamp(training.updatedAt || training.createdAt),

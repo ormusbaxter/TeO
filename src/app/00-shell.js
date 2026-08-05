@@ -647,7 +647,14 @@
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),
     trainingList: document.querySelector("#trainingList"),
+    openTrainingTimeCalculatorButton: document.querySelector(
+      "#openTrainingTimeCalculatorButton",
+    ),
     openTrainingMatrixButton: document.querySelector("#openTrainingMatrixButton"),
+    trainingDurationSettings: document.querySelector("#trainingDurationSettings"),
+    saveTrainingDurationsButton: document.querySelector(
+      "#saveTrainingDurationsButton",
+    ),
     meetingSummary: document.querySelector("#meetingSummary"),
     meetingList: document.querySelector("#meetingList"),
     openMeetingStatsButton: document.querySelector("#openMeetingStatsButton"),
@@ -704,6 +711,23 @@
       "#exportTrainingMatrixCsvButton",
     ),
     printTrainingMatrixButton: document.querySelector("#printTrainingMatrixButton"),
+    trainingTimeCalculatorDialog: document.querySelector(
+      "#trainingTimeCalculatorDialog",
+    ),
+    timeSpanList: document.querySelector("#timeSpanList"),
+    timeSpanTotalMinutes: document.querySelector("#timeSpanTotalMinutes"),
+    timeSpanTotalFormatted: document.querySelector("#timeSpanTotalFormatted"),
+    resetTimeSpansButton: document.querySelector("#resetTimeSpansButton"),
+    creditedTrainingTimeList: document.querySelector("#creditedTrainingTimeList"),
+    creditedTrainingTotalMinutes: document.querySelector(
+      "#creditedTrainingTotalMinutes",
+    ),
+    creditedTrainingTotalFormatted: document.querySelector(
+      "#creditedTrainingTotalFormatted",
+    ),
+    resetCreditedTrainingTimesButton: document.querySelector(
+      "#resetCreditedTrainingTimesButton",
+    ),
     loginDialog: document.querySelector("#loginDialog"),
     loginForm: document.querySelector("#loginForm"),
     loginError: document.querySelector("#loginError"),

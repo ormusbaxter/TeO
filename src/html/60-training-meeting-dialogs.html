@@ -196,6 +196,59 @@
       </div>
     </dialog>
 
+    <dialog
+      class="modal modal-large training-time-calculator-dialog"
+      id="trainingTimeCalculatorDialog"
+      aria-labelledby="trainingTimeCalculatorDialogTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Arbeitszeit</p>
+          <h2 id="trainingTimeCalculatorDialogTitle">Zeiten berechnen</h2>
+          <p class="modal-subtitle">Zeitspannen und anrechenbare Fortbildungszeiten addieren</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body training-time-calculator-body">
+        <section class="time-calculator-section" aria-labelledby="timeSpanCalculatorTitle">
+          <div class="time-calculator-heading">
+            <div>
+              <h3 id="timeSpanCalculatorTitle">Zeitspannen addieren</h3>
+              <p>Bis zu 20 Angaben in Stunden und Minuten. Leere Zeilen werden ignoriert.</p>
+            </div>
+            <button class="button button-secondary" id="resetTimeSpansButton" type="button">Eingaben leeren</button>
+          </div>
+          <div class="time-span-list" id="timeSpanList"></div>
+          <div class="time-calculator-result" aria-live="polite">
+            <span>Summe</span>
+            <strong id="timeSpanTotalMinutes">0 Minuten</strong>
+            <output id="timeSpanTotalFormatted">00:00</output>
+          </div>
+        </section>
+
+        <section class="time-calculator-section" aria-labelledby="creditedTrainingTimeTitle">
+          <div class="time-calculator-heading">
+            <div>
+              <h3 id="creditedTrainingTimeTitle">Anrechenbare Arbeitszeit</h3>
+              <p>Tatsächlich anzurechnende Minuten je Pflichtfortbildung eintragen.</p>
+            </div>
+            <button class="button button-secondary" id="resetCreditedTrainingTimesButton" type="button">Eingaben leeren</button>
+          </div>
+          <div class="credited-training-time-list" id="creditedTrainingTimeList"></div>
+          <div class="time-calculator-result" aria-live="polite">
+            <span>Anrechenbare Summe</span>
+            <strong id="creditedTrainingTotalMinutes">0 Minuten</strong>
+            <output id="creditedTrainingTotalFormatted">00:00</output>
+          </div>
+        </section>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
     <dialog class="modal" id="appointmentDialog" aria-labelledby="appointmentDialogTitle">
       <form id="appointmentForm">
         <div class="modal-header">

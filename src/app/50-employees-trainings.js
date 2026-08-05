@@ -701,6 +701,99 @@
       .sort((yearA, yearB) => yearB - yearA);
   }
 
+  function formatMinutesAsHoursAndMinutes(totalMinutes) {
+    const safeMinutes = Math.max(0, Math.round(Number(totalMinutes) || 0));
+    const hours = Math.floor(safeMinutes / 60);
+    const minutes = safeMinutes % 60;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  }
+
+  function openTrainingTimeCalculator() {
+    elements.timeSpanList.innerHTML = Array.from({ length: 20 }, (_, index) => `
+      <div class="time-span-row">
+        <span>${index + 1}.</span>
+        <label>
+          <span class="sr-only">Stunden der Zeitspanne ${index + 1}</span>
+          <input type="number" min="0" step="1" inputmode="numeric" data-time-hours placeholder="0" />
+          <small>Std.</small>
+        </label>
+        <span aria-hidden="true">:</span>
+        <label>
+          <span class="sr-only">Minuten der Zeitspanne ${index + 1}</span>
+          <input type="number" min="0" step="1" inputmode="numeric" data-time-minutes placeholder="00" />
+          <small>Min.</small>
+        </label>
+      </div>
+    `).join("");
+
+    const configuredTrainings = state.trainings
+      .filter((training) => Number.isInteger(training.targetMinutes) && training.targetMinutes > 0)
+      .sort(
+        (trainingA, trainingB) =>
+          trainingA.title.localeCompare(trainingB.title, "de") ||
+          trainingB.year - trainingA.year,
+      );
+    elements.creditedTrainingTimeList.innerHTML = configuredTrainings.length
+      ? configuredTrainings
+          .map(
+            (training) => `
+              <label class="credited-training-time-row">
+                <span>
+                  <strong>${escapeHtml(training.title)}</strong>
+                  <small>Soll-Zeit: ${training.targetMinutes} Minuten (${formatMinutesAsHoursAndMinutes(training.targetMinutes)})</small>
+                </span>
+                <span class="input-suffix">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                    data-credited-training-minutes
+                    data-training-id="${training.id}"
+                    aria-label="Anrechenbare Minuten für ${escapeHtml(training.title)}"
+                  />
+                  <span>Min.</span>
+                </span>
+              </label>
+            `,
+          )
+          .join("")
+      : `<div class="time-calculator-empty">
+          <strong>Keine Soll-Zeiten hinterlegt</strong>
+          <p>Unter Einstellungen → Pflichtfortbildungen können Sie Soll-Zeiten in Minuten eintragen.</p>
+        </div>`;
+
+    updateTimeSpanTotal();
+    updateCreditedTrainingTimeTotal();
+    elements.trainingTimeCalculatorDialog.showModal();
+    window.setTimeout(() => elements.timeSpanList.querySelector("input")?.focus(), 0);
+  }
+
+  function updateTimeSpanTotal() {
+    const rows = [...elements.timeSpanList.querySelectorAll(".time-span-row")];
+    const totalMinutes = rows.reduce((sum, row) => {
+      const hours = Math.max(0, Number(row.querySelector("[data-time-hours]").value) || 0);
+      const minutes = Math.max(
+        0,
+        Number(row.querySelector("[data-time-minutes]").value) || 0,
+      );
+      return sum + Math.round(hours * 60 + minutes);
+    }, 0);
+    elements.timeSpanTotalMinutes.textContent = `${totalMinutes} Minute${totalMinutes === 1 ? "" : "n"}`;
+    elements.timeSpanTotalFormatted.value = formatMinutesAsHoursAndMinutes(totalMinutes);
+  }
+
+  function updateCreditedTrainingTimeTotal() {
+    const totalMinutes = [...elements.creditedTrainingTimeList.querySelectorAll(
+      "[data-credited-training-minutes]",
+    )].reduce((sum, input) => {
+      const minutes = Math.max(0, Math.round(Number(input.value) || 0));
+      return sum + minutes;
+    }, 0);
+    elements.creditedTrainingTotalMinutes.textContent = `${totalMinutes} Minute${totalMinutes === 1 ? "" : "n"}`;
+    elements.creditedTrainingTotalFormatted.value = formatMinutesAsHoursAndMinutes(totalMinutes);
+  }
+
   function groupTrainingsByYear(trainings = state.trainings) {
     const groups = new Map();
     trainings.forEach((training) => {
@@ -993,6 +1086,11 @@
                 <svg><use href="#icon-calendar"></use></svg>
                 ${recurrenceLabel(training)}
               </span>
+              ${
+                training.targetMinutes
+                  ? `<span class="training-meta"><svg><use href="#icon-chart"></use></svg>Soll-Zeit: ${training.targetMinutes} Minuten (${formatMinutesAsHoursAndMinutes(training.targetMinutes)})</span>`
+                  : ""
+              }
             </div>
           </div>
           <div class="training-progress-block">

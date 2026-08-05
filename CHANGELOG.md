@@ -1,3 +1,8 @@
+### 004.020.000 – Pflichtfortbildungszeiten
+
+- **Neu:** Optionale Soll-Zeiten je Pflichtfortbildung in den Einstellungen
+- **Neu:** Rechner für bis zu 20 Zeitspannen und anrechenbare Fortbildungszeit
+
 ### 004.019.000 – Urlaubsplanung
 
 - **Neu:** Nachtdienst als Planungseintrag ohne Urlaubsverbrauch
