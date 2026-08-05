@@ -1811,7 +1811,8 @@
 <p>Titel, Datum, Uhrzeit und Notizen werden erfasst. Die Sitzungen werden chronologisch sortiert.</p>
 <h3 id="hilfe-teilnahme-effizient-dokumentieren">Teilnahme effizient dokumentieren</h3>
 <p>Für das aktive Team stehen folgende Statuswerte zur Verfügung:</p>
-<ul><li>teilgenommen</li><li>Urlaub</li><li>Dienst</li><li>Krankheit</li><li>Schule</li><li>entschuldigt</li><li>unentschuldigt</li></ul>
+<ul><li>teilgenommen</li><li>Urlaub</li><li>Dienst</li><li>Krankheit</li><li>Schule</li><li>entschuldigt</li><li>unentschuldigt</li><li>nicht zutreffend</li></ul>
+<p>Der Status <strong>nicht zutreffend</strong> ist beispielsweise für Personen vorgesehen, die zum Sitzungszeitpunkt noch nicht zum Team gehörten. Diese Einträge werden weder im Zähler noch im Nenner der Anwesenheitsstatistik berücksichtigt.</p>
 <p>Über die Sammelaktion kann zunächst allen sichtbaren Mitarbeitern ein Status zugewiesen werden. Anschließend müssen nur noch Ausnahmen einzeln geändert werden.</p>
 <h3 id="hilfe-statistische-auswertung">Statistische Auswertung</h3>
 <p>Die jahresbezogene Auswertung enthält:</p>
@@ -1925,6 +1926,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-021-000-fortbildungs-und-sitzungsstatus">004.021.000 – Fortbildungs- und Sitzungsstatus</h3>
+<ul><li><strong>Neu:</strong> Fortbildungsfortschritt auf der Startseite als Prozentwert</li><li><strong>Neu:</strong> Sitzungsstatus „Nicht zutreffend“ ohne Einfluss auf die Anwesenheitsstatistik</li></ul>
 <h3 id="hilfe-004-020-000-pflichtfortbildungszeiten">004.020.000 – Pflichtfortbildungszeiten</h3>
 <ul><li><strong>Neu:</strong> Optionale Soll-Zeiten je Pflichtfortbildung in den Einstellungen</li><li><strong>Neu:</strong> Rechner für bis zu 20 Zeitspannen und anrechenbare Fortbildungszeit</li></ul>
 <h3 id="hilfe-004-019-000-urlaubsplanung">004.019.000 – Urlaubsplanung</h3>
@@ -3173,6 +3176,7 @@ npm run verify</code></pre>
               <option value="schule">Schule</option>
               <option value="entschuldigt">Entschuldigt</option>
               <option value="unentschuldigt">Unentschuldigt</option>
+              <option value="nicht_zutreffend">Nicht zutreffend</option>
               <option value="">Status entfernen</option>
             </select>
             <button class="button button-secondary" id="applyBulkAttendance" type="button">

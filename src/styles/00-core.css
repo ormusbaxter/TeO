@@ -3597,6 +3597,10 @@ svg {
   --row-accent: var(--orange-700);
 }
 
+.attendance-row-muted {
+  --row-accent: var(--slate-400);
+}
+
 .attendance-row.has-status {
   background: #fcfdfd;
 }

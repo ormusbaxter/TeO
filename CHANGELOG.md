@@ -1,3 +1,8 @@
+### 004.021.000 – Fortbildungs- und Sitzungsstatus
+
+- **Neu:** Fortbildungsfortschritt auf der Startseite als Prozentwert
+- **Neu:** Sitzungsstatus „Nicht zutreffend“ ohne Einfluss auf die Anwesenheitsstatistik
+
 ### 004.020.000 – Pflichtfortbildungszeiten
 
 - **Neu:** Optionale Soll-Zeiten je Pflichtfortbildung in den Einstellungen

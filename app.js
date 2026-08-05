@@ -348,6 +348,7 @@
     schule: { label: "Schule", tone: "teal" },
     entschuldigt: { label: "Entschuldigt", tone: "orange" },
     unentschuldigt: { label: "Unentschuldigt", tone: "dark-red" },
+    nicht_zutreffend: { label: "Nicht zutreffend", tone: "muted" },
   };
 
   const ATTENDANCE_CHART_COLORS = {
@@ -358,6 +359,7 @@
     schule: "#25a29d",
     entschuldigt: "#dc8a31",
     unentschuldigt: "#9f2731",
+    nicht_zutreffend: "#9aa5b1",
     open: "#cdd5dd",
   };
 
@@ -4570,11 +4572,11 @@
       )
       .join("");
 
-    renderDashboardTrainingProgress(activeEmployees.length);
+    renderDashboardTrainingProgress();
     renderRecentEmployees();
   }
 
-  function renderDashboardTrainingProgress(activeCount) {
+  function renderDashboardTrainingProgress() {
     if (state.trainings.length === 0) {
       elements.dashboardTrainingProgress.innerHTML = renderEmptyState({
         title: "Noch keine Pflichtfortbildungen",
@@ -4631,7 +4633,7 @@
                     style="--progress: ${stats.percent}%; --progress-color: ${color}"
                   ></div>
                 </div>
-                <span class="progress-value">${activeCount ? `${stats.current}/${activeCount}` : "–"}</span>
+                <span class="progress-value">${stats.percent}&thinsp;%</span>
               </div>
             `;
           })
@@ -4974,9 +4976,14 @@
     const participated = attendances.filter(
       (attendance) => attendance.status === "teilgenommen",
     ).length;
-    const expectedMeetings = state.meetings.filter((meeting) =>
-      meeting.expectedEmployeeIds.includes(employee.id),
-    ).length;
+    const expectedMeetings = state.meetings.filter((meeting) => {
+      if (!meeting.expectedEmployeeIds.includes(employee.id)) return false;
+      return !attendances.some(
+        (attendance) =>
+          attendance.meetingId === meeting.id &&
+          attendance.status === "nicht_zutreffend",
+      );
+    }).length;
 
     elements.employeeDossierTitle.textContent = fullName(employee);
     elements.employeeDossierSubtitle.textContent = `${employee.profession} · ${employeeStatusLabel(
@@ -10237,12 +10244,14 @@
     }
 
     const chartSegments = [
-      ...Object.entries(ATTENDANCE_STATUSES).map(([status, config]) => ({
-        key: status,
-        label: config.label,
-        count: statistics.statusCounts[status],
-        color: ATTENDANCE_CHART_COLORS[status],
-      })),
+      ...Object.entries(ATTENDANCE_STATUSES)
+        .filter(([status]) => status !== "nicht_zutreffend")
+        .map(([status, config]) => ({
+          key: status,
+          label: config.label,
+          count: statistics.statusCounts[status],
+          color: ATTENDANCE_CHART_COLORS[status],
+        })),
       {
         key: "open",
         label: "Noch offen",
@@ -10388,6 +10397,7 @@
                 <th scope="col">Schule</th>
                 <th scope="col">Entschuldigt</th>
                 <th scope="col">Unentschuldigt</th>
+                <th scope="col">Nicht zutreffend</th>
                 <th scope="col">Quote</th>
               </tr>
             </thead>
@@ -10410,6 +10420,7 @@
                       <td>${employee.statusCounts.schule}</td>
                       <td>${employee.statusCounts.entschuldigt}</td>
                       <td>${employee.statusCounts.unentschuldigt}</td>
+                      <td>${employee.statusCounts.nicht_zutreffend}</td>
                       <td><strong>${employee.attendanceRate} %</strong></td>
                     </tr>
                   `,
@@ -10455,6 +10466,7 @@
         "Schule",
         "Entschuldigt",
         "Unentschuldigt",
+        "Nicht zutreffend",
         "Offen",
         "Teilnahmequote",
       ],
@@ -10468,6 +10480,7 @@
         employee.statusCounts.schule,
         employee.statusCounts.entschuldigt,
         employee.statusCounts.unentschuldigt,
+        employee.statusCounts.nicht_zutreffend,
         employee.open,
         `${employee.attendanceRate} %`,
       ]),
@@ -11370,7 +11383,7 @@
         if (attendanceStatusFilter === "documented" && !status) return false;
         if (
           attendanceStatusFilter === "absent" &&
-          (!status || status === "teilgenommen")
+          (!status || ["teilgenommen", "nicht_zutreffend"].includes(status))
         ) {
           return false;
         }
@@ -13323,11 +13336,17 @@
       documentedEmployeeIds.has(employeeId),
     ).length;
     const total = validExpectedIds.length;
+    const notApplicable = records.filter(
+      (record) => record.status === "nicht_zutreffend",
+    ).length;
 
     return {
       total,
       documented,
       open: Math.max(0, total - documented),
+      notApplicable,
+      applicableTotal: Math.max(0, total - notApplicable),
+      applicableDocumented: Math.max(0, documented - notApplicable),
       participated: records.filter((record) => record.status === "teilgenommen").length,
       percent: total ? Math.round((documented / total) * 100) : 0,
     };
@@ -13356,13 +13375,16 @@
         statusCounts[record.status] += 1;
       });
       const stats = getMeetingStats(meeting);
-      const participated = records.filter(
+      const applicableRecords = records.filter(
+        (record) => record.status !== "nicht_zutreffend",
+      );
+      const participated = applicableRecords.filter(
         (record) => record.status === "teilgenommen",
       ).length;
-      const absent = Math.max(0, stats.documented - participated);
+      const absent = Math.max(0, stats.applicableDocumented - participated);
 
-      totalSlots += stats.total;
-      documented += stats.documented;
+      totalSlots += stats.applicableTotal;
+      documented += stats.applicableDocumented;
       open += stats.open;
 
       return {
@@ -13394,16 +13416,23 @@
             records.filter((record) => record.status === status).length,
           ]),
         );
+        const applicableRecords = records.filter(
+          (record) => record.status !== "nicht_zutreffend",
+        );
+        const applicableExpected = Math.max(
+          0,
+          expectedMeetingIds.length - employeeStatusCounts.nicht_zutreffend,
+        );
         return {
           employeeId: employee.id,
           name: fullName(employee),
-          expected: expectedMeetingIds.length,
-          documented: records.length,
-          open: Math.max(0, expectedMeetingIds.length - records.length),
+          expected: applicableExpected,
+          documented: applicableRecords.length,
+          open: Math.max(0, applicableExpected - applicableRecords.length),
           statusCounts: employeeStatusCounts,
           attendanceRate: percentage(
             employeeStatusCounts.teilgenommen,
-            expectedMeetingIds.length,
+            applicableExpected,
           ),
         };
       })

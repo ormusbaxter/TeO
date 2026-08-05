@@ -34,11 +34,11 @@
       )
       .join("");
 
-    renderDashboardTrainingProgress(activeEmployees.length);
+    renderDashboardTrainingProgress();
     renderRecentEmployees();
   }
 
-  function renderDashboardTrainingProgress(activeCount) {
+  function renderDashboardTrainingProgress() {
     if (state.trainings.length === 0) {
       elements.dashboardTrainingProgress.innerHTML = renderEmptyState({
         title: "Noch keine Pflichtfortbildungen",
@@ -95,7 +95,7 @@
                     style="--progress: ${stats.percent}%; --progress-color: ${color}"
                   ></div>
                 </div>
-                <span class="progress-value">${activeCount ? `${stats.current}/${activeCount}` : "–"}</span>
+                <span class="progress-value">${stats.percent}&thinsp;%</span>
               </div>
             `;
           })
@@ -438,9 +438,14 @@
     const participated = attendances.filter(
       (attendance) => attendance.status === "teilgenommen",
     ).length;
-    const expectedMeetings = state.meetings.filter((meeting) =>
-      meeting.expectedEmployeeIds.includes(employee.id),
-    ).length;
+    const expectedMeetings = state.meetings.filter((meeting) => {
+      if (!meeting.expectedEmployeeIds.includes(employee.id)) return false;
+      return !attendances.some(
+        (attendance) =>
+          attendance.meetingId === meeting.id &&
+          attendance.status === "nicht_zutreffend",
+      );
+    }).length;
 
     elements.employeeDossierTitle.textContent = fullName(employee);
     elements.employeeDossierSubtitle.textContent = `${employee.profession} · ${employeeStatusLabel(

@@ -687,6 +687,11 @@ Für das aktive Team stehen folgende Statuswerte zur Verfügung:
 - Schule
 - entschuldigt
 - unentschuldigt
+- nicht zutreffend
+
+Der Status **nicht zutreffend** ist beispielsweise für Personen vorgesehen,
+die zum Sitzungszeitpunkt noch nicht zum Team gehörten. Diese Einträge werden
+weder im Zähler noch im Nenner der Anwesenheitsstatistik berücksichtigt.
 
 Über die Sammelaktion kann zunächst allen sichtbaren Mitarbeitern ein Status
 zugewiesen werden. Anschließend müssen nur noch Ausnahmen einzeln geändert

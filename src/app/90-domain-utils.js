@@ -138,11 +138,17 @@
       documentedEmployeeIds.has(employeeId),
     ).length;
     const total = validExpectedIds.length;
+    const notApplicable = records.filter(
+      (record) => record.status === "nicht_zutreffend",
+    ).length;
 
     return {
       total,
       documented,
       open: Math.max(0, total - documented),
+      notApplicable,
+      applicableTotal: Math.max(0, total - notApplicable),
+      applicableDocumented: Math.max(0, documented - notApplicable),
       participated: records.filter((record) => record.status === "teilgenommen").length,
       percent: total ? Math.round((documented / total) * 100) : 0,
     };
@@ -171,13 +177,16 @@
         statusCounts[record.status] += 1;
       });
       const stats = getMeetingStats(meeting);
-      const participated = records.filter(
+      const applicableRecords = records.filter(
+        (record) => record.status !== "nicht_zutreffend",
+      );
+      const participated = applicableRecords.filter(
         (record) => record.status === "teilgenommen",
       ).length;
-      const absent = Math.max(0, stats.documented - participated);
+      const absent = Math.max(0, stats.applicableDocumented - participated);
 
-      totalSlots += stats.total;
-      documented += stats.documented;
+      totalSlots += stats.applicableTotal;
+      documented += stats.applicableDocumented;
       open += stats.open;
 
       return {
@@ -209,16 +218,23 @@
             records.filter((record) => record.status === status).length,
           ]),
         );
+        const applicableRecords = records.filter(
+          (record) => record.status !== "nicht_zutreffend",
+        );
+        const applicableExpected = Math.max(
+          0,
+          expectedMeetingIds.length - employeeStatusCounts.nicht_zutreffend,
+        );
         return {
           employeeId: employee.id,
           name: fullName(employee),
-          expected: expectedMeetingIds.length,
-          documented: records.length,
-          open: Math.max(0, expectedMeetingIds.length - records.length),
+          expected: applicableExpected,
+          documented: applicableRecords.length,
+          open: Math.max(0, applicableExpected - applicableRecords.length),
           statusCounts: employeeStatusCounts,
           attendanceRate: percentage(
             employeeStatusCounts.teilgenommen,
-            expectedMeetingIds.length,
+            applicableExpected,
           ),
         };
       })

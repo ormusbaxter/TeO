@@ -347,6 +347,7 @@
     schule: { label: "Schule", tone: "teal" },
     entschuldigt: { label: "Entschuldigt", tone: "orange" },
     unentschuldigt: { label: "Unentschuldigt", tone: "dark-red" },
+    nicht_zutreffend: { label: "Nicht zutreffend", tone: "muted" },
   };
 
   const ATTENDANCE_CHART_COLORS = {
@@ -357,6 +358,7 @@
     schule: "#25a29d",
     entschuldigt: "#dc8a31",
     unentschuldigt: "#9f2731",
+    nicht_zutreffend: "#9aa5b1",
     open: "#cdd5dd",
   };
 

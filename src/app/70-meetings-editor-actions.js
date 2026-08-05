@@ -215,12 +215,14 @@
     }
 
     const chartSegments = [
-      ...Object.entries(ATTENDANCE_STATUSES).map(([status, config]) => ({
-        key: status,
-        label: config.label,
-        count: statistics.statusCounts[status],
-        color: ATTENDANCE_CHART_COLORS[status],
-      })),
+      ...Object.entries(ATTENDANCE_STATUSES)
+        .filter(([status]) => status !== "nicht_zutreffend")
+        .map(([status, config]) => ({
+          key: status,
+          label: config.label,
+          count: statistics.statusCounts[status],
+          color: ATTENDANCE_CHART_COLORS[status],
+        })),
       {
         key: "open",
         label: "Noch offen",
@@ -366,6 +368,7 @@
                 <th scope="col">Schule</th>
                 <th scope="col">Entschuldigt</th>
                 <th scope="col">Unentschuldigt</th>
+                <th scope="col">Nicht zutreffend</th>
                 <th scope="col">Quote</th>
               </tr>
             </thead>
@@ -388,6 +391,7 @@
                       <td>${employee.statusCounts.schule}</td>
                       <td>${employee.statusCounts.entschuldigt}</td>
                       <td>${employee.statusCounts.unentschuldigt}</td>
+                      <td>${employee.statusCounts.nicht_zutreffend}</td>
                       <td><strong>${employee.attendanceRate} %</strong></td>
                     </tr>
                   `,
@@ -433,6 +437,7 @@
         "Schule",
         "Entschuldigt",
         "Unentschuldigt",
+        "Nicht zutreffend",
         "Offen",
         "Teilnahmequote",
       ],
@@ -446,6 +451,7 @@
         employee.statusCounts.schule,
         employee.statusCounts.entschuldigt,
         employee.statusCounts.unentschuldigt,
+        employee.statusCounts.nicht_zutreffend,
         employee.open,
         `${employee.attendanceRate} %`,
       ]),
@@ -1348,7 +1354,7 @@
         if (attendanceStatusFilter === "documented" && !status) return false;
         if (
           attendanceStatusFilter === "absent" &&
-          (!status || status === "teilgenommen")
+          (!status || ["teilgenommen", "nicht_zutreffend"].includes(status))
         ) {
           return false;
         }
