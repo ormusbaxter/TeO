@@ -652,6 +652,11 @@ Historische Nachweise können anschließend korrigiert oder gelöscht werden.
 
 ### Jahresauswertung
 
+Die Jahresauswertung zeigt die Pflichtfortbildungsquote des gewählten Jahres. Der
+aufklappbare Verlauf stellt die Quote zusätzlich als Balkendiagramm über alle
+Auswertungsjahre dar. Ein Klick auf einen Mitarbeiternamen in der Matrix öffnet
+direkt die zugehörige Mitarbeiter-Akte.
+
 Die Jahresmatrix zeigt:
 
 - aktive Mitarbeiter in der ersten Spalte

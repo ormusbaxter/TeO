@@ -1,3 +1,8 @@
+### 004.022.000 – Fortbildungsquote im Jahresvergleich
+
+- **Neu:** Aufklappbarer Jahresverlauf der Pflichtfortbildungsquote als Balkendiagramm
+- **Verbessert:** Mitarbeiternamen in der Fortbildungs-Jahresauswertung öffnen direkt die Mitarbeiter-Akte
+
 ### 004.021.000 – Fortbildungs- und Sitzungsstatus
 
 - **Neu:** Fortbildungsfortschritt auf der Startseite als Prozentwert

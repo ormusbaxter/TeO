@@ -841,8 +841,34 @@
           `<option value="${year}" ${year === selectedYear ? "selected" : ""}>${year}</option>`,
       )
       .join("");
+    renderTrainingRateHistory(years);
     renderTrainingMatrix();
     elements.trainingMatrixDialog.showModal();
+  }
+
+  function renderTrainingRateHistory(years = getTrainingEvaluationYears()) {
+    const annualRates = [...years]
+      .sort((yearA, yearB) => yearA - yearB)
+      .map((year) => ({ year, rate: getAnnualTrainingMatrix(year).completionRate }));
+    elements.trainingRateHistoryChart.innerHTML = annualRates.length
+      ? `<div class="training-rate-chart" role="img" aria-label="${escapeHtml(
+          annualRates.map(({ year, rate }) => `${year}: ${rate} Prozent`).join(", "),
+        )}">
+          ${annualRates
+            .map(
+              ({ year, rate }) => `
+                <div class="training-rate-bar-row">
+                  <strong>${year}</strong>
+                  <div class="training-rate-bar-track" aria-hidden="true">
+                    <span style="--training-rate: ${rate}%"></span>
+                  </div>
+                  <span>${rate}&thinsp;%</span>
+                </div>
+              `,
+            )
+            .join("")}
+        </div>`
+      : '<p class="training-rate-chart-empty">Noch keine Jahresdaten vorhanden.</p>';
   }
 
   function renderTrainingMatrix() {
@@ -898,7 +924,14 @@
               .map(
                 (row) => `
                   <tr>
-                    <th scope="row">${escapeHtml(fullName(row.employee))}</th>
+                    <th scope="row">
+                      <button
+                        class="training-matrix-employee-link"
+                        type="button"
+                        data-training-matrix-employee="${row.employee.id}"
+                        title="Mitarbeiter-Akte von ${escapeHtml(fullName(row.employee))} öffnen"
+                      >${escapeHtml(fullName(row.employee))}</button>
+                    </th>
                     ${row.statuses
                       .map(
                         ({ training, completed }) => `
@@ -929,6 +962,14 @@
         </table>
       </div>
     `;
+    elements.trainingMatrixContent
+      .querySelectorAll("[data-training-matrix-employee]")
+      .forEach((button) =>
+        button.addEventListener("click", () => {
+          elements.trainingMatrixDialog.close();
+          openEmployeeDossier(button.dataset.trainingMatrixEmployee);
+        }),
+      );
     bindTrainingMatrixScrollers();
   }
 

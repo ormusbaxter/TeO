@@ -708,6 +708,7 @@
     trainingMatrixDialogTitle: document.querySelector("#trainingMatrixDialogTitle"),
     trainingMatrixYear: document.querySelector("#trainingMatrixYear"),
     trainingMatrixSummary: document.querySelector("#trainingMatrixSummary"),
+    trainingRateHistoryChart: document.querySelector("#trainingRateHistoryChart"),
     trainingMatrixContent: document.querySelector("#trainingMatrixContent"),
     exportTrainingMatrixCsvButton: document.querySelector(
       "#exportTrainingMatrixCsvButton",

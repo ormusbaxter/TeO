@@ -167,6 +167,7 @@
 
   #trainingMatrixDialog .modal-header .icon-button,
   #trainingMatrixDialog .modal-subtitle,
+  #trainingMatrixDialog .training-rate-history,
   #trainingMatrixDialog .training-matrix-toolbar .compact-field,
   #trainingMatrixDialog .training-matrix-horizontal-scroll,
   #trainingMatrixDialog .modal-footer .button {
