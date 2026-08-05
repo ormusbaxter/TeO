@@ -5577,6 +5577,44 @@ legend {
   min-width: 150px;
 }
 
+.device-filter-bar .device-authorization-filter-field {
+  min-width: 235px;
+}
+
+.device-authorization-summary {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.device-authorization-summary > strong {
+  color: var(--green-700);
+  font-size: 0.62rem;
+}
+
+.device-authorization-summary > span {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+  color: var(--slate-600);
+  font-size: 0.62rem;
+}
+
+.device-authorization-person {
+  padding: 3px 7px;
+  color: var(--green-700);
+  font-weight: 750;
+  border: 1px solid var(--green-100);
+  border-radius: 999px;
+  background: var(--green-100);
+}
+
+.device-authorization-summary.is-missing > strong,
+.device-authorization-summary.is-missing > span {
+  color: var(--orange-700);
+}
+
 .device-employee-search-field {
   min-width: min(260px, 100%);
   flex: 1 1 220px;

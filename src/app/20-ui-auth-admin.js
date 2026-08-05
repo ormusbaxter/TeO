@@ -615,6 +615,13 @@
         renderDevices();
       },
     );
+    elements.deviceManagementAuthorizationFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceManagementAuthorizationFilter = event.target.value;
+        renderDevices();
+      },
+    );
     elements.deviceEmployeeStatusFilter.addEventListener("change", (event) => {
       deviceEmployeeStatusFilter = event.target.value;
       renderDeviceInstructionMatrix();

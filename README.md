@@ -732,6 +732,13 @@ oder Herstellername** durchsuchen. Die Suche unterscheidet keine Groß- und
 Kleinschreibung und wirkt zusätzlich zu den Filtern für Bestand, Anlage 1 und
 Kategorie.
 
+Je Gerät werden alle **einweisungsberechtigten Mitarbeiter** angezeigt. Als
+einweisungsberechtigt gilt, wer bei einer dokumentierten Herstellereinweisung
+für dieses Gerät teilgenommen hat und zum Einweisungszeitpunkt als
+Gerätebeauftragter erfasst war. Der historische Status ist maßgeblich. Der
+Katalog kann nach einer bestimmten berechtigten Person sowie nach Geräten mit
+oder ohne hinterlegte Einweisungsberechtigte gefiltert werden.
+
 ### Einweisung dokumentieren
 
 Eine Geräteeinweisung enthält:

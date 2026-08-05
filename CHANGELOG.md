@@ -1,3 +1,8 @@
+### 004.023.000 – Einweisungsberechtigung für Geräte
+
+- **Neu:** Einweisungsberechtigte Mitarbeiter werden je Gerät aus Herstellereinweisungen angezeigt
+- **Neu:** Gerätefilter nach berechtigter Person sowie Geräten mit oder ohne Einweisungsberechtigte
+
 ### 004.022.000 – Fortbildungsquote im Jahresvergleich
 
 - **Neu:** Aufklappbarer Jahresverlauf der Pflichtfortbildungsquote als Balkendiagramm

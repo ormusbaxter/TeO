@@ -452,6 +452,7 @@
   let deviceManagementInventoryFilter = "current";
   let deviceManagementAnnexFilter = "all";
   let deviceManagementCategoryFilter = "all";
+  let deviceManagementAuthorizationFilter = "all";
   let deviceEmployeeStatusFilter = "employed";
   let deviceEmployeeSearchTerm = "";
   let deviceParticipantSearchTerm = "";
@@ -680,6 +681,9 @@
     ),
     deviceManagementCategoryFilter: document.querySelector(
       "#deviceManagementCategoryFilter",
+    ),
+    deviceManagementAuthorizationFilter: document.querySelector(
+      "#deviceManagementAuthorizationFilter",
     ),
     deviceEmployeeStatusFilter: document.querySelector("#deviceEmployeeStatusFilter"),
     deviceEmployeeSearch: document.querySelector("#deviceEmployeeSearch"),

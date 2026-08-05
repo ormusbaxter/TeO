@@ -199,6 +199,35 @@
     elements.deviceCategoryFilter.value = deviceCategoryFilter;
     elements.deviceManagementCategoryFilter.value =
       deviceManagementCategoryFilter;
+    const authorizedEmployees = [
+      ...new Map(
+        state.devices
+          .flatMap((device) => getDeviceAuthorizedEmployees(device.id))
+          .map((employee) => [employee.id, employee]),
+      ).values(),
+    ].sort(sortEmployees);
+    const validAuthorizationFilters = new Set([
+      "all",
+      "assigned",
+      "unassigned",
+      ...authorizedEmployees.map((employee) => `employee:${employee.id}`),
+    ]);
+    if (!validAuthorizationFilters.has(deviceManagementAuthorizationFilter)) {
+      deviceManagementAuthorizationFilter = "all";
+    }
+    elements.deviceManagementAuthorizationFilter.innerHTML = `
+      <option value="all">Alle Geräte</option>
+      <option value="assigned">Mit Einweisungsberechtigten</option>
+      <option value="unassigned">Ohne Einweisungsberechtigte</option>
+      ${authorizedEmployees
+        .map(
+          (employee) =>
+            `<option value="employee:${employee.id}">${escapeHtml(fullName(employee))}</option>`,
+        )
+        .join("")}
+    `;
+    elements.deviceManagementAuthorizationFilter.value =
+      deviceManagementAuthorizationFilter;
     elements.deviceInventoryFilter.value = deviceInventoryFilter;
     elements.deviceAnnexFilter.value = deviceAnnexFilter;
     elements.deviceManagementInventoryFilter.value =
@@ -257,6 +286,14 @@
         "Medizinprodukte der Anlage 1",
         "orange",
       )}
+      ${renderSummaryChip(
+        "alert",
+        state.devices.filter(
+          (device) => getDeviceAuthorizedEmployees(device.id).length === 0,
+        ).length,
+        "ohne Einweisungsberechtigte",
+        "orange",
+      )}
     `;
 
     const visibleDevices = filteredDevices({
@@ -264,6 +301,7 @@
       annexFilter: deviceManagementAnnexFilter,
       categoryFilter: deviceManagementCategoryFilter,
       searchTerm: deviceManagementSearchTerm,
+      authorizationFilter: deviceManagementAuthorizationFilter,
     });
     if (!state.devices.length) {
       elements.deviceCatalog.innerHTML = `
@@ -286,7 +324,7 @@
             title: "Keine Geräte für diese Filter",
             text: deviceManagementSearchTerm
               ? "Passen Sie den Suchbegriff oder die Filter an."
-              : "Passen Sie Anlage-1- oder Kategoriefilter an.",
+              : "Passen Sie die Filter der Geräteverwaltung an.",
             compact: true,
           })}
         </section>
@@ -306,6 +344,7 @@
     annexFilter = deviceAnnexFilter,
     categoryFilter = deviceCategoryFilter,
     searchTerm = deviceSearchTerm,
+    authorizationFilter = "all",
   } = {}) {
     return [...state.devices]
       .filter((device) => {
@@ -318,6 +357,22 @@
         if (annexFilter === "yes" && !device.annex1) return false;
         if (annexFilter === "no" && device.annex1) return false;
         if (categoryFilter !== "all" && device.category !== categoryFilter) {
+          return false;
+        }
+        const authorizedEmployees = getDeviceAuthorizedEmployees(device.id);
+        if (authorizationFilter === "assigned" && !authorizedEmployees.length) {
+          return false;
+        }
+        if (authorizationFilter === "unassigned" && authorizedEmployees.length) {
+          return false;
+        }
+        if (
+          authorizationFilter.startsWith("employee:") &&
+          !authorizedEmployees.some(
+            (employee) =>
+              employee.id === authorizationFilter.slice("employee:".length),
+          )
+        ) {
           return false;
         }
         if (!searchTerm) return true;
@@ -341,6 +396,7 @@
         instruction.participants.map((participant) => participant.employeeId),
       ),
     ).size;
+    const authorizedEmployees = getDeviceAuthorizedEmployees(device.id);
     return `
       <article class="training-card device-card ${
         device.currentInventory ? "" : "is-former"
@@ -360,6 +416,25 @@
                 · ${participantCount} eingewiesene${participantCount === 1 ? "/r" : ""}
                 Mitarbeiter/in${participantCount === 1 ? "" : "nen"}
               </span>
+              <div class="device-authorization-summary ${
+                authorizedEmployees.length ? "" : "is-missing"
+              }">
+                <strong>Einweisungsberechtigt</strong>
+                <span>
+                  ${
+                    authorizedEmployees.length
+                      ? authorizedEmployees
+                          .map(
+                            (employee) =>
+                              `<span class="device-authorization-person">${escapeHtml(
+                                fullName(employee),
+                              )}</span>`,
+                          )
+                          .join("")
+                      : "Keine einweisungsberechtigte Person hinterlegt"
+                  }
+                </span>
+              </div>
             </div>
           </div>
           <div class="training-actions">
@@ -396,6 +471,26 @@
         </div>
       </article>
     `;
+  }
+
+  function getDeviceAuthorizedEmployees(deviceId) {
+    const authorizedEmployeeIds = new Set(
+      state.deviceInstructions
+        .filter(
+          (instruction) =>
+            instruction.deviceId === deviceId &&
+            instruction.instructorType === "manufacturer",
+        )
+        .flatMap((instruction) =>
+          instruction.participants
+            .filter((participant) => participant.wasMedicalProductsOfficer)
+            .map((participant) => participant.employeeId),
+        ),
+    );
+    return [...authorizedEmployeeIds]
+      .map(getEmployee)
+      .filter(Boolean)
+      .sort(sortEmployees);
   }
 
   function renderDeviceInstructionMatrix() {
