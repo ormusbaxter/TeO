@@ -716,7 +716,9 @@
       "#trainingTimeCalculatorDialog",
     ),
     timeSpanList: document.querySelector("#timeSpanList"),
-    timeSpanTotalSeconds: document.querySelector("#timeSpanTotalSeconds"),
+    timeSpanTotalRoundedMinutes: document.querySelector(
+      "#timeSpanTotalRoundedMinutes",
+    ),
     timeSpanTotalFormatted: document.querySelector("#timeSpanTotalFormatted"),
     resetTimeSpansButton: document.querySelector("#resetTimeSpansButton"),
     creditedTrainingTimeList: document.querySelector("#creditedTrainingTimeList"),
@@ -8137,9 +8139,10 @@
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   }
 
-  function formatSecondsAsText(totalSeconds) {
+  function formatSecondsAsRoundedMinutes(totalSeconds) {
     const safeSeconds = Math.max(0, Math.round(Number(totalSeconds) || 0));
-    return `${Math.floor(safeSeconds / 60)} Min. ${safeSeconds % 60} Sek.`;
+    const roundedMinutes = Math.round(safeSeconds / 60);
+    return `${roundedMinutes} Minute${roundedMinutes === 1 ? "" : "n"}`;
   }
 
   function openTrainingTimeCalculator() {
@@ -8216,7 +8219,8 @@
       );
       return sum + Math.round(minutes * 60 + seconds);
     }, 0);
-    elements.timeSpanTotalSeconds.textContent = formatSecondsAsText(totalSeconds);
+    elements.timeSpanTotalRoundedMinutes.textContent =
+      formatSecondsAsRoundedMinutes(totalSeconds);
     elements.timeSpanTotalFormatted.value = formatSecondsAsMinutesAndSeconds(totalSeconds);
   }
 

@@ -12,7 +12,7 @@ test("Soll-Zeiten werden normalisiert und als hh:mm formatiert", async () => {
     "normalizeState",
     "formatMinutesAsHoursAndMinutes",
     "formatSecondsAsMinutesAndSeconds",
-    "formatSecondsAsText",
+    "formatSecondsAsRoundedMinutes",
   ]);
   const state = app.normalizeState(
     createMinimalState({
@@ -36,7 +36,8 @@ test("Soll-Zeiten werden normalisiert und als hh:mm formatiert", async () => {
   assert.equal(app.formatMinutesAsHoursAndMinutes(150), "02:30");
   assert.equal(app.formatSecondsAsMinutesAndSeconds(75), "01:15");
   assert.equal(app.formatSecondsAsMinutesAndSeconds(3670), "61:10");
-  assert.equal(app.formatSecondsAsText(75), "1 Min. 15 Sek.");
+  assert.equal(app.formatSecondsAsRoundedMinutes(75), "1 Minute");
+  assert.equal(app.formatSecondsAsRoundedMinutes(90), "2 Minuten");
 });
 
 test("Der Pflichtfortbildungsrechner ist vollständig verdrahtet", async () => {
