@@ -12,6 +12,7 @@ test("Soll-Zeiten werden normalisiert und als hh:mm formatiert", async () => {
     "normalizeState",
     "formatMinutesAsHoursAndMinutes",
     "formatSecondsAsMinutesAndSeconds",
+    "formatSecondsAsText",
   ]);
   const state = app.normalizeState(
     createMinimalState({
@@ -35,6 +36,7 @@ test("Soll-Zeiten werden normalisiert und als hh:mm formatiert", async () => {
   assert.equal(app.formatMinutesAsHoursAndMinutes(150), "02:30");
   assert.equal(app.formatSecondsAsMinutesAndSeconds(75), "01:15");
   assert.equal(app.formatSecondsAsMinutesAndSeconds(3670), "61:10");
+  assert.equal(app.formatSecondsAsText(75), "1 Min. 15 Sek.");
 });
 
 test("Der Pflichtfortbildungsrechner ist vollständig verdrahtet", async () => {
@@ -51,6 +53,8 @@ test("Der Pflichtfortbildungsrechner ist vollständig verdrahtet", async () => {
   assert.match(dialogHtml, /id="trainingTimeCalculatorDialog"/);
   assert.match(dialogHtml, /id="creditedTrainingTimeList"/);
   assert.match(dialogHtml, /id="creditedTrainingTotalFormatted"/);
+  assert.match(dialogHtml, /<small>mm:ss<\/small>/);
+  assert.match(dialogHtml, /<small>hh:mm<\/small>/);
   assert.match(appSource, /Array\.from\(\{ length: 20 \}/);
   assert.match(appSource, /function updateTimeSpanTotal\(\)/);
   assert.match(appSource, /data-time-seconds/);

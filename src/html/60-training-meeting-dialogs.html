@@ -223,8 +223,11 @@
           <div class="time-span-list" id="timeSpanList"></div>
           <div class="time-calculator-result" aria-live="polite">
             <span>Summe</span>
-            <strong id="timeSpanTotalSeconds">0 Sekunden</strong>
-            <output id="timeSpanTotalFormatted">00:00</output>
+            <strong id="timeSpanTotalSeconds">0 Min. 0 Sek.</strong>
+            <div class="time-calculator-formatted">
+              <small>mm:ss</small>
+              <output id="timeSpanTotalFormatted">00:00</output>
+            </div>
           </div>
         </section>
 
@@ -240,7 +243,10 @@
           <div class="time-calculator-result" aria-live="polite">
             <span>Anrechenbare Summe</span>
             <strong id="creditedTrainingTotalMinutes">0 Minuten</strong>
-            <output id="creditedTrainingTotalFormatted">00:00</output>
+            <div class="time-calculator-formatted">
+              <small>hh:mm</small>
+              <output id="creditedTrainingTotalFormatted">00:00</output>
+            </div>
           </div>
         </section>
       </div>

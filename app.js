@@ -8137,6 +8137,11 @@
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   }
 
+  function formatSecondsAsText(totalSeconds) {
+    const safeSeconds = Math.max(0, Math.round(Number(totalSeconds) || 0));
+    return `${Math.floor(safeSeconds / 60)} Min. ${safeSeconds % 60} Sek.`;
+  }
+
   function openTrainingTimeCalculator() {
     elements.timeSpanList.innerHTML = Array.from({ length: 20 }, (_, index) => `
       <div class="time-span-row">
@@ -8211,7 +8216,7 @@
       );
       return sum + Math.round(minutes * 60 + seconds);
     }, 0);
-    elements.timeSpanTotalSeconds.textContent = `${totalSeconds} Sekunde${totalSeconds === 1 ? "" : "n"}`;
+    elements.timeSpanTotalSeconds.textContent = formatSecondsAsText(totalSeconds);
     elements.timeSpanTotalFormatted.value = formatSecondsAsMinutesAndSeconds(totalSeconds);
   }
 

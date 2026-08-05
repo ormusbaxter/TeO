@@ -2982,7 +2982,20 @@ svg {
   font-size: 0.76rem;
 }
 
-.time-calculator-result output {
+.time-calculator-formatted {
+  display: grid;
+  gap: 2px;
+  justify-items: end;
+}
+
+.time-calculator-formatted small {
+  color: var(--blue-700);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.time-calculator-formatted output {
   min-width: 88px;
   font-size: 1.15rem;
   font-variant-numeric: tabular-nums;
