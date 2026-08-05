@@ -612,6 +612,21 @@ Beschreibung und Wiederholungsintervall festgelegt.
 Das angegebene Jahr ist das Einführungsjahr im Pflichtkatalog. Eine
 Fortbildung steht ab diesem Jahr auch in späteren Jahren zur Verfügung.
 
+Unter **Einstellungen → Pflichtfortbildungen** kann für jede Fortbildung
+optional eine Soll-Zeit in Minuten hinterlegt werden.
+
+### Zeiten berechnen
+
+Über **Pflichtfortbildungen → Zeiten berechnen** öffnet sich ein Rechner mit
+zwei Bereichen:
+
+- Bis zu 20 Zeitspannen in Stunden und Minuten werden live addiert.
+- Alle Fortbildungen mit hinterlegter Soll-Zeit werden aufgelistet. Je
+  Fortbildung kann die tatsächlich anzurechnende Arbeitszeit in Minuten
+  eingegeben werden.
+
+Beide Summen werden als Minutenwert und zusätzlich im Format `hh:mm` angezeigt.
+
 ### Wiederholungsintervalle
 
 Standardmäßig gilt eine jährliche Wiederholung. Für Gewaltprävention sind

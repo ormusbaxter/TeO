@@ -648,7 +648,14 @@
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),
     trainingList: document.querySelector("#trainingList"),
+    openTrainingTimeCalculatorButton: document.querySelector(
+      "#openTrainingTimeCalculatorButton",
+    ),
     openTrainingMatrixButton: document.querySelector("#openTrainingMatrixButton"),
+    trainingDurationSettings: document.querySelector("#trainingDurationSettings"),
+    saveTrainingDurationsButton: document.querySelector(
+      "#saveTrainingDurationsButton",
+    ),
     meetingSummary: document.querySelector("#meetingSummary"),
     meetingList: document.querySelector("#meetingList"),
     openMeetingStatsButton: document.querySelector("#openMeetingStatsButton"),
@@ -705,6 +712,23 @@
       "#exportTrainingMatrixCsvButton",
     ),
     printTrainingMatrixButton: document.querySelector("#printTrainingMatrixButton"),
+    trainingTimeCalculatorDialog: document.querySelector(
+      "#trainingTimeCalculatorDialog",
+    ),
+    timeSpanList: document.querySelector("#timeSpanList"),
+    timeSpanTotalMinutes: document.querySelector("#timeSpanTotalMinutes"),
+    timeSpanTotalFormatted: document.querySelector("#timeSpanTotalFormatted"),
+    resetTimeSpansButton: document.querySelector("#resetTimeSpansButton"),
+    creditedTrainingTimeList: document.querySelector("#creditedTrainingTimeList"),
+    creditedTrainingTotalMinutes: document.querySelector(
+      "#creditedTrainingTotalMinutes",
+    ),
+    creditedTrainingTotalFormatted: document.querySelector(
+      "#creditedTrainingTotalFormatted",
+    ),
+    resetCreditedTrainingTimesButton: document.querySelector(
+      "#resetCreditedTrainingTimesButton",
+    ),
     loginDialog: document.querySelector("#loginDialog"),
     loginForm: document.querySelector("#loginForm"),
     loginError: document.querySelector("#loginError"),
@@ -1554,6 +1578,7 @@
     const id = normalizeId(training?.id);
     if (!training || !id) return null;
     const recurrence = Number(training.recurrenceMonths);
+    const targetMinutes = Number(training.targetMinutes);
     const createdAt = validTimestamp(training.createdAt);
     const storedYear = Number(training.year);
     const fallbackYear = new Date(createdAt).getFullYear();
@@ -1567,6 +1592,8 @@
           ? storedYear
           : fallbackYear,
       recurrenceMonths: Number.isFinite(recurrence) && recurrence > 0 ? recurrence : null,
+      targetMinutes:
+        Number.isInteger(targetMinutes) && targetMinutes > 0 ? targetMinutes : null,
       seriesId: normalizeId(training.seriesId) || "",
       createdAt,
       updatedAt: validTimestamp(training.updatedAt || training.createdAt),
@@ -2264,6 +2291,27 @@
       requestApplyWeekendSimulation,
     );
     elements.openTrainingMatrixButton.addEventListener("click", openTrainingMatrixDialog);
+    elements.openTrainingTimeCalculatorButton.addEventListener(
+      "click",
+      openTrainingTimeCalculator,
+    );
+    elements.timeSpanList.addEventListener("input", updateTimeSpanTotal);
+    elements.creditedTrainingTimeList.addEventListener(
+      "input",
+      updateCreditedTrainingTimeTotal,
+    );
+    elements.resetTimeSpansButton.addEventListener("click", () => {
+      elements.timeSpanList.querySelectorAll("input").forEach((input) => {
+        input.value = "";
+      });
+      updateTimeSpanTotal();
+    });
+    elements.resetCreditedTrainingTimesButton.addEventListener("click", () => {
+      elements.creditedTrainingTimeList.querySelectorAll("input").forEach((input) => {
+        input.value = "";
+      });
+      updateCreditedTrainingTimeTotal();
+    });
     elements.trainingDisplayYear.addEventListener("change", () => {
       trainingDisplayYear = Number(elements.trainingDisplayYear.value);
       renderTrainings();
@@ -2411,6 +2459,10 @@
     elements.saveGeneralSettingsButton.addEventListener(
       "click",
       saveGeneralSettings,
+    );
+    elements.saveTrainingDurationsButton.addEventListener(
+      "click",
+      saveTrainingDurations,
     );
     elements.saveWeekendSettingsButton.addEventListener(
       "click",
@@ -8071,6 +8123,99 @@
       .sort((yearA, yearB) => yearB - yearA);
   }
 
+  function formatMinutesAsHoursAndMinutes(totalMinutes) {
+    const safeMinutes = Math.max(0, Math.round(Number(totalMinutes) || 0));
+    const hours = Math.floor(safeMinutes / 60);
+    const minutes = safeMinutes % 60;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  }
+
+  function openTrainingTimeCalculator() {
+    elements.timeSpanList.innerHTML = Array.from({ length: 20 }, (_, index) => `
+      <div class="time-span-row">
+        <span>${index + 1}.</span>
+        <label>
+          <span class="sr-only">Stunden der Zeitspanne ${index + 1}</span>
+          <input type="number" min="0" step="1" inputmode="numeric" data-time-hours placeholder="0" />
+          <small>Std.</small>
+        </label>
+        <span aria-hidden="true">:</span>
+        <label>
+          <span class="sr-only">Minuten der Zeitspanne ${index + 1}</span>
+          <input type="number" min="0" step="1" inputmode="numeric" data-time-minutes placeholder="00" />
+          <small>Min.</small>
+        </label>
+      </div>
+    `).join("");
+
+    const configuredTrainings = state.trainings
+      .filter((training) => Number.isInteger(training.targetMinutes) && training.targetMinutes > 0)
+      .sort(
+        (trainingA, trainingB) =>
+          trainingA.title.localeCompare(trainingB.title, "de") ||
+          trainingB.year - trainingA.year,
+      );
+    elements.creditedTrainingTimeList.innerHTML = configuredTrainings.length
+      ? configuredTrainings
+          .map(
+            (training) => `
+              <label class="credited-training-time-row">
+                <span>
+                  <strong>${escapeHtml(training.title)}</strong>
+                  <small>Soll-Zeit: ${training.targetMinutes} Minuten (${formatMinutesAsHoursAndMinutes(training.targetMinutes)})</small>
+                </span>
+                <span class="input-suffix">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                    data-credited-training-minutes
+                    data-training-id="${training.id}"
+                    aria-label="Anrechenbare Minuten für ${escapeHtml(training.title)}"
+                  />
+                  <span>Min.</span>
+                </span>
+              </label>
+            `,
+          )
+          .join("")
+      : `<div class="time-calculator-empty">
+          <strong>Keine Soll-Zeiten hinterlegt</strong>
+          <p>Unter Einstellungen → Pflichtfortbildungen können Sie Soll-Zeiten in Minuten eintragen.</p>
+        </div>`;
+
+    updateTimeSpanTotal();
+    updateCreditedTrainingTimeTotal();
+    elements.trainingTimeCalculatorDialog.showModal();
+    window.setTimeout(() => elements.timeSpanList.querySelector("input")?.focus(), 0);
+  }
+
+  function updateTimeSpanTotal() {
+    const rows = [...elements.timeSpanList.querySelectorAll(".time-span-row")];
+    const totalMinutes = rows.reduce((sum, row) => {
+      const hours = Math.max(0, Number(row.querySelector("[data-time-hours]").value) || 0);
+      const minutes = Math.max(
+        0,
+        Number(row.querySelector("[data-time-minutes]").value) || 0,
+      );
+      return sum + Math.round(hours * 60 + minutes);
+    }, 0);
+    elements.timeSpanTotalMinutes.textContent = `${totalMinutes} Minute${totalMinutes === 1 ? "" : "n"}`;
+    elements.timeSpanTotalFormatted.value = formatMinutesAsHoursAndMinutes(totalMinutes);
+  }
+
+  function updateCreditedTrainingTimeTotal() {
+    const totalMinutes = [...elements.creditedTrainingTimeList.querySelectorAll(
+      "[data-credited-training-minutes]",
+    )].reduce((sum, input) => {
+      const minutes = Math.max(0, Math.round(Number(input.value) || 0));
+      return sum + minutes;
+    }, 0);
+    elements.creditedTrainingTotalMinutes.textContent = `${totalMinutes} Minute${totalMinutes === 1 ? "" : "n"}`;
+    elements.creditedTrainingTotalFormatted.value = formatMinutesAsHoursAndMinutes(totalMinutes);
+  }
+
   function groupTrainingsByYear(trainings = state.trainings) {
     const groups = new Map();
     trainings.forEach((training) => {
@@ -8363,6 +8508,11 @@
                 <svg><use href="#icon-calendar"></use></svg>
                 ${recurrenceLabel(training)}
               </span>
+              ${
+                training.targetMinutes
+                  ? `<span class="training-meta"><svg><use href="#icon-chart"></use></svg>Soll-Zeit: ${training.targetMinutes} Minuten (${formatMinutesAsHoursAndMinutes(training.targetMinutes)})</span>`
+                  : ""
+              }
             </div>
           </div>
           <div class="training-progress-block">
@@ -10854,6 +11004,7 @@
       title: titleInput.value.trim(),
       year: trainingYear,
       recurrenceMonths,
+      targetMinutes: existingTraining?.targetMinutes || null,
       seriesId: recurrenceMonths
         ? existingTraining?.seriesId ||
           matchingSeries?.seriesId ||
@@ -12306,6 +12457,7 @@
       .closeDialogOnOutsideClick
       ? "on"
       : "off";
+    renderTrainingDurationSettings();
     renderSchoolVacationSettings();
     renderVacationSettingsControls();
     elements.settingsStorageBackend.value = backendMode;
@@ -12325,6 +12477,87 @@
       : "<i></i> Lokal verbunden";
     renderWeekendSettings();
     renderBackendSelection();
+  }
+
+  function renderTrainingDurationSettings() {
+    const trainings = [...state.trainings].sort(
+      (trainingA, trainingB) =>
+        trainingA.title.localeCompare(trainingB.title, "de") ||
+        trainingB.year - trainingA.year,
+    );
+    elements.trainingDurationSettings.innerHTML = trainings.length
+      ? trainings
+          .map(
+            (training) => `
+              <label class="training-duration-setting-row">
+                <span>
+                  <strong>${escapeHtml(training.title)}</strong>
+                  <small>Im Katalog seit ${training.year}</small>
+                </span>
+                <span class="input-suffix">
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    inputmode="numeric"
+                    value="${training.targetMinutes || ""}"
+                    placeholder="Optional"
+                    data-training-duration="${training.id}"
+                    aria-label="Soll-Zeit für ${escapeHtml(training.title)} in Minuten"
+                  />
+                  <span>Min.</span>
+                </span>
+              </label>
+            `,
+          )
+          .join("")
+      : `<p class="settings-empty-copy">Legen Sie zuerst eine Pflichtfortbildung an.</p>`;
+    elements.saveTrainingDurationsButton.disabled = trainings.length === 0;
+  }
+
+  async function saveTrainingDurations() {
+    const inputs = [...elements.trainingDurationSettings.querySelectorAll(
+      "[data-training-duration]",
+    )];
+    const invalidInput = inputs.find(
+      (input) =>
+        input.value.trim() &&
+        (!Number.isInteger(Number(input.value)) || Number(input.value) < 1),
+    );
+    if (invalidInput) {
+      invalidInput.setCustomValidity("Bitte ganze Minuten ab 1 eingeben oder das Feld leer lassen.");
+      invalidInput.reportValidity();
+      invalidInput.setCustomValidity("");
+      return;
+    }
+
+    const targetMinutesById = new Map(
+      inputs.map((input) => [
+        input.dataset.trainingDuration,
+        input.value.trim() ? Number(input.value) : null,
+      ]),
+    );
+    const changed = state.trainings.some(
+      (training) =>
+        (training.targetMinutes || null) !== targetMinutesById.get(training.id),
+    );
+    if (!changed) {
+      showToast("Die Soll-Zeiten sind bereits aktuell.");
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const committed = await commitStateMutation(() => {
+      state.trainings = state.trainings.map((training) => ({
+        ...training,
+        targetMinutes: targetMinutesById.get(training.id),
+        updatedAt:
+          (training.targetMinutes || null) === targetMinutesById.get(training.id)
+            ? training.updatedAt
+            : now,
+      }));
+    });
+    if (committed) showToast("Soll-Zeiten wurden gespeichert.");
   }
 
   function renderWeekendSettings() {
