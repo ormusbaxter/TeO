@@ -715,7 +715,7 @@
       "#trainingTimeCalculatorDialog",
     ),
     timeSpanList: document.querySelector("#timeSpanList"),
-    timeSpanTotalMinutes: document.querySelector("#timeSpanTotalMinutes"),
+    timeSpanTotalSeconds: document.querySelector("#timeSpanTotalSeconds"),
     timeSpanTotalFormatted: document.querySelector("#timeSpanTotalFormatted"),
     resetTimeSpansButton: document.querySelector("#resetTimeSpansButton"),
     creditedTrainingTimeList: document.querySelector("#creditedTrainingTimeList"),

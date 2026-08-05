@@ -716,7 +716,7 @@
       "#trainingTimeCalculatorDialog",
     ),
     timeSpanList: document.querySelector("#timeSpanList"),
-    timeSpanTotalMinutes: document.querySelector("#timeSpanTotalMinutes"),
+    timeSpanTotalSeconds: document.querySelector("#timeSpanTotalSeconds"),
     timeSpanTotalFormatted: document.querySelector("#timeSpanTotalFormatted"),
     resetTimeSpansButton: document.querySelector("#resetTimeSpansButton"),
     creditedTrainingTimeList: document.querySelector("#creditedTrainingTimeList"),
@@ -8130,20 +8130,27 @@
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
   }
 
+  function formatSecondsAsMinutesAndSeconds(totalSeconds) {
+    const safeSeconds = Math.max(0, Math.round(Number(totalSeconds) || 0));
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }
+
   function openTrainingTimeCalculator() {
     elements.timeSpanList.innerHTML = Array.from({ length: 20 }, (_, index) => `
       <div class="time-span-row">
         <span>${index + 1}.</span>
         <label>
-          <span class="sr-only">Stunden der Zeitspanne ${index + 1}</span>
-          <input type="number" min="0" step="1" inputmode="numeric" data-time-hours placeholder="0" />
-          <small>Std.</small>
+          <span class="sr-only">Minuten der Zeitspanne ${index + 1}</span>
+          <input type="number" min="0" step="1" inputmode="numeric" data-time-minutes placeholder="0" />
+          <small>Min.</small>
         </label>
         <span aria-hidden="true">:</span>
         <label>
-          <span class="sr-only">Minuten der Zeitspanne ${index + 1}</span>
-          <input type="number" min="0" step="1" inputmode="numeric" data-time-minutes placeholder="00" />
-          <small>Min.</small>
+          <span class="sr-only">Sekunden der Zeitspanne ${index + 1}</span>
+          <input type="number" min="0" step="1" inputmode="numeric" data-time-seconds placeholder="00" />
+          <small>Sek.</small>
         </label>
       </div>
     `).join("");
@@ -8193,16 +8200,19 @@
 
   function updateTimeSpanTotal() {
     const rows = [...elements.timeSpanList.querySelectorAll(".time-span-row")];
-    const totalMinutes = rows.reduce((sum, row) => {
-      const hours = Math.max(0, Number(row.querySelector("[data-time-hours]").value) || 0);
+    const totalSeconds = rows.reduce((sum, row) => {
       const minutes = Math.max(
         0,
         Number(row.querySelector("[data-time-minutes]").value) || 0,
       );
-      return sum + Math.round(hours * 60 + minutes);
+      const seconds = Math.max(
+        0,
+        Number(row.querySelector("[data-time-seconds]").value) || 0,
+      );
+      return sum + Math.round(minutes * 60 + seconds);
     }, 0);
-    elements.timeSpanTotalMinutes.textContent = `${totalMinutes} Minute${totalMinutes === 1 ? "" : "n"}`;
-    elements.timeSpanTotalFormatted.value = formatMinutesAsHoursAndMinutes(totalMinutes);
+    elements.timeSpanTotalSeconds.textContent = `${totalSeconds} Sekunde${totalSeconds === 1 ? "" : "n"}`;
+    elements.timeSpanTotalFormatted.value = formatSecondsAsMinutesAndSeconds(totalSeconds);
   }
 
   function updateCreditedTrainingTimeTotal() {

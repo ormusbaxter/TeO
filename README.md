@@ -620,12 +620,14 @@ optional eine Soll-Zeit in Minuten hinterlegt werden.
 Über **Pflichtfortbildungen → Zeiten berechnen** öffnet sich ein Rechner mit
 zwei Bereichen:
 
-- Bis zu 20 Zeitspannen in Stunden und Minuten werden live addiert.
+- Bis zu 20 Zeitspannen in Minuten und Sekunden werden live addiert und im
+  Format `mm:ss` angezeigt.
 - Alle Fortbildungen mit hinterlegter Soll-Zeit werden aufgelistet. Je
   Fortbildung kann die tatsächlich anzurechnende Arbeitszeit in Minuten
   eingegeben werden.
 
-Beide Summen werden als Minutenwert und zusätzlich im Format `hh:mm` angezeigt.
+Die anrechenbare Fortbildungszeit wird als Minutenwert und zusätzlich im Format
+`hh:mm` angezeigt.
 
 ### Wiederholungsintervalle
 

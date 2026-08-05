@@ -1791,8 +1791,8 @@
 <p>Unter <strong>Einstellungen → Pflichtfortbildungen</strong> kann für jede Fortbildung optional eine Soll-Zeit in Minuten hinterlegt werden.</p>
 <h3 id="hilfe-zeiten-berechnen">Zeiten berechnen</h3>
 <p>Über <strong>Pflichtfortbildungen → Zeiten berechnen</strong> öffnet sich ein Rechner mit zwei Bereichen:</p>
-<ul><li>Bis zu 20 Zeitspannen in Stunden und Minuten werden live addiert.</li><li>Alle Fortbildungen mit hinterlegter Soll-Zeit werden aufgelistet. Je Fortbildung kann die tatsächlich anzurechnende Arbeitszeit in Minuten eingegeben werden.</li></ul>
-<p>Beide Summen werden als Minutenwert und zusätzlich im Format <code>hh:mm</code> angezeigt.</p>
+<ul><li>Bis zu 20 Zeitspannen in Minuten und Sekunden werden live addiert und im Format <code>mm:ss</code> angezeigt.</li><li>Alle Fortbildungen mit hinterlegter Soll-Zeit werden aufgelistet. Je Fortbildung kann die tatsächlich anzurechnende Arbeitszeit in Minuten eingegeben werden.</li></ul>
+<p>Die anrechenbare Fortbildungszeit wird als Minutenwert und zusätzlich im Format <code>hh:mm</code> angezeigt.</p>
 <h3 id="hilfe-wiederholungsintervalle">Wiederholungsintervalle</h3>
 <p>Standardmäßig gilt eine jährliche Wiederholung. Für Gewaltprävention sind standardmäßig fünf Jahre vorgesehen. Andere Intervalle können ebenfalls festgelegt werden.</p>
 <p>Wiederkehrende Einträge desselben Themas werden zu einer Fortbildungsreihe verbunden. Der neueste gültige Nachweis bestimmt die nächste Fälligkeit der gesamten Reihe.</p>
@@ -2938,14 +2938,14 @@ npm run verify</code></pre>
           <div class="time-calculator-heading">
             <div>
               <h3 id="timeSpanCalculatorTitle">Zeitspannen addieren</h3>
-              <p>Bis zu 20 Angaben in Stunden und Minuten. Leere Zeilen werden ignoriert.</p>
+              <p>Bis zu 20 Angaben in Minuten und Sekunden. Leere Zeilen werden ignoriert.</p>
             </div>
             <button class="button button-secondary" id="resetTimeSpansButton" type="button">Eingaben leeren</button>
           </div>
           <div class="time-span-list" id="timeSpanList"></div>
           <div class="time-calculator-result" aria-live="polite">
             <span>Summe</span>
-            <strong id="timeSpanTotalMinutes">0 Minuten</strong>
+            <strong id="timeSpanTotalSeconds">0 Sekunden</strong>
             <output id="timeSpanTotalFormatted">00:00</output>
           </div>
         </section>
