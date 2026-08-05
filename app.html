@@ -218,6 +218,18 @@
             <svg><use href="#icon-settings"></use></svg>
             <span>Einstellungen</span>
           </button>
+          <div
+            class="settings-sidebar-subnav"
+            id="settingsSidebarSubnav"
+            role="group"
+            aria-label="Einstellungsbereiche"
+          >
+            <button type="button" data-settings-section-target="general">Allgemein</button>
+            <button type="button" data-settings-section-target="planning">Planung</button>
+            <button type="button" data-settings-section-target="training">Pflichtfortbildungen</button>
+            <button type="button" data-settings-section-target="master-data">Stammdaten &amp; Zugriffe</button>
+            <button type="button" data-settings-section-target="data">Daten &amp; Sicherung</button>
+          </div>
           <button class="nav-item" type="button" data-view="help">
             <svg><use href="#icon-help"></use></svg>
             <span>Hilfe</span>
@@ -1065,8 +1077,16 @@
             </div>
           </div>
 
+          <nav class="settings-section-nav" aria-label="Einstellungsbereiche">
+            <button type="button" data-settings-section-target="general">Allgemein</button>
+            <button type="button" data-settings-section-target="planning">Planung</button>
+            <button type="button" data-settings-section-target="training">Pflichtfortbildungen</button>
+            <button type="button" data-settings-section-target="master-data">Stammdaten &amp; Zugriffe</button>
+            <button type="button" data-settings-section-target="data">Daten &amp; Sicherung</button>
+          </nav>
+
           <div class="settings-grid">
-            <section class="panel settings-card">
+            <section class="panel settings-card" data-settings-section="general">
               <div class="settings-card-heading">
                 <span class="settings-card-icon">
                   <svg><use href="#icon-palette"></use></svg>
@@ -1090,7 +1110,7 @@
               </label>
             </section>
 
-            <section class="panel settings-card">
+            <section class="panel settings-card" data-settings-section="planning">
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-calendar"></use></svg>
@@ -1140,7 +1160,10 @@
               </div>
             </section>
 
-            <section class="panel settings-card settings-card-wide">
+            <section
+              class="panel settings-card settings-card-wide"
+              data-settings-section="planning"
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-calendar"></use></svg>
@@ -1182,7 +1205,10 @@
               </div>
             </section>
 
-            <section class="panel settings-card settings-card-wide">
+            <section
+              class="panel settings-card settings-card-wide"
+              data-settings-section="training"
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-training"></use></svg>
@@ -1204,7 +1230,11 @@
               </div>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section
+              class="panel settings-card"
+              data-settings-section="data"
+              data-admin-only
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-lock"></use></svg>
@@ -1270,7 +1300,7 @@
               </div>
             </section>
 
-            <section class="panel settings-card">
+            <section class="panel settings-card" data-settings-section="master-data">
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-admin">
                   <svg><use href="#icon-edit"></use></svg>
@@ -1309,7 +1339,11 @@
               </div>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section
+              class="panel settings-card"
+              data-settings-section="data"
+              data-admin-only
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-reminder">
                   <svg><use href="#icon-alert"></use></svg>
@@ -1347,7 +1381,11 @@
               </div>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section
+              class="panel settings-card"
+              data-settings-section="general"
+              data-admin-only
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-admin">
                   <svg><use href="#icon-edit"></use></svg>
@@ -1376,6 +1414,7 @@
 
             <section
               class="panel settings-card settings-card-wide"
+              data-settings-section="planning"
               data-admin-only
             >
               <div class="settings-card-heading">
@@ -1435,6 +1474,7 @@
 
           <section
             class="panel backup-panel settings-backup-panel"
+            data-settings-section="data"
             aria-labelledby="backupTitle"
           >
             <div class="backup-content">
@@ -1895,6 +1935,9 @@
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-einstellungen-und-administration">
 <h2 id="hilfe-einstellungen-und-administration">Einstellungen und Administration</h2>
+<p>Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint unter <strong>Einstellungen</strong> in der Sidebar und zusätzlich als Abschnittsnavigation oben auf der Einstellungsseite:</p>
+<ul><li><strong>Allgemein:</strong> Farbthema und Verhalten beim Schließen von Dialogen</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung sowie manuelle und automatische Datensicherungen</li></ul>
+<p>Beim Wechsel eines Untermenüs werden nur die zugehörigen Einstellungskarten angezeigt. Administratorgeschützte Funktionen bleiben weiterhin ausschließlich für Administratoren sichtbar.</p>
 <p>Die Einstellungsseite bündelt:</p>
 <ul><li>Farbthema</li><li>Dienstwochenendverantwortliche</li><li>lokales oder MariaDB-Backend</li><li>Benutzerverwaltung</li><li>Berufe und Qualifikationen</li><li>Datenqualitätsprüfung</li><li>Sicherungserinnerung</li><li>Import, Export und Sicherungsprüfung</li><li>verschlüsselten Export</li><li>Änderungsprotokoll</li></ul>
 <p>Verfügbare Farbthemen sind Standard, Dark Mode, Cellitinnen und Cellitinnen Rot. Die Auswahl wird mit dem Datenbestand gespeichert.</p>
@@ -1936,6 +1979,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-024-000-gegliederte-einstellungen">004.024.000 – Gegliederte Einstellungen</h3>
+<ul><li><strong>Neu:</strong> Einstellungen-Untermenü in Sidebar und Einstellungsansicht</li><li><strong>Verbessert:</strong> Einstellungskarten in fünf fachlich passende Bereiche gegliedert</li></ul>
 <h3 id="hilfe-004-023-000-einweisungsberechtigung-fur-gerate">004.023.000 – Einweisungsberechtigung für Geräte</h3>
 <ul><li><strong>Neu:</strong> Einweisungsberechtigte Mitarbeiter werden je Gerät aus Herstellereinweisungen angezeigt</li><li><strong>Neu:</strong> Gerätefilter nach berechtigter Person sowie Geräten mit oder ohne Einweisungsberechtigte</li></ul>
 <h3 id="hilfe-004-022-000-fortbildungsquote-im-jahresvergleich">004.022.000 – Fortbildungsquote im Jahresvergleich</h3>

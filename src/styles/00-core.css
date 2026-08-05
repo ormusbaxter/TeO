@@ -355,6 +355,36 @@ svg {
   background: rgb(255 255 255 / 13%);
 }
 
+.settings-sidebar-subnav {
+  display: none;
+  gap: 2px;
+  margin: -2px 0 3px 34px;
+  padding: 4px 0 4px 12px;
+  border-left: 1px solid rgb(255 255 255 / 14%);
+}
+
+.nav-item[data-view="settings"].is-active + .settings-sidebar-subnav {
+  display: grid;
+}
+
+.settings-sidebar-subnav button {
+  padding: 6px 9px;
+  cursor: pointer;
+  color: #8fa4b8;
+  font-size: 0.65rem;
+  font-weight: 650;
+  text-align: left;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+}
+
+.settings-sidebar-subnav button:hover,
+.settings-sidebar-subnav button.is-active {
+  color: white;
+  background: rgb(255 255 255 / 8%);
+}
+
 .sidebar-note {
   display: flex;
   gap: 10px;
@@ -1443,6 +1473,41 @@ svg {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   align-items: start;
+}
+
+.settings-section-nav {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 18px;
+  padding: 6px;
+  overflow-x: auto;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  background: var(--white);
+  scrollbar-width: thin;
+}
+
+.settings-section-nav button {
+  min-height: 36px;
+  padding: 7px 12px;
+  cursor: pointer;
+  color: var(--slate-600);
+  font-size: 0.68rem;
+  font-weight: 750;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.settings-section-nav button:hover {
+  color: var(--blue-700);
+  background: var(--blue-50);
+}
+
+.settings-section-nav button.is-active {
+  color: var(--blue-700);
+  background: var(--blue-100);
 }
 
 .settings-card {

@@ -467,6 +467,7 @@
   let deviceInstructionDeviceDraft = new Set();
   let deviceInstructionDeviceSearchTerm = "";
   const cleanFormSnapshots = new WeakMap();
+  let activeSettingsSection = "general";
 
   const elements = {
     navEmployeeCount: document.querySelector("#navEmployeeCount"),
@@ -513,6 +514,7 @@
     mainNav: document.querySelector("#mainNav"),
     resetSidebarOrderButton: document.querySelector("#resetSidebarOrderButton"),
     sidebarOrderStatus: document.querySelector("#sidebarOrderStatus"),
+    settingsSidebarSubnav: document.querySelector("#settingsSidebarSubnav"),
     copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),
     copyUsernamesButton: document.querySelector("#copyUsernamesButton"),
     copyUsernamesLabel: document.querySelector("#copyUsernamesLabel"),

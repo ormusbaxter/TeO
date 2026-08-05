@@ -468,6 +468,7 @@
   let deviceInstructionDeviceDraft = new Set();
   let deviceInstructionDeviceSearchTerm = "";
   const cleanFormSnapshots = new WeakMap();
+  let activeSettingsSection = "general";
 
   const elements = {
     navEmployeeCount: document.querySelector("#navEmployeeCount"),
@@ -514,6 +515,7 @@
     mainNav: document.querySelector("#mainNav"),
     resetSidebarOrderButton: document.querySelector("#resetSidebarOrderButton"),
     sidebarOrderStatus: document.querySelector("#sidebarOrderStatus"),
+    settingsSidebarSubnav: document.querySelector("#settingsSidebarSubnav"),
     copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),
     copyUsernamesButton: document.querySelector("#copyUsernamesButton"),
     copyUsernamesLabel: document.querySelector("#copyUsernamesLabel"),
@@ -2144,6 +2146,13 @@
       button.addEventListener("click", () => showView(button.dataset.goTo));
     });
 
+    document.querySelectorAll("[data-settings-section-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        showView("settings");
+        showSettingsSection(button.dataset.settingsSectionTarget);
+      });
+    });
+
     document.querySelectorAll("[data-help-target]").forEach((button) => {
       button.addEventListener("click", () => {
         document
@@ -2186,6 +2195,8 @@
       else button.removeAttribute("aria-current");
     });
 
+    if (view === "settings") showSettingsSection(activeSettingsSection);
+
     const mobileCreateType =
       view === "trainings"
         ? "training"
@@ -2216,6 +2227,25 @@
     }
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showSettingsSection(section = "general") {
+    const availableSections = new Set([
+      "general",
+      "planning",
+      "training",
+      "master-data",
+      "data",
+    ]);
+    activeSettingsSection = availableSections.has(section) ? section : "general";
+    document.querySelectorAll("[data-settings-section]").forEach((panel) => {
+      panel.hidden = panel.dataset.settingsSection !== activeSettingsSection;
+    });
+    document.querySelectorAll("[data-settings-section-target]").forEach((button) => {
+      const active = button.dataset.settingsSectionTarget === activeSettingsSection;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
   }
 
   function bindDialogTriggers() {
@@ -4383,6 +4413,12 @@
       const position = order.indexOf(item.dataset.view);
       item.style.order = String(position < 0 ? order.length : position);
     });
+    if (elements.settingsSidebarSubnav) {
+      const settingsPosition = order.indexOf("settings");
+      elements.settingsSidebarSubnav.style.order = String(
+        settingsPosition < 0 ? order.length : settingsPosition,
+      );
+    }
     if (elements.resetSidebarOrderButton) {
       elements.resetSidebarOrderButton.hidden = !hasCustomSidebarOrder();
     }

@@ -940,6 +940,21 @@ unverändert kompatibel.
 
 ## Einstellungen und Administration
 
+Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint
+unter **Einstellungen** in der Sidebar und zusätzlich als Abschnittsnavigation
+oben auf der Einstellungsseite:
+
+- **Allgemein:** Farbthema und Verhalten beim Schließen von Dialogen
+- **Planung:** feste Dienstwochenenden, Urlaubsplanung und Schulferien
+- **Pflichtfortbildungen:** Soll-Zeiten
+- **Stammdaten & Zugriffe:** Benutzer, Berufe, Qualifikationen und Datenqualität
+- **Daten & Sicherung:** Datenbank-Backend, Sicherungserinnerung sowie manuelle
+  und automatische Datensicherungen
+
+Beim Wechsel eines Untermenüs werden nur die zugehörigen Einstellungskarten
+angezeigt. Administratorgeschützte Funktionen bleiben weiterhin ausschließlich
+für Administratoren sichtbar.
+
 Die Einstellungsseite bündelt:
 
 - Farbthema

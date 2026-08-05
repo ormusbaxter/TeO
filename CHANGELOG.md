@@ -1,3 +1,8 @@
+### 004.024.000 – Gegliederte Einstellungen
+
+- **Neu:** Einstellungen-Untermenü in Sidebar und Einstellungsansicht
+- **Verbessert:** Einstellungskarten in fünf fachlich passende Bereiche gegliedert
+
 ### 004.023.000 – Einweisungsberechtigung für Geräte
 
 - **Neu:** Einweisungsberechtigte Mitarbeiter werden je Gerät aus Herstellereinweisungen angezeigt

@@ -61,6 +61,12 @@
       const position = order.indexOf(item.dataset.view);
       item.style.order = String(position < 0 ? order.length : position);
     });
+    if (elements.settingsSidebarSubnav) {
+      const settingsPosition = order.indexOf("settings");
+      elements.settingsSidebarSubnav.style.order = String(
+        settingsPosition < 0 ? order.length : settingsPosition,
+      );
+    }
     if (elements.resetSidebarOrderButton) {
       elements.resetSidebarOrderButton.hidden = !hasCustomSidebarOrder();
     }

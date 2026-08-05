@@ -176,8 +176,16 @@
             </div>
           </div>
 
+          <nav class="settings-section-nav" aria-label="Einstellungsbereiche">
+            <button type="button" data-settings-section-target="general">Allgemein</button>
+            <button type="button" data-settings-section-target="planning">Planung</button>
+            <button type="button" data-settings-section-target="training">Pflichtfortbildungen</button>
+            <button type="button" data-settings-section-target="master-data">Stammdaten &amp; Zugriffe</button>
+            <button type="button" data-settings-section-target="data">Daten &amp; Sicherung</button>
+          </nav>
+
           <div class="settings-grid">
-            <section class="panel settings-card">
+            <section class="panel settings-card" data-settings-section="general">
               <div class="settings-card-heading">
                 <span class="settings-card-icon">
                   <svg><use href="#icon-palette"></use></svg>
@@ -201,7 +209,7 @@
               </label>
             </section>
 
-            <section class="panel settings-card">
+            <section class="panel settings-card" data-settings-section="planning">
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-calendar"></use></svg>
@@ -251,7 +259,10 @@
               </div>
             </section>
 
-            <section class="panel settings-card settings-card-wide">
+            <section
+              class="panel settings-card settings-card-wide"
+              data-settings-section="planning"
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-calendar"></use></svg>
@@ -293,7 +304,10 @@
               </div>
             </section>
 
-            <section class="panel settings-card settings-card-wide">
+            <section
+              class="panel settings-card settings-card-wide"
+              data-settings-section="training"
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-training"></use></svg>
@@ -315,7 +329,11 @@
               </div>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section
+              class="panel settings-card"
+              data-settings-section="data"
+              data-admin-only
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-storage">
                   <svg><use href="#icon-lock"></use></svg>
@@ -381,7 +399,7 @@
               </div>
             </section>
 
-            <section class="panel settings-card">
+            <section class="panel settings-card" data-settings-section="master-data">
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-admin">
                   <svg><use href="#icon-edit"></use></svg>
@@ -420,7 +438,11 @@
               </div>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section
+              class="panel settings-card"
+              data-settings-section="data"
+              data-admin-only
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-reminder">
                   <svg><use href="#icon-alert"></use></svg>
@@ -458,7 +480,11 @@
               </div>
             </section>
 
-            <section class="panel settings-card" data-admin-only>
+            <section
+              class="panel settings-card"
+              data-settings-section="general"
+              data-admin-only
+            >
               <div class="settings-card-heading">
                 <span class="settings-card-icon settings-card-icon-admin">
                   <svg><use href="#icon-edit"></use></svg>
@@ -487,6 +513,7 @@
 
             <section
               class="panel settings-card settings-card-wide"
+              data-settings-section="planning"
               data-admin-only
             >
               <div class="settings-card-heading">
@@ -546,6 +573,7 @@
 
           <section
             class="panel backup-panel settings-backup-panel"
+            data-settings-section="data"
             aria-labelledby="backupTitle"
           >
             <div class="backup-content">

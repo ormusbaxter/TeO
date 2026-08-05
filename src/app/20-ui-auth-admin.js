@@ -7,6 +7,13 @@
       button.addEventListener("click", () => showView(button.dataset.goTo));
     });
 
+    document.querySelectorAll("[data-settings-section-target]").forEach((button) => {
+      button.addEventListener("click", () => {
+        showView("settings");
+        showSettingsSection(button.dataset.settingsSectionTarget);
+      });
+    });
+
     document.querySelectorAll("[data-help-target]").forEach((button) => {
       button.addEventListener("click", () => {
         document
@@ -49,6 +56,8 @@
       else button.removeAttribute("aria-current");
     });
 
+    if (view === "settings") showSettingsSection(activeSettingsSection);
+
     const mobileCreateType =
       view === "trainings"
         ? "training"
@@ -79,6 +88,25 @@
     }
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showSettingsSection(section = "general") {
+    const availableSections = new Set([
+      "general",
+      "planning",
+      "training",
+      "master-data",
+      "data",
+    ]);
+    activeSettingsSection = availableSections.has(section) ? section : "general";
+    document.querySelectorAll("[data-settings-section]").forEach((panel) => {
+      panel.hidden = panel.dataset.settingsSection !== activeSettingsSection;
+    });
+    document.querySelectorAll("[data-settings-section-target]").forEach((button) => {
+      const active = button.dataset.settingsSectionTarget === activeSettingsSection;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
   }
 
   function bindDialogTriggers() {
