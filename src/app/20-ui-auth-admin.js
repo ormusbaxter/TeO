@@ -31,6 +31,7 @@
   function showView(view, updateHash = true) {
     if (!VIEW_HASHES[view]) view = "dashboard";
     if (view !== "vacations") setVacationPlannerMaximized(false);
+    if (view !== "devices") setDeviceMatrixMaximized(false);
     activeView = view;
 
     document.body.classList.toggle("is-vacation-view", view === "vacations");
@@ -605,6 +606,11 @@
       deviceAnnexFilter = event.target.value;
       renderDevices();
     });
+    elements.toggleDeviceMatrixMaximizeButton.addEventListener(
+      "click",
+      toggleDeviceMatrixMaximized,
+    );
+    document.addEventListener("keydown", handleDeviceMatrixMaximizeKeydown);
     elements.deviceInventoryFilter.addEventListener("change", (event) => {
       deviceInventoryFilter = event.target.value;
       renderDevices();

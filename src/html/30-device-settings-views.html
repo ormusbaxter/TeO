@@ -15,7 +15,27 @@
 
           <div class="training-summary" id="deviceSummary"></div>
 
-          <section class="panel device-matrix-panel">
+          <section
+            class="panel device-matrix-panel"
+            id="deviceMatrixWidget"
+            aria-labelledby="deviceMatrixWidgetTitle"
+          >
+            <header class="device-matrix-widget-header">
+              <div>
+                <p class="eyebrow">Auswertung</p>
+                <h2 id="deviceMatrixWidgetTitle">Einweisungsmatrix</h2>
+              </div>
+              <button
+                class="button button-secondary button-compact"
+                id="toggleDeviceMatrixMaximizeButton"
+                type="button"
+                aria-controls="deviceInstructionMatrix"
+                aria-pressed="false"
+              >
+                <svg><use id="deviceMatrixMaximizeIcon" href="#icon-maximize"></use></svg>
+                <span id="deviceMatrixMaximizeLabel">Maximieren</span>
+              </button>
+            </header>
             <div class="device-filter-bar">
               <label class="search-field device-search-field" for="deviceSearch">
                 <svg><use href="#icon-search"></use></svg>

@@ -1,3 +1,8 @@
+### 004.025.000 – Maximierbare Einweisungsmatrix
+
+- **Neu:** Einweisungsmatrix lässt sich wie die Tabelle der Urlaubsplanung maximieren
+- **Verbessert:** Verkleinern per Schaltfläche oder Escape-Taste
+
 ### 004.024.000 – Gegliederte Einstellungen
 
 - **Neu:** Einstellungen-Untermenü in Sidebar und Einstellungsansicht

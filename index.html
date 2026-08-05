@@ -916,7 +916,27 @@
 
           <div class="training-summary" id="deviceSummary"></div>
 
-          <section class="panel device-matrix-panel">
+          <section
+            class="panel device-matrix-panel"
+            id="deviceMatrixWidget"
+            aria-labelledby="deviceMatrixWidgetTitle"
+          >
+            <header class="device-matrix-widget-header">
+              <div>
+                <p class="eyebrow">Auswertung</p>
+                <h2 id="deviceMatrixWidgetTitle">Einweisungsmatrix</h2>
+              </div>
+              <button
+                class="button button-secondary button-compact"
+                id="toggleDeviceMatrixMaximizeButton"
+                type="button"
+                aria-controls="deviceInstructionMatrix"
+                aria-pressed="false"
+              >
+                <svg><use id="deviceMatrixMaximizeIcon" href="#icon-maximize"></use></svg>
+                <span id="deviceMatrixMaximizeLabel">Maximieren</span>
+              </button>
+            </header>
             <div class="device-filter-bar">
               <label class="search-field device-search-field" for="deviceSearch">
                 <svg><use href="#icon-search"></use></svg>
@@ -1888,7 +1908,7 @@
 <ul><li><strong>Einweisungsdatum, neueste zuerst</strong> (Voreinstellung) – zeigt den fachlichen Verlauf.</li><li><strong>Eingabedatum, zuletzt erfasste zuerst</strong> – zeigt, was zuletzt dokumentiert wurde. Das hilft beim Nacherfassen älterer Einweisungen, die sonst weit hinten stünden. In dieser Ansicht steht unter dem Einweisungsdatum zusätzlich das Erfassungsdatum.</li></ul>
 <p>Bei gleichem Wert entscheidet jeweils das andere Datum, damit die Reihenfolge stabil bleibt.</p>
 <h3 id="hilfe-einweisungsmatrix">Einweisungsmatrix</h3>
-<p>Die Matrix zeigt Mitarbeiter in den Zeilen und Geräte in den Spalten. Filterbar sind unter anderem:</p>
+<p>Die Matrix zeigt Mitarbeiter in den Zeilen und Geräte in den Spalten. Über <strong>Maximieren</strong> lässt sie sich wie die Tabelle der Urlaubsplanung nahezu fensterfüllend anzeigen. <strong>Verkleinern</strong> oder die Escape-Taste stellt die normale Ansicht wieder her; geöffnete Dialoge haben bei Escape Vorrang. Filterbar sind unter anderem:</p>
 <ul><li>Anlage 1</li><li>Gerätekategorie</li><li>aktueller Gerätebestand</li><li>Mitarbeiterstatus</li><li>Mitarbeitername</li><li>Gerätename</li></ul>
 <p>Der Einweisungsstand je Gerät wird farblich angezeigt:</p>
 <ul><li>0 bis 65 Prozent: rot</li><li>66 bis 80 Prozent: gelb</li><li>81 bis 100 Prozent: grün</li></ul>
@@ -1979,6 +1999,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-025-000-maximierbare-einweisungsmatrix">004.025.000 – Maximierbare Einweisungsmatrix</h3>
+<ul><li><strong>Neu:</strong> Einweisungsmatrix lässt sich wie die Tabelle der Urlaubsplanung maximieren</li><li><strong>Verbessert:</strong> Verkleinern per Schaltfläche oder Escape-Taste</li></ul>
 <h3 id="hilfe-004-024-000-gegliederte-einstellungen">004.024.000 – Gegliederte Einstellungen</h3>
 <ul><li><strong>Neu:</strong> Einstellungen-Untermenü in Sidebar und Einstellungsansicht</li><li><strong>Verbessert:</strong> Einstellungskarten in fünf fachlich passende Bereiche gegliedert</li></ul>
 <h3 id="hilfe-004-023-000-einweisungsberechtigung-fur-gerate">004.023.000 – Einweisungsberechtigung für Geräte</h3>

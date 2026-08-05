@@ -169,6 +169,55 @@
     return `Vor ${Math.abs(daysUntil)} Tagen`;
   }
 
+  function toggleDeviceMatrixMaximized() {
+    setDeviceMatrixMaximized(
+      !elements.deviceMatrixWidget.classList.contains("is-maximized"),
+    );
+  }
+
+  function setDeviceMatrixMaximized(maximized) {
+    const active = Boolean(maximized);
+    const widget = elements.deviceMatrixWidget;
+    if (active && !deviceMatrixWidgetAnchor) {
+      deviceMatrixWidgetAnchor = document.createComment("device-matrix-widget-anchor");
+      widget.parentNode.insertBefore(deviceMatrixWidgetAnchor, widget);
+      document.body.append(widget);
+    } else if (!active && deviceMatrixWidgetAnchor) {
+      deviceMatrixWidgetAnchor.parentNode?.insertBefore(widget, deviceMatrixWidgetAnchor);
+      deviceMatrixWidgetAnchor.remove();
+      deviceMatrixWidgetAnchor = null;
+    }
+    widget.classList.toggle("is-maximized", active);
+    document.body.classList.toggle("is-device-matrix-maximized", active);
+    elements.toggleDeviceMatrixMaximizeButton.setAttribute(
+      "aria-pressed",
+      String(active),
+    );
+    elements.toggleDeviceMatrixMaximizeButton.title = active
+      ? "Einweisungsmatrix verkleinern (Esc)"
+      : "Einweisungsmatrix maximieren";
+    elements.deviceMatrixMaximizeLabel.textContent = active
+      ? "Verkleinern"
+      : "Maximieren";
+    elements.deviceMatrixMaximizeIcon.setAttribute(
+      "href",
+      active ? "#icon-minimize" : "#icon-maximize",
+    );
+  }
+
+  function handleDeviceMatrixMaximizeKeydown(event) {
+    if (
+      event.key !== "Escape" ||
+      !elements.deviceMatrixWidget.classList.contains("is-maximized") ||
+      document.querySelector("dialog[open]")
+    ) {
+      return;
+    }
+    event.preventDefault();
+    setDeviceMatrixMaximized(false);
+    elements.toggleDeviceMatrixMaximizeButton.focus();
+  }
+
   function renderDevices() {
     const categories = [
       ...new Set(state.devices.map((device) => device.category)),

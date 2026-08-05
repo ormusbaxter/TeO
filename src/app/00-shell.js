@@ -444,6 +444,7 @@
   let vacationVisibleEmployeeIds = [];
   let vacationVisibleDates = [];
   let vacationPlannerWidgetAnchor = null;
+  let deviceMatrixWidgetAnchor = null;
   let deviceInventoryFilter = "current";
   let deviceAnnexFilter = "all";
   let deviceCategoryFilter = "all";
@@ -666,6 +667,12 @@
     appointmentSummary: document.querySelector("#appointmentSummary"),
     appointmentList: document.querySelector("#appointmentList"),
     deviceSummary: document.querySelector("#deviceSummary"),
+    deviceMatrixWidget: document.querySelector("#deviceMatrixWidget"),
+    toggleDeviceMatrixMaximizeButton: document.querySelector(
+      "#toggleDeviceMatrixMaximizeButton",
+    ),
+    deviceMatrixMaximizeIcon: document.querySelector("#deviceMatrixMaximizeIcon"),
+    deviceMatrixMaximizeLabel: document.querySelector("#deviceMatrixMaximizeLabel"),
     deviceManagementSummary: document.querySelector("#deviceManagementSummary"),
     deviceCatalog: document.querySelector("#deviceCatalog"),
     deviceInstructionMatrix: document.querySelector("#deviceInstructionMatrix"),

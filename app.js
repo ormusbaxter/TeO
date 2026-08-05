@@ -445,6 +445,7 @@
   let vacationVisibleEmployeeIds = [];
   let vacationVisibleDates = [];
   let vacationPlannerWidgetAnchor = null;
+  let deviceMatrixWidgetAnchor = null;
   let deviceInventoryFilter = "current";
   let deviceAnnexFilter = "all";
   let deviceCategoryFilter = "all";
@@ -667,6 +668,12 @@
     appointmentSummary: document.querySelector("#appointmentSummary"),
     appointmentList: document.querySelector("#appointmentList"),
     deviceSummary: document.querySelector("#deviceSummary"),
+    deviceMatrixWidget: document.querySelector("#deviceMatrixWidget"),
+    toggleDeviceMatrixMaximizeButton: document.querySelector(
+      "#toggleDeviceMatrixMaximizeButton",
+    ),
+    deviceMatrixMaximizeIcon: document.querySelector("#deviceMatrixMaximizeIcon"),
+    deviceMatrixMaximizeLabel: document.querySelector("#deviceMatrixMaximizeLabel"),
     deviceManagementSummary: document.querySelector("#deviceManagementSummary"),
     deviceCatalog: document.querySelector("#deviceCatalog"),
     deviceInstructionMatrix: document.querySelector("#deviceInstructionMatrix"),
@@ -2170,6 +2177,7 @@
   function showView(view, updateHash = true) {
     if (!VIEW_HASHES[view]) view = "dashboard";
     if (view !== "vacations") setVacationPlannerMaximized(false);
+    if (view !== "devices") setDeviceMatrixMaximized(false);
     activeView = view;
 
     document.body.classList.toggle("is-vacation-view", view === "vacations");
@@ -2744,6 +2752,11 @@
       deviceAnnexFilter = event.target.value;
       renderDevices();
     });
+    elements.toggleDeviceMatrixMaximizeButton.addEventListener(
+      "click",
+      toggleDeviceMatrixMaximized,
+    );
+    document.addEventListener("keydown", handleDeviceMatrixMaximizeKeydown);
     elements.deviceInventoryFilter.addEventListener("change", (event) => {
       deviceInventoryFilter = event.target.value;
       renderDevices();
@@ -8896,6 +8909,55 @@
     if (daysUntil > 1) return `In ${daysUntil} Tagen`;
     if (daysUntil === -1) return "Gestern";
     return `Vor ${Math.abs(daysUntil)} Tagen`;
+  }
+
+  function toggleDeviceMatrixMaximized() {
+    setDeviceMatrixMaximized(
+      !elements.deviceMatrixWidget.classList.contains("is-maximized"),
+    );
+  }
+
+  function setDeviceMatrixMaximized(maximized) {
+    const active = Boolean(maximized);
+    const widget = elements.deviceMatrixWidget;
+    if (active && !deviceMatrixWidgetAnchor) {
+      deviceMatrixWidgetAnchor = document.createComment("device-matrix-widget-anchor");
+      widget.parentNode.insertBefore(deviceMatrixWidgetAnchor, widget);
+      document.body.append(widget);
+    } else if (!active && deviceMatrixWidgetAnchor) {
+      deviceMatrixWidgetAnchor.parentNode?.insertBefore(widget, deviceMatrixWidgetAnchor);
+      deviceMatrixWidgetAnchor.remove();
+      deviceMatrixWidgetAnchor = null;
+    }
+    widget.classList.toggle("is-maximized", active);
+    document.body.classList.toggle("is-device-matrix-maximized", active);
+    elements.toggleDeviceMatrixMaximizeButton.setAttribute(
+      "aria-pressed",
+      String(active),
+    );
+    elements.toggleDeviceMatrixMaximizeButton.title = active
+      ? "Einweisungsmatrix verkleinern (Esc)"
+      : "Einweisungsmatrix maximieren";
+    elements.deviceMatrixMaximizeLabel.textContent = active
+      ? "Verkleinern"
+      : "Maximieren";
+    elements.deviceMatrixMaximizeIcon.setAttribute(
+      "href",
+      active ? "#icon-minimize" : "#icon-maximize",
+    );
+  }
+
+  function handleDeviceMatrixMaximizeKeydown(event) {
+    if (
+      event.key !== "Escape" ||
+      !elements.deviceMatrixWidget.classList.contains("is-maximized") ||
+      document.querySelector("dialog[open]")
+    ) {
+      return;
+    }
+    event.preventDefault();
+    setDeviceMatrixMaximized(false);
+    elements.toggleDeviceMatrixMaximizeButton.focus();
   }
 
   function renderDevices() {

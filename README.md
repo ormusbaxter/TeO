@@ -786,6 +786,9 @@ stabil bleibt.
 ### Einweisungsmatrix
 
 Die Matrix zeigt Mitarbeiter in den Zeilen und Geräte in den Spalten.
+Über **Maximieren** lässt sie sich wie die Tabelle der Urlaubsplanung nahezu
+fensterfüllend anzeigen. **Verkleinern** oder die Escape-Taste stellt die
+normale Ansicht wieder her; geöffnete Dialoge haben bei Escape Vorrang.
 Filterbar sind unter anderem:
 
 - Anlage 1
