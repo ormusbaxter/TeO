@@ -866,6 +866,14 @@ solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen
 angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben
 unabhängig davon verfügbar.
 
+Beim Start in der lokalen Browser-Betriebsart verlangt TeO nach der Anmeldung
+die Auswahl von `teo-autosicherung.json`. Die Bedienoberfläche bleibt gesperrt,
+bis die Datei erfolgreich geprüft, gegebenenfalls mit dem beim Login
+entsperrten Schlüssel entschlüsselt und als aktueller Datenbestand übernommen
+wurde. Eine Sicherung, die älter als der zuletzt lokal gesicherte Stand ist,
+wird abgewiesen. In der MariaDB-Betriebsart übernimmt stattdessen der Server den
+verbindlichen Startabgleich.
+
 ### Sicherung prüfen
 
 Über **Sicherung prüfen** wird eine Datei validiert, ohne den aktuellen

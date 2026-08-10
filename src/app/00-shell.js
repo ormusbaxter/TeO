@@ -432,6 +432,8 @@
   let automaticBackupRequestSequence = 0;
   let automaticBackupRetryAt = 0;
   let automaticBackupNotice = "";
+  let startupBackupSynchronized = false;
+  let startupBackupImportRunning = false;
   let browserPersistenceNotice = "";
   let dateInputObserver = null;
   const savedVacationView = readVacationViewPreference();
@@ -767,6 +769,12 @@
     loginDialog: document.querySelector("#loginDialog"),
     loginForm: document.querySelector("#loginForm"),
     loginError: document.querySelector("#loginError"),
+    startupBackupDialog: document.querySelector("#startupBackupDialog"),
+    startupBackupFile: document.querySelector("#startupBackupFile"),
+    selectStartupBackupFileButton: document.querySelector(
+      "#selectStartupBackupFileButton",
+    ),
+    startupBackupStatus: document.querySelector("#startupBackupStatus"),
     setupDialog: document.querySelector("#setupDialog"),
     setupForm: document.querySelector("#setupForm"),
     setupError: document.querySelector("#setupError"),

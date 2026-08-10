@@ -24,6 +24,12 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
   assert.match(html, /id="setAutomaticBackupPasswordButton"/);
   assert.match(html, /id="automaticBackupRecoveryDialog"/);
   assert.match(html, /id="automaticBackupRecoveryKey"/);
+  assert.match(
+    html,
+    /id="startupBackupDialog"[^>]*[\s\S]*?data-persistent-dialog/,
+  );
+  assert.match(html, /id="startupBackupFile"/);
+  assert.match(html, /teo-autosicherung\.json auswählen/);
   assert.match(appSource, /window\.showDirectoryPicker/);
   assert.match(appSource, /AUTO_BACKUP_DIRECTORY_KEY/);
   assert.match(appSource, /AUTO_BACKUP_DELAY_MS\s*=\s*2000/);
@@ -49,7 +55,41 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
     appSource,
     /decryptBackup\(envelope, automaticBackupPassword\)/,
   );
+  assert.match(appSource, /handleStartupBackupFileSelection/);
+  assert.match(
+    appSource,
+    /!isMariaDbMode\(\) && !startupBackupSynchronized/,
+  );
   assert.match(styles, /\.automatic-backup-panel\s*\{/);
+});
+
+test("Der Startabgleich weist ältere Sicherungsstände ab", async () => {
+  const app = await loadAppFunctions(["startupBackupIsOlder"]);
+  const stateAt = (lastBackupAt) => ({ settings: { lastBackupAt } });
+  const backupSettingsAt = (lastBackupAt) => ({ lastBackupAt });
+
+  assert.equal(
+    app.startupBackupIsOlder(
+      stateAt("2026-08-10T08:00:00.000Z"),
+      backupSettingsAt("2026-08-10T09:00:00.000Z"),
+    ),
+    true,
+  );
+  assert.equal(
+    app.startupBackupIsOlder(
+      stateAt("2026-08-10T09:00:00.000Z"),
+      backupSettingsAt("2026-08-10T09:00:00.000Z"),
+    ),
+    false,
+  );
+  assert.equal(
+    app.startupBackupIsOlder(
+      stateAt(""),
+      backupSettingsAt("2026-08-10T09:00:00.000Z"),
+    ),
+    true,
+  );
+  assert.equal(app.startupBackupIsOlder(stateAt(""), backupSettingsAt("")), false);
 });
 
 test("Die automatische Sicherung normalisiert die Login-Verschlüsselung", async () => {

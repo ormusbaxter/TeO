@@ -433,6 +433,8 @@
   let automaticBackupRequestSequence = 0;
   let automaticBackupRetryAt = 0;
   let automaticBackupNotice = "";
+  let startupBackupSynchronized = false;
+  let startupBackupImportRunning = false;
   let browserPersistenceNotice = "";
   let dateInputObserver = null;
   const savedVacationView = readVacationViewPreference();
@@ -768,6 +770,12 @@
     loginDialog: document.querySelector("#loginDialog"),
     loginForm: document.querySelector("#loginForm"),
     loginError: document.querySelector("#loginError"),
+    startupBackupDialog: document.querySelector("#startupBackupDialog"),
+    startupBackupFile: document.querySelector("#startupBackupFile"),
+    selectStartupBackupFileButton: document.querySelector(
+      "#selectStartupBackupFileButton",
+    ),
+    startupBackupStatus: document.querySelector("#startupBackupStatus"),
     setupDialog: document.querySelector("#setupDialog"),
     setupForm: document.querySelector("#setupForm"),
     setupError: document.querySelector("#setupError"),
@@ -2463,6 +2471,14 @@
     );
     elements.importDataButton.addEventListener("click", () => elements.importDataFile.click());
     elements.importDataFile.addEventListener("change", handleBackupFileSelection);
+    elements.selectStartupBackupFileButton.addEventListener(
+      "click",
+      () => elements.startupBackupFile.click(),
+    );
+    elements.startupBackupFile.addEventListener(
+      "change",
+      handleStartupBackupFileSelection,
+    );
     elements.validateBackupButton.addEventListener(
       "click",
       () => elements.validateBackupFile.click(),
@@ -3536,6 +3552,11 @@
       return;
     }
 
+    if (!isMariaDbMode() && !startupBackupSynchronized) {
+      showStartupBackupDialog();
+      return;
+    }
+
     document.body.classList.remove("is-auth-locked");
     if (elements.changePasswordDialog.open) elements.changePasswordDialog.close();
     scheduleAutomaticBackup();
@@ -3545,6 +3566,8 @@
     currentUser = null;
     clearAutomaticBackupTimer();
     automaticBackupPassword = "";
+    startupBackupSynchronized = false;
+    startupBackupImportRunning = false;
     backupReminderShown = false;
     sessionStorage.removeItem(SESSION_USER_KEY);
     document.body.classList.add("is-auth-locked");
@@ -3554,6 +3577,17 @@
     applyAccessControl();
     if (!elements.loginDialog.open) elements.loginDialog.showModal();
     window.setTimeout(() => document.querySelector("#loginUsername").focus(), 0);
+  }
+
+  function showStartupBackupDialog() {
+    document.body.classList.add("is-auth-locked");
+    elements.startupBackupFile.value = "";
+    elements.startupBackupStatus.textContent = "";
+    elements.selectStartupBackupFileButton.disabled = false;
+    if (!elements.startupBackupDialog.open) {
+      elements.startupBackupDialog.showModal();
+    }
+    window.setTimeout(() => elements.selectStartupBackupFileButton.focus(), 0);
   }
 
   function logout() {
@@ -3608,8 +3642,12 @@
     }
     currentUser = state.users.find((user) => user.id === currentUser.id);
     elements.changePasswordDialog.close();
-    document.body.classList.remove("is-auth-locked");
-    applyAccessControl();
+    if (!isMariaDbMode() && !startupBackupSynchronized) {
+      showStartupBackupDialog();
+    } else {
+      document.body.classList.remove("is-auth-locked");
+      applyAccessControl();
+    }
     showToast("Das neue Passwort wurde gespeichert.");
   }
 
@@ -13325,6 +13363,70 @@
     }
   }
 
+  function startupBackupIsOlder(
+    importedState,
+    currentBackupSettings = automaticBackupSettings,
+  ) {
+    const importedAt = Date.parse(importedState?.settings?.lastBackupAt);
+    const currentAt = Date.parse(currentBackupSettings?.lastBackupAt);
+    if (!Number.isFinite(currentAt)) return false;
+    return !Number.isFinite(importedAt) || importedAt < currentAt;
+  }
+
+  async function handleStartupBackupFileSelection(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || startupBackupImportRunning) return;
+
+    if (file.name.toLocaleLowerCase("de-DE") !== AUTO_BACKUP_FILENAME) {
+      elements.startupBackupStatus.textContent =
+        `Bitte wählen Sie die Datei „${AUTO_BACKUP_FILENAME}“ aus.`;
+      return;
+    }
+    if (file.size > MAX_BACKUP_FILE_SIZE) {
+      elements.startupBackupStatus.textContent =
+        "Die Sicherungsdatei ist größer als 20 MB und kann nicht geladen werden.";
+      return;
+    }
+
+    startupBackupImportRunning = true;
+    elements.selectStartupBackupFileButton.disabled = true;
+    elements.startupBackupStatus.textContent = "Sicherungsdatei wird geprüft …";
+    try {
+      const importedState = await readBackupFile(file);
+      if (!importedState) {
+        elements.startupBackupStatus.textContent =
+          "Der Startabgleich wurde nicht abgeschlossen.";
+        return;
+      }
+      if (startupBackupIsOlder(importedState)) {
+        elements.startupBackupStatus.textContent =
+          "Diese Sicherungsdatei ist älter als der zuletzt lokal gesicherte Datenstand. Bitte wählen Sie die aktuelle Datei aus.";
+        return;
+      }
+      elements.startupBackupStatus.textContent = "Datenbestand wird übernommen …";
+      if (!(await importDatabase(importedState))) {
+        elements.startupBackupStatus.textContent =
+          "Der Datenbestand konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.";
+        return;
+      }
+
+      startupBackupSynchronized = true;
+      if (elements.startupBackupDialog.open) elements.startupBackupDialog.close();
+      document.body.classList.remove("is-auth-locked");
+      applyAccessControl();
+      scheduleAutomaticBackup();
+      showToast("Der aktuelle Datenbestand wurde aus teo-autosicherung.json geladen.");
+    } catch (error) {
+      console.warn("Startabgleich konnte nicht abgeschlossen werden.", error);
+      elements.startupBackupStatus.textContent =
+        error.message || "Die Sicherungsdatei ist ungültig.";
+    } finally {
+      startupBackupImportRunning = false;
+      elements.selectStartupBackupFileButton.disabled = false;
+    }
+  }
+
   function renderSettings() {
     elements.settingsBackupReminderDays.value = String(
       state.settings.backupReminderDays,
@@ -14019,7 +14121,7 @@
     if (!(await persistState())) {
       state = previousState;
       renderAll();
-      return;
+      return false;
     }
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
@@ -14033,7 +14135,7 @@
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {
       showLoginDialog();
-      return;
+      return false;
     }
     renderAll();
     showToast(
@@ -14041,6 +14143,7 @@
         ? "Die Datensicherung wurde einschließlich der Benutzerkonten importiert."
         : "Die Datensicherung wurde importiert. Die Benutzerkonten sind unverändert.",
     );
+    return true;
   }
 
   function getTrainingStats(training) {
