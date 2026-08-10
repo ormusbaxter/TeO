@@ -21,7 +21,13 @@
   margin: 10mm;
 }
 
-.appointment-print-surface {
+@page vacation-blank-year {
+  size: A4 landscape;
+  margin: 8mm;
+}
+
+.appointment-print-surface,
+.vacation-blank-year-print-surface {
   display: none;
 }
 
@@ -70,6 +76,159 @@
     width: 100%;
     color: #111;
     background: white;
+  }
+
+  body.print-vacation-blank-year > * {
+    display: none !important;
+  }
+
+  body.print-vacation-blank-year > #vacationBlankYearPrintSurface {
+    page: vacation-blank-year;
+    display: block !important;
+    width: 100%;
+    color: #182230;
+    background: white;
+  }
+
+  .vacation-blank-year-document {
+    box-sizing: border-box;
+    width: 100%;
+    height: 194mm;
+    overflow: hidden;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .vacation-blank-year-document:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .vacation-blank-year-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 3mm;
+    border-bottom: 0.35mm solid #9ba6b2;
+  }
+
+  .vacation-blank-year-header :is(h1, p),
+  .vacation-blank-year-document footer {
+    margin: 0;
+  }
+
+  .vacation-blank-year-header p {
+    margin-bottom: 1mm;
+    color: #596779;
+    font-size: 7pt;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .vacation-blank-year-header h1 {
+    font-size: 15pt;
+    line-height: 1.1;
+  }
+
+  .vacation-blank-year-meta {
+    display: grid;
+    gap: 1mm;
+    text-align: right;
+  }
+
+  .vacation-blank-year-meta strong {
+    font-size: 14pt;
+  }
+
+  .vacation-blank-year-meta span,
+  .vacation-blank-year-legend,
+  .vacation-blank-year-document footer {
+    font-size: 6.5pt;
+  }
+
+  .vacation-blank-year-legend {
+    display: flex;
+    gap: 5mm;
+    align-items: center;
+    margin-top: 2.5mm;
+    color: #29384a;
+    font-weight: 700;
+  }
+
+  .vacation-blank-year-legend > span {
+    display: inline-flex;
+    gap: 1.5mm;
+    align-items: center;
+  }
+
+  .vacation-blank-year-legend i {
+    display: inline-block;
+    width: 5mm;
+    height: 5mm;
+    border: 0.25mm solid #9ba6b2;
+    border-radius: 1mm;
+  }
+
+  .vacation-blank-holiday-swatch {
+    background-image: linear-gradient(
+      135deg,
+      transparent 0 70%,
+      rgb(180 35 47 / 60%) 70% 100%
+    );
+  }
+
+  .vacation-blank-own-weekend-swatch {
+    box-shadow: inset 0 0 0 0.5mm rgb(24 102 186 / 72%);
+  }
+
+  .vacation-blank-year-document .vacation-year-matrix-scroll {
+    margin-top: 2.5mm;
+    overflow: visible;
+    border-color: #9ba6b2;
+    border-radius: 0;
+  }
+
+  .vacation-blank-year-document .vacation-year-matrix {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .vacation-blank-year-document .vacation-year-matrix th,
+  .vacation-blank-year-document .vacation-year-matrix td {
+    position: static;
+    width: auto;
+    min-width: 0;
+    height: 9.2mm;
+    padding: 0.5mm;
+    color: #182230;
+    border-color: #b8c1cb;
+    background-color: white;
+    font-size: 6pt;
+  }
+
+  .vacation-blank-year-document .vacation-year-matrix thead th,
+  .vacation-blank-year-document .vacation-year-matrix .vacation-year-month-column {
+    background-color: #eef1f4;
+  }
+
+  .vacation-blank-year-document .vacation-year-matrix .vacation-year-month-column {
+    width: 20mm;
+    padding-left: 1.5mm;
+    font-size: 6.5pt;
+    box-shadow: none;
+  }
+
+  .vacation-blank-year-document .vacation-year-matrix td.is-own-weekend {
+    box-shadow: inset 0 0 0 0.45mm rgb(24 102 186 / 72%);
+  }
+
+  .vacation-blank-year-document footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2mm;
+    color: #596779;
   }
 
   .appointment-print-document,
