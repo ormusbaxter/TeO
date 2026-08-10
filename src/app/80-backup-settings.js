@@ -11,6 +11,7 @@
 
   function normalizeAutomaticBackupSettings(value = {}) {
     const parsedLastBackupAt = Date.parse(value.lastBackupAt);
+    const parsedLastBackupSizeBytes = Number(value.lastBackupSizeBytes);
     const keyFingerprint = String(value.keyFingerprint || "").slice(0, 200);
     const keyEnvelopes = Object.fromEntries(
       Object.entries(value.keyEnvelopes || {})
@@ -33,6 +34,11 @@
       lastBackupAt: Number.isFinite(parsedLastBackupAt)
         ? new Date(parsedLastBackupAt).toISOString()
         : "",
+      lastBackupSizeBytes:
+        Number.isSafeInteger(parsedLastBackupSizeBytes) &&
+        parsedLastBackupSizeBytes >= 0
+          ? parsedLastBackupSizeBytes
+          : 0,
       directoryName: String(value.directoryName || "").trim().slice(0, 200),
     };
   }
@@ -570,6 +576,7 @@
       );
       await persistState();
       automaticBackupSettings.lastBackupAt = exportedAt.toISOString();
+      automaticBackupSettings.lastBackupSizeBytes = volume.sizeBytes;
       await persistAutomaticBackupConfiguration();
       automaticBackupRetryAt = 0;
       automaticBackupNotice = "";
@@ -647,6 +654,85 @@
     return backupVolumeAssessment(
       new TextEncoder().encode(fileContent).byteLength,
     );
+  }
+
+  function estimatedCurrentBackupSizeBytes() {
+    const exportedAt = new Date().toISOString();
+    return assessBackupContent(
+      JSON.stringify(
+        {
+          format: BACKUP_FORMAT,
+          formatVersion: BACKUP_FORMAT_VERSION,
+          appVersion: STATE_VERSION,
+          exportedAt,
+          data: {
+            ...state,
+            settings: { ...state.settings, lastBackupAt: exportedAt },
+          },
+        },
+        null,
+        2,
+      ),
+    ).sizeBytes;
+  }
+
+  function formatBackupMegabytes(bytes) {
+    const megabytes = Math.max(0, Number(bytes) || 0) / (1024 * 1024);
+    return numberFormat({
+      minimumFractionDigits: megabytes > 0 && megabytes < 1 ? 1 : 0,
+      maximumFractionDigits: 1,
+    }).format(megabytes);
+  }
+
+  function renderBackupVolumeMeter(configuredMaxMb = state.settings.maxBackupFileSizeMb) {
+    const parsedMaxMb = Number(configuredMaxMb);
+    const maxBackupFileSizeMb =
+      Number.isInteger(parsedMaxMb) &&
+      parsedMaxMb >= MIN_BACKUP_FILE_SIZE_MB &&
+      parsedMaxMb <= MAX_BACKUP_FILE_SIZE_MB
+        ? parsedMaxMb
+        : state.settings.maxBackupFileSizeMb;
+    const sizeBytes =
+      automaticBackupSettings?.lastBackupSizeBytes ||
+      estimatedCurrentBackupSizeBytes();
+    const assessment = backupVolumeAssessment(sizeBytes, {
+      maxBackupFileSizeMb,
+    });
+    const percent = Math.min(
+      100,
+      assessment.maxBytes ? (assessment.sizeBytes / assessment.maxBytes) * 100 : 0,
+    );
+
+    elements.backupVolumeMeter.style.setProperty(
+      "--backup-volume-percent",
+      `${percent}%`,
+    );
+    elements.backupVolumeMeter.classList.toggle("is-warning", assessment.warning);
+    elements.backupVolumeMeter.classList.toggle("is-exceeded", assessment.exceeded);
+    elements.backupVolumeMeter.setAttribute(
+      "aria-valuenow",
+      String(Math.min(100, assessment.usagePercent)),
+    );
+    elements.backupVolumeMeter.setAttribute("aria-valuemax", "100");
+    elements.backupVolumeLabel.textContent =
+      `${formatBackupMegabytes(assessment.sizeBytes)} von ${maxBackupFileSizeMb} MB`;
+    elements.backupVolumeHint.textContent = assessment.exceeded
+      ? "Grenzwert überschritten – maximale Sicherungsgröße erhöhen."
+      : assessment.warning
+        ? `Volumenwarnung: ${assessment.usagePercent} % der Grenze erreicht.`
+        : `Warnung ab ${formatBackupMegabytes(assessment.maxBytes * BACKUP_VOLUME_WARNING_RATIO)} MB (90 %).`;
+  }
+
+  async function rememberBackupVolume(sizeBytes) {
+    automaticBackupSettings.lastBackupSizeBytes = Math.max(
+      0,
+      Math.round(Number(sizeBytes) || 0),
+    );
+    try {
+      await persistAutomaticBackupConfiguration();
+    } catch (error) {
+      console.warn("Das zuletzt gemessene Sicherungsvolumen konnte nicht gespeichert werden.", error);
+    }
   }
 
   async function exportDatabase() {
@@ -796,6 +882,7 @@
       fileContent,
       "application/json;charset=utf-8",
     );
+    await rememberBackupVolume(volume.sizeBytes);
     state.settings.lastBackupAt = exportedAt.toISOString();
     appendAuditEntry(
       encrypted
@@ -1070,6 +1157,8 @@
       }
 
       startupBackupSynchronized = true;
+      await rememberBackupVolume(volume.sizeBytes);
+      renderBackupVolumeMeter();
       if (elements.startupBackupDialog.open) elements.startupBackupDialog.close();
       document.body.classList.remove("is-auth-locked");
       applyAccessControl();
@@ -1097,6 +1186,7 @@
     elements.settingsMaxBackupFileSizeMb.value = String(
       state.settings.maxBackupFileSizeMb,
     );
+    renderBackupVolumeMeter();
     elements.settingsCloseDialogOnOutsideClick.value = state.settings
       .closeDialogOnOutsideClick
       ? "on"

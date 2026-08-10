@@ -488,7 +488,7 @@
                 TeO warnt, sobald die letzte Datensicherung länger als der gewählte
                 Zeitraum zurückliegt.
               </p>
-              <div class="settings-inline-form">
+              <div class="settings-inline-form backup-reminder-settings-form">
                 <label class="settings-field">
                   <span>Erinnerung nach</span>
                   <span class="input-suffix">
@@ -514,7 +514,6 @@
                     />
                     <span>MB</span>
                   </span>
-                  <small class="field-hint">Ab 90&nbsp;% zeigt TeO eine Volumenwarnung.</small>
                 </label>
                 <button
                   class="button button-primary"
@@ -523,6 +522,22 @@
                 >
                   Speichern
                 </button>
+                <div
+                  class="backup-volume-meter"
+                  id="backupVolumeMeter"
+                  role="progressbar"
+                  aria-label="Belegtes Sicherungsvolumen"
+                  aria-valuemin="0"
+                >
+                  <div class="backup-volume-heading">
+                    <strong>Sicherungsvolumen</strong>
+                    <span id="backupVolumeLabel">0 von 20 MB</span>
+                  </div>
+                  <div class="backup-volume-track" aria-hidden="true">
+                    <span id="backupVolumeBar"></span>
+                  </div>
+                  <small id="backupVolumeHint">Warnung ab 90&nbsp;% des eingestellten Volumens.</small>
+                </div>
               </div>
             </section>
 

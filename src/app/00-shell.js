@@ -583,6 +583,10 @@
     settingsMaxBackupFileSizeMb: document.querySelector(
       "#settingsMaxBackupFileSizeMb",
     ),
+    backupVolumeMeter: document.querySelector("#backupVolumeMeter"),
+    backupVolumeLabel: document.querySelector("#backupVolumeLabel"),
+    backupVolumeBar: document.querySelector("#backupVolumeBar"),
+    backupVolumeHint: document.querySelector("#backupVolumeHint"),
     settingsCloseDialogOnOutsideClick: document.querySelector(
       "#settingsCloseDialogOnOutsideClick",
     ),
