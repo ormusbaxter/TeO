@@ -9858,7 +9858,7 @@
         .map(
           (employee) => `
             <option value="${employee.id}">
-              ${escapeHtml(fullName(employee))}${
+              ${escapeHtml(deviceInstructionEmployeeOptionLabel(employee))}${
                 employee.qualifications.medizinproduktebeauftragter
                   ? " · aktuell Medizinproduktebeauftragte/r"
                   : ""
@@ -10046,6 +10046,10 @@
       a.firstName.localeCompare(b.firstName, "de", { sensitivity: "base" }) ||
       a.id.localeCompare(b.id)
     );
+  }
+
+  function deviceInstructionEmployeeOptionLabel(employee) {
+    return [employee.lastName, employee.firstName].filter(Boolean).join(", ");
   }
 
   function renderDeviceParticipantList() {

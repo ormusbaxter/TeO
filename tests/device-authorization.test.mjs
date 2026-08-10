@@ -117,7 +117,10 @@ test("Einweisungsberechtigung folgt der Herstellereinweisung und dem damaligen S
 });
 
 test("Mitarbeiter der Geräteeinweisung sind nach Nachname und Vorname sortiert", async () => {
-  const app = await loadAppFunctions(["filteredDeviceParticipants"]);
+  const app = await loadAppFunctions([
+    "deviceInstructionEmployeeOptionLabel",
+    "filteredDeviceParticipants",
+  ]);
   const employees = [
     { ...createEmployee("zimmer"), firstName: "Berta", lastName: "Zimmer" },
     { ...createEmployee("adler-zoe"), firstName: "Zoe", lastName: "Adler" },
@@ -132,5 +135,10 @@ test("Mitarbeiter der Geräteeinweisung sind nach Nachname und Vorname sortiert"
       ),
     ),
     ["adler-anna", "adler-zoe", "zimmer"],
+  );
+  assert.equal(
+    app.deviceInstructionEmployeeOptionLabel(employees[0]),
+    "Zimmer, Berta",
+    "Der sichtbare Optionswert muss mit dem Nachnamen beginnen, damit die native Tastatursuche danach springt.",
   );
 });
