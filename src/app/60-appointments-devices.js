@@ -1087,7 +1087,7 @@
     elements.employeeInstructor.innerHTML = `
       <option value="">Bitte auswählen</option>
       ${[...state.employees]
-        .sort(sortEmployees)
+        .sort(compareDeviceInstructionEmployees)
         .map(
           (employee) => `
             <option value="${employee.id}">
@@ -1270,7 +1270,15 @@
             .toLocaleLowerCase("de-DE")
             .includes(deviceParticipantSearchTerm),
       )
-      .sort(sortEmployees);
+      .sort(compareDeviceInstructionEmployees);
+  }
+
+  function compareDeviceInstructionEmployees(a, b) {
+    return (
+      a.lastName.localeCompare(b.lastName, "de", { sensitivity: "base" }) ||
+      a.firstName.localeCompare(b.firstName, "de", { sensitivity: "base" }) ||
+      a.id.localeCompare(b.id)
+    );
   }
 
   function renderDeviceParticipantList() {

@@ -115,3 +115,22 @@ test("Einweisungsberechtigung folgt der Herstellereinweisung und dem damaligen S
     [],
   );
 });
+
+test("Mitarbeiter der Geräteeinweisung sind nach Nachname und Vorname sortiert", async () => {
+  const app = await loadAppFunctions(["filteredDeviceParticipants"]);
+  const employees = [
+    { ...createEmployee("zimmer"), firstName: "Berta", lastName: "Zimmer" },
+    { ...createEmployee("adler-zoe"), firstName: "Zoe", lastName: "Adler" },
+    { ...createEmployee("adler-anna"), firstName: "Anna", lastName: "Adler" },
+  ];
+  app.setState(createMinimalState({ employees }));
+
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        app.filteredDeviceParticipants().map((employee) => employee.id),
+      ),
+    ),
+    ["adler-anna", "adler-zoe", "zimmer"],
+  );
+});
