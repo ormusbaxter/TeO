@@ -17,6 +17,37 @@
             </button>
           </div>
 
+          <div class="appointment-toolbar">
+            <label class="search-field" for="appointmentSearch">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="appointmentSearch"
+                type="search"
+                aria-label="Termine durchsuchen"
+                placeholder="Titel, Kategorie oder Ort suchen …"
+                autocomplete="off"
+              />
+            </label>
+            <div
+              class="segmented-control appointment-filter-control"
+              role="group"
+              aria-label="Termine nach Zeitraum filtern"
+            >
+              <button class="is-active" type="button" data-appointment-filter="all" aria-pressed="true">
+                Alle
+              </button>
+              <button type="button" data-appointment-filter="upcoming" aria-pressed="false">
+                Anstehend
+              </button>
+              <button type="button" data-appointment-filter="today" aria-pressed="false">
+                Heute
+              </button>
+              <button type="button" data-appointment-filter="past" aria-pressed="false">
+                Vergangen
+              </button>
+            </div>
+          </div>
+
           <div class="training-summary" id="appointmentSummary"></div>
           <section class="meeting-list" id="appointmentList"></section>
         </section>

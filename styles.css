@@ -1776,17 +1776,49 @@ svg {
 }
 
 .avatar {
+  --avatar-status: #278253;
+  --avatar-track: var(--slate-200);
+  --avatar-inner: #e7f6ee;
   display: grid;
   width: 36px;
   height: 36px;
   flex: 0 0 36px;
   place-items: center;
-  color: var(--avatar-color, var(--blue-700));
+  position: relative;
+  isolation: isolate;
+  padding: 3px;
+  color: var(--avatar-status);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   border-radius: 50%;
-  background: var(--avatar-bg, var(--blue-100));
+  background: conic-gradient(
+    var(--avatar-status) 0 var(--avatar-fill, 100%),
+    var(--avatar-track) var(--avatar-fill, 100%) 100%
+  );
+}
+
+.avatar::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  content: "";
+  border-radius: inherit;
+  background: var(--avatar-inner);
+}
+
+.avatar-initials {
+  line-height: 1;
+}
+
+.avatar-status-onboarding {
+  --avatar-status: #a66b00;
+  --avatar-inner: #fff5cc;
+}
+
+.avatar-status-inactive {
+  --avatar-status: #6b7788;
+  --avatar-inner: var(--slate-100);
 }
 
 .avatar.avatar-sm {
@@ -1796,19 +1828,17 @@ svg {
   font-size: 0.62rem;
 }
 
-.avatar-tone-2 {
-  --avatar-color: var(--teal-700);
-  --avatar-bg: var(--teal-100);
-}
-
-.avatar-tone-3 {
-  --avatar-color: #7650a6;
-  --avatar-bg: #f0e9fa;
-}
-
-.avatar-tone-4 {
-  --avatar-color: var(--orange-700);
-  --avatar-bg: var(--orange-100);
+.appointment-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
 }
 
 .toolbar {
@@ -4791,8 +4821,22 @@ legend {
     flex-direction: column;
   }
 
+  .appointment-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .appointment-toolbar .search-field {
+    width: 100%;
+  }
+
   .segmented-control {
     align-self: flex-start;
+  }
+
+  .appointment-filter-control {
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   .data-table {

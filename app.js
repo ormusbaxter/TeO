@@ -403,6 +403,8 @@
   let remoteUpdateNoticeRevision = 0;
   let employeeStatusFilter = "all";
   let employeeSearchTerm = "";
+  let appointmentPeriodFilter = "all";
+  let appointmentSearchTerm = "";
   let completionSearchTerm = "";
   let selectedCompletionEmployeeIds = new Set();
   let attendanceSearchTerm = "";
@@ -555,6 +557,9 @@
     mariaDbSettingsFields: document.querySelector("#mariaDbSettingsFields"),
     settingsMariaDbApiUrl: document.querySelector("#settingsMariaDbApiUrl"),
     settingsMariaDbPassword: document.querySelector("#settingsMariaDbPassword"),
+    settingsMariaDbBootstrapToken: document.querySelector(
+      "#settingsMariaDbBootstrapToken",
+    ),
     settingsBackendHint: document.querySelector("#settingsBackendHint"),
     settingsBackendStatus: document.querySelector("#settingsBackendStatus"),
     testBackendConnectionButton: document.querySelector(
@@ -667,6 +672,7 @@
     openMeetingStatsButton: document.querySelector("#openMeetingStatsButton"),
     appointmentSummary: document.querySelector("#appointmentSummary"),
     appointmentList: document.querySelector("#appointmentList"),
+    appointmentSearch: document.querySelector("#appointmentSearch"),
     deviceSummary: document.querySelector("#deviceSummary"),
     deviceMatrixWidget: document.querySelector("#deviceMatrixWidget"),
     toggleDeviceMatrixMaximizeButton: document.querySelector(
@@ -2644,6 +2650,25 @@
     elements.employeeSearch.addEventListener("input", (event) => {
       employeeSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
       renderEmployees();
+    });
+
+    elements.appointmentSearch.addEventListener("input", (event) => {
+      appointmentSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      renderAppointments();
+    });
+
+    document.querySelectorAll("[data-appointment-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        appointmentPeriodFilter = button.dataset.appointmentFilter;
+        document
+          .querySelectorAll("[data-appointment-filter]")
+          .forEach((filterButton) => {
+            const active = filterButton === button;
+            filterButton.classList.toggle("is-active", active);
+            filterButton.setAttribute("aria-pressed", String(active));
+          });
+        renderAppointments();
+      });
     });
 
     elements.employeeProfessionFilter.addEventListener("change", (event) => {
@@ -8742,10 +8767,27 @@
 
   function renderAppointments() {
     const today = todayIso();
-    const upcoming = [...state.appointments]
+    const matchingAppointments = state.appointments.filter((appointment) => {
+      if (appointmentPeriodFilter === "upcoming" && appointment.date < today) return false;
+      if (appointmentPeriodFilter === "today" && appointment.date !== today) return false;
+      if (appointmentPeriodFilter === "past" && appointment.date >= today) return false;
+      if (!appointmentSearchTerm) return true;
+
+      return [
+        appointment.title,
+        appointment.description,
+        appointment.location,
+        appointmentCategoryLabel(appointment),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLocaleLowerCase("de-DE")
+        .includes(appointmentSearchTerm);
+    });
+    const upcoming = [...matchingAppointments]
       .filter((appointment) => appointment.date >= today)
       .sort(sortAppointments);
-    const past = [...state.appointments]
+    const past = [...matchingAppointments]
       .filter((appointment) => appointment.date < today)
       .sort((a, b) => sortAppointments(b, a));
     const todayCount = upcoming.filter((appointment) => appointment.date === today).length;
@@ -8773,6 +8815,24 @@
       return;
     }
 
+    if (matchingAppointments.length === 0) {
+      elements.appointmentList.innerHTML = `
+        <section class="panel">
+          ${renderEmptyState({
+            title: "Keine passenden Termine",
+            text: "Ändern Sie den Suchbegriff oder den ausgewählten Zeitraumfilter.",
+            buttonText: "Filter zurücksetzen",
+            buttonAttribute: "data-reset-appointment-filters",
+            compact: true,
+          })}
+        </section>
+      `;
+      elements.appointmentList
+        .querySelector("[data-reset-appointment-filters]")
+        ?.addEventListener("click", resetAppointmentFilters);
+      return;
+    }
+
     elements.appointmentList.innerHTML = `
       ${
         upcoming.length
@@ -8791,6 +8851,19 @@
           : ""
       }
     `;
+  }
+
+  function resetAppointmentFilters() {
+    appointmentPeriodFilter = "all";
+    appointmentSearchTerm = "";
+    elements.appointmentSearch.value = "";
+    document.querySelectorAll("[data-appointment-filter]").forEach((button) => {
+      const active = button.dataset.appointmentFilter === "all";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    renderAppointments();
+    elements.appointmentSearch.focus();
   }
 
   function appointmentCategoryIcon(appointment) {
@@ -12745,6 +12818,7 @@
         ? window.location.origin
         : "");
     elements.settingsMariaDbPassword.value = "";
+    elements.settingsMariaDbBootstrapToken.value = "";
     elements.settingsBackendStatus.classList.toggle(
       "is-remote",
       isMariaDbMode(),
@@ -13056,6 +13130,7 @@
           state,
           currentUser.username,
           password,
+          elements.settingsMariaDbBootstrapToken.value.trim(),
         );
       }
 
@@ -13078,6 +13153,7 @@
         throw new Error("Das Administratorkonto fehlt im MariaDB-Datenbestand.");
       }
       elements.settingsMariaDbPassword.value = "";
+      elements.settingsMariaDbBootstrapToken.value = "";
       applyTheme(state.settings.theme);
       completeLogin(remoteUser);
       showView("settings", false);
@@ -14205,10 +14281,25 @@
   }
 
   function renderAvatar(employee, small = false) {
-    const tone = (hashString(employee.id) % 4) + 1;
+    const status = ["active", "onboarding", "inactive"].includes(
+      employee.employmentStatus,
+    )
+      ? employee.employmentStatus
+      : employee.active === false
+        ? "inactive"
+        : "active";
+    const employmentPercent = Math.min(
+      100,
+      Math.max(0, Number(employee.employmentPercent) || 0),
+    );
     return `
-      <span class="avatar avatar-tone-${tone} ${small ? "avatar-sm" : ""}" aria-hidden="true">
-        ${escapeHtml(initials(employee))}
+      <span
+        class="avatar avatar-status-${status} ${small ? "avatar-sm" : ""}"
+        style="--avatar-fill: ${employmentPercent}%"
+        aria-hidden="true"
+        title="${escapeHtml(employeeStatusLabel(employee))} · ${employmentPercent} % Beschäftigungsumfang"
+      >
+        <span class="avatar-initials">${escapeHtml(initials(employee))}</span>
       </span>
     `;
   }
@@ -14226,15 +14317,6 @@
       a.lastName.localeCompare(b.lastName, "de") ||
       a.firstName.localeCompare(b.firstName, "de")
     );
-  }
-
-  function hashString(value) {
-    let hash = 0;
-    for (let index = 0; index < value.length; index += 1) {
-      hash = (hash << 5) - hash + value.charCodeAt(index);
-      hash |= 0;
-    }
-    return Math.abs(hash);
   }
 
   function createId() {

@@ -5,7 +5,7 @@
   "name": "TeO – Team & Employee Organizer",
   "version": {
     "major": 4,
-    "minor": 25,
+    "minor": 26,
     "patch": 0
   },
   "stateVersion": 24,

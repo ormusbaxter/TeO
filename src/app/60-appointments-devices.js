@@ -1,9 +1,26 @@
   function renderAppointments() {
     const today = todayIso();
-    const upcoming = [...state.appointments]
+    const matchingAppointments = state.appointments.filter((appointment) => {
+      if (appointmentPeriodFilter === "upcoming" && appointment.date < today) return false;
+      if (appointmentPeriodFilter === "today" && appointment.date !== today) return false;
+      if (appointmentPeriodFilter === "past" && appointment.date >= today) return false;
+      if (!appointmentSearchTerm) return true;
+
+      return [
+        appointment.title,
+        appointment.description,
+        appointment.location,
+        appointmentCategoryLabel(appointment),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLocaleLowerCase("de-DE")
+        .includes(appointmentSearchTerm);
+    });
+    const upcoming = [...matchingAppointments]
       .filter((appointment) => appointment.date >= today)
       .sort(sortAppointments);
-    const past = [...state.appointments]
+    const past = [...matchingAppointments]
       .filter((appointment) => appointment.date < today)
       .sort((a, b) => sortAppointments(b, a));
     const todayCount = upcoming.filter((appointment) => appointment.date === today).length;
@@ -31,6 +48,24 @@
       return;
     }
 
+    if (matchingAppointments.length === 0) {
+      elements.appointmentList.innerHTML = `
+        <section class="panel">
+          ${renderEmptyState({
+            title: "Keine passenden Termine",
+            text: "Ändern Sie den Suchbegriff oder den ausgewählten Zeitraumfilter.",
+            buttonText: "Filter zurücksetzen",
+            buttonAttribute: "data-reset-appointment-filters",
+            compact: true,
+          })}
+        </section>
+      `;
+      elements.appointmentList
+        .querySelector("[data-reset-appointment-filters]")
+        ?.addEventListener("click", resetAppointmentFilters);
+      return;
+    }
+
     elements.appointmentList.innerHTML = `
       ${
         upcoming.length
@@ -49,6 +84,19 @@
           : ""
       }
     `;
+  }
+
+  function resetAppointmentFilters() {
+    appointmentPeriodFilter = "all";
+    appointmentSearchTerm = "";
+    elements.appointmentSearch.value = "";
+    document.querySelectorAll("[data-appointment-filter]").forEach((button) => {
+      const active = button.dataset.appointmentFilter === "all";
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    renderAppointments();
+    elements.appointmentSearch.focus();
   }
 
   function appointmentCategoryIcon(appointment) {
