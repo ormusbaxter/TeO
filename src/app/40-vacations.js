@@ -1072,6 +1072,7 @@
         </header>
         <div class="vacation-blank-year-legend" aria-label="Legende">
           <span><i class="vacation-blank-holiday-swatch"></i> Feiertag NRW</span>
+          <span><i class="vacation-blank-school-vacation-swatch"></i> Schulferien NRW</span>
           <span><i class="vacation-year-weekend-swatch is-weekend_a"></i> ${escapeHtml(serviceWeekendLabel("weekend_a"))}</span>
           <span><i class="vacation-year-weekend-swatch is-weekend_b"></i> ${escapeHtml(serviceWeekendLabel("weekend_b"))}</span>
           <span><i class="vacation-blank-own-weekend-swatch"></i> Eigenes Dienstwochenende</span>

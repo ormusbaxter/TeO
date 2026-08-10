@@ -180,6 +180,10 @@
     box-shadow: inset 0 0 0 0.5mm rgb(24 102 186 / 72%);
   }
 
+  .vacation-blank-school-vacation-swatch {
+    box-shadow: inset 0 1.2mm #e7b900;
+  }
+
   .vacation-blank-year-document .vacation-year-matrix-scroll {
     margin-top: 2.5mm;
     overflow: visible;
