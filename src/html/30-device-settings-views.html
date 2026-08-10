@@ -631,19 +631,6 @@
                     2 Sekunden Verzögerung geschrieben.
                   </p>
                   <div class="automatic-backup-fields">
-                    <label class="settings-field">
-                      <span>Sicherungen behalten</span>
-                      <span class="input-suffix">
-                        <input
-                          id="automaticBackupRetention"
-                          type="number"
-                          min="1"
-                          max="365"
-                          step="1"
-                        />
-                        <span>Dateien</span>
-                      </span>
-                    </label>
                     <label class="checkbox-field automatic-backup-encryption-field">
                       <input id="automaticBackupEncryption" type="checkbox" />
                       <span>JSON-Sicherungen verschlüsseln</span>
@@ -693,7 +680,8 @@
                   <p class="field-hint">
                     Die Ordnerfreigabe gilt nur für dieses Browserprofil. Der
                     Sicherungsschlüssel wird beim Login automatisch mit dem
-                    jeweiligen Benutzerpasswort entsperrt.
+                    jeweiligen Benutzerpasswort entsperrt. Jede Sicherung
+                    überschreibt die Datei <strong>teo-autosicherung.json</strong>.
                   </p>
                 </div>
                 <div class="browser-storage-info">

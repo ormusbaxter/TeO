@@ -19,9 +19,8 @@
   const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
-  const DEFAULT_AUTO_BACKUP_RETENTION_COUNT = 30;
   const AUTO_BACKUP_DELAY_MS = 2000;
-  const AUTO_BACKUP_FILE_PREFIX = "teo-autosicherung_";
+  const AUTO_BACKUP_FILENAME = "teo-autosicherung.json";
   const DEFAULT_VACATION_BASE_DAYS = 30;
   const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
   const DEFAULT_WEEKDAY_ABSENCE_LIMIT = 8;
@@ -539,7 +538,6 @@
     exportEncryptedDataButton: document.querySelector("#exportEncryptedDataButton"),
     backupStatus: document.querySelector("#backupStatus"),
     automaticBackupStatus: document.querySelector("#automaticBackupStatus"),
-    automaticBackupRetention: document.querySelector("#automaticBackupRetention"),
     automaticBackupEncryption: document.querySelector(
       "#automaticBackupEncryption",
     ),
@@ -12377,10 +12375,6 @@
   }
 
   function normalizeAutomaticBackupSettings(value = {}) {
-    const retention = Number(value.retentionCount);
-    const retentionCount = Number.isInteger(retention)
-      ? Math.min(365, Math.max(1, retention))
-      : DEFAULT_AUTO_BACKUP_RETENTION_COUNT;
     const parsedLastBackupAt = Date.parse(value.lastBackupAt);
     const keyFingerprint = String(value.keyFingerprint || "").slice(0, 200);
     const keyEnvelopes = Object.fromEntries(
@@ -12401,7 +12395,6 @@
       encrypted: Boolean(value.encrypted && keyFingerprint),
       keyFingerprint,
       keyEnvelopes,
-      retentionCount,
       lastBackupAt: Number.isFinite(parsedLastBackupAt)
         ? new Date(parsedLastBackupAt).toISOString()
         : "",
@@ -12503,18 +12496,6 @@
   }
 
   async function saveAutomaticBackupSettings() {
-    const retentionCount = Number(elements.automaticBackupRetention.value);
-    if (
-      !Number.isInteger(retentionCount) ||
-      retentionCount < 1 ||
-      retentionCount > 365
-    ) {
-      showToast(
-        "Bitte wählen Sie 1 bis 365 aufzubewahrende Sicherungsdateien.",
-        "error",
-      );
-      return;
-    }
     const encrypted = elements.automaticBackupEncryption.checked;
     if (encrypted && !automaticBackupPassword) {
       const configured = await configureAutomaticBackupEncryption({
@@ -12530,7 +12511,6 @@
       ...automaticBackupSettings,
       enabled: Boolean(automaticBackupDirectoryHandle),
       encrypted,
-      retentionCount,
     });
     try {
       await persistAutomaticBackupConfiguration();
@@ -12753,9 +12733,6 @@
 
   function renderAutomaticBackupStatus() {
     if (!automaticBackupSettings) return;
-    elements.automaticBackupRetention.value = String(
-      automaticBackupSettings.retentionCount,
-    );
     elements.automaticBackupEncryption.checked =
       automaticBackupSettings.encrypted;
     renderAutomaticBackupEncryptionControls();
@@ -12938,29 +12915,11 @@
           2,
         );
       }
-      const filename = automaticBackupFilename(
-        exportedAt,
-        automaticBackupSettings.encrypted,
-      );
       await writeAutomaticBackupFile(
         automaticBackupDirectoryHandle,
-        filename,
+        AUTO_BACKUP_FILENAME,
         fileContent,
       );
-      let cleanupWarning = "";
-      try {
-        await pruneAutomaticBackupFiles(
-          automaticBackupDirectoryHandle,
-          automaticBackupSettings.retentionCount,
-        );
-      } catch (error) {
-        console.warn(
-          "Ältere automatische Sicherungen konnten nicht bereinigt werden.",
-          error,
-        );
-        cleanupWarning =
-          "Sicherung erstellt, ältere Autosicherungen konnten jedoch nicht entfernt werden.";
-      }
 
       state.settings.lastBackupAt = exportedAt.toISOString();
       appendAuditEntry(
@@ -12972,15 +12931,13 @@
       automaticBackupSettings.lastBackupAt = exportedAt.toISOString();
       await persistAutomaticBackupConfiguration();
       automaticBackupRetryAt = 0;
-      automaticBackupNotice = cleanupWarning;
+      automaticBackupNotice = "";
       databaseSaveReminderArmed =
         automaticBackupRequestSequence !== requestSequence;
       renderAll();
-      if (cleanupWarning) {
-        showToast(cleanupWarning, "error");
-      } else {
-        showToast(`Automatische Datensicherung „${filename}“ wurde erstellt.`);
-      }
+      showToast(
+        `Automatische Datensicherung „${AUTO_BACKUP_FILENAME}“ wurde aktualisiert.`,
+      );
       return true;
     } catch (error) {
       console.error("Die automatische Datensicherung ist fehlgeschlagen.", error);
@@ -13007,34 +12964,6 @@
     } catch (error) {
       await writable.abort?.();
       throw error;
-    }
-  }
-
-  function automaticBackupFilename(date, encrypted = false) {
-    return `${AUTO_BACKUP_FILE_PREFIX}${fileTimestamp(date)}${
-      encrypted ? ".verschluesselt" : ""
-    }.json`;
-  }
-
-  function automaticBackupFilesToRemove(fileNames, retentionCount) {
-    const automaticBackupPattern =
-      /^teo-autosicherung_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}(?:\.verschluesselt)?\.json$/;
-    return fileNames
-      .filter((fileName) => automaticBackupPattern.test(fileName))
-      .sort((a, b) => b.localeCompare(a))
-      .slice(Math.max(1, retentionCount));
-  }
-
-  async function pruneAutomaticBackupFiles(directoryHandle, retentionCount) {
-    const fileNames = [];
-    for await (const [name, entry] of directoryHandle.entries()) {
-      if (entry.kind === "file") fileNames.push(name);
-    }
-    for (const fileName of automaticBackupFilesToRemove(
-      fileNames,
-      retentionCount,
-    )) {
-      await directoryHandle.removeEntry(fileName);
     }
   }
 

@@ -839,9 +839,9 @@ Datei wiederhergestellt werden.
 Unter **Einstellungen → Gesamten Datenbestand sichern** kann ein lokaler
 Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige
 JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung
-erneut. Außerdem kann festgelegt werden, wie viele der automatisch erzeugten
-Dateien erhalten bleiben; ältere TeO-Autosicherungen werden aus diesem Ordner
-entfernt.
+erneut. Jede Sicherung überschreibt dieselbe Datei
+`teo-autosicherung.json`. Der Dateiname bleibt auch bei aktivierter
+Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.
 
 Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt
 werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und

@@ -19,7 +19,7 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
 
   assert.match(html, /id="automaticBackupStatus"/);
   assert.match(html, /id="selectAutomaticBackupDirectoryButton"/);
-  assert.match(html, /id="automaticBackupRetention"/);
+  assert.doesNotMatch(html, /id="automaticBackupRetention"/);
   assert.match(html, /id="automaticBackupEncryption"/);
   assert.match(html, /id="setAutomaticBackupPasswordButton"/);
   assert.match(html, /id="automaticBackupRecoveryDialog"/);
@@ -27,6 +27,10 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
   assert.match(appSource, /window\.showDirectoryPicker/);
   assert.match(appSource, /AUTO_BACKUP_DIRECTORY_KEY/);
   assert.match(appSource, /AUTO_BACKUP_DELAY_MS\s*=\s*2000/);
+  assert.match(
+    appSource,
+    /AUTO_BACKUP_FILENAME\s*=\s*"teo-autosicherung\.json"/,
+  );
   assert.match(
     appSource,
     /encryptBackup\(fileContent, automaticBackupPassword\)/,
@@ -48,7 +52,7 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
   assert.match(styles, /\.automatic-backup-panel\s*\{/);
 });
 
-test("Die automatische Sicherung normalisiert Verschlüsselung und Aufbewahrung", async () => {
+test("Die automatische Sicherung normalisiert die Login-Verschlüsselung", async () => {
   const app = await loadAppFunctions(["normalizeAutomaticBackupSettings"]);
 
   assert.deepEqual(
@@ -66,7 +70,6 @@ test("Die automatische Sicherung normalisiert Verschlüsselung und Aufbewahrung"
               ciphertext: "ciphertext",
             },
           },
-          retentionCount: 45,
           lastBackupAt: "2026-08-03T12:00:00.000Z",
           directoryName: " TeO-Sicherungen ",
         }),
@@ -84,20 +87,17 @@ test("Die automatische Sicherung normalisiert Verschlüsselung und Aufbewahrung"
           ciphertext: "ciphertext",
         },
       },
-      retentionCount: 45,
       lastBackupAt: "2026-08-03T12:00:00.000Z",
       directoryName: "TeO-Sicherungen",
     },
   );
 
   const fallback = app.normalizeAutomaticBackupSettings({
-    retentionCount: 0,
     lastBackupAt: "ungültig",
   });
   assert.equal(fallback.encrypted, false);
   assert.equal(fallback.keyFingerprint, "");
   assert.deepEqual(JSON.parse(JSON.stringify(fallback.keyEnvelopes)), {});
-  assert.equal(fallback.retentionCount, 1);
   assert.equal(fallback.lastBackupAt, "");
 });
 
@@ -105,42 +105,6 @@ test("Automatische Sicherungen warten nach Änderungen zwei Sekunden", async () 
   const app = await loadAppFunctions(["automaticBackupScheduleDelay"]);
 
   assert.equal(app.automaticBackupScheduleDelay(Date.now()), 2000);
-});
-
-test("Die Aufbewahrung löscht nur ältere TeO-Autosicherungen", async () => {
-  const app = await loadAppFunctions(["automaticBackupFilesToRemove"]);
-  const files = [
-    "teo-autosicherung_2026-08-03_12-00-00.json",
-    "teo-autosicherung_2026-08-03_11-00-00.json",
-    "teo-autosicherung_2026-08-03_10-00-00.json",
-    "teo-autosicherung_2026-08-03_09-00-00.verschluesselt.json",
-    "teo-datensicherung_2026-08-01_10-00-00.json",
-    "notizen.txt",
-  ];
-
-  assert.deepEqual(
-    JSON.parse(
-      JSON.stringify(app.automaticBackupFilesToRemove(files, 2)),
-    ),
-    [
-      "teo-autosicherung_2026-08-03_10-00-00.json",
-      "teo-autosicherung_2026-08-03_09-00-00.verschluesselt.json",
-    ],
-  );
-});
-
-test("Automatische Sicherungsdateien kennzeichnen Verschlüsselung im Namen", async () => {
-  const app = await loadAppFunctions(["automaticBackupFilename"]);
-  const date = new Date("2026-08-03T12:00:00.000Z");
-
-  assert.equal(
-    app.automaticBackupFilename(date, false),
-    "teo-autosicherung_2026-08-03_12-00-00.json",
-  );
-  assert.equal(
-    app.automaticBackupFilename(date, true),
-    "teo-autosicherung_2026-08-03_12-00-00.verschluesselt.json",
-  );
 });
 
 test("Automatische Sicherungen verwenden das kompatible verschlüsselte Sicherungsformat", async () => {
@@ -204,11 +168,11 @@ test("Eine automatische Sicherung wird vollständig in das Verzeichnis geschrieb
 
   await app.writeAutomaticBackupFile(
     directory,
-    "teo-autosicherung_2026-08-03_12-00-00.json",
+    "teo-autosicherung.json",
     "{\"format\":\"test\"}",
   );
   assert.deepEqual(calls, [
-    ["file", "teo-autosicherung_2026-08-03_12-00-00.json", true],
+    ["file", "teo-autosicherung.json", true],
     ["write", "{\"format\":\"test\"}"],
     ["close"],
   ]);

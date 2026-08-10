@@ -1577,19 +1577,6 @@
                     2 Sekunden Verzögerung geschrieben.
                   </p>
                   <div class="automatic-backup-fields">
-                    <label class="settings-field">
-                      <span>Sicherungen behalten</span>
-                      <span class="input-suffix">
-                        <input
-                          id="automaticBackupRetention"
-                          type="number"
-                          min="1"
-                          max="365"
-                          step="1"
-                        />
-                        <span>Dateien</span>
-                      </span>
-                    </label>
                     <label class="checkbox-field automatic-backup-encryption-field">
                       <input id="automaticBackupEncryption" type="checkbox" />
                       <span>JSON-Sicherungen verschlüsseln</span>
@@ -1639,7 +1626,8 @@
                   <p class="field-hint">
                     Die Ordnerfreigabe gilt nur für dieses Browserprofil. Der
                     Sicherungsschlüssel wird beim Login automatisch mit dem
-                    jeweiligen Benutzerpasswort entsperrt.
+                    jeweiligen Benutzerpasswort entsperrt. Jede Sicherung
+                    überschreibt die Datei <strong>teo-autosicherung.json</strong>.
                   </p>
                 </div>
                 <div class="browser-storage-info">
@@ -1990,7 +1978,7 @@
 <ol><li>In der Warnleiste <strong>Jetzt exportieren</strong> wählen oder <strong>Einstellungen → Sicherung exportieren</strong> öffnen.</li><li>Die JSON-Datei an einem geschützten Ort speichern.</li><li>Prüfen, ob die Datei vollständig heruntergeladen wurde.</li></ol>
 <p>Optional kann die Sicherung mit Passwort, PBKDF2 und AES-GCM verschlüsselt werden. TeO verwendet dafür einen eigenen Passwortdialog mit Wiederholung, Eingabeprüfung und optionaler Passwortanzeige. Das Passwort kann nicht aus der Datei wiederhergestellt werden.</p>
 <h3 id="hilfe-automatische-sicherung-in-einen-ordner">Automatische Sicherung in einen Ordner</h3>
-<p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung erneut. Außerdem kann festgelegt werden, wie viele der automatisch erzeugten Dateien erhalten bleiben; ältere TeO-Autosicherungen werden aus diesem Ordner entfernt.</p>
+<p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung erneut. Jede Sicherung überschreibt dieselbe Datei <code>teo-autosicherung.json</code>. Der Dateiname bleibt auch bei aktivierter Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.</p>
 <p>Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
 <p>Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Ein bereits vorhandenes Konto ohne Schlüsselhülle benötigt ihn einmalig beim ersten Login. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.</p>
 <p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
