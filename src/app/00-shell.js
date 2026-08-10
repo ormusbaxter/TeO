@@ -638,6 +638,12 @@
     openVacationConflictsButton: document.querySelector(
       "#openVacationConflictsButton",
     ),
+    printBlankVacationYearOverviewsButton: document.querySelector(
+      "#printBlankVacationYearOverviewsButton",
+    ),
+    vacationBlankYearPrintSurface: document.querySelector(
+      "#vacationBlankYearPrintSurface",
+    ),
     vacationSummary: document.querySelector("#vacationSummary"),
     vacationPlannerWidget: document.querySelector("#vacationPlannerWidget"),
     vacationPlanner: document.querySelector("#vacationPlanner"),

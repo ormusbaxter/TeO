@@ -1022,6 +1022,69 @@
     );
   }
 
+  function vacationEmployeesForBlankYearPrint() {
+    return state.employees
+      .filter((employee) =>
+        ["active", "onboarding"].includes(employee.employmentStatus),
+      )
+      .sort(sortEmployees);
+  }
+
+  function printBlankVacationYearOverviews() {
+    const employees = vacationEmployeesForBlankYearPrint();
+    if (!employees.length) {
+      showToast(
+        "Es sind keine aktiven oder einzuarbeitenden Mitarbeiter vorhanden.",
+        "error",
+      );
+      return;
+    }
+
+    elements.vacationBlankYearPrintSurface.innerHTML = employees
+      .map(renderBlankVacationYearPrintDocument)
+      .join("");
+    document.body.classList.add("print-vacation-blank-year");
+    window.print();
+    window.setTimeout(() => {
+      document.body.classList.remove("print-vacation-blank-year");
+      elements.vacationBlankYearPrintSurface.innerHTML = "";
+    }, 0);
+  }
+
+  function renderBlankVacationYearPrintDocument(employee) {
+    return `
+      <article class="vacation-blank-year-document">
+        <header class="vacation-blank-year-header">
+          <div>
+            <p>Leere Jahresübersicht</p>
+            <h1>${escapeHtml(fullName(employee))}</h1>
+          </div>
+          <div class="vacation-blank-year-meta">
+            <strong>${vacationYear}</strong>
+            <span>${escapeHtml(
+              [
+                employeeStatusLabel(employee),
+                `${employee.employmentPercent} %`,
+                serviceWeekendLabel(employee.serviceWeekend),
+              ].join(" · "),
+            )}</span>
+          </div>
+        </header>
+        <div class="vacation-blank-year-legend" aria-label="Legende">
+          <span><i class="vacation-blank-holiday-swatch"></i> Feiertag NRW</span>
+          <span><i class="vacation-year-weekend-swatch is-weekend_a"></i> ${escapeHtml(serviceWeekendLabel("weekend_a"))}</span>
+          <span><i class="vacation-year-weekend-swatch is-weekend_b"></i> ${escapeHtml(serviceWeekendLabel("weekend_b"))}</span>
+          <span><i class="vacation-blank-own-weekend-swatch"></i> Eigenes Dienstwochenende</span>
+        </div>
+        ${renderVacationYearMatrix([], employee)}
+        <footer>
+          <span>Urlaubsplanung ${vacationYear}</span>
+          <span>Stand ${formatDate(todayIso())}</span>
+        </footer>
+      </article>
+    `;
+  }
+
   function renderVacationYearMatrix(entries, employee) {
     const entriesByDate = new Map(
       entries.map((entry) => [entry.date, entry]),
@@ -1108,7 +1171,11 @@
     ].filter(Boolean);
     return `
       <td
-        class="${metadata.className} ${entry ? "has-entry" : ""}"
+        class="${metadata.className} ${
+          metadata.weekendGroup === employee.serviceWeekend
+            ? "is-own-weekend"
+            : ""
+        } ${entry ? "has-entry" : ""}"
         title="${escapeHtml(details.join(" · "))}"
         aria-label="${escapeHtml(details.join(", "))}"
       >

@@ -692,6 +692,15 @@
             <div class="header-actions">
               <button
                 class="button button-secondary"
+                id="printBlankVacationYearOverviewsButton"
+                type="button"
+                title="Eine leere DIN-A4-Jahresübersicht je aktivem oder einzuarbeitendem Mitarbeiter drucken"
+              >
+                <svg><use href="#icon-print"></use></svg>
+                Leere Jahresübersichten
+              </button>
+              <button
+                class="button button-secondary"
                 id="openVacationConflictsButton"
                 type="button"
               >
@@ -3663,6 +3672,12 @@ npm run verify</code></pre>
     <section
       class="appointment-print-surface"
       id="appointmentPrintSurface"
+      aria-hidden="true"
+    ></section>
+
+    <section
+      class="vacation-blank-year-print-surface"
+      id="vacationBlankYearPrintSurface"
       aria-hidden="true"
     ></section>
 

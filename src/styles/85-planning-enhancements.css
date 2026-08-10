@@ -1003,6 +1003,10 @@ body.is-vacation-planner-maximized {
     );
 }
 
+.vacation-year-matrix td.is-own-weekend {
+  box-shadow: inset 0 0 0 2px rgb(24 102 186 / 72%);
+}
+
 .vacation-year-entry {
   display: inline-grid;
   width: 27px;

@@ -301,6 +301,10 @@
       "click",
       openVacationConflictOverview,
     );
+    elements.printBlankVacationYearOverviewsButton.addEventListener(
+      "click",
+      printBlankVacationYearOverviews,
+    );
     elements.toggleVacationPlannerMaximizeButton.addEventListener(
       "click",
       toggleVacationPlannerMaximized,
