@@ -272,6 +272,10 @@
       "click",
       saveAutomaticBackupSettings,
     );
+    elements.settingsMaxBackupFileSizeMb.addEventListener(
+      "input",
+      () => renderBackupVolumeMeter(elements.settingsMaxBackupFileSizeMb.value),
+    );
     elements.requestPersistentStorageButton.addEventListener(
       "click",
       requestPersistentBrowserStorage,

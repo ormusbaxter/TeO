@@ -851,6 +851,12 @@ Warnung mit aktueller Dateigröße und Grenzwert an. Wird die Grenze
 überschritten, muss sie vor der nächsten Sicherung oder dem Import erhöht
 werden.
 
+Ein farbiger Balken in den Einstellungen zeigt die zuletzt gemessene
+Sicherungsgröße als „xx von yy MB“. Solange noch keine Sicherung in diesem
+Browser erstellt oder eingelesen wurde, verwendet TeO eine Schätzung des
+aktuellen unverschlüsselten Datenbestands. Der Balken ist unter 90 % grün, ab
+90 % gelb und bei überschrittenem Grenzwert rot.
+
 Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt
 werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und
 hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim

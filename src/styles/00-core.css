@@ -1692,6 +1692,82 @@ svg {
   min-width: 0;
 }
 
+.backup-reminder-settings-form {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(210px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.backup-reminder-settings-form .settings-field {
+  width: 100%;
+}
+
+.backup-reminder-settings-form > .button {
+  min-height: 42px;
+}
+
+.backup-volume-meter {
+  --backup-volume-fill: var(--green-700);
+  --backup-volume-percent: 0%;
+
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 7px;
+  margin-top: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  background: var(--slate-50);
+}
+
+.backup-volume-heading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--slate-700);
+  font-size: 0.68rem;
+}
+
+.backup-volume-heading span {
+  color: var(--slate-600);
+  font-weight: 800;
+}
+
+.backup-volume-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--slate-200);
+}
+
+.backup-volume-track span {
+  display: block;
+  width: var(--backup-volume-percent);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--backup-volume-fill);
+  transition: width 180ms ease, background-color 180ms ease;
+}
+
+.backup-volume-meter.is-warning {
+  --backup-volume-fill: var(--orange-700);
+}
+
+.backup-volume-meter.is-exceeded {
+  --backup-volume-fill: var(--red-700);
+
+  border-color: var(--red-700);
+  background: var(--red-100);
+}
+
+.backup-volume-meter small {
+  color: var(--slate-500);
+  font-size: 0.61rem;
+  font-weight: 650;
+}
+
 .settings-weekend-config {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4462,6 +4538,14 @@ legend {
   .settings-inline-form {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .backup-reminder-settings-form {
+    grid-template-columns: 1fr;
+  }
+
+  .backup-reminder-settings-form > .button {
+    width: 100%;
   }
 
   .backend-settings-fields {

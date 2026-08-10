@@ -26,6 +26,9 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
   assert.match(html, /id="automaticBackupRecoveryKey"/);
   assert.match(html, /id="settingsMaxBackupFileSizeMb"/);
   assert.match(html, /Ab 90(?:&nbsp;|\s)*%/);
+  assert.match(html, /id="backupVolumeMeter"/);
+  assert.match(html, /id="backupVolumeLabel">0 von 20 MB/);
+  assert.match(html, /id="backupVolumeBar"/);
   assert.match(
     html,
     /id="startupBackupDialog"[^>]*[\s\S]*?data-persistent-dialog/,
@@ -58,11 +61,16 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
     /decryptBackup\(envelope, automaticBackupPassword\)/,
   );
   assert.match(appSource, /handleStartupBackupFileSelection/);
+  assert.match(appSource, /renderBackupVolumeMeter/);
+  assert.match(appSource, /lastBackupSizeBytes\s*=\s*volume\.sizeBytes/);
   assert.match(
     appSource,
     /!isMariaDbMode\(\) && !startupBackupSynchronized/,
   );
   assert.match(styles, /\.automatic-backup-panel\s*\{/);
+  assert.match(styles, /\.backup-reminder-settings-form\s*\{/);
+  assert.match(styles, /\.backup-volume-meter\.is-warning\s*\{/);
+  assert.match(styles, /\.backup-volume-meter\.is-exceeded\s*\{/);
 });
 
 test("Das Sicherungsvolumen warnt ab 90 Prozent der einstellbaren Grenze", async () => {
@@ -147,6 +155,7 @@ test("Die automatische Sicherung normalisiert die Login-Verschlüsselung", async
             },
           },
           lastBackupAt: "2026-08-03T12:00:00.000Z",
+          lastBackupSizeBytes: 123456,
           directoryName: " TeO-Sicherungen ",
         }),
       ),
@@ -164,6 +173,7 @@ test("Die automatische Sicherung normalisiert die Login-Verschlüsselung", async
         },
       },
       lastBackupAt: "2026-08-03T12:00:00.000Z",
+      lastBackupSizeBytes: 123456,
       directoryName: "TeO-Sicherungen",
     },
   );

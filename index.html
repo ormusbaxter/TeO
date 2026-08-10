@@ -1434,7 +1434,7 @@
                 TeO warnt, sobald die letzte Datensicherung länger als der gewählte
                 Zeitraum zurückliegt.
               </p>
-              <div class="settings-inline-form">
+              <div class="settings-inline-form backup-reminder-settings-form">
                 <label class="settings-field">
                   <span>Erinnerung nach</span>
                   <span class="input-suffix">
@@ -1460,7 +1460,6 @@
                     />
                     <span>MB</span>
                   </span>
-                  <small class="field-hint">Ab 90&nbsp;% zeigt TeO eine Volumenwarnung.</small>
                 </label>
                 <button
                   class="button button-primary"
@@ -1469,6 +1468,22 @@
                 >
                   Speichern
                 </button>
+                <div
+                  class="backup-volume-meter"
+                  id="backupVolumeMeter"
+                  role="progressbar"
+                  aria-label="Belegtes Sicherungsvolumen"
+                  aria-valuemin="0"
+                >
+                  <div class="backup-volume-heading">
+                    <strong>Sicherungsvolumen</strong>
+                    <span id="backupVolumeLabel">0 von 20 MB</span>
+                  </div>
+                  <div class="backup-volume-track" aria-hidden="true">
+                    <span id="backupVolumeBar"></span>
+                  </div>
+                  <small id="backupVolumeHint">Warnung ab 90&nbsp;% des eingestellten Volumens.</small>
+                </div>
               </div>
             </section>
 
@@ -1994,6 +2009,7 @@
 <h3 id="hilfe-automatische-sicherung-in-einen-ordner">Automatische Sicherung in einen Ordner</h3>
 <p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung erneut. Jede Sicherung überschreibt dieselbe Datei <code>teo-autosicherung.json</code>. Der Dateiname bleibt auch bei aktivierter Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.</p>
 <p>Administratoren können unter <strong>Einstellungen → Sicherungserinnerung</strong> die maximale Größe einer Sicherungsdatei zwischen 1 und 100 MB festlegen. Der Standardwert beträgt 20 MB. Die Grenze gilt beim Erstellen, Prüfen, Startabgleich und Import. Ab 90 % des eingestellten Volumens zeigt TeO eine Warnung mit aktueller Dateigröße und Grenzwert an. Wird die Grenze überschritten, muss sie vor der nächsten Sicherung oder dem Import erhöht werden.</p>
+<p>Ein farbiger Balken in den Einstellungen zeigt die zuletzt gemessene Sicherungsgröße als „xx von yy MB“. Solange noch keine Sicherung in diesem Browser erstellt oder eingelesen wurde, verwendet TeO eine Schätzung des aktuellen unverschlüsselten Datenbestands. Der Balken ist unter 90 % grün, ab 90 % gelb und bei überschrittenem Grenzwert rot.</p>
 <p>Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
 <p>Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Ein bereits vorhandenes Konto ohne Schlüsselhülle benötigt ihn einmalig beim ersten Login. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.</p>
 <p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
