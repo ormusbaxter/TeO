@@ -423,6 +423,7 @@
   let currentWeekendSimulation = null;
   let trainingRecurrenceManuallyChanged = false;
   let trainingDisplayYear = new Date().getFullYear();
+  let meetingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let databaseSaveReminderArmed = false;
   let automaticBackupSettings = null;
@@ -673,6 +674,7 @@
       "#saveTrainingDurationsButton",
     ),
     meetingSummary: document.querySelector("#meetingSummary"),
+    meetingDisplayYear: document.querySelector("#meetingDisplayYear"),
     meetingList: document.querySelector("#meetingList"),
     openMeetingStatsButton: document.querySelector("#openMeetingStatsButton"),
     appointmentSummary: document.querySelector("#appointmentSummary"),
@@ -2393,6 +2395,10 @@
     );
     elements.printTrainingMatrixButton.addEventListener("click", printTrainingMatrix);
     elements.openMeetingStatsButton.addEventListener("click", openMeetingStatsDialog);
+    elements.meetingDisplayYear.addEventListener("change", () => {
+      meetingDisplayYear = Number(elements.meetingDisplayYear.value);
+      renderMeetings();
+    });
     elements.meetingStatsYear.addEventListener("change", renderMeetingStatistics);
     elements.meetingAttendanceThreshold.addEventListener(
       "change",
@@ -10539,14 +10545,26 @@
   }
 
   function renderMeetings() {
-    const meetingStats = state.meetings.map((meeting) => getMeetingStats(meeting));
+    const availableYears = getMeetingDisplayYears();
+    if (!availableYears.includes(meetingDisplayYear)) {
+      meetingDisplayYear = new Date().getFullYear();
+    }
+    elements.meetingDisplayYear.innerHTML = availableYears
+      .map(
+        (year) =>
+          `<option value="${year}" ${year === meetingDisplayYear ? "selected" : ""}>${year}</option>`,
+      )
+      .join("");
+
+    const displayedMeetings = meetingsForDisplayYear();
+    const meetingStats = displayedMeetings.map((meeting) => getMeetingStats(meeting));
     const completedMeetings = meetingStats.filter(
       (stats) => stats.total > 0 && stats.documented === stats.total,
     ).length;
     const openEntries = meetingStats.reduce((sum, stats) => sum + stats.open, 0);
 
     elements.meetingSummary.innerHTML = `
-      ${renderSummaryChip("meeting", state.meetings.length, "Teamsitzungen angelegt")}
+      ${renderSummaryChip("meeting", displayedMeetings.length, `Teamsitzungen ${meetingDisplayYear}`)}
       ${renderSummaryChip("check", completedMeetings, "vollständig dokumentiert", "teal")}
       ${renderSummaryChip("alert", openEntries, "Teilnahmestatus offen", "orange")}
     `;
@@ -10569,7 +10587,24 @@
       return;
     }
 
-    elements.meetingList.innerHTML = [...state.meetings]
+    if (displayedMeetings.length === 0) {
+      elements.meetingList.innerHTML = `
+        <section class="panel">
+          ${renderEmptyState({
+            title: `Keine Teamsitzungen ${meetingDisplayYear}`,
+            text: "Wählen Sie ein anderes Jahr oder legen Sie eine Teamsitzung an.",
+            buttonText: "Teamsitzung anlegen",
+            buttonAttribute: "data-empty-add-meeting",
+          })}
+        </section>
+      `;
+      elements.meetingList
+        .querySelector("[data-empty-add-meeting]")
+        ?.addEventListener("click", () => openMeetingDialog());
+      return;
+    }
+
+    elements.meetingList.innerHTML = displayedMeetings
       .sort(
         (a, b) =>
           a.date.localeCompare(b.date) ||
@@ -10578,6 +10613,23 @@
       )
       .map(renderMeetingCard)
       .join("");
+  }
+
+  function getMeetingDisplayYears() {
+    return [
+      ...new Set([
+        new Date().getFullYear(),
+        ...state.meetings.map((meeting) => Number(meeting.date.slice(0, 4))),
+      ]),
+    ]
+      .filter((year) => Number.isInteger(year) && year >= 2000 && year <= 2100)
+      .sort((yearA, yearB) => yearB - yearA);
+  }
+
+  function meetingsForDisplayYear(year = meetingDisplayYear) {
+    return state.meetings.filter(
+      (meeting) => Number(meeting.date.slice(0, 4)) === Number(year),
+    );
   }
 
   function renderMeetingCard(meeting) {
@@ -11809,6 +11861,8 @@
     });
     if (!committed) return;
 
+    meetingDisplayYear = Number(meeting.date.slice(0, 4));
+    renderMeetings();
     elements.meetingDialog.close();
     showToast(existingMeeting ? "Teamsitzung wurde aktualisiert." : "Teamsitzung wurde angelegt.");
 

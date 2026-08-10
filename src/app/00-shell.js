@@ -422,6 +422,7 @@
   let currentWeekendSimulation = null;
   let trainingRecurrenceManuallyChanged = false;
   let trainingDisplayYear = new Date().getFullYear();
+  let meetingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let databaseSaveReminderArmed = false;
   let automaticBackupSettings = null;
@@ -672,6 +673,7 @@
       "#saveTrainingDurationsButton",
     ),
     meetingSummary: document.querySelector("#meetingSummary"),
+    meetingDisplayYear: document.querySelector("#meetingDisplayYear"),
     meetingList: document.querySelector("#meetingList"),
     openMeetingStatsButton: document.querySelector("#openMeetingStatsButton"),
     appointmentSummary: document.querySelector("#appointmentSummary"),

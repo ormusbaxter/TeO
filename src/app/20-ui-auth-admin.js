@@ -224,6 +224,10 @@
     );
     elements.printTrainingMatrixButton.addEventListener("click", printTrainingMatrix);
     elements.openMeetingStatsButton.addEventListener("click", openMeetingStatsDialog);
+    elements.meetingDisplayYear.addEventListener("change", () => {
+      meetingDisplayYear = Number(elements.meetingDisplayYear.value);
+      renderMeetings();
+    });
     elements.meetingStatsYear.addEventListener("change", renderMeetingStatistics);
     elements.meetingAttendanceThreshold.addEventListener(
       "change",
