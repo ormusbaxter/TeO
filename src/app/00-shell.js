@@ -402,6 +402,8 @@
   let remoteUpdateNoticeRevision = 0;
   let employeeStatusFilter = "all";
   let employeeSearchTerm = "";
+  let appointmentPeriodFilter = "all";
+  let appointmentSearchTerm = "";
   let completionSearchTerm = "";
   let selectedCompletionEmployeeIds = new Set();
   let attendanceSearchTerm = "";
@@ -554,6 +556,9 @@
     mariaDbSettingsFields: document.querySelector("#mariaDbSettingsFields"),
     settingsMariaDbApiUrl: document.querySelector("#settingsMariaDbApiUrl"),
     settingsMariaDbPassword: document.querySelector("#settingsMariaDbPassword"),
+    settingsMariaDbBootstrapToken: document.querySelector(
+      "#settingsMariaDbBootstrapToken",
+    ),
     settingsBackendHint: document.querySelector("#settingsBackendHint"),
     settingsBackendStatus: document.querySelector("#settingsBackendStatus"),
     testBackendConnectionButton: document.querySelector(
@@ -666,6 +671,7 @@
     openMeetingStatsButton: document.querySelector("#openMeetingStatsButton"),
     appointmentSummary: document.querySelector("#appointmentSummary"),
     appointmentList: document.querySelector("#appointmentList"),
+    appointmentSearch: document.querySelector("#appointmentSearch"),
     deviceSummary: document.querySelector("#deviceSummary"),
     deviceMatrixWidget: document.querySelector("#deviceMatrixWidget"),
     toggleDeviceMatrixMaximizeButton: document.querySelector(

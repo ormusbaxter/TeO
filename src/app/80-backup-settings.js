@@ -766,6 +766,7 @@
         ? window.location.origin
         : "");
     elements.settingsMariaDbPassword.value = "";
+    elements.settingsMariaDbBootstrapToken.value = "";
     elements.settingsBackendStatus.classList.toggle(
       "is-remote",
       isMariaDbMode(),
@@ -1077,6 +1078,7 @@
           state,
           currentUser.username,
           password,
+          elements.settingsMariaDbBootstrapToken.value.trim(),
         );
       }
 
@@ -1099,6 +1101,7 @@
         throw new Error("Das Administratorkonto fehlt im MariaDB-Datenbestand.");
       }
       elements.settingsMariaDbPassword.value = "";
+      elements.settingsMariaDbBootstrapToken.value = "";
       applyTheme(state.settings.theme);
       completeLogin(remoteUser);
       showView("settings", false);

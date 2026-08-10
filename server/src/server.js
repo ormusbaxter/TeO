@@ -18,6 +18,11 @@ const PASSWORD_ITERATIONS = 210000;
 const MAX_STATE_BYTES = 20 * 1024 * 1024;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_ATTEMPTS_PER_WINDOW = 8;
+const bootstrapToken = String(process.env.TEO_BOOTSTRAP_TOKEN || "").trim();
+const httpsOnly = booleanEnv("TEO_HTTPS_ONLY", false);
+if (bootstrapToken && bootstrapToken.length < 32) {
+  throw new Error("TEO_BOOTSTRAP_TOKEN muss mindestens 32 Zeichen lang sein.");
+}
 const DATABASE_SCHEMA_VERSION = Math.max(
   ...MIGRATIONS.map((migration) => migration.version),
 );
@@ -59,7 +64,6 @@ const pool = mariadb.createPool({
   insertIdAsNumber: true,
 });
 
-const loginAttempts = new Map();
 const app = express();
 const currentFile = fileURLToPath(import.meta.url);
 const projectRoot = path.resolve(path.dirname(currentFile), "../..");
@@ -68,18 +72,19 @@ const sessionStore = createSessionStore(pool, sessionTtlMs);
 app.disable("x-powered-by");
 if (booleanEnv("TEO_TRUST_PROXY", false)) app.set("trust proxy", 1);
 app.use((request, response, next) => {
+  const upgradeInsecureRequests = httpsOnly ? "; upgrade-insecure-requests" : "";
   response.set({
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "no-referrer",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
     "Content-Security-Policy":
-      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http: https:; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+      `default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'${upgradeInsecureRequests}`,
     "Cache-Control": request.path.startsWith("/api/")
       ? "no-store"
       : "no-cache",
   });
-  if (booleanEnv("TEO_HTTPS_ONLY", false)) {
+  if (httpsOnly) {
     response.setHeader(
       "Strict-Transport-Security",
       "max-age=31536000; includeSubDomains",
@@ -88,23 +93,30 @@ app.use((request, response, next) => {
   next();
 });
 app.use((request, response, next) => {
+  if (!httpsOnly || request.secure) return next();
+  return response.status(426).json({
+    code: "https_required",
+    message: "Dieser TeO-Server akzeptiert ausschließlich HTTPS-Verbindungen.",
+  });
+});
+app.use((request, response, next) => {
   const origin = request.headers.origin;
   if (!origin) return next();
-  let sameHostOrigin = false;
+  let sameOrigin = false;
   try {
-    sameHostOrigin = new URL(origin).host === request.get("host");
+    sameOrigin = new URL(origin).origin === `${request.protocol}://${request.get("host")}`;
   } catch {
-    sameHostOrigin = false;
+    sameOrigin = false;
   }
   if (
-    sameHostOrigin ||
+    sameOrigin ||
     allowedOrigins.includes(origin)
   ) {
     response.setHeader("Access-Control-Allow-Origin", origin);
     response.setHeader("Vary", "Origin");
     response.setHeader(
       "Access-Control-Allow-Headers",
-      "Authorization, Content-Type",
+      "Authorization, Content-Type, X-TeO-Bootstrap-Token",
     );
     response.setHeader(
       "Access-Control-Allow-Methods",
@@ -134,7 +146,7 @@ app.get("/api/health", asyncHandler(async (_request, response) => {
   });
 }));
 
-app.post("/api/bootstrap", loginRateLimit, asyncHandler(async (request, response) => {
+app.post("/api/bootstrap", requireBootstrapAuthorization, loginRateLimit, asyncHandler(async (request, response) => {
   const { state, username, password } = request.body || {};
   validateStateShape(state, { requireCredentials: true });
   const user = findUser(state, username);
@@ -143,7 +155,7 @@ app.post("/api/bootstrap", loginRateLimit, asyncHandler(async (request, response
     user.role !== "admin" ||
     !verifyPassword(password, user)
   ) {
-    registerFailedLogin(request.ip);
+    await registerFailedLogin(request.ip);
     return response.status(401).json({
       code: "invalid_credentials",
       message: "Administratorname oder Passwort ist nicht korrekt.",
@@ -182,7 +194,7 @@ app.post("/api/bootstrap", loginRateLimit, asyncHandler(async (request, response
     connection?.release();
   }
 
-  clearFailedLogins(request.ip);
+  await clearFailedLogins(request.ip);
   const token = await sessionStore.create(user);
   response.status(201).json({
     token,
@@ -206,14 +218,14 @@ app.post("/api/auth/login", loginRateLimit, asyncHandler(async (request, respons
   const state = row.state;
   const user = findUser(state, request.body?.username);
   if (!user || !verifyPassword(request.body?.password, user)) {
-    registerFailedLogin(request.ip);
+    await registerFailedLogin(request.ip);
     return response.status(401).json({
       code: "invalid_credentials",
       message: "Benutzername oder Passwort ist nicht korrekt.",
     });
   }
 
-  clearFailedLogins(request.ip);
+  await clearFailedLogins(request.ip);
   const token = await sessionStore.create(user);
   response.json({
     token,
@@ -423,10 +435,10 @@ app.use((error, _request, response, _next) => {
   }
   const status = Number(error?.status) || 500;
   return response.status(status).json({
-    code: error?.code || "server_error",
-    message:
-      error?.message ||
-      "Der TeO-Server konnte die Anfrage nicht verarbeiten.",
+    code: status >= 500 ? "server_error" : error?.code || "request_error",
+    message: status >= 500
+      ? "Der TeO-Server konnte die Anfrage nicht verarbeiten."
+      : error?.message || "Die Anfrage konnte nicht verarbeitet werden.",
   });
 });
 
@@ -470,6 +482,9 @@ async function ensureSchema() {
     );
   }
   await sessionStore.prune();
+  await pool.query(
+    "DELETE FROM teo_login_attempts WHERE reset_at <= CURRENT_TIMESTAMP(3)",
+  );
 }
 
 async function readStateRow(connection = pool, forUpdate = false) {
@@ -598,33 +613,80 @@ function requireSession(request, response, next) {
     .catch(next);
 }
 
-function loginRateLimit(request, response, next) {
-  const entry = loginAttempts.get(request.ip);
-  if (
-    entry &&
-    entry.resetAt > Date.now() &&
-    entry.count >= LOGIN_ATTEMPTS_PER_WINDOW
-  ) {
-    return response.status(429).json({
-      code: "too_many_login_attempts",
-      message: "Zu viele Anmeldeversuche. Bitte später erneut versuchen.",
-    });
+function requireBootstrapAuthorization(request, response, next) {
+  if (!bootstrapToken && isLoopbackRequest(request)) return next();
+  const suppliedToken = String(request.get("X-TeO-Bootstrap-Token") || "");
+  if (bootstrapToken && constantTimeStringEqual(suppliedToken, bootstrapToken)) {
+    return next();
   }
-  next();
+  return response.status(403).json({
+    code: "bootstrap_authorization_required",
+    message: bootstrapToken
+      ? "Der Einrichtungsschlüssel ist nicht korrekt."
+      : "Eine entfernte Ersteinrichtung erfordert TEO_BOOTSTRAP_TOKEN am Server.",
+  });
 }
 
-function registerFailedLogin(ip) {
-  const now = Date.now();
-  const existing = loginAttempts.get(ip);
-  if (!existing || existing.resetAt <= now) {
-    loginAttempts.set(ip, { count: 1, resetAt: now + LOGIN_WINDOW_MS });
-    return;
+async function loginRateLimit(request, response, next) {
+  try {
+    const rows = await pool.query(
+      `SELECT attempt_count
+         FROM teo_login_attempts
+        WHERE client_key_hash = ? AND reset_at > CURRENT_TIMESTAMP(3)`,
+      [loginClientKeyHash(request.ip)],
+    );
+    if (Number(rows[0]?.attempt_count) >= LOGIN_ATTEMPTS_PER_WINDOW) {
+      return response.status(429).json({
+        code: "too_many_login_attempts",
+        message: "Zu viele Anmeldeversuche. Bitte später erneut versuchen.",
+      });
+    }
+    next();
+  } catch (error) {
+    next(error);
   }
-  existing.count += 1;
 }
 
-function clearFailedLogins(ip) {
-  loginAttempts.delete(ip);
+async function registerFailedLogin(ip) {
+  const windowSeconds = Math.ceil(LOGIN_WINDOW_MS / 1000);
+  await pool.query(
+    `INSERT INTO teo_login_attempts (client_key_hash, attempt_count, reset_at)
+     VALUES (?, 1, DATE_ADD(CURRENT_TIMESTAMP(3), INTERVAL ? SECOND))
+     ON DUPLICATE KEY UPDATE
+       attempt_count = IF(reset_at <= CURRENT_TIMESTAMP(3), 1, attempt_count + 1),
+       reset_at = IF(
+         reset_at <= CURRENT_TIMESTAMP(3),
+         DATE_ADD(CURRENT_TIMESTAMP(3), INTERVAL ? SECOND),
+         reset_at
+       )`,
+    [loginClientKeyHash(ip), windowSeconds, windowSeconds],
+  );
+}
+
+async function clearFailedLogins(ip) {
+  await pool.query(
+    "DELETE FROM teo_login_attempts WHERE client_key_hash = ?",
+    [loginClientKeyHash(ip)],
+  );
+}
+
+function loginClientKeyHash(ip) {
+  return crypto.createHash("sha256").update(String(ip || "unknown")).digest("hex");
+}
+
+function isLoopbackRequest(request) {
+  const normalizedIp = String(request.ip || "").toLowerCase();
+  const normalizedHostname = String(request.hostname || "").toLowerCase();
+  return (
+    ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(normalizedIp) &&
+    ["localhost", "127.0.0.1", "::1", "[::1]"].includes(normalizedHostname)
+  );
+}
+
+function constantTimeStringEqual(left, right) {
+  const leftHash = crypto.createHash("sha256").update(left).digest();
+  const rightHash = crypto.createHash("sha256").update(right).digest();
+  return crypto.timingSafeEqual(leftHash, rightHash) && left.length === right.length;
 }
 
 // Normale Benutzerkonten dürfen den gesamten fachlichen Datenbestand pflegen.

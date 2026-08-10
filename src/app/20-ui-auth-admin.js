@@ -500,6 +500,25 @@
       renderEmployees();
     });
 
+    elements.appointmentSearch.addEventListener("input", (event) => {
+      appointmentSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      renderAppointments();
+    });
+
+    document.querySelectorAll("[data-appointment-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        appointmentPeriodFilter = button.dataset.appointmentFilter;
+        document
+          .querySelectorAll("[data-appointment-filter]")
+          .forEach((filterButton) => {
+            const active = filterButton === button;
+            filterButton.classList.toggle("is-active", active);
+            filterButton.setAttribute("aria-pressed", String(active));
+          });
+        renderAppointments();
+      });
+    });
+
     elements.employeeProfessionFilter.addEventListener("change", (event) => {
       employeeProfessionFilter = event.target.value;
       selectedEmployeeIds.clear();

@@ -62,6 +62,9 @@
       Accept: "application/json",
       ...(options.body ? { "Content-Type": "application/json" } : {}),
       ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+      ...(options.bootstrapToken
+        ? { "X-TeO-Bootstrap-Token": options.bootstrapToken }
+        : {}),
     };
 
     let response;
@@ -103,10 +106,11 @@
     return request(apiUrl, "/api/health");
   }
 
-  async function bootstrap(apiUrl, state, username, password) {
+  async function bootstrap(apiUrl, state, username, password, bootstrapToken = "") {
     return request(apiUrl, "/api/bootstrap", {
       method: "POST",
       body: { state, username, password },
+      bootstrapToken,
     });
   }
 

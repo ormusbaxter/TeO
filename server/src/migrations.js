@@ -331,6 +331,23 @@ const MIGRATIONS = Object.freeze([
     statements: [],
     run: addRelationalForeignKeys,
   },
+  {
+    version: 7,
+    name: "persistent_login_throttling",
+    statements: [
+      `CREATE TABLE IF NOT EXISTS teo_login_attempts (
+        client_key_hash CHAR(64) NOT NULL,
+        attempt_count INT UNSIGNED NOT NULL,
+        reset_at DATETIME(3) NOT NULL,
+        updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+          ON UPDATE CURRENT_TIMESTAMP(3),
+        PRIMARY KEY (client_key_hash),
+        INDEX idx_teo_login_attempts_reset (reset_at)
+      ) ENGINE=InnoDB
+        DEFAULT CHARACTER SET utf8mb4
+        COLLATE utf8mb4_unicode_ci`,
+    ],
+  },
 ]);
 
 export async function runMigrations(pool) {

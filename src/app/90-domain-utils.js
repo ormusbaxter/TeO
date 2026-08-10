@@ -761,10 +761,25 @@
   }
 
   function renderAvatar(employee, small = false) {
-    const tone = (hashString(employee.id) % 4) + 1;
+    const status = ["active", "onboarding", "inactive"].includes(
+      employee.employmentStatus,
+    )
+      ? employee.employmentStatus
+      : employee.active === false
+        ? "inactive"
+        : "active";
+    const employmentPercent = Math.min(
+      100,
+      Math.max(0, Number(employee.employmentPercent) || 0),
+    );
     return `
-      <span class="avatar avatar-tone-${tone} ${small ? "avatar-sm" : ""}" aria-hidden="true">
-        ${escapeHtml(initials(employee))}
+      <span
+        class="avatar avatar-status-${status} ${small ? "avatar-sm" : ""}"
+        style="--avatar-fill: ${employmentPercent}%"
+        aria-hidden="true"
+        title="${escapeHtml(employeeStatusLabel(employee))} · ${employmentPercent} % Beschäftigungsumfang"
+      >
+        <span class="avatar-initials">${escapeHtml(initials(employee))}</span>
       </span>
     `;
   }
@@ -782,15 +797,6 @@
       a.lastName.localeCompare(b.lastName, "de") ||
       a.firstName.localeCompare(b.firstName, "de")
     );
-  }
-
-  function hashString(value) {
-    let hash = 0;
-    for (let index = 0; index < value.length; index += 1) {
-      hash = (hash << 5) - hash + value.charCodeAt(index);
-      hash |= 0;
-    }
-    return Math.abs(hash);
   }
 
   function createId() {

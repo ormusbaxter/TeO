@@ -115,7 +115,7 @@ aktuelle Serverprozess betrieben werden.
 
 ### Migration der Beziehungen
 
-Die Datenbankschemata 5 und 6 werden beim Serverstart automatisch angewendet:
+Die Datenbankschemata 5 bis 7 werden beim Serverstart automatisch angewendet:
 
 1. vorhandene Qualifikationen, Einweisungsteilnehmer und Sollteilnehmer werden
    aus den bisherigen Payloads in Beziehungstabellen übertragen,
@@ -123,7 +123,9 @@ Die Datenbankschemata 5 und 6 werden beim Serverstart automatisch angewendet:
    Mitarbeiter zugeordnet,
 3. der aktuelle Qualifikationsstand wird als Ausgangspunkt der
    Qualifikationshistorie übernommen,
-4. danach werden die Fremdschlüssel aktiviert.
+4. danach werden die Fremdschlüssel aktiviert und
+5. fehlgeschlagene Loginversuche werden in einer eigenen Tabelle dauerhaft
+   und serverübergreifend erfasst.
 
 Vor dem ersten Start dieser Version sollte eine vollständige MariaDB-Sicherung
 erstellt werden. Ein Downgrade auf einen Server vor Datenbankschema 6 ist
@@ -138,7 +140,8 @@ anschließend nicht zulässig.
 | `TEO_SESSION_HOURS` | Laufzeit inaktiver Serversitzungen | `12` |
 | `TEO_CORS_ORIGINS` | Kommagetrennte zusätzlich erlaubte Ursprünge | leer |
 | `TEO_TRUST_PROXY` | genau einen vorgeschalteten Reverse Proxy vertrauen | `false` |
-| `TEO_HTTPS_ONLY` | HSTS senden; erst hinter vollständig eingerichtetem HTTPS aktivieren | `false` |
+| `TEO_HTTPS_ONLY` | unverschlüsselte Anfragen mit HTTP 426 ablehnen und HSTS senden; erst hinter vollständig eingerichtetem HTTPS aktivieren | `false` |
+| `TEO_BOOTSTRAP_TOKEN` | mindestens 32 Zeichen langer Einrichtungsschlüssel für die erstmalige entfernte Initialisierung | leer |
 | `DB_HOST` | MariaDB-Server | erforderlich |
 | `DB_PORT` | MariaDB-Port | `3306` |
 | `DB_NAME` | Datenbankname | erforderlich |
@@ -154,7 +157,9 @@ anschließend nicht zulässig.
 - API-Sitzungen verwenden zufällige Bearer-Token. Nur deren SHA-256-Hashes
   werden in MariaDB gespeichert; die Sitzungen überleben Serverneustarts und
   laufen automatisch ab.
-- Fehlgeschlagene Anmeldungen werden pro IP begrenzt.
+- Fehlgeschlagene Anmeldungen werden pro IP dauerhaft in MariaDB begrenzt; die Begrenzung gilt dadurch auch nach Neustarts und über mehrere Serverinstanzen hinweg.
+- Die Ersteinrichtung ist ohne Einrichtungsschlüssel ausschließlich über die Loopback-Schnittstelle möglich. Für eine entfernte Einrichtung muss `TEO_BOOTSTRAP_TOKEN` gesetzt und einmalig in der App eingegeben werden.
+- Bei `TEO_HTTPS_ONLY=true` lehnt der Server jede vom Proxy als unverschlüsselt gemeldete Anfrage ab. Hinter einem Reverse Proxy muss zusätzlich `TEO_TRUST_PROXY=true` gesetzt sein und der Proxy `X-Forwarded-Proto` korrekt setzen.
 - Normale Benutzer dürfen serverseitig nur Fortbildungsnachweise,
   Teamsitzungsteilnahmen, ihr eigenes Passwort und das Farbthema verändern.
 - Revisionsnummern verhindern, dass gleichzeitige Änderungen unbemerkt überschrieben
