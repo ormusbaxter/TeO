@@ -3508,6 +3508,27 @@ npm run verify</code></pre>
     </dialog>
 
     <dialog
+      class="modal modal-large device-employee-overview-dialog"
+      id="deviceEmployeeOverviewDialog"
+      aria-labelledby="deviceEmployeeOverviewTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Geräteübersicht</p>
+          <h2 id="deviceEmployeeOverviewTitle">Geräteeinweisungen</h2>
+          <p class="modal-subtitle" id="deviceEmployeeOverviewSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="deviceEmployeeOverviewContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
       class="modal modal-large"
       id="deviceInstructionHistoryDialog"
       aria-labelledby="deviceInstructionHistoryTitle"
@@ -3569,7 +3590,6 @@ npm run verify</code></pre>
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
     </dialog>
-
 
     <dialog
       class="modal backup-password-dialog"

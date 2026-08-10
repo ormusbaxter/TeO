@@ -777,6 +777,10 @@
       "click",
       handleDeviceHistoryAction,
     );
+    elements.deviceEmployeeOverviewContent.addEventListener(
+      "click",
+      handleDeviceEmployeeOverviewAction,
+    );
   }
 
   function bindDialogs() {
@@ -959,6 +963,7 @@
         elements.appointmentDialog,
         elements.deviceDialog,
         elements.deviceInstructionDialog,
+        elements.deviceEmployeeOverviewDialog,
         elements.deviceInstructionHistoryDialog,
         elements.attendanceDialog,
         elements.meetingStatsDialog,
