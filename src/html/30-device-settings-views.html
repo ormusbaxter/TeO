@@ -626,17 +626,11 @@
                     <strong>Automatische Sicherung</strong>
                     <p class="browser-storage-status" id="automaticBackupStatus"></p>
                   </div>
+                  <p class="field-hint">
+                    Nach einer Änderung wird die Sicherung automatisch mit
+                    2 Sekunden Verzögerung geschrieben.
+                  </p>
                   <div class="automatic-backup-fields">
-                    <label class="settings-field">
-                      <span>Frühestens alle</span>
-                      <select id="automaticBackupInterval">
-                        <option value="1">1 Stunde</option>
-                        <option value="6">6 Stunden</option>
-                        <option value="12">12 Stunden</option>
-                        <option value="24">24 Stunden</option>
-                        <option value="168">7 Tage</option>
-                      </select>
-                    </label>
                     <label class="settings-field">
                       <span>Sicherungen behalten</span>
                       <span class="input-suffix">
@@ -650,6 +644,10 @@
                         <span>Dateien</span>
                       </span>
                     </label>
+                    <label class="checkbox-field automatic-backup-encryption-field">
+                      <input id="automaticBackupEncryption" type="checkbox" />
+                      <span>JSON-Sicherungen verschlüsseln</span>
+                    </label>
                   </div>
                   <div class="automatic-backup-actions">
                     <button
@@ -659,6 +657,15 @@
                     >
                       <svg><use href="#icon-download"></use></svg>
                       Sicherungsordner auswählen
+                    </button>
+                    <button
+                      class="button button-secondary"
+                      id="setAutomaticBackupPasswordButton"
+                      type="button"
+                      hidden
+                    >
+                      <svg><use href="#icon-lock"></use></svg>
+                      Verschlüsselungspasswort festlegen
                     </button>
                     <button
                       class="button button-secondary"
@@ -684,8 +691,9 @@
                     </button>
                   </div>
                   <p class="field-hint">
-                    Die Ordnerfreigabe gilt nur für dieses Browserprofil. Automatische
-                    Sicherungen sind unverschlüsselt; wählen Sie einen geschützten Ordner.
+                    Die Ordnerfreigabe gilt nur für dieses Browserprofil. Ein
+                    Verschlüsselungspasswort wird nur für die laufende Sitzung
+                    vorgehalten und muss nach einem Neustart erneut eingegeben werden.
                   </p>
                 </div>
                 <div class="browser-storage-info">

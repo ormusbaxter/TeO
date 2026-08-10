@@ -260,6 +260,14 @@
       "click",
       removeAutomaticBackupDirectory,
     );
+    elements.automaticBackupEncryption.addEventListener(
+      "change",
+      renderAutomaticBackupEncryptionControls,
+    );
+    elements.setAutomaticBackupPasswordButton.addEventListener(
+      "click",
+      configureAutomaticBackupEncryption,
+    );
     elements.saveAutomaticBackupSettingsButton.addEventListener(
       "click",
       saveAutomaticBackupSettings,
@@ -1331,6 +1339,7 @@
   function showLoginDialog() {
     currentUser = null;
     clearAutomaticBackupTimer();
+    automaticBackupPassword = "";
     backupReminderShown = false;
     sessionStorage.removeItem(SESSION_USER_KEY);
     document.body.classList.add("is-auth-locked");

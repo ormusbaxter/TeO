@@ -1426,6 +1426,16 @@ svg {
   display: grid;
   grid-template-columns: repeat(2, minmax(150px, 220px));
   gap: 12px;
+  align-items: end;
+}
+
+.automatic-backup-encryption-field {
+  min-height: 38px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: white;
 }
 
 .automatic-backup-actions {
