@@ -843,11 +843,20 @@ erneut. Außerdem kann festgelegt werden, wie viele der automatisch erzeugten
 Dateien erhalten bleiben; ältere TeO-Autosicherungen werden aus diesem Ordner
 entfernt.
 
-Automatische Sicherungen können in den Einstellungen mit AES-GCM und einem
-eigenen Passwort verschlüsselt werden. Das Passwort wird nicht dauerhaft
-gespeichert, sondern nur für die laufende TeO-Sitzung im Arbeitsspeicher
-vorgehalten. Nach einem Neustart muss es erneut eingegeben werden. Verschlüsselte
-Autosicherungen lassen sich über denselben Sicherungsimport wiederherstellen.
+Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt
+werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und
+hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim
+Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für
+laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und
+administrative Passwort-Resets erhalten automatisch eine aktualisierte
+Schlüsselhülle.
+
+Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss
+getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die
+Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Ein
+bereits vorhandenes Konto ohne Schlüsselhülle benötigt ihn einmalig beim ersten
+Login. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung
+beim Prüfen und Importieren automatisch entschlüsselt.
 
 Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist
 nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über

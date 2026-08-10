@@ -423,6 +423,10 @@
       "change",
       updateBackupPasswordVisibility,
     );
+    elements.copyAutomaticBackupRecoveryKey.addEventListener(
+      "click",
+      copyAutomaticBackupRecoveryKey,
+    );
     elements.employeeForm.addEventListener("submit", handleEmployeeSubmit);
     elements.trainingForm.addEventListener("submit", handleTrainingSubmit);
     elements.completionForm.addEventListener("submit", handleCompletionSubmit);
@@ -990,6 +994,7 @@
         elements.bulkEditDialog,
         elements.dataQualityDialog,
         elements.auditLogDialog,
+        elements.automaticBackupRecoveryDialog,
         elements.confirmDialog,
       ].filter((dialog) => dialog.open);
       openDialogs.forEach((dialog) => dialog.close());
@@ -1183,6 +1188,13 @@
     }
     const sessionUserId = sessionStorage.getItem(SESSION_USER_KEY);
     const user = state.users.find((item) => item.id === sessionUserId);
+    if (user && automaticBackupSettings?.encrypted) {
+      sessionStorage.removeItem(SESSION_USER_KEY);
+      showLoginDialog();
+      elements.loginError.textContent =
+        "Bitte erneut anmelden, damit TeO den Sicherungsschlüssel entsperren kann.";
+      return;
+    }
     if (!user) {
       showLoginDialog();
       if (isMariaDbMode() && backendStartupError) {
@@ -1279,6 +1291,7 @@
         if (!remoteUser) {
           throw new Error("Das angemeldete Benutzerkonto fehlt im Serverdatenbestand.");
         }
+        await unlockAutomaticBackupForLogin(remoteUser, password);
         completeLogin(remoteUser);
       } catch (error) {
         console.error("Serveranmeldung fehlgeschlagen.", error);
@@ -1311,6 +1324,13 @@
       return;
     }
 
+    try {
+      await unlockAutomaticBackupForLogin(user, password);
+    } catch (error) {
+      console.warn("Der automatische Sicherungsschlüssel konnte nicht entsperrt werden.", error);
+      automaticBackupNotice =
+        "Sicherungsschlüssel nicht entsperrt – erneut anmelden oder Wiederherstellungsschlüssel verwenden.";
+    }
     completeLogin(user);
   }
 
@@ -1392,6 +1412,15 @@
     });
     if (!committed) return;
 
+    try {
+      await registerAutomaticBackupUserKey(currentUser.id, password);
+    } catch (error) {
+      console.warn("Der Sicherungsschlüssel konnte nicht auf das neue Passwort umgestellt werden.", error);
+      showToast(
+        "Passwort geändert; der automatische Sicherungsschlüssel konnte jedoch nicht aktualisiert werden.",
+        "error",
+      );
+    }
     currentUser = state.users.find((user) => user.id === currentUser.id);
     elements.changePasswordDialog.close();
     document.body.classList.remove("is-auth-locked");
@@ -1646,6 +1675,11 @@
     });
     if (!committed) return;
 
+    try {
+      await registerAutomaticBackupUserKey(newUser.id, temporaryPassword);
+    } catch (error) {
+      console.warn("Der Sicherungsschlüssel konnte für das neue Konto nicht hinterlegt werden.", error);
+    }
     elements.createUserForm.reset();
     renderUserManagement();
     showTemporaryPassword(username, temporaryPassword);
@@ -1684,6 +1718,11 @@
     });
     if (!committed) return;
 
+    try {
+      await removeAutomaticBackupUserKey(user.id);
+    } catch (error) {
+      console.warn("Die alte Sicherungsschlüssel-Hülle konnte nicht entfernt werden.", error);
+    }
     elements.temporaryPasswordResult.hidden = true;
     elements.temporaryPasswordValue.value = "";
     renderUserManagement();
@@ -1783,6 +1822,11 @@
     });
     if (!committed) return;
 
+    try {
+      await registerAutomaticBackupUserKey(user.id, temporaryPassword);
+    } catch (error) {
+      console.warn("Der Sicherungsschlüssel konnte für das zurückgesetzte Passwort nicht hinterlegt werden.", error);
+    }
     renderUserManagement();
     showTemporaryPassword(user.username, temporaryPassword);
     showToast(`Passwort für ${user.username} wurde zurückgesetzt.`);

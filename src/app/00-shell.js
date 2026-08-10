@@ -957,6 +957,15 @@
     showBackupPassword: document.querySelector("#showBackupPassword"),
     backupPasswordError: document.querySelector("#backupPasswordError"),
     backupPasswordSubmit: document.querySelector("#backupPasswordSubmit"),
+    automaticBackupRecoveryDialog: document.querySelector(
+      "#automaticBackupRecoveryDialog",
+    ),
+    automaticBackupRecoveryKey: document.querySelector(
+      "#automaticBackupRecoveryKey",
+    ),
+    copyAutomaticBackupRecoveryKey: document.querySelector(
+      "#copyAutomaticBackupRecoveryKey",
+    ),
     phoneListPreviewDialog: document.querySelector("#phoneListPreviewDialog"),
     phoneListPreviewSubtitle: document.querySelector("#phoneListPreviewSubtitle"),
     phoneListPreviewContent: document.querySelector("#phoneListPreviewContent"),
