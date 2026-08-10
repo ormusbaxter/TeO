@@ -960,6 +960,70 @@
     }
   }
 
+  function startupBackupIsOlder(
+    importedState,
+    currentBackupSettings = automaticBackupSettings,
+  ) {
+    const importedAt = Date.parse(importedState?.settings?.lastBackupAt);
+    const currentAt = Date.parse(currentBackupSettings?.lastBackupAt);
+    if (!Number.isFinite(currentAt)) return false;
+    return !Number.isFinite(importedAt) || importedAt < currentAt;
+  }
+
+  async function handleStartupBackupFileSelection(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || startupBackupImportRunning) return;
+
+    if (file.name.toLocaleLowerCase("de-DE") !== AUTO_BACKUP_FILENAME) {
+      elements.startupBackupStatus.textContent =
+        `Bitte wählen Sie die Datei „${AUTO_BACKUP_FILENAME}“ aus.`;
+      return;
+    }
+    if (file.size > MAX_BACKUP_FILE_SIZE) {
+      elements.startupBackupStatus.textContent =
+        "Die Sicherungsdatei ist größer als 20 MB und kann nicht geladen werden.";
+      return;
+    }
+
+    startupBackupImportRunning = true;
+    elements.selectStartupBackupFileButton.disabled = true;
+    elements.startupBackupStatus.textContent = "Sicherungsdatei wird geprüft …";
+    try {
+      const importedState = await readBackupFile(file);
+      if (!importedState) {
+        elements.startupBackupStatus.textContent =
+          "Der Startabgleich wurde nicht abgeschlossen.";
+        return;
+      }
+      if (startupBackupIsOlder(importedState)) {
+        elements.startupBackupStatus.textContent =
+          "Diese Sicherungsdatei ist älter als der zuletzt lokal gesicherte Datenstand. Bitte wählen Sie die aktuelle Datei aus.";
+        return;
+      }
+      elements.startupBackupStatus.textContent = "Datenbestand wird übernommen …";
+      if (!(await importDatabase(importedState))) {
+        elements.startupBackupStatus.textContent =
+          "Der Datenbestand konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.";
+        return;
+      }
+
+      startupBackupSynchronized = true;
+      if (elements.startupBackupDialog.open) elements.startupBackupDialog.close();
+      document.body.classList.remove("is-auth-locked");
+      applyAccessControl();
+      scheduleAutomaticBackup();
+      showToast("Der aktuelle Datenbestand wurde aus teo-autosicherung.json geladen.");
+    } catch (error) {
+      console.warn("Startabgleich konnte nicht abgeschlossen werden.", error);
+      elements.startupBackupStatus.textContent =
+        error.message || "Die Sicherungsdatei ist ungültig.";
+    } finally {
+      startupBackupImportRunning = false;
+      elements.selectStartupBackupFileButton.disabled = false;
+    }
+  }
+
   function renderSettings() {
     elements.settingsBackupReminderDays.value = String(
       state.settings.backupReminderDays,
@@ -1654,7 +1718,7 @@
     if (!(await persistState())) {
       state = previousState;
       renderAll();
-      return;
+      return false;
     }
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
@@ -1668,7 +1732,7 @@
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {
       showLoginDialog();
-      return;
+      return false;
     }
     renderAll();
     showToast(
@@ -1676,4 +1740,5 @@
         ? "Die Datensicherung wurde einschließlich der Benutzerkonten importiert."
         : "Die Datensicherung wurde importiert. Die Benutzerkonten sind unverändert.",
     );
+    return true;
   }

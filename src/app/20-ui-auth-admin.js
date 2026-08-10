@@ -278,6 +278,14 @@
     );
     elements.importDataButton.addEventListener("click", () => elements.importDataFile.click());
     elements.importDataFile.addEventListener("change", handleBackupFileSelection);
+    elements.selectStartupBackupFileButton.addEventListener(
+      "click",
+      () => elements.startupBackupFile.click(),
+    );
+    elements.startupBackupFile.addEventListener(
+      "change",
+      handleStartupBackupFileSelection,
+    );
     elements.validateBackupButton.addEventListener(
       "click",
       () => elements.validateBackupFile.click(),
@@ -1351,6 +1359,11 @@
       return;
     }
 
+    if (!isMariaDbMode() && !startupBackupSynchronized) {
+      showStartupBackupDialog();
+      return;
+    }
+
     document.body.classList.remove("is-auth-locked");
     if (elements.changePasswordDialog.open) elements.changePasswordDialog.close();
     scheduleAutomaticBackup();
@@ -1360,6 +1373,8 @@
     currentUser = null;
     clearAutomaticBackupTimer();
     automaticBackupPassword = "";
+    startupBackupSynchronized = false;
+    startupBackupImportRunning = false;
     backupReminderShown = false;
     sessionStorage.removeItem(SESSION_USER_KEY);
     document.body.classList.add("is-auth-locked");
@@ -1369,6 +1384,17 @@
     applyAccessControl();
     if (!elements.loginDialog.open) elements.loginDialog.showModal();
     window.setTimeout(() => document.querySelector("#loginUsername").focus(), 0);
+  }
+
+  function showStartupBackupDialog() {
+    document.body.classList.add("is-auth-locked");
+    elements.startupBackupFile.value = "";
+    elements.startupBackupStatus.textContent = "";
+    elements.selectStartupBackupFileButton.disabled = false;
+    if (!elements.startupBackupDialog.open) {
+      elements.startupBackupDialog.showModal();
+    }
+    window.setTimeout(() => elements.selectStartupBackupFileButton.focus(), 0);
   }
 
   function logout() {
@@ -1423,8 +1449,12 @@
     }
     currentUser = state.users.find((user) => user.id === currentUser.id);
     elements.changePasswordDialog.close();
-    document.body.classList.remove("is-auth-locked");
-    applyAccessControl();
+    if (!isMariaDbMode() && !startupBackupSynchronized) {
+      showStartupBackupDialog();
+    } else {
+      document.body.classList.remove("is-auth-locked");
+      applyAccessControl();
+    }
     showToast("Das neue Passwort wurde gespeichert.");
   }
 

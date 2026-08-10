@@ -1982,6 +1982,7 @@
 <p>Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
 <p>Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Ein bereits vorhandenes Konto ohne Schlüsselhülle benötigt ihn einmalig beim ersten Login. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.</p>
 <p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
+<p>Beim Start in der lokalen Browser-Betriebsart verlangt TeO nach der Anmeldung die Auswahl von <code>teo-autosicherung.json</code>. Die Bedienoberfläche bleibt gesperrt, bis die Datei erfolgreich geprüft, gegebenenfalls mit dem beim Login entsperrten Schlüssel entschlüsselt und als aktueller Datenbestand übernommen wurde. Eine Sicherung, die älter als der zuletzt lokal gesicherte Stand ist, wird abgewiesen. In der MariaDB-Betriebsart übernimmt stattdessen der Server den verbindlichen Startabgleich.</p>
 <h3 id="hilfe-sicherung-prufen">Sicherung prüfen</h3>
 <p>Über <strong>Sicherung prüfen</strong> wird eine Datei validiert, ohne den aktuellen Datenbestand zu verändern.</p>
 <h3 id="hilfe-sicherung-importieren">Sicherung importieren</h3>
@@ -2280,6 +2281,51 @@ npm run verify</code></pre>
           <button class="button button-primary" type="submit">Anmelden</button>
         </div>
       </form>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
+      id="startupBackupDialog"
+      aria-labelledby="startupBackupDialogTitle"
+      data-persistent-dialog
+    >
+      <div class="modal-header auth-dialog-header">
+        <span class="brand-mark">
+          <svg><use href="#icon-logo"></use></svg>
+        </span>
+        <div>
+          <p class="eyebrow">Verpflichtender Startabgleich</p>
+          <h2 id="startupBackupDialogTitle">Aktuellen Datenbestand laden</h2>
+          <p class="modal-subtitle">
+            Wählen Sie die gemeinsame Datei <strong>teo-autosicherung.json</strong> aus.
+            TeO bleibt bis zum erfolgreichen Abgleich gesperrt.
+          </p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="empty-state compact-empty-state">
+          <svg><use href="#icon-upload"></use></svg>
+          <div>
+            <strong>Gemeinsame Sicherungsdatei erforderlich</strong>
+            <span>Die Datei wird geprüft, bei Bedarf automatisch entschlüsselt und anschließend als aktueller Datenstand übernommen.</span>
+          </div>
+        </div>
+        <input
+          class="sr-only"
+          id="startupBackupFile"
+          type="file"
+          accept="application/json,.json"
+          aria-label="teo-autosicherung.json für den Startabgleich auswählen"
+        />
+        <p class="form-error auth-error" id="startupBackupStatus" role="alert"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-ghost" type="button" data-logout>Abmelden</button>
+        <button class="button button-primary" id="selectStartupBackupFileButton" type="button">
+          <svg><use href="#icon-upload"></use></svg>
+          teo-autosicherung.json auswählen
+        </button>
+      </div>
     </dialog>
 
     <dialog
