@@ -1611,7 +1611,7 @@
                       hidden
                     >
                       <svg><use href="#icon-lock"></use></svg>
-                      Verschlüsselungspasswort festlegen
+                      Login-Verschlüsselung einrichten
                     </button>
                     <button
                       class="button button-secondary"
@@ -1637,9 +1637,9 @@
                     </button>
                   </div>
                   <p class="field-hint">
-                    Die Ordnerfreigabe gilt nur für dieses Browserprofil. Ein
-                    Verschlüsselungspasswort wird nur für die laufende Sitzung
-                    vorgehalten und muss nach einem Neustart erneut eingegeben werden.
+                    Die Ordnerfreigabe gilt nur für dieses Browserprofil. Der
+                    Sicherungsschlüssel wird beim Login automatisch mit dem
+                    jeweiligen Benutzerpasswort entsperrt.
                   </p>
                 </div>
                 <div class="browser-storage-info">
@@ -1991,7 +1991,8 @@
 <p>Optional kann die Sicherung mit Passwort, PBKDF2 und AES-GCM verschlüsselt werden. TeO verwendet dafür einen eigenen Passwortdialog mit Wiederholung, Eingabeprüfung und optionaler Passwortanzeige. Das Passwort kann nicht aus der Datei wiederhergestellt werden.</p>
 <h3 id="hilfe-automatische-sicherung-in-einen-ordner">Automatische Sicherung in einen Ordner</h3>
 <p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung erneut. Außerdem kann festgelegt werden, wie viele der automatisch erzeugten Dateien erhalten bleiben; ältere TeO-Autosicherungen werden aus diesem Ordner entfernt.</p>
-<p>Automatische Sicherungen können in den Einstellungen mit AES-GCM und einem eigenen Passwort verschlüsselt werden. Das Passwort wird nicht dauerhaft gespeichert, sondern nur für die laufende TeO-Sitzung im Arbeitsspeicher vorgehalten. Nach einem Neustart muss es erneut eingegeben werden. Verschlüsselte Autosicherungen lassen sich über denselben Sicherungsimport wiederherstellen.</p>
+<p>Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
+<p>Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Ein bereits vorhandenes Konto ohne Schlüsselhülle benötigt ihn einmalig beim ersten Login. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.</p>
 <p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
 <h3 id="hilfe-sicherung-prufen">Sicherung prüfen</h3>
 <p>Über <strong>Sicherung prüfen</strong> wird eine Datei validiert, ohne den aktuellen Datenbestand zu verändern.</p>
@@ -3665,6 +3666,47 @@ npm run verify</code></pre>
           </button>
         </div>
       </form>
+    </dialog>
+
+    <dialog
+      class="modal backup-recovery-dialog"
+      id="automaticBackupRecoveryDialog"
+      aria-labelledby="automaticBackupRecoveryTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Notfallzugang</p>
+          <h2 id="automaticBackupRecoveryTitle">Wiederherstellungsschlüssel</h2>
+          <p class="modal-subtitle">
+            Bewahren Sie diesen Schlüssel getrennt von den Sicherungsdateien auf.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="backup-password-notice">
+          <svg><use href="#icon-lock"></use></svg>
+          <p>
+            Der Schlüssel ist für eine Wiederherstellung ohne vorhandene
+            Benutzerkonten erforderlich. TeO kann ihn nicht zurücksetzen.
+          </p>
+        </div>
+        <label class="form-field">
+          <span>Wiederherstellungsschlüssel</span>
+          <textarea id="automaticBackupRecoveryKey" rows="3" readonly></textarea>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="copyAutomaticBackupRecoveryKey" type="button">
+          <svg><use href="#icon-copy"></use></svg>
+          Schlüssel kopieren
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>
+          Sicher verwahrt
+        </button>
+      </div>
     </dialog>
 
     <dialog

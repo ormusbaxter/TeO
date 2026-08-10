@@ -59,6 +59,47 @@
     </dialog>
 
     <dialog
+      class="modal backup-recovery-dialog"
+      id="automaticBackupRecoveryDialog"
+      aria-labelledby="automaticBackupRecoveryTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Notfallzugang</p>
+          <h2 id="automaticBackupRecoveryTitle">Wiederherstellungsschlüssel</h2>
+          <p class="modal-subtitle">
+            Bewahren Sie diesen Schlüssel getrennt von den Sicherungsdateien auf.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="backup-password-notice">
+          <svg><use href="#icon-lock"></use></svg>
+          <p>
+            Der Schlüssel ist für eine Wiederherstellung ohne vorhandene
+            Benutzerkonten erforderlich. TeO kann ihn nicht zurücksetzen.
+          </p>
+        </div>
+        <label class="form-field">
+          <span>Wiederherstellungsschlüssel</span>
+          <textarea id="automaticBackupRecoveryKey" rows="3" readonly></textarea>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="copyAutomaticBackupRecoveryKey" type="button">
+          <svg><use href="#icon-copy"></use></svg>
+          Schlüssel kopieren
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>
+          Sicher verwahrt
+        </button>
+      </div>
+    </dialog>
+
+    <dialog
       class="modal phone-list-preview-dialog"
       id="phoneListPreviewDialog"
       aria-labelledby="phoneListPreviewTitle"

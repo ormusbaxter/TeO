@@ -958,6 +958,15 @@
     showBackupPassword: document.querySelector("#showBackupPassword"),
     backupPasswordError: document.querySelector("#backupPasswordError"),
     backupPasswordSubmit: document.querySelector("#backupPasswordSubmit"),
+    automaticBackupRecoveryDialog: document.querySelector(
+      "#automaticBackupRecoveryDialog",
+    ),
+    automaticBackupRecoveryKey: document.querySelector(
+      "#automaticBackupRecoveryKey",
+    ),
+    copyAutomaticBackupRecoveryKey: document.querySelector(
+      "#copyAutomaticBackupRecoveryKey",
+    ),
     phoneListPreviewDialog: document.querySelector("#phoneListPreviewDialog"),
     phoneListPreviewSubtitle: document.querySelector("#phoneListPreviewSubtitle"),
     phoneListPreviewContent: document.querySelector("#phoneListPreviewContent"),
@@ -2601,6 +2610,10 @@
       "change",
       updateBackupPasswordVisibility,
     );
+    elements.copyAutomaticBackupRecoveryKey.addEventListener(
+      "click",
+      copyAutomaticBackupRecoveryKey,
+    );
     elements.employeeForm.addEventListener("submit", handleEmployeeSubmit);
     elements.trainingForm.addEventListener("submit", handleTrainingSubmit);
     elements.completionForm.addEventListener("submit", handleCompletionSubmit);
@@ -3168,6 +3181,7 @@
         elements.bulkEditDialog,
         elements.dataQualityDialog,
         elements.auditLogDialog,
+        elements.automaticBackupRecoveryDialog,
         elements.confirmDialog,
       ].filter((dialog) => dialog.open);
       openDialogs.forEach((dialog) => dialog.close());
@@ -3361,6 +3375,13 @@
     }
     const sessionUserId = sessionStorage.getItem(SESSION_USER_KEY);
     const user = state.users.find((item) => item.id === sessionUserId);
+    if (user && automaticBackupSettings?.encrypted) {
+      sessionStorage.removeItem(SESSION_USER_KEY);
+      showLoginDialog();
+      elements.loginError.textContent =
+        "Bitte erneut anmelden, damit TeO den Sicherungsschlüssel entsperren kann.";
+      return;
+    }
     if (!user) {
       showLoginDialog();
       if (isMariaDbMode() && backendStartupError) {
@@ -3457,6 +3478,7 @@
         if (!remoteUser) {
           throw new Error("Das angemeldete Benutzerkonto fehlt im Serverdatenbestand.");
         }
+        await unlockAutomaticBackupForLogin(remoteUser, password);
         completeLogin(remoteUser);
       } catch (error) {
         console.error("Serveranmeldung fehlgeschlagen.", error);
@@ -3489,6 +3511,13 @@
       return;
     }
 
+    try {
+      await unlockAutomaticBackupForLogin(user, password);
+    } catch (error) {
+      console.warn("Der automatische Sicherungsschlüssel konnte nicht entsperrt werden.", error);
+      automaticBackupNotice =
+        "Sicherungsschlüssel nicht entsperrt – erneut anmelden oder Wiederherstellungsschlüssel verwenden.";
+    }
     completeLogin(user);
   }
 
@@ -3570,6 +3599,15 @@
     });
     if (!committed) return;
 
+    try {
+      await registerAutomaticBackupUserKey(currentUser.id, password);
+    } catch (error) {
+      console.warn("Der Sicherungsschlüssel konnte nicht auf das neue Passwort umgestellt werden.", error);
+      showToast(
+        "Passwort geändert; der automatische Sicherungsschlüssel konnte jedoch nicht aktualisiert werden.",
+        "error",
+      );
+    }
     currentUser = state.users.find((user) => user.id === currentUser.id);
     elements.changePasswordDialog.close();
     document.body.classList.remove("is-auth-locked");
@@ -3824,6 +3862,11 @@
     });
     if (!committed) return;
 
+    try {
+      await registerAutomaticBackupUserKey(newUser.id, temporaryPassword);
+    } catch (error) {
+      console.warn("Der Sicherungsschlüssel konnte für das neue Konto nicht hinterlegt werden.", error);
+    }
     elements.createUserForm.reset();
     renderUserManagement();
     showTemporaryPassword(username, temporaryPassword);
@@ -3862,6 +3905,11 @@
     });
     if (!committed) return;
 
+    try {
+      await removeAutomaticBackupUserKey(user.id);
+    } catch (error) {
+      console.warn("Die alte Sicherungsschlüssel-Hülle konnte nicht entfernt werden.", error);
+    }
     elements.temporaryPasswordResult.hidden = true;
     elements.temporaryPasswordValue.value = "";
     renderUserManagement();
@@ -3961,6 +4009,11 @@
     });
     if (!committed) return;
 
+    try {
+      await registerAutomaticBackupUserKey(user.id, temporaryPassword);
+    } catch (error) {
+      console.warn("Der Sicherungsschlüssel konnte für das zurückgesetzte Passwort nicht hinterlegt werden.", error);
+    }
     renderUserManagement();
     showTemporaryPassword(user.username, temporaryPassword);
     showToast(`Passwort für ${user.username} wurde zurückgesetzt.`);
@@ -12329,9 +12382,25 @@
       ? Math.min(365, Math.max(1, retention))
       : DEFAULT_AUTO_BACKUP_RETENTION_COUNT;
     const parsedLastBackupAt = Date.parse(value.lastBackupAt);
+    const keyFingerprint = String(value.keyFingerprint || "").slice(0, 200);
+    const keyEnvelopes = Object.fromEntries(
+      Object.entries(value.keyEnvelopes || {})
+        .filter(
+          ([userId, envelope]) =>
+            String(userId).length > 0 &&
+            envelope &&
+            envelope.format === `${BACKUP_FORMAT}-verschluesselt` &&
+            typeof envelope.salt === "string" &&
+            typeof envelope.iv === "string" &&
+            typeof envelope.ciphertext === "string",
+        )
+        .slice(0, 500),
+    );
     return {
       enabled: Boolean(value.enabled),
-      encrypted: Boolean(value.encrypted),
+      encrypted: Boolean(value.encrypted && keyFingerprint),
+      keyFingerprint,
+      keyEnvelopes,
       retentionCount,
       lastBackupAt: Number.isFinite(parsedLastBackupAt)
         ? new Date(parsedLastBackupAt).toISOString()
@@ -12476,14 +12545,35 @@
   }
 
   async function configureAutomaticBackupEncryption({ persist = true } = {}) {
-    const password = await requestBackupPassword({ mode: "automatic" });
-    if (!password) return false;
-    automaticBackupPassword = password;
+    if (automaticBackupSettings.encrypted) {
+      if (!automaticBackupPassword) {
+        automaticBackupPassword = await requestAutomaticBackupRecoveryKey();
+      }
+      if (!automaticBackupPassword) return false;
+      showAutomaticBackupRecoveryKey();
+      renderAutomaticBackupStatus();
+      return true;
+    }
+
+    const loginPassword = await requestVerifiedAutomaticBackupLoginPassword();
+    if (!loginPassword) return false;
+    automaticBackupPassword = generateAutomaticBackupRecoveryKey();
+    const keyFingerprint = await automaticBackupKeyFingerprint(
+      automaticBackupPassword,
+    );
+    const keyEnvelope = await encryptBackup(
+      automaticBackupPassword,
+      loginPassword,
+    );
     automaticBackupNotice = "";
     elements.automaticBackupEncryption.checked = true;
     automaticBackupSettings = normalizeAutomaticBackupSettings({
       ...automaticBackupSettings,
       encrypted: true,
+      keyFingerprint,
+      keyEnvelopes: {
+        [currentUser.id]: keyEnvelope,
+      },
     });
     if (persist) {
       try {
@@ -12497,15 +12587,168 @@
         return false;
       }
       scheduleAutomaticBackup();
-      showToast("Das Verschlüsselungspasswort ist für diese Sitzung eingerichtet.");
+      showToast("Die automatische Login-Verschlüsselung wurde eingerichtet.");
     }
     renderAutomaticBackupStatus();
+    showAutomaticBackupRecoveryKey();
     return true;
+  }
+
+  async function requestVerifiedAutomaticBackupLoginPassword() {
+    let errorMessage = "";
+    while (true) {
+      const password = await requestBackupPassword({
+        mode: "automatic",
+        errorMessage,
+      });
+      if (!password) return null;
+      if (await verifyAutomaticBackupLoginPassword(password)) return password;
+      errorMessage = "Das eingegebene Login-Passwort ist nicht korrekt.";
+    }
+  }
+
+  async function verifyAutomaticBackupLoginPassword(password) {
+    if (!currentUser) return false;
+    if (!isMariaDbMode()) return verifyPassword(password, currentUser);
+    try {
+      const previousToken = window.TeOBackend.readToken();
+      const result = await window.TeOBackend.login(
+        backendConfig.apiUrl,
+        currentUser.username,
+        password,
+      );
+      window.TeOBackend.writeToken(result.token);
+      if (previousToken && previousToken !== result.token) {
+        void window.TeOBackend.logout(backendConfig.apiUrl, previousToken);
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function generateAutomaticBackupRecoveryKey() {
+    return bytesToBase64(crypto.getRandomValues(new Uint8Array(32)));
+  }
+
+  async function automaticBackupKeyFingerprint(key) {
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(key),
+    );
+    return bytesToBase64(new Uint8Array(digest));
+  }
+
+  async function registerAutomaticBackupUserKey(userId, loginPassword) {
+    if (
+      !automaticBackupSettings?.encrypted ||
+      !automaticBackupPassword ||
+      !userId ||
+      !loginPassword
+    ) {
+      return false;
+    }
+    const keyEnvelope = await encryptBackup(
+      automaticBackupPassword,
+      loginPassword,
+    );
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      keyEnvelopes: {
+        ...automaticBackupSettings.keyEnvelopes,
+        [userId]: keyEnvelope,
+      },
+    });
+    await persistAutomaticBackupConfiguration();
+    return true;
+  }
+
+  async function removeAutomaticBackupUserKey(userId) {
+    if (!automaticBackupSettings?.keyEnvelopes?.[userId]) return false;
+    const keyEnvelopes = { ...automaticBackupSettings.keyEnvelopes };
+    delete keyEnvelopes[userId];
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      keyEnvelopes,
+    });
+    await persistAutomaticBackupConfiguration();
+    return true;
+  }
+
+  async function unlockAutomaticBackupForLogin(user, loginPassword) {
+    if (!automaticBackupSettings?.encrypted) return true;
+    const envelope = automaticBackupSettings.keyEnvelopes?.[user.id];
+    if (envelope) {
+      try {
+        const key = await decryptBackup(envelope, loginPassword);
+        if (
+          (await automaticBackupKeyFingerprint(key)) ===
+          automaticBackupSettings.keyFingerprint
+        ) {
+          automaticBackupPassword = key;
+          automaticBackupNotice = "";
+          return true;
+        }
+      } catch {
+        // Ein altes Passwort oder eine fehlende Hülle wird über den
+        // Wiederherstellungsschlüssel repariert.
+      }
+    }
+    const recoveryKey = await requestAutomaticBackupRecoveryKey();
+    if (!recoveryKey) return false;
+    automaticBackupPassword = recoveryKey;
+    await registerAutomaticBackupUserKey(user.id, loginPassword);
+    automaticBackupNotice = "";
+    return true;
+  }
+
+  async function requestAutomaticBackupRecoveryKey() {
+    let errorMessage = "";
+    while (true) {
+      const key = (
+        await requestBackupPassword({ mode: "recovery", errorMessage })
+      )?.trim();
+      if (!key) return null;
+      if (
+        (await automaticBackupKeyFingerprint(key)) ===
+        automaticBackupSettings.keyFingerprint
+      ) {
+        return key;
+      }
+      errorMessage = "Der Wiederherstellungsschlüssel ist nicht korrekt.";
+    }
+  }
+
+  function showAutomaticBackupRecoveryKey() {
+    if (!automaticBackupPassword) return;
+    elements.automaticBackupRecoveryKey.value = automaticBackupPassword;
+    if (!elements.automaticBackupRecoveryDialog.open) {
+      elements.automaticBackupRecoveryDialog.showModal();
+    }
+    elements.automaticBackupRecoveryKey.focus();
+    elements.automaticBackupRecoveryKey.select();
+  }
+
+  async function copyAutomaticBackupRecoveryKey() {
+    const key = elements.automaticBackupRecoveryKey.value;
+    if (!key) return;
+    try {
+      await navigator.clipboard.writeText(key);
+    } catch {
+      copyTextWithFallback(key);
+    }
+    showToast("Wiederherstellungsschlüssel wurde kopiert.");
   }
 
   function renderAutomaticBackupEncryptionControls() {
     elements.setAutomaticBackupPasswordButton.hidden =
       !elements.automaticBackupEncryption.checked;
+    elements.setAutomaticBackupPasswordButton.textContent =
+      automaticBackupSettings?.encrypted
+        ? automaticBackupPassword
+          ? "Wiederherstellungsschlüssel anzeigen"
+          : "Wiederherstellungsschlüssel eingeben"
+        : "Login-Verschlüsselung einrichten";
   }
 
   function renderAutomaticBackupStatus() {
@@ -12549,7 +12792,7 @@
     if (!encryptionReady) {
       elements.automaticBackupStatus.textContent =
         `Ordner: ${automaticBackupSettings.directoryName} · Verschlüsselung aktiv – ` +
-        "Passwort für diese Sitzung festlegen.";
+        "erneut anmelden oder Wiederherstellungsschlüssel eingeben.";
       return;
     }
     const lastBackup = automaticBackupSettings.lastBackupAt
@@ -12816,32 +13059,42 @@
   function requestBackupPassword({ mode, errorMessage = "" }) {
     const exporting = mode === "export";
     const automatic = mode === "automatic";
-    const encrypting = exporting || automatic;
+    const recovery = mode === "recovery";
     elements.backupPasswordForm.reset();
     elements.backupPasswordDialog.dataset.mode = mode;
     elements.backupPasswordDialogTitle.textContent = automatic
-      ? "Automatische Sicherungen verschlüsseln"
+      ? "Login-Verschlüsselung einrichten"
+      : recovery
+        ? "Wiederherstellungsschlüssel eingeben"
       : exporting
         ? "Sicherung verschlüsseln"
         : "Sicherung entschlüsseln";
     elements.backupPasswordDialogDescription.textContent = automatic
-      ? "Legen Sie das Passwort für die automatischen Sicherungen dieser Sitzung fest."
+      ? "Bestätigen Sie Ihr aktuelles Login-Passwort. TeO verwendet es zum geschützten Hinterlegen des gemeinsamen Sicherungsschlüssels."
+      : recovery
+        ? "Dieses Konto benötigt einmalig den Wiederherstellungsschlüssel der automatischen Sicherung."
       : exporting
         ? "Schützen Sie den vollständigen Datenbestand mit einem eigenen Passwort."
         : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort ein.";
     elements.backupPasswordNotice.textContent = automatic
-      ? "Das Passwort bleibt nur bis zum Schließen von TeO im Arbeitsspeicher. Nach einem Neustart muss es erneut eingegeben werden."
+      ? "Das Login-Passwort wird nicht gespeichert. Bei späteren Anmeldungen entsperrt es den Sicherungsschlüssel automatisch."
+      : recovery
+        ? "Nach erfolgreicher Eingabe wird der Sicherungsschlüssel mit Ihrem Login-Passwort geschützt."
       : exporting
         ? "Das Passwort wird nicht gespeichert und kann nicht wiederhergestellt werden. Bewahren Sie es getrennt von der Sicherungsdatei auf."
         : "Das Passwort wird ausschließlich zur Entschlüsselung dieser Datei verwendet und nicht gespeichert.";
-    elements.backupPasswordConfirmationField.hidden = !encrypting;
-    elements.backupPasswordConfirmation.required = encrypting;
-    elements.backupPassword.minLength = encrypting ? 8 : 1;
-    elements.backupPassword.autocomplete = encrypting
+    elements.backupPasswordConfirmationField.hidden = !exporting;
+    elements.backupPasswordConfirmation.required = exporting;
+    elements.backupPassword.minLength = exporting ? 8 : 1;
+    elements.backupPassword.autocomplete = automatic
+      ? "current-password"
+      : exporting
       ? "new-password"
       : "current-password";
     elements.backupPasswordSubmit.textContent = automatic
-      ? "Passwort übernehmen"
+      ? "Login bestätigen"
+      : recovery
+        ? "Schlüssel übernehmen"
       : exporting
         ? "Verschlüsselt exportieren"
         : "Sicherung entsperren";
@@ -12858,7 +13111,7 @@
   function handleBackupPasswordSubmit(event) {
     event.preventDefault();
     const mode = elements.backupPasswordDialog.dataset.mode;
-    const encrypting = mode === "export" || mode === "automatic";
+    const encrypting = mode === "export";
     const password = elements.backupPassword.value;
     if (encrypting && password.length < 8) {
       elements.backupPasswordError.textContent =
@@ -13044,6 +13297,15 @@
       throw new Error("Die ausgewählte Datei enthält kein gültiges JSON.");
     }
     if (envelope?.format === `${BACKUP_FORMAT}-verschluesselt`) {
+      if (automaticBackupPassword) {
+        try {
+          return parseBackup(
+            await decryptBackup(envelope, automaticBackupPassword),
+          );
+        } catch {
+          // Manuelle Sicherungen können ein anderes Passwort verwenden.
+        }
+      }
       let errorMessage = "";
       while (true) {
         const password = await requestBackupPassword({
