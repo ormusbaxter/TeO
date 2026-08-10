@@ -1003,81 +1003,124 @@ Die Datenqualitätsprüfung sucht unter anderem nach:
 - auffälligen Telefonnummern
 - fehlenden Kontaktdaten
 
-## Häufige Fragen und Problemlösung
+## Häufig gestellte Fragen
 
-### Warum sehe ich meine Daten an einem anderen Arbeitsplatz nicht?
+### Welche Datei muss ich nach der Anmeldung auswählen?
 
-Wahrscheinlich wird der lokale Modus verwendet. IndexedDB gehört zum
-jeweiligen Browserprofil. Für einen gemeinsamen Datenbestand muss MariaDB
-eingerichtet oder der JSON-Bestand kontrolliert exportiert und importiert
-werden.
+Im lokalen Browserbetrieb erwartet TeO die gemeinsame Datei
+`teo-autosicherung.json`. Wählen Sie genau diese Datei aus dem zuvor
+festgelegten Sicherungs- oder Netzordner. Erst nach erfolgreicher Prüfung und
+Übernahme wird die Anwendung freigegeben. Im MariaDB-Betrieb entfällt diese
+Auswahl, weil der Server bereits den verbindlichen Datenstand liefert.
 
-### Warum erscheint die Sicherungswarnung trotz automatischer Speicherung?
+### Warum lässt sich der Startabgleich nicht überspringen?
 
-Automatische Speicherung und Sicherungsdatei sind zwei verschiedene Dinge.
-Die Warnung bleibt bestehen, bis eine unabhängige JSON-Sicherung exportiert
-wurde.
+Der verpflichtende Abgleich verhindert, dass versehentlich mit einem veralteten
+Browserstand weitergearbeitet wird. Ohne gültige Sicherungsdatei kann die lokale
+Anwendung deshalb nur abgemeldet, aber nicht geöffnet werden. Falls die Datei
+nicht erreichbar ist, prüfen Sie die Netzwerkverbindung, den freigegebenen
+Ordner und Ihre Zugriffsrechte.
 
-### Warum erscheint beim Schließen ein Browserdialog?
+### Warum wird `teo-autosicherung.json` beim Start abgelehnt?
 
-Seit der letzten Sicherung liegen Änderungen vor. Browser verwenden für diesen
-Dialog einen eigenen Standardtext. Auch ein Neuladen kann technisch als
-Verlassen der Seite gelten.
+TeO lehnt die Datei ab, wenn sie:
 
-### Warum kann eine Leitungsrolle nicht entfernt werden?
+- anders heißt oder größer als 20 MB ist
+- kein vollständiges und gültiges TeO-Sicherungsformat enthält
+- beschädigt oder manuell unvollständig bearbeitet wurde
+- aus einer neueren, nicht kompatiblen TeO-Version stammt
+- älter als die zuletzt in diesem Browser erfolgreich erstellte Autosicherung ist
+- verschlüsselt ist und nicht entschlüsselt werden kann
 
-Die Person ist noch als Verantwortliche eines Dienstwochenendes eingetragen.
-Zuerst unter **Einstellungen → Feste Dienstwochenenden** eine andere
-Stationsleitung oder stellvertretende Stationsleitung auswählen.
+Die Meldung im Startdialog nennt den erkannten Grund. Verwenden Sie nicht
+ersatzweise eine beliebige umbenannte JSON-Datei.
+
+### Muss ich für eine verschlüsselte Autosicherung ein zweites Passwort eingeben?
+
+Normalerweise nicht. Der gemeinsame Sicherungsschlüssel wird beim Login mit dem
+persönlichen Benutzerpasswort automatisch entsperrt. Nur wenn dem Konto noch
+keine passende Schlüsselhülle zugeordnet ist oder das Browserprofil vollständig
+verloren ging, wird einmalig der separat aufbewahrte Wiederherstellungsschlüssel
+benötigt. Dieser Schlüssel ist nicht das Login-Passwort.
+
+### Wann wird die gemeinsame Datei aktualisiert?
+
+Nach einer fachlichen Änderung wartet TeO zwei Sekunden. Weitere Änderungen in
+diesem Zeitraum starten die Frist neu. Anschließend wird
+`teo-autosicherung.json` vollständig überschrieben. Die Sicherung funktioniert
+nur, solange TeO geöffnet ist und der Browser weiterhin Schreibzugriff auf den
+gewählten Ordner besitzt.
+
+### Können mehrere Personen gleichzeitig mit derselben JSON-Datei arbeiten?
+
+Nein. Die gemeinsame JSON-Datei ist für eine nacheinander erfolgende Nutzung
+gedacht. Jede geöffnete Anwendung hält einen vollständigen Datenstand und würde
+beim Sichern die gesamte Datei überschreiben. Bei gleichzeitiger Bearbeitung
+kann dadurch die zuletzt geschriebene Version Änderungen einer anderen Person
+verdrängen. Für den parallelen Betrieb an mehreren Arbeitsplätzen muss MariaDB
+als gemeinsamer Datenbestand verwendet werden.
+
+### Warum sehe ich Änderungen eines anderen Arbeitsplatzes nicht sofort?
+
+Im lokalen Betrieb wird die gemeinsame Datei nur beim verpflichtenden
+Startabgleich eingelesen. Während einer bereits laufenden Sitzung werden fremde
+Dateiänderungen nicht automatisch zusammengeführt. Melden Sie sich ab, laden
+Sie TeO neu und wählen Sie anschließend erneut `teo-autosicherung.json`. Im
+MariaDB-Betrieb prüft TeO regelmäßig, ob eine neuere Serverrevision vorliegt.
+
+### Warum fragt der Browser erneut nach dem Sicherungsordner?
+
+Die Ordnerfreigabe gehört zum jeweiligen Browserprofil und kann durch einen
+Browserwechsel, ein neues Profil, gelöschte Websitedaten oder geänderte
+Berechtigungen verloren gehen. Wählen Sie den Ordner unter
+**Einstellungen → Gesamten Datenbestand sichern** erneut aus. Für die direkte
+Ordnerfreigabe werden Chrome oder Edge über HTTPS beziehungsweise `localhost`
+benötigt.
+
+### Warum erscheint beim Schließen weiterhin eine Warnung?
+
+Die Warnung bedeutet, dass seit der letzten erfolgreich abgeschlossenen
+Sicherung Änderungen vorliegen. Prüfen Sie unter **Einstellungen → Gesamten
+Datenbestand sichern** den Sicherungsstatus und führen Sie bei Bedarf **Jetzt
+automatisch sichern** aus. Browser verwenden beim Verlassen der Seite einen
+eigenen Standardtext, den TeO nicht verändern kann.
 
 ### Warum wird ein Mitarbeiter nicht in einer Auswahl angezeigt?
 
-Prüfen:
-
-- Ist der Mitarbeiter inaktiv?
-- Ist ein Such- oder Statusfilter aktiv?
-- Wird für die Funktion eine bestimmte Qualifikation benötigt?
-- Gehört der Mitarbeiter bereits zu einer geschützten Zuordnung?
+Prüfen Sie den Beschäftigungsstatus sowie aktive Such-, Status-, Berufs- und
+Qualifikationsfilter. Einige Auswahllisten zeigen bewusst nur aktive oder in
+Einarbeitung befindliche Personen. Bei Namenslisten hilft die Eingabe des ersten
+Buchstabens des Nachnamens, direkt zu den passenden Einträgen zu springen.
 
 ### Warum wird eine Fortbildung als offen oder fällig angezeigt?
 
-Prüfen:
+Maßgeblich sind Einführungsjahr, Wiederholungsintervall, das Datum des neuesten
+Nachweises, die Zuordnung zur richtigen Fortbildungsreihe und das ausgewählte
+Auswertungsjahr. Prüfen Sie diese Angaben sowohl im Fortbildungskatalog als auch
+im Nachweis des Mitarbeiters.
 
-- Einführungsjahr der Fortbildung
-- Wiederholungsintervall
-- Datum des neuesten Nachweises
-- Zuordnung zur richtigen Fortbildungsreihe
-- ausgewähltes Auswertungsjahr
+### Warum kann eine Leitungsrolle nicht entfernt werden?
 
-### Warum kann ein Gerät nicht gefunden werden?
-
-Der Filter steht möglicherweise auf „aktueller Bestand“. Für ausgemusterte
-Geräte den Bestandsfilter erweitern und zusätzlich Suchbegriff,
-Gerätekategorie und Anlage-1-Filter prüfen.
+Die Person ist noch als verantwortliche Leitung eines Dienstwochenendes
+eingetragen. Wählen Sie zuerst unter **Einstellungen → Feste
+Dienstwochenenden** eine andere Stationsleitung oder stellvertretende
+Stationsleitung aus.
 
 ### Warum ist ein Tag in der Urlaubsplanung rot?
 
-Die konfigurierte Abwesenheitsgrenze wurde überschritten. Die Planung ist
-bewusst weiterhin möglich, muss aber organisatorisch geprüft werden. Die
-Schaltfläche **Überschneidungen prüfen** listet alle betroffenen Tage des
-Jahres samt beteiligter Mitarbeiter auf.
+Die konfigurierte Abwesenheitsgrenze wurde überschritten. Die Eintragung bleibt
+möglich, muss aber organisatorisch geprüft werden. **Überschneidungen prüfen**
+listet die betroffenen Tage und Personen auf. Abwesenheiten von Medizinischen
+Fachangestellten, Pflegefachassistenz und Stationsassistenz werden bei dieser
+Grenze nicht mitgezählt.
 
-Abwesenheiten von Medizinischen Fachangestellten, Pflegefachassistenz und
-Stationsassistenz zählen dabei nicht mit – ein Tag kann also mehr Einträge
-zeigen, als die Grenze zulässt, ohne rot zu werden.
+### Wie stelle ich den Datenbestand nach einem Browser- oder Geräteverlust wieder her?
 
-### Was tun, wenn der Import abgelehnt wird?
-
-1. Datei über **Sicherung prüfen** untersuchen.
-2. Sicherstellen, dass es sich um eine vollständige TeO-JSON-Sicherung handelt.
-3. Bei verschlüsselten Dateien das korrekte Passwort verwenden.
-4. Keine manuell bearbeiteten oder abgeschnittenen JSON-Dateien importieren.
-5. Bei Sicherungen aus einer neueren TeO-Version zunächst die Anwendung
-   aktualisieren.
-
-Bei einer verschlüsselten Datei zeigt TeO einen eigenen Entschlüsselungsdialog.
-Ein falsches Passwort kann dort erneut eingegeben werden, ohne die Datei noch
-einmal auswählen zu müssen.
+Öffnen Sie TeO in einem unterstützten Browser und importieren Sie die zuletzt
+erfolgreich erstellte Sicherung. Bei einer verschlüsselten Datei benötigen Sie
+den getrennt aufbewahrten Wiederherstellungsschlüssel. Bewahren Sie Datei und
+Schlüssel nicht ausschließlich auf demselben Gerät auf. Im MariaDB-Betrieb
+erfolgt die Wiederherstellung stattdessen über die geregelte Serversicherung.
 
 ## Datenschutz und IT-Sicherheit
 
