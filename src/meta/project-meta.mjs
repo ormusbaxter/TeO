@@ -8,7 +8,7 @@ export const PROJECT_META = Object.freeze({
   version: Object.freeze({
     major: 4,
     minor: 27,
-    patch: 2,
+    patch: 3,
   }),
   stateVersion: 24,
   backupFormat: "intensivteam-datensicherung",

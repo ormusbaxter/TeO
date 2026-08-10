@@ -89,3 +89,13 @@ test("Die Startseite zeigt Fortbildungsfortschritt als Prozentwert", async () =>
   assert.match(source, /progress-value">\$\{stats\.percent\}&thinsp;%/);
   assert.doesNotMatch(source, /progress-value">\$\{activeCount/);
 });
+
+test("Die Startseite enthält kein Widget für aktive Mitarbeiter", async () => {
+  const [source, html] = await Promise.all([
+    fs.readFile(path.join(projectRoot, "src/app/30-dashboard-weekends.js"), "utf8"),
+    fs.readFile(path.join(projectRoot, "src/html/00-shell-dashboard.html"), "utf8"),
+  ]);
+
+  assert.doesNotMatch(source, /label: "Aktive Mitarbeiter"/);
+  assert.doesNotMatch(html, /id="dashboardStats"/);
+});

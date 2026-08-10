@@ -1,39 +1,5 @@
   function renderDashboard() {
     renderDashboardGreeting();
-    const activeEmployees = activeEmployeeList();
-    const inactiveCount = state.employees.length - activeEmployees.length;
-    const onboardingCount = state.employees.filter(
-      (employee) => employee.employmentStatus === "onboarding",
-    ).length;
-    // Eine einzelne Kennzahl: aktive Mitarbeiter als Zahl, die uebrigen
-    // Personalstaende als Aufschluesselung darunter.
-    const stats = [
-      {
-        label: "Aktive Mitarbeiter",
-        value: activeEmployees.length,
-        detail: `${onboardingCount} in Einarbeitung · ${inactiveCount} inaktiv · ${state.employees.length} gesamt`,
-        icon: "users",
-        className: "",
-      },
-    ];
-
-    elements.dashboardStats.innerHTML = stats
-      .map(
-        (stat) => `
-          <article class="stat-card ${stat.className}">
-            <div class="stat-top">
-              <span class="stat-label">${stat.label}</span>
-              <span class="stat-icon">
-                <svg><use href="#icon-${stat.icon}"></use></svg>
-              </span>
-            </div>
-            <strong class="stat-value">${stat.value}</strong>
-            <span class="stat-detail">${stat.detail}</span>
-          </article>
-        `,
-      )
-      .join("");
-
     renderDashboardTrainingProgress();
     renderRecentEmployees();
   }
