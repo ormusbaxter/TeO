@@ -838,19 +838,24 @@ Datei wiederhergestellt werden.
 
 Unter **Einstellungen → Gesamten Datenbestand sichern** kann ein lokaler
 Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige
-JSON-Sicherung und danach erneut, sobald Änderungen vorliegen und das gewählte
-Intervall erreicht ist. Das Intervall lässt sich zwischen einer Stunde und
-sieben Tagen einstellen. Außerdem kann festgelegt werden, wie viele der
-automatisch erzeugten Dateien erhalten bleiben; ältere TeO-Autosicherungen
-werden aus diesem Ordner entfernt.
+JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung
+erneut. Außerdem kann festgelegt werden, wie viele der automatisch erzeugten
+Dateien erhalten bleiben; ältere TeO-Autosicherungen werden aus diesem Ordner
+entfernt.
+
+Automatische Sicherungen können in den Einstellungen mit AES-GCM und einem
+eigenen Passwort verschlüsselt werden. Das Passwort wird nicht dauerhaft
+gespeichert, sondern nur für die laufende TeO-Sitzung im Arbeitsspeicher
+vorgehalten. Nach einem Neustart muss es erneut eingegeben werden. Verschlüsselte
+Autosicherungen lassen sich über denselben Sicherungsimport wiederherstellen.
 
 Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist
 nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über
 HTTPS oder `localhost` unterstützt. Nach einem Browser- oder Profilwechsel kann
 eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur,
-solange TeO geöffnet ist, und werden unverschlüsselt geschrieben; der gewählte
-Ordner muss daher angemessen geschützt sein. Manueller und verschlüsselter
-Export bleiben unabhängig davon verfügbar.
+solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen
+angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben
+unabhängig davon verfügbar.
 
 ### Sicherung prüfen
 

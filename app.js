@@ -19,8 +19,8 @@
   const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
-  const DEFAULT_AUTO_BACKUP_INTERVAL_HOURS = 24;
   const DEFAULT_AUTO_BACKUP_RETENTION_COUNT = 30;
+  const AUTO_BACKUP_DELAY_MS = 2000;
   const AUTO_BACKUP_FILE_PREFIX = "teo-autosicherung_";
   const DEFAULT_VACATION_BASE_DAYS = 30;
   const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
@@ -428,8 +428,10 @@
   let databaseSaveReminderArmed = false;
   let automaticBackupSettings = null;
   let automaticBackupDirectoryHandle = null;
+  let automaticBackupPassword = "";
   let automaticBackupTimer = null;
   let automaticBackupRunning = false;
+  let automaticBackupRequestSequence = 0;
   let automaticBackupRetryAt = 0;
   let automaticBackupNotice = "";
   let browserPersistenceNotice = "";
@@ -537,8 +539,13 @@
     exportEncryptedDataButton: document.querySelector("#exportEncryptedDataButton"),
     backupStatus: document.querySelector("#backupStatus"),
     automaticBackupStatus: document.querySelector("#automaticBackupStatus"),
-    automaticBackupInterval: document.querySelector("#automaticBackupInterval"),
     automaticBackupRetention: document.querySelector("#automaticBackupRetention"),
+    automaticBackupEncryption: document.querySelector(
+      "#automaticBackupEncryption",
+    ),
+    setAutomaticBackupPasswordButton: document.querySelector(
+      "#setAutomaticBackupPasswordButton",
+    ),
     saveAutomaticBackupSettingsButton: document.querySelector(
       "#saveAutomaticBackupSettingsButton",
     ),
@@ -2431,6 +2438,14 @@
       "click",
       removeAutomaticBackupDirectory,
     );
+    elements.automaticBackupEncryption.addEventListener(
+      "change",
+      renderAutomaticBackupEncryptionControls,
+    );
+    elements.setAutomaticBackupPasswordButton.addEventListener(
+      "click",
+      configureAutomaticBackupEncryption,
+    );
     elements.saveAutomaticBackupSettingsButton.addEventListener(
       "click",
       saveAutomaticBackupSettings,
@@ -3502,6 +3517,7 @@
   function showLoginDialog() {
     currentUser = null;
     clearAutomaticBackupTimer();
+    automaticBackupPassword = "";
     backupReminderShown = false;
     sessionStorage.removeItem(SESSION_USER_KEY);
     document.body.classList.add("is-auth-locked");
@@ -12308,10 +12324,6 @@
   }
 
   function normalizeAutomaticBackupSettings(value = {}) {
-    const allowedIntervals = [1, 6, 12, 24, 168];
-    const intervalHours = allowedIntervals.includes(Number(value.intervalHours))
-      ? Number(value.intervalHours)
-      : DEFAULT_AUTO_BACKUP_INTERVAL_HOURS;
     const retention = Number(value.retentionCount);
     const retentionCount = Number.isInteger(retention)
       ? Math.min(365, Math.max(1, retention))
@@ -12319,7 +12331,7 @@
     const parsedLastBackupAt = Date.parse(value.lastBackupAt);
     return {
       enabled: Boolean(value.enabled),
-      intervalHours,
+      encrypted: Boolean(value.encrypted),
       retentionCount,
       lastBackupAt: Number.isFinite(parsedLastBackupAt)
         ? new Date(parsedLastBackupAt).toISOString()
@@ -12399,6 +12411,7 @@
   async function removeAutomaticBackupDirectory() {
     clearAutomaticBackupTimer();
     automaticBackupDirectoryHandle = null;
+    automaticBackupPassword = "";
     automaticBackupSettings = normalizeAutomaticBackupSettings({
       ...automaticBackupSettings,
       enabled: false,
@@ -12421,24 +12434,33 @@
   }
 
   async function saveAutomaticBackupSettings() {
-    const intervalHours = Number(elements.automaticBackupInterval.value);
     const retentionCount = Number(elements.automaticBackupRetention.value);
     if (
-      ![1, 6, 12, 24, 168].includes(intervalHours) ||
       !Number.isInteger(retentionCount) ||
       retentionCount < 1 ||
       retentionCount > 365
     ) {
       showToast(
-        "Bitte wählen Sie ein gültiges Intervall und 1 bis 365 Sicherungsdateien.",
+        "Bitte wählen Sie 1 bis 365 aufzubewahrende Sicherungsdateien.",
         "error",
       );
       return;
     }
+    const encrypted = elements.automaticBackupEncryption.checked;
+    if (encrypted && !automaticBackupPassword) {
+      const configured = await configureAutomaticBackupEncryption({
+        persist: false,
+      });
+      if (!configured) {
+        renderAutomaticBackupStatus();
+        return;
+      }
+    }
+    if (!encrypted) automaticBackupPassword = "";
     automaticBackupSettings = normalizeAutomaticBackupSettings({
       ...automaticBackupSettings,
       enabled: Boolean(automaticBackupDirectoryHandle),
-      intervalHours,
+      encrypted,
       retentionCount,
     });
     try {
@@ -12453,20 +12475,56 @@
     }
   }
 
+  async function configureAutomaticBackupEncryption({ persist = true } = {}) {
+    const password = await requestBackupPassword({ mode: "automatic" });
+    if (!password) return false;
+    automaticBackupPassword = password;
+    automaticBackupNotice = "";
+    elements.automaticBackupEncryption.checked = true;
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      encrypted: true,
+    });
+    if (persist) {
+      try {
+        await persistAutomaticBackupConfiguration();
+      } catch (error) {
+        console.error(
+          "Die Einstellung zur automatischen Verschlüsselung konnte nicht gespeichert werden.",
+          error,
+        );
+        showToast("Die Verschlüsselungseinstellung konnte nicht gespeichert werden.", "error");
+        return false;
+      }
+      scheduleAutomaticBackup();
+      showToast("Das Verschlüsselungspasswort ist für diese Sitzung eingerichtet.");
+    }
+    renderAutomaticBackupStatus();
+    return true;
+  }
+
+  function renderAutomaticBackupEncryptionControls() {
+    elements.setAutomaticBackupPasswordButton.hidden =
+      !elements.automaticBackupEncryption.checked;
+  }
+
   function renderAutomaticBackupStatus() {
     if (!automaticBackupSettings) return;
-    elements.automaticBackupInterval.value = String(
-      automaticBackupSettings.intervalHours,
-    );
     elements.automaticBackupRetention.value = String(
       automaticBackupSettings.retentionCount,
     );
+    elements.automaticBackupEncryption.checked =
+      automaticBackupSettings.encrypted;
+    renderAutomaticBackupEncryptionControls();
     const supported = typeof window.showDirectoryPicker === "function";
     const connected = Boolean(
       automaticBackupSettings.enabled && automaticBackupDirectoryHandle,
     );
     elements.selectAutomaticBackupDirectoryButton.disabled = !supported;
-    elements.runAutomaticBackupButton.disabled = !connected || automaticBackupRunning;
+    const encryptionReady =
+      !automaticBackupSettings.encrypted || Boolean(automaticBackupPassword);
+    elements.runAutomaticBackupButton.disabled =
+      !connected || !encryptionReady || automaticBackupRunning;
     elements.removeAutomaticBackupDirectoryButton.hidden = !automaticBackupDirectoryHandle;
     elements.saveAutomaticBackupSettingsButton.disabled = !supported;
 
@@ -12488,30 +12546,19 @@
         "Noch kein Sicherungsordner ausgewählt.";
       return;
     }
+    if (!encryptionReady) {
+      elements.automaticBackupStatus.textContent =
+        `Ordner: ${automaticBackupSettings.directoryName} · Verschlüsselung aktiv – ` +
+        "Passwort für diese Sitzung festlegen.";
+      return;
+    }
     const lastBackup = automaticBackupSettings.lastBackupAt
       ? ` · zuletzt ${formatDateTime(automaticBackupSettings.lastBackupAt)}`
       : " · noch keine automatische Sicherung";
     elements.automaticBackupStatus.textContent =
-      `Ordner: ${automaticBackupSettings.directoryName}` + lastBackup;
-  }
-
-  function automaticBackupReferenceTime() {
-    const timestamps = [
-      automaticBackupSettings?.lastBackupAt,
-      state?.settings?.lastBackupAt,
-    ]
-      .map((value) => Date.parse(value))
-      .filter(Number.isFinite);
-    return timestamps.length ? Math.max(...timestamps) : 0;
-  }
-
-  function automaticBackupIsDue(now = Date.now()) {
-    const reference = automaticBackupReferenceTime();
-    if (!reference) return true;
-    return (
-      now - reference >=
-      automaticBackupSettings.intervalHours * 60 * 60 * 1000
-    );
+      `Ordner: ${automaticBackupSettings.directoryName}` +
+      `${automaticBackupSettings.encrypted ? " · verschlüsselt" : ""}` +
+      lastBackup;
   }
 
   function clearAutomaticBackupTimer() {
@@ -12526,21 +12573,22 @@
       currentUser.mustChangePassword ||
       !databaseSaveReminderArmed ||
       !automaticBackupSettings?.enabled ||
-      !automaticBackupDirectoryHandle
+      !automaticBackupDirectoryHandle ||
+      (automaticBackupSettings.encrypted && !automaticBackupPassword)
     ) {
       return;
     }
-    const reference = automaticBackupReferenceTime();
-    const intervalMs = automaticBackupSettings.intervalHours * 60 * 60 * 1000;
-    const dueDelay = reference
-      ? Math.max(250, reference + intervalMs - Date.now())
-      : 250;
-    const retryDelay = Math.max(0, automaticBackupRetryAt - Date.now());
-    const delay = Math.max(dueDelay, retryDelay);
+    automaticBackupRequestSequence += 1;
+    const delay = automaticBackupScheduleDelay();
     automaticBackupTimer = window.setTimeout(() => {
       automaticBackupTimer = null;
       void runAutomaticBackup();
     }, Math.min(delay, 2147483647));
+  }
+
+  function automaticBackupScheduleDelay(now = Date.now()) {
+    const retryDelay = Math.max(0, automaticBackupRetryAt - now);
+    return Math.max(AUTO_BACKUP_DELAY_MS, retryDelay);
   }
 
   async function automaticBackupPermissionGranted(requestPermission = false) {
@@ -12580,6 +12628,13 @@
       showToast("Bitte wählen Sie zuerst einen Sicherungsordner aus.", "error");
       return false;
     }
+    if (automaticBackupSettings.encrypted && !automaticBackupPassword) {
+      automaticBackupNotice =
+        "Verschlüsselung aktiv – Passwort für diese Sitzung festlegen.";
+      renderAutomaticBackupStatus();
+      return false;
+    }
+    const requestSequence = automaticBackupRequestSequence;
     if (force) {
       automaticBackupRetryAt = 0;
     } else {
@@ -12596,7 +12651,7 @@
       } catch (error) {
         console.warn("Der Sicherungszeitpunkt konnte nicht abgeglichen werden.", error);
       }
-      if (!databaseSaveReminderArmed || !automaticBackupIsDue()) {
+      if (!databaseSaveReminderArmed) {
         scheduleAutomaticBackup();
         return false;
       }
@@ -12632,11 +12687,22 @@
         exportedAt: exportedAt.toISOString(),
         data: exportedState,
       };
-      const filename = `${AUTO_BACKUP_FILE_PREFIX}${fileTimestamp(exportedAt)}.json`;
+      let fileContent = JSON.stringify(backup, null, 2);
+      if (automaticBackupSettings.encrypted) {
+        fileContent = JSON.stringify(
+          await encryptBackup(fileContent, automaticBackupPassword),
+          null,
+          2,
+        );
+      }
+      const filename = automaticBackupFilename(
+        exportedAt,
+        automaticBackupSettings.encrypted,
+      );
       await writeAutomaticBackupFile(
         automaticBackupDirectoryHandle,
         filename,
-        JSON.stringify(backup, null, 2),
+        fileContent,
       );
       let cleanupWarning = "";
       try {
@@ -12654,13 +12720,18 @@
       }
 
       state.settings.lastBackupAt = exportedAt.toISOString();
-      appendAuditEntry("Automatische Datensicherung exportiert");
+      appendAuditEntry(
+        automaticBackupSettings.encrypted
+          ? "Verschlüsselte automatische Datensicherung exportiert"
+          : "Automatische Datensicherung exportiert",
+      );
       await persistState();
       automaticBackupSettings.lastBackupAt = exportedAt.toISOString();
       await persistAutomaticBackupConfiguration();
       automaticBackupRetryAt = 0;
       automaticBackupNotice = cleanupWarning;
-      databaseSaveReminderArmed = false;
+      databaseSaveReminderArmed =
+        automaticBackupRequestSequence !== requestSequence;
       renderAll();
       if (cleanupWarning) {
         showToast(cleanupWarning, "error");
@@ -12696,9 +12767,15 @@
     }
   }
 
+  function automaticBackupFilename(date, encrypted = false) {
+    return `${AUTO_BACKUP_FILE_PREFIX}${fileTimestamp(date)}${
+      encrypted ? ".verschluesselt" : ""
+    }.json`;
+  }
+
   function automaticBackupFilesToRemove(fileNames, retentionCount) {
     const automaticBackupPattern =
-      /^teo-autosicherung_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/;
+      /^teo-autosicherung_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}(?:\.verschluesselt)?\.json$/;
     return fileNames
       .filter((fileName) => automaticBackupPattern.test(fileName))
       .sort((a, b) => b.localeCompare(a))
@@ -12738,26 +12815,36 @@
 
   function requestBackupPassword({ mode, errorMessage = "" }) {
     const exporting = mode === "export";
+    const automatic = mode === "automatic";
+    const encrypting = exporting || automatic;
     elements.backupPasswordForm.reset();
     elements.backupPasswordDialog.dataset.mode = mode;
-    elements.backupPasswordDialogTitle.textContent = exporting
-      ? "Sicherung verschlüsseln"
-      : "Sicherung entschlüsseln";
-    elements.backupPasswordDialogDescription.textContent = exporting
-      ? "Schützen Sie den vollständigen Datenbestand mit einem eigenen Passwort."
-      : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort ein.";
-    elements.backupPasswordNotice.textContent = exporting
-      ? "Das Passwort wird nicht gespeichert und kann nicht wiederhergestellt werden. Bewahren Sie es getrennt von der Sicherungsdatei auf."
-      : "Das Passwort wird ausschließlich zur Entschlüsselung dieser Datei verwendet und nicht gespeichert.";
-    elements.backupPasswordConfirmationField.hidden = !exporting;
-    elements.backupPasswordConfirmation.required = exporting;
-    elements.backupPassword.minLength = exporting ? 8 : 1;
-    elements.backupPassword.autocomplete = exporting
+    elements.backupPasswordDialogTitle.textContent = automatic
+      ? "Automatische Sicherungen verschlüsseln"
+      : exporting
+        ? "Sicherung verschlüsseln"
+        : "Sicherung entschlüsseln";
+    elements.backupPasswordDialogDescription.textContent = automatic
+      ? "Legen Sie das Passwort für die automatischen Sicherungen dieser Sitzung fest."
+      : exporting
+        ? "Schützen Sie den vollständigen Datenbestand mit einem eigenen Passwort."
+        : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort ein.";
+    elements.backupPasswordNotice.textContent = automatic
+      ? "Das Passwort bleibt nur bis zum Schließen von TeO im Arbeitsspeicher. Nach einem Neustart muss es erneut eingegeben werden."
+      : exporting
+        ? "Das Passwort wird nicht gespeichert und kann nicht wiederhergestellt werden. Bewahren Sie es getrennt von der Sicherungsdatei auf."
+        : "Das Passwort wird ausschließlich zur Entschlüsselung dieser Datei verwendet und nicht gespeichert.";
+    elements.backupPasswordConfirmationField.hidden = !encrypting;
+    elements.backupPasswordConfirmation.required = encrypting;
+    elements.backupPassword.minLength = encrypting ? 8 : 1;
+    elements.backupPassword.autocomplete = encrypting
       ? "new-password"
       : "current-password";
-    elements.backupPasswordSubmit.textContent = exporting
-      ? "Verschlüsselt exportieren"
-      : "Sicherung entsperren";
+    elements.backupPasswordSubmit.textContent = automatic
+      ? "Passwort übernehmen"
+      : exporting
+        ? "Verschlüsselt exportieren"
+        : "Sicherung entsperren";
     elements.backupPasswordError.textContent = errorMessage;
     updateBackupPasswordVisibility();
 
@@ -12771,15 +12858,16 @@
   function handleBackupPasswordSubmit(event) {
     event.preventDefault();
     const mode = elements.backupPasswordDialog.dataset.mode;
+    const encrypting = mode === "export" || mode === "automatic";
     const password = elements.backupPassword.value;
-    if (mode === "export" && password.length < 8) {
+    if (encrypting && password.length < 8) {
       elements.backupPasswordError.textContent =
         "Das Sicherungspasswort muss mindestens 8 Zeichen lang sein.";
       elements.backupPassword.focus();
       return;
     }
     if (
-      mode === "export" &&
+      encrypting &&
       password !== elements.backupPasswordConfirmation.value
     ) {
       elements.backupPasswordError.textContent =

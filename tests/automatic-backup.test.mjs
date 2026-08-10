@@ -19,15 +19,21 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
 
   assert.match(html, /id="automaticBackupStatus"/);
   assert.match(html, /id="selectAutomaticBackupDirectoryButton"/);
-  assert.match(html, /id="automaticBackupInterval"/);
   assert.match(html, /id="automaticBackupRetention"/);
+  assert.match(html, /id="automaticBackupEncryption"/);
+  assert.match(html, /id="setAutomaticBackupPasswordButton"/);
   assert.match(appSource, /window\.showDirectoryPicker/);
   assert.match(appSource, /AUTO_BACKUP_DIRECTORY_KEY/);
+  assert.match(appSource, /AUTO_BACKUP_DELAY_MS\s*=\s*2000/);
+  assert.match(
+    appSource,
+    /encryptBackup\(fileContent, automaticBackupPassword\)/,
+  );
   assert.match(appSource, /scheduleAutomaticBackup\(\)/);
   assert.match(styles, /\.automatic-backup-panel\s*\{/);
 });
 
-test("Die automatische Sicherung normalisiert Intervall und Aufbewahrung", async () => {
+test("Die automatische Sicherung normalisiert Verschlüsselung und Aufbewahrung", async () => {
   const app = await loadAppFunctions(["normalizeAutomaticBackupSettings"]);
 
   assert.deepEqual(
@@ -35,7 +41,7 @@ test("Die automatische Sicherung normalisiert Intervall und Aufbewahrung", async
       JSON.stringify(
         app.normalizeAutomaticBackupSettings({
           enabled: true,
-          intervalHours: 6,
+          encrypted: true,
           retentionCount: 45,
           lastBackupAt: "2026-08-03T12:00:00.000Z",
           directoryName: " TeO-Sicherungen ",
@@ -44,7 +50,7 @@ test("Die automatische Sicherung normalisiert Intervall und Aufbewahrung", async
     ),
     {
       enabled: true,
-      intervalHours: 6,
+      encrypted: true,
       retentionCount: 45,
       lastBackupAt: "2026-08-03T12:00:00.000Z",
       directoryName: "TeO-Sicherungen",
@@ -52,13 +58,18 @@ test("Die automatische Sicherung normalisiert Intervall und Aufbewahrung", async
   );
 
   const fallback = app.normalizeAutomaticBackupSettings({
-    intervalHours: 5,
     retentionCount: 0,
     lastBackupAt: "ungültig",
   });
-  assert.equal(fallback.intervalHours, 24);
+  assert.equal(fallback.encrypted, false);
   assert.equal(fallback.retentionCount, 1);
   assert.equal(fallback.lastBackupAt, "");
+});
+
+test("Automatische Sicherungen warten nach Änderungen zwei Sekunden", async () => {
+  const app = await loadAppFunctions(["automaticBackupScheduleDelay"]);
+
+  assert.equal(app.automaticBackupScheduleDelay(Date.now()), 2000);
 });
 
 test("Die Aufbewahrung löscht nur ältere TeO-Autosicherungen", async () => {
@@ -67,6 +78,7 @@ test("Die Aufbewahrung löscht nur ältere TeO-Autosicherungen", async () => {
     "teo-autosicherung_2026-08-03_12-00-00.json",
     "teo-autosicherung_2026-08-03_11-00-00.json",
     "teo-autosicherung_2026-08-03_10-00-00.json",
+    "teo-autosicherung_2026-08-03_09-00-00.verschluesselt.json",
     "teo-datensicherung_2026-08-01_10-00-00.json",
     "notizen.txt",
   ];
@@ -75,7 +87,42 @@ test("Die Aufbewahrung löscht nur ältere TeO-Autosicherungen", async () => {
     JSON.parse(
       JSON.stringify(app.automaticBackupFilesToRemove(files, 2)),
     ),
-    ["teo-autosicherung_2026-08-03_10-00-00.json"],
+    [
+      "teo-autosicherung_2026-08-03_10-00-00.json",
+      "teo-autosicherung_2026-08-03_09-00-00.verschluesselt.json",
+    ],
+  );
+});
+
+test("Automatische Sicherungsdateien kennzeichnen Verschlüsselung im Namen", async () => {
+  const app = await loadAppFunctions(["automaticBackupFilename"]);
+  const date = new Date("2026-08-03T12:00:00.000Z");
+
+  assert.equal(
+    app.automaticBackupFilename(date, false),
+    "teo-autosicherung_2026-08-03_12-00-00.json",
+  );
+  assert.equal(
+    app.automaticBackupFilename(date, true),
+    "teo-autosicherung_2026-08-03_12-00-00.verschluesselt.json",
+  );
+});
+
+test("Automatische Sicherungen verwenden das kompatible verschlüsselte Sicherungsformat", async () => {
+  const app = await loadAppFunctions(["encryptBackup", "decryptBackup"]);
+  const content = JSON.stringify({ format: "test", data: { employees: 3 } });
+  const envelope = await app.encryptBackup(content, "Sicheres Passwort 2026");
+
+  assert.equal(envelope.algorithm, "AES-GCM");
+  assert.equal(envelope.keyDerivation, "PBKDF2-SHA-256");
+  assert.notEqual(envelope.ciphertext, content);
+  assert.equal(
+    await app.decryptBackup(envelope, "Sicheres Passwort 2026"),
+    content,
+  );
+  await assert.rejects(
+    app.decryptBackup(envelope, "Falsches Passwort"),
+    /nicht entschlüsselt/,
   );
 });
 

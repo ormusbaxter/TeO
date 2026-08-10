@@ -18,8 +18,8 @@
   const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
-  const DEFAULT_AUTO_BACKUP_INTERVAL_HOURS = 24;
   const DEFAULT_AUTO_BACKUP_RETENTION_COUNT = 30;
+  const AUTO_BACKUP_DELAY_MS = 2000;
   const AUTO_BACKUP_FILE_PREFIX = "teo-autosicherung_";
   const DEFAULT_VACATION_BASE_DAYS = 30;
   const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
@@ -427,8 +427,10 @@
   let databaseSaveReminderArmed = false;
   let automaticBackupSettings = null;
   let automaticBackupDirectoryHandle = null;
+  let automaticBackupPassword = "";
   let automaticBackupTimer = null;
   let automaticBackupRunning = false;
+  let automaticBackupRequestSequence = 0;
   let automaticBackupRetryAt = 0;
   let automaticBackupNotice = "";
   let browserPersistenceNotice = "";
@@ -536,8 +538,13 @@
     exportEncryptedDataButton: document.querySelector("#exportEncryptedDataButton"),
     backupStatus: document.querySelector("#backupStatus"),
     automaticBackupStatus: document.querySelector("#automaticBackupStatus"),
-    automaticBackupInterval: document.querySelector("#automaticBackupInterval"),
     automaticBackupRetention: document.querySelector("#automaticBackupRetention"),
+    automaticBackupEncryption: document.querySelector(
+      "#automaticBackupEncryption",
+    ),
+    setAutomaticBackupPasswordButton: document.querySelector(
+      "#setAutomaticBackupPasswordButton",
+    ),
     saveAutomaticBackupSettingsButton: document.querySelector(
       "#saveAutomaticBackupSettingsButton",
     ),

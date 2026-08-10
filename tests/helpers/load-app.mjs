@@ -41,6 +41,8 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
     console,
     crypto: globalThis.crypto,
     Blob: globalThis.Blob || class Blob {},
+    atob: globalThis.atob,
+    btoa: globalThis.btoa,
     Date,
     Intl,
     TextDecoder,
@@ -60,6 +62,7 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
     window: {
       TeOProjectMeta: PROJECT_META,
       TeOStateSchema: { validateStateShape },
+      crypto: globalThis.crypto,
       ...(dom ? dom.window : {}),
     },
   };
