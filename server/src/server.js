@@ -691,8 +691,8 @@ function constantTimeStringEqual(left, right) {
 
 // Normale Benutzerkonten dürfen den gesamten fachlichen Datenbestand pflegen.
 // Administratoren vorbehalten sind ausschließlich die Benutzerverwaltung, die
-// Sicherungserinnerung und das Schließverhalten der Dialoge; der Speicherort
-// ist reine Clientkonfiguration und gar nicht Teil des Datenbestands.
+// Sicherungserinnerung, Sicherungsvolumen und das Schließverhalten der Dialoge;
+// der Speicherort ist reine Clientkonfiguration und gar nicht Teil des Datenbestands.
 function isPermittedUserMutation(before, after, userId) {
   if (!isPermittedSettingsMutation(before.settings, after.settings)) return false;
   if (!isPermittedOwnUserMutation(before.users, after.users, userId)) return false;
@@ -713,6 +713,7 @@ function containsRequiredPasswordChange(before, after, userId) {
 
 const ADMIN_ONLY_SETTINGS = [
   "backupReminderDays",
+  "maxBackupFileSizeMb",
   "closeDialogOnOutsideClick",
   "schoolVacationPeriods",
 ];

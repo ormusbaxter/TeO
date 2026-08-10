@@ -67,6 +67,7 @@
         theme: "standard",
         lastBackupAt: "",
         backupReminderDays: DEFAULT_BACKUP_REMINDER_DAYS,
+        maxBackupFileSizeMb: DEFAULT_MAX_BACKUP_FILE_SIZE_MB,
         closeDialogOnOutsideClick: false,
         schoolVacationPeriods: normalizeSchoolVacationPeriods(
           NRW_SCHOOL_VACATION_PERIODS,
@@ -387,6 +388,14 @@
           1,
           365,
           DEFAULT_BACKUP_REMINDER_DAYS,
+        ),
+        maxBackupFileSizeMb: Math.round(
+          clampNumber(
+            parsed.settings?.maxBackupFileSizeMb,
+            MIN_BACKUP_FILE_SIZE_MB,
+            MAX_BACKUP_FILE_SIZE_MB,
+            DEFAULT_MAX_BACKUP_FILE_SIZE_MB,
+          ),
         ),
         // Standardmaessig aus: Ein Klick neben den Dialog schliesst ihn nicht,
         // damit versehentliches Schliessen ausgeschlossen ist.

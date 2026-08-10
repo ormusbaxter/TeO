@@ -502,6 +502,20 @@
                     <span>Tagen</span>
                   </span>
                 </label>
+                <label class="settings-field">
+                  <span>Maximale Sicherungsgröße</span>
+                  <span class="input-suffix">
+                    <input
+                      id="settingsMaxBackupFileSizeMb"
+                      type="number"
+                      min="1"
+                      max="100"
+                      step="1"
+                    />
+                    <span>MB</span>
+                  </span>
+                  <small class="field-hint">Ab 90&nbsp;% zeigt TeO eine Volumenwarnung.</small>
+                </label>
                 <button
                   class="button button-primary"
                   id="saveGeneralSettingsButton"

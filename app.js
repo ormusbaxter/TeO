@@ -16,9 +16,12 @@
   const PROJECT_VERSION = PROJECT_META.version;
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
-  const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
+  const DEFAULT_MAX_BACKUP_FILE_SIZE_MB = 20;
+  const MIN_BACKUP_FILE_SIZE_MB = 1;
+  const MAX_BACKUP_FILE_SIZE_MB = 100;
+  const BACKUP_VOLUME_WARNING_RATIO = 0.9;
   const AUTO_BACKUP_DELAY_MS = 2000;
   const AUTO_BACKUP_FILENAME = "teo-autosicherung.json";
   const DEFAULT_VACATION_BASE_DAYS = 30;
@@ -578,6 +581,9 @@
     settingsBackupReminderDays: document.querySelector(
       "#settingsBackupReminderDays",
     ),
+    settingsMaxBackupFileSizeMb: document.querySelector(
+      "#settingsMaxBackupFileSizeMb",
+    ),
     settingsCloseDialogOnOutsideClick: document.querySelector(
       "#settingsCloseDialogOnOutsideClick",
     ),
@@ -1055,6 +1061,7 @@
         theme: "standard",
         lastBackupAt: "",
         backupReminderDays: DEFAULT_BACKUP_REMINDER_DAYS,
+        maxBackupFileSizeMb: DEFAULT_MAX_BACKUP_FILE_SIZE_MB,
         closeDialogOnOutsideClick: false,
         schoolVacationPeriods: normalizeSchoolVacationPeriods(
           NRW_SCHOOL_VACATION_PERIODS,
@@ -1375,6 +1382,14 @@
           1,
           365,
           DEFAULT_BACKUP_REMINDER_DAYS,
+        ),
+        maxBackupFileSizeMb: Math.round(
+          clampNumber(
+            parsed.settings?.maxBackupFileSizeMb,
+            MIN_BACKUP_FILE_SIZE_MB,
+            MAX_BACKUP_FILE_SIZE_MB,
+            DEFAULT_MAX_BACKUP_FILE_SIZE_MB,
+          ),
         ),
         // Standardmaessig aus: Ein Klick neben den Dialog schliesst ihn nicht,
         // damit versehentliches Schliessen ausgeschlossen ist.
@@ -12953,6 +12968,12 @@
           2,
         );
       }
+      const volume = assessBackupContent(fileContent);
+      if (volume.exceeded) {
+        const error = new Error(backupVolumeMessage(volume));
+        error.code = "backup_volume_exceeded";
+        throw error;
+      }
       await writeAutomaticBackupFile(
         automaticBackupDirectoryHandle,
         AUTO_BACKUP_FILENAME,
@@ -12974,14 +12995,19 @@
         automaticBackupRequestSequence !== requestSequence;
       renderAll();
       showToast(
-        `Automatische Datensicherung „${AUTO_BACKUP_FILENAME}“ wurde aktualisiert.`,
+        volume.warning
+          ? backupVolumeMessage(volume)
+          : `Automatische Datensicherung „${AUTO_BACKUP_FILENAME}“ wurde aktualisiert.`,
+        volume.warning ? "warning" : undefined,
       );
       return true;
     } catch (error) {
       console.error("Die automatische Datensicherung ist fehlgeschlagen.", error);
       automaticBackupRetryAt = Date.now() + 60 * 60 * 1000;
       automaticBackupNotice =
-        "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
+        error?.code === "backup_volume_exceeded"
+          ? error.message
+          : "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
       showToast(automaticBackupNotice, "error");
       return false;
     } finally {
@@ -13003,6 +13029,42 @@
       await writable.abort?.();
       throw error;
     }
+  }
+
+  function configuredBackupMaxBytes(settings = state?.settings) {
+    const configuredMb = Number(settings?.maxBackupFileSizeMb);
+    const maxMb =
+      Number.isInteger(configuredMb) &&
+      configuredMb >= MIN_BACKUP_FILE_SIZE_MB &&
+      configuredMb <= MAX_BACKUP_FILE_SIZE_MB
+        ? configuredMb
+        : DEFAULT_MAX_BACKUP_FILE_SIZE_MB;
+    return maxMb * 1024 * 1024;
+  }
+
+  function backupVolumeAssessment(sizeBytes, settings = state?.settings) {
+    const bytes = Math.max(0, Number(sizeBytes) || 0);
+    const maxBytes = configuredBackupMaxBytes(settings);
+    const ratio = maxBytes ? bytes / maxBytes : 0;
+    return {
+      sizeBytes: bytes,
+      maxBytes,
+      usagePercent: Math.round(ratio * 100),
+      warning: ratio >= BACKUP_VOLUME_WARNING_RATIO,
+      exceeded: bytes > maxBytes,
+    };
+  }
+
+  function backupVolumeMessage(assessment) {
+    return assessment.exceeded
+      ? `Die Sicherungsdatei ist ${formatStorageSize(assessment.sizeBytes)} groß und überschreitet das eingestellte Maximum von ${formatStorageSize(assessment.maxBytes)}.`
+      : `Die Sicherungsdatei nutzt ${assessment.usagePercent} % des eingestellten Volumens (${formatStorageSize(assessment.sizeBytes)} von ${formatStorageSize(assessment.maxBytes)}).`;
+  }
+
+  function assessBackupContent(fileContent) {
+    return backupVolumeAssessment(
+      new TextEncoder().encode(fileContent).byteLength,
+    );
   }
 
   async function exportDatabase() {
@@ -13140,6 +13202,11 @@
     if (encrypted) {
       fileContent = JSON.stringify(await encryptBackup(fileContent, password), null, 2);
     }
+    const volume = assessBackupContent(fileContent);
+    if (volume.exceeded) {
+      showToast(backupVolumeMessage(volume), "error");
+      return false;
+    }
     downloadTextFile(
       `teo-${prefix}_${fileTimestamp(exportedAt)}${
         encrypted ? ".verschluesselt" : ""
@@ -13158,11 +13225,15 @@
     renderAll();
     if (!silent) {
       showToast(
-        encrypted
-          ? "Die verschlüsselte Datensicherung wurde exportiert."
-          : "Die vollständige Datensicherung wurde exportiert.",
+        volume.warning
+          ? backupVolumeMessage(volume)
+          : encrypted
+            ? "Die verschlüsselte Datensicherung wurde exportiert."
+            : "Die vollständige Datensicherung wurde exportiert.",
+        volume.warning ? "warning" : undefined,
       );
     }
+    return true;
   }
 
   function downloadTextFile(filename, content, type = "text/plain;charset=utf-8") {
@@ -13300,10 +13371,12 @@
     event.target.value = "";
     if (!file) return;
 
-    if (file.size > MAX_BACKUP_FILE_SIZE) {
-      showToast("Die Sicherungsdatei ist größer als 20 MB und kann nicht importiert werden.", "error");
+    const volume = backupVolumeAssessment(file.size);
+    if (volume.exceeded) {
+      showToast(backupVolumeMessage(volume), "error");
       return;
     }
+    if (volume.warning) showToast(backupVolumeMessage(volume), "warning");
 
     let importedState;
     try {
@@ -13335,10 +13408,11 @@
       acceptLabel: "Daten importieren",
       tone: "primary",
       callback: async () => {
-        await createAndDownloadBackup({
+        const recoveryBackupCreated = await createAndDownloadBackup({
           prefix: "vor-import",
           silent: true,
         });
+        if (!recoveryBackupCreated) return;
         await importDatabase(importedState);
       },
     });
@@ -13348,10 +13422,12 @@
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    if (file.size > MAX_BACKUP_FILE_SIZE) {
-      showToast("Die Sicherungsdatei ist größer als 20 MB.", "error");
+    const volume = backupVolumeAssessment(file.size);
+    if (volume.exceeded) {
+      showToast(backupVolumeMessage(volume), "error");
       return;
     }
+    if (volume.warning) showToast(backupVolumeMessage(volume), "warning");
     try {
       const checkedState = await readBackupFile(file);
       if (!checkedState) return;
@@ -13383,9 +13459,9 @@
         `Bitte wählen Sie die Datei „${AUTO_BACKUP_FILENAME}“ aus.`;
       return;
     }
-    if (file.size > MAX_BACKUP_FILE_SIZE) {
-      elements.startupBackupStatus.textContent =
-        "Die Sicherungsdatei ist größer als 20 MB und kann nicht geladen werden.";
+    const volume = backupVolumeAssessment(file.size);
+    if (volume.exceeded) {
+      elements.startupBackupStatus.textContent = backupVolumeMessage(volume);
       return;
     }
 
@@ -13416,7 +13492,12 @@
       document.body.classList.remove("is-auth-locked");
       applyAccessControl();
       scheduleAutomaticBackup();
-      showToast("Der aktuelle Datenbestand wurde aus teo-autosicherung.json geladen.");
+      showToast(
+        volume.warning
+          ? backupVolumeMessage(volume)
+          : "Der aktuelle Datenbestand wurde aus teo-autosicherung.json geladen.",
+        volume.warning ? "warning" : undefined,
+      );
     } catch (error) {
       console.warn("Startabgleich konnte nicht abgeschlossen werden.", error);
       elements.startupBackupStatus.textContent =
@@ -13430,6 +13511,9 @@
   function renderSettings() {
     elements.settingsBackupReminderDays.value = String(
       state.settings.backupReminderDays,
+    );
+    elements.settingsMaxBackupFileSizeMb.value = String(
+      state.settings.maxBackupFileSizeMb,
     );
     elements.settingsCloseDialogOnOutsideClick.value = state.settings
       .closeDialogOnOutsideClick
@@ -13849,8 +13933,12 @@
   async function saveGeneralSettings() {
     if (!requireAdmin()) return;
 
+    const previousMaxBackupFileSizeMb = state.settings.maxBackupFileSizeMb;
     const backupReminderDays = Number(
       elements.settingsBackupReminderDays.value,
+    );
+    const maxBackupFileSizeMb = Number(
+      elements.settingsMaxBackupFileSizeMb.value,
     );
     if (
       !Number.isInteger(backupReminderDays) ||
@@ -13865,15 +13953,36 @@
       return;
     }
 
-    if (backupReminderDays === state.settings.backupReminderDays) {
+    if (
+      !Number.isInteger(maxBackupFileSizeMb) ||
+      maxBackupFileSizeMb < MIN_BACKUP_FILE_SIZE_MB ||
+      maxBackupFileSizeMb > MAX_BACKUP_FILE_SIZE_MB
+    ) {
+      showToast(
+        `Bitte für die maximale Sicherungsgröße einen Wert zwischen ${MIN_BACKUP_FILE_SIZE_MB} und ${MAX_BACKUP_FILE_SIZE_MB} MB eingeben.`,
+        "error",
+      );
+      elements.settingsMaxBackupFileSizeMb.focus();
+      return;
+    }
+
+    if (
+      backupReminderDays === state.settings.backupReminderDays &&
+      maxBackupFileSizeMb === state.settings.maxBackupFileSizeMb
+    ) {
       showToast("Die Einstellungen sind bereits aktuell.");
       return;
     }
 
     const committed = await commitStateMutation(() => {
       state.settings.backupReminderDays = backupReminderDays;
+      state.settings.maxBackupFileSizeMb = maxBackupFileSizeMb;
     });
     if (committed) {
+      if (maxBackupFileSizeMb !== previousMaxBackupFileSizeMb) {
+        automaticBackupRetryAt = 0;
+        scheduleAutomaticBackup();
+      }
       showToast("Einstellungen wurden gespeichert.");
     }
   }
@@ -14089,7 +14198,7 @@
     }
 
     const validation = window.TeOStateSchema?.validateStateShape(normalizedState, {
-      maxBytes: MAX_BACKUP_FILE_SIZE,
+      maxBytes: configuredBackupMaxBytes(),
       requireAdmin: normalizedState.users.length > 0,
       maxAuditEntries: MAX_AUDIT_LOG_ENTRIES,
     });

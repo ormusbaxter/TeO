@@ -15,9 +15,12 @@
   const PROJECT_VERSION = PROJECT_META.version;
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
-  const MAX_BACKUP_FILE_SIZE = 20 * 1024 * 1024;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
+  const DEFAULT_MAX_BACKUP_FILE_SIZE_MB = 20;
+  const MIN_BACKUP_FILE_SIZE_MB = 1;
+  const MAX_BACKUP_FILE_SIZE_MB = 100;
+  const BACKUP_VOLUME_WARNING_RATIO = 0.9;
   const AUTO_BACKUP_DELAY_MS = 2000;
   const AUTO_BACKUP_FILENAME = "teo-autosicherung.json";
   const DEFAULT_VACATION_BASE_DAYS = 30;
@@ -576,6 +579,9 @@
     ),
     settingsBackupReminderDays: document.querySelector(
       "#settingsBackupReminderDays",
+    ),
+    settingsMaxBackupFileSizeMb: document.querySelector(
+      "#settingsMaxBackupFileSizeMb",
     ),
     settingsCloseDialogOnOutsideClick: document.querySelector(
       "#settingsCloseDialogOnOutsideClick",

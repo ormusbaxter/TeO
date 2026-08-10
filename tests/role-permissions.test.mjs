@@ -71,6 +71,7 @@ function createServerState(overrides = {}) {
     settings: {
       theme: "standard",
       backupReminderDays: 14,
+      maxBackupFileSizeMb: 20,
       closeDialogOnOutsideClick: false,
       schoolVacationPeriods: [
         { start: "2026-07-20", end: "2026-09-01", label: "Sommerferien" },
@@ -144,6 +145,9 @@ test("Normale Konten dürfen Sicherungserinnerung und fremde Konten nicht änder
   const forbidden = {
     Sicherungserinnerung: (next) => {
       next.settings.backupReminderDays = 30;
+    },
+    Sicherungsvolumen: (next) => {
+      next.settings.maxBackupFileSizeMb = 100;
     },
     "Schließverhalten der Dialoge": (next) => {
       next.settings.closeDialogOnOutsideClick = true;
