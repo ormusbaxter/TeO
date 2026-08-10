@@ -54,6 +54,8 @@ test("Leere Jahresübersichten enthalten nur Beschäftigte und Kalendermerkmale"
   const markup = app.renderBlankVacationYearPrintDocument(active);
   assert.match(markup, /Leere Jahresübersicht/);
   assert.match(markup, /vacation-holiday/);
+  assert.match(markup, /vacation-blank-school-vacation-swatch/);
+  assert.match(markup, /Schulferien NRW/);
   assert.match(markup, /is-own-weekend/);
   assert.doesNotMatch(markup, /vacation-year-entry planner-entry-/);
 });
@@ -68,6 +70,10 @@ test("Jede leere Jahresübersicht ist als eigene DIN-A4-Seite definiert", async 
   assert.match(
     printCss,
     /@page vacation-blank-year\s*{[^}]*size: A4 landscape;[^}]*margin: 8mm;/s,
+  );
+  assert.match(
+    printCss,
+    /\.vacation-blank-school-vacation-swatch\s*{[^}]*#e7b900;/s,
   );
   assert.match(
     printCss,
