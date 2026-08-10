@@ -501,7 +501,6 @@
     sidebarRevisionLabel: document.querySelector("#sidebarRevisionLabel"),
     sidebarSchemaLabel: document.querySelector("#sidebarSchemaLabel"),
     sidebarSyncLabel: document.querySelector("#sidebarSyncLabel"),
-    dashboardStats: document.querySelector("#dashboardStats"),
     dashboardTrainingProgress: document.querySelector("#dashboardTrainingProgress"),
     dashboardGreeting: document.querySelector("#dashboardGreeting"),
     projectBuildLabel: document.querySelector("#projectBuildLabel"),
