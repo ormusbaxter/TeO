@@ -71,6 +71,18 @@ test("Jede leere Jahresübersicht ist als eigene DIN-A4-Seite definiert", async 
   );
   assert.match(
     printCss,
-    /\.vacation-blank-year-document\s*{[^}]*height: 194mm;[^}]*break-after: page;/s,
+    /\.vacation-blank-year-document\s*{[^}]*height: 194mm;/s,
+  );
+  assert.match(
+    printCss,
+    /\.vacation-blank-year-document \+ \.vacation-blank-year-document\s*{[^}]*break-before: page;[^}]*page-break-before: always;/s,
+  );
+  assert.doesNotMatch(
+    printCss,
+    /\.vacation-blank-year-document\s*{[^}]*break-after:/s,
+  );
+  assert.match(
+    printCss,
+    /body\.print-vacation-blank-year > #trainingMatrixDialog\s*{[^}]*display: none !important;/s,
   );
 });

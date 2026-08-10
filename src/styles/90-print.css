@@ -95,13 +95,11 @@
     width: 100%;
     height: 194mm;
     overflow: hidden;
-    break-after: page;
-    page-break-after: always;
   }
 
-  .vacation-blank-year-document:last-child {
-    break-after: auto;
-    page-break-after: auto;
+  .vacation-blank-year-document + .vacation-blank-year-document {
+    break-before: page;
+    page-break-before: always;
   }
 
   .vacation-blank-year-header {
@@ -427,7 +425,8 @@
   body.print-appointment > #trainingMatrixDialog,
   body.print-employee-dossier > #trainingMatrixDialog,
   body.print-weekend-overview > #trainingMatrixDialog,
-  body.print-vacation-overview > #trainingMatrixDialog {
+  body.print-vacation-overview > #trainingMatrixDialog,
+  body.print-vacation-blank-year > #trainingMatrixDialog {
     display: none !important;
   }
 
