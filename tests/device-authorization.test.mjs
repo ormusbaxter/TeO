@@ -142,3 +142,70 @@ test("Mitarbeiter der Geräteeinweisung sind nach Nachname und Vorname sortiert"
     "Der sichtbare Optionswert muss mit dem Nachnamen beginnen, damit die native Tastatursuche danach springt.",
   );
 });
+
+test("Mitarbeiterübersicht führt alle Geräte mit und ohne Einweisung auf", async () => {
+  const app = await loadAppFunctions(["getEmployeeDeviceOverview"]);
+  const employee = createEmployee("employee-overview");
+  const devices = [
+    {
+      id: "device-zulu",
+      manufacturer: "Hersteller Z",
+      productName: "Zulu",
+      category: "Beatmung",
+      currentInventory: false,
+      annex1: false,
+    },
+    {
+      id: "device-alpha",
+      manufacturer: "Hersteller A",
+      productName: "Alpha",
+      category: "Monitoring",
+      currentInventory: true,
+      annex1: false,
+    },
+  ];
+  app.setState(
+    createMinimalState({
+      employees: [employee],
+      devices,
+      deviceInstructions: [
+        {
+          id: "older-instruction",
+          deviceId: "device-zulu",
+          date: "2025-03-01",
+          createdAt: "2025-03-01T10:00:00.000Z",
+          instructorType: "manufacturer",
+          instructorName: "Hersteller Z",
+          participants: [{ employeeId: employee.id, wasMedicalProductsOfficer: false }],
+        },
+        {
+          id: "latest-instruction",
+          deviceId: "device-zulu",
+          date: "2026-04-15",
+          createdAt: "2026-04-15T10:00:00.000Z",
+          instructorType: "employee",
+          instructorName: "Max Mustermann",
+          participants: [{ employeeId: employee.id, wasMedicalProductsOfficer: false }],
+        },
+      ],
+    }),
+  );
+
+  const overview = JSON.parse(
+    JSON.stringify(app.getEmployeeDeviceOverview(employee.id)),
+  );
+
+  assert.deepEqual(
+    overview.map(({ device, isInstructed }) => ({
+      deviceId: device.id,
+      isInstructed,
+    })),
+    [
+      { deviceId: "device-alpha", isInstructed: false },
+      { deviceId: "device-zulu", isInstructed: true },
+    ],
+    "Auch Geräte außerhalb des aktuellen Bestands müssen erscheinen.",
+  );
+  assert.equal(overview[1].instructions.length, 2);
+  assert.equal(overview[1].latestInstruction.id, "latest-instruction");
+});

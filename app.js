@@ -854,6 +854,18 @@
     deviceInstructionHistoryContent: document.querySelector(
       "#deviceInstructionHistoryContent",
     ),
+    deviceEmployeeOverviewDialog: document.querySelector(
+      "#deviceEmployeeOverviewDialog",
+    ),
+    deviceEmployeeOverviewTitle: document.querySelector(
+      "#deviceEmployeeOverviewTitle",
+    ),
+    deviceEmployeeOverviewSubtitle: document.querySelector(
+      "#deviceEmployeeOverviewSubtitle",
+    ),
+    deviceEmployeeOverviewContent: document.querySelector(
+      "#deviceEmployeeOverviewContent",
+    ),
     attendanceDialog: document.querySelector("#attendanceDialog"),
     attendanceForm: document.querySelector("#attendanceForm"),
     attendanceMeetingMeta: document.querySelector("#attendanceMeetingMeta"),
@@ -2934,6 +2946,10 @@
       "click",
       handleDeviceHistoryAction,
     );
+    elements.deviceEmployeeOverviewContent.addEventListener(
+      "click",
+      handleDeviceEmployeeOverviewAction,
+    );
   }
 
   function bindDialogs() {
@@ -3116,6 +3132,7 @@
         elements.appointmentDialog,
         elements.deviceDialog,
         elements.deviceInstructionDialog,
+        elements.deviceEmployeeOverviewDialog,
         elements.deviceInstructionHistoryDialog,
         elements.attendanceDialog,
         elements.meetingStatsDialog,
@@ -9477,12 +9494,19 @@
                 (employee) => `
                   <tr>
                     <th scope="row">
-                      <strong>${escapeHtml(fullName(employee))}</strong>
-                      ${
-                        employee.qualifications.medizinproduktebeauftragter
-                          ? '<small class="device-mpo-status is-qualified">Gerätebeauftragte/r</small>'
-                          : ""
-                      }
+                      <button
+                        class="device-matrix-employee"
+                        type="button"
+                        data-device-employee-overview="${employee.id}"
+                        aria-label="Geräteübersicht für ${escapeHtml(fullName(employee))} anzeigen"
+                      >
+                        <strong>${escapeHtml(fullName(employee))}</strong>
+                        ${
+                          employee.qualifications.medizinproduktebeauftragter
+                            ? '<small class="device-mpo-status is-qualified">Gerätebeauftragte/r</small>'
+                            : ""
+                        }
+                      </button>
                     </th>
                     ${devices
                       .map((device) =>
@@ -9698,6 +9722,15 @@
   }
 
   function handleDeviceMatrixAction(event) {
+    const employeeButton = event.target.closest(
+      "[data-device-employee-overview]",
+    );
+    if (employeeButton) {
+      openDeviceEmployeeOverview(
+        employeeButton.dataset.deviceEmployeeOverview,
+      );
+      return;
+    }
     const button = event.target.closest(
       "[data-device-history-employee][data-device-history-device]",
     );
@@ -9712,6 +9745,17 @@
     const button = event.target.closest("[data-delete-device-instruction]");
     if (!button) return;
     requestDeleteDeviceInstruction(button.dataset.deleteDeviceInstruction);
+  }
+
+  function handleDeviceEmployeeOverviewAction(event) {
+    const button = event.target.closest(
+      "[data-device-history-employee][data-device-history-device]",
+    );
+    if (!button) return;
+    openDeviceInstructionHistory(
+      button.dataset.deviceHistoryEmployee,
+      button.dataset.deviceHistoryDevice,
+    );
   }
 
   function handleDeviceInstructionListAction(event) {
@@ -10294,6 +10338,99 @@
           ? `Einweisung wurde für ${teilnehmerText} gespeichert.`
           : `${instructions.length} Einweisungen wurden für ${teilnehmerText} gespeichert.`,
     );
+  }
+
+  function getEmployeeDeviceOverview(employeeId) {
+    return [...state.devices]
+      .sort(
+        (a, b) =>
+          a.productName.localeCompare(b.productName, "de") ||
+          a.manufacturer.localeCompare(b.manufacturer, "de"),
+      )
+      .map((device) => {
+        const instructions = state.deviceInstructions
+          .filter(
+            (instruction) =>
+              instruction.deviceId === device.id &&
+              instruction.participants.some(
+                (participant) => participant.employeeId === employeeId,
+              ),
+          )
+          .sort(
+            (a, b) =>
+              b.date.localeCompare(a.date) ||
+              String(b.createdAt || "").localeCompare(
+                String(a.createdAt || ""),
+              ),
+          );
+        return {
+          device,
+          instructions,
+          latestInstruction: instructions[0] || null,
+          isInstructed: instructions.length > 0,
+        };
+      });
+  }
+
+  function openDeviceEmployeeOverview(employeeId) {
+    const employee = getEmployee(employeeId);
+    if (!employee) return;
+    const overview = getEmployeeDeviceOverview(employeeId);
+    const instructedCount = overview.filter((item) => item.isInstructed).length;
+    elements.deviceEmployeeOverviewTitle.textContent = fullName(employee);
+    elements.deviceEmployeeOverviewSubtitle.textContent = overview.length
+      ? `${instructedCount} von ${overview.length} Geräten mit dokumentierter Einweisung`
+      : "Keine Geräte angelegt";
+    elements.deviceEmployeeOverviewContent.innerHTML = overview.length
+      ? `
+        <div class="device-employee-overview-summary" aria-label="Zusammenfassung">
+          <span><strong>${overview.length}</strong> Geräte gesamt</span>
+          <span class="is-complete"><strong>${instructedCount}</strong> eingewiesen</span>
+          <span class="is-missing"><strong>${overview.length - instructedCount}</strong> nicht eingewiesen</span>
+        </div>
+        <div class="device-employee-overview-list">
+          ${overview
+            .map(({ device, instructions, latestInstruction, isInstructed }) => {
+              const details = isInstructed
+                ? `Zuletzt am ${formatDate(latestInstruction.date)} · Einweisende Person: ${escapeHtml(latestInstruction.instructorName)}`
+                : "Für dieses Gerät ist keine Einweisung dokumentiert.";
+              const content = `
+                <span class="device-employee-overview-icon" aria-hidden="true">
+                  <svg><use href="#icon-device"></use></svg>
+                </span>
+                <span class="device-employee-overview-device">
+                  <strong>${escapeHtml(deviceLabel(device))}</strong>
+                  <small>${escapeHtml(device.category)}${device.currentInventory ? "" : " · nicht mehr im Bestand"}</small>
+                  <small>${details}</small>
+                </span>
+                <span class="status-badge ${isInstructed ? "" : "inactive"}">
+                  ${isInstructed ? "Eingewiesen" : "Nicht eingewiesen"}
+                </span>
+                ${instructions.length > 1 ? `<span class="device-employee-overview-count">${instructions.length} Nachweise</span>` : ""}
+              `;
+              return isInstructed
+                ? `
+                  <button
+                    class="device-employee-overview-row"
+                    type="button"
+                    data-device-history-employee="${employeeId}"
+                    data-device-history-device="${device.id}"
+                    aria-label="Einweisungsverlauf für ${escapeHtml(deviceLabel(device))} anzeigen"
+                  >${content}</button>
+                `
+                : `<article class="device-employee-overview-row is-missing">${content}</article>`;
+            })
+            .join("")}
+        </div>
+      `
+      : renderEmptyState({
+          title: "Noch keine Geräte",
+          text: "Nach dem Anlegen eines Geräts erscheint hier der Einweisungsstatus.",
+          compact: true,
+        });
+    if (!elements.deviceEmployeeOverviewDialog.open) {
+      elements.deviceEmployeeOverviewDialog.showModal();
+    }
   }
 
   function openDeviceInstructionHistory(employeeId, deviceId) {

@@ -5874,6 +5874,26 @@ body.is-device-matrix-maximized {
   font-weight: 750;
 }
 
+.device-matrix-employee {
+  display: block;
+  width: 100%;
+  padding: 7px 8px;
+  cursor: pointer;
+  text-align: left;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.device-matrix-employee:hover {
+  background: var(--blue-50);
+}
+
+.device-matrix-employee:focus-visible {
+  outline: 2px solid var(--blue-700);
+  outline-offset: 1px;
+}
+
 .device-matrix-table thead th .completion-progress,
 .training-matrix-table thead th .completion-progress {
   display: inline-block;
@@ -6111,6 +6131,103 @@ button.device-matrix-status {
   gap: 8px;
 }
 
+.device-employee-overview-summary {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.device-employee-overview-summary span {
+  padding: 7px 10px;
+  color: var(--slate-600);
+  font-size: 0.64rem;
+  border-radius: 999px;
+  background: var(--slate-100);
+}
+
+.device-employee-overview-summary span.is-complete {
+  color: var(--green-700);
+  background: var(--green-100);
+}
+
+.device-employee-overview-summary span.is-missing {
+  color: var(--slate-700);
+  background: var(--slate-100);
+}
+
+.device-employee-overview-list {
+  display: grid;
+  gap: 8px;
+}
+
+.device-employee-overview-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto auto;
+  width: 100%;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  background: white;
+}
+
+button.device-employee-overview-row {
+  cursor: pointer;
+}
+
+button.device-employee-overview-row:hover {
+  border-color: #a8c8f4;
+  background: var(--blue-50);
+}
+
+.device-employee-overview-row.is-missing {
+  background: var(--slate-50);
+}
+
+.device-employee-overview-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--blue-700);
+  border-radius: 9px;
+  background: var(--blue-100);
+}
+
+.device-employee-overview-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.device-employee-overview-device strong,
+.device-employee-overview-device small {
+  display: block;
+}
+
+.device-employee-overview-device strong {
+  color: var(--slate-800);
+  font-size: 0.72rem;
+}
+
+.device-employee-overview-device small {
+  margin-top: 3px;
+  color: var(--slate-500);
+  font-size: 0.62rem;
+  line-height: 1.4;
+}
+
+.device-employee-overview-count {
+  color: var(--slate-500);
+  font-size: 0.6rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .device-instruction-log-section {
   margin-top: 24px;
 }
@@ -6254,8 +6371,13 @@ button.device-matrix-status {
 
   .device-participant-row,
   .device-instruction-log-row,
+  .device-employee-overview-row,
   .device-history-row {
     grid-template-columns: 1fr;
+  }
+
+  .device-employee-overview-icon {
+    display: none;
   }
 
   .device-instruction-log-actions {

@@ -853,6 +853,18 @@
     deviceInstructionHistoryContent: document.querySelector(
       "#deviceInstructionHistoryContent",
     ),
+    deviceEmployeeOverviewDialog: document.querySelector(
+      "#deviceEmployeeOverviewDialog",
+    ),
+    deviceEmployeeOverviewTitle: document.querySelector(
+      "#deviceEmployeeOverviewTitle",
+    ),
+    deviceEmployeeOverviewSubtitle: document.querySelector(
+      "#deviceEmployeeOverviewSubtitle",
+    ),
+    deviceEmployeeOverviewContent: document.querySelector(
+      "#deviceEmployeeOverviewContent",
+    ),
     attendanceDialog: document.querySelector("#attendanceDialog"),
     attendanceForm: document.querySelector("#attendanceForm"),
     attendanceMeetingMeta: document.querySelector("#attendanceMeetingMeta"),
