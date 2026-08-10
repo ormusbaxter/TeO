@@ -24,6 +24,8 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
   assert.match(html, /id="setAutomaticBackupPasswordButton"/);
   assert.match(html, /id="automaticBackupRecoveryDialog"/);
   assert.match(html, /id="automaticBackupRecoveryKey"/);
+  assert.match(html, /id="settingsMaxBackupFileSizeMb"/);
+  assert.match(html, /Ab 90(?:&nbsp;|\s)*%/);
   assert.match(
     html,
     /id="startupBackupDialog"[^>]*[\s\S]*?data-persistent-dialog/,
@@ -61,6 +63,40 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
     /!isMariaDbMode\(\) && !startupBackupSynchronized/,
   );
   assert.match(styles, /\.automatic-backup-panel\s*\{/);
+});
+
+test("Das Sicherungsvolumen warnt ab 90 Prozent der einstellbaren Grenze", async () => {
+  const app = await loadAppFunctions([
+    "configuredBackupMaxBytes",
+    "backupVolumeAssessment",
+  ]);
+  const settings = { maxBackupFileSizeMb: 20 };
+
+  assert.equal(app.configuredBackupMaxBytes(settings), 20 * 1024 * 1024);
+  assert.equal(
+    app.configuredBackupMaxBytes({ maxBackupFileSizeMb: 2048 }),
+    20 * 1024 * 1024,
+  );
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(app.backupVolumeAssessment(18 * 1024 * 1024, settings)),
+    ),
+    {
+      sizeBytes: 18 * 1024 * 1024,
+      maxBytes: 20 * 1024 * 1024,
+      usagePercent: 90,
+      warning: true,
+      exceeded: false,
+    },
+  );
+  assert.equal(
+    app.backupVolumeAssessment(17 * 1024 * 1024, settings).warning,
+    false,
+  );
+  assert.equal(
+    app.backupVolumeAssessment(21 * 1024 * 1024, settings).exceeded,
+    true,
+  );
 });
 
 test("Der Startabgleich weist ältere Sicherungsstände ab", async () => {

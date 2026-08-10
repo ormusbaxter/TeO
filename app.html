@@ -1448,6 +1448,20 @@
                     <span>Tagen</span>
                   </span>
                 </label>
+                <label class="settings-field">
+                  <span>Maximale Sicherungsgröße</span>
+                  <span class="input-suffix">
+                    <input
+                      id="settingsMaxBackupFileSizeMb"
+                      type="number"
+                      min="1"
+                      max="100"
+                      step="1"
+                    />
+                    <span>MB</span>
+                  </span>
+                  <small class="field-hint">Ab 90&nbsp;% zeigt TeO eine Volumenwarnung.</small>
+                </label>
                 <button
                   class="button button-primary"
                   id="saveGeneralSettingsButton"
@@ -1979,6 +1993,7 @@
 <p>Optional kann die Sicherung mit Passwort, PBKDF2 und AES-GCM verschlüsselt werden. TeO verwendet dafür einen eigenen Passwortdialog mit Wiederholung, Eingabeprüfung und optionaler Passwortanzeige. Das Passwort kann nicht aus der Datei wiederhergestellt werden.</p>
 <h3 id="hilfe-automatische-sicherung-in-einen-ordner">Automatische Sicherung in einen Ordner</h3>
 <p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung erneut. Jede Sicherung überschreibt dieselbe Datei <code>teo-autosicherung.json</code>. Der Dateiname bleibt auch bei aktivierter Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.</p>
+<p>Administratoren können unter <strong>Einstellungen → Sicherungserinnerung</strong> die maximale Größe einer Sicherungsdatei zwischen 1 und 100 MB festlegen. Der Standardwert beträgt 20 MB. Die Grenze gilt beim Erstellen, Prüfen, Startabgleich und Import. Ab 90 % des eingestellten Volumens zeigt TeO eine Warnung mit aktueller Dateigröße und Grenzwert an. Wird die Grenze überschritten, muss sie vor der nächsten Sicherung oder dem Import erhöht werden.</p>
 <p>Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
 <p>Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Ein bereits vorhandenes Konto ohne Schlüsselhülle benötigt ihn einmalig beim ersten Login. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.</p>
 <p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
@@ -2028,7 +2043,7 @@
 <p>Der verpflichtende Abgleich verhindert, dass versehentlich mit einem veralteten Browserstand weitergearbeitet wird. Ohne gültige Sicherungsdatei kann die lokale Anwendung deshalb nur abgemeldet, aber nicht geöffnet werden. Falls die Datei nicht erreichbar ist, prüfen Sie die Netzwerkverbindung, den freigegebenen Ordner und Ihre Zugriffsrechte.</p>
 <h3 id="hilfe-warum-wird-teo-autosicherung-json-beim-start-abgelehnt">Warum wird <code>teo-autosicherung.json</code> beim Start abgelehnt?</h3>
 <p>TeO lehnt die Datei ab, wenn sie:</p>
-<ul><li>anders heißt oder größer als 20 MB ist</li><li>kein vollständiges und gültiges TeO-Sicherungsformat enthält</li><li>beschädigt oder manuell unvollständig bearbeitet wurde</li><li>aus einer neueren, nicht kompatiblen TeO-Version stammt</li><li>älter als die zuletzt in diesem Browser erfolgreich erstellte Autosicherung ist</li><li>verschlüsselt ist und nicht entschlüsselt werden kann</li></ul>
+<ul><li>anders heißt oder das unter <strong>Einstellungen → Sicherungserinnerung</strong> festgelegte Maximalvolumen überschreitet</li><li>kein vollständiges und gültiges TeO-Sicherungsformat enthält</li><li>beschädigt oder manuell unvollständig bearbeitet wurde</li><li>aus einer neueren, nicht kompatiblen TeO-Version stammt</li><li>älter als die zuletzt in diesem Browser erfolgreich erstellte Autosicherung ist</li><li>verschlüsselt ist und nicht entschlüsselt werden kann</li></ul>
 <p>Die Meldung im Startdialog nennt den erkannten Grund. Verwenden Sie nicht ersatzweise eine beliebige umbenannte JSON-Datei.</p>
 <h3 id="hilfe-muss-ich-fur-eine-verschlusselte-autosicherung-ein-zweites-passwort-eingeben">Muss ich für eine verschlüsselte Autosicherung ein zweites Passwort eingeben?</h3>
 <p>Normalerweise nicht. Der gemeinsame Sicherungsschlüssel wird beim Login mit dem persönlichen Benutzerpasswort automatisch entsperrt. Nur wenn dem Konto noch keine passende Schlüsselhülle zugeordnet ist oder das Browserprofil vollständig verloren ging, wird einmalig der separat aufbewahrte Wiederherstellungsschlüssel benötigt. Dieser Schlüssel ist nicht das Login-Passwort.</p>

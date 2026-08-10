@@ -843,6 +843,14 @@ erneut. Jede Sicherung überschreibt dieselbe Datei
 `teo-autosicherung.json`. Der Dateiname bleibt auch bei aktivierter
 Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.
 
+Administratoren können unter **Einstellungen → Sicherungserinnerung** die
+maximale Größe einer Sicherungsdatei zwischen 1 und 100 MB festlegen. Der
+Standardwert beträgt 20 MB. Die Grenze gilt beim Erstellen, Prüfen,
+Startabgleich und Import. Ab 90 % des eingestellten Volumens zeigt TeO eine
+Warnung mit aktueller Dateigröße und Grenzwert an. Wird die Grenze
+überschritten, muss sie vor der nächsten Sicherung oder dem Import erhöht
+werden.
+
 Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt
 werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und
 hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim
@@ -1025,7 +1033,8 @@ Ordner und Ihre Zugriffsrechte.
 
 TeO lehnt die Datei ab, wenn sie:
 
-- anders heißt oder größer als 20 MB ist
+- anders heißt oder das unter **Einstellungen → Sicherungserinnerung**
+  festgelegte Maximalvolumen überschreitet
 - kein vollständiges und gültiges TeO-Sicherungsformat enthält
 - beschädigt oder manuell unvollständig bearbeitet wurde
 - aus einer neueren, nicht kompatiblen TeO-Version stammt
