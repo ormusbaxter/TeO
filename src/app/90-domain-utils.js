@@ -971,8 +971,26 @@
       .replaceAll("'", "&#039;");
   }
 
-  function showToast(message, type = "success") {
+  function syncToastRegionLayer() {
+    const openDialogs = [...document.querySelectorAll("dialog[open]")];
+    const activeDialog = openDialogs.at(-1) || null;
+    const popoverOpen =
+      typeof elements.toastRegion.hidePopover === "function" &&
+      elements.toastRegion.matches(":popover-open");
+
+    if (activeDialog) {
+      if (popoverOpen) elements.toastRegion.hidePopover();
+      if (elements.toastRegion.parentElement !== activeDialog) {
+        activeDialog.append(elements.toastRegion);
+      }
+      return;
+    }
+
+    if (elements.toastRegion.parentElement !== document.body) {
+      document.body.append(elements.toastRegion);
+    }
     if (
+      elements.toastRegion.childElementCount &&
       typeof elements.toastRegion.showPopover === "function" &&
       !elements.toastRegion.matches(":popover-open")
     ) {
@@ -982,6 +1000,9 @@
         console.warn("Die Statusmeldung konnte nicht in die oberste Ebene gehoben werden.", error);
       }
     }
+  }
+
+  function showToast(message, type = "success") {
     const toast = document.createElement("div");
     toast.className = "toast";
     toast.innerHTML = `
@@ -1000,6 +1021,7 @@
     }
 
     elements.toastRegion.append(toast);
+    syncToastRegionLayer();
     window.setTimeout(() => {
       toast.classList.add("is-leaving");
       window.setTimeout(() => {
@@ -1010,6 +1032,9 @@
           elements.toastRegion.matches(":popover-open")
         ) {
           elements.toastRegion.hidePopover();
+        }
+        if (!elements.toastRegion.childElementCount) {
+          syncToastRegionLayer();
         }
       }, 190);
     }, 3400);
