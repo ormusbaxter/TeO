@@ -93,13 +93,24 @@
                 <p class="eyebrow">Dokumentation</p>
                 <h2>Erfasste Einweisungen</h2>
               </div>
-              <label class="compact-field">
-                <span>Sortierung</span>
-                <select id="deviceInstructionSort">
-                  <option value="date">Einweisungsdatum, neueste zuerst</option>
-                  <option value="createdAt">Eingabedatum, zuletzt erfasste zuerst</option>
-                </select>
-              </label>
+              <div class="device-instruction-log-controls">
+                <label class="search-field">
+                  <svg><use href="#icon-search"></use></svg>
+                  <input
+                    id="deviceInstructionSearch"
+                    type="search"
+                    placeholder="Gerät, Person oder Hersteller suchen"
+                    aria-label="Erfasste Einweisungen filtern"
+                  />
+                </label>
+                <label class="compact-field">
+                  <span>Sortierung</span>
+                  <select id="deviceInstructionSort">
+                    <option value="createdAt">Eingabedatum, zuletzt erfasste zuerst</option>
+                    <option value="date">Einweisungsdatum, neueste zuerst</option>
+                  </select>
+                </label>
+              </div>
             </div>
             <div id="deviceInstructionList"></div>
           </section>

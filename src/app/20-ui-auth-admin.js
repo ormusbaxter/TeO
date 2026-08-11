@@ -730,6 +730,12 @@
     elements.toggleAllDeviceParticipants.addEventListener("click", () => {
       toggleVisibleDeviceParticipants();
     });
+    elements.deviceInstructionSearch.addEventListener("input", (event) => {
+      deviceInstructionSearchTerm = event.target.value
+        .trim()
+        .toLocaleLowerCase("de-DE");
+      renderDeviceInstructionList();
+    });
     elements.deviceInstructionSort.addEventListener("change", (event) => {
       deviceInstructionSortKey =
         event.target.value === "createdAt" ? "createdAt" : "date";

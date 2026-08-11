@@ -467,9 +467,11 @@
   let deviceEmployeeSearchTerm = "";
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
+  let deviceInstructionSearchTerm = "";
   // Sortierung der erfassten Einweisungen: nach Einweisungsdatum oder danach,
   // wann der Nachweis erfasst wurde.
-  let deviceInstructionSortKey = "date";
+  let deviceInstructionSortKey = "createdAt";
+  const VISIBLE_DEVICE_INSTRUCTION_ROWS = 10;
   // So viele Geraete bleiben in der Auswahl sichtbar, weitere sind scrollbar.
   const VISIBLE_INSTRUCTION_DEVICES = 5;
   // Mehrere Geraete koennen mit denselben Angaben auf einmal dokumentiert
@@ -707,6 +709,7 @@
     deviceCatalog: document.querySelector("#deviceCatalog"),
     deviceInstructionMatrix: document.querySelector("#deviceInstructionMatrix"),
     deviceInstructionList: document.querySelector("#deviceInstructionList"),
+    deviceInstructionSearch: document.querySelector("#deviceInstructionSearch"),
     deviceInventoryFilter: document.querySelector("#deviceInventoryFilter"),
     deviceAnnexFilter: document.querySelector("#deviceAnnexFilter"),
     deviceCategoryFilter: document.querySelector("#deviceCategoryFilter"),
