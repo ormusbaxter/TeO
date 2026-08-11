@@ -156,7 +156,6 @@
     nord: "Nord",
     dracula: "Dracula",
     "catppuccin-latte": "Catppuccin Latte",
-    "windows-311": "Windows 3.11",
     "windows-95": "Windows 95",
     cellitinnen: "Cellitinnen",
     "cellitinnen-red": "Cellitinnen Rot",

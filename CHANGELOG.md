@@ -1,3 +1,7 @@
+### 004.032.001 – Farbthemen
+
+- **Entfernt:** Farbschema Windows 3.11 wegen zu intensiver Darstellung
+
 ### 004.032.000 – Zusätzliche Farbthemen
 
 - **Neu:** Nord, Dracula und Catppuccin Latte als etablierte Farbpaletten
