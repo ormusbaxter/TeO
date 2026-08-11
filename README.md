@@ -1008,8 +1008,8 @@ Die Einstellungsseite bündelt:
 - Änderungsprotokoll
 
 Verfügbare Farbthemen sind Standard, Dark Mode, Nord, Dracula,
-Catppuccin Latte, Windows 3.11, Windows 95, Cellitinnen und Cellitinnen Rot.
-Die Auswahl wird mit dem Datenbestand gespeichert.
+Catppuccin Latte, Windows 95, Cellitinnen und Cellitinnen Rot. Die Auswahl wird
+mit dem Datenbestand gespeichert.
 
 Die Datenqualitätsprüfung sucht unter anderem nach:
 

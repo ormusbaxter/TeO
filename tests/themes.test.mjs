@@ -23,7 +23,6 @@ const themes = [
   ["nord", "Nord"],
   ["dracula", "Dracula"],
   ["catppuccin-latte", "Catppuccin Latte"],
-  ["windows-311", "Windows 3.11"],
   ["windows-95", "Windows 95"],
 ];
 
@@ -33,6 +32,12 @@ test("die zusätzlichen Farbthemen sind vollständig auswählbar", () => {
     assert.match(settingsHtml, new RegExp(`<option value="${key}">${label}</option>`));
     assert.match(themeStyles, new RegExp(`html\\[data-theme="${key}"\\]`));
   }
+});
+
+test("Windows 3.11 wird nicht mehr als Farbthema angeboten", () => {
+  assert.doesNotMatch(shellSource, /windows-311|Windows 3\.11/);
+  assert.doesNotMatch(settingsHtml, /windows-311|Windows 3\.11/);
+  assert.doesNotMatch(themeStyles, /windows-311/);
 });
 
 test("die zusätzlichen dunklen Themes aktivieren native dunkle Formulare", () => {
@@ -53,8 +58,6 @@ test("Text und Primäraktionen der neuen Paletten besitzen ausreichenden Kontras
     ["#282a36", "#bd93f9"],
     ["#4c4f69", "#eff1f5"],
     ["#ffffff", "#1e66f5"],
-    ["#000000", "#ededed"],
-    ["#ffffff", "#0000aa"],
     ["#000000", "#d4d0c8"],
     ["#ffffff", "#000080"],
   ];
