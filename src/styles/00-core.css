@@ -4204,6 +4204,7 @@ legend {
 }
 
 .check-card {
+  position: relative;
   display: flex;
   min-height: 42px;
   gap: 9px;
@@ -4228,9 +4229,13 @@ legend {
 
 .check-card input {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  top: 50%;
+  left: 10px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
   opacity: 0;
+  transform: translateY(-50%);
 }
 
 .check-box {
