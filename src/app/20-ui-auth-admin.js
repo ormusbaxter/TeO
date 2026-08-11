@@ -820,6 +820,9 @@
     });
 
     document.querySelectorAll("dialog").forEach((dialog) => {
+      dialog.addEventListener("close", () => {
+        window.setTimeout(syncToastRegionLayer, 0);
+      });
       if (dialog.hasAttribute("data-persistent-dialog")) {
         dialog.addEventListener("cancel", (event) => event.preventDefault());
         return;
