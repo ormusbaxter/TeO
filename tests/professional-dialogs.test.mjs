@@ -28,16 +28,18 @@ test("Sicherungen und Telefonliste verwenden integrierte TeO-Dialoge", async () 
   assert.match(appSource, /toastRegion\.showPopover\(\)/);
   assert.match(appSource, /toastRegion\.hidePopover\(\)/);
   assert.match(appSource, /function syncToastRegionLayer\(\)/);
-  assert.match(appSource, /activeDialog\.append\(elements\.toastRegion\)/);
+  assert.match(appSource, /document\.body\.append\(elements\.toastRegion\)/);
+  assert.doesNotMatch(appSource, /activeDialog\.append\(elements\.toastRegion\)/);
+  assert.match(
+    appSource,
+    /if \(popoverOpen\) elements\.toastRegion\.hidePopover\(\);[\s\S]*document\.body\.append\(elements\.toastRegion\);[\s\S]*elements\.toastRegion\.showPopover\(\)/,
+  );
   assert.match(appSource, /setTimeout\(syncToastRegionLayer, 0\)/);
   assert.match(
     styles,
     /\.toast-region::backdrop\s*\{[^}]*background: transparent;[^}]*backdrop-filter: none;/s,
   );
-  assert.match(
-    styles,
-    /\.modal > \.toast-region\s*\{[^}]*position: fixed;[^}]*z-index: 10;/s,
-  );
+  assert.doesNotMatch(styles, /\.modal > \.toast-region/);
   assert.match(
     styles,
     /@page phone-list\s*\{[^}]*size: A4 portrait;[^}]*margin: 0;/s,
