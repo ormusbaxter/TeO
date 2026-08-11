@@ -172,6 +172,85 @@ test("Mitarbeiter der Geräteeinweisung sind nach Nachname und Vorname sortiert"
   );
 });
 
+test("Erfasste Einweisungen sind filterbar und standardmäßig nach Eingabe sortiert", async () => {
+  const app = await loadAppFunctions(["filteredDeviceInstructions"]);
+  const anna = { ...createEmployee("anna"), firstName: "Anna", lastName: "Adler" };
+  const berta = { ...createEmployee("berta"), firstName: "Berta", lastName: "Berg" };
+  app.setState(
+    createMinimalState({
+      employees: [anna, berta],
+      devices: [
+        {
+          id: "monitor",
+          manufacturer: "Hersteller Nord",
+          productName: "Monitor Alpha",
+          category: "Monitoring",
+          currentInventory: true,
+          annex1: false,
+        },
+      ],
+      deviceInstructions: [
+        {
+          id: "older-entry",
+          deviceId: "monitor",
+          date: "2026-05-20",
+          createdAt: "2026-06-01T08:00:00.000Z",
+          instructorType: "manufacturer",
+          instructorName: "Externe Person",
+          participants: [{ employeeId: anna.id, wasMedicalProductsOfficer: false }],
+        },
+        {
+          id: "newer-entry",
+          deviceId: "monitor",
+          date: "2026-04-10",
+          createdAt: "2026-07-01T08:00:00.000Z",
+          instructorType: "employee",
+          instructorName: "Interne Person",
+          participants: [{ employeeId: berta.id, wasMedicalProductsOfficer: false }],
+        },
+      ],
+    }),
+  );
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(app.filteredDeviceInstructions().map(({ id }) => id))),
+    ["newer-entry", "older-entry"],
+  );
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        app.filteredDeviceInstructions({ searchTerm: "adler" }).map(({ id }) => id),
+      ),
+    ),
+    ["older-entry"],
+  );
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        app.filteredDeviceInstructions({ searchTerm: "hersteller nord" }).map(
+          ({ id }) => id,
+        ),
+      ),
+    ),
+    ["newer-entry", "older-entry"],
+  );
+});
+
+test("Die Einweisungsliste ist auf zehn sichtbare Einträge begrenzt", async () => {
+  const [indexHtml, deviceSource, styles] = await Promise.all([
+    readFile(indexUrl, "utf8"),
+    readFile(deviceSourceUrl, "utf8"),
+    readFile(new URL("../src/styles/00-core.css", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(indexHtml, /id="deviceInstructionSearch"[^>]*type="search"/s);
+  assert.match(deviceSource, /VISIBLE_DEVICE_INSTRUCTION_ROWS - 1/);
+  assert.match(
+    styles,
+    /\.device-instruction-log\s*\{[^}]*position: relative;[^}]*overflow-y: auto;/s,
+  );
+});
+
 test("Mitarbeiterübersicht führt alle Geräte mit und ohne Einweisung auf", async () => {
   const app = await loadAppFunctions(["getEmployeeDeviceOverview"]);
   const employee = createEmployee("employee-overview");

@@ -6343,6 +6343,18 @@ button.device-employee-overview-row:hover {
   margin-bottom: 12px;
 }
 
+.device-instruction-log-controls {
+  display: flex;
+  min-width: min(100%, 620px);
+  gap: 12px;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.device-instruction-log-controls .search-field {
+  width: min(360px, 100%);
+}
+
 .device-instruction-log-heading h2 {
   margin: 4px 0 0;
   color: var(--navy-950);
@@ -6356,8 +6368,12 @@ button.device-employee-overview-row:hover {
 }
 
 .device-instruction-log {
+  position: relative;
   display: grid;
-  overflow: hidden;
+  max-height: min(70vh, 720px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid var(--slate-200);
   border-radius: var(--radius-lg);
   background: white;
@@ -6486,6 +6502,18 @@ button.device-employee-overview-row:hover {
 
   .device-instruction-log-actions {
     justify-content: flex-start;
+  }
+
+  .device-instruction-log-heading,
+  .device-instruction-log-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .device-instruction-log-controls,
+  .device-instruction-log-controls .search-field,
+  .device-instruction-log-controls .compact-field {
+    width: 100%;
   }
 
   .device-mpo-toggle {

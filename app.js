@@ -468,9 +468,11 @@
   let deviceEmployeeSearchTerm = "";
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
+  let deviceInstructionSearchTerm = "";
   // Sortierung der erfassten Einweisungen: nach Einweisungsdatum oder danach,
   // wann der Nachweis erfasst wurde.
-  let deviceInstructionSortKey = "date";
+  let deviceInstructionSortKey = "createdAt";
+  const VISIBLE_DEVICE_INSTRUCTION_ROWS = 10;
   // So viele Geraete bleiben in der Auswahl sichtbar, weitere sind scrollbar.
   const VISIBLE_INSTRUCTION_DEVICES = 5;
   // Mehrere Geraete koennen mit denselben Angaben auf einmal dokumentiert
@@ -708,6 +710,7 @@
     deviceCatalog: document.querySelector("#deviceCatalog"),
     deviceInstructionMatrix: document.querySelector("#deviceInstructionMatrix"),
     deviceInstructionList: document.querySelector("#deviceInstructionList"),
+    deviceInstructionSearch: document.querySelector("#deviceInstructionSearch"),
     deviceInventoryFilter: document.querySelector("#deviceInventoryFilter"),
     deviceAnnexFilter: document.querySelector("#deviceAnnexFilter"),
     deviceCategoryFilter: document.querySelector("#deviceCategoryFilter"),
@@ -2944,6 +2947,12 @@
     });
     elements.toggleAllDeviceParticipants.addEventListener("click", () => {
       toggleVisibleDeviceParticipants();
+    });
+    elements.deviceInstructionSearch.addEventListener("input", (event) => {
+      deviceInstructionSearchTerm = event.target.value
+        .trim()
+        .toLocaleLowerCase("de-DE");
+      renderDeviceInstructionList();
     });
     elements.deviceInstructionSort.addEventListener("change", (event) => {
       deviceInstructionSortKey =
@@ -9668,24 +9677,64 @@
     `;
   }
 
+  function filteredDeviceInstructions({
+    searchTerm = deviceInstructionSearchTerm,
+    sortKey = deviceInstructionSortKey,
+  } = {}) {
+    const normalizedSearchTerm = String(searchTerm)
+      .trim()
+      .toLocaleLowerCase("de-DE");
+    const nachEingabe = sortKey === "createdAt";
+
+    return [...state.deviceInstructions]
+      .filter((instruction) => {
+        if (!normalizedSearchTerm) return true;
+        const device = getDevice(instruction.deviceId);
+        const participantNames = instruction.participants
+          .map((participant) => getEmployee(participant.employeeId))
+          .filter(Boolean)
+          .map(fullName);
+        const searchableText = [
+          device?.productName,
+          device?.manufacturer,
+          instruction.instructorName,
+          instruction.instructorType === "employee"
+            ? "Interne Einweisung"
+            : "Herstellereinweisung",
+          instruction.date,
+          String(instruction.createdAt || "").slice(0, 10),
+          ...participantNames,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase("de-DE");
+        return searchableText.includes(normalizedSearchTerm);
+      })
+      .sort((a, b) =>
+        nachEingabe
+          ? String(b.createdAt || "").localeCompare(String(a.createdAt || "")) ||
+            b.date.localeCompare(a.date)
+          : b.date.localeCompare(a.date) ||
+            String(b.createdAt || "").localeCompare(String(a.createdAt || "")),
+      );
+  }
+
   function renderDeviceInstructionList() {
     elements.deviceInstructionSort.value = deviceInstructionSortKey;
     // Beide Sortierungen fallen auf das jeweils andere Datum zurueck, damit
     // gleichzeitig erfasste Nachweise eine stabile Reihenfolge behalten.
     const nachEingabe = deviceInstructionSortKey === "createdAt";
-    const instructions = [...state.deviceInstructions].sort((a, b) =>
-      nachEingabe
-        ? b.createdAt.localeCompare(a.createdAt) ||
-          b.date.localeCompare(a.date)
-        : b.date.localeCompare(a.date) ||
-          b.createdAt.localeCompare(a.createdAt),
-    );
+    const instructions = filteredDeviceInstructions();
     if (!instructions.length) {
       elements.deviceInstructionList.innerHTML = `
         <section class="panel">
           ${renderEmptyState({
-            title: "Noch keine Einweisungen dokumentiert",
-            text: "Gespeicherte Einweisungen erscheinen hier chronologisch.",
+            title: state.deviceInstructions.length
+              ? "Keine Einweisungen für diesen Filter"
+              : "Noch keine Einweisungen dokumentiert",
+            text: state.deviceInstructions.length
+              ? "Passen Sie den Suchbegriff an."
+              : "Gespeicherte Einweisungen erscheinen hier chronologisch.",
             compact: true,
           })}
         </section>
@@ -9774,6 +9823,23 @@
           .join("")}
       </div>
     `;
+    limitDeviceInstructionLogHeight();
+  }
+
+  function limitDeviceInstructionLogHeight() {
+    const log = elements.deviceInstructionList.querySelector(
+      ".device-instruction-log",
+    );
+    if (!log) return;
+    log.style.maxHeight = "";
+    const rows = [...log.querySelectorAll(".device-instruction-log-row")];
+    if (rows.length <= VISIBLE_DEVICE_INSTRUCTION_ROWS || !log.offsetParent) {
+      return;
+    }
+    const lastVisibleRow = rows[VISIBLE_DEVICE_INSTRUCTION_ROWS - 1];
+    log.style.maxHeight = `${
+      lastVisibleRow.offsetTop + lastVisibleRow.offsetHeight
+    }px`;
   }
 
   function getDeviceInstructionPercentage(deviceId, employees) {
