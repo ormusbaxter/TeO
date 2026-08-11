@@ -7,16 +7,32 @@ import {
   loadAppFunctions,
 } from "./helpers/load-app.mjs";
 
-const stylesUrl = new URL("../src/styles/00-core.css", import.meta.url);
+const indexUrl = new URL("../index.html", import.meta.url);
+const deviceSourceUrl = new URL(
+  "../src/app/60-appointments-devices.js",
+  import.meta.url,
+);
 
-test("Pflicht-Checkboxen verankern die Browsermeldung am sichtbaren Kästchen", async () => {
-  const styles = await readFile(stylesUrl, "utf8");
+test("Die Statusbestätigung zeigt ihre Meldung direkt im Formular", async () => {
+  const [indexHtml, deviceSource] = await Promise.all([
+    readFile(indexUrl, "utf8"),
+    readFile(deviceSourceUrl, "utf8"),
+  ]);
 
-  assert.match(styles, /\.check-card\s*\{[^}]*position: relative;/s);
   assert.match(
-    styles,
-    /\.check-card input\s*\{[^}]*position: absolute;[^}]*top: 50%;[^}]*left: 10px;[^}]*width: 18px;[^}]*height: 18px;/s,
+    indexHtml,
+    /id="employeeInstructorMpoConfirmationError"[^>]*role="alert"/s,
   );
+  assert.doesNotMatch(
+    deviceSource,
+    /employeeInstructorMpoConfirmation\.required\s*=/,
+  );
+  assert.match(
+    deviceSource,
+    /employeeInstructorMpoConfirmationError\.textContent\s*=[\s\S]*Bitte bestätigen Sie den Status zum Einweisungszeitpunkt\./,
+  );
+  assert.match(deviceSource, /scrollIntoView\(\{ block: "center", behavior: "smooth" \}\)/);
+  assert.match(deviceSource, /employeeInstructorMpoConfirmation\.focus\(\{ preventScroll: true \}\)/);
 });
 
 test("Einweisungsberechtigung folgt der Herstellereinweisung und dem damaligen Status", async () => {
