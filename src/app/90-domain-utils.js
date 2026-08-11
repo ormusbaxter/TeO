@@ -972,6 +972,16 @@
   }
 
   function showToast(message, type = "success") {
+    if (
+      typeof elements.toastRegion.showPopover === "function" &&
+      !elements.toastRegion.matches(":popover-open")
+    ) {
+      try {
+        elements.toastRegion.showPopover();
+      } catch (error) {
+        console.warn("Die Statusmeldung konnte nicht in die oberste Ebene gehoben werden.", error);
+      }
+    }
     const toast = document.createElement("div");
     toast.className = "toast";
     toast.innerHTML = `
@@ -992,7 +1002,16 @@
     elements.toastRegion.append(toast);
     window.setTimeout(() => {
       toast.classList.add("is-leaving");
-      window.setTimeout(() => toast.remove(), 190);
+      window.setTimeout(() => {
+        toast.remove();
+        if (
+          !elements.toastRegion.childElementCount &&
+          typeof elements.toastRegion.hidePopover === "function" &&
+          elements.toastRegion.matches(":popover-open")
+        ) {
+          elements.toastRegion.hidePopover();
+        }
+      }, 190);
     }, 3400);
   }
 })();
