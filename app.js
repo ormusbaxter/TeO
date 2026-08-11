@@ -153,9 +153,15 @@
   const THEMES = {
     standard: "Standard",
     dark: "Dark Mode",
+    nord: "Nord",
+    dracula: "Dracula",
+    "catppuccin-latte": "Catppuccin Latte",
+    "windows-311": "Windows 3.11",
+    "windows-95": "Windows 95",
     cellitinnen: "Cellitinnen",
     "cellitinnen-red": "Cellitinnen Rot",
   };
+  const DARK_THEMES = new Set(["dark", "nord", "dracula"]);
 
   const PASSWORD_ITERATIONS = 210000;
   const USER_FIRST_NAME_FALLBACKS = {
@@ -3410,7 +3416,9 @@
   function applyTheme(theme) {
     const activeTheme = normalizeTheme(theme);
     document.documentElement.dataset.theme = activeTheme;
-    document.documentElement.style.colorScheme = activeTheme === "dark" ? "dark" : "light";
+    document.documentElement.style.colorScheme = DARK_THEMES.has(activeTheme)
+      ? "dark"
+      : "light";
     document.querySelectorAll("[data-theme-select]").forEach((select) => {
       select.value = activeTheme;
     });

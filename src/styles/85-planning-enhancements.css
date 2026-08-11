@@ -1058,7 +1058,7 @@ body.is-vacation-planner-maximized {
   opacity: 0.55;
 }
 
-html[data-theme="dark"] :is(
+:is(html[data-theme="dark"], html[data-theme="nord"], html[data-theme="dracula"]) :is(
     .legend-weekend-weekend_a,
     .vacation-weekend-weekend_a,
     .vacation-employee-weekend-weekend_a
@@ -1066,7 +1066,7 @@ html[data-theme="dark"] :is(
   background: rgb(40 120 227 / 20%) !important;
 }
 
-html[data-theme="dark"] :is(
+:is(html[data-theme="dark"], html[data-theme="nord"], html[data-theme="dracula"]) :is(
     .legend-weekend-weekend_b,
     .vacation-weekend-weekend_b,
     .vacation-employee-weekend-weekend_b
