@@ -1,3 +1,9 @@
+### 004.032.000 – Zusätzliche Farbthemen
+
+- **Neu:** Nord, Dracula und Catppuccin Latte als etablierte Farbpaletten
+- **Neu:** Retro-Farbschemata Windows 3.11 und Windows 95
+- **Verbessert:** Dunkle Formulare, Urlaubsmarkierungen und Mindestkontraste der neuen Themes abgesichert
+
 ### 004.031.015 – Historische Änderungshistorie
 
 - **Verbessert:** Changelog anhand der Git-Historie bis zur ersten Repository-Version vervollständigt

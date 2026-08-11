@@ -1192,7 +1192,9 @@
   function applyTheme(theme) {
     const activeTheme = normalizeTheme(theme);
     document.documentElement.dataset.theme = activeTheme;
-    document.documentElement.style.colorScheme = activeTheme === "dark" ? "dark" : "light";
+    document.documentElement.style.colorScheme = DARK_THEMES.has(activeTheme)
+      ? "dark"
+      : "light";
     document.querySelectorAll("[data-theme-select]").forEach((select) => {
       select.value = activeTheme;
     });
