@@ -36,7 +36,7 @@ test("Sicherungen und Telefonliste verwenden integrierte TeO-Dialoge", async () 
   );
   assert.match(
     styles,
-    /\.modal > \.toast-region\s*\{[^}]*position: absolute;[^}]*z-index: 10;/s,
+    /\.modal > \.toast-region\s*\{[^}]*position: fixed;[^}]*z-index: 10;/s,
   );
   assert.match(
     styles,
