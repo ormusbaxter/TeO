@@ -1,3 +1,7 @@
+### 004.031.015 – Historische Änderungshistorie
+
+- **Verbessert:** Changelog anhand der Git-Historie bis zur ersten Repository-Version vervollständigt
+
 ### 004.031.014 – Repository und Releaseprozess
 
 - **Verbessert:** Veraltete Archive, Sicherungskopien und redundante Generatoren entfernt
@@ -189,3 +193,69 @@
 - **Neu:** Sortierbare Navigation und zusätzliche Terminkategorien
 - **Verbessert:** Schnellere Ansichtswechsel durch selektives Rendern
 - **Verbessert:** Auswertungen, Dialogbedienung und Statusanzeigen
+
+### 004.012.001 – Seitenleiste
+
+- **Verbessert:** Sortierhinweis der Navigation oberhalb der Anmeldeinformationen angeordnet
+
+### 004.012.000 – Urlaubsplanung
+
+- **Neu:** Vollständige Tastaturbedienung und rechteckige Bereichsauswahl in der Monatsplanung
+- **Neu:** Mitarbeiterfilter und detaillierte Prüfung von Abwesenheitsüberschneidungen
+- **Neu:** Geburtstage, Beschäftigungsumfang und Dienstwochenenden in der Planung sichtbar
+- **Verbessert:** Assistenzberufe werden bei den konfigurierten Abwesenheitsgrenzen gesondert behandelt
+
+### 004.010.000 – Geräteeinweisungen
+
+- **Neu:** Mehrere Geräte können gemeinsam für eine Einweisung ausgewählt werden
+- **Neu:** Gerätesuche, alphabetische Sortierung und Auswahl aller sichtbaren Geräte
+- **Neu:** Sortierung der Nachweise nach Einweisungs- oder Eingabedatum
+
+### 004.009.000 – Navigation und Termine
+
+- **Neu:** Persönlich sortierbare Seitenleiste mit Maus- und Tastaturbedienung
+- **Neu:** Zusätzliche Terminkategorien mit eigenen Symbolen
+- **Verbessert:** Startseite und Fristenmonitor kompakter und übersichtlicher gestaltet
+
+### 004.008.000 – Schulferien und Buildnummer
+
+- **Neu:** Schulferien lassen sich in den Einstellungen pflegen und um amtliche NRW-Termine ergänzen
+- **Neu:** Ferienzeiträume erweitern automatisch die Jahresauswahl der Urlaubsplanung
+- **Verbessert:** Einheitliche dreiteilige Buildnummer und Befehle für Versionssprünge eingeführt
+
+### 004.004 – Web-App, Rollen und Auswertungen
+
+- **Neu:** Installierbare Web-App mit Manifest und eigenen App-Symbolen
+- **Neu:** Normale Konten dürfen den fachlichen Datenbestand vollständig bearbeiten
+- **Neu:** Benutzerverwaltung mit temporären Passwörtern und geschütztem letzten Administratorkonto
+- **Neu:** Benutzernamenexport, Gerätesuche und Fortbildungs-Komplettierungsgrad
+- **Neu:** Einstellbares Verhalten beim Schließen von Dialogen
+- **Verbessert:** Systemstatus, dauerhafter Browserspeicher und Demo-Daten erweitert
+
+### 004.001 – Relationale MariaDB-Speicherung
+
+- **Neu:** Fachliche Daten und Beziehungen werden in getrennten MariaDB-Tabellen gespeichert
+- **Neu:** Automatische, transaktionale Migration des früheren JSON-Gesamtbestands
+- **Verbessert:** Fremdschlüssel, relationale Zuordnungen und selektive Datenbankaktualisierung
+
+### 003.023 – Projektstruktur und Administration
+
+- **Neu:** Quellmodule für Anwendung, HTML, Styles, Datenvertrag und Metadaten eingeführt
+- **Neu:** Reproduzierbarer Build mit Strukturprüfung und automatisierten Fachtests
+- **Neu:** Persistente Serversitzungen, Datenbankmigrationen und abgesicherte Administrationsabläufe
+- **Verbessert:** README als ausführliches Benutzerhandbuch und integrierte Online-Hilfe aufgebaut
+
+### 002.009 – Fortbildungsreihen und Demo-Daten
+
+- **Neu:** Wiederkehrende Pflichtfortbildungen werden zu Reihen mit fortgeschriebenen Fristen verbunden
+- **Neu:** Einführungsjahr und mehrjährige Gültigkeit wirken in der Jahresauswertung
+- **Neu:** Reproduzierbarer synthetischer Demo-Datensatz mit 60 Mitarbeitern
+- **Verbessert:** Eindeutige Benutzernamen verknüpfen Konten mit Personalstammdaten
+
+### 002.000 – Erste Repository-Version
+
+- **Neu:** Mitarbeiterverwaltung, Dienstwochenenden, Urlaubsplanung und Terminkalender
+- **Neu:** Pflichtfortbildungen, Teamsitzungen, Gerätekatalog und Einweisungsmatrix
+- **Neu:** Lokaler IndexedDB-Betrieb sowie gemeinsamer Betrieb mit Node.js und MariaDB
+- **Neu:** Benutzeranmeldung, Rollen, Datensicherung, Fristenmonitor und Änderungsprotokoll
+- **Verbessert:** Datenrevisionen und gehärtete Synchronisierung verhindern unbemerkte Überschreibungen
