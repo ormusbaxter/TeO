@@ -4428,13 +4428,6 @@ legend {
   backdrop-filter: none;
 }
 
-.modal > .toast-region {
-  position: fixed;
-  z-index: 10;
-  inset: auto 24px 24px auto;
-  width: min(380px, calc(100vw - 32px));
-}
-
 .toast {
   display: flex;
   gap: 10px;
@@ -5119,8 +5112,7 @@ legend {
     margin: 0 -20px;
   }
 
-  .toast-region,
-  .modal > .toast-region {
+  .toast-region {
     right: 16px;
     bottom: 84px;
     left: 16px;

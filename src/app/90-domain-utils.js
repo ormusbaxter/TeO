@@ -972,20 +972,14 @@
   }
 
   function syncToastRegionLayer() {
-    const openDialogs = [...document.querySelectorAll("dialog[open]")];
-    const activeDialog = openDialogs.at(-1) || null;
     const popoverOpen =
       typeof elements.toastRegion.hidePopover === "function" &&
       elements.toastRegion.matches(":popover-open");
 
-    if (activeDialog) {
-      if (popoverOpen) elements.toastRegion.hidePopover();
-      if (elements.toastRegion.parentElement !== activeDialog) {
-        activeDialog.append(elements.toastRegion);
-      }
-      return;
-    }
-
+    // Ein bereits geoeffnetes Popover kann in der Top-Layer-Reihenfolge hinter
+    // einem spaeter geoeffneten Dialog liegen. Vor jeder Meldung kurz schliessen
+    // und neu oeffnen, damit die Region ueber Dialog und Backdrop einsortiert wird.
+    if (popoverOpen) elements.toastRegion.hidePopover();
     if (elements.toastRegion.parentElement !== document.body) {
       document.body.append(elements.toastRegion);
     }
