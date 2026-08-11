@@ -1204,6 +1204,18 @@ npm run verify
 `npm run verify` erzeugt die verteilbaren Dateien neu, prüft die Struktur und
 führt alle automatisierten Tests aus.
 
+Ein geprüftes ZIP-Paket für den lokalen Einzelplatzbetrieb entsteht mit:
+
+```text
+npm run release:package
+```
+
+Der Befehl führt zuerst die vollständige Verifikation aus und schreibt danach
+`dist/TeO-<Version>-lokaler-Betrieb.zip`. Das Paket enthält ausschließlich die
+gebaute Anwendung und ihre unmittelbar benötigten Laufzeitdateien. Quellen,
+Tests, Entwicklungswerkzeuge, Serverkomponenten und Demo-Daten bleiben außen
+vor. `dist/` und lokale ZIP-Dateien werden von Git ignoriert.
+
 ### Buildnummer
 
 Die Buildnummer folgt dem Muster `major.minor.patch` mit je drei Stellen und

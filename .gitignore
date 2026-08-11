@@ -3,3 +3,12 @@ server/node_modules/
 .env
 server/.env
 tmp/
+dist/
+.claude/
+*.zip
+demo/teo-datensicherung_*.json
+demo/teo-random-datenbank-*.json
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
