@@ -4409,13 +4409,23 @@ legend {
 .toast-region {
   position: fixed;
   z-index: 100;
-  right: 24px;
-  bottom: 24px;
+  inset: auto 24px 24px auto;
   display: flex;
   width: min(380px, calc(100vw - 32px));
+  margin: 0;
+  padding: 0;
   flex-direction: column;
   gap: 9px;
+  overflow: visible;
   pointer-events: none;
+  color: inherit;
+  border: 0;
+  background: transparent;
+}
+
+.toast-region::backdrop {
+  background: transparent;
+  backdrop-filter: none;
 }
 
 .toast {

@@ -22,6 +22,16 @@ test("Sicherungen und Telefonliste verwenden integrierte TeO-Dialoge", async () 
   assert.match(indexHtml, /id="phoneListPreviewDialog"/);
   assert.match(indexHtml, /id="phoneListPrintSurface"/);
   assert.match(
+    indexHtml,
+    /class="toast-region"[^>]*id="toastRegion"[^>]*popover="manual"/s,
+  );
+  assert.match(appSource, /toastRegion\.showPopover\(\)/);
+  assert.match(appSource, /toastRegion\.hidePopover\(\)/);
+  assert.match(
+    styles,
+    /\.toast-region::backdrop\s*\{[^}]*background: transparent;[^}]*backdrop-filter: none;/s,
+  );
+  assert.match(
     styles,
     /@page phone-list\s*\{[^}]*size: A4 portrait;[^}]*margin: 0;/s,
   );
