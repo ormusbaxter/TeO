@@ -1,10 +1,23 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   createEmployee,
   createMinimalState,
   loadAppFunctions,
 } from "./helpers/load-app.mjs";
+
+const stylesUrl = new URL("../src/styles/00-core.css", import.meta.url);
+
+test("Pflicht-Checkboxen verankern die Browsermeldung am sichtbaren Kästchen", async () => {
+  const styles = await readFile(stylesUrl, "utf8");
+
+  assert.match(styles, /\.check-card\s*\{[^}]*position: relative;/s);
+  assert.match(
+    styles,
+    /\.check-card input\s*\{[^}]*position: absolute;[^}]*top: 50%;[^}]*left: 10px;[^}]*width: 18px;[^}]*height: 18px;/s,
+  );
+});
 
 test("Einweisungsberechtigung folgt der Herstellereinweisung und dem damaligen Status", async () => {
   const app = await loadAppFunctions([
