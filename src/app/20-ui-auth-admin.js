@@ -498,6 +498,7 @@
     });
     elements.employeeInstructorMpoConfirmation.addEventListener("change", () => {
       elements.employeeInstructorMpoConfirmation.setCustomValidity("");
+      elements.employeeInstructorMpoConfirmationError.textContent = "";
     });
     elements.deviceInstructionDate.addEventListener("input", () => {
       elements.deviceInstructionDate.setCustomValidity("");

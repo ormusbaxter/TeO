@@ -844,6 +844,9 @@
     employeeInstructorMpoConfirmation: document.querySelector(
       "#employeeInstructorMpoConfirmation",
     ),
+    employeeInstructorMpoConfirmationError: document.querySelector(
+      "#employeeInstructorMpoConfirmationError",
+    ),
     deviceParticipantSearch: document.querySelector("#deviceParticipantSearch"),
     toggleAllDeviceParticipants: document.querySelector(
       "#toggleAllDeviceParticipants",
@@ -2710,6 +2713,7 @@
     });
     elements.employeeInstructorMpoConfirmation.addEventListener("change", () => {
       elements.employeeInstructorMpoConfirmation.setCustomValidity("");
+      elements.employeeInstructorMpoConfirmationError.textContent = "";
     });
     elements.deviceInstructionDate.addEventListener("input", () => {
       elements.deviceInstructionDate.setCustomValidity("");
@@ -10055,6 +10059,7 @@
     elements.externalInstructorName.setCustomValidity("");
     elements.employeeInstructor.setCustomValidity("");
     elements.employeeInstructorMpoConfirmation.setCustomValidity("");
+    elements.employeeInstructorMpoConfirmationError.textContent = "";
     // Bewusst kein Vorgabedatum: Einweisungen werden haeufig nachtraeglich
     // erfasst, ein voreingetragenes Heute wuerde leicht uebersehen.
     elements.deviceInstructionDate.value = "";
@@ -10243,7 +10248,6 @@
     elements.employeeInstructorFields.hidden = !isEmployee;
     elements.externalInstructorName.required = !isEmployee;
     elements.employeeInstructor.required = isEmployee;
-    elements.employeeInstructorMpoConfirmation.required = isEmployee;
     if (isEmployee) {
       elements.externalInstructorName.setCustomValidity("");
     } else {
@@ -10394,12 +10398,21 @@
         ? "Bitte den Namen des Einweisenden eingeben."
         : "",
     );
-    elements.employeeInstructorMpoConfirmation.setCustomValidity(
-      isEmployee && !elements.employeeInstructorMpoConfirmation.checked
+    const instructorConfirmationMissing =
+      isEmployee && !elements.employeeInstructorMpoConfirmation.checked;
+    elements.employeeInstructorMpoConfirmation.setCustomValidity("");
+    elements.employeeInstructorMpoConfirmationError.textContent =
+      instructorConfirmationMissing
         ? "Bitte bestätigen Sie den Status zum Einweisungszeitpunkt."
-        : "",
-    );
+        : "";
     if (!elements.deviceInstructionForm.reportValidity()) return;
+    if (instructorConfirmationMissing) {
+      elements.employeeInstructorMpoConfirmation
+        .closest(".device-instructor-confirmation")
+        ?.scrollIntoView({ block: "center", behavior: "smooth" });
+      elements.employeeInstructorMpoConfirmation.focus({ preventScroll: true });
+      return;
+    }
     if (!deviceInstructionDeviceDraft.size) {
       elements.deviceInstructionDeviceError.textContent =
         "Bitte mindestens ein Gerät auswählen.";

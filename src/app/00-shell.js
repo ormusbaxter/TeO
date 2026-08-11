@@ -843,6 +843,9 @@
     employeeInstructorMpoConfirmation: document.querySelector(
       "#employeeInstructorMpoConfirmation",
     ),
+    employeeInstructorMpoConfirmationError: document.querySelector(
+      "#employeeInstructorMpoConfirmationError",
+    ),
     deviceParticipantSearch: document.querySelector("#deviceParticipantSearch"),
     toggleAllDeviceParticipants: document.querySelector(
       "#toggleAllDeviceParticipants",
