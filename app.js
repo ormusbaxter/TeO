@@ -471,6 +471,10 @@
   let deviceManagementAuthorizationFilter = "all";
   let deviceEmployeeStatusFilter = "employed";
   let deviceEmployeeSearchTerm = "";
+  let deviceOverviewDeviceId = "";
+  let deviceOverviewInstructionFilter = "all";
+  let deviceOverviewEmploymentFilter = "employed";
+  let deviceOverviewSearchTerm = "";
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
   let deviceInstructionSearchTerm = "";
@@ -903,6 +907,17 @@
     deviceEmployeeOverviewContent: document.querySelector(
       "#deviceEmployeeOverviewContent",
     ),
+    deviceOverviewDialog: document.querySelector("#deviceOverviewDialog"),
+    deviceOverviewTitle: document.querySelector("#deviceOverviewTitle"),
+    deviceOverviewSubtitle: document.querySelector("#deviceOverviewSubtitle"),
+    deviceOverviewSearch: document.querySelector("#deviceOverviewSearch"),
+    deviceOverviewInstructionFilter: document.querySelector(
+      "#deviceOverviewInstructionFilter",
+    ),
+    deviceOverviewEmploymentFilter: document.querySelector(
+      "#deviceOverviewEmploymentFilter",
+    ),
+    deviceOverviewContent: document.querySelector("#deviceOverviewContent"),
     attendanceDialog: document.querySelector("#attendanceDialog"),
     attendanceForm: document.querySelector("#attendanceForm"),
     attendanceMeetingMeta: document.querySelector("#attendanceMeetingMeta"),
@@ -2943,6 +2958,26 @@
         .toLocaleLowerCase("de-DE");
       renderDeviceInstructionMatrix();
     });
+    elements.deviceOverviewSearch.addEventListener("input", (event) => {
+      deviceOverviewSearchTerm = event.target.value
+        .trim()
+        .toLocaleLowerCase("de-DE");
+      renderDeviceOverview();
+    });
+    elements.deviceOverviewInstructionFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceOverviewInstructionFilter = event.target.value;
+        renderDeviceOverview();
+      },
+    );
+    elements.deviceOverviewEmploymentFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceOverviewEmploymentFilter = event.target.value;
+        renderDeviceOverview();
+      },
+    );
     elements.deviceParticipantSearch.addEventListener("input", (event) => {
       deviceParticipantSearchTerm = event.target.value
         .trim()
@@ -3038,6 +3073,10 @@
       handleDeviceHistoryAction,
     );
     elements.deviceEmployeeOverviewContent.addEventListener(
+      "click",
+      handleDeviceEmployeeOverviewAction,
+    );
+    elements.deviceOverviewContent.addEventListener(
       "click",
       handleDeviceEmployeeOverviewAction,
     );
@@ -3227,6 +3266,7 @@
         elements.deviceDialog,
         elements.deviceInstructionDialog,
         elements.deviceEmployeeOverviewDialog,
+        elements.deviceOverviewDialog,
         elements.deviceInstructionHistoryDialog,
         elements.attendanceDialog,
         elements.meetingStatsDialog,
@@ -9676,13 +9716,20 @@
                     getDeviceInstructionPercentage(device.id, employees);
                   return `
                     <th scope="col" title="${escapeHtml(deviceLabel(device))}">
-                      <span>${escapeHtml(device.manufacturer)}</span>
-                      <strong>${escapeHtml(device.productName)}</strong>
-                      <small class="completion-progress ${completionProgressTone(
-                        instructionPercentage,
-                      )}">
-                        ${instructionPercentage} % eingewiesen
-                      </small>
+                      <button
+                        class="device-matrix-device"
+                        type="button"
+                        data-device-overview="${device.id}"
+                        aria-label="Einweisungsübersicht für ${escapeHtml(deviceLabel(device))} anzeigen"
+                      >
+                        <span>${escapeHtml(device.manufacturer)}</span>
+                        <strong>${escapeHtml(device.productName)}</strong>
+                        <small class="completion-progress ${completionProgressTone(
+                          instructionPercentage,
+                        )}">
+                          ${instructionPercentage} % eingewiesen
+                        </small>
+                      </button>
                     </th>
                   `;
                 })
@@ -9723,7 +9770,8 @@
       </div>
       <p class="device-matrix-hint">
         Grün zeigt eine dokumentierte Einweisung. Gold kennzeichnet eine
-        Herstellereinweisung als Gerätebeauftragte/r. Per Klick öffnet sich der Verlauf.
+        Herstellereinweisung als Gerätebeauftragte/r. Gerätenamen und Statusfelder
+        öffnen die jeweilige Detailübersicht.
       </p>
     `;
   }
@@ -9980,6 +10028,11 @@
   }
 
   function handleDeviceMatrixAction(event) {
+    const deviceButton = event.target.closest("[data-device-overview]");
+    if (deviceButton) {
+      openDeviceOverview(deviceButton.dataset.deviceOverview);
+      return;
+    }
     const employeeButton = event.target.closest(
       "[data-device-employee-overview]",
     );
@@ -10637,6 +10690,148 @@
           isInstructed: instructions.length > 0,
         };
       });
+  }
+
+  function getDeviceEmployeeOverview(deviceId) {
+    return [...state.employees].sort(sortEmployees).map((employee) => {
+      const instructions = state.deviceInstructions
+        .filter(
+          (instruction) =>
+            instruction.deviceId === deviceId &&
+            instruction.participants.some(
+              (participant) => participant.employeeId === employee.id,
+            ),
+        )
+        .sort(
+          (a, b) =>
+            b.date.localeCompare(a.date) ||
+            String(b.createdAt || "").localeCompare(String(a.createdAt || "")),
+        );
+      return {
+        employee,
+        instructions,
+        latestInstruction: instructions[0] || null,
+        isInstructed: instructions.length > 0,
+      };
+    });
+  }
+
+  function filterDeviceEmployeeOverview(
+    overview,
+    {
+      searchTerm = "",
+      instructionFilter = "all",
+      employmentFilter = "employed",
+    } = {},
+  ) {
+    const normalizedSearch = String(searchTerm)
+      .trim()
+      .toLocaleLowerCase("de-DE");
+    return overview.filter(({ employee, isInstructed }) => {
+      if (instructionFilter === "instructed" && !isInstructed) return false;
+      if (instructionFilter === "missing" && isInstructed) return false;
+      if (
+        employmentFilter === "employed" &&
+        employee.employmentStatus === "inactive"
+      ) {
+        return false;
+      }
+      if (
+        !["all", "employed"].includes(employmentFilter) &&
+        employee.employmentStatus !== employmentFilter
+      ) {
+        return false;
+      }
+      return (
+        !normalizedSearch ||
+        [fullName(employee), employee.profession]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase("de-DE")
+          .includes(normalizedSearch)
+      );
+    });
+  }
+
+  function openDeviceOverview(deviceId) {
+    const device = getDevice(deviceId);
+    if (!device) return;
+    deviceOverviewDeviceId = device.id;
+    deviceOverviewInstructionFilter = "all";
+    deviceOverviewEmploymentFilter = "employed";
+    deviceOverviewSearchTerm = "";
+    elements.deviceOverviewSearch.value = "";
+    elements.deviceOverviewInstructionFilter.value = "all";
+    elements.deviceOverviewEmploymentFilter.value = "employed";
+    elements.deviceOverviewTitle.textContent = device.productName;
+    elements.deviceOverviewSubtitle.textContent = [
+      device.manufacturer,
+      device.category,
+      device.currentInventory ? "aktueller Bestand" : "nicht mehr im Bestand",
+    ].join(" · ");
+    renderDeviceOverview();
+    if (!elements.deviceOverviewDialog.open) {
+      elements.deviceOverviewDialog.showModal();
+    }
+    window.setTimeout(() => elements.deviceOverviewSearch.focus(), 0);
+  }
+
+  function renderDeviceOverview() {
+    const device = getDevice(deviceOverviewDeviceId);
+    if (!device) return;
+    const completeOverview = getDeviceEmployeeOverview(device.id);
+    const overview = filterDeviceEmployeeOverview(completeOverview, {
+      searchTerm: deviceOverviewSearchTerm,
+      instructionFilter: deviceOverviewInstructionFilter,
+      employmentFilter: deviceOverviewEmploymentFilter,
+    });
+    const instructedCount = overview.filter((item) => item.isInstructed).length;
+    const missingCount = overview.length - instructedCount;
+    elements.deviceOverviewContent.innerHTML = `
+      <div class="device-employee-overview-summary" aria-label="Zusammenfassung der gefilterten Mitarbeiter">
+        <span><strong>${overview.length}</strong> sichtbar</span>
+        <span class="is-complete"><strong>${instructedCount}</strong> eingewiesen</span>
+        <span class="is-missing"><strong>${missingCount}</strong> nicht eingewiesen</span>
+      </div>
+      ${
+        overview.length
+          ? `<div class="device-employee-overview-list">
+              ${overview
+                .map(({ employee, instructions, latestInstruction, isInstructed }) => {
+                  const details = isInstructed
+                    ? `Zuletzt am ${formatDate(latestInstruction.date)} · Einweisende Person: ${escapeHtml(latestInstruction.instructorName)}`
+                    : "Für diese Person ist keine Einweisung dokumentiert.";
+                  const content = `
+                    ${renderAvatar(employee, true)}
+                    <span class="device-employee-overview-device">
+                      <strong>${escapeHtml(fullName(employee))}</strong>
+                      <small>${escapeHtml(employee.profession)} · ${escapeHtml(employeeStatusLabel(employee))}</small>
+                      <small>${details}</small>
+                    </span>
+                    <span class="status-badge ${isInstructed ? "" : "inactive"}">
+                      ${isInstructed ? "Eingewiesen" : "Nicht eingewiesen"}
+                    </span>
+                    ${instructions.length > 1 ? `<span class="device-employee-overview-count">${instructions.length} Nachweise</span>` : ""}
+                  `;
+                  return isInstructed
+                    ? `<button
+                        class="device-employee-overview-row"
+                        type="button"
+                        data-device-history-employee="${employee.id}"
+                        data-device-history-device="${device.id}"
+                        aria-label="Einweisungsverlauf für ${escapeHtml(fullName(employee))} anzeigen"
+                      >${content}</button>`
+                    : `<article class="device-employee-overview-row is-missing">${content}</article>`;
+                })
+                .join("")}
+            </div>`
+          : renderEmptyState({
+              title: "Keine Mitarbeiter für diese Filter",
+              text: "Ändern Sie die Suche oder die ausgewählten Statusfilter.",
+              compact: true,
+            })
+      }
+    `;
   }
 
   function openDeviceEmployeeOverview(employeeId) {

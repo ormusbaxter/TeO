@@ -718,6 +718,26 @@
         .toLocaleLowerCase("de-DE");
       renderDeviceInstructionMatrix();
     });
+    elements.deviceOverviewSearch.addEventListener("input", (event) => {
+      deviceOverviewSearchTerm = event.target.value
+        .trim()
+        .toLocaleLowerCase("de-DE");
+      renderDeviceOverview();
+    });
+    elements.deviceOverviewInstructionFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceOverviewInstructionFilter = event.target.value;
+        renderDeviceOverview();
+      },
+    );
+    elements.deviceOverviewEmploymentFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceOverviewEmploymentFilter = event.target.value;
+        renderDeviceOverview();
+      },
+    );
     elements.deviceParticipantSearch.addEventListener("input", (event) => {
       deviceParticipantSearchTerm = event.target.value
         .trim()
@@ -813,6 +833,10 @@
       handleDeviceHistoryAction,
     );
     elements.deviceEmployeeOverviewContent.addEventListener(
+      "click",
+      handleDeviceEmployeeOverviewAction,
+    );
+    elements.deviceOverviewContent.addEventListener(
       "click",
       handleDeviceEmployeeOverviewAction,
     );
@@ -1002,6 +1026,7 @@
         elements.deviceDialog,
         elements.deviceInstructionDialog,
         elements.deviceEmployeeOverviewDialog,
+        elements.deviceOverviewDialog,
         elements.deviceInstructionHistoryDialog,
         elements.attendanceDialog,
         elements.meetingStatsDialog,

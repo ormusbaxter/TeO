@@ -470,6 +470,10 @@
   let deviceManagementAuthorizationFilter = "all";
   let deviceEmployeeStatusFilter = "employed";
   let deviceEmployeeSearchTerm = "";
+  let deviceOverviewDeviceId = "";
+  let deviceOverviewInstructionFilter = "all";
+  let deviceOverviewEmploymentFilter = "employed";
+  let deviceOverviewSearchTerm = "";
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
   let deviceInstructionSearchTerm = "";
@@ -902,6 +906,17 @@
     deviceEmployeeOverviewContent: document.querySelector(
       "#deviceEmployeeOverviewContent",
     ),
+    deviceOverviewDialog: document.querySelector("#deviceOverviewDialog"),
+    deviceOverviewTitle: document.querySelector("#deviceOverviewTitle"),
+    deviceOverviewSubtitle: document.querySelector("#deviceOverviewSubtitle"),
+    deviceOverviewSearch: document.querySelector("#deviceOverviewSearch"),
+    deviceOverviewInstructionFilter: document.querySelector(
+      "#deviceOverviewInstructionFilter",
+    ),
+    deviceOverviewEmploymentFilter: document.querySelector(
+      "#deviceOverviewEmploymentFilter",
+    ),
+    deviceOverviewContent: document.querySelector("#deviceOverviewContent"),
     attendanceDialog: document.querySelector("#attendanceDialog"),
     attendanceForm: document.querySelector("#attendanceForm"),
     attendanceMeetingMeta: document.querySelector("#attendanceMeetingMeta"),
