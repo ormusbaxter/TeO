@@ -2112,6 +2112,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-034-000-geratebezogene-einweisungsubersicht">004.034.000 – Gerätebezogene Einweisungsübersicht</h3>
+<ul><li><strong>Neu:</strong> Klick auf einen Gerätenamen in der Einweisungsmatrix öffnet die Übersicht aller eingewiesenen und nicht eingewiesenen Mitarbeiter</li><li><strong>Neu:</strong> Geräteübersicht lässt sich nach Name, Einweisungsstatus und Mitarbeiterstatus filtern</li><li><strong>Verbessert:</strong> Vorhandene Einweisungen führen direkt aus der Geräteübersicht in den vollständigen Einweisungsverlauf</li></ul>
 <h3 id="hilfe-004-033-000-angepinnte-termine">004.033.000 – Angepinnte Termine</h3>
 <ul><li><strong>Neu:</strong> Termine lassen sich im Formular oder direkt in der Terminliste anpinnen</li><li><strong>Neu:</strong> Angepinnte Termine stehen unabhängig von Suche, Zeitraum und sonstigen Filtern ganz oben in Terminliste und Fristenmonitor</li><li><strong>Verbessert:</strong> Wichtige Termine werden mit Pin-Symbol, Wichtig-Kennzeichnung und farblicher Hervorhebung dargestellt</li></ul>
 <h3 id="hilfe-004-032-001-farbthemen">004.032.001 – Farbthemen</h3>
@@ -3589,6 +3591,58 @@ npm run verify</code></pre>
           </button>
         </div>
       </form>
+    </dialog>
+
+    <dialog
+      class="modal modal-large device-employee-overview-dialog"
+      id="deviceOverviewDialog"
+      aria-labelledby="deviceOverviewTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Geräteübersicht</p>
+          <h2 id="deviceOverviewTitle">Einweisungsstatus</h2>
+          <p class="modal-subtitle" id="deviceOverviewSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="device-overview-filter-bar">
+          <label class="search-field" for="deviceOverviewSearch">
+            <svg><use href="#icon-search"></use></svg>
+            <input
+              id="deviceOverviewSearch"
+              type="search"
+              placeholder="Mitarbeiter suchen …"
+              autocomplete="off"
+            />
+          </label>
+          <label class="compact-field">
+            <span>Einweisungsstatus</span>
+            <select id="deviceOverviewInstructionFilter">
+              <option value="all">Alle</option>
+              <option value="instructed">Eingewiesen</option>
+              <option value="missing">Nicht eingewiesen</option>
+            </select>
+          </label>
+          <label class="compact-field">
+            <span>Mitarbeiterstatus</span>
+            <select id="deviceOverviewEmploymentFilter">
+              <option value="employed">Aktiv &amp; in Einarbeitung</option>
+              <option value="active">Aktiv</option>
+              <option value="onboarding">In Einarbeitung</option>
+              <option value="inactive">Inaktiv</option>
+              <option value="all">Alle Status</option>
+            </select>
+          </label>
+        </div>
+        <div id="deviceOverviewContent"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
     </dialog>
 
     <dialog

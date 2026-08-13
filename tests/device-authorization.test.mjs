@@ -317,3 +317,88 @@ test("Mitarbeiterübersicht führt alle Geräte mit und ohne Einweisung auf", as
   assert.equal(overview[1].instructions.length, 2);
   assert.equal(overview[1].latestInstruction.id, "latest-instruction");
 });
+
+test("Geräteübersicht führt Mitarbeiter mit und ohne Einweisung und filtert sie", async () => {
+  const app = await loadAppFunctions([
+    "getDeviceEmployeeOverview",
+    "filterDeviceEmployeeOverview",
+  ]);
+  const instructed = createEmployee("employee-instructed");
+  const missing = {
+    ...createEmployee("employee-missing"),
+    firstName: "Ohne",
+    lastName: "Nachweis",
+    profession: "Pflegefachkraft",
+    employmentStatus: "onboarding",
+  };
+  const inactive = {
+    ...createEmployee("employee-inactive"),
+    firstName: "Ehemalige",
+    lastName: "Person",
+    employmentStatus: "inactive",
+  };
+  const device = {
+    id: "device-overview",
+    manufacturer: "Hersteller",
+    productName: "Testgerät",
+    category: "Monitoring",
+    currentInventory: true,
+    annex1: false,
+  };
+  app.setState(
+    createMinimalState({
+      employees: [missing, inactive, instructed],
+      devices: [device],
+      deviceInstructions: [
+        {
+          id: "instruction-overview",
+          deviceId: device.id,
+          date: "2026-04-15",
+          createdAt: "2026-04-15T10:00:00.000Z",
+          instructorType: "manufacturer",
+          instructorName: "Hersteller",
+          participants: [
+            { employeeId: instructed.id, wasMedicalProductsOfficer: false },
+          ],
+        },
+      ],
+    }),
+  );
+
+  const overview = app.getDeviceEmployeeOverview(device.id);
+  assert.equal(overview.length, 3);
+  assert.deepEqual(
+    Array.from(
+      app.filterDeviceEmployeeOverview(overview, {
+        instructionFilter: "missing",
+        employmentFilter: "employed",
+      }),
+      ({ employee }) => employee.id,
+    ),
+    [missing.id],
+  );
+  assert.deepEqual(
+    Array.from(
+      app.filterDeviceEmployeeOverview(overview, {
+        searchTerm: "test person",
+        instructionFilter: "instructed",
+        employmentFilter: "all",
+      }),
+      ({ employee }) => employee.id,
+    ),
+    [instructed.id],
+  );
+});
+
+test("Gerätenamen und Filter des Einweisungswidgets sind verdrahtet", async () => {
+  const [dialogHtml, deviceSource] = await Promise.all([
+    readFile(new URL("../src/html/70-device-dialogs.html", import.meta.url), "utf8"),
+    readFile(deviceSourceUrl, "utf8"),
+  ]);
+
+  assert.match(deviceSource, /data-device-overview="\$\{device\.id\}"/);
+  assert.match(deviceSource, /function openDeviceOverview\(deviceId\)/);
+  assert.match(dialogHtml, /id="deviceOverviewSearch"/);
+  assert.match(dialogHtml, /id="deviceOverviewInstructionFilter"/);
+  assert.match(dialogHtml, /id="deviceOverviewEmploymentFilter"/);
+});

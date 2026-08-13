@@ -6071,6 +6071,27 @@ body.is-device-matrix-maximized {
   background: transparent;
 }
 
+.device-matrix-device {
+  display: block;
+  width: 100%;
+  padding: 6px;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.device-matrix-device:hover {
+  background: var(--blue-100);
+}
+
+.device-matrix-device:focus-visible {
+  outline: 2px solid var(--blue-700);
+  outline-offset: 1px;
+}
+
 .device-matrix-employee:hover {
   background: var(--blue-50);
 }
@@ -6324,6 +6345,20 @@ button.device-matrix-status {
   flex-wrap: wrap;
 }
 
+.device-overview-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(155px, auto) minmax(190px, auto);
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.device-overview-filter-bar .search-field {
+  width: 100%;
+}
+
 .device-employee-overview-summary span {
   padding: 7px 10px;
   color: var(--slate-600);
@@ -6556,8 +6591,10 @@ button.device-employee-overview-row:hover {
   }
 
   .device-filter-bar,
+  .device-overview-filter-bar,
   .selection-toolbar {
     align-items: stretch;
+    grid-template-columns: 1fr;
     flex-direction: column;
   }
 

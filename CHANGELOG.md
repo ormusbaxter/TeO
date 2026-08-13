@@ -1,3 +1,9 @@
+### 004.034.000 – Gerätebezogene Einweisungsübersicht
+
+- **Neu:** Klick auf einen Gerätenamen in der Einweisungsmatrix öffnet die Übersicht aller eingewiesenen und nicht eingewiesenen Mitarbeiter
+- **Neu:** Geräteübersicht lässt sich nach Name, Einweisungsstatus und Mitarbeiterstatus filtern
+- **Verbessert:** Vorhandene Einweisungen führen direkt aus der Geräteübersicht in den vollständigen Einweisungsverlauf
+
 ### 004.033.000 – Angepinnte Termine
 
 - **Neu:** Termine lassen sich im Formular oder direkt in der Terminliste anpinnen
