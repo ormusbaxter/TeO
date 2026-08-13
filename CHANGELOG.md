@@ -1,3 +1,9 @@
+### 004.033.000 – Angepinnte Termine
+
+- **Neu:** Termine lassen sich im Formular oder direkt in der Terminliste anpinnen
+- **Neu:** Angepinnte Termine stehen unabhängig von Suche, Zeitraum und sonstigen Filtern ganz oben in Terminliste und Fristenmonitor
+- **Verbessert:** Wichtige Termine werden mit Pin-Symbol, Wichtig-Kennzeichnung und farblicher Hervorhebung dargestellt
+
 ### 004.032.001 – Farbthemen
 
 - **Entfernt:** Farbschema Windows 3.11 wegen zu intensiver Darstellung

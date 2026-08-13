@@ -136,6 +136,9 @@
       <symbol id="icon-star" viewBox="0 0 24 24">
         <path d="m12 3 2.6 5.6 6 .8-4.4 4.2 1.1 6.1L12 16.8 6.7 19.7l1.1-6.1L3.4 9.4l6-.8Z" />
       </symbol>
+      <symbol id="icon-pin" viewBox="0 0 24 24">
+        <path d="m9 3 6 6M8 8l-3 3 3 1 4 4 1 3 3-3M14 5l5 5M12 16l-7 5" />
+      </symbol>
       <symbol id="icon-eye" viewBox="0 0 24 24">
         <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" />
         <circle cx="12" cy="12" r="2.8" />
@@ -2109,6 +2112,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-033-000-angepinnte-termine">004.033.000 – Angepinnte Termine</h3>
+<ul><li><strong>Neu:</strong> Termine lassen sich im Formular oder direkt in der Terminliste anpinnen</li><li><strong>Neu:</strong> Angepinnte Termine stehen unabhängig von Suche, Zeitraum und sonstigen Filtern ganz oben in Terminliste und Fristenmonitor</li><li><strong>Verbessert:</strong> Wichtige Termine werden mit Pin-Symbol, Wichtig-Kennzeichnung und farblicher Hervorhebung dargestellt</li></ul>
 <h3 id="hilfe-004-032-001-farbthemen">004.032.001 – Farbthemen</h3>
 <ul><li><strong>Entfernt:</strong> Farbschema Windows 3.11 wegen zu intensiver Darstellung</li></ul>
 <h3 id="hilfe-004-032-000-zusatzliche-farbthemen">004.032.000 – Zusätzliche Farbthemen</h3>
@@ -3359,6 +3364,15 @@ npm run verify</code></pre>
               <input id="appointmentParticipantList" name="participantList" type="checkbox" />
               <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
               <span>Teilnehmerliste mit Leerzeilen drucken</span>
+            </label>
+            <label class="check-card form-field-wide appointment-pin-option">
+              <input id="appointmentPinned" name="pinned" type="checkbox" />
+              <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
+              <span>
+                <strong>Termin anpinnen</strong>
+                <small>Immer ganz oben in Terminliste und Fristenmonitor anzeigen</small>
+              </span>
+              <svg class="appointment-pin-option-icon" aria-hidden="true"><use href="#icon-pin"></use></svg>
             </label>
           </div>
         </div>

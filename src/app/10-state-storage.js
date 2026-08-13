@@ -801,6 +801,7 @@
       category: Object.hasOwn(APPOINTMENT_CATEGORIES, category) ? category : "",
       location: String(appointment.location || "").trim().slice(0, 160),
       description: String(appointment.description || "").trim().slice(0, 1000),
+      pinned: Boolean(appointment.pinned),
       participantList: Boolean(appointment.participantList),
       createdAt: validTimestamp(appointment.createdAt),
       updatedAt: validTimestamp(appointment.updatedAt || appointment.createdAt),

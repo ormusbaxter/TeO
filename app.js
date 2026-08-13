@@ -827,6 +827,7 @@
     appointmentForm: document.querySelector("#appointmentForm"),
     appointmentDialogTitle: document.querySelector("#appointmentDialogTitle"),
     appointmentSubmitLabel: document.querySelector("#appointmentSubmitLabel"),
+    appointmentPinned: document.querySelector("#appointmentPinned"),
     appointmentParticipantList: document.querySelector(
       "#appointmentParticipantList",
     ),
@@ -1810,6 +1811,7 @@
       category: Object.hasOwn(APPOINTMENT_CATEGORIES, category) ? category : "",
       location: String(appointment.location || "").trim().slice(0, 160),
       description: String(appointment.description || "").trim().slice(0, 1000),
+      pinned: Boolean(appointment.pinned),
       participantList: Boolean(appointment.participantList),
       createdAt: validTimestamp(appointment.createdAt),
       updatedAt: validTimestamp(appointment.updatedAt || appointment.createdAt),
@@ -4912,6 +4914,16 @@
       return;
     }
 
+    // Angepinnte Termine werden nie durch die allgemeine 25-Zeilen-Grenze
+    // abgeschnitten. Freie Plaetze werden danach mit regulaeren Fristen gefuellt.
+    const pinnedDeadlines = deadlines.filter((item) => item.appointment?.pinned);
+    const displayedDeadlines = [
+      ...pinnedDeadlines,
+      ...deadlines
+        .filter((item) => !item.appointment?.pinned)
+        .slice(0, Math.max(0, 25 - pinnedDeadlines.length)),
+    ];
+
     elements.deadlineOverview.innerHTML = `
       <div class="deadline-summary">
         <span class="summary-chip summary-orange">
@@ -4934,12 +4946,11 @@
           .join("")}
       </div>
       <div class="deadline-list">
-        ${deadlines
-          .slice(0, 25)
+        ${displayedDeadlines
           .map(
             (item) => `
               <button
-                class="deadline-row ${item.daysUntil < 0 ? "is-overdue" : ""}"
+                class="deadline-row ${item.appointment?.pinned ? "is-pinned" : ""} ${item.daysUntil < 0 ? "is-overdue" : ""}"
                 type="button"
                 ${
                   item.kind === "appointment"
@@ -4959,7 +4970,7 @@
                     : renderAvatar(item.employee, true)
                 }</span>
                 <span>
-                  <strong>${escapeHtml(
+                  <strong>${item.appointment?.pinned ? `<span class="deadline-pin-badge"><svg><use href="#icon-pin"></use></svg>Wichtig</span>` : ""}${escapeHtml(
                     item.kind === "birthday"
                       ? `${fullName(item.employee)} - ${item.title}`
                       : item.title,
@@ -4988,8 +4999,8 @@
           .join("")}
       </div>
       ${
-        deadlines.length > 25
-          ? `<p class="field-hint">${deadlines.length - 25} weitere Einträge werden in den jeweiligen Übersichten angezeigt.</p>`
+        deadlines.length > displayedDeadlines.length
+          ? `<p class="field-hint">${deadlines.length - displayedDeadlines.length} weitere Einträge werden in den jeweiligen Übersichten angezeigt.</p>`
           : ""
       }
     `;
@@ -5067,12 +5078,19 @@
   }
 
   function filterDeadlineItems(items, activeKinds, horizon, hideOverdue = false) {
-    return items.filter(
-      (item) =>
-        activeKinds.has(deadlineFilterKind(item)) &&
-        item.daysUntil <= horizon &&
-        (!hideOverdue || item.daysUntil >= 0),
-    );
+    return items
+      .filter(
+        (item) =>
+          item.appointment?.pinned ||
+          (activeKinds.has(deadlineFilterKind(item)) &&
+            item.daysUntil <= horizon &&
+            (!hideOverdue || item.daysUntil >= 0)),
+      )
+      .sort(
+        (a, b) =>
+          Number(Boolean(b.appointment?.pinned)) -
+          Number(Boolean(a.appointment?.pinned)),
+      );
   }
 
   function deadlineFilterKind(item) {
@@ -5136,7 +5154,7 @@
     });
     state.appointments.forEach((appointment) => {
       const daysUntil = daysBetween(today, parseLocalDate(appointment.date));
-      if (daysUntil < 0) return;
+      if (daysUntil < 0 && !appointment.pinned) return;
       items.push({
         employeeId: "",
         employee: null,
@@ -5150,6 +5168,8 @@
     });
     return items.sort(
       (a, b) =>
+        Number(Boolean(b.appointment?.pinned)) -
+          Number(Boolean(a.appointment?.pinned)) ||
         a.daysUntil - b.daysUntil ||
         (a.employee && b.employee ? sortEmployees(a.employee, b.employee) : 0) ||
         a.title.localeCompare(b.title, "de"),
@@ -8984,7 +9004,11 @@
 
   function renderAppointments() {
     const today = todayIso();
+    const pinnedAppointments = state.appointments
+      .filter((appointment) => appointment.pinned)
+      .sort(sortAppointments);
     const matchingAppointments = state.appointments.filter((appointment) => {
+      if (appointment.pinned) return false;
       if (appointmentPeriodFilter === "upcoming" && appointment.date < today) return false;
       if (appointmentPeriodFilter === "today" && appointment.date !== today) return false;
       if (appointmentPeriodFilter === "past" && appointment.date >= today) return false;
@@ -9001,7 +9025,8 @@
         .toLocaleLowerCase("de-DE")
         .includes(appointmentSearchTerm);
     });
-    const upcoming = [...matchingAppointments]
+    const visibleAppointments = [...pinnedAppointments, ...matchingAppointments];
+    const upcoming = [...visibleAppointments]
       .filter((appointment) => appointment.date >= today)
       .sort(sortAppointments);
     const past = [...matchingAppointments]
@@ -9032,7 +9057,7 @@
       return;
     }
 
-    if (matchingAppointments.length === 0) {
+    if (visibleAppointments.length === 0) {
       elements.appointmentList.innerHTML = `
         <section class="panel">
           ${renderEmptyState({
@@ -9051,6 +9076,14 @@
     }
 
     elements.appointmentList.innerHTML = `
+      ${
+        pinnedAppointments.length
+          ? `<section class="appointment-group appointment-group-pinned">
+              <h2 class="appointment-group-title"><svg><use href="#icon-pin"></use></svg>Angepinnte Termine</h2>
+              ${pinnedAppointments.map(renderAppointmentCard).join("")}
+            </section>`
+          : ""
+      }
       ${
         upcoming.length
           ? `<section class="appointment-group">
@@ -9127,7 +9160,7 @@
     ].filter(Boolean);
     return `
       <article
-        class="meeting-card appointment-card ${daysUntil < 0 ? "is-past" : ""}"
+        class="meeting-card appointment-card ${appointment.pinned ? "is-pinned" : ""} ${daysUntil < 0 ? "is-past" : ""}"
         data-appointment-card="${appointment.id}"
         tabindex="0"
         aria-label="Termindetails zu ${escapeHtml(appointment.title)} öffnen"
@@ -9141,7 +9174,7 @@
               <svg><use href="#icon-${appointmentCategoryIcon(appointment)}"></use></svg>
             </span>
             <div>
-              <h2>${escapeHtml(appointment.title)}${
+              <h2>${appointment.pinned ? `<span class="appointment-pinned-badge"><svg><use href="#icon-pin"></use></svg>Wichtig</span>` : ""}${escapeHtml(appointment.title)}${
                 kategorie
                   ? ` <span class="appointment-category-tag">${escapeHtml(kategorie)}</span>`
                   : ""
@@ -9158,6 +9191,17 @@
             <span>${escapeHtml(appointmentRelativeLabel(daysUntil))}</span>
           </div>
           <div class="training-actions">
+            <button
+              class="icon-button appointment-pin-button ${appointment.pinned ? "is-active" : ""}"
+              type="button"
+              data-action="toggle-appointment-pin"
+              data-id="${appointment.id}"
+              aria-label="${escapeHtml(appointment.title)} ${appointment.pinned ? "lösen" : "anpinnen"}"
+              aria-pressed="${String(Boolean(appointment.pinned))}"
+              title="${appointment.pinned ? "Nicht mehr anpinnen" : "Termin anpinnen"}"
+            >
+              <svg><use href="#icon-pin"></use></svg>
+            </button>
             <button
               class="icon-button"
               type="button"
@@ -11394,6 +11438,7 @@
     if (button) {
       if (event.type === "keydown") return;
       const { action, id } = button.dataset;
+      if (action === "toggle-appointment-pin") toggleAppointmentPinned(id);
       if (action === "edit-appointment") openAppointmentDialog(id);
       if (action === "delete-appointment") requestDeleteAppointment(id);
       return;
@@ -11405,6 +11450,21 @@
     }
     if (event.type === "keydown") event.preventDefault();
     openAppointmentDialog(card.dataset.appointmentCard);
+  }
+
+  async function toggleAppointmentPinned(appointmentId) {
+    const appointment = getAppointment(appointmentId);
+    if (!appointment) return;
+    const pinned = !appointment.pinned;
+    const committed = await commitStateMutation(() => {
+      state.appointments = state.appointments.map((item) =>
+        item.id === appointmentId
+          ? { ...item, pinned, updatedAt: new Date().toISOString() }
+          : item,
+      );
+    });
+    if (!committed) return;
+    showToast(pinned ? "Termin wurde angepinnt." : "Termin wurde gelöst.");
   }
 
   function openEmployeeDialog(employeeId = null) {
@@ -11885,6 +11945,7 @@
     document.querySelector("#appointmentEndTime").setCustomValidity("");
     document.querySelector("#appointmentDate").value = todayIso();
     elements.appointmentParticipantList.checked = false;
+    elements.appointmentPinned.checked = false;
 
     const appointment = appointmentId ? getAppointment(appointmentId) : null;
     elements.appointmentDialogTitle.textContent = appointment
@@ -11904,6 +11965,7 @@
       document.querySelector("#appointmentLocation").value = appointment.location;
       document.querySelector("#appointmentDescription").value = appointment.description;
       elements.appointmentParticipantList.checked = Boolean(appointment.participantList);
+      elements.appointmentPinned.checked = Boolean(appointment.pinned);
     }
 
     elements.appointmentDialog.showModal();
@@ -11948,6 +12010,7 @@
       category: elements.appointmentCategory.value,
       location: document.querySelector("#appointmentLocation").value.trim(),
       description: document.querySelector("#appointmentDescription").value.trim(),
+      pinned: elements.appointmentPinned.checked,
       participantList: elements.appointmentParticipantList.checked,
       createdAt: existingAppointment?.createdAt || now,
       updatedAt: now,
