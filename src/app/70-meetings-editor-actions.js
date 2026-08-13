@@ -631,6 +631,7 @@
     if (button) {
       if (event.type === "keydown") return;
       const { action, id } = button.dataset;
+      if (action === "toggle-appointment-pin") toggleAppointmentPinned(id);
       if (action === "edit-appointment") openAppointmentDialog(id);
       if (action === "delete-appointment") requestDeleteAppointment(id);
       return;
@@ -642,6 +643,21 @@
     }
     if (event.type === "keydown") event.preventDefault();
     openAppointmentDialog(card.dataset.appointmentCard);
+  }
+
+  async function toggleAppointmentPinned(appointmentId) {
+    const appointment = getAppointment(appointmentId);
+    if (!appointment) return;
+    const pinned = !appointment.pinned;
+    const committed = await commitStateMutation(() => {
+      state.appointments = state.appointments.map((item) =>
+        item.id === appointmentId
+          ? { ...item, pinned, updatedAt: new Date().toISOString() }
+          : item,
+      );
+    });
+    if (!committed) return;
+    showToast(pinned ? "Termin wurde angepinnt." : "Termin wurde gelöst.");
   }
 
   function openEmployeeDialog(employeeId = null) {
@@ -1122,6 +1138,7 @@
     document.querySelector("#appointmentEndTime").setCustomValidity("");
     document.querySelector("#appointmentDate").value = todayIso();
     elements.appointmentParticipantList.checked = false;
+    elements.appointmentPinned.checked = false;
 
     const appointment = appointmentId ? getAppointment(appointmentId) : null;
     elements.appointmentDialogTitle.textContent = appointment
@@ -1141,6 +1158,7 @@
       document.querySelector("#appointmentLocation").value = appointment.location;
       document.querySelector("#appointmentDescription").value = appointment.description;
       elements.appointmentParticipantList.checked = Boolean(appointment.participantList);
+      elements.appointmentPinned.checked = Boolean(appointment.pinned);
     }
 
     elements.appointmentDialog.showModal();
@@ -1185,6 +1203,7 @@
       category: elements.appointmentCategory.value,
       location: document.querySelector("#appointmentLocation").value.trim(),
       description: document.querySelector("#appointmentDescription").value.trim(),
+      pinned: elements.appointmentPinned.checked,
       participantList: elements.appointmentParticipantList.checked,
       createdAt: existingAppointment?.createdAt || now,
       updatedAt: now,

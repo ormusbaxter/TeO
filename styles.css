@@ -2607,6 +2607,28 @@ svg {
   margin-top: 22px;
 }
 
+.appointment-group-pinned {
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--orange-700) 38%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--orange-100) 58%, var(--white));
+}
+
+.appointment-group-pinned .appointment-group-title {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  color: var(--orange-700);
+}
+
+.appointment-group-pinned .appointment-group-title svg,
+.appointment-pinned-badge svg,
+.deadline-pin-badge svg,
+.appointment-pin-option-icon {
+  width: 14px;
+  height: 14px;
+}
+
 .appointment-card .meeting-card-main {
   grid-template-columns: minmax(280px, 1fr) auto auto;
 }
@@ -2629,6 +2651,56 @@ svg {
 
 .appointment-card.is-past {
   opacity: 0.78;
+}
+
+.appointment-card.is-pinned {
+  border-color: color-mix(in srgb, var(--orange-700) 38%, transparent);
+  box-shadow: inset 4px 0 0 var(--orange-700), 0 8px 22px rgb(170 92 12 / 10%);
+  background: color-mix(in srgb, var(--orange-100) 35%, var(--white));
+}
+
+.appointment-card.is-pinned.is-past {
+  opacity: 1;
+}
+
+.appointment-pinned-badge,
+.deadline-pin-badge {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  margin-right: 8px;
+  padding: 3px 7px;
+  color: var(--orange-700);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  vertical-align: 2px;
+  text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, var(--orange-700) 38%, transparent);
+  border-radius: 999px;
+  background: var(--orange-100);
+}
+
+.appointment-pin-button.is-active {
+  color: var(--orange-700);
+  border-color: color-mix(in srgb, var(--orange-700) 38%, transparent);
+  background: var(--orange-100);
+}
+
+.appointment-pin-option {
+  position: relative;
+  border-color: color-mix(in srgb, var(--orange-700) 38%, transparent);
+}
+
+.appointment-pin-option small {
+  display: block;
+  margin-top: 3px;
+  color: var(--slate-500);
+}
+
+.appointment-pin-option-icon {
+  margin-left: auto;
+  color: var(--orange-700);
 }
 
 .appointment-icon {
@@ -5719,6 +5791,16 @@ legend {
 
 .deadline-row:hover {
   background: var(--slate-50);
+}
+
+.deadline-row.is-pinned {
+  border-bottom-color: color-mix(in srgb, var(--orange-700) 38%, transparent);
+  box-shadow: inset 4px 0 0 var(--orange-700);
+  background: color-mix(in srgb, var(--orange-100) 48%, var(--white));
+}
+
+.deadline-row.is-pinned:hover {
+  background: var(--orange-100);
 }
 
 .deadline-calendar-icon {

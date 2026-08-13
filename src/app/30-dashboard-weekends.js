@@ -105,6 +105,16 @@
       return;
     }
 
+    // Angepinnte Termine werden nie durch die allgemeine 25-Zeilen-Grenze
+    // abgeschnitten. Freie Plaetze werden danach mit regulaeren Fristen gefuellt.
+    const pinnedDeadlines = deadlines.filter((item) => item.appointment?.pinned);
+    const displayedDeadlines = [
+      ...pinnedDeadlines,
+      ...deadlines
+        .filter((item) => !item.appointment?.pinned)
+        .slice(0, Math.max(0, 25 - pinnedDeadlines.length)),
+    ];
+
     elements.deadlineOverview.innerHTML = `
       <div class="deadline-summary">
         <span class="summary-chip summary-orange">
@@ -127,12 +137,11 @@
           .join("")}
       </div>
       <div class="deadline-list">
-        ${deadlines
-          .slice(0, 25)
+        ${displayedDeadlines
           .map(
             (item) => `
               <button
-                class="deadline-row ${item.daysUntil < 0 ? "is-overdue" : ""}"
+                class="deadline-row ${item.appointment?.pinned ? "is-pinned" : ""} ${item.daysUntil < 0 ? "is-overdue" : ""}"
                 type="button"
                 ${
                   item.kind === "appointment"
@@ -152,7 +161,7 @@
                     : renderAvatar(item.employee, true)
                 }</span>
                 <span>
-                  <strong>${escapeHtml(
+                  <strong>${item.appointment?.pinned ? `<span class="deadline-pin-badge"><svg><use href="#icon-pin"></use></svg>Wichtig</span>` : ""}${escapeHtml(
                     item.kind === "birthday"
                       ? `${fullName(item.employee)} - ${item.title}`
                       : item.title,
@@ -181,8 +190,8 @@
           .join("")}
       </div>
       ${
-        deadlines.length > 25
-          ? `<p class="field-hint">${deadlines.length - 25} weitere Einträge werden in den jeweiligen Übersichten angezeigt.</p>`
+        deadlines.length > displayedDeadlines.length
+          ? `<p class="field-hint">${deadlines.length - displayedDeadlines.length} weitere Einträge werden in den jeweiligen Übersichten angezeigt.</p>`
           : ""
       }
     `;
@@ -260,12 +269,19 @@
   }
 
   function filterDeadlineItems(items, activeKinds, horizon, hideOverdue = false) {
-    return items.filter(
-      (item) =>
-        activeKinds.has(deadlineFilterKind(item)) &&
-        item.daysUntil <= horizon &&
-        (!hideOverdue || item.daysUntil >= 0),
-    );
+    return items
+      .filter(
+        (item) =>
+          item.appointment?.pinned ||
+          (activeKinds.has(deadlineFilterKind(item)) &&
+            item.daysUntil <= horizon &&
+            (!hideOverdue || item.daysUntil >= 0)),
+      )
+      .sort(
+        (a, b) =>
+          Number(Boolean(b.appointment?.pinned)) -
+          Number(Boolean(a.appointment?.pinned)),
+      );
   }
 
   function deadlineFilterKind(item) {
@@ -329,7 +345,7 @@
     });
     state.appointments.forEach((appointment) => {
       const daysUntil = daysBetween(today, parseLocalDate(appointment.date));
-      if (daysUntil < 0) return;
+      if (daysUntil < 0 && !appointment.pinned) return;
       items.push({
         employeeId: "",
         employee: null,
@@ -343,6 +359,8 @@
     });
     return items.sort(
       (a, b) =>
+        Number(Boolean(b.appointment?.pinned)) -
+          Number(Boolean(a.appointment?.pinned)) ||
         a.daysUntil - b.daysUntil ||
         (a.employee && b.employee ? sortEmployees(a.employee, b.employee) : 0) ||
         a.title.localeCompare(b.title, "de"),

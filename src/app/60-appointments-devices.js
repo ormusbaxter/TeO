@@ -1,6 +1,10 @@
   function renderAppointments() {
     const today = todayIso();
+    const pinnedAppointments = state.appointments
+      .filter((appointment) => appointment.pinned)
+      .sort(sortAppointments);
     const matchingAppointments = state.appointments.filter((appointment) => {
+      if (appointment.pinned) return false;
       if (appointmentPeriodFilter === "upcoming" && appointment.date < today) return false;
       if (appointmentPeriodFilter === "today" && appointment.date !== today) return false;
       if (appointmentPeriodFilter === "past" && appointment.date >= today) return false;
@@ -17,7 +21,8 @@
         .toLocaleLowerCase("de-DE")
         .includes(appointmentSearchTerm);
     });
-    const upcoming = [...matchingAppointments]
+    const visibleAppointments = [...pinnedAppointments, ...matchingAppointments];
+    const upcoming = [...visibleAppointments]
       .filter((appointment) => appointment.date >= today)
       .sort(sortAppointments);
     const past = [...matchingAppointments]
@@ -48,7 +53,7 @@
       return;
     }
 
-    if (matchingAppointments.length === 0) {
+    if (visibleAppointments.length === 0) {
       elements.appointmentList.innerHTML = `
         <section class="panel">
           ${renderEmptyState({
@@ -67,6 +72,14 @@
     }
 
     elements.appointmentList.innerHTML = `
+      ${
+        pinnedAppointments.length
+          ? `<section class="appointment-group appointment-group-pinned">
+              <h2 class="appointment-group-title"><svg><use href="#icon-pin"></use></svg>Angepinnte Termine</h2>
+              ${pinnedAppointments.map(renderAppointmentCard).join("")}
+            </section>`
+          : ""
+      }
       ${
         upcoming.length
           ? `<section class="appointment-group">
@@ -143,7 +156,7 @@
     ].filter(Boolean);
     return `
       <article
-        class="meeting-card appointment-card ${daysUntil < 0 ? "is-past" : ""}"
+        class="meeting-card appointment-card ${appointment.pinned ? "is-pinned" : ""} ${daysUntil < 0 ? "is-past" : ""}"
         data-appointment-card="${appointment.id}"
         tabindex="0"
         aria-label="Termindetails zu ${escapeHtml(appointment.title)} öffnen"
@@ -157,7 +170,7 @@
               <svg><use href="#icon-${appointmentCategoryIcon(appointment)}"></use></svg>
             </span>
             <div>
-              <h2>${escapeHtml(appointment.title)}${
+              <h2>${appointment.pinned ? `<span class="appointment-pinned-badge"><svg><use href="#icon-pin"></use></svg>Wichtig</span>` : ""}${escapeHtml(appointment.title)}${
                 kategorie
                   ? ` <span class="appointment-category-tag">${escapeHtml(kategorie)}</span>`
                   : ""
@@ -174,6 +187,17 @@
             <span>${escapeHtml(appointmentRelativeLabel(daysUntil))}</span>
           </div>
           <div class="training-actions">
+            <button
+              class="icon-button appointment-pin-button ${appointment.pinned ? "is-active" : ""}"
+              type="button"
+              data-action="toggle-appointment-pin"
+              data-id="${appointment.id}"
+              aria-label="${escapeHtml(appointment.title)} ${appointment.pinned ? "lösen" : "anpinnen"}"
+              aria-pressed="${String(Boolean(appointment.pinned))}"
+              title="${appointment.pinned ? "Nicht mehr anpinnen" : "Termin anpinnen"}"
+            >
+              <svg><use href="#icon-pin"></use></svg>
+            </button>
             <button
               class="icon-button"
               type="button"
