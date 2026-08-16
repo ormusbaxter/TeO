@@ -1,3 +1,8 @@
+### 004.035.002 – Primäraktion der Pflichtfortbildungen
+
+- **Verbessert:** „Abschluss eintragen“ steht jetzt an der prominenten Aktionsposition und verwendet den Primärstil
+- **Verbessert:** „Fortbildung anlegen“ steht davor und verwendet den zurückhaltenderen Sekundärstil
+
 ### 004.035.001 – Erkennbares Symbol für wichtige Termine
 
 - **Verbessert:** Angepinnte Termine verwenden jetzt das deutlich erkennbare Glockensymbol „notifications_active“
