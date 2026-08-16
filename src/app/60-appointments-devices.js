@@ -22,17 +22,22 @@
         .includes(appointmentSearchTerm);
     });
     const visibleAppointments = [...pinnedAppointments, ...matchingAppointments];
-    const upcoming = [...visibleAppointments]
+    const upcoming = [...matchingAppointments]
       .filter((appointment) => appointment.date >= today)
       .sort(sortAppointments);
     const past = [...matchingAppointments]
       .filter((appointment) => appointment.date < today)
       .sort((a, b) => sortAppointments(b, a));
-    const todayCount = upcoming.filter((appointment) => appointment.date === today).length;
+    const visibleUpcomingCount = visibleAppointments.filter(
+      (appointment) => appointment.date >= today,
+    ).length;
+    const todayCount = visibleAppointments.filter(
+      (appointment) => appointment.date === today,
+    ).length;
 
     elements.appointmentSummary.innerHTML = `
       ${renderSummaryChip("calendar", state.appointments.length, "Termine gesamt")}
-      ${renderSummaryChip("alert", upcoming.length, "anstehende Termine", "orange")}
+      ${renderSummaryChip("alert", visibleUpcomingCount, "anstehende Termine", "orange")}
       ${renderSummaryChip("check", todayCount, "Termine heute", "teal")}
     `;
 

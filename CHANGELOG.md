@@ -1,3 +1,8 @@
+### 004.034.001 – Filter für angepinnte Termine
+
+- **Fix:** Der Filter „Überfällige ausblenden“ gilt jetzt auch für angepinnte Termine im Fristenmonitor
+- **Fix:** Angepinnte Termine erscheinen im Terminkalender nur noch im Abschnitt „Angepinnte Termine“ statt zusätzlich in einer Zeitraumgruppe
+
 ### 004.034.000 – Gerätebezogene Einweisungsübersicht
 
 - **Neu:** Klick auf einen Gerätenamen in der Einweisungsmatrix öffnet die Übersicht aller eingewiesenen und nicht eingewiesenen Mitarbeiter
