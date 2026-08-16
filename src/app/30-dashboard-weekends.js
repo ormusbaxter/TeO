@@ -272,10 +272,10 @@
     return items
       .filter(
         (item) =>
-          item.appointment?.pinned ||
-          (activeKinds.has(deadlineFilterKind(item)) &&
-            item.daysUntil <= horizon &&
-            (!hideOverdue || item.daysUntil >= 0)),
+          (!hideOverdue || item.daysUntil >= 0) &&
+          (item.appointment?.pinned ||
+            (activeKinds.has(deadlineFilterKind(item)) &&
+              item.daysUntil <= horizon)),
       )
       .sort(
         (a, b) =>
