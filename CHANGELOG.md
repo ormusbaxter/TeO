@@ -1,3 +1,8 @@
+### 004.035.001 – Erkennbares Symbol für wichtige Termine
+
+- **Verbessert:** Angepinnte Termine verwenden jetzt das deutlich erkennbare Glockensymbol „notifications_active“
+- **Verbessert:** Das Material-Symbol ist als CSS-Maske vollständig offline eingebettet und übernimmt automatisch die jeweilige Theme-Farbe
+
 ### 004.035.000 – Terminbeschreibungen im Fristenmonitor
 
 - **Neu:** Hinterlegte Terminbeschreibungen werden im Fristenmonitor unter den Termindetails angezeigt

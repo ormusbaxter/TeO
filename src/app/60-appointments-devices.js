@@ -80,7 +80,7 @@
       ${
         pinnedAppointments.length
           ? `<section class="appointment-group appointment-group-pinned">
-              <h2 class="appointment-group-title"><svg><use href="#icon-pin"></use></svg>Angepinnte Termine</h2>
+              <h2 class="appointment-group-title"><span class="important-notification-icon" aria-hidden="true"></span>Angepinnte Termine</h2>
               ${pinnedAppointments.map(renderAppointmentCard).join("")}
             </section>`
           : ""
@@ -175,7 +175,7 @@
               <svg><use href="#icon-${appointmentCategoryIcon(appointment)}"></use></svg>
             </span>
             <div>
-              <h2>${appointment.pinned ? `<span class="appointment-pinned-badge"><svg><use href="#icon-pin"></use></svg>Wichtig</span>` : ""}${escapeHtml(appointment.title)}${
+              <h2>${appointment.pinned ? `<span class="appointment-pinned-badge"><span class="important-notification-icon" aria-hidden="true"></span>Wichtig</span>` : ""}${escapeHtml(appointment.title)}${
                 kategorie
                   ? ` <span class="appointment-category-tag">${escapeHtml(kategorie)}</span>`
                   : ""
@@ -201,7 +201,7 @@
               aria-pressed="${String(Boolean(appointment.pinned))}"
               title="${appointment.pinned ? "Nicht mehr anpinnen" : "Termin anpinnen"}"
             >
-              <svg><use href="#icon-pin"></use></svg>
+              <span class="important-notification-icon" aria-hidden="true"></span>
             </button>
             <button
               class="icon-button"

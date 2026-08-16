@@ -161,7 +161,7 @@
                     : renderAvatar(item.employee, true)
                 }</span>
                 <span>
-                  <strong>${item.appointment?.pinned ? `<span class="deadline-pin-badge"><svg><use href="#icon-pin"></use></svg>Wichtig</span>` : ""}${escapeHtml(
+                  <strong>${item.appointment?.pinned ? `<span class="deadline-pin-badge"><span class="important-notification-icon" aria-hidden="true"></span>Wichtig</span>` : ""}${escapeHtml(
                     item.kind === "birthday"
                       ? `${fullName(item.employee)} - ${item.title}`
                       : item.title,
