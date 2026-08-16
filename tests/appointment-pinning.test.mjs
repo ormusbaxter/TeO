@@ -50,6 +50,8 @@ test("Pin-Status, Bedienung und Wichtig-Markierung sind verdrahtet", async () =>
   assert.match(dialogHtml, /id="appointmentPinned"/);
   assert.match(appSource, /pinned:\s*Boolean\(appointment\.pinned\)/);
   assert.match(appSource, /data-action="toggle-appointment-pin"/);
+  assert.doesNotMatch(appSource, /href="#icon-pin"/);
+  assert.match(appSource, /important-notification-icon/);
   assert.match(appSource, /appointment-group-pinned/);
   assert.match(
     appSource,
@@ -63,6 +65,11 @@ test("Pin-Status, Bedienung und Wichtig-Markierung sind verdrahtet", async () =>
   );
   assert.match(coreCss, /\.appointment-card\.is-pinned\s*{/);
   assert.match(coreCss, /\.deadline-row\.is-pinned\s*{/);
+  assert.match(
+    coreCss,
+    /\.important-notification-icon\s*\{[\s\S]*data:image\/svg\+xml[\s\S]*M80-560/,
+  );
+  assert.doesNotMatch(coreCss, /fonts\.googleapis\.com/);
   assert.match(
     coreCss,
     /\.deadline-row \.deadline-description\s*\{[^}]*-webkit-line-clamp:\s*2;/s,
