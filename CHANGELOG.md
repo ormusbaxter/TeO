@@ -1,3 +1,8 @@
+### 004.035.000 – Terminbeschreibungen im Fristenmonitor
+
+- **Neu:** Hinterlegte Terminbeschreibungen werden im Fristenmonitor unter den Termindetails angezeigt
+- **Verbessert:** Lange Beschreibungen werden auf zwei Zeilen begrenzt und bleiben vollständig als Tooltip verfügbar
+
 ### 004.034.001 – Filter für angepinnte Termine
 
 - **Fix:** Der Filter „Überfällige ausblenden“ gilt jetzt auch für angepinnte Termine im Fristenmonitor

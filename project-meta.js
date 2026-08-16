@@ -5,8 +5,8 @@
   "name": "TeO – Team & Employee Organizer",
   "version": {
     "major": 4,
-    "minor": 34,
-    "patch": 1
+    "minor": 35,
+    "patch": 0
   },
   "stateVersion": 24,
   "backupFormat": "intensivteam-datensicherung",
