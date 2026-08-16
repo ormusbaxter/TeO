@@ -5028,6 +5028,14 @@
                             .join(" · ")
                         : `${fullName(item.employee)} · ${item.type}`,
                   )}</small>
+                  ${
+                    item.kind === "appointment" && item.appointment.description
+                      ? `<small
+                          class="deadline-description"
+                          title="${escapeHtml(item.appointment.description)}"
+                        >${escapeHtml(item.appointment.description)}</small>`
+                      : ""
+                  }
                 </span>
                 <span>
                   <strong>${formatDate(item.dueDate)}</strong>

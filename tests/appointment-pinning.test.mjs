@@ -57,6 +57,14 @@ test("Pin-Status, Bedienung und Wichtig-Markierung sind verdrahtet", async () =>
     "Angepinnte Termine dürfen nicht zusätzlich in einer Zeitraumgruppe erscheinen.",
   );
   assert.match(appSource, /deadline-row \$\{item\.appointment\?\.pinned \? "is-pinned"/);
+  assert.match(
+    appSource,
+    /class="deadline-description"[\s\S]*item\.appointment\.description/,
+  );
   assert.match(coreCss, /\.appointment-card\.is-pinned\s*{/);
   assert.match(coreCss, /\.deadline-row\.is-pinned\s*{/);
+  assert.match(
+    coreCss,
+    /\.deadline-row \.deadline-description\s*\{[^}]*-webkit-line-clamp:\s*2;/s,
+  );
 });

@@ -5834,6 +5834,21 @@ legend {
   font-size: 0.62rem;
 }
 
+.deadline-row > span:nth-child(2) {
+  min-width: 0;
+}
+
+.deadline-row .deadline-description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--slate-700);
+  line-height: 1.4;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
 .deadline-row > :last-child {
   text-align: right;
 }
