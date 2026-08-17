@@ -683,6 +683,10 @@
         .toLocaleLowerCase("de-DE");
       renderDevices();
     });
+    elements.exportDeviceCatalogExcelButton.addEventListener(
+      "click",
+      exportDeviceCatalogExcel,
+    );
     elements.deviceManagementInventoryFilter.addEventListener(
       "change",
       (event) => {

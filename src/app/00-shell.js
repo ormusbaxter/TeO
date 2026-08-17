@@ -716,6 +716,9 @@
     deviceMatrixMaximizeLabel: document.querySelector("#deviceMatrixMaximizeLabel"),
     deviceManagementSummary: document.querySelector("#deviceManagementSummary"),
     deviceCatalog: document.querySelector("#deviceCatalog"),
+    exportDeviceCatalogExcelButton: document.querySelector(
+      "#exportDeviceCatalogExcelButton",
+    ),
     deviceInstructionMatrix: document.querySelector("#deviceInstructionMatrix"),
     deviceInstructionList: document.querySelector("#deviceInstructionList"),
     deviceInstructionSearch: document.querySelector("#deviceInstructionSearch"),
