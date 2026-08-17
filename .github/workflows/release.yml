@@ -1,0 +1,74 @@
+name: Release
+
+# Legt zu einem Tag das Paket für den lokalen Betrieb an und veröffentlicht es
+# als GitHub-Release. Titel und Text stammen aus CHANGELOG.md; beim manuellen
+# Start lassen sie sich überschreiben.
+#
+# Ein Tag-Push veröffentlicht damit von selbst. Wer den Tag vor der
+# Veröffentlichung noch prüfen möchte, startet den Lauf stattdessen von Hand.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag der Fassung, z. B. v4.39.0"
+        required: true
+      ref:
+        description: "Stand, der gebaut wird (leer = der Tag selbst)"
+        required: false
+      title:
+        description: "Titel (leer = aus CHANGELOG.md)"
+        required: false
+      notes:
+        description: "Release-Text (leer = Abschnitt aus CHANGELOG.md)"
+        required: false
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Paket bauen und veröffentlichen
+    # Das Paketskript ist für Windows-PowerShell geschrieben und wird über
+    # npm run release:package genauso aufgerufen wie bei einer Auslieferung
+    # vom Arbeitsplatz aus.
+    runs-on: windows-latest
+    steps:
+      # Gebaut wird der Tag. Trägt ein Tag die Bauwerkzeuge noch nicht - etwa
+      # der erste, der vor diesem Workflow entstanden ist -, benennt „ref“
+      # stattdessen den Stand, der sie enthält. Der Abgleich mit package.json
+      # im nächsten Schritt stellt sicher, dass er dieselbe Fassung trägt.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || inputs.tag || github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Enthält npm run verify: Build, Strukturprüfung und Tests. Schlägt eine
+      # der Prüfungen fehl, entsteht keine Veröffentlichung.
+      - name: Paket bauen
+        run: npm run release:package
+
+      - name: Titel und Text bestimmen
+        id: notes
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          RELEASE_TITLE: ${{ inputs.title }}
+          RELEASE_NOTES: ${{ inputs.notes }}
+        run: node tools/release-notes.mjs $env:RELEASE_TAG release-notes.md
+
+      - name: Veröffentlichung anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.notes.outputs.tag }}
+          RELEASE_TITLE: ${{ steps.notes.outputs.title }}
+          RELEASE_ASSET: ${{ steps.notes.outputs.asset }}
+        run: >
+          gh release create $env:RELEASE_TAG $env:RELEASE_ASSET
+          --title $env:RELEASE_TITLE
+          --notes-file release-notes.md
+          --verify-tag
+          --latest
