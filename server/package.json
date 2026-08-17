@@ -12,6 +12,7 @@
     "check": "node --check src/server.js && node --check src/session-store.js && node --check src/migrations.js && node --check src/relational-state-store.js"
   },
   "dependencies": {
+    "compression": "1.8.1",
     "dotenv": "17.4.2",
     "express": "5.2.1",
     "mariadb": "3.5.3"

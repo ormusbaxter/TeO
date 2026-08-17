@@ -2,6 +2,7 @@ import "dotenv/config";
 import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import compression from "compression";
 import express from "express";
 import mariadb from "mariadb";
 import { validateStateShape as validateSharedState } from "../../src/shared/state-schema.mjs";
@@ -71,6 +72,10 @@ const sessionStore = createSessionStore(pool, sessionTtlMs);
 
 app.disable("x-powered-by");
 if (booleanEnv("TEO_TRUST_PROXY", false)) app.set("trust proxy", 1);
+// app.js, styles.css und index.html sind zusammen rund ein Megabyte reiner
+// Text. Ohne Komprimierung geht das bei jedem Kaltstart vollstaendig ueber das
+// Stationsnetz.
+app.use(compression());
 app.use((request, response, next) => {
   const upgradeInsecureRequests = httpsOnly ? "; upgrade-insecure-requests" : "";
   response.set({
@@ -416,6 +421,7 @@ for (const fileName of [
   "state-schema.js",
   "backend-client.js",
   "app.js",
+  "service-worker.js",
 ]) {
   app.get(`/${fileName}`, (_request, response) => {
     response.sendFile(path.join(projectRoot, fileName));

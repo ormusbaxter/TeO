@@ -47,7 +47,30 @@
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
     restoreAuthenticationSession();
+    if (discardedUserAccounts > 0) {
+      showToast(
+        `${discardedUserAccounts} Benutzerkonto/-konten waren ungültig oder doppelt vergeben und wurden nicht übernommen.`,
+        "warning",
+      );
+      discardedUserAccounts = 0;
+    }
     void refreshBackendHealth();
+    registerServiceWorker();
+  }
+
+  // Haelt die Anwendung selbst offline verfuegbar. Der Datenbestand liegt
+  // ohnehin lokal; ohne Zwischenspeicher laedt bei fehlender Verbindung
+  // lediglich die Seite nicht. Beim Oeffnen per Doppelklick (file://) und in
+  // unsicheren Kontexten steht die Schnittstelle nicht bereit - dann arbeitet
+  // TeO wie bisher ohne Zwischenspeicher weiter.
+  function registerServiceWorker() {
+    if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
+    navigator.serviceWorker.register("service-worker.js").catch((error) => {
+      console.warn(
+        "Der Offlinebetrieb konnte nicht eingerichtet werden.",
+        error,
+      );
+    });
   }
 
   function emptyState() {
@@ -555,18 +578,33 @@
       .slice(0, MAX_SCHOOL_VACATION_PERIODS);
   }
 
+  // Ein einzelnes beschaedigtes Konto darf nicht alle uebrigen mitreissen:
+  // Fruher gab diese Funktion in dem Fall eine leere Liste zurueck, wodurch die
+  // Anwendung ohne Hinweis in die Ersteinrichtung zurueckfiel. Ungueltige und
+  // doppelt vergebene Konten werden deshalb einzeln verworfen. Nur wenn danach
+  // kein Administratorkonto mehr uebrig ist, bleibt der Bestand unbrauchbar -
+  // dann ist die Ersteinrichtung tatsaechlich der richtige Weg.
   function normalizeUsers(users) {
     if (!Array.isArray(users)) return initialUsers();
-    const normalized = users.map(normalizeUser).filter(Boolean);
-    const normalizedNames = new Set(
-      normalized.map((user) => user.username.toLocaleLowerCase("de-DE")),
-    );
-    if (
-      normalizedNames.size !== normalized.length ||
-      (normalized.length > 0 &&
-        !normalized.some((user) => user.role === "admin"))
-    ) {
+    const seenNames = new Set();
+    const normalized = [];
+    let discarded = users.length;
+    users.map(normalizeUser).forEach((user) => {
+      if (!user) return;
+      const normalizedName = user.username.toLocaleLowerCase("de-DE");
+      if (seenNames.has(normalizedName)) return;
+      seenNames.add(normalizedName);
+      normalized.push(user);
+    });
+    discarded -= normalized.length;
+    if (!normalized.some((user) => user.role === "admin")) {
       return initialUsers();
+    }
+    if (discarded > 0) {
+      console.warn(
+        `${discarded} Benutzerkonto/-konten waren ungültig oder doppelt vergeben und wurden verworfen.`,
+      );
+      discardedUserAccounts = discarded;
     }
     return normalized;
   }
@@ -624,20 +662,6 @@
     )
       ? "Pflegefachkraft"
       : profession;
-  }
-
-  function employeeNameSignature(value) {
-    return String(value || "")
-      .normalize("NFKD")
-      .replace(/\p{Diacritic}/gu, "")
-      .replace(/ß/gi, "ss")
-      .toLocaleLowerCase("de-DE")
-      .replace(/[^a-z0-9]+/g, " ")
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .sort()
-      .join(" ");
   }
 
   function normalizeEmployee(employee) {
@@ -1188,6 +1212,7 @@
     appendAuditEntry(describeMutation(previousState, state));
 
     if (await persistState()) {
+      stateMutationSequence += 1;
       databaseSaveReminderArmed = true;
       renderAll();
       scheduleAutomaticBackup();
@@ -1211,32 +1236,23 @@
     return false;
   }
 
+  // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn
+  // gezielt wieder entfernen kann, wenn das Speichern anschliessend scheitert.
   function appendAuditEntry(action) {
-    if (!action) return;
+    if (!action) return "";
+    const id = createId();
     state.auditLog.unshift({
-      id: createId(),
+      id,
       timestamp: new Date().toISOString(),
       username: currentUser?.username || "System",
       action,
     });
     state.auditLog = state.auditLog.slice(0, MAX_AUDIT_LOG_ENTRIES);
+    return id;
   }
 
   function describeMutation(before, after) {
-    const collections = [
-      ["employees", "Mitarbeiter"],
-      ["trainings", "Pflichtfortbildungen"],
-      ["completions", "Fortbildungsnachweise"],
-      ["meetings", "Teamsitzungen"],
-      ["meetingAttendances", "Sitzungsteilnahmen"],
-      ["appointments", "Termine"],
-      ["devices", "Geräte"],
-      ["deviceInstructions", "Geräteeinweisungen"],
-      ["vacationEntitlements", "Urlaubsansprüche"],
-      ["vacationDays", "Abwesenheitsplanung"],
-      ["users", "Benutzerkonten"],
-    ];
-    for (const [key, label] of collections) {
+    for (const [key, label] of TRACKED_COLLECTIONS) {
       const difference = after[key].length - before[key].length;
       if (difference > 0) return `${label}: ${difference} Eintrag/Einträge hinzugefügt`;
       if (difference < 0) return `${label}: ${Math.abs(difference)} Eintrag/Einträge gelöscht`;

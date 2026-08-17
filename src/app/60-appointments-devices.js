@@ -600,7 +600,7 @@
 
   function exportDeviceCatalogExcel() {
     const workbook = createDeviceExcelWorkbook(state.devices);
-    const date = new Date().toISOString().slice(0, 10);
+    const date = todayIso();
     downloadTextFile(
       `TeO-Geraetekatalog-${date}.xls`,
       workbook,

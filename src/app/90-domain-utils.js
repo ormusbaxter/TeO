@@ -398,19 +398,7 @@
 
   function shouldRemindBeforeUnload(candidateState = state) {
     if (!candidateState || typeof candidateState !== "object") return false;
-    const collections = [
-      "employees",
-      "trainings",
-      "completions",
-      "meetings",
-      "meetingAttendances",
-      "appointments",
-      "devices",
-      "deviceInstructions",
-      "vacationEntitlements",
-      "vacationDays",
-      "users",
-    ];
+    const collections = TRACKED_COLLECTION_KEYS;
     const containsData = collections.some(
       (collection) => candidateState[collection]?.length,
     );
@@ -429,7 +417,9 @@
     if (hasLaterAuditChange) return true;
 
     return collections
-      .filter((collection) => collection !== "users")
+      .filter(
+        (collection) => !COLLECTIONS_WITHOUT_TIMESTAMPS.includes(collection),
+      )
       .some((collection) =>
         (candidateState[collection] || []).some((entry) =>
           ["updatedAt", "createdAt"].some(
@@ -438,6 +428,87 @@
           ),
         ),
       );
+  }
+
+  // Nach einem Import beschreiben die zuvor gesetzten Filter einen anderen
+  // Datenbestand: Eine Namenssuche, eine Kategorie oder ein Bestandsfilter
+  // laesst Listen dann leer wirken, obwohl die Daten vollstaendig vorliegen.
+  // Deshalb gehen alle Listenfilter gemeinsam auf ihre Voreinstellung zurueck.
+  // Sortierungen bleiben bewusst erhalten, sie verbergen keine Datensaetze.
+  //
+  // tools/check.mjs prueft, dass jede Filter- und Suchvariable hier vorkommt,
+  // damit ein spaeter ergaenzter Filter nicht vergessen wird.
+  function resetListFilters() {
+    employeeStatusFilter = "all";
+    employeeSearchTerm = "";
+    employeeProfessionFilter = "all";
+    employeeQualificationFilter = "all";
+    employeeWeekendFilter = "all";
+    elements.employeeSearch.value = "";
+    elements.employeeProfessionFilter.value = employeeProfessionFilter;
+    elements.employeeQualificationFilter.value = employeeQualificationFilter;
+    elements.employeeWeekendFilter.value = employeeWeekendFilter;
+
+    appointmentPeriodFilter = "all";
+    appointmentSearchTerm = "";
+    elements.appointmentSearch.value = "";
+
+    memoSearchTerm = "";
+    memoCategoryFilter = "all";
+    memoStatusFilter = "open";
+    elements.memoSearch.value = "";
+    elements.memoCategoryFilter.value = memoCategoryFilter;
+
+    completionSearchTerm = "";
+    elements.completionEmployeeSearch.value = "";
+
+    attendanceSearchTerm = "";
+    attendanceStatusFilter = "all";
+    elements.attendanceSearch.value = "";
+    elements.attendanceFilter.value = attendanceStatusFilter;
+
+    vacationEmployeeSearchTerm = "";
+    elements.vacationEmployeeSearch.value = "";
+
+    deviceInventoryFilter = "current";
+    deviceAnnexFilter = "all";
+    deviceCategoryFilter = "all";
+    deviceSearchTerm = "";
+    elements.deviceInventoryFilter.value = deviceInventoryFilter;
+    elements.deviceAnnexFilter.value = deviceAnnexFilter;
+    elements.deviceCategoryFilter.value = deviceCategoryFilter;
+    elements.deviceSearch.value = "";
+
+    deviceManagementSearchTerm = "";
+    deviceManagementInventoryFilter = "current";
+    deviceManagementAnnexFilter = "all";
+    deviceManagementCategoryFilter = "all";
+    deviceManagementAuthorizationFilter = "all";
+    elements.deviceManagementSearch.value = "";
+    elements.deviceManagementInventoryFilter.value = deviceManagementInventoryFilter;
+    elements.deviceManagementAnnexFilter.value = deviceManagementAnnexFilter;
+    elements.deviceManagementCategoryFilter.value = deviceManagementCategoryFilter;
+    elements.deviceManagementAuthorizationFilter.value =
+      deviceManagementAuthorizationFilter;
+
+    deviceEmployeeStatusFilter = "employed";
+    deviceEmployeeSearchTerm = "";
+    elements.deviceEmployeeStatusFilter.value = deviceEmployeeStatusFilter;
+    elements.deviceEmployeeSearch.value = "";
+
+    deviceOverviewInstructionFilter = "all";
+    deviceOverviewEmploymentFilter = "employed";
+    deviceOverviewSearchTerm = "";
+    elements.deviceOverviewInstructionFilter.value = deviceOverviewInstructionFilter;
+    elements.deviceOverviewEmploymentFilter.value = deviceOverviewEmploymentFilter;
+    elements.deviceOverviewSearch.value = "";
+
+    deviceParticipantSearchTerm = "";
+    deviceInstructionSearchTerm = "";
+    deviceInstructionDeviceSearchTerm = "";
+    elements.deviceParticipantSearch.value = "";
+    elements.deviceInstructionSearch.value = "";
+    elements.deviceInstructionDeviceSearch.value = "";
   }
 
   function employeeStatusLabel(employee) {
@@ -460,10 +531,6 @@
         seenAddresses.add(normalizedEmail);
         return true;
       });
-  }
-
-  function getFilteredEmployeeEmailExport() {
-    return getFilteredEmployeeEmailAddresses().join(";");
   }
 
   function getFilteredEmployeeUsernames() {
@@ -582,7 +649,7 @@
       >
         <header class="phone-list-document-header">
           <h1>Telefonliste</h1>
-          <span>${rows.length} Mitarbeiter · Stand ${formatDate(new Date().toISOString().slice(0, 10))}</span>
+          <span>${rows.length} Mitarbeiter · Stand ${formatDate(todayIso())}</span>
         </header>
         <div class="phone-list-document-grid">${tables}</div>
       </article>`;

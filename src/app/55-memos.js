@@ -71,7 +71,7 @@
       ${renderSummaryChip("empty", allVisible.length, "sichtbare Einträge")}
       ${renderSummaryChip("check", allVisible.filter((memo) => !memo.completed).length, "offen", "teal")}
       ${renderSummaryChip("alert", allVisible.filter((memo) => memo.pinned && !memo.completed).length, "wichtig", "orange")}
-      ${renderSummaryChip("lock", allVisible.filter((memo) => memo.visibility === "private").length, "nur für mich")}
+      ${renderSummaryChip("lock", allVisible.filter((memo) => memo.visibility === "private").length, "nur in meiner Ansicht")}
     `;
 
     if (!allVisible.length) {
@@ -118,7 +118,7 @@
     const date = memoDatePresentation(memo);
     const meta = [
       memo.category || "Ohne Kategorie",
-      memo.visibility === "private" ? "Nur für mich" : "Für alle",
+      memo.visibility === "private" ? "Nur in meiner Ansicht" : "Für alle",
       `Erstellt von ${memoCreatorLabel(memo)}`,
     ];
     return `
@@ -160,7 +160,7 @@
             const date = memoDatePresentation(memo);
             return `<button class="dashboard-memo-row ${memo.pinned ? "is-pinned" : ""}" type="button" data-dashboard-memo="${memo.id}">
               <span class="memo-dashboard-icon">${memo.pinned ? '<span class="important-notification-icon" aria-hidden="true"></span>' : '<svg><use href="#icon-memo"></use></svg>'}</span>
-              <span><strong>${escapeHtml(memo.title)}</strong><small>${escapeHtml([memo.category || "Ohne Kategorie", memo.visibility === "private" ? "Nur für mich" : "Für alle"].join(" · "))}</small></span>
+              <span><strong>${escapeHtml(memo.title)}</strong><small>${escapeHtml([memo.category || "Ohne Kategorie", memo.visibility === "private" ? "Nur in meiner Ansicht" : "Für alle"].join(" · "))}</small></span>
               <span><strong>${escapeHtml(date.date)}</strong><small>${escapeHtml(date.relative)}</small></span>
             </button>`;
           })

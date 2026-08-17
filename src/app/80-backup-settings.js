@@ -439,7 +439,6 @@
     ) {
       return;
     }
-    automaticBackupRequestSequence += 1;
     const delay = automaticBackupScheduleDelay();
     automaticBackupTimer = window.setTimeout(() => {
       automaticBackupTimer = null;
@@ -495,7 +494,10 @@
       renderAutomaticBackupStatus();
       return false;
     }
-    const requestSequence = automaticBackupRequestSequence;
+    // Merkt sich den Aenderungsstand zu Beginn der Sicherung. Kommt waehrend
+    // des Schreibens eine weitere Aenderung dazu, bleibt die Erinnerung an die
+    // naechste Sicherung bestehen.
+    const mutationSequence = stateMutationSequence;
     if (force) {
       automaticBackupRetryAt = 0;
     } else {
@@ -568,20 +570,40 @@
         fileContent,
       );
 
+      // Die Datei liegt geschrieben vor, der Zeitstempel muss aber auch in den
+      // Datenbestand. Scheitert das, darf der lokale Stand nicht so tun, als
+      // waere gesichert worden - und der vom Server geladene Konfliktstand darf
+      // nicht bis zur naechsten Mutation unbeachtet liegen bleiben, sonst
+      // verwirft er dort eine Eingabe ohne erkennbaren Zusammenhang.
+      const previousLastBackupAt = state.settings.lastBackupAt;
       state.settings.lastBackupAt = exportedAt.toISOString();
-      appendAuditEntry(
+      const auditEntryId = appendAuditEntry(
         automaticBackupSettings.encrypted
           ? "Verschlüsselte automatische Datensicherung exportiert"
           : "Automatische Datensicherung exportiert",
       );
-      await persistState();
+      if (!(await persistState())) {
+        if (pendingRemoteConflictState) {
+          state = pendingRemoteConflictState;
+          pendingRemoteConflictState = null;
+        } else {
+          state.settings.lastBackupAt = previousLastBackupAt;
+          state.auditLog = state.auditLog.filter(
+            (entry) => entry.id !== auditEntryId,
+          );
+        }
+        const error = new Error(
+          "Die Sicherungsdatei wurde geschrieben, der Sicherungszeitpunkt konnte aber nicht gespeichert werden.",
+        );
+        error.code = "backup_timestamp_not_persisted";
+        throw error;
+      }
       automaticBackupSettings.lastBackupAt = exportedAt.toISOString();
       automaticBackupSettings.lastBackupSizeBytes = volume.sizeBytes;
       await persistAutomaticBackupConfiguration();
       automaticBackupRetryAt = 0;
       automaticBackupNotice = "";
-      databaseSaveReminderArmed =
-        automaticBackupRequestSequence !== requestSequence;
+      databaseSaveReminderArmed = stateMutationSequence !== mutationSequence;
       renderAll();
       showToast(
         volume.warning
@@ -593,10 +615,12 @@
     } catch (error) {
       console.error("Die automatische Datensicherung ist fehlgeschlagen.", error);
       automaticBackupRetryAt = Date.now() + 60 * 60 * 1000;
-      automaticBackupNotice =
-        error?.code === "backup_volume_exceeded"
-          ? error.message
-          : "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
+      automaticBackupNotice = [
+        "backup_volume_exceeded",
+        "backup_timestamp_not_persisted",
+      ].includes(error?.code)
+        ? error.message
+        : "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
       showToast(automaticBackupNotice, "error");
       return false;
     } finally {
@@ -1990,14 +2014,13 @@
       renderAll();
       return false;
     }
+    stateMutationSequence += 1;
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
-    employeeSearchTerm = "";
-    completionSearchTerm = "";
-    attendanceSearchTerm = "";
+    resetListFilters();
     selectedCompletionEmployeeIds.clear();
+    selectedEmployeeIds.clear();
     attendanceDraft.clear();
-    elements.employeeSearch.value = "";
     applyTheme(state.settings.theme);
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {

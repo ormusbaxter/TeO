@@ -1452,6 +1452,18 @@
                   <option value="mariadb">MariaDB – zentraler TeO-Server</option>
                 </select>
               </label>
+              <p class="settings-warning-copy">
+                <strong>Lokaler Browser: kein Zugriffsschutz.</strong>
+                Anmeldung und Rollen steuern in diesem Modus nur die Bedienung.
+                Der Datenbestand liegt unverschlüsselt im Browserprofil und ist
+                für jeden lesbar, der an diesem Benutzerkonto des Rechners
+                arbeitet – auch ohne TeO-Anmeldung. Verwenden Sie den lokalen
+                Modus deshalb nur auf einem persönlich gesicherten Rechner mit
+                eigenem Windows- oder macOS-Konto und aktiver
+                Bildschirmsperre. Für den gemeinsamen Stationsrechner ist
+                MariaDB vorgesehen: Dort prüft der Server jede Anmeldung und
+                jede Änderung.
+              </p>
               <div class="backend-settings-fields" id="mariaDbSettingsFields" hidden>
                 <label class="settings-field">
                   <span>Adresse des TeO-Servers</span>
@@ -2053,7 +2065,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-memo-todo">
 <h2 id="hilfe-memo-todo">Memo / ToDo</h2>
 <p>Memos und ToDos benötigen nur einen Titel. Optional können Beschreibung, Fälligkeitsdatum und Kategorie ergänzt werden. Einträge lassen sich als erledigt markieren und wieder öffnen. Angepinnte Einträge werden farblich hervorgehoben und unabhängig vom Datum zuerst angezeigt.</p>
-<p>Mit <strong>Für alle Nutzer sichtbar</strong> steht der Eintrag jedem angemeldeten Konto zur Verfügung. <strong>Nur für mich sichtbar</strong> beschränkt ihn auf das Konto, das ihn angelegt hat. Suche, Kategorie und Status können miteinander kombiniert werden.</p>
+<p>Mit <strong>Für alle Nutzer sichtbar</strong> steht der Eintrag jedem angemeldeten Konto zur Verfügung. <strong>Nur in meiner Ansicht</strong> blendet ihn für andere Konten aus. Suche, Kategorie und Status können miteinander kombiniert werden.</p>
+<p>Wichtig zur Einordnung: „Nur in meiner Ansicht“ ist eine Anzeigeeinstellung, keine Verschlüsselung und keine Zugriffsbeschränkung. Der Eintrag bleibt Teil des gemeinsamen Datenbestands und erscheint deshalb unverändert in Datensicherungen sowie in der Datenbank. Vertrauliche Angaben – etwa zu einzelnen Personen – gehören nicht in ein Memo.</p>
 <p>Die Kategorien werden unter <strong>Einstellungen → Stammdaten &amp; Zugriffe → Memo-/ToDo-Kategorien</strong> angelegt, umbenannt oder gelöscht. Umbenennungen werden in vorhandene Einträge übernommen.</p>
 <p>Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der Übersichtsseite neben dem Fristenmonitor. Nur wenn solche Einträge vorhanden sind, teilen sich beide Bereiche die verfügbare Breite zu gleichen Teilen; auf schmaleren Bildschirmen stehen sie untereinander.</p>
 </section>
@@ -2229,10 +2242,33 @@
 <p>Mindestens erforderlich sind:</p>
 <ul><li>geregelte Zugriffsrechte</li><li>persönliche Benutzerkonten</li><li>sichere Passwörter</li><li>HTTPS im MariaDB-Betrieb</li><li>kontrollierte Server- und Datenbank-Backups</li><li>Betriebssystem- und Netzwerkhärtung</li><li>Schutz exportierter Sicherungsdateien</li><li>geregelte Aufbewahrungs- und Löschfristen</li><li>Protokollierung und organisatorische Verantwortlichkeiten</li><li>abgestimmte Betriebsvereinbarung</li></ul>
 <p>Unverschlüsselte JSON-Sicherungen enthalten den vollständigen Datenbestand und müssen entsprechend geschützt gespeichert und übertragen werden.</p>
+<h3 id="hilfe-was-der-lokale-modus-leistet-und-was-nicht">Was der lokale Modus leistet – und was nicht</h3>
+<p>Im lokalen Modus (localForage / IndexedDB) steuern Anmeldung und Rollen ausschließlich die Bedienung der Oberfläche. Sie sind kein Zugriffsschutz:</p>
+<ul><li>Der Datenbestand liegt <strong>unverschlüsselt</strong> im Profil des Browsers und lässt sich ohne TeO-Anmeldung auslesen.</li><li>Wer am selben Benutzerkonto des Rechners arbeitet, kann die Anmeldung mit Bordmitteln des Browsers umgehen und erhält damit auch Administratorrechte.</li><li>Die Rollentrennung wird erst im MariaDB-Betrieb serverseitig durchgesetzt.</li></ul>
+<p>Daraus folgt für den Betrieb:</p>
+<ul><li>Den lokalen Modus nur auf einem <strong>persönlich gesicherten Rechner</strong> einsetzen – eigenes Windows- oder macOS-Konto, Anmeldekennwort, aktive Bildschirmsperre, idealerweise verschlüsselte Festplatte (BitLocker, FileVault).</li><li>Auf gemeinsam genutzten Stationsrechnern und überall dort, wo mehrere Personen mit demselben Datenbestand arbeiten, den <strong>MariaDB-Betrieb</strong> verwenden. Dort prüft der Server jede Anmeldung und jede Änderung.</li><li>Der lokale Modus eignet sich außerdem für Erprobung, Schulung und Demodaten.</li></ul>
+<h3 id="hilfe-urlaubsanspruch-bei-teilzeit">Urlaubsanspruch bei Teilzeit</h3>
+<p>TeO kürzt den Grundanspruch linear zum hinterlegten Stellenumfang: 30 Tage bei 50 Prozent ergeben 15 Tage. Das Bundesurlaubsgesetz bemisst den Anspruch dagegen nach der Zahl der <strong>Arbeitstage pro Woche</strong>. Beide Rechnungen stimmen überein, solange Teilzeit auch weniger Arbeitstage bedeutet.</p>
+<p>Arbeitet jemand in Teilzeit bei unveränderter Fünftagewoche – also kürzere Tage statt weniger Tage –, steht dieser Person weiterhin der volle Anspruch zu; TeO weist dann zu wenig aus. Der Wert muss in diesem Fall über <strong>Zusätzliche Tage</strong> in der Urlaubsplanung ausgeglichen werden.</p>
+<p>Ebenfalls nicht automatisch berücksichtigt: die anteilige Berechnung nach § 5 BUrlG bei Ein- oder Austritt im laufenden Kalenderjahr. Auch hier ist die manuelle Korrektur über <strong>Zusätzliche Tage</strong> vorgesehen.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-037-007-sicherungszeitpunkt-und-datenbankabgleich">004.037.007 – Sicherungszeitpunkt und Datenbankabgleich</h3>
+<ul><li><strong>Behoben:</strong> Lässt sich der Sicherungszeitpunkt nach einer automatischen Sicherung nicht speichern, gilt der Bestand nicht mehr fälschlich als gesichert; ein Serverkonflikt wird sofort statt bei der nächsten Änderung behandelt</li><li><strong>Verbessert:</strong> Der Datenbankabgleich vergleicht Datensätze unabhängig von der Feldreihenfolge – eine Umsortierung im Client schreibt nicht mehr den gesamten Bestand neu</li></ul>
+<h3 id="hilfe-004-037-006-schnellerer-start">004.037.006 – Schnellerer Start</h3>
+<ul><li><strong>Neu:</strong> Der TeO-Server komprimiert Oberfläche und Programmdateien; die Startlast sinkt von rund 1 MB auf etwa 210 KB</li><li><strong>Verbessert:</strong> Die Skripte werden mit <code>defer</code> geladen und blockieren den Seitenaufbau nicht mehr</li></ul>
+<h3 id="hilfe-004-037-005-offlinebetrieb">004.037.005 – Offlinebetrieb</h3>
+<ul><li><strong>Neu:</strong> TeO läuft ohne Netzverbindung weiter und lässt sich als App installieren; Oberfläche und Programmdateien liegen in einem versionierten Zwischenspeicher</li><li><strong>Neu:</strong> Jeder Build legt einen eigenen Zwischenspeicher an und räumt den vorherigen, damit nie ein veralteter Stand ausgeliefert wird</li><li><strong>Verbessert:</strong> Anfragen an den MariaDB-Dienst werden nie zwischengespeichert, damit kein veralteter Datenbestand entsteht</li></ul>
+<h3 id="hilfe-004-037-004-klarere-einordnung-von-lokalem-modus-memos-und-urlaub">004.037.004 – Klarere Einordnung von lokalem Modus, Memos und Urlaub</h3>
+<ul><li><strong>Verbessert:</strong> Die Speicherort-Einstellung benennt jetzt deutlich, dass der lokale Modus keinen Zugriffsschutz bietet und wofür er geeignet ist</li><li><strong>Verbessert:</strong> „Nur für mich“ heißt jetzt „Nur in meiner Ansicht“ – der Eintrag bleibt Teil des gemeinsamen Datenbestands und erscheint in Datensicherungen</li><li><strong>Verbessert:</strong> Die Hilfe erklärt, wann die lineare Kürzung des Urlaubsanspruchs bei Teilzeit von der Berechnung nach Arbeitstagen abweicht und wie sich das ausgleichen lässt</li></ul>
+<h3 id="hilfe-004-037-003-robusterer-import-und-kontenprufung">004.037.003 – Robusterer Import und Kontenprüfung</h3>
+<ul><li><strong>Behoben:</strong> Nach einem Import bleiben keine Filter mehr stehen – zuvor schränkten Suche, Kategorie- und Bestandsfilter den neuen Datenbestand weiter ein und ließen Listen leer wirken</li><li><strong>Behoben:</strong> Ein ungültiges oder doppelt vergebenes Benutzerkonto verwirft nicht mehr alle übrigen Konten; verworfene Konten werden nach dem Start gemeldet</li><li><strong>Behoben:</strong> Der Hinweis „noch nicht als Datensicherung exportiert“ verschwindet nach einer erfolgreichen automatischen Sicherung wieder zuverlässig</li><li><strong>Neu:</strong> Die Strukturprüfung meldet Filter, die beim Import nicht zurückgesetzt werden</li></ul>
+<h3 id="hilfe-004-037-002-prufstrecke-gegen-toten-code">004.037.002 – Prüfstrecke gegen toten Code</h3>
+<ul><li><strong>Neu:</strong> Ein GitHub-Workflow führt bei jedem Push <code>npm run verify</code> aus und meldet, wenn die erzeugten Dateien nicht mehr zu den Quellen in <code>src/</code> passen</li><li><strong>Neu:</strong> Die Strukturprüfung meldet Funktionen, die nirgends aufgerufen werden, sowie Oberflächenverweise, die nie gelesen werden</li><li><strong>Behoben:</strong> <code>getFilteredEmployeeEmailExport</code> wurde nur noch vom Test verwendet – der E-Mail-Export ist jetzt über den tatsächlich genutzten Weg abgesichert</li><li><strong>Behoben:</strong> Nicht mehr benötigte Funktion <code>employeeNameSignature</code> sowie die Verweise auf <code>openCatalogManagementButton</code> und <code>backupVolumeBar</code> entfernt</li></ul>
+<h3 id="hilfe-004-037-001-memos-in-protokoll-und-sicherung">004.037.001 – Memos in Protokoll und Sicherung</h3>
+<ul><li><strong>Behoben:</strong> Änderungen an Memos und ToDos erscheinen im Änderungsprotokoll wieder namentlich statt als „Datenbestand aktualisiert“</li><li><strong>Behoben:</strong> Wurden seit der letzten Datensicherung nur Memos oder ToDos geändert, galt der Datenbestand fälschlich als gesichert – Warnhinweis, Schließen-Erinnerung und automatische Sicherung blieben aus</li><li><strong>Behoben:</strong> Der Dateiname des Geräte-Excel-Exports und das Stand-Datum der gedruckten Telefonliste nannten zwischen Mitternacht und 2 Uhr den Vortag</li><li><strong>Verbessert:</strong> Die nachverfolgten Sammlungen stehen jetzt an einer einzigen Stelle; ein neuer Test gleicht sie gegen den Datenvertrag ab, damit künftige Sammlungen nicht vergessen werden</li></ul>
 <h3 id="hilfe-004-037-000-memo-todo">004.037.000 – Memo / ToDo</h3>
 <ul><li><strong>Neu:</strong> Eigener Bereich für persönliche und gemeinsame Memos und ToDos mit optionalem Datum, Beschreibung, Status und Wichtig-Markierung</li><li><strong>Neu:</strong> Memo-/ToDo-Kategorien lassen sich in den Stammdaten anlegen, umbenennen und löschen</li><li><strong>Neu:</strong> Offene sichtbare Einträge erscheinen bei Bedarf neben dem auf 50 Prozent verkleinerten Fristenmonitor</li><li><strong>Verbessert:</strong> Private Einträge werden ausschließlich dem erstellenden Konto angezeigt; Suche sowie Kategorie- und Statusfilter erleichtern die Übersicht</li></ul>
 <h3 id="hilfe-004-036-001-automatischer-startabgleich">004.036.001 – Automatischer Startabgleich</h3>
@@ -3567,8 +3603,14 @@ npm run verify</code></pre>
               <span>Sichtbarkeit</span>
               <select id="memoVisibility">
                 <option value="all">Für alle Nutzer der App</option>
-                <option value="private">Nur für mich</option>
+                <option value="private">Nur in meiner Ansicht</option>
               </select>
+              <small class="field-hint">
+                „Nur in meiner Ansicht“ blendet den Eintrag für andere Konten
+                aus. Er bleibt Teil des gemeinsamen Datenbestands und steht
+                dadurch auch in Datensicherungen – kein Ersatz für
+                Vertraulichkeit.
+              </small>
             </label>
             <label class="form-field form-field-wide">
               <span>Beschreibung</span>
@@ -4241,10 +4283,13 @@ npm run verify</code></pre>
       </div>
     </noscript>
 
-    <script src="project-meta.js"></script>
-    <script src="state-schema.js"></script>
-    <script src="vendor/localforage.min.js"></script>
-    <script src="backend-client.js"></script>
-    <script src="app.js"></script>
+    <!-- defer: Die Skripte werden waehrend des Parsens geladen und erst danach
+         ausgefuehrt. Die Reihenfolge bleibt dabei erhalten, worauf app.js
+         angewiesen ist. -->
+    <script src="project-meta.js" defer></script>
+    <script src="state-schema.js" defer></script>
+    <script src="vendor/localforage.min.js" defer></script>
+    <script src="backend-client.js" defer></script>
+    <script src="app.js" defer></script>
   </body>
 </html>

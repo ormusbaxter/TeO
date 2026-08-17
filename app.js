@@ -17,6 +17,37 @@
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
+  // Alle fachlichen Sammlungen des Datenbestands mit ihrer Bezeichnung im
+  // Aenderungsprotokoll. Aus dieser Liste leiten sich der Protokolltext einer
+  // Mutation und die Pruefung ab, ob seit der letzten Sicherung etwas geaendert
+  // wurde. Das Aenderungsprotokoll selbst, die Einstellungen und die Kataloge
+  // gehoeren bewusst nicht dazu, sie werden gesondert ausgewertet.
+  //
+  // Fehlt hier eine Sammlung, bleibt sie im Protokoll namenlos UND loest keine
+  // Sicherungserinnerung aus - der Datenbestand gilt dann faelschlich als
+  // gesichert. tests/tracked-collections.test.mjs gleicht die Liste deshalb
+  // gegen den Datenvertrag ab, damit eine neue Sammlung nicht vergessen wird.
+  const TRACKED_COLLECTIONS = Object.freeze([
+    ["employees", "Mitarbeiter"],
+    ["trainings", "Pflichtfortbildungen"],
+    ["completions", "Fortbildungsnachweise"],
+    ["meetings", "Teamsitzungen"],
+    ["meetingAttendances", "Sitzungsteilnahmen"],
+    ["appointments", "Termine"],
+    ["memos", "Memos und ToDos"],
+    ["devices", "Geräte"],
+    ["deviceInstructions", "Geräteeinweisungen"],
+    ["vacationEntitlements", "Urlaubsansprüche"],
+    ["vacationDays", "Abwesenheitsplanung"],
+    ["users", "Benutzerkonten"],
+  ]);
+  const TRACKED_COLLECTION_KEYS = Object.freeze(
+    TRACKED_COLLECTIONS.map(([collection]) => collection),
+  );
+  // Benutzerkonten fuehren bewusst keine Zeitstempel - eine Passwortaenderung
+  // soll keinen Zeitpunkt hinterlassen. Ob seit der letzten Sicherung an ihnen
+  // gearbeitet wurde, verraet stattdessen das Aenderungsprotokoll.
+  const COLLECTIONS_WITHOUT_TIMESTAMPS = Object.freeze(["users"]);
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
   const DEFAULT_MAX_BACKUP_FILE_SIZE_MB = 20;
   const MIN_BACKUP_FILE_SIZE_MB = 1;
@@ -448,12 +479,20 @@
   let automaticBackupPassword = "";
   let automaticBackupTimer = null;
   let automaticBackupRunning = false;
-  let automaticBackupRequestSequence = 0;
+  // Zaehlt erfolgreich gespeicherte Aenderungen am Datenbestand. Die
+  // automatische Sicherung erkennt daran, ob waehrend des Schreibens eine
+  // weitere Aenderung dazugekommen ist. Ein Renderdurchlauf zaehlt bewusst
+  // nicht mit - sonst bliebe die Sicherungserinnerung nach einer erfolgreichen
+  // Sicherung stehen, nur weil zwischendurch neu gezeichnet wurde.
+  let stateMutationSequence = 0;
   let automaticBackupRetryAt = 0;
   let automaticBackupNotice = "";
   let startupBackupSynchronized = false;
   let startupBackupImportRunning = false;
   let browserPersistenceNotice = "";
+  // Beim Laden verworfene Benutzerkonten, damit der Verlust nicht unbemerkt
+  // bleibt. Wird nach dem Start einmalig gemeldet.
+  let discardedUserAccounts = 0;
   let dateInputObserver = null;
   const savedVacationView = readVacationViewPreference();
   let vacationYear = savedVacationView.year;
@@ -559,7 +598,6 @@
     exportEmployeePhoneListLabel: document.querySelector(
       "#exportEmployeePhoneListLabel",
     ),
-    openCatalogManagementButton: document.querySelector("#openCatalogManagementButton"),
     exportDataButton: document.querySelector("#exportDataButton"),
     importDataButton: document.querySelector("#importDataButton"),
     importDataFile: document.querySelector("#importDataFile"),
@@ -611,7 +649,6 @@
     ),
     backupVolumeMeter: document.querySelector("#backupVolumeMeter"),
     backupVolumeLabel: document.querySelector("#backupVolumeLabel"),
-    backupVolumeBar: document.querySelector("#backupVolumeBar"),
     backupVolumeHint: document.querySelector("#backupVolumeHint"),
     settingsCloseDialogOnOutsideClick: document.querySelector(
       "#settingsCloseDialogOnOutsideClick",
@@ -1104,7 +1141,30 @@
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
     restoreAuthenticationSession();
+    if (discardedUserAccounts > 0) {
+      showToast(
+        `${discardedUserAccounts} Benutzerkonto/-konten waren ungültig oder doppelt vergeben und wurden nicht übernommen.`,
+        "warning",
+      );
+      discardedUserAccounts = 0;
+    }
     void refreshBackendHealth();
+    registerServiceWorker();
+  }
+
+  // Haelt die Anwendung selbst offline verfuegbar. Der Datenbestand liegt
+  // ohnehin lokal; ohne Zwischenspeicher laedt bei fehlender Verbindung
+  // lediglich die Seite nicht. Beim Oeffnen per Doppelklick (file://) und in
+  // unsicheren Kontexten steht die Schnittstelle nicht bereit - dann arbeitet
+  // TeO wie bisher ohne Zwischenspeicher weiter.
+  function registerServiceWorker() {
+    if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
+    navigator.serviceWorker.register("service-worker.js").catch((error) => {
+      console.warn(
+        "Der Offlinebetrieb konnte nicht eingerichtet werden.",
+        error,
+      );
+    });
   }
 
   function emptyState() {
@@ -1612,18 +1672,33 @@
       .slice(0, MAX_SCHOOL_VACATION_PERIODS);
   }
 
+  // Ein einzelnes beschaedigtes Konto darf nicht alle uebrigen mitreissen:
+  // Fruher gab diese Funktion in dem Fall eine leere Liste zurueck, wodurch die
+  // Anwendung ohne Hinweis in die Ersteinrichtung zurueckfiel. Ungueltige und
+  // doppelt vergebene Konten werden deshalb einzeln verworfen. Nur wenn danach
+  // kein Administratorkonto mehr uebrig ist, bleibt der Bestand unbrauchbar -
+  // dann ist die Ersteinrichtung tatsaechlich der richtige Weg.
   function normalizeUsers(users) {
     if (!Array.isArray(users)) return initialUsers();
-    const normalized = users.map(normalizeUser).filter(Boolean);
-    const normalizedNames = new Set(
-      normalized.map((user) => user.username.toLocaleLowerCase("de-DE")),
-    );
-    if (
-      normalizedNames.size !== normalized.length ||
-      (normalized.length > 0 &&
-        !normalized.some((user) => user.role === "admin"))
-    ) {
+    const seenNames = new Set();
+    const normalized = [];
+    let discarded = users.length;
+    users.map(normalizeUser).forEach((user) => {
+      if (!user) return;
+      const normalizedName = user.username.toLocaleLowerCase("de-DE");
+      if (seenNames.has(normalizedName)) return;
+      seenNames.add(normalizedName);
+      normalized.push(user);
+    });
+    discarded -= normalized.length;
+    if (!normalized.some((user) => user.role === "admin")) {
       return initialUsers();
+    }
+    if (discarded > 0) {
+      console.warn(
+        `${discarded} Benutzerkonto/-konten waren ungültig oder doppelt vergeben und wurden verworfen.`,
+      );
+      discardedUserAccounts = discarded;
     }
     return normalized;
   }
@@ -1681,20 +1756,6 @@
     )
       ? "Pflegefachkraft"
       : profession;
-  }
-
-  function employeeNameSignature(value) {
-    return String(value || "")
-      .normalize("NFKD")
-      .replace(/\p{Diacritic}/gu, "")
-      .replace(/ß/gi, "ss")
-      .toLocaleLowerCase("de-DE")
-      .replace(/[^a-z0-9]+/g, " ")
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .sort()
-      .join(" ");
   }
 
   function normalizeEmployee(employee) {
@@ -2245,6 +2306,7 @@
     appendAuditEntry(describeMutation(previousState, state));
 
     if (await persistState()) {
+      stateMutationSequence += 1;
       databaseSaveReminderArmed = true;
       renderAll();
       scheduleAutomaticBackup();
@@ -2268,32 +2330,23 @@
     return false;
   }
 
+  // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn
+  // gezielt wieder entfernen kann, wenn das Speichern anschliessend scheitert.
   function appendAuditEntry(action) {
-    if (!action) return;
+    if (!action) return "";
+    const id = createId();
     state.auditLog.unshift({
-      id: createId(),
+      id,
       timestamp: new Date().toISOString(),
       username: currentUser?.username || "System",
       action,
     });
     state.auditLog = state.auditLog.slice(0, MAX_AUDIT_LOG_ENTRIES);
+    return id;
   }
 
   function describeMutation(before, after) {
-    const collections = [
-      ["employees", "Mitarbeiter"],
-      ["trainings", "Pflichtfortbildungen"],
-      ["completions", "Fortbildungsnachweise"],
-      ["meetings", "Teamsitzungen"],
-      ["meetingAttendances", "Sitzungsteilnahmen"],
-      ["appointments", "Termine"],
-      ["devices", "Geräte"],
-      ["deviceInstructions", "Geräteeinweisungen"],
-      ["vacationEntitlements", "Urlaubsansprüche"],
-      ["vacationDays", "Abwesenheitsplanung"],
-      ["users", "Benutzerkonten"],
-    ];
-    for (const [key, label] of collections) {
+    for (const [key, label] of TRACKED_COLLECTIONS) {
       const difference = after[key].length - before[key].length;
       if (difference > 0) return `${label}: ${difference} Eintrag/Einträge hinzugefügt`;
       if (difference < 0) return `${label}: ${Math.abs(difference)} Eintrag/Einträge gelöscht`;
@@ -7435,6 +7488,19 @@
     `;
   }
 
+  // ACHTUNG, bewusste Vereinfachung: Der Grundanspruch wird linear zum
+  // Stellenumfang gekuerzt. Das Bundesurlaubsgesetz bemisst ihn dagegen nach
+  // der Zahl der ARBEITSTAGE PRO WOCHE. Wer 50 Prozent auf fuenf kuerzere Tage
+  // verteilt, hat weiterhin Anspruch auf die vollen 30 Tage; wer 50 Prozent
+  // auf zweieinhalb Tage verteilt, auf 15.
+  //
+  // Fuer die Station stimmt die Rechnung, solange Teilzeit immer auch weniger
+  // Arbeitstage bedeutet. Kommt Teilzeit bei voller Fuenftagewoche vor, rechnet
+  // TeO systematisch zu wenig - dann muessen die Arbeitstage pro Woche am
+  // Mitarbeitenden erfasst und hier statt employmentPercent verwendet werden.
+  //
+  // Ebenfalls nicht abgebildet: die Zwoelftelung nach Paragraf 5 BUrlG bei Ein-
+  // oder Austritt im laufenden Jahr. Die Funktion kennt nur volle Kalenderjahre.
   function getVacationEntitlement(employee, year) {
     const base =
       Math.round(
@@ -9252,7 +9318,7 @@
       ${renderSummaryChip("empty", allVisible.length, "sichtbare Einträge")}
       ${renderSummaryChip("check", allVisible.filter((memo) => !memo.completed).length, "offen", "teal")}
       ${renderSummaryChip("alert", allVisible.filter((memo) => memo.pinned && !memo.completed).length, "wichtig", "orange")}
-      ${renderSummaryChip("lock", allVisible.filter((memo) => memo.visibility === "private").length, "nur für mich")}
+      ${renderSummaryChip("lock", allVisible.filter((memo) => memo.visibility === "private").length, "nur in meiner Ansicht")}
     `;
 
     if (!allVisible.length) {
@@ -9299,7 +9365,7 @@
     const date = memoDatePresentation(memo);
     const meta = [
       memo.category || "Ohne Kategorie",
-      memo.visibility === "private" ? "Nur für mich" : "Für alle",
+      memo.visibility === "private" ? "Nur in meiner Ansicht" : "Für alle",
       `Erstellt von ${memoCreatorLabel(memo)}`,
     ];
     return `
@@ -9341,7 +9407,7 @@
             const date = memoDatePresentation(memo);
             return `<button class="dashboard-memo-row ${memo.pinned ? "is-pinned" : ""}" type="button" data-dashboard-memo="${memo.id}">
               <span class="memo-dashboard-icon">${memo.pinned ? '<span class="important-notification-icon" aria-hidden="true"></span>' : '<svg><use href="#icon-memo"></use></svg>'}</span>
-              <span><strong>${escapeHtml(memo.title)}</strong><small>${escapeHtml([memo.category || "Ohne Kategorie", memo.visibility === "private" ? "Nur für mich" : "Für alle"].join(" · "))}</small></span>
+              <span><strong>${escapeHtml(memo.title)}</strong><small>${escapeHtml([memo.category || "Ohne Kategorie", memo.visibility === "private" ? "Nur in meiner Ansicht" : "Für alle"].join(" · "))}</small></span>
               <span><strong>${escapeHtml(date.date)}</strong><small>${escapeHtml(date.relative)}</small></span>
             </button>`;
           })
@@ -10163,7 +10229,7 @@
 
   function exportDeviceCatalogExcel() {
     const workbook = createDeviceExcelWorkbook(state.devices);
-    const date = new Date().toISOString().slice(0, 10);
+    const date = todayIso();
     downloadTextFile(
       `TeO-Geraetekatalog-${date}.xls`,
       workbook,
@@ -13834,7 +13900,6 @@
     ) {
       return;
     }
-    automaticBackupRequestSequence += 1;
     const delay = automaticBackupScheduleDelay();
     automaticBackupTimer = window.setTimeout(() => {
       automaticBackupTimer = null;
@@ -13890,7 +13955,10 @@
       renderAutomaticBackupStatus();
       return false;
     }
-    const requestSequence = automaticBackupRequestSequence;
+    // Merkt sich den Aenderungsstand zu Beginn der Sicherung. Kommt waehrend
+    // des Schreibens eine weitere Aenderung dazu, bleibt die Erinnerung an die
+    // naechste Sicherung bestehen.
+    const mutationSequence = stateMutationSequence;
     if (force) {
       automaticBackupRetryAt = 0;
     } else {
@@ -13963,20 +14031,40 @@
         fileContent,
       );
 
+      // Die Datei liegt geschrieben vor, der Zeitstempel muss aber auch in den
+      // Datenbestand. Scheitert das, darf der lokale Stand nicht so tun, als
+      // waere gesichert worden - und der vom Server geladene Konfliktstand darf
+      // nicht bis zur naechsten Mutation unbeachtet liegen bleiben, sonst
+      // verwirft er dort eine Eingabe ohne erkennbaren Zusammenhang.
+      const previousLastBackupAt = state.settings.lastBackupAt;
       state.settings.lastBackupAt = exportedAt.toISOString();
-      appendAuditEntry(
+      const auditEntryId = appendAuditEntry(
         automaticBackupSettings.encrypted
           ? "Verschlüsselte automatische Datensicherung exportiert"
           : "Automatische Datensicherung exportiert",
       );
-      await persistState();
+      if (!(await persistState())) {
+        if (pendingRemoteConflictState) {
+          state = pendingRemoteConflictState;
+          pendingRemoteConflictState = null;
+        } else {
+          state.settings.lastBackupAt = previousLastBackupAt;
+          state.auditLog = state.auditLog.filter(
+            (entry) => entry.id !== auditEntryId,
+          );
+        }
+        const error = new Error(
+          "Die Sicherungsdatei wurde geschrieben, der Sicherungszeitpunkt konnte aber nicht gespeichert werden.",
+        );
+        error.code = "backup_timestamp_not_persisted";
+        throw error;
+      }
       automaticBackupSettings.lastBackupAt = exportedAt.toISOString();
       automaticBackupSettings.lastBackupSizeBytes = volume.sizeBytes;
       await persistAutomaticBackupConfiguration();
       automaticBackupRetryAt = 0;
       automaticBackupNotice = "";
-      databaseSaveReminderArmed =
-        automaticBackupRequestSequence !== requestSequence;
+      databaseSaveReminderArmed = stateMutationSequence !== mutationSequence;
       renderAll();
       showToast(
         volume.warning
@@ -13988,10 +14076,12 @@
     } catch (error) {
       console.error("Die automatische Datensicherung ist fehlgeschlagen.", error);
       automaticBackupRetryAt = Date.now() + 60 * 60 * 1000;
-      automaticBackupNotice =
-        error?.code === "backup_volume_exceeded"
-          ? error.message
-          : "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
+      automaticBackupNotice = [
+        "backup_volume_exceeded",
+        "backup_timestamp_not_persisted",
+      ].includes(error?.code)
+        ? error.message
+        : "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
       showToast(automaticBackupNotice, "error");
       return false;
     } finally {
@@ -15385,14 +15475,13 @@
       renderAll();
       return false;
     }
+    stateMutationSequence += 1;
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
-    employeeSearchTerm = "";
-    completionSearchTerm = "";
-    attendanceSearchTerm = "";
+    resetListFilters();
     selectedCompletionEmployeeIds.clear();
+    selectedEmployeeIds.clear();
     attendanceDraft.clear();
-    elements.employeeSearch.value = "";
     applyTheme(state.settings.theme);
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {
@@ -15808,19 +15897,7 @@
 
   function shouldRemindBeforeUnload(candidateState = state) {
     if (!candidateState || typeof candidateState !== "object") return false;
-    const collections = [
-      "employees",
-      "trainings",
-      "completions",
-      "meetings",
-      "meetingAttendances",
-      "appointments",
-      "devices",
-      "deviceInstructions",
-      "vacationEntitlements",
-      "vacationDays",
-      "users",
-    ];
+    const collections = TRACKED_COLLECTION_KEYS;
     const containsData = collections.some(
       (collection) => candidateState[collection]?.length,
     );
@@ -15839,7 +15916,9 @@
     if (hasLaterAuditChange) return true;
 
     return collections
-      .filter((collection) => collection !== "users")
+      .filter(
+        (collection) => !COLLECTIONS_WITHOUT_TIMESTAMPS.includes(collection),
+      )
       .some((collection) =>
         (candidateState[collection] || []).some((entry) =>
           ["updatedAt", "createdAt"].some(
@@ -15848,6 +15927,87 @@
           ),
         ),
       );
+  }
+
+  // Nach einem Import beschreiben die zuvor gesetzten Filter einen anderen
+  // Datenbestand: Eine Namenssuche, eine Kategorie oder ein Bestandsfilter
+  // laesst Listen dann leer wirken, obwohl die Daten vollstaendig vorliegen.
+  // Deshalb gehen alle Listenfilter gemeinsam auf ihre Voreinstellung zurueck.
+  // Sortierungen bleiben bewusst erhalten, sie verbergen keine Datensaetze.
+  //
+  // tools/check.mjs prueft, dass jede Filter- und Suchvariable hier vorkommt,
+  // damit ein spaeter ergaenzter Filter nicht vergessen wird.
+  function resetListFilters() {
+    employeeStatusFilter = "all";
+    employeeSearchTerm = "";
+    employeeProfessionFilter = "all";
+    employeeQualificationFilter = "all";
+    employeeWeekendFilter = "all";
+    elements.employeeSearch.value = "";
+    elements.employeeProfessionFilter.value = employeeProfessionFilter;
+    elements.employeeQualificationFilter.value = employeeQualificationFilter;
+    elements.employeeWeekendFilter.value = employeeWeekendFilter;
+
+    appointmentPeriodFilter = "all";
+    appointmentSearchTerm = "";
+    elements.appointmentSearch.value = "";
+
+    memoSearchTerm = "";
+    memoCategoryFilter = "all";
+    memoStatusFilter = "open";
+    elements.memoSearch.value = "";
+    elements.memoCategoryFilter.value = memoCategoryFilter;
+
+    completionSearchTerm = "";
+    elements.completionEmployeeSearch.value = "";
+
+    attendanceSearchTerm = "";
+    attendanceStatusFilter = "all";
+    elements.attendanceSearch.value = "";
+    elements.attendanceFilter.value = attendanceStatusFilter;
+
+    vacationEmployeeSearchTerm = "";
+    elements.vacationEmployeeSearch.value = "";
+
+    deviceInventoryFilter = "current";
+    deviceAnnexFilter = "all";
+    deviceCategoryFilter = "all";
+    deviceSearchTerm = "";
+    elements.deviceInventoryFilter.value = deviceInventoryFilter;
+    elements.deviceAnnexFilter.value = deviceAnnexFilter;
+    elements.deviceCategoryFilter.value = deviceCategoryFilter;
+    elements.deviceSearch.value = "";
+
+    deviceManagementSearchTerm = "";
+    deviceManagementInventoryFilter = "current";
+    deviceManagementAnnexFilter = "all";
+    deviceManagementCategoryFilter = "all";
+    deviceManagementAuthorizationFilter = "all";
+    elements.deviceManagementSearch.value = "";
+    elements.deviceManagementInventoryFilter.value = deviceManagementInventoryFilter;
+    elements.deviceManagementAnnexFilter.value = deviceManagementAnnexFilter;
+    elements.deviceManagementCategoryFilter.value = deviceManagementCategoryFilter;
+    elements.deviceManagementAuthorizationFilter.value =
+      deviceManagementAuthorizationFilter;
+
+    deviceEmployeeStatusFilter = "employed";
+    deviceEmployeeSearchTerm = "";
+    elements.deviceEmployeeStatusFilter.value = deviceEmployeeStatusFilter;
+    elements.deviceEmployeeSearch.value = "";
+
+    deviceOverviewInstructionFilter = "all";
+    deviceOverviewEmploymentFilter = "employed";
+    deviceOverviewSearchTerm = "";
+    elements.deviceOverviewInstructionFilter.value = deviceOverviewInstructionFilter;
+    elements.deviceOverviewEmploymentFilter.value = deviceOverviewEmploymentFilter;
+    elements.deviceOverviewSearch.value = "";
+
+    deviceParticipantSearchTerm = "";
+    deviceInstructionSearchTerm = "";
+    deviceInstructionDeviceSearchTerm = "";
+    elements.deviceParticipantSearch.value = "";
+    elements.deviceInstructionSearch.value = "";
+    elements.deviceInstructionDeviceSearch.value = "";
   }
 
   function employeeStatusLabel(employee) {
@@ -15870,10 +16030,6 @@
         seenAddresses.add(normalizedEmail);
         return true;
       });
-  }
-
-  function getFilteredEmployeeEmailExport() {
-    return getFilteredEmployeeEmailAddresses().join(";");
   }
 
   function getFilteredEmployeeUsernames() {
@@ -15992,7 +16148,7 @@
       >
         <header class="phone-list-document-header">
           <h1>Telefonliste</h1>
-          <span>${rows.length} Mitarbeiter · Stand ${formatDate(new Date().toISOString().slice(0, 10))}</span>
+          <span>${rows.length} Mitarbeiter · Stand ${formatDate(todayIso())}</span>
         </header>
         <div class="phone-list-document-grid">${tables}</div>
       </article>`;

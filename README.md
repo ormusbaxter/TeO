@@ -563,8 +563,14 @@ markieren und wieder öffnen. Angepinnte Einträge werden farblich hervorgehoben
 und unabhängig vom Datum zuerst angezeigt.
 
 Mit **Für alle Nutzer sichtbar** steht der Eintrag jedem angemeldeten Konto zur
-Verfügung. **Nur für mich sichtbar** beschränkt ihn auf das Konto, das ihn
-angelegt hat. Suche, Kategorie und Status können miteinander kombiniert werden.
+Verfügung. **Nur in meiner Ansicht** blendet ihn für andere Konten aus. Suche,
+Kategorie und Status können miteinander kombiniert werden.
+
+Wichtig zur Einordnung: „Nur in meiner Ansicht“ ist eine Anzeigeeinstellung,
+keine Verschlüsselung und keine Zugriffsbeschränkung. Der Eintrag bleibt Teil
+des gemeinsamen Datenbestands und erscheint deshalb unverändert in
+Datensicherungen sowie in der Datenbank. Vertrauliche Angaben – etwa zu
+einzelnen Personen – gehören nicht in ein Memo.
 
 Die Kategorien werden unter **Einstellungen → Stammdaten & Zugriffe →
 Memo-/ToDo-Kategorien** angelegt, umbenannt oder gelöscht. Umbenennungen werden
@@ -1187,6 +1193,43 @@ Mindestens erforderlich sind:
 
 Unverschlüsselte JSON-Sicherungen enthalten den vollständigen Datenbestand und
 müssen entsprechend geschützt gespeichert und übertragen werden.
+
+### Was der lokale Modus leistet – und was nicht
+
+Im lokalen Modus (localForage / IndexedDB) steuern Anmeldung und Rollen
+ausschließlich die Bedienung der Oberfläche. Sie sind kein Zugriffsschutz:
+
+- Der Datenbestand liegt **unverschlüsselt** im Profil des Browsers und lässt
+  sich ohne TeO-Anmeldung auslesen.
+- Wer am selben Benutzerkonto des Rechners arbeitet, kann die Anmeldung mit
+  Bordmitteln des Browsers umgehen und erhält damit auch Administratorrechte.
+- Die Rollentrennung wird erst im MariaDB-Betrieb serverseitig durchgesetzt.
+
+Daraus folgt für den Betrieb:
+
+- Den lokalen Modus nur auf einem **persönlich gesicherten Rechner** einsetzen –
+  eigenes Windows- oder macOS-Konto, Anmeldekennwort, aktive Bildschirmsperre,
+  idealerweise verschlüsselte Festplatte (BitLocker, FileVault).
+- Auf gemeinsam genutzten Stationsrechnern und überall dort, wo mehrere Personen
+  mit demselben Datenbestand arbeiten, den **MariaDB-Betrieb** verwenden. Dort
+  prüft der Server jede Anmeldung und jede Änderung.
+- Der lokale Modus eignet sich außerdem für Erprobung, Schulung und Demodaten.
+
+### Urlaubsanspruch bei Teilzeit
+
+TeO kürzt den Grundanspruch linear zum hinterlegten Stellenumfang: 30 Tage bei
+50 Prozent ergeben 15 Tage. Das Bundesurlaubsgesetz bemisst den Anspruch
+dagegen nach der Zahl der **Arbeitstage pro Woche**. Beide Rechnungen stimmen
+überein, solange Teilzeit auch weniger Arbeitstage bedeutet.
+
+Arbeitet jemand in Teilzeit bei unveränderter Fünftagewoche – also kürzere Tage
+statt weniger Tage –, steht dieser Person weiterhin der volle Anspruch zu; TeO
+weist dann zu wenig aus. Der Wert muss in diesem Fall über **Zusätzliche Tage**
+in der Urlaubsplanung ausgeglichen werden.
+
+Ebenfalls nicht automatisch berücksichtigt: die anteilige Berechnung nach
+§ 5 BUrlG bei Ein- oder Austritt im laufenden Kalenderjahr. Auch hier ist die
+manuelle Korrektur über **Zusätzliche Tage** vorgesehen.
 
 ## Änderungshistorie
 

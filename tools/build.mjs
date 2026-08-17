@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { PROJECT_META } from "../src/meta/project-meta.mjs";
+import { PROJECT_META, projectBuildNumber } from "../src/meta/project-meta.mjs";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readmeMarkdown = await fs.readFile(
@@ -45,6 +45,23 @@ ${stateSchemaSource.replace(/^export /gm, "")}
 await fs.writeFile(
   path.join(projectRoot, "state-schema.js"),
   browserStateSchema,
+  "utf8",
+);
+
+// Der Offline-Zwischenspeicher traegt die Buildnummer im Namen. Dadurch legt
+// jede Fassung ihren eigenen Speicher an, und der alte wird beim Aktivieren
+// geraeumt - ohne diesen Schritt lieferte der Browser dauerhaft den Stand der
+// ersten Installation aus.
+const serviceWorkerSource = await fs.readFile(
+  path.join(projectRoot, "src", "shared", "service-worker.js"),
+  "utf8",
+);
+await fs.writeFile(
+  path.join(projectRoot, "service-worker.js"),
+  `/* Generiert aus src/shared/service-worker.js – Änderungen dort vornehmen. */\n${serviceWorkerSource.replaceAll(
+    "__TEO_BUILD_NUMBER__",
+    projectBuildNumber(PROJECT_META),
+  )}`,
   "utf8",
 );
 

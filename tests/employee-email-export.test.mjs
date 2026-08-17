@@ -9,7 +9,7 @@ import {
 test("Der E-Mail-Export verwendet alle aktuellen Mitarbeiterfilter", async () => {
   const app = await loadAppFunctions([
     "normalizeState",
-    "getFilteredEmployeeEmailExport",
+    "getFilteredEmployeeEmailAddresses",
   ]);
   const anna = {
     ...createEmployee("employee-anna"),
@@ -53,9 +53,9 @@ test("Der E-Mail-Export verwendet alle aktuellen Mitarbeiterfilter", async () =>
     search: "anna",
   });
 
-  assert.equal(
-    app.getFilteredEmployeeEmailExport(),
-    "anna@example.invalid",
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(app.getFilteredEmployeeEmailAddresses())),
+    ["anna@example.invalid"],
   );
 });
 
@@ -114,7 +114,7 @@ test("Der Benutzernamen-Export folgt denselben Filtern wie der E-Mail-Export", a
 test("Der Mitarbeiterfilter findet Personen ohne Qualifikation", async () => {
   const app = await loadAppFunctions([
     "normalizeState",
-    "getFilteredEmployeeEmailExport",
+    "getFilteredEmployeeEmailAddresses",
   ]);
   const withoutQualification = {
     ...createEmployee("employee-without-qualification"),
@@ -144,7 +144,10 @@ test("Der Mitarbeiterfilter findet Personen ohne Qualifikation", async () => {
   );
   app.setEmployeeFilters({ qualification: "none" });
 
-  assert.equal(app.getFilteredEmployeeEmailExport(), "ohne@example.invalid");
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(app.getFilteredEmployeeEmailAddresses())),
+    ["ohne@example.invalid"],
+  );
 });
 
 test("Die Telefonliste zeigt aktive und einzuarbeitende Mitarbeiter unabhängig von den Filtern", async () => {

@@ -411,3 +411,67 @@ test("Unveränderte Datensätze werden nicht erneut geschrieben", async () => {
     1,
   );
 });
+
+test("Eine geänderte Feldreihenfolge schreibt keine Zeile neu", async () => {
+  const gespeichert = {
+    id: "employee-1",
+    firstName: "Anna",
+    lastName: "Aktiv",
+    qualifications: { praxisanleiter: true, hygiene: false },
+  };
+  // Derselbe Inhalt, aber in anderer Schlüsselreihenfolge aufgebaut – so, wie
+  // es nach einer Umsortierung in normalizeEmployee entstünde.
+  const umsortiert = {
+    lastName: "Aktiv",
+    qualifications: { hygiene: false, praxisanleiter: true },
+    id: "employee-1",
+    firstName: "Anna",
+  };
+
+  const schreibzugriffe = [];
+  const connection = {
+    async query(sql, values = []) {
+      if (/SELECT id, sort_order, payload FROM teo_employees/.test(sql)) {
+        return [
+          {
+            id: "employee-1",
+            sort_order: 0,
+            payload: JSON.stringify(gespeichert),
+          },
+        ];
+      }
+      if (/^\s*INSERT INTO teo_employees/.test(sql)) {
+        schreibzugriffe.push({ sql, values });
+      }
+      if (/COUNT\(\*\) AS table_count/.test(sql)) return [{ table_count: 0 }];
+      return [];
+    },
+  };
+
+  const state = emptyRelationalState();
+  state.employees = [umsortiert];
+  await replaceRelationalState(connection, state, {
+    revision: 2,
+    updatedBy: "Admin001",
+  });
+
+  assert.deepEqual(
+    schreibzugriffe,
+    [],
+    "Gleicher Inhalt in anderer Feldreihenfolge darf keinen Schreibzugriff auslösen",
+  );
+
+  // Gegenprobe: eine echte Änderung muss weiterhin geschrieben werden
+  const geaendert = { ...umsortiert, firstName: "Anne" };
+  const stateGeaendert = emptyRelationalState();
+  stateGeaendert.employees = [geaendert];
+  await replaceRelationalState(connection, stateGeaendert, {
+    revision: 3,
+    updatedBy: "Admin001",
+  });
+  assert.equal(
+    schreibzugriffe.length,
+    1,
+    "Eine inhaltliche Änderung muss geschrieben werden",
+  );
+});

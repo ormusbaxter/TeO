@@ -1,3 +1,46 @@
+### 004.037.007 – Sicherungszeitpunkt und Datenbankabgleich
+
+- **Behoben:** Lässt sich der Sicherungszeitpunkt nach einer automatischen Sicherung nicht speichern, gilt der Bestand nicht mehr fälschlich als gesichert; ein Serverkonflikt wird sofort statt bei der nächsten Änderung behandelt
+- **Verbessert:** Der Datenbankabgleich vergleicht Datensätze unabhängig von der Feldreihenfolge – eine Umsortierung im Client schreibt nicht mehr den gesamten Bestand neu
+
+### 004.037.006 – Schnellerer Start
+
+- **Neu:** Der TeO-Server komprimiert Oberfläche und Programmdateien; die Startlast sinkt von rund 1 MB auf etwa 210 KB
+- **Verbessert:** Die Skripte werden mit `defer` geladen und blockieren den Seitenaufbau nicht mehr
+
+### 004.037.005 – Offlinebetrieb
+
+- **Neu:** TeO läuft ohne Netzverbindung weiter und lässt sich als App installieren; Oberfläche und Programmdateien liegen in einem versionierten Zwischenspeicher
+- **Neu:** Jeder Build legt einen eigenen Zwischenspeicher an und räumt den vorherigen, damit nie ein veralteter Stand ausgeliefert wird
+- **Verbessert:** Anfragen an den MariaDB-Dienst werden nie zwischengespeichert, damit kein veralteter Datenbestand entsteht
+
+### 004.037.004 – Klarere Einordnung von lokalem Modus, Memos und Urlaub
+
+- **Verbessert:** Die Speicherort-Einstellung benennt jetzt deutlich, dass der lokale Modus keinen Zugriffsschutz bietet und wofür er geeignet ist
+- **Verbessert:** „Nur für mich“ heißt jetzt „Nur in meiner Ansicht“ – der Eintrag bleibt Teil des gemeinsamen Datenbestands und erscheint in Datensicherungen
+- **Verbessert:** Die Hilfe erklärt, wann die lineare Kürzung des Urlaubsanspruchs bei Teilzeit von der Berechnung nach Arbeitstagen abweicht und wie sich das ausgleichen lässt
+
+### 004.037.003 – Robusterer Import und Kontenprüfung
+
+- **Behoben:** Nach einem Import bleiben keine Filter mehr stehen – zuvor schränkten Suche, Kategorie- und Bestandsfilter den neuen Datenbestand weiter ein und ließen Listen leer wirken
+- **Behoben:** Ein ungültiges oder doppelt vergebenes Benutzerkonto verwirft nicht mehr alle übrigen Konten; verworfene Konten werden nach dem Start gemeldet
+- **Behoben:** Der Hinweis „noch nicht als Datensicherung exportiert“ verschwindet nach einer erfolgreichen automatischen Sicherung wieder zuverlässig
+- **Neu:** Die Strukturprüfung meldet Filter, die beim Import nicht zurückgesetzt werden
+
+### 004.037.002 – Prüfstrecke gegen toten Code
+
+- **Neu:** Ein GitHub-Workflow führt bei jedem Push `npm run verify` aus und meldet, wenn die erzeugten Dateien nicht mehr zu den Quellen in `src/` passen
+- **Neu:** Die Strukturprüfung meldet Funktionen, die nirgends aufgerufen werden, sowie Oberflächenverweise, die nie gelesen werden
+- **Behoben:** `getFilteredEmployeeEmailExport` wurde nur noch vom Test verwendet – der E-Mail-Export ist jetzt über den tatsächlich genutzten Weg abgesichert
+- **Behoben:** Nicht mehr benötigte Funktion `employeeNameSignature` sowie die Verweise auf `openCatalogManagementButton` und `backupVolumeBar` entfernt
+
+### 004.037.001 – Memos in Protokoll und Sicherung
+
+- **Behoben:** Änderungen an Memos und ToDos erscheinen im Änderungsprotokoll wieder namentlich statt als „Datenbestand aktualisiert“
+- **Behoben:** Wurden seit der letzten Datensicherung nur Memos oder ToDos geändert, galt der Datenbestand fälschlich als gesichert – Warnhinweis, Schließen-Erinnerung und automatische Sicherung blieben aus
+- **Behoben:** Der Dateiname des Geräte-Excel-Exports und das Stand-Datum der gedruckten Telefonliste nannten zwischen Mitternacht und 2 Uhr den Vortag
+- **Verbessert:** Die nachverfolgten Sammlungen stehen jetzt an einer einzigen Stelle; ein neuer Test gleicht sie gegen den Datenvertrag ab, damit künftige Sammlungen nicht vergessen werden
+
 ### 004.037.000 – Memo / ToDo
 
 - **Neu:** Eigener Bereich für persönliche und gemeinsame Memos und ToDos mit optionalem Datum, Beschreibung, Status und Wichtig-Markierung

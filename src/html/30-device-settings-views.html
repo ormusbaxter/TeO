@@ -429,6 +429,18 @@
                   <option value="mariadb">MariaDB – zentraler TeO-Server</option>
                 </select>
               </label>
+              <p class="settings-warning-copy">
+                <strong>Lokaler Browser: kein Zugriffsschutz.</strong>
+                Anmeldung und Rollen steuern in diesem Modus nur die Bedienung.
+                Der Datenbestand liegt unverschlüsselt im Browserprofil und ist
+                für jeden lesbar, der an diesem Benutzerkonto des Rechners
+                arbeitet – auch ohne TeO-Anmeldung. Verwenden Sie den lokalen
+                Modus deshalb nur auf einem persönlich gesicherten Rechner mit
+                eigenem Windows- oder macOS-Konto und aktiver
+                Bildschirmsperre. Für den gemeinsamen Stationsrechner ist
+                MariaDB vorgesehen: Dort prüft der Server jede Anmeldung und
+                jede Änderung.
+              </p>
               <div class="backend-settings-fields" id="mariaDbSettingsFields" hidden>
                 <label class="settings-field">
                   <span>Adresse des TeO-Servers</span>

@@ -16,6 +16,7 @@ const [
   cssSource,
   generatedMeta,
   generatedSchema,
+  serviceWorkerSource,
 ] =
   await Promise.all([
     read("app.js"),
@@ -24,12 +25,14 @@ const [
     read("styles.css"),
     read("project-meta.js"),
     read("state-schema.js"),
+    read("service-worker.js"),
   ]);
 const packageJson = JSON.parse(await read("package.json"));
 
 new vm.Script(appSource, { filename: "app.js" });
 new vm.Script(backendSource, { filename: "backend-client.js" });
 new vm.Script(generatedSchema, { filename: "state-schema.js" });
+new vm.Script(serviceWorkerSource, { filename: "service-worker.js" });
 const metaContext = { window: {} };
 vm.createContext(metaContext);
 new vm.Script(generatedMeta, { filename: "project-meta.js" }).runInContext(
@@ -38,10 +41,13 @@ new vm.Script(generatedMeta, { filename: "project-meta.js" }).runInContext(
 
 const ids = [...htmlSource.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
 assert.equal(new Set(ids).size, ids.length, "index.html enthält doppelte IDs");
+// defer behaelt die Reihenfolge bei, deshalb genuegt weiterhin die
+// Reihenfolge im Dokument. Ohne defer wuerde das Laden der Skripte das
+// Parsen der 240 KB grossen Seite blockieren.
 assert.match(
   htmlSource,
-  /<script src="project-meta\.js"><\/script>[\s\S]*<script src="state-schema\.js"><\/script>[\s\S]*<script src="app\.js"><\/script>/,
-  "Projektmetadaten und Datenvertrag müssen vor app.js geladen werden",
+  /<script src="project-meta\.js" defer><\/script>[\s\S]*<script src="state-schema\.js" defer><\/script>[\s\S]*<script src="app\.js" defer><\/script>/,
+  "Projektmetadaten und Datenvertrag müssen mit defer und vor app.js geladen werden",
 );
 assert.equal(
   (cssSource.match(/{/g) || []).length,
@@ -157,5 +163,89 @@ assert.equal(
   `${PROJECT_META.version.major}.${PROJECT_META.version.minor}.${PROJECT_META.version.patch}`,
   "package.json und src/meta/project-meta.mjs nennen unterschiedliche Versionen",
 );
+
+// Die Anwendung ist eine einzige IIFE ohne Modulgrenzen, deshalb meldet kein
+// Werkzeug von sich aus, wenn eine Funktion oder ein Oberflaechenverweis nicht
+// mehr gebraucht wird. Beides bleibt sonst als toter Code liegen und
+// suggeriert Abdeckung, die es nicht gibt - etwa wenn ein Test die letzte
+// verbliebene Verwendung ist.
+const declaredFunctions = [
+  ...appSource.matchAll(/^\s*(?:async\s+)?function\s+([A-Za-z0-9_]+)\s*\(/gm),
+].map((match) => match[1]);
+const unusedFunctions = declaredFunctions.filter(
+  (name) =>
+    (appSource.match(new RegExp(`\\b${name}\\b`, "g")) || []).length <= 1,
+);
+assert.deepEqual(
+  unusedFunctions,
+  [],
+  `In app.js werden diese Funktionen nirgends aufgerufen: ${unusedFunctions.join(", ")}. ` +
+    "Bitte entfernen - wird eine davon nur noch von einem Test gebraucht, " +
+    "prueft der Test den Produktivpfad nicht mehr.",
+);
+
+const elementsBlockStart = appSource.indexOf("const elements = {");
+assert.notEqual(
+  elementsBlockStart,
+  -1,
+  "Die Oberflaechenverweise (const elements) wurden in app.js nicht gefunden",
+);
+const elementsBlock = appSource.slice(
+  elementsBlockStart,
+  matchingBraceIndex(appSource, appSource.indexOf("{", elementsBlockStart)),
+);
+const declaredElements = [
+  ...elementsBlock.matchAll(/^\s{4}([A-Za-z0-9_]+):/gm),
+].map((match) => match[1]);
+const usedElements = new Set(
+  [...appSource.matchAll(/\belements\.([A-Za-z0-9_]+)/g)].map(
+    (match) => match[1],
+  ),
+);
+const unusedElements = declaredElements.filter((name) => !usedElements.has(name));
+assert.deepEqual(
+  unusedElements,
+  [],
+  `Diese Oberflaechenverweise werden nie gelesen: ${unusedElements.join(", ")}. ` +
+    "Bitte aus const elements entfernen; das HTML-Element selbst kann bleiben.",
+);
+
+// Ein Import ersetzt den gesamten fachlichen Datenbestand. Bleibt dabei ein
+// Filter stehen, wirken Listen leer, obwohl die Daten vollstaendig vorliegen.
+// resetListFilters muss deshalb jede Filter- und Suchvariable abdecken.
+const resetFiltersStart = appSource.indexOf("function resetListFilters()");
+assert.notEqual(
+  resetFiltersStart,
+  -1,
+  "resetListFilters wurde in app.js nicht gefunden",
+);
+const resetFiltersBody = appSource.slice(
+  resetFiltersStart,
+  matchingBraceIndex(appSource, appSource.indexOf("{", resetFiltersStart)),
+);
+const filterVariables = [
+  ...appSource.matchAll(/^\s*let ([A-Za-z0-9_]*(?:SearchTerm|Filter)) = /gm),
+].map((match) => match[1]);
+const unresetFilters = filterVariables.filter(
+  (name) => !new RegExp(`\\b${name} = `).test(resetFiltersBody),
+);
+assert.deepEqual(
+  unresetFilters,
+  [],
+  `Diese Filter setzt resetListFilters nicht zurueck: ${unresetFilters.join(", ")}. ` +
+    "Nach einem Import wuerden sie den neuen Datenbestand weiter einschraenken.",
+);
+
+function matchingBraceIndex(source, openingBraceIndex) {
+  let depth = 0;
+  for (let index = openingBraceIndex; index < source.length; index += 1) {
+    if (source[index] === "{") depth += 1;
+    else if (source[index] === "}") {
+      depth -= 1;
+      if (depth === 0) return index;
+    }
+  }
+  throw new Error("Zu der oeffnenden Klammer fehlt die schliessende.");
+}
 
 console.log(`TeO ${projectBuildNumber(PROJECT_META)}: Strukturprüfung erfolgreich.`);

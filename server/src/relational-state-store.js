@@ -463,7 +463,7 @@ async function synchronizeCollection(connection, spec, items) {
       String(row.id),
       {
         sortOrder: Number(row.sort_order),
-        payload: stringifyJson(row.payload),
+        payload: canonicalJson(row.payload),
       },
     ]),
   );
@@ -480,16 +480,18 @@ async function synchronizeCollection(connection, spec, items) {
 
   for (const [sortOrder, item] of items.entries()) {
     const id = spec.id(item);
-    const payload = JSON.stringify(item);
     const existing = existingById.get(id);
+    // Gespeichert wird die Form des Clients, verglichen die kanonische - so
+    // bleibt der Inhalt unveraendert lesbar, ohne dass eine geaenderte
+    // Feldreihenfolge als Aenderung zaehlt.
     if (
       existing &&
       existing.sortOrder === sortOrder &&
-      existing.payload === payload
+      existing.payload === canonicalJson(item)
     ) {
       continue;
     }
-    await upsertItem(connection, spec, item, sortOrder, payload);
+    await upsertItem(connection, spec, item, sortOrder, JSON.stringify(item));
   }
 }
 
@@ -1059,8 +1061,29 @@ function parseJson(value) {
   return JSON.parse(String(value));
 }
 
-function stringifyJson(value) {
-  return JSON.stringify(parseJson(value));
+// Vergleichsform mit sortierten Objektschluesseln. Der Abgleich in
+// synchronizeCollection entscheidet anhand eines Zeichenkettenvergleichs, ob
+// eine Zeile neu geschrieben werden muss. Ohne Kanonisierung haengt dieses
+// Ergebnis an der Reihenfolge, in der der Client seine Objekte aufbaut: Wird
+// in normalizeEmployee ein Feld verschoben, gilt jede Zeile als geaendert und
+// der gesamte Bestand wird bei jedem Speichern neu geschrieben. Ebenso wuerde
+// eine Datenbank, die JSON-Spalten normalisiert (etwa MySQL statt MariaDB),
+// dauerhaft Unterschiede melden.
+//
+// Reihenfolgen innerhalb von Arrays bleiben erhalten, sie sind fachlich
+// bedeutsam.
+function canonicalJson(value) {
+  return JSON.stringify(canonicalValue(parseJson(value)));
+}
+
+function canonicalValue(value) {
+  if (Array.isArray(value)) return value.map(canonicalValue);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.keys(value)
+      .sort()
+      .map((key) => [key, canonicalValue(value[key])]),
+  );
 }
 
 export { COLLECTION_SPECS };

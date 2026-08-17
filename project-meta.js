@@ -6,7 +6,7 @@
   "version": {
     "major": 4,
     "minor": 37,
-    "patch": 0
+    "patch": 7
   },
   "stateVersion": 25,
   "backupFormat": "intensivteam-datensicherung",
