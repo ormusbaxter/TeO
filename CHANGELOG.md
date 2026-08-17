@@ -1,3 +1,8 @@
+### 004.036.001 – Automatischer Startabgleich
+
+- **Verbessert:** Nach dem Login lädt TeO `teo-autosicherung.json` automatisch aus dem zuletzt verknüpften Sicherungsordner
+- **Verbessert:** Die Dateiauswahl erscheint nur noch, wenn Ordnerzugriff oder Sicherungsdatei nicht verfügbar sind oder die Datei nicht übernommen werden kann
+
 ### 004.036.000 – Excel-Export der Geräteverwaltung
 
 - **Neu:** Der vollständige Gerätekatalog lässt sich unabhängig von den gesetzten Filtern als Excel-Datei exportieren

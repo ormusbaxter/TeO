@@ -1315,7 +1315,7 @@
     }
     databaseSaveReminderArmed = true;
     elements.setupDialog.close();
-    completeLogin(admin);
+    completeLogin(admin, { requestStartupBackupPermission: true });
     showToast("TeO wurde eingerichtet.");
   }
 
@@ -1384,10 +1384,13 @@
       automaticBackupNotice =
         "Sicherungsschlüssel nicht entsperrt – erneut anmelden oder Wiederherstellungsschlüssel verwenden.";
     }
-    completeLogin(user);
+    completeLogin(user, { requestStartupBackupPermission: true });
   }
 
-  function completeLogin(user) {
+  function completeLogin(
+    user,
+    { requestStartupBackupPermission = false } = {},
+  ) {
     currentUser = user;
     sessionStorage.setItem(SESSION_USER_KEY, user.id);
     elements.loginForm.reset();
@@ -1405,7 +1408,9 @@
     }
 
     if (!isMariaDbMode() && !startupBackupSynchronized) {
-      showStartupBackupDialog();
+      void synchronizeStartupBackupFromSavedDirectory({
+        requestPermission: requestStartupBackupPermission,
+      });
       return;
     }
 
@@ -1431,10 +1436,10 @@
     window.setTimeout(() => document.querySelector("#loginUsername").focus(), 0);
   }
 
-  function showStartupBackupDialog() {
+  function showStartupBackupDialog(status = "") {
     document.body.classList.add("is-auth-locked");
     elements.startupBackupFile.value = "";
-    elements.startupBackupStatus.textContent = "";
+    elements.startupBackupStatus.textContent = status;
     elements.selectStartupBackupFileButton.disabled = false;
     if (!elements.startupBackupDialog.open) {
       elements.startupBackupDialog.showModal();
@@ -1495,7 +1500,7 @@
     currentUser = state.users.find((user) => user.id === currentUser.id);
     elements.changePasswordDialog.close();
     if (!isMariaDbMode() && !startupBackupSynchronized) {
-      showStartupBackupDialog();
+      void synchronizeStartupBackupFromSavedDirectory({ requestPermission: true });
     } else {
       document.body.classList.remove("is-auth-locked");
       applyAccessControl();

@@ -61,6 +61,14 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
     /decryptBackup\(envelope, automaticBackupPassword\)/,
   );
   assert.match(appSource, /handleStartupBackupFileSelection/);
+  assert.match(
+    appSource,
+    /synchronizeStartupBackupFromSavedDirectory\(\{[\s\S]*requestPermission:/,
+  );
+  assert.match(
+    appSource,
+    /getFileHandle\(\s*AUTO_BACKUP_FILENAME,\s*\{ create: false \}/,
+  );
   assert.match(appSource, /renderBackupVolumeMeter/);
   assert.match(appSource, /lastBackupSizeBytes\s*=\s*volume\.sizeBytes/);
   assert.match(
@@ -134,6 +142,74 @@ test("Der Startabgleich weist ältere Sicherungsstände ab", async () => {
     true,
   );
   assert.equal(app.startupBackupIsOlder(stateAt(""), backupSettingsAt("")), false);
+});
+
+test("Der Startabgleich sucht zuerst still im gespeicherten Sicherungsordner", async () => {
+  const app = await loadAppFunctions(["findStartupBackupFileInSavedDirectory"]);
+  const backupFile = { name: "teo-autosicherung.json", size: 1234 };
+  const calls = [];
+  const directory = {
+    async queryPermission(descriptor) {
+      calls.push(["permission", descriptor.mode]);
+      return "granted";
+    },
+    async getFileHandle(filename, options) {
+      calls.push(["file", filename, options.create]);
+      return { async getFile() { return backupFile; } };
+    },
+  };
+
+  const result = await app.findStartupBackupFileInSavedDirectory(directory);
+
+  assert.equal(result.status, "found");
+  assert.equal(result.file, backupFile);
+  assert.deepEqual(calls, [
+    ["permission", "read"],
+    ["file", "teo-autosicherung.json", false],
+  ]);
+});
+
+test("Die Dateiauswahl bleibt Rückfall bei fehlender Berechtigung oder Datei", async () => {
+  const app = await loadAppFunctions(["findStartupBackupFileInSavedDirectory"]);
+  const denied = await app.findStartupBackupFileInSavedDirectory({
+    async queryPermission() { return "prompt"; },
+    async getFileHandle() { throw new Error("darf nicht aufgerufen werden"); },
+  });
+  const missing = await app.findStartupBackupFileInSavedDirectory({
+    async queryPermission() { return "granted"; },
+    async getFileHandle() {
+      const error = new Error("nicht gefunden");
+      error.name = "NotFoundError";
+      throw error;
+    },
+  });
+
+  assert.equal(denied.status, "permission-required");
+  assert.equal(missing.status, "file-missing");
+});
+
+test("Der Anmeldeklick kann einen gespeicherten Ordnerzugriff erneut bestätigen", async () => {
+  const app = await loadAppFunctions(["findStartupBackupFileInSavedDirectory"]);
+  const permissions = [];
+  const directory = {
+    async queryPermission() { return "prompt"; },
+    async requestPermission(descriptor) {
+      permissions.push(descriptor.mode);
+      return "granted";
+    },
+    async getFileHandle() {
+      return {
+        async getFile() {
+          return { name: "teo-autosicherung.json", size: 42 };
+        },
+      };
+    },
+  };
+
+  const result = await app.findStartupBackupFileInSavedDirectory(directory, true);
+
+  assert.equal(result.status, "found");
+  assert.deepEqual(permissions, ["read"]);
 });
 
 test("Die automatische Sicherung normalisiert die Login-Verschlüsselung", async () => {
