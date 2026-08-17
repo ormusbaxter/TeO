@@ -164,6 +164,17 @@ assert.equal(
   "package.json und src/meta/project-meta.mjs nennen unterschiedliche Versionen",
 );
 
+// Platzhalter in Skriptzeilen loest nur eine POSIX-Shell auf. Unter Windows
+// bekommt das Programm den Stern woertlich - dort schlug 'npm test' und damit
+// auch das Paketskript fehl, bis der Aufruf ohne Pfadangabe auskam.
+for (const [name, command] of Object.entries(packageJson.scripts)) {
+  assert.doesNotMatch(
+    command,
+    /(?<![-\w])\*/,
+    `Das Skript "${name}" verlässt sich auf die Auflösung von Platzhaltern durch die Shell und schlägt unter Windows fehl`,
+  );
+}
+
 // Die Anwendung ist eine einzige IIFE ohne Modulgrenzen, deshalb meldet kein
 // Werkzeug von sich aus, wenn eine Funktion oder ein Oberflaechenverweis nicht
 // mehr gebraucht wird. Beides bleibt sonst als toter Code liegen und
