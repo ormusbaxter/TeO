@@ -1,3 +1,9 @@
+### 004.037.004 – Klarere Einordnung von lokalem Modus, Memos und Urlaub
+
+- **Verbessert:** Die Speicherort-Einstellung benennt jetzt deutlich, dass der lokale Modus keinen Zugriffsschutz bietet und wofür er geeignet ist
+- **Verbessert:** „Nur für mich“ heißt jetzt „Nur in meiner Ansicht“ – der Eintrag bleibt Teil des gemeinsamen Datenbestands und erscheint in Datensicherungen
+- **Verbessert:** Die Hilfe erklärt, wann die lineare Kürzung des Urlaubsanspruchs bei Teilzeit von der Berechnung nach Arbeitstagen abweicht und wie sich das ausgleichen lässt
+
 ### 004.037.003 – Robusterer Import und Kontenprüfung
 
 - **Behoben:** Nach einem Import bleiben keine Filter mehr stehen – zuvor schränkten Suche, Kategorie- und Bestandsfilter den neuen Datenbestand weiter ein und ließen Listen leer wirken

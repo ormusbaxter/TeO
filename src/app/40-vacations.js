@@ -1189,6 +1189,19 @@
     `;
   }
 
+  // ACHTUNG, bewusste Vereinfachung: Der Grundanspruch wird linear zum
+  // Stellenumfang gekuerzt. Das Bundesurlaubsgesetz bemisst ihn dagegen nach
+  // der Zahl der ARBEITSTAGE PRO WOCHE. Wer 50 Prozent auf fuenf kuerzere Tage
+  // verteilt, hat weiterhin Anspruch auf die vollen 30 Tage; wer 50 Prozent
+  // auf zweieinhalb Tage verteilt, auf 15.
+  //
+  // Fuer die Station stimmt die Rechnung, solange Teilzeit immer auch weniger
+  // Arbeitstage bedeutet. Kommt Teilzeit bei voller Fuenftagewoche vor, rechnet
+  // TeO systematisch zu wenig - dann muessen die Arbeitstage pro Woche am
+  // Mitarbeitenden erfasst und hier statt employmentPercent verwendet werden.
+  //
+  // Ebenfalls nicht abgebildet: die Zwoelftelung nach Paragraf 5 BUrlG bei Ein-
+  // oder Austritt im laufenden Jahr. Die Funktion kennt nur volle Kalenderjahre.
   function getVacationEntitlement(employee, year) {
     const base =
       Math.round(

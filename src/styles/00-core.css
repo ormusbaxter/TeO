@@ -3350,6 +3350,23 @@ svg {
   background: var(--white);
 }
 
+/* Sachlicher Hinweis auf eine Einschraenkung, die man vor der Auswahl kennen
+   muss - nicht als Fehler, aber deutlich abgesetzt vom Fliesstext. */
+.settings-warning-copy {
+  margin: 0;
+  padding: 14px 16px;
+  color: var(--orange-700);
+  background: var(--orange-100);
+  border-left: 5px solid var(--orange-700);
+  border-radius: 0 9px 9px 0;
+  line-height: 1.55;
+}
+
+.settings-warning-copy strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
 .training-matrix-toolbar {
   display: flex;
   gap: 20px;
