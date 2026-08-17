@@ -1666,7 +1666,7 @@
       }
       elements.settingsMariaDbPassword.value = "";
       elements.settingsMariaDbBootstrapToken.value = "";
-      applyTheme(state.settings.theme);
+      // completeLogin setzt das Farbthema des Kontos.
       completeLogin(remoteUser);
       showView("settings", false);
       showToast(
@@ -2046,12 +2046,14 @@
     selectedCompletionEmployeeIds.clear();
     selectedEmployeeIds.clear();
     attendanceDraft.clear();
-    applyTheme(state.settings.theme);
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {
       showLoginDialog();
       return false;
     }
+    // Nach dem Auffrischen des Kontos, damit das Farbthema aus der Sicherung
+    // greift.
+    applyTheme(activeThemeKey());
     renderAll();
     showToast(
       usersFromBackup

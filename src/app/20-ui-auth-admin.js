@@ -139,7 +139,7 @@
     });
     elements.mobileThemeButton.addEventListener("click", () => {
       const themes = Object.keys(THEMES);
-      const currentIndex = themes.indexOf(state.settings.theme);
+      const currentIndex = themes.indexOf(activeThemeKey());
       changeTheme(themes[(currentIndex + 1) % themes.length]);
     });
 
@@ -1087,7 +1087,6 @@
 
       state = await loadState();
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
-      applyTheme(state.settings.theme);
       if (currentUser) {
         const refreshedUser = state.users.find((user) => user.id === currentUser.id);
         if (!refreshedUser) {
@@ -1095,11 +1094,16 @@
           return;
         }
         currentUser = refreshedUser;
+        // Erst nach dem Auffrischen des Kontos, damit ein an einem anderen
+        // Arbeitsplatz gewaehltes Farbthema uebernommen wird.
+        applyTheme(activeThemeKey());
         if (currentUser.mustChangePassword) {
           completeLogin(currentUser);
           showToast("Das Passwort wurde zurückgesetzt. Bitte legen Sie ein neues Passwort fest.");
           return;
         }
+      } else {
+        applyTheme(activeThemeKey());
       }
       renderAll();
       showToast(
@@ -1161,7 +1165,7 @@
         return;
       }
       currentUser = refreshedUser;
-      applyTheme(state.settings.theme);
+      applyTheme(activeThemeKey());
       if (currentUser.mustChangePassword) {
         completeLogin(currentUser);
         showToast(
@@ -1243,18 +1247,49 @@
     renderSidebarSystemStatus();
   }
 
+  // Das Farbthema gehoert zum Benutzerkonto, nicht zum Datenbestand: Wer sich
+  // anmeldet, bringt seine eigene Auswahl mit. state.settings.theme bleibt die
+  // gemeinsame Vorgabe - sie gilt vor der Anmeldung und fuer Konten, die noch
+  // nie ein eigenes Thema gewaehlt haben.
+  function activeThemeKey() {
+    return normalizeTheme(currentUser?.theme || state.settings.theme);
+  }
+
   async function changeTheme(theme) {
     const nextTheme = normalizeTheme(theme);
-    if (nextTheme === state.settings.theme) {
+    if (!currentUser) {
+      // Ohne Anmeldung gibt es kein Konto, das die Wahl aufbewahren koennte.
+      applyTheme(nextTheme);
+      showToast(
+        "Das Farbthema gilt vorerst nur für diese Sitzung. Nach der Anmeldung wird es für das Benutzerkonto gespeichert.",
+      );
+      return;
+    }
+    if (nextTheme === activeThemeKey()) {
       applyTheme(nextTheme);
       return;
     }
 
-    const committed = await commitStateMutation(() => {
-      state.settings.theme = nextTheme;
-    });
-    applyTheme(state.settings.theme);
-    if (committed) showToast(`Farbthema „${THEMES[nextTheme]}“ wurde aktiviert.`);
+    const committed = await commitStateMutation(
+      () => {
+        const account = state.users.find((user) => user.id === currentUser.id);
+        if (account) account.theme = nextTheme;
+        currentUser.theme = nextTheme;
+      },
+      // Eine Anzeigeeinstellung eines einzelnen Kontos ist keine fachliche
+      // Aenderung und hat im Änderungsprotokoll nichts verloren.
+      { auditAction: "" },
+    );
+    if (committed) {
+      currentUser =
+        state.users.find((user) => user.id === currentUser.id) || currentUser;
+    }
+    applyTheme(activeThemeKey());
+    if (committed) {
+      showToast(
+        `Farbthema „${THEMES[nextTheme]}“ wurde für „${currentUser.username}“ gespeichert.`,
+      );
+    }
   }
 
   function applyTheme(theme) {
@@ -1432,6 +1467,8 @@
   ) {
     currentUser = user;
     sessionStorage.setItem(SESSION_USER_KEY, user.id);
+    // Jede Anmeldung bringt das Farbthema des Kontos mit.
+    applyTheme(activeThemeKey());
     elements.loginForm.reset();
     elements.loginError.textContent = "";
     if (elements.loginDialog.open) elements.loginDialog.close();
@@ -1460,6 +1497,8 @@
 
   function showLoginDialog() {
     currentUser = null;
+    // Ohne angemeldetes Konto gilt wieder die gemeinsame Vorgabe.
+    applyTheme(activeThemeKey());
     clearAutomaticBackupTimer();
     automaticBackupPassword = "";
     startupBackupSynchronized = false;

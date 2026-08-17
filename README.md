@@ -21,8 +21,8 @@ TeO-Server aufgerufen. Die technische Einrichtung ist im Abschnitt
 
 ### Erste sinnvolle Schritte
 
-1. Unter **Einstellungen** das gewünschte Farbthema und die
-   Sicherungserinnerung festlegen.
+1. Unter **Einstellungen** das gewünschte Farbthema – es gilt für das eigene
+   Benutzerkonto – und die Sicherungserinnerung festlegen.
 2. Unter **Mitarbeiter** Personalstammdaten, Stellenanteile, Berufe und
    Qualifikationen erfassen.
 3. Stationsleitung und stellvertretende Stationsleitung kennzeichnen.
@@ -142,7 +142,7 @@ Normale Benutzer dürfen alles, was zur regulären Bedienung gehört:
 - Dienstwochenenden konfigurieren und Simulationen übernehmen
 - Datenqualität prüfen, Telefonliste und E-Mail-Adressen exportieren
 - Daten sichern, prüfen und Sicherungen importieren
-- das eigene Passwort und das Farbthema ändern
+- das eigene Passwort und das eigene Farbthema ändern
 
 ### Administratoren
 
@@ -1013,7 +1013,9 @@ Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint
 unter **Einstellungen** in der Sidebar und zusätzlich als Abschnittsnavigation
 oben auf der Einstellungsseite:
 
-- **Allgemein:** Farbthema und Verhalten beim Schließen von Dialogen
+- **Allgemein:** Farbthema und Verhalten beim Schließen von Dialogen; das
+  Farbthema gehört zum angemeldeten Benutzerkonto und begleitet es an jeden
+  Arbeitsplatz, während andere Konten ihr eigenes Farbthema behalten
 - **Planung:** feste Dienstwochenenden, Urlaubsplanung und Schulferien
 - **Pflichtfortbildungen:** Soll-Zeiten
 - **Stammdaten & Zugriffe:** Benutzer, Berufe, Qualifikationen,

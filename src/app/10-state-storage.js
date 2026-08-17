@@ -23,7 +23,7 @@
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     window.addEventListener("beforeunload", handleBeforeUnload);
     initializeFormattedDateInputs();
-    applyTheme(state.settings.theme);
+    applyTheme(activeThemeKey());
     renderProjectMetadata();
 
     const today = todayIso();
@@ -637,11 +637,19 @@
       passwordSalt,
       passwordHash,
       mustChangePassword: Boolean(user.mustChangePassword),
+      theme: normalizeUserTheme(user.theme),
     };
   }
 
   function normalizeTheme(theme) {
     return Object.hasOwn(THEMES, theme) ? theme : "standard";
+  }
+
+  // Das Farbthema eines Kontos darf leer bleiben. Leer heisst nicht
+  // "Standard", sondern "noch keine eigene Wahl getroffen" - dann gilt die
+  // gemeinsame Vorgabe aus den Einstellungen.
+  function normalizeUserTheme(theme) {
+    return Object.hasOwn(THEMES, theme) ? theme : "";
   }
 
   function normalizeServiceWeekendName(value, fallback) {
@@ -1207,10 +1215,18 @@
     return true;
   }
 
-  async function commitStateMutation(mutate) {
+  // auditAction ersetzt die automatisch ermittelte Beschreibung. Eine leere
+  // Zeichenkette laesst den Protokolleintrag ganz weg - fuer Aenderungen, die
+  // nur die Anzeige eines einzelnen Kontos betreffen und den fachlichen
+  // Datenbestand unberuehrt lassen.
+  async function commitStateMutation(mutate, { auditAction } = {}) {
     const previousState = JSON.parse(JSON.stringify(state));
     mutate();
-    appendAuditEntry(describeMutation(previousState, state));
+    appendAuditEntry(
+      auditAction === undefined
+        ? describeMutation(previousState, state)
+        : auditAction,
+    );
 
     if (await persistState()) {
       stateMutationSequence += 1;

@@ -1,3 +1,10 @@
+### 004.038.000 – Farbthema je Benutzerkonto
+
+- **Neu:** Das Farbthema gehört zum Benutzerkonto: Jede Anmeldung bringt die eigene Auswahl mit, an jedem Arbeitsplatz, ohne die Ansicht der übrigen Konten zu verändern
+- **Verbessert:** Das Farbthema aus den Einstellungen bleibt die gemeinsame Vorgabe – sie gilt vor der Anmeldung und für Konten, die noch nie ein eigenes Thema gewählt haben
+- **Verbessert:** Ein Themenwechsel erscheint nicht mehr im Änderungsprotokoll; er betrifft nur die Anzeige eines einzelnen Kontos
+- **Verbessert:** Die Abmeldung in der Sidebar trägt statt des Schließen-Kreuzes ein eigenes Symbol
+
 ### 004.037.008 – Strengere CSP und schlankeres Paket
 
 - **Verbessert:** Die Anwendung kommt ohne style-Attribute aus; die CSP des Servers verbietet sie jetzt vollständig (`style-src-attr 'none'`)
