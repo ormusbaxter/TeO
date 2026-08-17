@@ -416,6 +416,7 @@ for (const fileName of [
   "state-schema.js",
   "backend-client.js",
   "app.js",
+  "service-worker.js",
 ]) {
   app.get(`/${fileName}`, (_request, response) => {
     response.sendFile(path.join(projectRoot, fileName));

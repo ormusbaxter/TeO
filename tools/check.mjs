@@ -16,6 +16,7 @@ const [
   cssSource,
   generatedMeta,
   generatedSchema,
+  serviceWorkerSource,
 ] =
   await Promise.all([
     read("app.js"),
@@ -24,12 +25,14 @@ const [
     read("styles.css"),
     read("project-meta.js"),
     read("state-schema.js"),
+    read("service-worker.js"),
   ]);
 const packageJson = JSON.parse(await read("package.json"));
 
 new vm.Script(appSource, { filename: "app.js" });
 new vm.Script(backendSource, { filename: "backend-client.js" });
 new vm.Script(generatedSchema, { filename: "state-schema.js" });
+new vm.Script(serviceWorkerSource, { filename: "service-worker.js" });
 const metaContext = { window: {} };
 vm.createContext(metaContext);
 new vm.Script(generatedMeta, { filename: "project-meta.js" }).runInContext(

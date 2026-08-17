@@ -1,3 +1,9 @@
+### 004.037.005 – Offlinebetrieb
+
+- **Neu:** TeO läuft ohne Netzverbindung weiter und lässt sich als App installieren; Oberfläche und Programmdateien liegen in einem versionierten Zwischenspeicher
+- **Neu:** Jeder Build legt einen eigenen Zwischenspeicher an und räumt den vorherigen, damit nie ein veralteter Stand ausgeliefert wird
+- **Verbessert:** Anfragen an den MariaDB-Dienst werden nie zwischengespeichert, damit kein veralteter Datenbestand entsteht
+
 ### 004.037.004 – Klarere Einordnung von lokalem Modus, Memos und Urlaub
 
 - **Verbessert:** Die Speicherort-Einstellung benennt jetzt deutlich, dass der lokale Modus keinen Zugriffsschutz bietet und wofür er geeignet ist

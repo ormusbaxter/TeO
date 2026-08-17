@@ -55,6 +55,22 @@
       discardedUserAccounts = 0;
     }
     void refreshBackendHealth();
+    registerServiceWorker();
+  }
+
+  // Haelt die Anwendung selbst offline verfuegbar. Der Datenbestand liegt
+  // ohnehin lokal; ohne Zwischenspeicher laedt bei fehlender Verbindung
+  // lediglich die Seite nicht. Beim Oeffnen per Doppelklick (file://) und in
+  // unsicheren Kontexten steht die Schnittstelle nicht bereit - dann arbeitet
+  // TeO wie bisher ohne Zwischenspeicher weiter.
+  function registerServiceWorker() {
+    if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
+    navigator.serviceWorker.register("service-worker.js").catch((error) => {
+      console.warn(
+        "Der Offlinebetrieb konnte nicht eingerichtet werden.",
+        error,
+      );
+    });
   }
 
   function emptyState() {
