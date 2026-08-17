@@ -4,6 +4,8 @@
 - **Neu:** Im Monatsraster legt ein Klick auf einen Tag einen Termin für genau diesen Tag an, ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten
 - **Neu:** Das Monatsraster hebt den heutigen Tag hervor, setzt Wochenenden und Feiertage in Nordrhein-Westfalen ab und klappt ab dem vierten Termin eines Tages den Rest über „+n weitere“ auf
 - **Verbessert:** Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar
+- **Behoben:** `npm test` und damit `npm run verify` und das Paketskript liefen unter Windows nicht – der Testaufruf verließ sich auf die Auflösung von Platzhaltern durch die Shell, die es dort nicht gibt
+- **Neu:** Ein GitHub-Workflow baut das Paket und legt die Veröffentlichung mit Titel, Text und Prüfsumme an; Titel und Text stammen aus diesem Änderungsverzeichnis
 
 ### 004.038.000 – Farbthema je Benutzerkonto
 
