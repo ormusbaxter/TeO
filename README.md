@@ -68,6 +68,7 @@ Folgende Bereiche stehen zur Verfügung:
 - **Wochenendverteilung:** Vergleich der beiden festen Dienstwochenenden
 - **Urlaubsplanung:** Monats- und Jahresplanung von Urlaub und Abwesenheiten
 - **Terminkalender:** Termine mit Ort, Uhrzeit und Beschreibung
+- **Memo / ToDo:** persönliche und gemeinsame Notizen und Aufgaben
 - **Pflichtfortbildungen:** Fortbildungskatalog, Nachweise und Jahresauswertung
 - **Teamsitzungen:** Sitzungen, Teilnahmen und statistische Auswertung
 - **Geräteeinweisungen:** Einweisungsnachweise und Einweisungsmatrix
@@ -77,8 +78,8 @@ Folgende Bereiche stehen zur Verfügung:
 
 Die Zahl neben einem Eintrag nennt bei **Mitarbeitern** die aktiven und die in
 Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei
-**Terminen** die noch bevorstehenden und bei der **Geräteverwaltung** die
-Geräte im aktuellen Bestand.
+**Terminen** die noch bevorstehenden, bei **Memo / ToDo** die sichtbaren offenen
+Einträge und bei der **Geräteverwaltung** die Geräte im aktuellen Bestand.
 
 ### Suche und Filter
 
@@ -554,6 +555,26 @@ sich dort für beliebige Jahre ergänzen; vorbelegt ist die amtliche
 Ferienordnung NRW bis April 2030. Örtlich unterschiedliche bewegliche
 Ferientage sind nicht enthalten.
 
+## Memo / ToDo
+
+Memos und ToDos benötigen nur einen Titel. Optional können Beschreibung,
+Fälligkeitsdatum und Kategorie ergänzt werden. Einträge lassen sich als erledigt
+markieren und wieder öffnen. Angepinnte Einträge werden farblich hervorgehoben
+und unabhängig vom Datum zuerst angezeigt.
+
+Mit **Für alle Nutzer sichtbar** steht der Eintrag jedem angemeldeten Konto zur
+Verfügung. **Nur für mich sichtbar** beschränkt ihn auf das Konto, das ihn
+angelegt hat. Suche, Kategorie und Status können miteinander kombiniert werden.
+
+Die Kategorien werden unter **Einstellungen → Stammdaten & Zugriffe →
+Memo-/ToDo-Kategorien** angelegt, umbenannt oder gelöscht. Umbenennungen werden
+in vorhandene Einträge übernommen.
+
+Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der
+Übersichtsseite neben dem Fristenmonitor. Nur wenn solche Einträge vorhanden
+sind, teilen sich beide Bereiche die verfügbare Breite zu gleichen Teilen; auf
+schmaleren Bildschirmen stehen sie untereinander.
+
 ## Terminkalender und Fristenmonitor
 
 ### Termine anlegen
@@ -989,7 +1010,8 @@ oben auf der Einstellungsseite:
 - **Allgemein:** Farbthema und Verhalten beim Schließen von Dialogen
 - **Planung:** feste Dienstwochenenden, Urlaubsplanung und Schulferien
 - **Pflichtfortbildungen:** Soll-Zeiten
-- **Stammdaten & Zugriffe:** Benutzer, Berufe, Qualifikationen und Datenqualität
+- **Stammdaten & Zugriffe:** Benutzer, Berufe, Qualifikationen,
+  Memo-/ToDo-Kategorien und Datenqualität
 - **Daten & Sicherung:** Datenbank-Backend, Sicherungserinnerung sowie manuelle
   und automatische Datensicherungen
 
@@ -1004,6 +1026,7 @@ Die Einstellungsseite bündelt:
 - lokales oder MariaDB-Backend
 - Benutzerverwaltung
 - Berufe und Qualifikationen
+- Memo-/ToDo-Kategorien
 - Datenqualitätsprüfung
 - Sicherungserinnerung
 - Import, Export und Sicherungsprüfung

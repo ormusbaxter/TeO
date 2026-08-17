@@ -1,3 +1,10 @@
+### 004.037.000 – Memo / ToDo
+
+- **Neu:** Eigener Bereich für persönliche und gemeinsame Memos und ToDos mit optionalem Datum, Beschreibung, Status und Wichtig-Markierung
+- **Neu:** Memo-/ToDo-Kategorien lassen sich in den Stammdaten anlegen, umbenennen und löschen
+- **Neu:** Offene sichtbare Einträge erscheinen bei Bedarf neben dem auf 50 Prozent verkleinerten Fristenmonitor
+- **Verbessert:** Private Einträge werden ausschließlich dem erstellenden Konto angezeigt; Suche sowie Kategorie- und Statusfilter erleichtern die Übersicht
+
 ### 004.036.001 – Automatischer Startabgleich
 
 - **Verbessert:** Nach dem Login lädt TeO `teo-autosicherung.json` automatisch aus dem zuletzt verknüpften Sicherungsordner

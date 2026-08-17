@@ -31,6 +31,15 @@ const COLLECTION_SPECS = Object.freeze([
     column("title", (item) => item.title),
     column("appointment_date", (item) => item.date),
   ]),
+  collection("memos", "teo_memos", [
+    column("title", (item) => item.title),
+    column("memo_date", (item) => item.date || null),
+    column("memo_category", (item) => item.category || null),
+    column("visibility", (item) => item.visibility),
+    column("created_by_user_id", (item) => item.createdByUserId || null),
+    column("is_pinned", (item) => Boolean(item.pinned)),
+    column("is_completed", (item) => Boolean(item.completed)),
+  ]),
   collection("devices", "teo_devices", [
     column("product_name", (item) => item.productName),
     column("manufacturer", (item) => item.manufacturer),

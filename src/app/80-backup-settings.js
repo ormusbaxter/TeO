@@ -1271,6 +1271,7 @@
       ? "on"
       : "off";
     renderTrainingDurationSettings();
+    renderMemoCategorySettings();
     renderSchoolVacationSettings();
     renderVacationSettingsControls();
     elements.settingsStorageBackend.value = backendMode;
@@ -1901,6 +1902,7 @@
     if (Number(backup.appVersion) >= 17) {
       collections.push("devices", "deviceInstructions");
     }
+    if (Number(backup.appVersion) >= 25) collections.push("memos");
     const vacationCollections = ["vacationEntitlements", "vacationDays"];
     if (
       !importedData ||
@@ -1911,6 +1913,8 @@
         (!importedData.catalogs ||
           !Array.isArray(importedData.catalogs.professions) ||
           !Array.isArray(importedData.catalogs.qualifications))) ||
+      (Number(backup.appVersion) >= 25 &&
+        !Array.isArray(importedData.catalogs?.memoCategories)) ||
       (Number(backup.appVersion) >= 7 && !Array.isArray(importedData.auditLog)) ||
       (Number(backup.appVersion) >= 9 &&
         vacationCollections.some(
@@ -1936,6 +1940,9 @@
           importedData.catalogs.professions.length ||
           normalizedState.catalogs.qualifications.length !==
             importedData.catalogs.qualifications.length)) ||
+      (Number(backup.appVersion) >= 25 &&
+        normalizedState.catalogs.memoCategories.length !==
+          importedData.catalogs.memoCategories.length) ||
       (Number(backup.appVersion) >= 7 &&
         normalizedState.auditLog.length !==
           Math.min(importedData.auditLog.length, MAX_AUDIT_LOG_ENTRIES)) ||

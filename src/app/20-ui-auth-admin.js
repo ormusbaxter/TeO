@@ -66,6 +66,8 @@
           ? "meeting"
           : view === "appointments"
             ? "appointment"
+            : view === "memos"
+              ? "memo"
             : view === "devices"
               ? "device-instruction"
               : view === "device-management"
@@ -77,6 +79,7 @@
       training: "Fortbildung",
       meeting: "Sitzung",
       appointment: "Termin",
+      memo: "Memo / ToDo",
       "device-instruction": "Einweisung",
       device: "Gerät",
     }[mobileCreateType];
@@ -118,6 +121,8 @@
         openMeetingDialog();
       } else if (elements.mobileCreateButton.dataset.createType === "appointment") {
         openAppointmentDialog();
+      } else if (elements.mobileCreateButton.dataset.createType === "memo") {
+        openMemoDialog();
       } else if (
         elements.mobileCreateButton.dataset.createType === "device-instruction"
       ) {
@@ -156,6 +161,9 @@
 
     document.querySelectorAll("[data-open-appointment]").forEach((button) => {
       button.addEventListener("click", () => openAppointmentDialog());
+    });
+    document.querySelectorAll("[data-open-memo]").forEach((button) => {
+      button.addEventListener("click", () => openMemoDialog());
     });
     document.querySelectorAll("[data-open-device]").forEach((button) => {
       button.addEventListener("click", () => openDeviceDialog());
@@ -444,6 +452,9 @@
     elements.completionForm.addEventListener("submit", handleCompletionSubmit);
     elements.meetingForm.addEventListener("submit", handleMeetingSubmit);
     elements.appointmentForm.addEventListener("submit", handleAppointmentSubmit);
+    elements.memoForm.addEventListener("submit", handleMemoSubmit);
+    elements.memoCategoryForm.addEventListener("submit", addMemoCategory);
+    elements.memoCategoryList.addEventListener("click", handleMemoCategoryAction);
     elements.deviceForm.addEventListener("submit", handleDeviceSubmit);
     elements.deviceInstructionForm.addEventListener(
       "submit",
@@ -459,6 +470,7 @@
       ["#trainingTitle", "Bitte eine Bezeichnung eingeben."],
       ["#meetingTitle", "Bitte eine Bezeichnung eingeben."],
       ["#appointmentTitle", "Bitte einen Titel eingeben."],
+      ["#memoTitle", "Bitte einen Titel eingeben."],
       ["#deviceProductName", "Bitte einen Produktnamen eingeben."],
       ["#deviceManufacturer", "Bitte einen Hersteller eingeben."],
       ["#deviceCategory", "Bitte eine Gerätekategorie eingeben."],
@@ -549,6 +561,26 @@
             filterButton.setAttribute("aria-pressed", String(active));
           });
         renderAppointments();
+      });
+    });
+
+    elements.memoSearch.addEventListener("input", (event) => {
+      memoSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      renderMemos();
+    });
+    elements.memoCategoryFilter.addEventListener("change", (event) => {
+      memoCategoryFilter = event.target.value;
+      renderMemos();
+    });
+    document.querySelectorAll("[data-memo-status]").forEach((button) => {
+      button.addEventListener("click", () => {
+        memoStatusFilter = button.dataset.memoStatus;
+        document.querySelectorAll("[data-memo-status]").forEach((item) => {
+          const active = item === button;
+          item.classList.toggle("is-active", active);
+          item.setAttribute("aria-pressed", String(active));
+        });
+        renderMemos();
       });
     });
 
@@ -823,6 +855,9 @@
     elements.meetingList.addEventListener("click", handleMeetingAction);
     elements.appointmentList.addEventListener("click", handleAppointmentAction);
     elements.appointmentList.addEventListener("keydown", handleAppointmentAction);
+    elements.memoList.addEventListener("click", handleMemoAction);
+    elements.memoList.addEventListener("keydown", handleMemoAction);
+    elements.dashboardMemoList.addEventListener("click", handleDashboardMemoAction);
     elements.deviceCatalog.addEventListener("click", handleDeviceAction);
     elements.deviceInstructionMatrix.addEventListener(
       "click",
@@ -1153,11 +1188,12 @@
   // Inhalte von Dialogen stehen bewusst nicht hier: Sie werden beim Oeffnen
   // des Dialogs aufgebaut und sind dadurch immer aktuell.
   const VIEW_RENDERERS = {
-    dashboard: [renderDashboard, renderDeadlineOverview],
+    dashboard: [renderDashboard, renderDeadlineOverview, renderDashboardMemos],
     employees: [renderEmployees],
     weekends: [renderWeekendDistribution],
     vacations: [renderVacationPlanner],
     appointments: [renderAppointments],
+    memos: [renderMemos],
     trainings: [renderTrainings],
     meetings: [renderMeetings],
     devices: [renderDevices],
@@ -1184,6 +1220,9 @@
     elements.navMeetingCount.textContent = String(state.meetings.length);
     elements.navAppointmentCount.textContent = String(
       state.appointments.filter((appointment) => appointment.date >= todayIso()).length,
+    );
+    elements.navMemoCount.textContent = String(
+      visibleMemos().filter((memo) => !memo.completed).length,
     );
     elements.navDeviceManagementCount.textContent = String(
       state.devices.filter((device) => device.currentInventory).length,

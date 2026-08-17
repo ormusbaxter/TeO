@@ -185,6 +185,7 @@ export function createMinimalState(overrides = {}) {
     meetings: [],
     meetingAttendances: [],
     appointments: [],
+    memos: [],
     devices: [],
     deviceInstructions: [],
     vacationEntitlements: [],
@@ -202,6 +203,7 @@ export function createMinimalState(overrides = {}) {
     catalogs: {
       professions: ["Pflegefachkraft"],
       qualifications: [],
+      memoCategories: ["Allgemein", "Aufgabe"],
     },
     ...overrides,
   };

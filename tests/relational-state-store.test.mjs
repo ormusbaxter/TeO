@@ -20,13 +20,14 @@ const projectRoot = path.resolve(
 
 function emptyRelationalState() {
   return {
-    version: 24,
+    version: 25,
     employees: [],
     trainings: [],
     completions: [],
     meetings: [],
     meetingAttendances: [],
     appointments: [],
+    memos: [],
     devices: [],
     deviceInstructions: [],
     vacationEntitlements: [],
@@ -34,7 +35,7 @@ function emptyRelationalState() {
     users: [],
     auditLog: [],
     settings: { theme: "standard" },
-    catalogs: { professions: [], qualifications: [] },
+    catalogs: { professions: [], qualifications: [], memoCategories: [] },
   };
 }
 
@@ -51,7 +52,7 @@ function sampleEmployee() {
 }
 
 test("Jede fachliche Sammlung besitzt eine eigene relationale Tabelle", async () => {
-  assert.equal(COLLECTION_SPECS.length, 12);
+  assert.equal(COLLECTION_SPECS.length, 13);
   assert.equal(
     new Set(COLLECTION_SPECS.map((spec) => spec.table)).size,
     COLLECTION_SPECS.length,
