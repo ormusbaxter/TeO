@@ -16,6 +16,37 @@
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
+  // Alle fachlichen Sammlungen des Datenbestands mit ihrer Bezeichnung im
+  // Aenderungsprotokoll. Aus dieser Liste leiten sich der Protokolltext einer
+  // Mutation und die Pruefung ab, ob seit der letzten Sicherung etwas geaendert
+  // wurde. Das Aenderungsprotokoll selbst, die Einstellungen und die Kataloge
+  // gehoeren bewusst nicht dazu, sie werden gesondert ausgewertet.
+  //
+  // Fehlt hier eine Sammlung, bleibt sie im Protokoll namenlos UND loest keine
+  // Sicherungserinnerung aus - der Datenbestand gilt dann faelschlich als
+  // gesichert. tests/tracked-collections.test.mjs gleicht die Liste deshalb
+  // gegen den Datenvertrag ab, damit eine neue Sammlung nicht vergessen wird.
+  const TRACKED_COLLECTIONS = Object.freeze([
+    ["employees", "Mitarbeiter"],
+    ["trainings", "Pflichtfortbildungen"],
+    ["completions", "Fortbildungsnachweise"],
+    ["meetings", "Teamsitzungen"],
+    ["meetingAttendances", "Sitzungsteilnahmen"],
+    ["appointments", "Termine"],
+    ["memos", "Memos und ToDos"],
+    ["devices", "Geräte"],
+    ["deviceInstructions", "Geräteeinweisungen"],
+    ["vacationEntitlements", "Urlaubsansprüche"],
+    ["vacationDays", "Abwesenheitsplanung"],
+    ["users", "Benutzerkonten"],
+  ]);
+  const TRACKED_COLLECTION_KEYS = Object.freeze(
+    TRACKED_COLLECTIONS.map(([collection]) => collection),
+  );
+  // Benutzerkonten fuehren bewusst keine Zeitstempel - eine Passwortaenderung
+  // soll keinen Zeitpunkt hinterlassen. Ob seit der letzten Sicherung an ihnen
+  // gearbeitet wurde, verraet stattdessen das Aenderungsprotokoll.
+  const COLLECTIONS_WITHOUT_TIMESTAMPS = Object.freeze(["users"]);
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
   const DEFAULT_MAX_BACKUP_FILE_SIZE_MB = 20;
   const MIN_BACKUP_FILE_SIZE_MB = 1;

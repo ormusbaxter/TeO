@@ -398,19 +398,7 @@
 
   function shouldRemindBeforeUnload(candidateState = state) {
     if (!candidateState || typeof candidateState !== "object") return false;
-    const collections = [
-      "employees",
-      "trainings",
-      "completions",
-      "meetings",
-      "meetingAttendances",
-      "appointments",
-      "devices",
-      "deviceInstructions",
-      "vacationEntitlements",
-      "vacationDays",
-      "users",
-    ];
+    const collections = TRACKED_COLLECTION_KEYS;
     const containsData = collections.some(
       (collection) => candidateState[collection]?.length,
     );
@@ -429,7 +417,9 @@
     if (hasLaterAuditChange) return true;
 
     return collections
-      .filter((collection) => collection !== "users")
+      .filter(
+        (collection) => !COLLECTIONS_WITHOUT_TIMESTAMPS.includes(collection),
+      )
       .some((collection) =>
         (candidateState[collection] || []).some((entry) =>
           ["updatedAt", "createdAt"].some(
@@ -582,7 +572,7 @@
       >
         <header class="phone-list-document-header">
           <h1>Telefonliste</h1>
-          <span>${rows.length} Mitarbeiter · Stand ${formatDate(new Date().toISOString().slice(0, 10))}</span>
+          <span>${rows.length} Mitarbeiter · Stand ${formatDate(todayIso())}</span>
         </header>
         <div class="phone-list-document-grid">${tables}</div>
       </article>`;

@@ -17,6 +17,37 @@
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
+  // Alle fachlichen Sammlungen des Datenbestands mit ihrer Bezeichnung im
+  // Aenderungsprotokoll. Aus dieser Liste leiten sich der Protokolltext einer
+  // Mutation und die Pruefung ab, ob seit der letzten Sicherung etwas geaendert
+  // wurde. Das Aenderungsprotokoll selbst, die Einstellungen und die Kataloge
+  // gehoeren bewusst nicht dazu, sie werden gesondert ausgewertet.
+  //
+  // Fehlt hier eine Sammlung, bleibt sie im Protokoll namenlos UND loest keine
+  // Sicherungserinnerung aus - der Datenbestand gilt dann faelschlich als
+  // gesichert. tests/tracked-collections.test.mjs gleicht die Liste deshalb
+  // gegen den Datenvertrag ab, damit eine neue Sammlung nicht vergessen wird.
+  const TRACKED_COLLECTIONS = Object.freeze([
+    ["employees", "Mitarbeiter"],
+    ["trainings", "Pflichtfortbildungen"],
+    ["completions", "Fortbildungsnachweise"],
+    ["meetings", "Teamsitzungen"],
+    ["meetingAttendances", "Sitzungsteilnahmen"],
+    ["appointments", "Termine"],
+    ["memos", "Memos und ToDos"],
+    ["devices", "Geräte"],
+    ["deviceInstructions", "Geräteeinweisungen"],
+    ["vacationEntitlements", "Urlaubsansprüche"],
+    ["vacationDays", "Abwesenheitsplanung"],
+    ["users", "Benutzerkonten"],
+  ]);
+  const TRACKED_COLLECTION_KEYS = Object.freeze(
+    TRACKED_COLLECTIONS.map(([collection]) => collection),
+  );
+  // Benutzerkonten fuehren bewusst keine Zeitstempel - eine Passwortaenderung
+  // soll keinen Zeitpunkt hinterlassen. Ob seit der letzten Sicherung an ihnen
+  // gearbeitet wurde, verraet stattdessen das Aenderungsprotokoll.
+  const COLLECTIONS_WITHOUT_TIMESTAMPS = Object.freeze(["users"]);
   const DEFAULT_BACKUP_REMINDER_DAYS = 14;
   const DEFAULT_MAX_BACKUP_FILE_SIZE_MB = 20;
   const MIN_BACKUP_FILE_SIZE_MB = 1;
@@ -2280,20 +2311,7 @@
   }
 
   function describeMutation(before, after) {
-    const collections = [
-      ["employees", "Mitarbeiter"],
-      ["trainings", "Pflichtfortbildungen"],
-      ["completions", "Fortbildungsnachweise"],
-      ["meetings", "Teamsitzungen"],
-      ["meetingAttendances", "Sitzungsteilnahmen"],
-      ["appointments", "Termine"],
-      ["devices", "Geräte"],
-      ["deviceInstructions", "Geräteeinweisungen"],
-      ["vacationEntitlements", "Urlaubsansprüche"],
-      ["vacationDays", "Abwesenheitsplanung"],
-      ["users", "Benutzerkonten"],
-    ];
-    for (const [key, label] of collections) {
+    for (const [key, label] of TRACKED_COLLECTIONS) {
       const difference = after[key].length - before[key].length;
       if (difference > 0) return `${label}: ${difference} Eintrag/Einträge hinzugefügt`;
       if (difference < 0) return `${label}: ${Math.abs(difference)} Eintrag/Einträge gelöscht`;
@@ -10163,7 +10181,7 @@
 
   function exportDeviceCatalogExcel() {
     const workbook = createDeviceExcelWorkbook(state.devices);
-    const date = new Date().toISOString().slice(0, 10);
+    const date = todayIso();
     downloadTextFile(
       `TeO-Geraetekatalog-${date}.xls`,
       workbook,
@@ -15808,19 +15826,7 @@
 
   function shouldRemindBeforeUnload(candidateState = state) {
     if (!candidateState || typeof candidateState !== "object") return false;
-    const collections = [
-      "employees",
-      "trainings",
-      "completions",
-      "meetings",
-      "meetingAttendances",
-      "appointments",
-      "devices",
-      "deviceInstructions",
-      "vacationEntitlements",
-      "vacationDays",
-      "users",
-    ];
+    const collections = TRACKED_COLLECTION_KEYS;
     const containsData = collections.some(
       (collection) => candidateState[collection]?.length,
     );
@@ -15839,7 +15845,9 @@
     if (hasLaterAuditChange) return true;
 
     return collections
-      .filter((collection) => collection !== "users")
+      .filter(
+        (collection) => !COLLECTIONS_WITHOUT_TIMESTAMPS.includes(collection),
+      )
       .some((collection) =>
         (candidateState[collection] || []).some((entry) =>
           ["updatedAt", "createdAt"].some(
@@ -15992,7 +16000,7 @@
       >
         <header class="phone-list-document-header">
           <h1>Telefonliste</h1>
-          <span>${rows.length} Mitarbeiter · Stand ${formatDate(new Date().toISOString().slice(0, 10))}</span>
+          <span>${rows.length} Mitarbeiter · Stand ${formatDate(todayIso())}</span>
         </header>
         <div class="phone-list-document-grid">${tables}</div>
       </article>`;

@@ -1223,20 +1223,7 @@
   }
 
   function describeMutation(before, after) {
-    const collections = [
-      ["employees", "Mitarbeiter"],
-      ["trainings", "Pflichtfortbildungen"],
-      ["completions", "Fortbildungsnachweise"],
-      ["meetings", "Teamsitzungen"],
-      ["meetingAttendances", "Sitzungsteilnahmen"],
-      ["appointments", "Termine"],
-      ["devices", "Geräte"],
-      ["deviceInstructions", "Geräteeinweisungen"],
-      ["vacationEntitlements", "Urlaubsansprüche"],
-      ["vacationDays", "Abwesenheitsplanung"],
-      ["users", "Benutzerkonten"],
-    ];
-    for (const [key, label] of collections) {
+    for (const [key, label] of TRACKED_COLLECTIONS) {
       const difference = after[key].length - before[key].length;
       if (difference > 0) return `${label}: ${difference} Eintrag/Einträge hinzugefügt`;
       if (difference < 0) return `${label}: ${Math.abs(difference)} Eintrag/Einträge gelöscht`;

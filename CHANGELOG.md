@@ -1,3 +1,10 @@
+### 004.037.001 – Memos in Protokoll und Sicherung
+
+- **Behoben:** Änderungen an Memos und ToDos erscheinen im Änderungsprotokoll wieder namentlich statt als „Datenbestand aktualisiert“
+- **Behoben:** Wurden seit der letzten Datensicherung nur Memos oder ToDos geändert, galt der Datenbestand fälschlich als gesichert – Warnhinweis, Schließen-Erinnerung und automatische Sicherung blieben aus
+- **Behoben:** Der Dateiname des Geräte-Excel-Exports und das Stand-Datum der gedruckten Telefonliste nannten zwischen Mitternacht und 2 Uhr den Vortag
+- **Verbessert:** Die nachverfolgten Sammlungen stehen jetzt an einer einzigen Stelle; ein neuer Test gleicht sie gegen den Datenvertrag ab, damit künftige Sammlungen nicht vergessen werden
+
 ### 004.037.000 – Memo / ToDo
 
 - **Neu:** Eigener Bereich für persönliche und gemeinsame Memos und ToDos mit optionalem Datum, Beschreibung, Status und Wichtig-Markierung
