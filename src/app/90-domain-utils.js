@@ -452,10 +452,6 @@
       });
   }
 
-  function getFilteredEmployeeEmailExport() {
-    return getFilteredEmployeeEmailAddresses().join(";");
-  }
-
   function getFilteredEmployeeUsernames() {
     const seenUsernames = new Set();
 

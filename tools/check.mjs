@@ -158,4 +158,62 @@ assert.equal(
   "package.json und src/meta/project-meta.mjs nennen unterschiedliche Versionen",
 );
 
+// Die Anwendung ist eine einzige IIFE ohne Modulgrenzen, deshalb meldet kein
+// Werkzeug von sich aus, wenn eine Funktion oder ein Oberflaechenverweis nicht
+// mehr gebraucht wird. Beides bleibt sonst als toter Code liegen und
+// suggeriert Abdeckung, die es nicht gibt - etwa wenn ein Test die letzte
+// verbliebene Verwendung ist.
+const declaredFunctions = [
+  ...appSource.matchAll(/^\s*(?:async\s+)?function\s+([A-Za-z0-9_]+)\s*\(/gm),
+].map((match) => match[1]);
+const unusedFunctions = declaredFunctions.filter(
+  (name) =>
+    (appSource.match(new RegExp(`\\b${name}\\b`, "g")) || []).length <= 1,
+);
+assert.deepEqual(
+  unusedFunctions,
+  [],
+  `In app.js werden diese Funktionen nirgends aufgerufen: ${unusedFunctions.join(", ")}. ` +
+    "Bitte entfernen - wird eine davon nur noch von einem Test gebraucht, " +
+    "prueft der Test den Produktivpfad nicht mehr.",
+);
+
+const elementsBlockStart = appSource.indexOf("const elements = {");
+assert.notEqual(
+  elementsBlockStart,
+  -1,
+  "Die Oberflaechenverweise (const elements) wurden in app.js nicht gefunden",
+);
+const elementsBlock = appSource.slice(
+  elementsBlockStart,
+  matchingBraceIndex(appSource, appSource.indexOf("{", elementsBlockStart)),
+);
+const declaredElements = [
+  ...elementsBlock.matchAll(/^\s{4}([A-Za-z0-9_]+):/gm),
+].map((match) => match[1]);
+const usedElements = new Set(
+  [...appSource.matchAll(/\belements\.([A-Za-z0-9_]+)/g)].map(
+    (match) => match[1],
+  ),
+);
+const unusedElements = declaredElements.filter((name) => !usedElements.has(name));
+assert.deepEqual(
+  unusedElements,
+  [],
+  `Diese Oberflaechenverweise werden nie gelesen: ${unusedElements.join(", ")}. ` +
+    "Bitte aus const elements entfernen; das HTML-Element selbst kann bleiben.",
+);
+
+function matchingBraceIndex(source, openingBraceIndex) {
+  let depth = 0;
+  for (let index = openingBraceIndex; index < source.length; index += 1) {
+    if (source[index] === "{") depth += 1;
+    else if (source[index] === "}") {
+      depth -= 1;
+      if (depth === 0) return index;
+    }
+  }
+  throw new Error("Zu der oeffnenden Klammer fehlt die schliessende.");
+}
+
 console.log(`TeO ${projectBuildNumber(PROJECT_META)}: Strukturprüfung erfolgreich.`);

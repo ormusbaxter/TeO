@@ -590,7 +590,6 @@
     exportEmployeePhoneListLabel: document.querySelector(
       "#exportEmployeePhoneListLabel",
     ),
-    openCatalogManagementButton: document.querySelector("#openCatalogManagementButton"),
     exportDataButton: document.querySelector("#exportDataButton"),
     importDataButton: document.querySelector("#importDataButton"),
     importDataFile: document.querySelector("#importDataFile"),
@@ -642,7 +641,6 @@
     ),
     backupVolumeMeter: document.querySelector("#backupVolumeMeter"),
     backupVolumeLabel: document.querySelector("#backupVolumeLabel"),
-    backupVolumeBar: document.querySelector("#backupVolumeBar"),
     backupVolumeHint: document.querySelector("#backupVolumeHint"),
     settingsCloseDialogOnOutsideClick: document.querySelector(
       "#settingsCloseDialogOnOutsideClick",
@@ -1712,20 +1710,6 @@
     )
       ? "Pflegefachkraft"
       : profession;
-  }
-
-  function employeeNameSignature(value) {
-    return String(value || "")
-      .normalize("NFKD")
-      .replace(/\p{Diacritic}/gu, "")
-      .replace(/ß/gi, "ss")
-      .toLocaleLowerCase("de-DE")
-      .replace(/[^a-z0-9]+/g, " ")
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .sort()
-      .join(" ");
   }
 
   function normalizeEmployee(employee) {
@@ -15878,10 +15862,6 @@
         seenAddresses.add(normalizedEmail);
         return true;
       });
-  }
-
-  function getFilteredEmployeeEmailExport() {
-    return getFilteredEmployeeEmailAddresses().join(";");
   }
 
   function getFilteredEmployeeUsernames() {

@@ -1,3 +1,10 @@
+### 004.037.002 – Prüfstrecke gegen toten Code
+
+- **Neu:** Ein GitHub-Workflow führt bei jedem Push `npm run verify` aus und meldet, wenn die erzeugten Dateien nicht mehr zu den Quellen in `src/` passen
+- **Neu:** Die Strukturprüfung meldet Funktionen, die nirgends aufgerufen werden, sowie Oberflächenverweise, die nie gelesen werden
+- **Behoben:** `getFilteredEmployeeEmailExport` wurde nur noch vom Test verwendet – der E-Mail-Export ist jetzt über den tatsächlich genutzten Weg abgesichert
+- **Behoben:** Nicht mehr benötigte Funktion `employeeNameSignature` sowie die Verweise auf `openCatalogManagementButton` und `backupVolumeBar` entfernt
+
 ### 004.037.001 – Memos in Protokoll und Sicherung
 
 - **Behoben:** Änderungen an Memos und ToDos erscheinen im Änderungsprotokoll wieder namentlich statt als „Datenbestand aktualisiert“

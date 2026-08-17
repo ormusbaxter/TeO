@@ -589,7 +589,6 @@
     exportEmployeePhoneListLabel: document.querySelector(
       "#exportEmployeePhoneListLabel",
     ),
-    openCatalogManagementButton: document.querySelector("#openCatalogManagementButton"),
     exportDataButton: document.querySelector("#exportDataButton"),
     importDataButton: document.querySelector("#importDataButton"),
     importDataFile: document.querySelector("#importDataFile"),
@@ -641,7 +640,6 @@
     ),
     backupVolumeMeter: document.querySelector("#backupVolumeMeter"),
     backupVolumeLabel: document.querySelector("#backupVolumeLabel"),
-    backupVolumeBar: document.querySelector("#backupVolumeBar"),
     backupVolumeHint: document.querySelector("#backupVolumeHint"),
     settingsCloseDialogOnOutsideClick: document.querySelector(
       "#settingsCloseDialogOnOutsideClick",
