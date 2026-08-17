@@ -3,24 +3,10 @@
     const pinnedAppointments = state.appointments
       .filter((appointment) => appointment.pinned)
       .sort(sortAppointments);
-    const matchingAppointments = state.appointments.filter((appointment) => {
-      if (appointment.pinned) return false;
-      if (appointmentPeriodFilter === "upcoming" && appointment.date < today) return false;
-      if (appointmentPeriodFilter === "today" && appointment.date !== today) return false;
-      if (appointmentPeriodFilter === "past" && appointment.date >= today) return false;
-      if (!appointmentSearchTerm) return true;
-
-      return [
-        appointment.title,
-        appointment.description,
-        appointment.location,
-        appointmentCategoryLabel(appointment),
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLocaleLowerCase("de-DE")
-        .includes(appointmentSearchTerm);
-    });
+    const matchingAppointments = state.appointments.filter(
+      (appointment) =>
+        !appointment.pinned && appointmentMatchesFilters(appointment, today),
+    );
     const visibleAppointments = [...pinnedAppointments, ...matchingAppointments];
     const upcoming = [...matchingAppointments]
       .filter((appointment) => appointment.date >= today)
@@ -40,6 +26,12 @@
       ${renderSummaryChip("alert", visibleUpcomingCount, "anstehende Termine", "orange")}
       ${renderSummaryChip("check", todayCount, "Termine heute", "teal")}
     `;
+
+    renderAppointmentViewControls();
+    if (appointmentViewMode === "calendar") {
+      renderAppointmentCalendar(today);
+      return;
+    }
 
     if (state.appointments.length === 0) {
       elements.appointmentList.innerHTML = `
@@ -102,6 +94,303 @@
           : ""
       }
     `;
+  }
+
+  // Angepinnte Termine bleiben bewusst an jedem Filter vorbei sichtbar; sie
+  // sind als wichtig markiert und sollen nicht durch einen Zeitraumfilter
+  // verschwinden. Fuer alle uebrigen entscheiden Zeitraum und Suchbegriff.
+  function appointmentMatchesFilters(appointment, today) {
+    if (appointmentPeriodFilter === "upcoming" && appointment.date < today) return false;
+    if (appointmentPeriodFilter === "today" && appointment.date !== today) return false;
+    if (appointmentPeriodFilter === "past" && appointment.date >= today) return false;
+    if (!appointmentSearchTerm) return true;
+
+    return [
+      appointment.title,
+      appointment.description,
+      appointment.location,
+      appointmentCategoryLabel(appointment),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLocaleLowerCase("de-DE")
+      .includes(appointmentSearchTerm);
+  }
+
+  function renderAppointmentViewControls() {
+    document.querySelectorAll("[data-appointment-view]").forEach((button) => {
+      const active = button.dataset.appointmentView === appointmentViewMode;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    const calendarActive = appointmentViewMode === "calendar";
+    elements.appointmentList.hidden = calendarActive;
+    elements.appointmentCalendar.hidden = !calendarActive;
+  }
+
+  function setAppointmentViewMode(mode) {
+    appointmentViewMode = mode === "calendar" ? "calendar" : "list";
+    saveAppointmentViewPreference();
+    renderAppointments();
+  }
+
+  function readAppointmentViewPreference() {
+    const now = new Date();
+    const fallback = {
+      mode: "list",
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+    };
+    try {
+      const raw = window.localStorage?.getItem?.(APPOINTMENT_VIEW_KEY);
+      if (!raw) return fallback;
+      const value = JSON.parse(raw);
+      const year = Number(value?.year);
+      const month = Number(value?.month);
+      return {
+        mode: value?.mode === "calendar" ? "calendar" : "list",
+        year: Number.isInteger(year) && year >= 2000 && year <= 2100 ? year : fallback.year,
+        month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : fallback.month,
+      };
+    } catch {
+      return fallback;
+    }
+  }
+
+  function saveAppointmentViewPreference() {
+    try {
+      window.localStorage?.setItem?.(
+        APPOINTMENT_VIEW_KEY,
+        JSON.stringify({
+          mode: appointmentViewMode,
+          year: appointmentCalendarYear,
+          month: appointmentCalendarMonth,
+        }),
+      );
+    } catch {
+      // Der Terminkalender bleibt auch ohne Browserspeicher bedienbar; dann
+      // startet er beim naechsten Aufruf wieder in der Listenansicht.
+    }
+  }
+
+  function shiftAppointmentCalendarMonth(offset) {
+    const shifted = new Date(
+      appointmentCalendarYear,
+      appointmentCalendarMonth - 1 + offset,
+      1,
+      12,
+    );
+    setAppointmentCalendarMonth(shifted.getFullYear(), shifted.getMonth() + 1);
+  }
+
+  function showAppointmentCalendarToday() {
+    const now = new Date();
+    setAppointmentCalendarMonth(now.getFullYear(), now.getMonth() + 1);
+  }
+
+  function setAppointmentCalendarMonth(year, month) {
+    appointmentCalendarYear = year;
+    appointmentCalendarMonth = month;
+    saveAppointmentViewPreference();
+    renderAppointments();
+  }
+
+  function renderAppointmentCalendar(today) {
+    const firstOfMonth = new Date(
+      appointmentCalendarYear,
+      appointmentCalendarMonth - 1,
+      1,
+      12,
+    );
+    const monthLabel = dateFormat({ month: "long", year: "numeric" }).format(
+      firstOfMonth,
+    );
+    elements.appointmentCalendarLabel.textContent = monthLabel;
+
+    // Die Randtage stammen aus den Nachbarmonaten und koennen im Januar oder
+    // Dezember in ein anderes Jahr fallen.
+    const holidays = new Map([
+      ...getNrwHolidays(appointmentCalendarYear - 1),
+      ...getNrwHolidays(appointmentCalendarYear),
+      ...getNrwHolidays(appointmentCalendarYear + 1),
+    ]);
+    const appointmentsByDate = new Map();
+    state.appointments
+      .filter(
+        (appointment) =>
+          appointment.pinned || appointmentMatchesFilters(appointment, today),
+      )
+      .sort(sortAppointments)
+      .forEach((appointment) => {
+        const entries = appointmentsByDate.get(appointment.date) || [];
+        entries.push(appointment);
+        appointmentsByDate.set(appointment.date, entries);
+      });
+
+    let monthCount = 0;
+    const cells = appointmentCalendarDates(
+      appointmentCalendarYear,
+      appointmentCalendarMonth,
+    ).map((iso) => {
+      const date = parseLocalDate(iso);
+      const entries = appointmentsByDate.get(iso) || [];
+      const inMonth = date.getMonth() === appointmentCalendarMonth - 1;
+      if (inMonth) monthCount += entries.length;
+      return renderAppointmentCalendarDay({
+        date,
+        iso,
+        entries,
+        inMonth,
+        isToday: iso === today,
+        holidayName: holidays.get(iso) || "",
+      });
+    });
+    elements.appointmentCalendarGrid.innerHTML = cells.join("");
+    elements.appointmentCalendarNote.textContent = monthCount
+      ? `${monthCount} ${monthCount === 1 ? "Termin" : "Termine"} im ${monthLabel}. Auf einen Tag klicken, um einen Termin anzulegen, auf einen Eintrag, um ihn zu bearbeiten.`
+      : `Im ${monthLabel} ist kein Termin eingetragen. Auf einen Tag klicken, um einen anzulegen.`;
+  }
+
+  // Alle Tage, die das Monatsraster zeigt: der Monat selbst, davor die Tage
+  // bis zum Wochenbeginn und dahinter der Rest der letzten Woche. Die Woche
+  // beginnt am Montag; getDay() zaehlt ab Sonntag, daher der Versatz um sechs
+  // Tage.
+  function appointmentCalendarDates(year, month) {
+    const leadingDays = (new Date(year, month - 1, 1, 12).getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const cellCount = Math.ceil((leadingDays + daysInMonth) / 7) * 7;
+    return Array.from({ length: cellCount }, (_, index) =>
+      localDateToIso(new Date(year, month - 1, index + 1 - leadingDays, 12)),
+    );
+  }
+
+  function renderAppointmentCalendarDay({
+    date,
+    iso,
+    entries,
+    inMonth,
+    isToday,
+    holidayName,
+  }) {
+    const weekend = [0, 6].includes(date.getDay());
+    const hiddenCount = Math.max(
+      entries.length - APPOINTMENT_CALENDAR_ENTRY_LIMIT,
+      0,
+    );
+    const moreLabel = `+${hiddenCount} weitere`;
+    const dayLabel = dateFormat({
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+    const classes = [
+      "appointment-calendar-day",
+      inMonth ? "" : "is-outside",
+      isToday ? "is-today" : "",
+      weekend ? "is-weekend" : "",
+      holidayName ? "is-holiday" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return `
+      <div class="${classes}" data-calendar-day="${iso}">
+        <div class="appointment-calendar-day-head">
+          <button
+            class="appointment-calendar-day-number"
+            type="button"
+            aria-label="Termin am ${escapeHtml(dayLabel)} anlegen"
+            title="Termin am ${escapeHtml(dayLabel)} anlegen"
+          >
+            ${date.getDate()}
+          </button>
+          ${
+            holidayName
+              ? `<span class="appointment-calendar-day-note" title="${escapeHtml(holidayName)}">${escapeHtml(holidayName)}</span>`
+              : ""
+          }
+        </div>
+        ${
+          entries.length
+            ? `<ul class="appointment-calendar-day-entries">
+                ${entries.map(renderAppointmentCalendarEntry).join("")}
+              </ul>`
+            : ""
+        }
+        ${
+          hiddenCount
+            ? `<button
+                class="appointment-calendar-more"
+                type="button"
+                data-calendar-expand="${iso}"
+                data-more-label="${escapeHtml(moreLabel)}"
+                aria-expanded="false"
+              >${escapeHtml(moreLabel)}</button>`
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  function renderAppointmentCalendarEntry(appointment) {
+    const timeLabel = appointment.startTime ? formatTime(appointment.startTime) : "";
+    const category = appointmentCategoryLabel(appointment);
+    const details = [
+      formatAppointmentTime(appointment) || "ganztägig",
+      category,
+      appointment.location,
+    ].filter(Boolean);
+    return `
+      <li>
+        <button
+          class="appointment-calendar-entry ${appointment.pinned ? "is-pinned" : ""}"
+          type="button"
+          data-appointment-card="${appointment.id}"
+          title="${escapeHtml(`${appointment.title} · ${details.join(" · ")}`)}"
+          aria-label="${escapeHtml(`${appointment.title} bearbeiten. ${details.join(", ")}`)}"
+        >
+          <span class="appointment-calendar-entry-icon">
+            <svg><use href="#icon-${appointmentCategoryIcon(appointment)}"></use></svg>
+          </span>
+          ${
+            timeLabel
+              ? `<span class="appointment-calendar-entry-time">${escapeHtml(timeLabel)}</span>`
+              : ""
+          }
+          <span class="appointment-calendar-entry-title">${escapeHtml(appointment.title)}</span>
+          ${
+            appointment.pinned
+              ? '<span class="important-notification-icon" aria-hidden="true"></span>'
+              : ""
+          }
+        </button>
+      </li>
+    `;
+  }
+
+  // Ein Klick auf einen Eintrag oeffnet ihn, ein Klick auf den freien Bereich
+  // eines Tages legt einen neuen Termin fuer genau diesen Tag an.
+  function handleAppointmentCalendarClick(event) {
+    const expandButton = event.target.closest("[data-calendar-expand]");
+    if (expandButton) {
+      const day = expandButton.closest("[data-calendar-day]");
+      const expanded = day.classList.toggle("is-expanded");
+      expandButton.setAttribute("aria-expanded", String(expanded));
+      expandButton.textContent = expanded
+        ? "Weniger anzeigen"
+        : expandButton.dataset.moreLabel;
+      return;
+    }
+
+    const entry = event.target.closest("[data-appointment-card]");
+    if (entry) {
+      openAppointmentDialog(entry.dataset.appointmentCard);
+      return;
+    }
+
+    const day = event.target.closest("[data-calendar-day]");
+    if (day) openAppointmentDialog(null, { date: day.dataset.calendarDay });
   }
 
   function resetAppointmentFilters() {

@@ -886,28 +886,104 @@
                 autocomplete="off"
               />
             </label>
-            <div
-              class="segmented-control appointment-filter-control"
-              role="group"
-              aria-label="Termine nach Zeitraum filtern"
-            >
-              <button class="is-active" type="button" data-appointment-filter="all" aria-pressed="true">
-                Alle
-              </button>
-              <button type="button" data-appointment-filter="upcoming" aria-pressed="false">
-                Anstehend
-              </button>
-              <button type="button" data-appointment-filter="today" aria-pressed="false">
-                Heute
-              </button>
-              <button type="button" data-appointment-filter="past" aria-pressed="false">
-                Vergangen
-              </button>
+            <div class="appointment-toolbar-controls">
+              <div
+                class="segmented-control appointment-filter-control"
+                role="group"
+                aria-label="Termine nach Zeitraum filtern"
+              >
+                <button class="is-active" type="button" data-appointment-filter="all" aria-pressed="true">
+                  Alle
+                </button>
+                <button type="button" data-appointment-filter="upcoming" aria-pressed="false">
+                  Anstehend
+                </button>
+                <button type="button" data-appointment-filter="today" aria-pressed="false">
+                  Heute
+                </button>
+                <button type="button" data-appointment-filter="past" aria-pressed="false">
+                  Vergangen
+                </button>
+              </div>
+              <div
+                class="segmented-control appointment-view-control"
+                role="group"
+                aria-label="Darstellung der Termine wählen"
+              >
+                <button
+                  class="is-active"
+                  type="button"
+                  data-appointment-view="list"
+                  aria-pressed="true"
+                  title="Termine als Liste anzeigen"
+                >
+                  <svg><use href="#icon-memo"></use></svg>
+                  Liste
+                </button>
+                <button
+                  type="button"
+                  data-appointment-view="calendar"
+                  aria-pressed="false"
+                  title="Termine als Monatskalender anzeigen"
+                >
+                  <svg><use href="#icon-calendar"></use></svg>
+                  Kalender
+                </button>
+              </div>
             </div>
           </div>
 
           <div class="training-summary" id="appointmentSummary"></div>
           <section class="meeting-list" id="appointmentList"></section>
+          <section
+            class="panel appointment-calendar"
+            id="appointmentCalendar"
+            aria-label="Terminkalender als Monatsübersicht"
+            hidden
+          >
+            <header class="appointment-calendar-header">
+              <div class="appointment-calendar-nav">
+                <button
+                  class="icon-button"
+                  id="appointmentCalendarPreviousButton"
+                  type="button"
+                  aria-label="Vorheriger Monat"
+                  title="Vorheriger Monat"
+                >
+                  <svg class="appointment-calendar-chevron-back"><use href="#icon-chevron"></use></svg>
+                </button>
+                <h2 id="appointmentCalendarLabel" aria-live="polite">Monat</h2>
+                <button
+                  class="icon-button"
+                  id="appointmentCalendarNextButton"
+                  type="button"
+                  aria-label="Nächster Monat"
+                  title="Nächster Monat"
+                >
+                  <svg><use href="#icon-chevron"></use></svg>
+                </button>
+              </div>
+              <button
+                class="button button-secondary button-compact"
+                id="appointmentCalendarTodayButton"
+                type="button"
+                title="Zum laufenden Monat springen"
+              >
+                Heute
+              </button>
+            </header>
+            <div class="appointment-calendar-weekdays" aria-hidden="true">
+              <span>Mo</span>
+              <span>Di</span>
+              <span>Mi</span>
+              <span>Do</span>
+              <span>Fr</span>
+              <span>Sa</span>
+              <span>So</span>
+            </div>
+            <div class="appointment-calendar-grid" id="appointmentCalendarGrid"></div>
+            <p class="appointment-calendar-note" id="appointmentCalendarNote"></p>
+          </section>
         </section>
 
         <section class="view" id="memosView" data-view-panel="memos">
@@ -1930,7 +2006,7 @@
 <h3 id="hilfe-hauptnavigation">Hauptnavigation</h3>
 <p>Die Desktop-Navigation befindet sich links. Auf kleinen Bildschirmen wird am unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.</p>
 <p>Folgende Bereiche stehen zur Verfügung:</p>
-<ul><li><strong>Übersicht:</strong> Kennzahlen, Fristenmonitor und zuletzt bearbeitete Daten</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
+<ul><li><strong>Übersicht:</strong> Kennzahlen, Fristenmonitor und zuletzt bearbeitete Daten</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung, wahlweise als Liste oder als Monatskalender</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
 <p>Die Zahl neben einem Eintrag nennt bei <strong>Mitarbeitern</strong> die aktiven und die in Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei <strong>Terminen</strong> die noch bevorstehenden, bei <strong>Memo / ToDo</strong> die sichtbaren offenen Einträge und bei der <strong>Geräteverwaltung</strong> die Geräte im aktuellen Bestand.</p>
 <h3 id="hilfe-suche-und-filter">Suche und Filter</h3>
 <p>Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können kombiniert werden. Filter beziehen sich immer auf die aktuell sichtbare Ansicht.</p>
@@ -2086,6 +2162,12 @@
 <p>Optional können Uhrzeit von/bis, Ort, Beschreibung und eine <strong>Kategorie</strong> hinterlegt werden.</p>
 <p><strong>Speichern &amp; Drucken</strong> legt den Termin an und öffnet eine mittig gesetzte DIN-A4-Druckansicht. Ist <strong>Teilnehmerliste</strong> aktiviert, enthält sie zusätzliche Leerzeilen zur handschriftlichen Eintragung. Angelegte Termine lassen sich in der Terminübersicht und im Fristenmonitor anklicken; beide Wege öffnen denselben Detaildialog zum Ansehen oder Bearbeiten.</p>
 <p>Zur Auswahl stehen Geräteeinweisung, Teamsitzung, Meeting, Stationsleiterkonferenz, Begehung, Hospitation, Prüfung, Schulung und Baumaßnahme. Jede Kategorie hat ein eigenes Symbol, das in der Terminübersicht und im Fristenmonitor anstelle des allgemeinen Kalendersymbols erscheint; im Fristenmonitor ersetzt die Kategorie zusätzlich die Bezeichnung „Termin“. Termine ohne Kategorie behalten das Kalendersymbol.</p>
+<h3 id="hilfe-liste-oder-monatskalender">Liste oder Monatskalender</h3>
+<p>Rechts in der Werkzeugleiste des Terminkalenders wird zwischen zwei Darstellungen umgeschaltet:</p>
+<ul><li><strong>Liste:</strong> die gewohnte Aufstellung nach angepinnten, anstehenden und vergangenen Terminen</li><li><strong>Kalender:</strong> ein Monatsraster mit einem Feld je Tag, Woche ab Montag</li></ul>
+<p>Im Monatsraster steht in jedem Tagesfeld, was an diesem Tag ansteht – mit Uhrzeit, Kategoriesymbol und Titel. Der heutige Tag ist hervorgehoben, Wochenenden und Feiertage in Nordrhein-Westfalen sind abgesetzt; der Name des Feiertags steht im Feld. Ab dem vierten Termin eines Tages klappt <strong>+n weitere</strong> den Rest auf.</p>
+<ul><li>Ein Klick auf ein Tagesfeld legt einen Termin für genau diesen Tag an.</li><li>Ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten.</li><li>Die Pfeile wechseln den Monat, <strong>Heute</strong> springt zum laufenden Monat zurück.</li></ul>
+<p>Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar. Die gewählte Darstellung und der zuletzt angesehene Monat bleiben im Browser gespeichert und stehen beim nächsten Aufruf wieder bereit. Auf schmalen Bildschirmen zeigt jedes Tagesfeld statt der Titel farbige Balken – ein Tippen öffnet den Termin.</p>
 <h3 id="hilfe-fristenmonitor">Fristenmonitor</h3>
 <p>Der Fristenmonitor steht auf der Übersichtsseite direkt unter den Kennzahlen. Sechs Einträge bleiben sichtbar, weitere sind innerhalb des Bereichs scrollbar.</p>
 <p>Er zeigt:</p>
@@ -2263,6 +2345,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-039-000-terminkalender-als-monatsansicht">004.039.000 – Terminkalender als Monatsansicht</h3>
+<ul><li><strong>Neu:</strong> Der Terminkalender lässt sich zwischen der Liste und einem Monatsraster mit einem Feld je Tag umschalten; die Auswahl und der angesehene Monat bleiben im Browser gespeichert</li><li><strong>Neu:</strong> Im Monatsraster legt ein Klick auf einen Tag einen Termin für genau diesen Tag an, ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten</li><li><strong>Neu:</strong> Das Monatsraster hebt den heutigen Tag hervor, setzt Wochenenden und Feiertage in Nordrhein-Westfalen ab und klappt ab dem vierten Termin eines Tages den Rest über „+n weitere“ auf</li><li><strong>Verbessert:</strong> Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar</li></ul>
 <h3 id="hilfe-004-038-000-farbthema-je-benutzerkonto">004.038.000 – Farbthema je Benutzerkonto</h3>
 <ul><li><strong>Neu:</strong> Das Farbthema gehört zum Benutzerkonto: Jede Anmeldung bringt die eigene Auswahl mit, an jedem Arbeitsplatz, ohne die Ansicht der übrigen Konten zu verändern</li><li><strong>Verbessert:</strong> Das Farbthema aus den Einstellungen bleibt die gemeinsame Vorgabe – sie gilt vor der Anmeldung und für Konten, die noch nie ein eigenes Thema gewählt haben</li><li><strong>Verbessert:</strong> Ein Themenwechsel erscheint nicht mehr im Änderungsprotokoll; er betrifft nur die Anzeige eines einzelnen Kontos</li><li><strong>Verbessert:</strong> Die Abmeldung in der Sidebar trägt statt des Schließen-Kreuzes ein eigenes Symbol</li></ul>
 <h3 id="hilfe-004-037-008-strengere-csp-und-schlankeres-paket">004.037.008 – Strengere CSP und schlankeres Paket</h3>

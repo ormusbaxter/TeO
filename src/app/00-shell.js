@@ -10,6 +10,7 @@
   const AUTO_BACKUP_CONFIG_KEY = "intensivteam-auto-backup-config-v1";
   const AUTO_BACKUP_DIRECTORY_KEY = "intensivteam-auto-backup-directory-v1";
   const VACATION_VIEW_KEY = "intensivteam-vacation-view-v1";
+  const APPOINTMENT_VIEW_KEY = "intensivteam-appointment-view-v1";
   const STATE_VERSION = PROJECT_META.stateVersion;
   const PROJECT_NAME = PROJECT_META.name;
   const PROJECT_VERSION = PROJECT_META.version;
@@ -303,6 +304,10 @@
     baumassnahme: { label: "Baumaßnahme", icon: "construction" },
   });
   const APPOINTMENT_CATEGORY_FALLBACK_ICON = "calendar";
+  // Wie viele Termine ein Tag im Monatskalender zeigt, bevor der Rest hinter
+  // "+n weitere" liegt. Der Wert steckt zusaetzlich in der Regel
+  // .appointment-calendar-day-entries li:nth-child(n + 4) im Stylesheet.
+  const APPOINTMENT_CALENDAR_ENTRY_LIMIT = 3;
 
   const EMPLOYMENT_STATUSES = {
     active: "Aktiv",
@@ -449,6 +454,13 @@
   let employeeSearchTerm = "";
   let appointmentPeriodFilter = "all";
   let appointmentSearchTerm = "";
+  // Listen- oder Monatsansicht des Terminkalenders samt angezeigtem Monat.
+  // Beides ist reine Darstellung und bleibt deshalb im Browser, nicht im
+  // gemeinsamen Datenbestand.
+  const savedAppointmentView = readAppointmentViewPreference();
+  let appointmentViewMode = savedAppointmentView.mode;
+  let appointmentCalendarYear = savedAppointmentView.year;
+  let appointmentCalendarMonth = savedAppointmentView.month;
   let memoSearchTerm = "";
   let memoCategoryFilter = "all";
   let memoStatusFilter = "open";
@@ -758,6 +770,19 @@
     appointmentSummary: document.querySelector("#appointmentSummary"),
     appointmentList: document.querySelector("#appointmentList"),
     appointmentSearch: document.querySelector("#appointmentSearch"),
+    appointmentCalendar: document.querySelector("#appointmentCalendar"),
+    appointmentCalendarGrid: document.querySelector("#appointmentCalendarGrid"),
+    appointmentCalendarLabel: document.querySelector("#appointmentCalendarLabel"),
+    appointmentCalendarNote: document.querySelector("#appointmentCalendarNote"),
+    appointmentCalendarPreviousButton: document.querySelector(
+      "#appointmentCalendarPreviousButton",
+    ),
+    appointmentCalendarNextButton: document.querySelector(
+      "#appointmentCalendarNextButton",
+    ),
+    appointmentCalendarTodayButton: document.querySelector(
+      "#appointmentCalendarTodayButton",
+    ),
     memoSummary: document.querySelector("#memoSummary"),
     memoList: document.querySelector("#memoList"),
     memoSearch: document.querySelector("#memoSearch"),

@@ -67,7 +67,8 @@ Folgende Bereiche stehen zur Verfügung:
 - **Mitarbeiter:** Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten
 - **Wochenendverteilung:** Vergleich der beiden festen Dienstwochenenden
 - **Urlaubsplanung:** Monats- und Jahresplanung von Urlaub und Abwesenheiten
-- **Terminkalender:** Termine mit Ort, Uhrzeit und Beschreibung
+- **Terminkalender:** Termine mit Ort, Uhrzeit und Beschreibung, wahlweise als
+  Liste oder als Monatskalender
 - **Memo / ToDo:** persönliche und gemeinsame Notizen und Aufgaben
 - **Pflichtfortbildungen:** Fortbildungskatalog, Nachweise und Jahresauswertung
 - **Teamsitzungen:** Sitzungen, Teilnahmen und statistische Auswertung
@@ -606,6 +607,31 @@ ein eigenes Symbol, das in der Terminübersicht und im Fristenmonitor anstelle
 des allgemeinen Kalendersymbols erscheint; im Fristenmonitor ersetzt die
 Kategorie zusätzlich die Bezeichnung „Termin“. Termine ohne Kategorie behalten
 das Kalendersymbol.
+
+### Liste oder Monatskalender
+
+Rechts in der Werkzeugleiste des Terminkalenders wird zwischen zwei
+Darstellungen umgeschaltet:
+
+- **Liste:** die gewohnte Aufstellung nach angepinnten, anstehenden und
+  vergangenen Terminen
+- **Kalender:** ein Monatsraster mit einem Feld je Tag, Woche ab Montag
+
+Im Monatsraster steht in jedem Tagesfeld, was an diesem Tag ansteht – mit
+Uhrzeit, Kategoriesymbol und Titel. Der heutige Tag ist hervorgehoben,
+Wochenenden und Feiertage in Nordrhein-Westfalen sind abgesetzt; der Name des
+Feiertags steht im Feld. Ab dem vierten Termin eines Tages klappt **+n
+weitere** den Rest auf.
+
+- Ein Klick auf ein Tagesfeld legt einen Termin für genau diesen Tag an.
+- Ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten.
+- Die Pfeile wechseln den Monat, **Heute** springt zum laufenden Monat zurück.
+
+Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine
+bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar. Die gewählte
+Darstellung und der zuletzt angesehene Monat bleiben im Browser gespeichert und
+stehen beim nächsten Aufruf wieder bereit. Auf schmalen Bildschirmen zeigt jedes
+Tagesfeld statt der Titel farbige Balken – ein Tippen öffnet den Termin.
 
 ### Fristenmonitor
 

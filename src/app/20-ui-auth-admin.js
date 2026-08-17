@@ -564,6 +564,23 @@
       });
     });
 
+    document.querySelectorAll("[data-appointment-view]").forEach((button) => {
+      button.addEventListener("click", () =>
+        setAppointmentViewMode(button.dataset.appointmentView),
+      );
+    });
+
+    elements.appointmentCalendarPreviousButton.addEventListener("click", () =>
+      shiftAppointmentCalendarMonth(-1),
+    );
+    elements.appointmentCalendarNextButton.addEventListener("click", () =>
+      shiftAppointmentCalendarMonth(1),
+    );
+    elements.appointmentCalendarTodayButton.addEventListener(
+      "click",
+      showAppointmentCalendarToday,
+    );
+
     elements.memoSearch.addEventListener("input", (event) => {
       memoSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
       renderMemos();
@@ -855,6 +872,12 @@
     elements.meetingList.addEventListener("click", handleMeetingAction);
     elements.appointmentList.addEventListener("click", handleAppointmentAction);
     elements.appointmentList.addEventListener("keydown", handleAppointmentAction);
+    // Im Kalender sind Tage und Eintraege Schaltflaechen; die Tastatur loest
+    // sie ohne eigenen keydown-Zweig aus.
+    elements.appointmentCalendarGrid.addEventListener(
+      "click",
+      handleAppointmentCalendarClick,
+    );
     elements.memoList.addEventListener("click", handleMemoAction);
     elements.memoList.addEventListener("keydown", handleMemoAction);
     elements.dashboardMemoList.addEventListener("click", handleDashboardMemoAction);
