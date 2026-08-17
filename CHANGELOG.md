@@ -1,3 +1,11 @@
+### 004.037.008 – Strengere CSP und schlankeres Paket
+
+- **Verbessert:** Die Anwendung kommt ohne style-Attribute aus; die CSP des Servers verbietet sie jetzt vollständig (`style-src-attr 'none'`)
+- **Verbessert:** Die Statusauskunft des Servers nennt Revision und Schemastand nur noch einer angemeldeten Sitzung
+- **Verbessert:** Die Anmeldedrosselung zählt jeden Versuch atomar, bevor sie entscheidet – gleichzeitige Anfragen kommen nicht mehr am Limit vorbei
+- **Verbessert:** `app.html` ist keine 240 KB große Kopie von `index.html` mehr, sondern eine Weiterleitung
+- **Verbessert:** Einheitlich englische Bezeichner im Programmcode
+
 ### 004.037.007 – Sicherungszeitpunkt und Datenbankabgleich
 
 - **Behoben:** Lässt sich der Sicherungszeitpunkt nach einer automatischen Sicherung nicht speichern, gilt der Bestand nicht mehr fälschlich als gesichert; ein Serverkonflikt wird sofort statt bei der nächsten Änderung behandelt

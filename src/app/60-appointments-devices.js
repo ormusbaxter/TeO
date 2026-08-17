@@ -1435,14 +1435,14 @@
   }
 
   function updateInstructionDeviceCount() {
-    const anzahl = deviceInstructionDeviceDraft.size;
+    const selectedCount = deviceInstructionDeviceDraft.size;
     elements.toggleAllInstructionDevices.textContent =
-      anzahl && filteredInstructionDevices().every((device) =>
+      selectedCount && filteredInstructionDevices().every((device) =>
         deviceInstructionDeviceDraft.has(device.id),
       )
         ? "Sichtbare abwählen"
         : "Sichtbare auswählen";
-    if (anzahl) elements.deviceInstructionDeviceError.textContent = "";
+    if (selectedCount) elements.deviceInstructionDeviceError.textContent = "";
   }
 
   function handleInstructionDeviceChange(event) {

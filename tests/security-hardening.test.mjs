@@ -24,7 +24,10 @@ test("HTML-Escaping neutralisiert Text und Attributausbrüche", async () => {
 test("die Server-CSP begrenzt Skripte, Verbindungen, Formulare und Frames", async () => {
   const source = await read("server/src/server.js");
   assert.match(source, /script-src 'self'/);
-  assert.match(source, /style-src 'self'; style-src-attr 'unsafe-inline'/);
+  // style-Attribute sind vollständig verboten: Dynamische CSS-Werte gehen
+  // über dynamicStyle() und werden nach dem Einfügen per setProperty gesetzt.
+  assert.match(source, /style-src 'self'; style-src-attr 'none'/);
+  assert.doesNotMatch(source, /style-src-attr 'unsafe-inline'/);
   assert.match(source, /connect-src 'self';/);
   assert.doesNotMatch(source, /connect-src 'self' http: https:/);
   assert.match(source, /form-action 'self'/);
@@ -60,4 +63,60 @@ test("Login-Drosselung wird in MariaDB persistiert", async () => {
   assert.match(serverSource, /INSERT INTO teo_login_attempts/);
   assert.doesNotMatch(serverSource, /const loginAttempts = new Map/);
   assert.match(migrationSource, /persistent_login_throttling/);
+});
+
+test("Die Anmeldedrosselung zählt vor der Entscheidung", async () => {
+  const source = await read("server/src/server.js");
+  const rateLimit = source.match(
+    /async function loginRateLimit\(request, response, next\) \{[\s\S]*?\n\}/,
+  );
+  assert.ok(rateLimit, "loginRateLimit wurde nicht gefunden");
+
+  // Wird zuerst gelesen und erst beim Fehlschlag gezählt, lesen gleichzeitig
+  // eintreffende Anfragen denselben Wert und kommen gemeinsam am Limit vorbei.
+  assert.match(
+    rateLimit[0],
+    /const attempts = await registerLoginAttempt\(request\.ip\)/,
+    "Der Versuch muss vor der Entscheidung gezählt werden",
+  );
+  assert.doesNotMatch(
+    rateLimit[0],
+    /SELECT attempt_count/,
+    "loginRateLimit darf den Zähler nicht selbst lesen, bevor er ihn erhöht hat",
+  );
+  assert.match(
+    source,
+    /async function registerLoginAttempt\(ip\) \{[\s\S]*?INSERT INTO teo_login_attempts[\s\S]*?ON DUPLICATE KEY UPDATE/,
+    "Das Hochzählen muss in einer einzigen atomaren Anweisung geschehen",
+  );
+});
+
+test("Ohne Anmeldung verrät die Statusauskunft keinen Betriebszustand", async () => {
+  const source = await read("server/src/server.js");
+  const health = source.match(
+    /app\.get\("\/api\/health"[\s\S]*?\n\}\)\);/,
+  );
+  assert.ok(health, "Der Statusendpunkt wurde nicht gefunden");
+
+  const anonymousAnswer = health[0].match(
+    /if \(!session\) \{[\s\S]*?\n {2}\}/,
+  );
+  assert.ok(anonymousAnswer, "Der anonyme Zweig wurde nicht gefunden");
+  for (const leak of [
+    "initialized",
+    "revision",
+    "databaseSchemaVersion",
+    "storageModel",
+  ]) {
+    assert.doesNotMatch(
+      anonymousAnswer[0],
+      new RegExp(`\\b${leak}\\b`),
+      `„${leak}“ darf ohne angemeldete Sitzung nicht ausgeliefert werden`,
+    );
+  }
+  assert.match(
+    health[0],
+    /const session = await readOptionalSession\(request\)/,
+    "Der Endpunkt muss die Sitzung prüfen, ohne die Anfrage abzuweisen",
+  );
 });

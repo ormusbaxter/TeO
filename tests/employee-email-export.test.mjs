@@ -232,9 +232,12 @@ test("Die Telefonliste zeigt aktive und einzuarbeitende Mitarbeiter unabhängig 
 
   const printHtml = app.buildEmployeePhoneListPrintHtml(sixtyRows);
   assert.match(printHtml, /class="phone-list-document"/);
-  assert.match(printHtml, /--phone-columns: 2/);
-  assert.match(printHtml, /--phone-font-size: 10pt/);
-  assert.match(printHtml, /--phone-cell-padding: 2mm/);
+  assert.match(printHtml, /--phone-columns:2/);
+  assert.match(printHtml, /--phone-font-size:10pt/);
+  assert.match(printHtml, /--phone-cell-padding:2mm/);
+  // Als data-Attribut statt als style-Attribut: siehe dynamicStyle().
+  assert.match(printHtml, /data-teo-style="/);
+  assert.doesNotMatch(printHtml, /\sstyle="/);
   assert.match(printHtml, /<th>Name<\/th><th>Nummer<\/th>/);
   assert.doesNotMatch(printHtml, /Beruf|Stellenanteil|Status/);
   assert.doesNotMatch(printHtml, /<!doctype|window\.print/);
@@ -245,6 +248,6 @@ test("Die Telefonliste zeigt aktive und einzuarbeitende Mitarbeiter unabhängig 
   );
   assert.match(
     app.buildEmployeePhoneListPrintHtml(sixtyOneRows),
-    /--phone-cell-padding: 1\.65mm/,
+    /--phone-cell-padding:1\.65mm/,
   );
 });

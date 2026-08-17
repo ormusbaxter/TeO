@@ -1137,6 +1137,7 @@
     bindDataSync();
     bindRemoteSync();
 
+    observeDynamicStyles();
     const initialHash = window.location.hash.replace("#", "");
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
@@ -1268,7 +1269,7 @@
 
     try {
       const [health, result] = await Promise.all([
-        window.TeOBackend.health(backendConfig.apiUrl),
+        window.TeOBackend.health(backendConfig.apiUrl, token),
         window.TeOBackend.load(backendConfig.apiUrl, token),
       ]);
       markBackendConnected({ health, synchronized: true });
@@ -4788,7 +4789,10 @@
     backendConnectionStatus = "checking";
     renderSidebarSystemStatus();
     try {
-      const health = await window.TeOBackend.health(backendConfig.apiUrl);
+      const health = await window.TeOBackend.health(
+        backendConfig.apiUrl,
+        window.TeOBackend.readToken(),
+      );
       markBackendConnected({ health });
     } catch (error) {
       markBackendConnectionError(error);
@@ -5089,7 +5093,7 @@
                 >
                   <div
                     class="progress-bar"
-                    style="--progress: ${stats.percent}%; --progress-color: ${color}"
+                    ${dynamicStyle({ "--progress": `${stats.percent}%`, "--progress-color": color })}
                   ></div>
                 </div>
                 <span class="progress-value">${stats.percent}&thinsp;%</span>
@@ -8306,7 +8310,7 @@
 
     elements.employeeTable.innerHTML = `
       <div class="table-scroll">
-        <table class="data-table">
+        <table class="data-table employee-table">
           <thead>
             <tr>
               <th class="selection-column">
@@ -8317,13 +8321,13 @@
                   ${filtered.every((employee) => selectedEmployeeIds.has(employee.id)) ? "checked" : ""}
                 />
               </th>
-              ${renderEmployeeSortHeader("name", "Mitarbeiter", "23%")}
-              ${renderEmployeeSortHeader("profession", "Beruf", "16%")}
-              ${renderEmployeeSortHeader("employment", "Umfang", "10%")}
-              ${renderEmployeeSortHeader("qualifications", "Qualifikationen", "22%")}
-              ${renderEmployeeSortHeader("trainings", "Fortbildungen", "13%")}
-              ${renderEmployeeSortHeader("status", "Status", "9%")}
-              <th style="width: 138px"><span class="sr-only">Aktionen</span></th>
+              ${renderEmployeeSortHeader("name", "Mitarbeiter")}
+              ${renderEmployeeSortHeader("profession", "Beruf")}
+              ${renderEmployeeSortHeader("employment", "Umfang")}
+              ${renderEmployeeSortHeader("qualifications", "Qualifikationen")}
+              ${renderEmployeeSortHeader("trainings", "Fortbildungen")}
+              ${renderEmployeeSortHeader("status", "Status")}
+              <th><span class="sr-only">Aktionen</span></th>
             </tr>
           </thead>
           <tbody>
@@ -8450,7 +8454,7 @@
               aria-valuemax="100"
               aria-valuenow="${trainingStats.percent}"
             >
-              <div class="progress-bar" style="--progress: ${trainingStats.percent}%"></div>
+              <div class="progress-bar"${dynamicStyle({ "--progress": `${trainingStats.percent}%` })}></div>
             </div>
             <span>${trainingStats.current}/${trainingStats.total}</span>
           </div>
@@ -8518,11 +8522,11 @@
     `;
   }
 
-  function renderEmployeeSortHeader(key, label, width) {
+  function renderEmployeeSortHeader(key, label) {
     const active = employeeSortKey === key;
     const direction = active ? (employeeSortDirection === "asc" ? "▲" : "▼") : "";
     return `
-      <th style="width: ${width}">
+      <th>
         <button
           class="table-sort-button ${active ? "is-active" : ""}"
           type="button"
@@ -8857,7 +8861,7 @@
                 <div class="training-rate-bar-row">
                   <strong>${year}</strong>
                   <div class="training-rate-bar-track" aria-hidden="true">
-                    <span style="--training-rate: ${rate}%"></span>
+                    <span${dynamicStyle({ "--training-rate": `${rate}%` })}></span>
                   </div>
                   <span>${rate}&thinsp;%</span>
                 </div>
@@ -9098,14 +9102,14 @@
 
   function renderSummaryChip(icon, value, label, tone = "blue") {
     const tones = {
-      teal: "--chip-color: var(--teal-700); --chip-bg: var(--teal-100)",
-      orange: "--chip-color: var(--orange-700); --chip-bg: var(--orange-100)",
+      teal: "summary-chip-icon-teal",
+      orange: "summary-chip-icon-orange",
       blue: "",
     };
 
     return `
       <article class="summary-chip">
-        <span class="summary-chip-icon" style="${tones[tone]}">
+        <span class="summary-chip-icon ${tones[tone] || ""}">
           <svg><use href="#icon-${icon}"></use></svg>
         </span>
         <span>
@@ -9161,7 +9165,7 @@
               aria-valuemax="100"
               aria-valuenow="${stats.percent}"
             >
-              <div class="progress-bar" style="--progress: ${stats.percent}%"></div>
+              <div class="progress-bar"${dynamicStyle({ "--progress": `${stats.percent}%` })}></div>
             </div>
             <small>${stats.open} Nachweis${stats.open === 1 ? "" : "e"} offen</small>
           </div>
@@ -11064,14 +11068,14 @@
   }
 
   function updateInstructionDeviceCount() {
-    const anzahl = deviceInstructionDeviceDraft.size;
+    const selectedCount = deviceInstructionDeviceDraft.size;
     elements.toggleAllInstructionDevices.textContent =
-      anzahl && filteredInstructionDevices().every((device) =>
+      selectedCount && filteredInstructionDevices().every((device) =>
         deviceInstructionDeviceDraft.has(device.id),
       )
         ? "Sichtbare abwählen"
         : "Sichtbare auswählen";
-    if (anzahl) elements.deviceInstructionDeviceError.textContent = "";
+    if (selectedCount) elements.deviceInstructionDeviceError.textContent = "";
   }
 
   function handleInstructionDeviceChange(event) {
@@ -11822,7 +11826,7 @@
               aria-valuemax="100"
               aria-valuenow="${stats.percent}"
             >
-              <div class="progress-bar" style="--progress: ${stats.percent}%"></div>
+              <div class="progress-bar"${dynamicStyle({ "--progress": `${stats.percent}%` })}></div>
             </div>
             <div class="meeting-breakdown">
               ${
@@ -12022,7 +12026,7 @@
             class="meeting-pie-chart"
             role="img"
             aria-label="${escapeHtml(chartDescription)}"
-            style="--chart-segments: ${chartBackground}"
+            ${dynamicStyle({ "--chart-segments": chartBackground })}
           >
             <span>
               <strong>${statistics.participated}</strong>
@@ -12038,7 +12042,7 @@
                   <div class="meeting-legend-item">
                     <span
                       class="meeting-legend-color"
-                      style="--legend-color: ${segment.color}"
+                      ${dynamicStyle({ "--legend-color": segment.color })}
                       aria-hidden="true"
                     ></span>
                     <span>${escapeHtml(segment.label)}</span>
@@ -15010,14 +15014,23 @@
 
     setBackendButtonsBusy(true);
     try {
-      const health = await window.TeOBackend.health(apiUrl);
+      // Ohne angemeldete Sitzung meldet der Server nur seine Erreichbarkeit.
+      // Die Datenrevision erscheint deshalb erst, wenn bereits eine Sitzung
+      // besteht - der Verbindungstest selbst kommt ohne sie aus.
+      const health = await window.TeOBackend.health(
+        apiUrl,
+        apiUrl === backendConfig.apiUrl ? window.TeOBackend.readToken() : "",
+      );
       if (isMariaDbMode() && apiUrl === backendConfig.apiUrl) {
         markBackendConnected({ health });
       }
       elements.settingsBackendStatus.classList.remove("is-error");
-      elements.settingsBackendStatus.innerHTML = health.initialized
-        ? `<i></i> Server erreichbar · Datenrevision ${health.revision}`
-        : "<i></i> Server erreichbar · noch nicht eingerichtet";
+      elements.settingsBackendStatus.innerHTML =
+        health.initialized === undefined
+          ? "<i></i> Server erreichbar"
+          : health.initialized
+            ? `<i></i> Server erreichbar · Datenrevision ${health.revision}`
+            : "<i></i> Server erreichbar · noch nicht eingerichtet";
       showToast("Verbindung zum TeO-Server wurde erfolgreich geprüft.");
     } catch (error) {
       if (isMariaDbMode() && apiUrl === backendConfig.apiUrl) {
@@ -15064,21 +15077,29 @@
 
     setBackendButtonsBusy(true);
     try {
-      const health = await window.TeOBackend.health(apiUrl);
+      // Ob der Server bereits einen Datenbestand hat, sagt er selbst: Die
+      // Anmeldung antwortet auf einer leeren Datenbank mit "not_initialized".
+      // Deshalb erst anmelden und nur im Bedarfsfall einrichten - so verlangt
+      // der Weg den Einrichtungsschluessel nur dort, wo er wirklich noetig
+      // ist, und der Server muss den Einrichtungsstand nicht offenlegen.
+      const bootstrapToken = elements.settingsMariaDbBootstrapToken.value.trim();
+      let initialized = true;
       let result;
-      if (health.initialized) {
+      try {
         result = await window.TeOBackend.login(
           apiUrl,
           currentUser.username,
           password,
         );
-      } else {
+      } catch (error) {
+        if (error?.code !== "not_initialized") throw error;
+        initialized = false;
         result = await window.TeOBackend.bootstrap(
           apiUrl,
           state,
           currentUser.username,
           password,
-          elements.settingsMariaDbBootstrapToken.value.trim(),
+          bootstrapToken,
         );
       }
 
@@ -15089,8 +15110,16 @@
       });
       backendMode = "mariadb";
       remoteRevision = Number(result.revision) || 1;
-      markBackendConnected({ health, synchronized: true });
       window.TeOBackend.writeToken(result.token);
+      // Revision und Schemastand liefert der Server erst der angemeldeten
+      // Sitzung, deshalb erst jetzt abfragen. Bleibt die Auskunft aus, gilt
+      // die Verbindung trotzdem als hergestellt.
+      const health = await window.TeOBackend
+        .health(apiUrl, result.token)
+        .catch(() => null);
+      markBackendConnected(
+        health ? { health, synchronized: true } : { synchronized: true },
+      );
       state = normalizeState(result.state);
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       backendStartupError = "";
@@ -15106,7 +15135,7 @@
       completeLogin(remoteUser);
       showView("settings", false);
       showToast(
-        health.initialized
+        initialized
           ? "MariaDB wurde verbunden und der Serverdatenbestand geladen."
           : "MariaDB wurde eingerichtet und der lokale Datenbestand übertragen.",
       );
@@ -16144,7 +16173,7 @@
     return `
       <article
         class="phone-list-document"
-        style="--phone-columns: ${columns.length}; --phone-font-size: ${fontSize}; --phone-cell-padding: ${cellPadding}"
+        ${dynamicStyle({ "--phone-columns": columns.length, "--phone-font-size": fontSize, "--phone-cell-padding": cellPadding })}
       >
         <header class="phone-list-document-header">
           <h1>Telefonliste</h1>
@@ -16181,9 +16210,9 @@
     );
   }
 
-  async function copyListToClipboard(werte, { erfolg, fehlerProtokoll }) {
-    const exportText = werte.join(";");
-    const meldung = erfolg(werte.length);
+  async function copyListToClipboard(values, { successMessage, errorLogLabel }) {
+    const exportText = values.join(";");
+    const message = successMessage(values.length);
 
     try {
       if (navigator.clipboard?.writeText) {
@@ -16191,13 +16220,13 @@
       } else {
         copyTextWithFallback(exportText);
       }
-      showToast(meldung);
+      showToast(message);
     } catch (error) {
       try {
         copyTextWithFallback(exportText);
-        showToast(meldung);
+        showToast(message);
       } catch (fallbackError) {
-        console.error(fehlerProtokoll, error, fallbackError);
+        console.error(errorLogLabel, error, fallbackError);
         showToast(
           "Die Zwischenablage ist nicht verfügbar. Bitte prüfen Sie die Browserberechtigung.",
           "error",
@@ -16217,11 +16246,11 @@
     }
 
     await copyListToClipboard(emailAddresses, {
-      erfolg: (anzahl) =>
-        `${anzahl} E-Mail-Adresse${
-          anzahl === 1 ? "" : "n"
+      successMessage: (count) =>
+        `${count} E-Mail-Adresse${
+          count === 1 ? "" : "n"
         } wurden in die Zwischenablage kopiert.`,
-      fehlerProtokoll: "E-Mail-Adressen konnten nicht kopiert werden.",
+      errorLogLabel: "E-Mail-Adressen konnten nicht kopiert werden.",
     });
   }
 
@@ -16236,11 +16265,11 @@
     }
 
     await copyListToClipboard(usernames, {
-      erfolg: (anzahl) =>
-        `${anzahl} Benutzername${
-          anzahl === 1 ? "" : "n"
+      successMessage: (count) =>
+        `${count} Benutzername${
+          count === 1 ? "" : "n"
         } wurden in die Zwischenablage kopiert.`,
-      fehlerProtokoll: "Benutzernamen konnten nicht kopiert werden.",
+      errorLogLabel: "Benutzernamen konnten nicht kopiert werden.",
     });
   }
 
@@ -16341,7 +16370,7 @@
     return `
       <span
         class="avatar avatar-status-${status} ${small ? "avatar-sm" : ""}"
-        style="--avatar-fill: ${employmentPercent}%"
+        ${dynamicStyle({ "--avatar-fill": `${employmentPercent}%` })}
         aria-hidden="true"
         title="${escapeHtml(employeeStatusLabel(employee))} · ${employmentPercent} % Beschäftigungsumfang"
       >
@@ -16526,6 +16555,56 @@
       .join("\r\n");
     downloadTextFile(filename, content, "text/csv;charset=utf-8");
     showToast("CSV-Datei wurde exportiert.");
+  }
+
+  // Dynamische CSS-Werte - Fortschrittsbalken, Diagrammsegmente,
+  // Spaltenzahlen - kommen aus dem Datenbestand und koennen deshalb nicht im
+  // Stylesheet stehen. Statt sie als style-Attribut auszugeben (was
+  // style-src-attr 'unsafe-inline' in der CSP erzwingt), wandern sie als
+  // data-teo-style in das Markup und werden nach dem Einfuegen per
+  // setProperty gesetzt.
+  //
+  // Erlaubt sind ausschliesslich Custom Properties (--name). Damit kann ueber
+  // diesen Weg keine beliebige CSS-Deklaration in die Seite gelangen.
+  function dynamicStyle(properties) {
+    const declarations = Object.entries(properties)
+      .filter(([name, value]) => /^--[a-z0-9-]+$/i.test(name) && value !== "")
+      .map(([name, value]) => `${name}:${String(value).replaceAll(";", "")}`)
+      .join(";");
+    return declarations ? ` data-teo-style="${escapeHtml(declarations)}"` : "";
+  }
+
+  function applyDynamicStyles(root) {
+    if (!root?.querySelectorAll) return;
+    const targets =
+      root.matches?.("[data-teo-style]") === true
+        ? [root, ...root.querySelectorAll("[data-teo-style]")]
+        : [...root.querySelectorAll("[data-teo-style]")];
+    targets.forEach((element) => {
+      element.dataset.teoStyle.split(";").forEach((declaration) => {
+        const separator = declaration.indexOf(":");
+        if (separator < 1) return;
+        const name = declaration.slice(0, separator).trim();
+        if (!/^--[a-z0-9-]+$/i.test(name)) return;
+        element.style.setProperty(name, declaration.slice(separator + 1).trim());
+      });
+      delete element.dataset.teoStyle;
+    });
+  }
+
+  // Ein einzelner Beobachter statt eines Aufrufs hinter jeder der ueber
+  // hundert innerHTML-Zuweisungen: So greift der Mechanismus auch in
+  // Renderpfaden, die spaeter dazukommen. Der Rueckruf laeuft als Microtask
+  // noch vor dem Zeichnen, die Werte sind also nie kurzzeitig ungesetzt.
+  function observeDynamicStyles() {
+    applyDynamicStyles(document.body);
+    new MutationObserver((records) => {
+      records.forEach((record) => {
+        record.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) applyDynamicStyles(node);
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
   }
 
   function escapeHtml(value) {

@@ -1549,14 +1549,23 @@
 
     setBackendButtonsBusy(true);
     try {
-      const health = await window.TeOBackend.health(apiUrl);
+      // Ohne angemeldete Sitzung meldet der Server nur seine Erreichbarkeit.
+      // Die Datenrevision erscheint deshalb erst, wenn bereits eine Sitzung
+      // besteht - der Verbindungstest selbst kommt ohne sie aus.
+      const health = await window.TeOBackend.health(
+        apiUrl,
+        apiUrl === backendConfig.apiUrl ? window.TeOBackend.readToken() : "",
+      );
       if (isMariaDbMode() && apiUrl === backendConfig.apiUrl) {
         markBackendConnected({ health });
       }
       elements.settingsBackendStatus.classList.remove("is-error");
-      elements.settingsBackendStatus.innerHTML = health.initialized
-        ? `<i></i> Server erreichbar · Datenrevision ${health.revision}`
-        : "<i></i> Server erreichbar · noch nicht eingerichtet";
+      elements.settingsBackendStatus.innerHTML =
+        health.initialized === undefined
+          ? "<i></i> Server erreichbar"
+          : health.initialized
+            ? `<i></i> Server erreichbar · Datenrevision ${health.revision}`
+            : "<i></i> Server erreichbar · noch nicht eingerichtet";
       showToast("Verbindung zum TeO-Server wurde erfolgreich geprüft.");
     } catch (error) {
       if (isMariaDbMode() && apiUrl === backendConfig.apiUrl) {
@@ -1603,21 +1612,29 @@
 
     setBackendButtonsBusy(true);
     try {
-      const health = await window.TeOBackend.health(apiUrl);
+      // Ob der Server bereits einen Datenbestand hat, sagt er selbst: Die
+      // Anmeldung antwortet auf einer leeren Datenbank mit "not_initialized".
+      // Deshalb erst anmelden und nur im Bedarfsfall einrichten - so verlangt
+      // der Weg den Einrichtungsschluessel nur dort, wo er wirklich noetig
+      // ist, und der Server muss den Einrichtungsstand nicht offenlegen.
+      const bootstrapToken = elements.settingsMariaDbBootstrapToken.value.trim();
+      let initialized = true;
       let result;
-      if (health.initialized) {
+      try {
         result = await window.TeOBackend.login(
           apiUrl,
           currentUser.username,
           password,
         );
-      } else {
+      } catch (error) {
+        if (error?.code !== "not_initialized") throw error;
+        initialized = false;
         result = await window.TeOBackend.bootstrap(
           apiUrl,
           state,
           currentUser.username,
           password,
-          elements.settingsMariaDbBootstrapToken.value.trim(),
+          bootstrapToken,
         );
       }
 
@@ -1628,8 +1645,16 @@
       });
       backendMode = "mariadb";
       remoteRevision = Number(result.revision) || 1;
-      markBackendConnected({ health, synchronized: true });
       window.TeOBackend.writeToken(result.token);
+      // Revision und Schemastand liefert der Server erst der angemeldeten
+      // Sitzung, deshalb erst jetzt abfragen. Bleibt die Auskunft aus, gilt
+      // die Verbindung trotzdem als hergestellt.
+      const health = await window.TeOBackend
+        .health(apiUrl, result.token)
+        .catch(() => null);
+      markBackendConnected(
+        health ? { health, synchronized: true } : { synchronized: true },
+      );
       state = normalizeState(result.state);
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       backendStartupError = "";
@@ -1645,7 +1670,7 @@
       completeLogin(remoteUser);
       showView("settings", false);
       showToast(
-        health.initialized
+        initialized
           ? "MariaDB wurde verbunden und der Serverdatenbestand geladen."
           : "MariaDB wurde eingerichtet und der lokale Datenbestand übertragen.",
       );

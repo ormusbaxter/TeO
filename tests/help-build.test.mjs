@@ -14,7 +14,20 @@ test("Die Online-Hilfe enthält die beim Build eingebettete README", async () =>
     fs.readFile(path.join(projectRoot, "app.html"), "utf8"),
   ]);
 
-assert.equal(appHtml, indexHtml);
+// app.html ist nur noch eine Weiterleitung, damit vorhandene Verknüpfungen
+// weiter funktionieren – nicht mehr eine zweite 240-KB-Kopie der Anwendung.
+assert.notEqual(appHtml, indexHtml);
+assert.match(appHtml, /http-equiv="refresh" content="0; url=index\.html"/);
+assert.match(appHtml, /<a href="index\.html">/);
+assert.ok(
+  appHtml.length < 1024,
+  `app.html soll eine Weiterleitung bleiben, ist aber ${appHtml.length} Bytes groß`,
+);
+assert.doesNotMatch(
+  appHtml,
+  /<script/,
+  "Ohne Skript funktioniert die Weiterleitung auch per Doppelklick und unter der CSP",
+);
 
 assert.match(indexHtml, /data-view-panel="help"/);
 assert.match(indexHtml, /id="helpSearch"/);

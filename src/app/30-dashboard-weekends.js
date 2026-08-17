@@ -58,7 +58,7 @@
                 >
                   <div
                     class="progress-bar"
-                    style="--progress: ${stats.percent}%; --progress-color: ${color}"
+                    ${dynamicStyle({ "--progress": `${stats.percent}%`, "--progress-color": color })}
                   ></div>
                 </div>
                 <span class="progress-value">${stats.percent}&thinsp;%</span>

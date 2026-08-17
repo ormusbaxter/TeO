@@ -84,7 +84,7 @@ app.use((request, response, next) => {
     "Referrer-Policy": "no-referrer",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
     "Content-Security-Policy":
-      `default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'${upgradeInsecureRequests}`,
+      `default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'none'; connect-src 'self'; img-src 'self' data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'${upgradeInsecureRequests}`,
     "Cache-Control": request.path.startsWith("/api/")
       ? "no-store"
       : "no-cache",
@@ -137,8 +137,23 @@ app.use((request, response, next) => {
 });
 app.use(express.json({ limit: MAX_STATE_BYTES }));
 
-app.get("/api/health", asyncHandler(async (_request, response) => {
+// Ohne Anmeldung nur die Erreichbarkeit. Revision, Schemastand und die Frage,
+// ob ueberhaupt schon ein Datenbestand existiert, sagen etwas ueber den
+// Betrieb der Station aus und gehoeren deshalb hinter die Sitzung.
+//
+// Die Ersteinrichtung kommt ohne diese Auskunft aus: Sie meldet sich zuerst
+// an, und auf einer leeren Datenbank antwortet /api/auth/login mit
+// "not_initialized" - erst dann wird eingerichtet.
+app.get("/api/health", asyncHandler(async (request, response) => {
   await pool.query("SELECT 1");
+  const session = await readOptionalSession(request);
+  if (!session) {
+    return response.json({
+      ok: true,
+      service: "TeO MariaDB API",
+      serverTime: new Date().toISOString(),
+    });
+  }
   const row = await readStateRow();
   response.json({
     ok: true,
@@ -160,7 +175,6 @@ app.post("/api/bootstrap", requireBootstrapAuthorization, loginRateLimit, asyncH
     user.role !== "admin" ||
     !verifyPassword(password, user)
   ) {
-    await registerFailedLogin(request.ip);
     return response.status(401).json({
       code: "invalid_credentials",
       message: "Administratorname oder Passwort ist nicht korrekt.",
@@ -199,7 +213,7 @@ app.post("/api/bootstrap", requireBootstrapAuthorization, loginRateLimit, asyncH
     connection?.release();
   }
 
-  await clearFailedLogins(request.ip);
+  await clearLoginAttempts(request.ip);
   const token = await sessionStore.create(user);
   response.status(201).json({
     token,
@@ -223,14 +237,13 @@ app.post("/api/auth/login", loginRateLimit, asyncHandler(async (request, respons
   const state = row.state;
   const user = findUser(state, request.body?.username);
   if (!user || !verifyPassword(request.body?.password, user)) {
-    await registerFailedLogin(request.ip);
     return response.status(401).json({
       code: "invalid_credentials",
       message: "Benutzername oder Passwort ist nicht korrekt.",
     });
   }
 
-  await clearFailedLogins(request.ip);
+  await clearLoginAttempts(request.ip);
   const token = await sessionStore.create(user);
   response.json({
     token,
@@ -599,6 +612,14 @@ function mergeProtectedCredentials(currentState, nextState) {
   return hydratedState;
 }
 
+// Liest eine gueltige Sitzung, ohne die Anfrage abzuweisen. Fuer Endpunkte,
+// die angemeldeten Konten mehr zeigen als anonymen Aufrufern.
+async function readOptionalSession(request) {
+  const authorization = request.headers.authorization || "";
+  if (!authorization.startsWith("Bearer ")) return null;
+  return sessionStore.read(authorization.slice(7).trim());
+}
+
 function requireSession(request, response, next) {
   const authorization = request.headers.authorization || "";
   const token = authorization.startsWith("Bearer ")
@@ -633,15 +654,19 @@ function requireBootstrapAuthorization(request, response, next) {
   });
 }
 
+// Erst zaehlen, dann entscheiden. Wuerde der Zaehler wie frueher zuerst
+// gelesen und erst beim Fehlschlag erhoeht, laesen gleichzeitig eintreffende
+// Anfragen alle denselben Wert und kaemen gemeinsam am Limit vorbei - ein
+// Angreifer koennte das Fenster mit parallelen Versuchen beliebig weit
+// ausdehnen. Das INSERT ... ON DUPLICATE KEY UPDATE ist atomar; entschieden
+// wird anhand des danach gelesenen Standes.
+//
+// Gezaehlt wird damit jeder Versuch, nicht nur der gescheiterte. Eine
+// erfolgreiche Anmeldung raeumt den Zaehler unmittelbar wieder ab.
 async function loginRateLimit(request, response, next) {
   try {
-    const rows = await pool.query(
-      `SELECT attempt_count
-         FROM teo_login_attempts
-        WHERE client_key_hash = ? AND reset_at > CURRENT_TIMESTAMP(3)`,
-      [loginClientKeyHash(request.ip)],
-    );
-    if (Number(rows[0]?.attempt_count) >= LOGIN_ATTEMPTS_PER_WINDOW) {
+    const attempts = await registerLoginAttempt(request.ip);
+    if (attempts > LOGIN_ATTEMPTS_PER_WINDOW) {
       return response.status(429).json({
         code: "too_many_login_attempts",
         message: "Zu viele Anmeldeversuche. Bitte später erneut versuchen.",
@@ -653,8 +678,9 @@ async function loginRateLimit(request, response, next) {
   }
 }
 
-async function registerFailedLogin(ip) {
+async function registerLoginAttempt(ip) {
   const windowSeconds = Math.ceil(LOGIN_WINDOW_MS / 1000);
+  const clientKeyHash = loginClientKeyHash(ip);
   await pool.query(
     `INSERT INTO teo_login_attempts (client_key_hash, attempt_count, reset_at)
      VALUES (?, 1, DATE_ADD(CURRENT_TIMESTAMP(3), INTERVAL ? SECOND))
@@ -665,11 +691,18 @@ async function registerFailedLogin(ip) {
          DATE_ADD(CURRENT_TIMESTAMP(3), INTERVAL ? SECOND),
          reset_at
        )`,
-    [loginClientKeyHash(ip), windowSeconds, windowSeconds],
+    [clientKeyHash, windowSeconds, windowSeconds],
   );
+  const rows = await pool.query(
+    `SELECT attempt_count
+       FROM teo_login_attempts
+      WHERE client_key_hash = ? AND reset_at > CURRENT_TIMESTAMP(3)`,
+    [clientKeyHash],
+  );
+  return Number(rows[0]?.attempt_count) || 0;
 }
 
-async function clearFailedLogins(ip) {
+async function clearLoginAttempts(ip) {
   await pool.query(
     "DELETE FROM teo_login_attempts WHERE client_key_hash = ?",
     [loginClientKeyHash(ip)],
