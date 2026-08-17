@@ -52,6 +52,49 @@
           <section class="meeting-list" id="appointmentList"></section>
         </section>
 
+        <section class="view" id="memosView" data-view-panel="memos">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Organisation</p>
+              <h1>Memo / ToDo</h1>
+              <p class="page-subtitle">
+                Persönliche und gemeinsame Notizen oder Aufgaben verwalten.
+              </p>
+            </div>
+            <button class="button button-primary" type="button" data-open-memo>
+              <svg><use href="#icon-plus"></use></svg>
+              Memo / ToDo anlegen
+            </button>
+          </div>
+
+          <div class="memo-toolbar">
+            <label class="search-field" for="memoSearch">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="memoSearch"
+                type="search"
+                aria-label="Memos und ToDos durchsuchen"
+                placeholder="Titel oder Beschreibung suchen …"
+                autocomplete="off"
+              />
+            </label>
+            <label class="compact-field">
+              <span>Kategorie</span>
+              <select id="memoCategoryFilter">
+                <option value="all">Alle Kategorien</option>
+              </select>
+            </label>
+            <div class="segmented-control" role="group" aria-label="Status filtern">
+              <button type="button" data-memo-status="all" aria-pressed="false">Alle</button>
+              <button class="is-active" type="button" data-memo-status="open" aria-pressed="true">Offen</button>
+              <button type="button" data-memo-status="completed" aria-pressed="false">Erledigt</button>
+            </div>
+          </div>
+
+          <div class="training-summary" id="memoSummary"></div>
+          <section class="memo-list" id="memoList"></section>
+        </section>
+
         <section class="view" id="trainingsView" data-view-panel="trainings">
           <div class="page-header">
             <div>

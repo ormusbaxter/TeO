@@ -15,6 +15,7 @@ const ANSICHTEN = {
   trainings: "#trainingList",
   meetings: "#meetingList",
   appointments: "#appointmentList",
+  memos: "#memoList",
   weekends: "#weekendDistributionContent",
 };
 
@@ -52,6 +53,14 @@ async function anwendungMitDaten() {
       meetings: [{ id: "meeting-1", title: "Teamsitzung", date: "2026-03-02" }],
       appointments: [
         { id: "appointment-1", title: "Begehung", date: "2026-09-01" },
+      ],
+      memos: [
+        {
+          id: "memo-1",
+          title: "Materialbestand prüfen",
+          visibility: "all",
+          createdByUserId: "user-1",
+        },
       ],
       vacationDays: mitarbeiter.map((person, index) => ({
         id: `vacation-${index}`,

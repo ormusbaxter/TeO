@@ -142,6 +142,27 @@ CREATE TABLE IF NOT EXISTS teo_appointments (
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS teo_memos (
+  id VARCHAR(100) NOT NULL,
+  sort_order INT UNSIGNED NOT NULL,
+  payload JSON NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  memo_date DATE NULL,
+  memo_category VARCHAR(60) NULL,
+  visibility VARCHAR(20) NOT NULL,
+  created_by_user_id VARCHAR(100) NULL,
+  is_pinned BOOLEAN NOT NULL,
+  is_completed BOOLEAN NOT NULL,
+  updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (id),
+  INDEX idx_teo_memo_date (memo_date),
+  INDEX idx_teo_memo_category (memo_category),
+  INDEX idx_teo_memo_visibility (visibility, created_by_user_id),
+  INDEX idx_teo_memo_status (is_completed, is_pinned)
+) ENGINE=InnoDB
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS teo_devices (
   id VARCHAR(100) NOT NULL,
   sort_order INT UNSIGNED NOT NULL,

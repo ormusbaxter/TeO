@@ -17,7 +17,7 @@ test("Administratoren aus Datenformat 21 müssen ihr Passwort einmalig ändern",
     createMinimalState({ version: 21, users: [admin] }),
   );
 
-  assert.equal(migrated.version, 24);
+  assert.equal(migrated.version, 25);
   assert.equal(migrated.users[0].mustChangePassword, true);
 });
 

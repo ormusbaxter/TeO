@@ -21,6 +21,7 @@ Wichtige Tabellen:
 | `teo_trainings`, `teo_completions` | Fortbildungskatalog und Nachweise |
 | `teo_meetings`, `teo_meeting_attendances` | Teamsitzungen und Teilnahmen |
 | `teo_appointments` | Termine |
+| `teo_memos` | Memos und ToDos |
 | `teo_devices`, `teo_device_instructions` | Geräte und Einweisungen |
 | `teo_vacation_entitlements`, `teo_vacation_days` | Urlaubsansprüche und Abwesenheiten |
 | `teo_users` | Benutzerkonten und geschützte Passwortdaten |

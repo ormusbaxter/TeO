@@ -7,6 +7,7 @@ const REQUIRED_COLLECTIONS = Object.freeze([
   "meetings",
   "meetingAttendances",
   "appointments",
+  "memos",
   "devices",
   "deviceInstructions",
   "vacationEntitlements",
@@ -48,7 +49,8 @@ function validateStateShape(
   if (
     !isRecord(state.catalogs) ||
     !Array.isArray(state.catalogs?.professions) ||
-    !Array.isArray(state.catalogs?.qualifications)
+    !Array.isArray(state.catalogs?.qualifications) ||
+    !Array.isArray(state.catalogs?.memoCategories)
   ) {
     issues.push("Die Stammdatenkataloge fehlen.");
   }
@@ -61,6 +63,7 @@ function validateStateShape(
   validateIds(state.completions, "Fortbildungsnachweise", issues);
   validateIds(state.meetingAttendances, "Sitzungsteilnahmen", issues);
   validateIds(state.appointments, "Termine", issues);
+  validateIds(state.memos, "Memos und ToDos", issues);
   validateIds(state.deviceInstructions, "Geräteeinweisungen", issues);
 
   validateUsers(state.users, issues, requireAdmin);
@@ -72,6 +75,7 @@ function validateStateShape(
     issues,
   );
   validateReferences(state, { employeeIds, trainingIds, meetingIds, deviceIds }, issues);
+  validateMemos(state.memos, state.catalogs.memoCategories, issues);
   validateDates(state, issues);
 
   if (state.auditLog.length > maxAuditEntries) {
@@ -82,6 +86,21 @@ function validateStateShape(
     issues.push(`Der Textwert „${oversizedString}“ überschreitet 5.000 Zeichen.`);
   }
   return result(issues, byteLength);
+}
+
+function validateMemos(memos, categories, issues) {
+  const availableCategories = new Set(categories);
+  memos.forEach((memo) => {
+    if (
+      !isRecord(memo) ||
+      !String(memo.title || "").trim() ||
+      !["all", "private"].includes(memo.visibility) ||
+      (memo.category && !availableCategories.has(memo.category)) ||
+      (memo.visibility === "private" && !ID_PATTERN.test(String(memo.createdByUserId || "")))
+    ) {
+      issues.push(`Memo/ToDo „${memo?.id || "ohne ID"}“ ist ungültig.`);
+    }
+  });
 }
 
 function validateServiceWeekends(
@@ -236,6 +255,9 @@ function validateDates(state, issues) {
     ...state.completions.map((entry) => ["Fortbildungsnachweis", entry.completedOn]),
     ...state.meetings.map((entry) => ["Teamsitzung", entry.date]),
     ...state.appointments.map((entry) => ["Termin", entry.date]),
+    ...state.memos
+      .filter((entry) => entry.date)
+      .map((entry) => ["Memo/ToDo", entry.date]),
     ...state.deviceInstructions.map((entry) => ["Geräteeinweisung", entry.date]),
     ...state.vacationDays.map((entry) => ["Abwesenheit", entry.date]),
   ];

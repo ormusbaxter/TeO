@@ -29,6 +29,12 @@
   const DEFAULT_WEEKEND_ABSENCE_LIMIT = 5;
   const DEFAULT_TRAINING_RECURRENCE_MONTHS = 12;
   const VIOLENCE_PREVENTION_RECURRENCE_MONTHS = 60;
+  const DEFAULT_MEMO_CATEGORIES = Object.freeze([
+    "Allgemein",
+    "Aufgabe",
+    "Information",
+    "Rückfrage",
+  ]);
   const DEADLINE_KINDS = Object.freeze([
     "appointment",
     "birthday",
@@ -375,6 +381,7 @@
     weekends: "wochenendverteilung",
     vacations: "urlaubsplanung",
     appointments: "terminkalender",
+    memos: "memo-todo",
     trainings: "pflichtfortbildungen",
     meetings: "teamsitzungen",
     devices: "geraeteeinweisungen",
@@ -411,6 +418,9 @@
   let employeeSearchTerm = "";
   let appointmentPeriodFilter = "all";
   let appointmentSearchTerm = "";
+  let memoSearchTerm = "";
+  let memoCategoryFilter = "all";
+  let memoStatusFilter = "open";
   let completionSearchTerm = "";
   let selectedCompletionEmployeeIds = new Set();
   let attendanceSearchTerm = "";
@@ -495,6 +505,7 @@
     navTrainingCount: document.querySelector("#navTrainingCount"),
     navMeetingCount: document.querySelector("#navMeetingCount"),
     navAppointmentCount: document.querySelector("#navAppointmentCount"),
+    navMemoCount: document.querySelector("#navMemoCount"),
     navDeviceManagementCount: document.querySelector("#navDeviceManagementCount"),
     mobileCreateButton: document.querySelector("#mobileCreateButton"),
     databaseSaveWarning: document.querySelector("#databaseSaveWarning"),
@@ -526,6 +537,9 @@
     deadlineHorizon: document.querySelector("#deadlineHorizon"),
     deadlineFilters: [...document.querySelectorAll("[data-deadline-filter]")],
     deadlineHideOverdue: document.querySelector("#deadlineHideOverdue"),
+    dashboardPriorityGrid: document.querySelector("#dashboardPriorityGrid"),
+    dashboardMemoPanel: document.querySelector("#dashboardMemoPanel"),
+    dashboardMemoList: document.querySelector("#dashboardMemoList"),
     recentEmployees: document.querySelector("#recentEmployees"),
     employeeTable: document.querySelector("#employeeTable"),
     employeeSearch: document.querySelector("#employeeSearch"),
@@ -707,6 +721,10 @@
     appointmentSummary: document.querySelector("#appointmentSummary"),
     appointmentList: document.querySelector("#appointmentList"),
     appointmentSearch: document.querySelector("#appointmentSearch"),
+    memoSummary: document.querySelector("#memoSummary"),
+    memoList: document.querySelector("#memoList"),
+    memoSearch: document.querySelector("#memoSearch"),
+    memoCategoryFilter: document.querySelector("#memoCategoryFilter"),
     deviceSummary: document.querySelector("#deviceSummary"),
     deviceMatrixWidget: document.querySelector("#deviceMatrixWidget"),
     toggleDeviceMatrixMaximizeButton: document.querySelector(
@@ -825,6 +843,9 @@
     newQualification: document.querySelector("#newQualification"),
     addProfessionButton: document.querySelector("#addProfessionButton"),
     addQualificationButton: document.querySelector("#addQualificationButton"),
+    memoCategoryForm: document.querySelector("#memoCategoryForm"),
+    newMemoCategory: document.querySelector("#newMemoCategory"),
+    memoCategoryList: document.querySelector("#memoCategoryList"),
     meetingDialog: document.querySelector("#meetingDialog"),
     meetingForm: document.querySelector("#meetingForm"),
     meetingDialogTitle: document.querySelector("#meetingDialogTitle"),
@@ -837,6 +858,14 @@
     appointmentParticipantList: document.querySelector(
       "#appointmentParticipantList",
     ),
+    memoDialog: document.querySelector("#memoDialog"),
+    memoForm: document.querySelector("#memoForm"),
+    memoDialogTitle: document.querySelector("#memoDialogTitle"),
+    memoSubmitLabel: document.querySelector("#memoSubmitLabel"),
+    memoCategory: document.querySelector("#memoCategory"),
+    memoVisibility: document.querySelector("#memoVisibility"),
+    memoPinned: document.querySelector("#memoPinned"),
+    memoCompleted: document.querySelector("#memoCompleted"),
     deviceDialog: document.querySelector("#deviceDialog"),
     deviceForm: document.querySelector("#deviceForm"),
     deviceDialogTitle: document.querySelector("#deviceDialogTitle"),

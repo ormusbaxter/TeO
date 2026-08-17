@@ -348,6 +348,77 @@
       </form>
     </dialog>
 
+    <dialog class="modal" id="memoDialog" aria-labelledby="memoDialogTitle">
+      <form id="memoForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Memo / ToDo</p>
+            <h2 id="memoDialogTitle">Memo / ToDo anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="memoId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field form-field-wide">
+              <span>Titel <em>*</em></span>
+              <input id="memoTitle" type="text" maxlength="160" required />
+            </label>
+            <label class="form-field">
+              <span>Datum</span>
+              <input id="memoDate" type="date" />
+              <small class="field-hint">Optional</small>
+            </label>
+            <label class="form-field">
+              <span>Kategorie</span>
+              <select id="memoCategory">
+                <option value="">Ohne Kategorie</option>
+              </select>
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Sichtbarkeit</span>
+              <select id="memoVisibility">
+                <option value="all">Für alle Nutzer der App</option>
+                <option value="private">Nur für mich</option>
+              </select>
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Beschreibung</span>
+              <textarea
+                id="memoDescription"
+                rows="6"
+                maxlength="2000"
+                placeholder="Optionale Notiz oder Aufgabenbeschreibung"
+              ></textarea>
+            </label>
+            <label class="check-card form-field-wide memo-pin-option">
+              <input id="memoPinned" type="checkbox" />
+              <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
+              <span>
+                <strong>Als wichtig markieren</strong>
+                <small>Angepinnte Einträge stehen immer ganz oben</small>
+              </span>
+              <span class="appointment-pin-option-icon important-notification-icon" aria-hidden="true"></span>
+            </label>
+            <label class="check-card form-field-wide">
+              <input id="memoCompleted" type="checkbox" />
+              <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
+              <span>Als erledigt markieren</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="memoSubmitLabel">Memo / ToDo speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
     <dialog class="modal" id="meetingDialog" aria-labelledby="meetingDialogTitle">
       <form id="meetingForm">
         <div class="modal-header">

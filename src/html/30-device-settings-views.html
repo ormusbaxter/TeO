@@ -304,6 +304,36 @@
               </div>
             </section>
 
+            <section class="panel settings-card" data-settings-section="master-data">
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-admin">
+                  <svg><use href="#icon-memo"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Memo / ToDo</p>
+                  <h2>Kategorien</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Kategorien für Memos und ToDos hinzufügen, umbenennen oder entfernen.
+              </p>
+              <form class="catalog-add-row" id="memoCategoryForm">
+                <input
+                  id="newMemoCategory"
+                  type="text"
+                  maxlength="60"
+                  placeholder="Neue Kategorie"
+                  aria-label="Neue Memo- oder ToDo-Kategorie"
+                  required
+                />
+                <button class="button button-primary button-compact" type="submit">
+                  <svg><use href="#icon-plus"></use></svg>
+                  Hinzufügen
+                </button>
+              </form>
+              <div class="catalog-list" id="memoCategoryList"></div>
+            </section>
+
             <section
               class="panel settings-card settings-card-wide"
               data-settings-section="planning"
@@ -854,6 +884,10 @@
       <button type="button" data-view="appointments">
         <svg><use href="#icon-calendar"></use></svg>
         <span>Termine</span>
+      </button>
+      <button type="button" data-view="memos">
+        <svg><use href="#icon-memo"></use></svg>
+        <span>Memo / ToDo</span>
       </button>
       <button type="button" data-view="trainings">
         <svg><use href="#icon-training"></use></svg>

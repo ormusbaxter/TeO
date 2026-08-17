@@ -68,6 +68,10 @@
         <rect x="8" y="8" width="12" height="12" rx="2" />
         <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
       </symbol>
+      <symbol id="icon-memo" viewBox="0 0 24 24">
+        <path d="M5 3h14a2 2 0 0 1 2 2v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
+        <path d="M15 21v-6h6M7 8h10M7 12h7" />
+      </symbol>
       <symbol id="icon-download" viewBox="0 0 24 24">
         <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
       </symbol>
@@ -194,6 +198,11 @@
             <svg><use href="#icon-calendar"></use></svg>
             <span>Terminkalender</span>
             <span class="nav-count" id="navAppointmentCount">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="memos">
+            <svg><use href="#icon-memo"></use></svg>
+            <span>Memo / ToDo</span>
+            <span class="nav-count" id="navMemoCount">0</span>
           </button>
           <button class="nav-item" type="button" data-view="trainings">
             <svg><use href="#icon-training"></use></svg>
@@ -389,6 +398,7 @@
             </div>
           </div>
 
+          <div class="dashboard-priority-grid" id="dashboardPriorityGrid">
           <section class="panel deadline-panel" aria-labelledby="deadlineOverviewTitle">
             <div class="panel-header deadline-panel-header">
               <div>
@@ -431,6 +441,26 @@
             </div>
             <div id="deadlineOverview"></div>
           </section>
+
+          <section
+            class="panel dashboard-memo-panel"
+            id="dashboardMemoPanel"
+            aria-labelledby="dashboardMemoTitle"
+            hidden
+          >
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Memo / ToDo</p>
+                <h2 id="dashboardMemoTitle">Offene Einträge</h2>
+              </div>
+              <button class="text-button" type="button" data-go-to="memos">
+                Alle anzeigen
+                <svg><use href="#icon-chevron"></use></svg>
+              </button>
+            </div>
+            <div id="dashboardMemoList"></div>
+          </section>
+          </div>
 
           <div class="dashboard-grid">
             <section class="panel panel-large">
@@ -875,6 +905,49 @@
           <section class="meeting-list" id="appointmentList"></section>
         </section>
 
+        <section class="view" id="memosView" data-view-panel="memos">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Organisation</p>
+              <h1>Memo / ToDo</h1>
+              <p class="page-subtitle">
+                Persönliche und gemeinsame Notizen oder Aufgaben verwalten.
+              </p>
+            </div>
+            <button class="button button-primary" type="button" data-open-memo>
+              <svg><use href="#icon-plus"></use></svg>
+              Memo / ToDo anlegen
+            </button>
+          </div>
+
+          <div class="memo-toolbar">
+            <label class="search-field" for="memoSearch">
+              <svg><use href="#icon-search"></use></svg>
+              <input
+                id="memoSearch"
+                type="search"
+                aria-label="Memos und ToDos durchsuchen"
+                placeholder="Titel oder Beschreibung suchen …"
+                autocomplete="off"
+              />
+            </label>
+            <label class="compact-field">
+              <span>Kategorie</span>
+              <select id="memoCategoryFilter">
+                <option value="all">Alle Kategorien</option>
+              </select>
+            </label>
+            <div class="segmented-control" role="group" aria-label="Status filtern">
+              <button type="button" data-memo-status="all" aria-pressed="false">Alle</button>
+              <button class="is-active" type="button" data-memo-status="open" aria-pressed="true">Offen</button>
+              <button type="button" data-memo-status="completed" aria-pressed="false">Erledigt</button>
+            </div>
+          </div>
+
+          <div class="training-summary" id="memoSummary"></div>
+          <section class="memo-list" id="memoList"></section>
+        </section>
+
         <section class="view" id="trainingsView" data-view-panel="trainings">
           <div class="page-header">
             <div>
@@ -1252,6 +1325,36 @@
                   Wochenenden speichern
                 </button>
               </div>
+            </section>
+
+            <section class="panel settings-card" data-settings-section="master-data">
+              <div class="settings-card-heading">
+                <span class="settings-card-icon settings-card-icon-admin">
+                  <svg><use href="#icon-memo"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Memo / ToDo</p>
+                  <h2>Kategorien</h2>
+                </div>
+              </div>
+              <p class="settings-description">
+                Kategorien für Memos und ToDos hinzufügen, umbenennen oder entfernen.
+              </p>
+              <form class="catalog-add-row" id="memoCategoryForm">
+                <input
+                  id="newMemoCategory"
+                  type="text"
+                  maxlength="60"
+                  placeholder="Neue Kategorie"
+                  aria-label="Neue Memo- oder ToDo-Kategorie"
+                  required
+                />
+                <button class="button button-primary button-compact" type="submit">
+                  <svg><use href="#icon-plus"></use></svg>
+                  Hinzufügen
+                </button>
+              </form>
+              <div class="catalog-list" id="memoCategoryList"></div>
             </section>
 
             <section
@@ -1782,7 +1885,7 @@
           <div class="help-layout">
             <nav class="panel help-toc" aria-label="Inhaltsverzeichnis der Hilfe">
               <p class="eyebrow">Inhalt</p>
-              <button type="button" data-help-target="hilfe-schnellstart" data-help-nav-target="hilfe-schnellstart">Schnellstart</button><button type="button" data-help-target="hilfe-navigation-und-bedienung" data-help-nav-target="hilfe-navigation-und-bedienung">Navigation und Bedienung</button><button type="button" data-help-target="hilfe-benutzerkonten-und-berechtigungen" data-help-nav-target="hilfe-benutzerkonten-und-berechtigungen">Benutzerkonten und Berechtigungen</button><button type="button" data-help-target="hilfe-mitarbeiterverwaltung" data-help-nav-target="hilfe-mitarbeiterverwaltung">Mitarbeiterverwaltung</button><button type="button" data-help-target="hilfe-dienstwochenenden" data-help-nav-target="hilfe-dienstwochenenden">Dienstwochenenden</button><button type="button" data-help-target="hilfe-urlaubs-und-abwesenheitsplanung" data-help-nav-target="hilfe-urlaubs-und-abwesenheitsplanung">Urlaubs- und Abwesenheitsplanung</button><button type="button" data-help-target="hilfe-terminkalender-und-fristenmonitor" data-help-nav-target="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</button><button type="button" data-help-target="hilfe-pflichtfortbildungen" data-help-nav-target="hilfe-pflichtfortbildungen">Pflichtfortbildungen</button><button type="button" data-help-target="hilfe-teamsitzungen" data-help-nav-target="hilfe-teamsitzungen">Teamsitzungen</button><button type="button" data-help-target="hilfe-gerateverwaltung-und-gerateeinweisungen" data-help-nav-target="hilfe-gerateverwaltung-und-gerateeinweisungen">Geräteverwaltung und Geräteeinweisungen</button><button type="button" data-help-target="hilfe-datensicherung-und-wiederherstellung" data-help-nav-target="hilfe-datensicherung-und-wiederherstellung">Datensicherung und Wiederherstellung</button><button type="button" data-help-target="hilfe-datenspeicherung-und-mariadb" data-help-nav-target="hilfe-datenspeicherung-und-mariadb">Datenspeicherung und MariaDB</button><button type="button" data-help-target="hilfe-einstellungen-und-administration" data-help-nav-target="hilfe-einstellungen-und-administration">Einstellungen und Administration</button><button type="button" data-help-target="hilfe-haufig-gestellte-fragen" data-help-nav-target="hilfe-haufig-gestellte-fragen">Häufig gestellte Fragen</button><button type="button" data-help-target="hilfe-datenschutz-und-it-sicherheit" data-help-nav-target="hilfe-datenschutz-und-it-sicherheit">Datenschutz und IT-Sicherheit</button><button type="button" data-help-target="hilfe-anderungshistorie" data-help-nav-target="hilfe-anderungshistorie">Änderungshistorie</button><button type="button" data-help-target="hilfe-entwicklung-und-projektstruktur" data-help-nav-target="hilfe-entwicklung-und-projektstruktur">Entwicklung und Projektstruktur</button>
+              <button type="button" data-help-target="hilfe-schnellstart" data-help-nav-target="hilfe-schnellstart">Schnellstart</button><button type="button" data-help-target="hilfe-navigation-und-bedienung" data-help-nav-target="hilfe-navigation-und-bedienung">Navigation und Bedienung</button><button type="button" data-help-target="hilfe-benutzerkonten-und-berechtigungen" data-help-nav-target="hilfe-benutzerkonten-und-berechtigungen">Benutzerkonten und Berechtigungen</button><button type="button" data-help-target="hilfe-mitarbeiterverwaltung" data-help-nav-target="hilfe-mitarbeiterverwaltung">Mitarbeiterverwaltung</button><button type="button" data-help-target="hilfe-dienstwochenenden" data-help-nav-target="hilfe-dienstwochenenden">Dienstwochenenden</button><button type="button" data-help-target="hilfe-urlaubs-und-abwesenheitsplanung" data-help-nav-target="hilfe-urlaubs-und-abwesenheitsplanung">Urlaubs- und Abwesenheitsplanung</button><button type="button" data-help-target="hilfe-memo-todo" data-help-nav-target="hilfe-memo-todo">Memo / ToDo</button><button type="button" data-help-target="hilfe-terminkalender-und-fristenmonitor" data-help-nav-target="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</button><button type="button" data-help-target="hilfe-pflichtfortbildungen" data-help-nav-target="hilfe-pflichtfortbildungen">Pflichtfortbildungen</button><button type="button" data-help-target="hilfe-teamsitzungen" data-help-nav-target="hilfe-teamsitzungen">Teamsitzungen</button><button type="button" data-help-target="hilfe-gerateverwaltung-und-gerateeinweisungen" data-help-nav-target="hilfe-gerateverwaltung-und-gerateeinweisungen">Geräteverwaltung und Geräteeinweisungen</button><button type="button" data-help-target="hilfe-datensicherung-und-wiederherstellung" data-help-nav-target="hilfe-datensicherung-und-wiederherstellung">Datensicherung und Wiederherstellung</button><button type="button" data-help-target="hilfe-datenspeicherung-und-mariadb" data-help-nav-target="hilfe-datenspeicherung-und-mariadb">Datenspeicherung und MariaDB</button><button type="button" data-help-target="hilfe-einstellungen-und-administration" data-help-nav-target="hilfe-einstellungen-und-administration">Einstellungen und Administration</button><button type="button" data-help-target="hilfe-haufig-gestellte-fragen" data-help-nav-target="hilfe-haufig-gestellte-fragen">Häufig gestellte Fragen</button><button type="button" data-help-target="hilfe-datenschutz-und-it-sicherheit" data-help-nav-target="hilfe-datenschutz-und-it-sicherheit">Datenschutz und IT-Sicherheit</button><button type="button" data-help-target="hilfe-anderungshistorie" data-help-nav-target="hilfe-anderungshistorie">Änderungshistorie</button><button type="button" data-help-target="hilfe-entwicklung-und-projektstruktur" data-help-nav-target="hilfe-entwicklung-und-projektstruktur">Entwicklung und Projektstruktur</button>
             </nav>
             <article class="panel help-article">
               <h1 id="hilfe-teo-team-employee-organizer">TeO – Team &amp; Employee Organizer</h1>
@@ -1807,8 +1910,8 @@
 <h3 id="hilfe-hauptnavigation">Hauptnavigation</h3>
 <p>Die Desktop-Navigation befindet sich links. Auf kleinen Bildschirmen wird am unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.</p>
 <p>Folgende Bereiche stehen zur Verfügung:</p>
-<ul><li><strong>Übersicht:</strong> Kennzahlen, Fristenmonitor und zuletzt bearbeitete Daten</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
-<p>Die Zahl neben einem Eintrag nennt bei <strong>Mitarbeitern</strong> die aktiven und die in Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei <strong>Terminen</strong> die noch bevorstehenden und bei der <strong>Geräteverwaltung</strong> die Geräte im aktuellen Bestand.</p>
+<ul><li><strong>Übersicht:</strong> Kennzahlen, Fristenmonitor und zuletzt bearbeitete Daten</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
+<p>Die Zahl neben einem Eintrag nennt bei <strong>Mitarbeitern</strong> die aktiven und die in Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei <strong>Terminen</strong> die noch bevorstehenden, bei <strong>Memo / ToDo</strong> die sichtbaren offenen Einträge und bei der <strong>Geräteverwaltung</strong> die Geräte im aktuellen Bestand.</p>
 <h3 id="hilfe-suche-und-filter">Suche und Filter</h3>
 <p>Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können kombiniert werden. Filter beziehen sich immer auf die aktuell sichtbare Ansicht.</p>
 <p>In der Mitarbeiterverwaltung berücksichtigt auch <strong>E-Mails kopieren</strong> nur die aktuell gefilterte Liste.</p>
@@ -1947,6 +2050,13 @@
 <p>Gesetzliche Feiertage in Nordrhein-Westfalen werden für jedes Jahr automatisch berechnet und müssen nicht gepflegt werden.</p>
 <p>Die Schulferien stammen dagegen aus <strong>Einstellungen → Schulferien</strong> und lassen sich dort für beliebige Jahre ergänzen; vorbelegt ist die amtliche Ferienordnung NRW bis April 2030. Örtlich unterschiedliche bewegliche Ferientage sind nicht enthalten.</p>
 </section>
+<section class="help-section" data-help-section data-help-heading="hilfe-memo-todo">
+<h2 id="hilfe-memo-todo">Memo / ToDo</h2>
+<p>Memos und ToDos benötigen nur einen Titel. Optional können Beschreibung, Fälligkeitsdatum und Kategorie ergänzt werden. Einträge lassen sich als erledigt markieren und wieder öffnen. Angepinnte Einträge werden farblich hervorgehoben und unabhängig vom Datum zuerst angezeigt.</p>
+<p>Mit <strong>Für alle Nutzer sichtbar</strong> steht der Eintrag jedem angemeldeten Konto zur Verfügung. <strong>Nur für mich sichtbar</strong> beschränkt ihn auf das Konto, das ihn angelegt hat. Suche, Kategorie und Status können miteinander kombiniert werden.</p>
+<p>Die Kategorien werden unter <strong>Einstellungen → Stammdaten &amp; Zugriffe → Memo-/ToDo-Kategorien</strong> angelegt, umbenannt oder gelöscht. Umbenennungen werden in vorhandene Einträge übernommen.</p>
+<p>Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der Übersichtsseite neben dem Fristenmonitor. Nur wenn solche Einträge vorhanden sind, teilen sich beide Bereiche die verfügbare Breite zu gleichen Teilen; auf schmaleren Bildschirmen stehen sie untereinander.</p>
+</section>
 <section class="help-section" data-help-section data-help-heading="hilfe-terminkalender-und-fristenmonitor">
 <h2 id="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</h2>
 <h3 id="hilfe-termine-anlegen">Termine anlegen</h3>
@@ -2072,10 +2182,10 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-einstellungen-und-administration">
 <h2 id="hilfe-einstellungen-und-administration">Einstellungen und Administration</h2>
 <p>Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint unter <strong>Einstellungen</strong> in der Sidebar und zusätzlich als Abschnittsnavigation oben auf der Einstellungsseite:</p>
-<ul><li><strong>Allgemein:</strong> Farbthema und Verhalten beim Schließen von Dialogen</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung sowie manuelle und automatische Datensicherungen</li></ul>
+<ul><li><strong>Allgemein:</strong> Farbthema und Verhalten beim Schließen von Dialogen</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen, Memo-/ToDo-Kategorien und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung sowie manuelle und automatische Datensicherungen</li></ul>
 <p>Beim Wechsel eines Untermenüs werden nur die zugehörigen Einstellungskarten angezeigt. Administratorgeschützte Funktionen bleiben weiterhin ausschließlich für Administratoren sichtbar.</p>
 <p>Die Einstellungsseite bündelt:</p>
-<ul><li>Farbthema</li><li>Dienstwochenendverantwortliche</li><li>lokales oder MariaDB-Backend</li><li>Benutzerverwaltung</li><li>Berufe und Qualifikationen</li><li>Datenqualitätsprüfung</li><li>Sicherungserinnerung</li><li>Import, Export und Sicherungsprüfung</li><li>verschlüsselten Export</li><li>Änderungsprotokoll</li></ul>
+<ul><li>Farbthema</li><li>Dienstwochenendverantwortliche</li><li>lokales oder MariaDB-Backend</li><li>Benutzerverwaltung</li><li>Berufe und Qualifikationen</li><li>Memo-/ToDo-Kategorien</li><li>Datenqualitätsprüfung</li><li>Sicherungserinnerung</li><li>Import, Export und Sicherungsprüfung</li><li>verschlüsselten Export</li><li>Änderungsprotokoll</li></ul>
 <p>Verfügbare Farbthemen sind Standard, Dark Mode, Nord, Dracula, Catppuccin Latte, Windows 95, Cellitinnen und Cellitinnen Rot. Die Auswahl wird mit dem Datenbestand gespeichert.</p>
 <p>Die Datenqualitätsprüfung sucht unter anderem nach:</p>
 <ul><li>möglichen Dubletten</li><li>ungültigen E-Mail-Adressen</li><li>auffälligen Telefonnummern</li><li>fehlenden Kontaktdaten</li></ul>
@@ -2123,6 +2233,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-037-000-memo-todo">004.037.000 – Memo / ToDo</h3>
+<ul><li><strong>Neu:</strong> Eigener Bereich für persönliche und gemeinsame Memos und ToDos mit optionalem Datum, Beschreibung, Status und Wichtig-Markierung</li><li><strong>Neu:</strong> Memo-/ToDo-Kategorien lassen sich in den Stammdaten anlegen, umbenennen und löschen</li><li><strong>Neu:</strong> Offene sichtbare Einträge erscheinen bei Bedarf neben dem auf 50 Prozent verkleinerten Fristenmonitor</li><li><strong>Verbessert:</strong> Private Einträge werden ausschließlich dem erstellenden Konto angezeigt; Suche sowie Kategorie- und Statusfilter erleichtern die Übersicht</li></ul>
 <h3 id="hilfe-004-036-001-automatischer-startabgleich">004.036.001 – Automatischer Startabgleich</h3>
 <ul><li><strong>Verbessert:</strong> Nach dem Login lädt TeO <code>teo-autosicherung.json</code> automatisch aus dem zuletzt verknüpften Sicherungsordner</li><li><strong>Verbessert:</strong> Die Dateiauswahl erscheint nur noch, wenn Ordnerzugriff oder Sicherungsdatei nicht verfügbar sind oder die Datei nicht übernommen werden kann</li></ul>
 <h3 id="hilfe-004-036-000-excel-export-der-gerateverwaltung">004.036.000 – Excel-Export der Geräteverwaltung</h3>
@@ -2301,6 +2413,10 @@ npm run verify</code></pre>
       <button type="button" data-view="appointments">
         <svg><use href="#icon-calendar"></use></svg>
         <span>Termine</span>
+      </button>
+      <button type="button" data-view="memos">
+        <svg><use href="#icon-memo"></use></svg>
+        <span>Memo / ToDo</span>
       </button>
       <button type="button" data-view="trainings">
         <svg><use href="#icon-training"></use></svg>
@@ -3413,6 +3529,77 @@ npm run verify</code></pre>
           <button class="button button-primary" type="submit" name="submitAction" value="save">
             <svg><use href="#icon-check"></use></svg>
             <span id="appointmentSubmitLabel">Termin speichern</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="memoDialog" aria-labelledby="memoDialogTitle">
+      <form id="memoForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Memo / ToDo</p>
+            <h2 id="memoDialogTitle">Memo / ToDo anlegen</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="memoId" type="hidden" />
+          <div class="form-grid">
+            <label class="form-field form-field-wide">
+              <span>Titel <em>*</em></span>
+              <input id="memoTitle" type="text" maxlength="160" required />
+            </label>
+            <label class="form-field">
+              <span>Datum</span>
+              <input id="memoDate" type="date" />
+              <small class="field-hint">Optional</small>
+            </label>
+            <label class="form-field">
+              <span>Kategorie</span>
+              <select id="memoCategory">
+                <option value="">Ohne Kategorie</option>
+              </select>
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Sichtbarkeit</span>
+              <select id="memoVisibility">
+                <option value="all">Für alle Nutzer der App</option>
+                <option value="private">Nur für mich</option>
+              </select>
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Beschreibung</span>
+              <textarea
+                id="memoDescription"
+                rows="6"
+                maxlength="2000"
+                placeholder="Optionale Notiz oder Aufgabenbeschreibung"
+              ></textarea>
+            </label>
+            <label class="check-card form-field-wide memo-pin-option">
+              <input id="memoPinned" type="checkbox" />
+              <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
+              <span>
+                <strong>Als wichtig markieren</strong>
+                <small>Angepinnte Einträge stehen immer ganz oben</small>
+              </span>
+              <span class="appointment-pin-option-icon important-notification-icon" aria-hidden="true"></span>
+            </label>
+            <label class="check-card form-field-wide">
+              <input id="memoCompleted" type="checkbox" />
+              <span class="check-box"><svg><use href="#icon-check"></use></svg></span>
+              <span>Als erledigt markieren</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            <span id="memoSubmitLabel">Memo / ToDo speichern</span>
           </button>
         </div>
       </form>

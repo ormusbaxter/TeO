@@ -67,6 +67,10 @@
         <rect x="8" y="8" width="12" height="12" rx="2" />
         <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
       </symbol>
+      <symbol id="icon-memo" viewBox="0 0 24 24">
+        <path d="M5 3h14a2 2 0 0 1 2 2v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" />
+        <path d="M15 21v-6h6M7 8h10M7 12h7" />
+      </symbol>
       <symbol id="icon-download" viewBox="0 0 24 24">
         <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
       </symbol>
@@ -193,6 +197,11 @@
             <svg><use href="#icon-calendar"></use></svg>
             <span>Terminkalender</span>
             <span class="nav-count" id="navAppointmentCount">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="memos">
+            <svg><use href="#icon-memo"></use></svg>
+            <span>Memo / ToDo</span>
+            <span class="nav-count" id="navMemoCount">0</span>
           </button>
           <button class="nav-item" type="button" data-view="trainings">
             <svg><use href="#icon-training"></use></svg>
@@ -388,6 +397,7 @@
             </div>
           </div>
 
+          <div class="dashboard-priority-grid" id="dashboardPriorityGrid">
           <section class="panel deadline-panel" aria-labelledby="deadlineOverviewTitle">
             <div class="panel-header deadline-panel-header">
               <div>
@@ -430,6 +440,26 @@
             </div>
             <div id="deadlineOverview"></div>
           </section>
+
+          <section
+            class="panel dashboard-memo-panel"
+            id="dashboardMemoPanel"
+            aria-labelledby="dashboardMemoTitle"
+            hidden
+          >
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Memo / ToDo</p>
+                <h2 id="dashboardMemoTitle">Offene Einträge</h2>
+              </div>
+              <button class="text-button" type="button" data-go-to="memos">
+                Alle anzeigen
+                <svg><use href="#icon-chevron"></use></svg>
+              </button>
+            </div>
+            <div id="dashboardMemoList"></div>
+          </section>
+          </div>
 
           <div class="dashboard-grid">
             <section class="panel panel-large">

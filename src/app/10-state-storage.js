@@ -59,6 +59,7 @@
       meetings: [],
       meetingAttendances: [],
       appointments: [],
+      memos: [],
       devices: createDefaultDeviceCatalog(),
       deviceInstructions: [],
       vacationEntitlements: [],
@@ -99,6 +100,7 @@
           id,
           label,
         })),
+        memoCategories: [...DEFAULT_MEMO_CATEGORIES],
       },
     };
   }
@@ -199,6 +201,9 @@
     const appointments = Array.isArray(parsed.appointments)
       ? parsed.appointments.map(normalizeAppointment).filter(Boolean)
       : [];
+    const memos = Array.isArray(parsed.memos)
+      ? parsed.memos.map(normalizeMemo).filter(Boolean)
+      : [];
     const devices = Array.isArray(parsed.devices)
       ? parsed.devices.map(normalizeDevice).filter(Boolean)
       : [];
@@ -277,6 +282,9 @@
       : [];
 
     const catalogs = normalizeCatalogs(parsed.catalogs, employees);
+    memos.forEach((memo) => {
+      if (!catalogs.memoCategories.includes(memo.category)) memo.category = "";
+    });
     const qualificationIds = new Set(
       catalogs.qualifications.map((qualification) => qualification.id),
     );
@@ -376,6 +384,7 @@
       meetings,
       meetingAttendances,
       appointments,
+      memos,
       devices,
       deviceInstructions,
       vacationEntitlements: uniqueVacationEntitlements(vacationEntitlements),
@@ -495,7 +504,27 @@
     return {
       professions: professions.sort((a, b) => a.localeCompare(b, "de")),
       qualifications: [...qualificationMap].map(([id, label]) => ({ id, label })),
+      memoCategories: normalizeMemoCategories(catalogs?.memoCategories),
     };
+  }
+
+  function normalizeMemoCategories(values) {
+    const source = Array.isArray(values) ? values : DEFAULT_MEMO_CATEGORIES;
+    const categories = [];
+    source.forEach((value) => {
+      const category = String(value || "").trim().slice(0, 60);
+      if (
+        category &&
+        !categories.some(
+          (item) =>
+            item.toLocaleLowerCase("de-DE") ===
+            category.toLocaleLowerCase("de-DE"),
+        )
+      ) {
+        categories.push(category);
+      }
+    });
+    return categories.sort((a, b) => a.localeCompare(b, "de"));
   }
 
   function initialUsers() {
@@ -805,6 +834,26 @@
       participantList: Boolean(appointment.participantList),
       createdAt: validTimestamp(appointment.createdAt),
       updatedAt: validTimestamp(appointment.updatedAt || appointment.createdAt),
+    };
+  }
+
+  function normalizeMemo(memo) {
+    const id = normalizeId(memo?.id);
+    const title = String(memo?.title || "").trim().slice(0, 160);
+    if (!memo || !id || !title) return null;
+
+    return {
+      id,
+      title,
+      description: String(memo.description || "").trim().slice(0, 2000),
+      date: normalizeOptionalDate(memo.date),
+      category: String(memo.category || "").trim().slice(0, 60),
+      pinned: Boolean(memo.pinned),
+      completed: Boolean(memo.completed),
+      visibility: memo.visibility === "private" ? "private" : "all",
+      createdByUserId: normalizeId(memo.createdByUserId),
+      createdAt: validTimestamp(memo.createdAt),
+      updatedAt: validTimestamp(memo.updatedAt || memo.createdAt),
     };
   }
 

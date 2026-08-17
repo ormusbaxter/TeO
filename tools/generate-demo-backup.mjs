@@ -654,6 +654,7 @@ export async function generateDemoBackup(outputPath = DEFAULT_OUTPUT) {
       meetings,
       meetingAttendances,
       appointments: [],
+      memos: [],
       devices,
       deviceInstructions,
       vacationEntitlements: [],
@@ -684,6 +685,7 @@ export async function generateDemoBackup(outputPath = DEFAULT_OUTPUT) {
       catalogs: {
         professions: PROFESSIONS,
         qualifications: QUALIFICATIONS.map(([id, label]) => ({ id, label })),
+        memoCategories: ["Allgemein", "Aufgabe", "Information", "Rückfrage"],
       },
     },
   };
