@@ -2321,6 +2321,30 @@ svg {
   height: 17px;
 }
 
+/* Farbvarianten der Übersichtskacheln. Früher als Inline-Style gesetzt; als
+   Klasse kommt die Anwendung ohne style-Attribute und damit ohne
+   style-src-attr 'unsafe-inline' in der CSP aus. */
+.summary-chip-icon-teal {
+  --chip-color: var(--teal-700);
+  --chip-bg: var(--teal-100);
+}
+
+.summary-chip-icon-orange {
+  --chip-color: var(--orange-700);
+  --chip-bg: var(--orange-100);
+}
+
+/* Spaltenbreiten der Mitarbeitertabelle. Die Reihenfolge ist in
+   renderEmployees festgelegt: Auswahlspalte, dann die sechs sortierbaren
+   Spalten, zuletzt die Aktionen. */
+.employee-table th:nth-child(2) { width: 23%; }
+.employee-table th:nth-child(3) { width: 16%; }
+.employee-table th:nth-child(4) { width: 10%; }
+.employee-table th:nth-child(5) { width: 22%; }
+.employee-table th:nth-child(6) { width: 13%; }
+.employee-table th:nth-child(7) { width: 9%; }
+.employee-table th:last-child { width: 138px; }
+
 .summary-chip strong {
   display: block;
   color: var(--slate-800);

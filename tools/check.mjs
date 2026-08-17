@@ -210,6 +210,26 @@ assert.deepEqual(
     "Bitte aus const elements entfernen; das HTML-Element selbst kann bleiben.",
 );
 
+// Die CSP des Servers verbietet style-Attribute (style-src-attr 'none').
+// Dynamische CSS-Werte gehen deshalb ueber dynamicStyle() und werden nach dem
+// Einfuegen per setProperty gesetzt; feste Werte gehoeren ins Stylesheet.
+const inlineStyleAttributes = [
+  ...appSource.matchAll(/^.*\sstyle="(?!\$\{)[^"]*".*$/gm),
+]
+  .map((match) => match[0].trim())
+  .filter((line) => !line.includes("data-teo-style"));
+assert.deepEqual(
+  inlineStyleAttributes,
+  [],
+  `Diese Stellen erzeugen style-Attribute, die die CSP blockiert:\n${inlineStyleAttributes.join("\n")}\n` +
+    "Dynamische Werte über dynamicStyle() ausgeben, feste Werte ins Stylesheet.",
+);
+assert.doesNotMatch(
+  htmlSource,
+  /\sstyle="/,
+  "Die statische Oberfläche darf keine style-Attribute enthalten",
+);
+
 // Ein Import ersetzt den gesamten fachlichen Datenbestand. Bleibt dabei ein
 // Filter stehen, wirken Listen leer, obwohl die Daten vollstaendig vorliegen.
 // resetListFilters muss deshalb jede Filter- und Suchvariable abdecken.

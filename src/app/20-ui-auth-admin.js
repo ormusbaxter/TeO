@@ -2414,7 +2414,10 @@
     backendConnectionStatus = "checking";
     renderSidebarSystemStatus();
     try {
-      const health = await window.TeOBackend.health(backendConfig.apiUrl);
+      const health = await window.TeOBackend.health(
+        backendConfig.apiUrl,
+        window.TeOBackend.readToken(),
+      );
       markBackendConnected({ health });
     } catch (error) {
       markBackendConnectionError(error);

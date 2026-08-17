@@ -43,6 +43,7 @@
     bindDataSync();
     bindRemoteSync();
 
+    observeDynamicStyles();
     const initialHash = window.location.hash.replace("#", "");
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
@@ -174,7 +175,7 @@
 
     try {
       const [health, result] = await Promise.all([
-        window.TeOBackend.health(backendConfig.apiUrl),
+        window.TeOBackend.health(backendConfig.apiUrl, token),
         window.TeOBackend.load(backendConfig.apiUrl, token),
       ]);
       markBackendConnected({ health, synchronized: true });

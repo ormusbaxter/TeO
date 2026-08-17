@@ -23,7 +23,12 @@ test("Terminfilter und statusabhängige Beschäftigungsringe sind verdrahtet", a
   assert.match(appSource, /function resetAppointmentFilters\(\)/);
   assert.match(appSource, /appointmentCategoryLabel\(appointment\)/);
   assert.match(appSource, /class="avatar avatar-status-\$\{status\}/);
-  assert.match(appSource, /style="--avatar-fill: \$\{employmentPercent\}%"/);
+  // Der Füllstand kommt aus den Daten und wird deshalb über dynamicStyle()
+  // ausgegeben – style-Attribute blockiert die CSP des Servers.
+  assert.match(
+    appSource,
+    /dynamicStyle\(\{ "--avatar-fill": `\$\{employmentPercent\}%` \}\)/,
+  );
   assert.match(coreCss, /\.avatar-status-onboarding\s*{/);
   assert.match(coreCss, /\.avatar-status-inactive\s*{/);
   assert.match(coreCss, /background:\s*conic-gradient\(/);

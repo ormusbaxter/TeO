@@ -309,7 +309,7 @@
 
     elements.employeeTable.innerHTML = `
       <div class="table-scroll">
-        <table class="data-table">
+        <table class="data-table employee-table">
           <thead>
             <tr>
               <th class="selection-column">
@@ -320,13 +320,13 @@
                   ${filtered.every((employee) => selectedEmployeeIds.has(employee.id)) ? "checked" : ""}
                 />
               </th>
-              ${renderEmployeeSortHeader("name", "Mitarbeiter", "23%")}
-              ${renderEmployeeSortHeader("profession", "Beruf", "16%")}
-              ${renderEmployeeSortHeader("employment", "Umfang", "10%")}
-              ${renderEmployeeSortHeader("qualifications", "Qualifikationen", "22%")}
-              ${renderEmployeeSortHeader("trainings", "Fortbildungen", "13%")}
-              ${renderEmployeeSortHeader("status", "Status", "9%")}
-              <th style="width: 138px"><span class="sr-only">Aktionen</span></th>
+              ${renderEmployeeSortHeader("name", "Mitarbeiter")}
+              ${renderEmployeeSortHeader("profession", "Beruf")}
+              ${renderEmployeeSortHeader("employment", "Umfang")}
+              ${renderEmployeeSortHeader("qualifications", "Qualifikationen")}
+              ${renderEmployeeSortHeader("trainings", "Fortbildungen")}
+              ${renderEmployeeSortHeader("status", "Status")}
+              <th><span class="sr-only">Aktionen</span></th>
             </tr>
           </thead>
           <tbody>
@@ -453,7 +453,7 @@
               aria-valuemax="100"
               aria-valuenow="${trainingStats.percent}"
             >
-              <div class="progress-bar" style="--progress: ${trainingStats.percent}%"></div>
+              <div class="progress-bar"${dynamicStyle({ "--progress": `${trainingStats.percent}%` })}></div>
             </div>
             <span>${trainingStats.current}/${trainingStats.total}</span>
           </div>
@@ -521,11 +521,11 @@
     `;
   }
 
-  function renderEmployeeSortHeader(key, label, width) {
+  function renderEmployeeSortHeader(key, label) {
     const active = employeeSortKey === key;
     const direction = active ? (employeeSortDirection === "asc" ? "▲" : "▼") : "";
     return `
-      <th style="width: ${width}">
+      <th>
         <button
           class="table-sort-button ${active ? "is-active" : ""}"
           type="button"
@@ -860,7 +860,7 @@
                 <div class="training-rate-bar-row">
                   <strong>${year}</strong>
                   <div class="training-rate-bar-track" aria-hidden="true">
-                    <span style="--training-rate: ${rate}%"></span>
+                    <span${dynamicStyle({ "--training-rate": `${rate}%` })}></span>
                   </div>
                   <span>${rate}&thinsp;%</span>
                 </div>
@@ -1101,14 +1101,14 @@
 
   function renderSummaryChip(icon, value, label, tone = "blue") {
     const tones = {
-      teal: "--chip-color: var(--teal-700); --chip-bg: var(--teal-100)",
-      orange: "--chip-color: var(--orange-700); --chip-bg: var(--orange-100)",
+      teal: "summary-chip-icon-teal",
+      orange: "summary-chip-icon-orange",
       blue: "",
     };
 
     return `
       <article class="summary-chip">
-        <span class="summary-chip-icon" style="${tones[tone]}">
+        <span class="summary-chip-icon ${tones[tone] || ""}">
           <svg><use href="#icon-${icon}"></use></svg>
         </span>
         <span>
@@ -1164,7 +1164,7 @@
               aria-valuemax="100"
               aria-valuenow="${stats.percent}"
             >
-              <div class="progress-bar" style="--progress: ${stats.percent}%"></div>
+              <div class="progress-bar"${dynamicStyle({ "--progress": `${stats.percent}%` })}></div>
             </div>
             <small>${stats.open} Nachweis${stats.open === 1 ? "" : "e"} offen</small>
           </div>

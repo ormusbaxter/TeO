@@ -98,16 +98,35 @@ for (const [source, output, banner] of manifests) {
             readmeHelp,
           )
         : content.join("\n");
-    const outputs = output === "index.html" ? ["index.html", "app.html"] : [output];
-    await Promise.all(
-      outputs.map((fileName) =>
-        fs.writeFile(
-          path.join(projectRoot, fileName),
-          `${banner}${generatedContent}`,
-          "utf8",
-        ),
-      ),
+    await fs.writeFile(
+      path.join(projectRoot, output),
+      `${banner}${generatedContent}`,
+      "utf8",
     );
+    // app.html war frueher eine byteidentische Kopie von index.html - zwei mal
+    // 240 KB im Repository fuer denselben Inhalt. Vorhandene Verknuepfungen
+    // sollen weiter funktionieren, deshalb bleibt die Datei als
+    // Weiterleitung bestehen. Ohne Skript, damit sie auch per Doppelklick
+    // (file://) und unter der strengen CSP des Servers greift.
+    if (output === "index.html") {
+      await fs.writeFile(
+        path.join(projectRoot, "app.html"),
+        `<!doctype html>
+<!-- Generiert von tools/build.mjs – TeO wird über index.html gestartet. -->
+<html lang="de-DE">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="0; url=index.html" />
+    <title>TeO – Weiterleitung</title>
+  </head>
+  <body>
+    <p>TeO wird über <a href="index.html">index.html</a> gestartet.</p>
+  </body>
+</html>
+`,
+        "utf8",
+      );
+    }
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
   }

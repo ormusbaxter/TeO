@@ -132,7 +132,7 @@
               aria-valuemax="100"
               aria-valuenow="${stats.percent}"
             >
-              <div class="progress-bar" style="--progress: ${stats.percent}%"></div>
+              <div class="progress-bar"${dynamicStyle({ "--progress": `${stats.percent}%` })}></div>
             </div>
             <div class="meeting-breakdown">
               ${
@@ -332,7 +332,7 @@
             class="meeting-pie-chart"
             role="img"
             aria-label="${escapeHtml(chartDescription)}"
-            style="--chart-segments: ${chartBackground}"
+            ${dynamicStyle({ "--chart-segments": chartBackground })}
           >
             <span>
               <strong>${statistics.participated}</strong>
@@ -348,7 +348,7 @@
                   <div class="meeting-legend-item">
                     <span
                       class="meeting-legend-color"
-                      style="--legend-color: ${segment.color}"
+                      ${dynamicStyle({ "--legend-color": segment.color })}
                       aria-hidden="true"
                     ></span>
                     <span>${escapeHtml(segment.label)}</span>

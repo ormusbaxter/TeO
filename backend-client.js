@@ -102,9 +102,12 @@
     return payload;
   }
 
-  async function health(apiUrl) {
-    return request(apiUrl, "/api/health");
+  // Ohne Token meldet der Server nur seine Erreichbarkeit. Revision und
+  // Schemastand liefert er erst einer angemeldeten Sitzung.
+  async function health(apiUrl, token = "") {
+    return request(apiUrl, "/api/health", token ? { token } : {});
   }
+
 
   async function bootstrap(apiUrl, state, username, password, bootstrapToken = "") {
     return request(apiUrl, "/api/bootstrap", {

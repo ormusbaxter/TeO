@@ -645,7 +645,7 @@
     return `
       <article
         class="phone-list-document"
-        style="--phone-columns: ${columns.length}; --phone-font-size: ${fontSize}; --phone-cell-padding: ${cellPadding}"
+        ${dynamicStyle({ "--phone-columns": columns.length, "--phone-font-size": fontSize, "--phone-cell-padding": cellPadding })}
       >
         <header class="phone-list-document-header">
           <h1>Telefonliste</h1>
@@ -682,9 +682,9 @@
     );
   }
 
-  async function copyListToClipboard(werte, { erfolg, fehlerProtokoll }) {
-    const exportText = werte.join(";");
-    const meldung = erfolg(werte.length);
+  async function copyListToClipboard(values, { successMessage, errorLogLabel }) {
+    const exportText = values.join(";");
+    const message = successMessage(values.length);
 
     try {
       if (navigator.clipboard?.writeText) {
@@ -692,13 +692,13 @@
       } else {
         copyTextWithFallback(exportText);
       }
-      showToast(meldung);
+      showToast(message);
     } catch (error) {
       try {
         copyTextWithFallback(exportText);
-        showToast(meldung);
+        showToast(message);
       } catch (fallbackError) {
-        console.error(fehlerProtokoll, error, fallbackError);
+        console.error(errorLogLabel, error, fallbackError);
         showToast(
           "Die Zwischenablage ist nicht verfügbar. Bitte prüfen Sie die Browserberechtigung.",
           "error",
@@ -718,11 +718,11 @@
     }
 
     await copyListToClipboard(emailAddresses, {
-      erfolg: (anzahl) =>
-        `${anzahl} E-Mail-Adresse${
-          anzahl === 1 ? "" : "n"
+      successMessage: (count) =>
+        `${count} E-Mail-Adresse${
+          count === 1 ? "" : "n"
         } wurden in die Zwischenablage kopiert.`,
-      fehlerProtokoll: "E-Mail-Adressen konnten nicht kopiert werden.",
+      errorLogLabel: "E-Mail-Adressen konnten nicht kopiert werden.",
     });
   }
 
@@ -737,11 +737,11 @@
     }
 
     await copyListToClipboard(usernames, {
-      erfolg: (anzahl) =>
-        `${anzahl} Benutzername${
-          anzahl === 1 ? "" : "n"
+      successMessage: (count) =>
+        `${count} Benutzername${
+          count === 1 ? "" : "n"
         } wurden in die Zwischenablage kopiert.`,
-      fehlerProtokoll: "Benutzernamen konnten nicht kopiert werden.",
+      errorLogLabel: "Benutzernamen konnten nicht kopiert werden.",
     });
   }
 
@@ -842,7 +842,7 @@
     return `
       <span
         class="avatar avatar-status-${status} ${small ? "avatar-sm" : ""}"
-        style="--avatar-fill: ${employmentPercent}%"
+        ${dynamicStyle({ "--avatar-fill": `${employmentPercent}%` })}
         aria-hidden="true"
         title="${escapeHtml(employeeStatusLabel(employee))} · ${employmentPercent} % Beschäftigungsumfang"
       >
@@ -1027,6 +1027,56 @@
       .join("\r\n");
     downloadTextFile(filename, content, "text/csv;charset=utf-8");
     showToast("CSV-Datei wurde exportiert.");
+  }
+
+  // Dynamische CSS-Werte - Fortschrittsbalken, Diagrammsegmente,
+  // Spaltenzahlen - kommen aus dem Datenbestand und koennen deshalb nicht im
+  // Stylesheet stehen. Statt sie als style-Attribut auszugeben (was
+  // style-src-attr 'unsafe-inline' in der CSP erzwingt), wandern sie als
+  // data-teo-style in das Markup und werden nach dem Einfuegen per
+  // setProperty gesetzt.
+  //
+  // Erlaubt sind ausschliesslich Custom Properties (--name). Damit kann ueber
+  // diesen Weg keine beliebige CSS-Deklaration in die Seite gelangen.
+  function dynamicStyle(properties) {
+    const declarations = Object.entries(properties)
+      .filter(([name, value]) => /^--[a-z0-9-]+$/i.test(name) && value !== "")
+      .map(([name, value]) => `${name}:${String(value).replaceAll(";", "")}`)
+      .join(";");
+    return declarations ? ` data-teo-style="${escapeHtml(declarations)}"` : "";
+  }
+
+  function applyDynamicStyles(root) {
+    if (!root?.querySelectorAll) return;
+    const targets =
+      root.matches?.("[data-teo-style]") === true
+        ? [root, ...root.querySelectorAll("[data-teo-style]")]
+        : [...root.querySelectorAll("[data-teo-style]")];
+    targets.forEach((element) => {
+      element.dataset.teoStyle.split(";").forEach((declaration) => {
+        const separator = declaration.indexOf(":");
+        if (separator < 1) return;
+        const name = declaration.slice(0, separator).trim();
+        if (!/^--[a-z0-9-]+$/i.test(name)) return;
+        element.style.setProperty(name, declaration.slice(separator + 1).trim());
+      });
+      delete element.dataset.teoStyle;
+    });
+  }
+
+  // Ein einzelner Beobachter statt eines Aufrufs hinter jeder der ueber
+  // hundert innerHTML-Zuweisungen: So greift der Mechanismus auch in
+  // Renderpfaden, die spaeter dazukommen. Der Rueckruf laeuft als Microtask
+  // noch vor dem Zeichnen, die Werte sind also nie kurzzeitig ungesetzt.
+  function observeDynamicStyles() {
+    applyDynamicStyles(document.body);
+    new MutationObserver((records) => {
+      records.forEach((record) => {
+        record.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) applyDynamicStyles(node);
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
   }
 
   function escapeHtml(value) {
