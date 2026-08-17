@@ -19,6 +19,7 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       ${exposed},
       setState(value) { state = value; },
       getState() { return state; },
+      getStateMutationSequence() { return stateMutationSequence; },
       setCurrentUser(value) { currentUser = value; },
       setActiveView(value) { activeView = value; },
       getActiveView() { return activeView; },

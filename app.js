@@ -479,12 +479,20 @@
   let automaticBackupPassword = "";
   let automaticBackupTimer = null;
   let automaticBackupRunning = false;
-  let automaticBackupRequestSequence = 0;
+  // Zaehlt erfolgreich gespeicherte Aenderungen am Datenbestand. Die
+  // automatische Sicherung erkennt daran, ob waehrend des Schreibens eine
+  // weitere Aenderung dazugekommen ist. Ein Renderdurchlauf zaehlt bewusst
+  // nicht mit - sonst bliebe die Sicherungserinnerung nach einer erfolgreichen
+  // Sicherung stehen, nur weil zwischendurch neu gezeichnet wurde.
+  let stateMutationSequence = 0;
   let automaticBackupRetryAt = 0;
   let automaticBackupNotice = "";
   let startupBackupSynchronized = false;
   let startupBackupImportRunning = false;
   let browserPersistenceNotice = "";
+  // Beim Laden verworfene Benutzerkonten, damit der Verlust nicht unbemerkt
+  // bleibt. Wird nach dem Start einmalig gemeldet.
+  let discardedUserAccounts = 0;
   let dateInputObserver = null;
   const savedVacationView = readVacationViewPreference();
   let vacationYear = savedVacationView.year;
@@ -1133,6 +1141,13 @@
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
     restoreAuthenticationSession();
+    if (discardedUserAccounts > 0) {
+      showToast(
+        `${discardedUserAccounts} Benutzerkonto/-konten waren ungültig oder doppelt vergeben und wurden nicht übernommen.`,
+        "warning",
+      );
+      discardedUserAccounts = 0;
+    }
     void refreshBackendHealth();
   }
 
@@ -1641,18 +1656,33 @@
       .slice(0, MAX_SCHOOL_VACATION_PERIODS);
   }
 
+  // Ein einzelnes beschaedigtes Konto darf nicht alle uebrigen mitreissen:
+  // Fruher gab diese Funktion in dem Fall eine leere Liste zurueck, wodurch die
+  // Anwendung ohne Hinweis in die Ersteinrichtung zurueckfiel. Ungueltige und
+  // doppelt vergebene Konten werden deshalb einzeln verworfen. Nur wenn danach
+  // kein Administratorkonto mehr uebrig ist, bleibt der Bestand unbrauchbar -
+  // dann ist die Ersteinrichtung tatsaechlich der richtige Weg.
   function normalizeUsers(users) {
     if (!Array.isArray(users)) return initialUsers();
-    const normalized = users.map(normalizeUser).filter(Boolean);
-    const normalizedNames = new Set(
-      normalized.map((user) => user.username.toLocaleLowerCase("de-DE")),
-    );
-    if (
-      normalizedNames.size !== normalized.length ||
-      (normalized.length > 0 &&
-        !normalized.some((user) => user.role === "admin"))
-    ) {
+    const seenNames = new Set();
+    const normalized = [];
+    let discarded = users.length;
+    users.map(normalizeUser).forEach((user) => {
+      if (!user) return;
+      const normalizedName = user.username.toLocaleLowerCase("de-DE");
+      if (seenNames.has(normalizedName)) return;
+      seenNames.add(normalizedName);
+      normalized.push(user);
+    });
+    discarded -= normalized.length;
+    if (!normalized.some((user) => user.role === "admin")) {
       return initialUsers();
+    }
+    if (discarded > 0) {
+      console.warn(
+        `${discarded} Benutzerkonto/-konten waren ungültig oder doppelt vergeben und wurden verworfen.`,
+      );
+      discardedUserAccounts = discarded;
     }
     return normalized;
   }
@@ -2260,6 +2290,7 @@
     appendAuditEntry(describeMutation(previousState, state));
 
     if (await persistState()) {
+      stateMutationSequence += 1;
       databaseSaveReminderArmed = true;
       renderAll();
       scheduleAutomaticBackup();
@@ -13836,7 +13867,6 @@
     ) {
       return;
     }
-    automaticBackupRequestSequence += 1;
     const delay = automaticBackupScheduleDelay();
     automaticBackupTimer = window.setTimeout(() => {
       automaticBackupTimer = null;
@@ -13892,7 +13922,10 @@
       renderAutomaticBackupStatus();
       return false;
     }
-    const requestSequence = automaticBackupRequestSequence;
+    // Merkt sich den Aenderungsstand zu Beginn der Sicherung. Kommt waehrend
+    // des Schreibens eine weitere Aenderung dazu, bleibt die Erinnerung an die
+    // naechste Sicherung bestehen.
+    const mutationSequence = stateMutationSequence;
     if (force) {
       automaticBackupRetryAt = 0;
     } else {
@@ -13977,8 +14010,7 @@
       await persistAutomaticBackupConfiguration();
       automaticBackupRetryAt = 0;
       automaticBackupNotice = "";
-      databaseSaveReminderArmed =
-        automaticBackupRequestSequence !== requestSequence;
+      databaseSaveReminderArmed = stateMutationSequence !== mutationSequence;
       renderAll();
       showToast(
         volume.warning
@@ -15387,14 +15419,13 @@
       renderAll();
       return false;
     }
+    stateMutationSequence += 1;
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
-    employeeSearchTerm = "";
-    completionSearchTerm = "";
-    attendanceSearchTerm = "";
+    resetListFilters();
     selectedCompletionEmployeeIds.clear();
+    selectedEmployeeIds.clear();
     attendanceDraft.clear();
-    elements.employeeSearch.value = "";
     applyTheme(state.settings.theme);
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {
@@ -15840,6 +15871,87 @@
           ),
         ),
       );
+  }
+
+  // Nach einem Import beschreiben die zuvor gesetzten Filter einen anderen
+  // Datenbestand: Eine Namenssuche, eine Kategorie oder ein Bestandsfilter
+  // laesst Listen dann leer wirken, obwohl die Daten vollstaendig vorliegen.
+  // Deshalb gehen alle Listenfilter gemeinsam auf ihre Voreinstellung zurueck.
+  // Sortierungen bleiben bewusst erhalten, sie verbergen keine Datensaetze.
+  //
+  // tools/check.mjs prueft, dass jede Filter- und Suchvariable hier vorkommt,
+  // damit ein spaeter ergaenzter Filter nicht vergessen wird.
+  function resetListFilters() {
+    employeeStatusFilter = "all";
+    employeeSearchTerm = "";
+    employeeProfessionFilter = "all";
+    employeeQualificationFilter = "all";
+    employeeWeekendFilter = "all";
+    elements.employeeSearch.value = "";
+    elements.employeeProfessionFilter.value = employeeProfessionFilter;
+    elements.employeeQualificationFilter.value = employeeQualificationFilter;
+    elements.employeeWeekendFilter.value = employeeWeekendFilter;
+
+    appointmentPeriodFilter = "all";
+    appointmentSearchTerm = "";
+    elements.appointmentSearch.value = "";
+
+    memoSearchTerm = "";
+    memoCategoryFilter = "all";
+    memoStatusFilter = "open";
+    elements.memoSearch.value = "";
+    elements.memoCategoryFilter.value = memoCategoryFilter;
+
+    completionSearchTerm = "";
+    elements.completionEmployeeSearch.value = "";
+
+    attendanceSearchTerm = "";
+    attendanceStatusFilter = "all";
+    elements.attendanceSearch.value = "";
+    elements.attendanceFilter.value = attendanceStatusFilter;
+
+    vacationEmployeeSearchTerm = "";
+    elements.vacationEmployeeSearch.value = "";
+
+    deviceInventoryFilter = "current";
+    deviceAnnexFilter = "all";
+    deviceCategoryFilter = "all";
+    deviceSearchTerm = "";
+    elements.deviceInventoryFilter.value = deviceInventoryFilter;
+    elements.deviceAnnexFilter.value = deviceAnnexFilter;
+    elements.deviceCategoryFilter.value = deviceCategoryFilter;
+    elements.deviceSearch.value = "";
+
+    deviceManagementSearchTerm = "";
+    deviceManagementInventoryFilter = "current";
+    deviceManagementAnnexFilter = "all";
+    deviceManagementCategoryFilter = "all";
+    deviceManagementAuthorizationFilter = "all";
+    elements.deviceManagementSearch.value = "";
+    elements.deviceManagementInventoryFilter.value = deviceManagementInventoryFilter;
+    elements.deviceManagementAnnexFilter.value = deviceManagementAnnexFilter;
+    elements.deviceManagementCategoryFilter.value = deviceManagementCategoryFilter;
+    elements.deviceManagementAuthorizationFilter.value =
+      deviceManagementAuthorizationFilter;
+
+    deviceEmployeeStatusFilter = "employed";
+    deviceEmployeeSearchTerm = "";
+    elements.deviceEmployeeStatusFilter.value = deviceEmployeeStatusFilter;
+    elements.deviceEmployeeSearch.value = "";
+
+    deviceOverviewInstructionFilter = "all";
+    deviceOverviewEmploymentFilter = "employed";
+    deviceOverviewSearchTerm = "";
+    elements.deviceOverviewInstructionFilter.value = deviceOverviewInstructionFilter;
+    elements.deviceOverviewEmploymentFilter.value = deviceOverviewEmploymentFilter;
+    elements.deviceOverviewSearch.value = "";
+
+    deviceParticipantSearchTerm = "";
+    deviceInstructionSearchTerm = "";
+    deviceInstructionDeviceSearchTerm = "";
+    elements.deviceParticipantSearch.value = "";
+    elements.deviceInstructionSearch.value = "";
+    elements.deviceInstructionDeviceSearch.value = "";
   }
 
   function employeeStatusLabel(employee) {

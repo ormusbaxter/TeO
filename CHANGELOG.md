@@ -1,3 +1,10 @@
+### 004.037.003 – Robusterer Import und Kontenprüfung
+
+- **Behoben:** Nach einem Import bleiben keine Filter mehr stehen – zuvor schränkten Suche, Kategorie- und Bestandsfilter den neuen Datenbestand weiter ein und ließen Listen leer wirken
+- **Behoben:** Ein ungültiges oder doppelt vergebenes Benutzerkonto verwirft nicht mehr alle übrigen Konten; verworfene Konten werden nach dem Start gemeldet
+- **Behoben:** Der Hinweis „noch nicht als Datensicherung exportiert“ verschwindet nach einer erfolgreichen automatischen Sicherung wieder zuverlässig
+- **Neu:** Die Strukturprüfung meldet Filter, die beim Import nicht zurückgesetzt werden
+
 ### 004.037.002 – Prüfstrecke gegen toten Code
 
 - **Neu:** Ein GitHub-Workflow führt bei jedem Push `npm run verify` aus und meldet, wenn die erzeugten Dateien nicht mehr zu den Quellen in `src/` passen

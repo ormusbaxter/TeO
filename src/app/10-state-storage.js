@@ -47,6 +47,13 @@
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
     restoreAuthenticationSession();
+    if (discardedUserAccounts > 0) {
+      showToast(
+        `${discardedUserAccounts} Benutzerkonto/-konten waren ungültig oder doppelt vergeben und wurden nicht übernommen.`,
+        "warning",
+      );
+      discardedUserAccounts = 0;
+    }
     void refreshBackendHealth();
   }
 
@@ -555,18 +562,33 @@
       .slice(0, MAX_SCHOOL_VACATION_PERIODS);
   }
 
+  // Ein einzelnes beschaedigtes Konto darf nicht alle uebrigen mitreissen:
+  // Fruher gab diese Funktion in dem Fall eine leere Liste zurueck, wodurch die
+  // Anwendung ohne Hinweis in die Ersteinrichtung zurueckfiel. Ungueltige und
+  // doppelt vergebene Konten werden deshalb einzeln verworfen. Nur wenn danach
+  // kein Administratorkonto mehr uebrig ist, bleibt der Bestand unbrauchbar -
+  // dann ist die Ersteinrichtung tatsaechlich der richtige Weg.
   function normalizeUsers(users) {
     if (!Array.isArray(users)) return initialUsers();
-    const normalized = users.map(normalizeUser).filter(Boolean);
-    const normalizedNames = new Set(
-      normalized.map((user) => user.username.toLocaleLowerCase("de-DE")),
-    );
-    if (
-      normalizedNames.size !== normalized.length ||
-      (normalized.length > 0 &&
-        !normalized.some((user) => user.role === "admin"))
-    ) {
+    const seenNames = new Set();
+    const normalized = [];
+    let discarded = users.length;
+    users.map(normalizeUser).forEach((user) => {
+      if (!user) return;
+      const normalizedName = user.username.toLocaleLowerCase("de-DE");
+      if (seenNames.has(normalizedName)) return;
+      seenNames.add(normalizedName);
+      normalized.push(user);
+    });
+    discarded -= normalized.length;
+    if (!normalized.some((user) => user.role === "admin")) {
       return initialUsers();
+    }
+    if (discarded > 0) {
+      console.warn(
+        `${discarded} Benutzerkonto/-konten waren ungültig oder doppelt vergeben und wurden verworfen.`,
+      );
+      discardedUserAccounts = discarded;
     }
     return normalized;
   }
@@ -1174,6 +1196,7 @@
     appendAuditEntry(describeMutation(previousState, state));
 
     if (await persistState()) {
+      stateMutationSequence += 1;
       databaseSaveReminderArmed = true;
       renderAll();
       scheduleAutomaticBackup();

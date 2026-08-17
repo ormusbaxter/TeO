@@ -204,6 +204,32 @@ assert.deepEqual(
     "Bitte aus const elements entfernen; das HTML-Element selbst kann bleiben.",
 );
 
+// Ein Import ersetzt den gesamten fachlichen Datenbestand. Bleibt dabei ein
+// Filter stehen, wirken Listen leer, obwohl die Daten vollstaendig vorliegen.
+// resetListFilters muss deshalb jede Filter- und Suchvariable abdecken.
+const resetFiltersStart = appSource.indexOf("function resetListFilters()");
+assert.notEqual(
+  resetFiltersStart,
+  -1,
+  "resetListFilters wurde in app.js nicht gefunden",
+);
+const resetFiltersBody = appSource.slice(
+  resetFiltersStart,
+  matchingBraceIndex(appSource, appSource.indexOf("{", resetFiltersStart)),
+);
+const filterVariables = [
+  ...appSource.matchAll(/^\s*let ([A-Za-z0-9_]*(?:SearchTerm|Filter)) = /gm),
+].map((match) => match[1]);
+const unresetFilters = filterVariables.filter(
+  (name) => !new RegExp(`\\b${name} = `).test(resetFiltersBody),
+);
+assert.deepEqual(
+  unresetFilters,
+  [],
+  `Diese Filter setzt resetListFilters nicht zurueck: ${unresetFilters.join(", ")}. ` +
+    "Nach einem Import wuerden sie den neuen Datenbestand weiter einschraenken.",
+);
+
 function matchingBraceIndex(source, openingBraceIndex) {
   let depth = 0;
   for (let index = openingBraceIndex; index < source.length; index += 1) {

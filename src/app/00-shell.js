@@ -478,12 +478,20 @@
   let automaticBackupPassword = "";
   let automaticBackupTimer = null;
   let automaticBackupRunning = false;
-  let automaticBackupRequestSequence = 0;
+  // Zaehlt erfolgreich gespeicherte Aenderungen am Datenbestand. Die
+  // automatische Sicherung erkennt daran, ob waehrend des Schreibens eine
+  // weitere Aenderung dazugekommen ist. Ein Renderdurchlauf zaehlt bewusst
+  // nicht mit - sonst bliebe die Sicherungserinnerung nach einer erfolgreichen
+  // Sicherung stehen, nur weil zwischendurch neu gezeichnet wurde.
+  let stateMutationSequence = 0;
   let automaticBackupRetryAt = 0;
   let automaticBackupNotice = "";
   let startupBackupSynchronized = false;
   let startupBackupImportRunning = false;
   let browserPersistenceNotice = "";
+  // Beim Laden verworfene Benutzerkonten, damit der Verlust nicht unbemerkt
+  // bleibt. Wird nach dem Start einmalig gemeldet.
+  let discardedUserAccounts = 0;
   let dateInputObserver = null;
   const savedVacationView = readVacationViewPreference();
   let vacationYear = savedVacationView.year;

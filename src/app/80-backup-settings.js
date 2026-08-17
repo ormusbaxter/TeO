@@ -439,7 +439,6 @@
     ) {
       return;
     }
-    automaticBackupRequestSequence += 1;
     const delay = automaticBackupScheduleDelay();
     automaticBackupTimer = window.setTimeout(() => {
       automaticBackupTimer = null;
@@ -495,7 +494,10 @@
       renderAutomaticBackupStatus();
       return false;
     }
-    const requestSequence = automaticBackupRequestSequence;
+    // Merkt sich den Aenderungsstand zu Beginn der Sicherung. Kommt waehrend
+    // des Schreibens eine weitere Aenderung dazu, bleibt die Erinnerung an die
+    // naechste Sicherung bestehen.
+    const mutationSequence = stateMutationSequence;
     if (force) {
       automaticBackupRetryAt = 0;
     } else {
@@ -580,8 +582,7 @@
       await persistAutomaticBackupConfiguration();
       automaticBackupRetryAt = 0;
       automaticBackupNotice = "";
-      databaseSaveReminderArmed =
-        automaticBackupRequestSequence !== requestSequence;
+      databaseSaveReminderArmed = stateMutationSequence !== mutationSequence;
       renderAll();
       showToast(
         volume.warning
@@ -1990,14 +1991,13 @@
       renderAll();
       return false;
     }
+    stateMutationSequence += 1;
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
-    employeeSearchTerm = "";
-    completionSearchTerm = "";
-    attendanceSearchTerm = "";
+    resetListFilters();
     selectedCompletionEmployeeIds.clear();
+    selectedEmployeeIds.clear();
     attendanceDraft.clear();
-    elements.employeeSearch.value = "";
     applyTheme(state.settings.theme);
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {
