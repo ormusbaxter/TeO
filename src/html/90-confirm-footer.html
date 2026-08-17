@@ -178,10 +178,13 @@
       </div>
     </noscript>
 
-    <script src="project-meta.js"></script>
-    <script src="state-schema.js"></script>
-    <script src="vendor/localforage.min.js"></script>
-    <script src="backend-client.js"></script>
-    <script src="app.js"></script>
+    <!-- defer: Die Skripte werden waehrend des Parsens geladen und erst danach
+         ausgefuehrt. Die Reihenfolge bleibt dabei erhalten, worauf app.js
+         angewiesen ist. -->
+    <script src="project-meta.js" defer></script>
+    <script src="state-schema.js" defer></script>
+    <script src="vendor/localforage.min.js" defer></script>
+    <script src="backend-client.js" defer></script>
+    <script src="app.js" defer></script>
   </body>
 </html>

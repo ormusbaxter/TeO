@@ -41,10 +41,13 @@ new vm.Script(generatedMeta, { filename: "project-meta.js" }).runInContext(
 
 const ids = [...htmlSource.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
 assert.equal(new Set(ids).size, ids.length, "index.html enthält doppelte IDs");
+// defer behaelt die Reihenfolge bei, deshalb genuegt weiterhin die
+// Reihenfolge im Dokument. Ohne defer wuerde das Laden der Skripte das
+// Parsen der 240 KB grossen Seite blockieren.
 assert.match(
   htmlSource,
-  /<script src="project-meta\.js"><\/script>[\s\S]*<script src="state-schema\.js"><\/script>[\s\S]*<script src="app\.js"><\/script>/,
-  "Projektmetadaten und Datenvertrag müssen vor app.js geladen werden",
+  /<script src="project-meta\.js" defer><\/script>[\s\S]*<script src="state-schema\.js" defer><\/script>[\s\S]*<script src="app\.js" defer><\/script>/,
+  "Projektmetadaten und Datenvertrag müssen mit defer und vor app.js geladen werden",
 );
 assert.equal(
   (cssSource.match(/{/g) || []).length,

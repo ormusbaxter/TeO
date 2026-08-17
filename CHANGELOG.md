@@ -1,3 +1,8 @@
+### 004.037.006 – Schnellerer Start
+
+- **Neu:** Der TeO-Server komprimiert Oberfläche und Programmdateien; die Startlast sinkt von rund 1 MB auf etwa 210 KB
+- **Verbessert:** Die Skripte werden mit `defer` geladen und blockieren den Seitenaufbau nicht mehr
+
 ### 004.037.005 – Offlinebetrieb
 
 - **Neu:** TeO läuft ohne Netzverbindung weiter und lässt sich als App installieren; Oberfläche und Programmdateien liegen in einem versionierten Zwischenspeicher
