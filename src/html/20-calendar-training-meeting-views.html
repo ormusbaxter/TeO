@@ -28,28 +28,104 @@
                 autocomplete="off"
               />
             </label>
-            <div
-              class="segmented-control appointment-filter-control"
-              role="group"
-              aria-label="Termine nach Zeitraum filtern"
-            >
-              <button class="is-active" type="button" data-appointment-filter="all" aria-pressed="true">
-                Alle
-              </button>
-              <button type="button" data-appointment-filter="upcoming" aria-pressed="false">
-                Anstehend
-              </button>
-              <button type="button" data-appointment-filter="today" aria-pressed="false">
-                Heute
-              </button>
-              <button type="button" data-appointment-filter="past" aria-pressed="false">
-                Vergangen
-              </button>
+            <div class="appointment-toolbar-controls">
+              <div
+                class="segmented-control appointment-filter-control"
+                role="group"
+                aria-label="Termine nach Zeitraum filtern"
+              >
+                <button class="is-active" type="button" data-appointment-filter="all" aria-pressed="true">
+                  Alle
+                </button>
+                <button type="button" data-appointment-filter="upcoming" aria-pressed="false">
+                  Anstehend
+                </button>
+                <button type="button" data-appointment-filter="today" aria-pressed="false">
+                  Heute
+                </button>
+                <button type="button" data-appointment-filter="past" aria-pressed="false">
+                  Vergangen
+                </button>
+              </div>
+              <div
+                class="segmented-control appointment-view-control"
+                role="group"
+                aria-label="Darstellung der Termine wählen"
+              >
+                <button
+                  class="is-active"
+                  type="button"
+                  data-appointment-view="list"
+                  aria-pressed="true"
+                  title="Termine als Liste anzeigen"
+                >
+                  <svg><use href="#icon-memo"></use></svg>
+                  Liste
+                </button>
+                <button
+                  type="button"
+                  data-appointment-view="calendar"
+                  aria-pressed="false"
+                  title="Termine als Monatskalender anzeigen"
+                >
+                  <svg><use href="#icon-calendar"></use></svg>
+                  Kalender
+                </button>
+              </div>
             </div>
           </div>
 
           <div class="training-summary" id="appointmentSummary"></div>
           <section class="meeting-list" id="appointmentList"></section>
+          <section
+            class="panel appointment-calendar"
+            id="appointmentCalendar"
+            aria-label="Terminkalender als Monatsübersicht"
+            hidden
+          >
+            <header class="appointment-calendar-header">
+              <div class="appointment-calendar-nav">
+                <button
+                  class="icon-button"
+                  id="appointmentCalendarPreviousButton"
+                  type="button"
+                  aria-label="Vorheriger Monat"
+                  title="Vorheriger Monat"
+                >
+                  <svg class="appointment-calendar-chevron-back"><use href="#icon-chevron"></use></svg>
+                </button>
+                <h2 id="appointmentCalendarLabel" aria-live="polite">Monat</h2>
+                <button
+                  class="icon-button"
+                  id="appointmentCalendarNextButton"
+                  type="button"
+                  aria-label="Nächster Monat"
+                  title="Nächster Monat"
+                >
+                  <svg><use href="#icon-chevron"></use></svg>
+                </button>
+              </div>
+              <button
+                class="button button-secondary button-compact"
+                id="appointmentCalendarTodayButton"
+                type="button"
+                title="Zum laufenden Monat springen"
+              >
+                Heute
+              </button>
+            </header>
+            <div class="appointment-calendar-weekdays" aria-hidden="true">
+              <span>Mo</span>
+              <span>Di</span>
+              <span>Mi</span>
+              <span>Do</span>
+              <span>Fr</span>
+              <span>Sa</span>
+              <span>So</span>
+            </div>
+            <div class="appointment-calendar-grid" id="appointmentCalendarGrid"></div>
+            <p class="appointment-calendar-note" id="appointmentCalendarNote"></p>
+          </section>
         </section>
 
         <section class="view" id="memosView" data-view-panel="memos">

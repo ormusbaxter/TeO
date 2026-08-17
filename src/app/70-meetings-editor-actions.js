@@ -1130,13 +1130,16 @@
     });
   }
 
-  function openAppointmentDialog(appointmentId = null) {
+  // date belegt das Datumsfeld eines neuen Termins vor - so legt ein Klick auf
+  // einen Tag im Monatskalender den Termin gleich dort an.
+  function openAppointmentDialog(appointmentId = null, { date = "" } = {}) {
     renderAppointmentCategoryOptions();
     elements.appointmentForm.reset();
     document.querySelector("#appointmentId").value = "";
     document.querySelector("#appointmentTitle").setCustomValidity("");
     document.querySelector("#appointmentEndTime").setCustomValidity("");
-    document.querySelector("#appointmentDate").value = todayIso();
+    document.querySelector("#appointmentDate").value =
+      parseLocalDate(date) ? date : todayIso();
     elements.appointmentParticipantList.checked = false;
     elements.appointmentPinned.checked = false;
 

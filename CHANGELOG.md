@@ -1,3 +1,10 @@
+### 004.039.000 – Terminkalender als Monatsansicht
+
+- **Neu:** Der Terminkalender lässt sich zwischen der Liste und einem Monatsraster mit einem Feld je Tag umschalten; die Auswahl und der angesehene Monat bleiben im Browser gespeichert
+- **Neu:** Im Monatsraster legt ein Klick auf einen Tag einen Termin für genau diesen Tag an, ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten
+- **Neu:** Das Monatsraster hebt den heutigen Tag hervor, setzt Wochenenden und Feiertage in Nordrhein-Westfalen ab und klappt ab dem vierten Termin eines Tages den Rest über „+n weitere“ auf
+- **Verbessert:** Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar
+
 ### 004.038.000 – Farbthema je Benutzerkonto
 
 - **Neu:** Das Farbthema gehört zum Benutzerkonto: Jede Anmeldung bringt die eigene Auswahl mit, an jedem Arbeitsplatz, ohne die Ansicht der übrigen Konten zu verändern
