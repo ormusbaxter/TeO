@@ -880,13 +880,16 @@ solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen
 angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben
 unabhängig davon verfügbar.
 
-Beim Start in der lokalen Browser-Betriebsart verlangt TeO nach der Anmeldung
-die Auswahl von `teo-autosicherung.json`. Die Bedienoberfläche bleibt gesperrt,
-bis die Datei erfolgreich geprüft, gegebenenfalls mit dem beim Login
-entsperrten Schlüssel entschlüsselt und als aktueller Datenbestand übernommen
-wurde. Eine Sicherung, die älter als der zuletzt lokal gesicherte Stand ist,
-wird abgewiesen. In der MariaDB-Betriebsart übernimmt stattdessen der Server den
-verbindlichen Startabgleich.
+Beim Start in der lokalen Browser-Betriebsart sucht TeO nach der Anmeldung
+zuerst im zuletzt verknüpften Sicherungsordner nach `teo-autosicherung.json` und
+lädt sie ohne zusätzliche Auswahl. Nur wenn der Ordnerzugriff nicht mehr gilt,
+die Datei dort fehlt oder nicht gelesen werden kann, erscheint die Dateiauswahl.
+Die Bedienoberfläche bleibt bis zum erfolgreichen Abgleich gesperrt. Die Datei
+wird geprüft, gegebenenfalls mit dem beim Login entsperrten Schlüssel
+entschlüsselt und als aktueller Datenbestand übernommen. Eine Sicherung, die
+älter als der zuletzt lokal gesicherte Stand ist, wird abgewiesen. In der
+MariaDB-Betriebsart übernimmt stattdessen der Server den verbindlichen
+Startabgleich.
 
 ### Sicherung prüfen
 
@@ -1022,11 +1025,12 @@ Die Datenqualitätsprüfung sucht unter anderem nach:
 
 ### Welche Datei muss ich nach der Anmeldung auswählen?
 
-Im lokalen Browserbetrieb erwartet TeO die gemeinsame Datei
-`teo-autosicherung.json`. Wählen Sie genau diese Datei aus dem zuvor
-festgelegten Sicherungs- oder Netzordner. Erst nach erfolgreicher Prüfung und
-Übernahme wird die Anwendung freigegeben. Im MariaDB-Betrieb entfällt diese
-Auswahl, weil der Server bereits den verbindlichen Datenstand liefert.
+Im lokalen Browserbetrieb lädt TeO die gemeinsame Datei
+`teo-autosicherung.json` automatisch aus dem zuletzt verknüpften Sicherungsordner.
+Eine Auswahl ist nur erforderlich, wenn die gespeicherte Freigabe nicht mehr
+gilt, die Datei fehlt oder nicht gelesen werden kann. Erst nach erfolgreicher
+Prüfung und Übernahme wird die Anwendung freigegeben. Im MariaDB-Betrieb entfällt
+dieser Startabgleich, weil der Server bereits den verbindlichen Datenstand liefert.
 
 ### Warum lässt sich der Startabgleich nicht überspringen?
 

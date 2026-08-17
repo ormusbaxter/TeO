@@ -1118,20 +1118,97 @@
     return !Number.isFinite(importedAt) || importedAt < currentAt;
   }
 
+  async function findStartupBackupFileInSavedDirectory(
+    directoryHandle = automaticBackupDirectoryHandle,
+    requestPermission = false,
+  ) {
+    if (!directoryHandle) return { status: "directory-missing" };
+
+    try {
+      if (typeof directoryHandle.queryPermission === "function") {
+        const descriptor = { mode: "read" };
+        let permission = await directoryHandle.queryPermission(descriptor);
+        if (
+          permission !== "granted" &&
+          requestPermission &&
+          typeof directoryHandle.requestPermission === "function"
+        ) {
+          permission = await directoryHandle.requestPermission(descriptor);
+        }
+        if (permission !== "granted") {
+          return { status: "permission-required" };
+        }
+      }
+      const fileHandle = await directoryHandle.getFileHandle(
+        AUTO_BACKUP_FILENAME,
+        { create: false },
+      );
+      return { status: "found", file: await fileHandle.getFile() };
+    } catch (error) {
+      if (error?.name === "NotFoundError") return { status: "file-missing" };
+      console.warn(
+        "Die Sicherungsdatei konnte am gespeicherten Ort nicht gelesen werden.",
+        error,
+      );
+      return { status: "read-failed" };
+    }
+  }
+
+  function startupBackupFallbackMessage(status) {
+    if (status === "permission-required") {
+      return "Der zuletzt verwendete Sicherungsordner muss erneut freigegeben werden. Bitte wählen Sie teo-autosicherung.json aus.";
+    }
+    if (status === "file-missing") {
+      return "Im zuletzt verwendeten Sicherungsordner wurde teo-autosicherung.json nicht gefunden. Bitte wählen Sie die Datei aus.";
+    }
+    if (status === "read-failed") {
+      return "Der zuletzt verwendete Sicherungsordner konnte nicht gelesen werden. Bitte wählen Sie teo-autosicherung.json aus.";
+    }
+    return "";
+  }
+
+  async function synchronizeStartupBackupFromSavedDirectory({
+    requestPermission = false,
+  } = {}) {
+    document.body.classList.add("is-auth-locked");
+    const located = await findStartupBackupFileInSavedDirectory(
+      automaticBackupDirectoryHandle,
+      requestPermission,
+    );
+    if (!currentUser || startupBackupSynchronized) return false;
+
+    if (located.status !== "found") {
+      showStartupBackupDialog(startupBackupFallbackMessage(located.status));
+      return false;
+    }
+
+    elements.startupBackupStatus.textContent =
+      "Gespeicherte Sicherungsdatei wird automatisch geladen …";
+    const synchronized = await synchronizeStartupBackupFile(located.file);
+    if (!synchronized && currentUser && !startupBackupSynchronized) {
+      showStartupBackupDialog(elements.startupBackupStatus.textContent);
+    }
+    return synchronized;
+  }
+
   async function handleStartupBackupFileSelection(event) {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file || startupBackupImportRunning) return;
+    await synchronizeStartupBackupFile(file);
+  }
+
+  async function synchronizeStartupBackupFile(file) {
+    if (!file || startupBackupImportRunning) return false;
 
     if (file.name.toLocaleLowerCase("de-DE") !== AUTO_BACKUP_FILENAME) {
       elements.startupBackupStatus.textContent =
         `Bitte wählen Sie die Datei „${AUTO_BACKUP_FILENAME}“ aus.`;
-      return;
+      return false;
     }
     const volume = backupVolumeAssessment(file.size);
     if (volume.exceeded) {
       elements.startupBackupStatus.textContent = backupVolumeMessage(volume);
-      return;
+      return false;
     }
 
     startupBackupImportRunning = true;
@@ -1142,18 +1219,18 @@
       if (!importedState) {
         elements.startupBackupStatus.textContent =
           "Der Startabgleich wurde nicht abgeschlossen.";
-        return;
+        return false;
       }
       if (startupBackupIsOlder(importedState)) {
         elements.startupBackupStatus.textContent =
           "Diese Sicherungsdatei ist älter als der zuletzt lokal gesicherte Datenstand. Bitte wählen Sie die aktuelle Datei aus.";
-        return;
+        return false;
       }
       elements.startupBackupStatus.textContent = "Datenbestand wird übernommen …";
       if (!(await importDatabase(importedState))) {
         elements.startupBackupStatus.textContent =
           "Der Datenbestand konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.";
-        return;
+        return false;
       }
 
       startupBackupSynchronized = true;
@@ -1169,10 +1246,12 @@
           : "Der aktuelle Datenbestand wurde aus teo-autosicherung.json geladen.",
         volume.warning ? "warning" : undefined,
       );
+      return true;
     } catch (error) {
       console.warn("Startabgleich konnte nicht abgeschlossen werden.", error);
       elements.startupBackupStatus.textContent =
         error.message || "Die Sicherungsdatei ist ungültig.";
+      return false;
     } finally {
       startupBackupImportRunning = false;
       elements.selectStartupBackupFileButton.disabled = false;
