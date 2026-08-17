@@ -49,7 +49,13 @@ jobs:
 
       # Enthält npm run verify: Build, Strukturprüfung und Tests. Schlägt eine
       # der Prüfungen fehl, entsteht keine Veröffentlichung.
+      #
+      # Ausdrücklich in Windows PowerShell: Der Standard von Actions ist
+      # PowerShell 7, und das Paketskript startet seinerseits powershell.exe.
+      # Die geerbte Modulsuche der 7er lässt die 5.1 dann ihre eigenen
+      # Standardbefehle nicht mehr finden - Get-FileHash etwa.
       - name: Paket bauen
+        shell: powershell
         run: npm run release:package
 
       - name: Titel und Text bestimmen
