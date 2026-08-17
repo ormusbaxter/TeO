@@ -717,6 +717,9 @@
     deviceMatrixMaximizeLabel: document.querySelector("#deviceMatrixMaximizeLabel"),
     deviceManagementSummary: document.querySelector("#deviceManagementSummary"),
     deviceCatalog: document.querySelector("#deviceCatalog"),
+    exportDeviceCatalogExcelButton: document.querySelector(
+      "#exportDeviceCatalogExcelButton",
+    ),
     deviceInstructionMatrix: document.querySelector("#deviceInstructionMatrix"),
     deviceInstructionList: document.querySelector("#deviceInstructionList"),
     deviceInstructionSearch: document.querySelector("#deviceInstructionSearch"),
@@ -2923,6 +2926,10 @@
         .toLocaleLowerCase("de-DE");
       renderDevices();
     });
+    elements.exportDeviceCatalogExcelButton.addEventListener(
+      "click",
+      exportDeviceCatalogExcel,
+    );
     elements.deviceManagementInventoryFilter.addEventListener(
       "change",
       (event) => {
@@ -9563,6 +9570,104 @@
           a.productName.localeCompare(b.productName, "de") ||
           a.manufacturer.localeCompare(b.manufacturer, "de"),
       );
+  }
+
+  function createDeviceExcelWorkbook(devices = state.devices) {
+    const headers = [
+      "ID bzw. Nummer",
+      "Hersteller",
+      "Produktname",
+      "Gerätekategorie",
+      "Anlage 1",
+      "aktuell",
+    ];
+    const rows = [...devices]
+      .sort(
+        (a, b) =>
+          a.productName.localeCompare(b.productName, "de") ||
+          a.manufacturer.localeCompare(b.manufacturer, "de") ||
+          a.id.localeCompare(b.id, "de"),
+      )
+      .map((device) => [
+        device.id,
+        device.manufacturer,
+        device.productName,
+        device.category,
+        device.annex1 ? "Ja" : "Nein",
+        device.currentInventory ? "Ja" : "Nein",
+      ]);
+    const escapeXml = (value) =>
+      String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&apos;");
+    const renderRow = (values, styleId) =>
+      `<Row>${values
+        .map(
+          (value) =>
+            `<Cell ss:StyleID="${styleId}"><Data ss:Type="String">${escapeXml(value)}</Data></Cell>`,
+        )
+        .join("")}</Row>`;
+    const rowCount = rows.length + 1;
+
+    return `\uFEFF<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center" />
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#222222" />
+  </Style>
+  <Style ss:ID="Header">
+   <Alignment ss:Vertical="Center" />
+   <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#A6A6A6" /></Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Bold="1" ss:Color="#222222" />
+   <Interior ss:Color="#E7E6E6" ss:Pattern="Solid" />
+  </Style>
+  <Style ss:ID="Data">
+   <Alignment ss:Vertical="Center" ss:WrapText="1" />
+   <Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9" /></Borders>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Geräte">
+  <Table ss:ExpandedColumnCount="6" ss:ExpandedRowCount="${rowCount}" x:FullColumns="1" x:FullRows="1">
+   <Column ss:Width="150" />
+   <Column ss:Width="120" />
+   <Column ss:Width="150" />
+   <Column ss:Width="130" />
+   <Column ss:Width="70" />
+   <Column ss:Width="70" />
+   ${renderRow(headers, "Header")}
+   ${rows.map((row) => renderRow(row, "Data")).join("\n   ")}
+  </Table>
+  <AutoFilter x:Range="R1C1:R${rowCount}C6" xmlns="urn:schemas-microsoft-com:office:excel" />
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <FreezePanes />
+   <FrozenNoSplit />
+   <SplitHorizontal>1</SplitHorizontal>
+   <TopRowBottomPane>1</TopRowBottomPane>
+   <ActivePane>2</ActivePane>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>`;
+  }
+
+  function exportDeviceCatalogExcel() {
+    const workbook = createDeviceExcelWorkbook(state.devices);
+    const date = new Date().toISOString().slice(0, 10);
+    downloadTextFile(
+      `TeO-Geraetekatalog-${date}.xls`,
+      workbook,
+      "application/vnd.ms-excel;charset=utf-8",
+    );
+    showToast(
+      `${state.devices.length} Gerät${state.devices.length === 1 ? "" : "e"} wurden nach Excel exportiert.`,
+    );
   }
 
   function renderDeviceCard(device) {

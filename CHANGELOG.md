@@ -1,3 +1,8 @@
+### 004.036.000 – Excel-Export der Geräteverwaltung
+
+- **Neu:** Der vollständige Gerätekatalog lässt sich unabhängig von den gesetzten Filtern als Excel-Datei exportieren
+- **Neu:** Die neutral formatierte Tabelle enthält ID bzw. Nummer, Hersteller, Produktname, Gerätekategorie, Anlage-1-Status und aktuellen Bestandsstatus
+
 ### 004.035.002 – Primäraktion der Pflichtfortbildungen
 
 - **Verbessert:** „Abschluss eintragen“ steht jetzt an der prominenten Aktionsposition und verwendet den Primärstil

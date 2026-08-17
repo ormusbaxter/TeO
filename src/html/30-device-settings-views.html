@@ -129,10 +129,20 @@
                 Gerätebestand, Kategorien und Anlage-1-Kennzeichnung verwalten.
               </p>
             </div>
-            <button class="button button-primary" type="button" data-open-device>
-              <svg><use href="#icon-plus"></use></svg>
-              Gerät anlegen
-            </button>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="exportDeviceCatalogExcelButton"
+                type="button"
+              >
+                <svg><use href="#icon-spreadsheet"></use></svg>
+                Export Excel
+              </button>
+              <button class="button button-primary" type="button" data-open-device>
+                <svg><use href="#icon-plus"></use></svg>
+                Gerät anlegen
+              </button>
+            </div>
           </div>
 
           <div class="training-summary" id="deviceManagementSummary"></div>

@@ -71,6 +71,10 @@
       <symbol id="icon-download" viewBox="0 0 24 24">
         <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
       </symbol>
+      <symbol id="icon-spreadsheet" viewBox="0 0 24 24">
+        <rect x="4" y="3" width="16" height="18" rx="2" />
+        <path d="M4 9h16M4 14h16M10 9v12" />
+      </symbol>
       <symbol id="icon-upload" viewBox="0 0 24 24">
         <path d="M12 16V4M7 9l5-5 5 5M5 21h14" />
       </symbol>
@@ -1075,10 +1079,20 @@
                 Gerätebestand, Kategorien und Anlage-1-Kennzeichnung verwalten.
               </p>
             </div>
-            <button class="button button-primary" type="button" data-open-device>
-              <svg><use href="#icon-plus"></use></svg>
-              Gerät anlegen
-            </button>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="exportDeviceCatalogExcelButton"
+                type="button"
+              >
+                <svg><use href="#icon-spreadsheet"></use></svg>
+                Export Excel
+              </button>
+              <button class="button button-primary" type="button" data-open-device>
+                <svg><use href="#icon-plus"></use></svg>
+                Gerät anlegen
+              </button>
+            </div>
           </div>
 
           <div class="training-summary" id="deviceManagementSummary"></div>
@@ -2109,6 +2123,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-036-000-excel-export-der-gerateverwaltung">004.036.000 – Excel-Export der Geräteverwaltung</h3>
+<ul><li><strong>Neu:</strong> Der vollständige Gerätekatalog lässt sich unabhängig von den gesetzten Filtern als Excel-Datei exportieren</li><li><strong>Neu:</strong> Die neutral formatierte Tabelle enthält ID bzw. Nummer, Hersteller, Produktname, Gerätekategorie, Anlage-1-Status und aktuellen Bestandsstatus</li></ul>
 <h3 id="hilfe-004-035-002-primaraktion-der-pflichtfortbildungen">004.035.002 – Primäraktion der Pflichtfortbildungen</h3>
 <ul><li><strong>Verbessert:</strong> „Abschluss eintragen“ steht jetzt an der prominenten Aktionsposition und verwendet den Primärstil</li><li><strong>Verbessert:</strong> „Fortbildung anlegen“ steht davor und verwendet den zurückhaltenderen Sekundärstil</li></ul>
 <h3 id="hilfe-004-035-001-erkennbares-symbol-fur-wichtige-termine">004.035.001 – Erkennbares Symbol für wichtige Termine</h3>
