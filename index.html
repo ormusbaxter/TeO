@@ -2255,6 +2255,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-037-007-sicherungszeitpunkt-und-datenbankabgleich">004.037.007 – Sicherungszeitpunkt und Datenbankabgleich</h3>
+<ul><li><strong>Behoben:</strong> Lässt sich der Sicherungszeitpunkt nach einer automatischen Sicherung nicht speichern, gilt der Bestand nicht mehr fälschlich als gesichert; ein Serverkonflikt wird sofort statt bei der nächsten Änderung behandelt</li><li><strong>Verbessert:</strong> Der Datenbankabgleich vergleicht Datensätze unabhängig von der Feldreihenfolge – eine Umsortierung im Client schreibt nicht mehr den gesamten Bestand neu</li></ul>
 <h3 id="hilfe-004-037-006-schnellerer-start">004.037.006 – Schnellerer Start</h3>
 <ul><li><strong>Neu:</strong> Der TeO-Server komprimiert Oberfläche und Programmdateien; die Startlast sinkt von rund 1 MB auf etwa 210 KB</li><li><strong>Verbessert:</strong> Die Skripte werden mit <code>defer</code> geladen und blockieren den Seitenaufbau nicht mehr</li></ul>
 <h3 id="hilfe-004-037-005-offlinebetrieb">004.037.005 – Offlinebetrieb</h3>

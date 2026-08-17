@@ -2330,15 +2330,19 @@
     return false;
   }
 
+  // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn
+  // gezielt wieder entfernen kann, wenn das Speichern anschliessend scheitert.
   function appendAuditEntry(action) {
-    if (!action) return;
+    if (!action) return "";
+    const id = createId();
     state.auditLog.unshift({
-      id: createId(),
+      id,
       timestamp: new Date().toISOString(),
       username: currentUser?.username || "System",
       action,
     });
     state.auditLog = state.auditLog.slice(0, MAX_AUDIT_LOG_ENTRIES);
+    return id;
   }
 
   function describeMutation(before, after) {
@@ -14027,13 +14031,34 @@
         fileContent,
       );
 
+      // Die Datei liegt geschrieben vor, der Zeitstempel muss aber auch in den
+      // Datenbestand. Scheitert das, darf der lokale Stand nicht so tun, als
+      // waere gesichert worden - und der vom Server geladene Konfliktstand darf
+      // nicht bis zur naechsten Mutation unbeachtet liegen bleiben, sonst
+      // verwirft er dort eine Eingabe ohne erkennbaren Zusammenhang.
+      const previousLastBackupAt = state.settings.lastBackupAt;
       state.settings.lastBackupAt = exportedAt.toISOString();
-      appendAuditEntry(
+      const auditEntryId = appendAuditEntry(
         automaticBackupSettings.encrypted
           ? "Verschlüsselte automatische Datensicherung exportiert"
           : "Automatische Datensicherung exportiert",
       );
-      await persistState();
+      if (!(await persistState())) {
+        if (pendingRemoteConflictState) {
+          state = pendingRemoteConflictState;
+          pendingRemoteConflictState = null;
+        } else {
+          state.settings.lastBackupAt = previousLastBackupAt;
+          state.auditLog = state.auditLog.filter(
+            (entry) => entry.id !== auditEntryId,
+          );
+        }
+        const error = new Error(
+          "Die Sicherungsdatei wurde geschrieben, der Sicherungszeitpunkt konnte aber nicht gespeichert werden.",
+        );
+        error.code = "backup_timestamp_not_persisted";
+        throw error;
+      }
       automaticBackupSettings.lastBackupAt = exportedAt.toISOString();
       automaticBackupSettings.lastBackupSizeBytes = volume.sizeBytes;
       await persistAutomaticBackupConfiguration();
@@ -14051,10 +14076,12 @@
     } catch (error) {
       console.error("Die automatische Datensicherung ist fehlgeschlagen.", error);
       automaticBackupRetryAt = Date.now() + 60 * 60 * 1000;
-      automaticBackupNotice =
-        error?.code === "backup_volume_exceeded"
-          ? error.message
-          : "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
+      automaticBackupNotice = [
+        "backup_volume_exceeded",
+        "backup_timestamp_not_persisted",
+      ].includes(error?.code)
+        ? error.message
+        : "Automatische Sicherung fehlgeschlagen – Ordnerzugriff und freien Speicher prüfen.";
       showToast(automaticBackupNotice, "error");
       return false;
     } finally {

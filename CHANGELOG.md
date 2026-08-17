@@ -1,3 +1,8 @@
+### 004.037.007 – Sicherungszeitpunkt und Datenbankabgleich
+
+- **Behoben:** Lässt sich der Sicherungszeitpunkt nach einer automatischen Sicherung nicht speichern, gilt der Bestand nicht mehr fälschlich als gesichert; ein Serverkonflikt wird sofort statt bei der nächsten Änderung behandelt
+- **Verbessert:** Der Datenbankabgleich vergleicht Datensätze unabhängig von der Feldreihenfolge – eine Umsortierung im Client schreibt nicht mehr den gesamten Bestand neu
+
 ### 004.037.006 – Schnellerer Start
 
 - **Neu:** Der TeO-Server komprimiert Oberfläche und Programmdateien; die Startlast sinkt von rund 1 MB auf etwa 210 KB

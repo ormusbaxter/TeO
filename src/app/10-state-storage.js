@@ -1236,15 +1236,19 @@
     return false;
   }
 
+  // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn
+  // gezielt wieder entfernen kann, wenn das Speichern anschliessend scheitert.
   function appendAuditEntry(action) {
-    if (!action) return;
+    if (!action) return "";
+    const id = createId();
     state.auditLog.unshift({
-      id: createId(),
+      id,
       timestamp: new Date().toISOString(),
       username: currentUser?.username || "System",
       action,
     });
     state.auditLog = state.auditLog.slice(0, MAX_AUDIT_LOG_ENTRIES);
+    return id;
   }
 
   function describeMutation(before, after) {
