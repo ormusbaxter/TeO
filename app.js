@@ -1117,7 +1117,7 @@
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     window.addEventListener("beforeunload", handleBeforeUnload);
     initializeFormattedDateInputs();
-    applyTheme(state.settings.theme);
+    applyTheme(activeThemeKey());
     renderProjectMetadata();
 
     const today = todayIso();
@@ -1731,11 +1731,19 @@
       passwordSalt,
       passwordHash,
       mustChangePassword: Boolean(user.mustChangePassword),
+      theme: normalizeUserTheme(user.theme),
     };
   }
 
   function normalizeTheme(theme) {
     return Object.hasOwn(THEMES, theme) ? theme : "standard";
+  }
+
+  // Das Farbthema eines Kontos darf leer bleiben. Leer heisst nicht
+  // "Standard", sondern "noch keine eigene Wahl getroffen" - dann gilt die
+  // gemeinsame Vorgabe aus den Einstellungen.
+  function normalizeUserTheme(theme) {
+    return Object.hasOwn(THEMES, theme) ? theme : "";
   }
 
   function normalizeServiceWeekendName(value, fallback) {
@@ -2301,10 +2309,18 @@
     return true;
   }
 
-  async function commitStateMutation(mutate) {
+  // auditAction ersetzt die automatisch ermittelte Beschreibung. Eine leere
+  // Zeichenkette laesst den Protokolleintrag ganz weg - fuer Aenderungen, die
+  // nur die Anzeige eines einzelnen Kontos betreffen und den fachlichen
+  // Datenbestand unberuehrt lassen.
+  async function commitStateMutation(mutate, { auditAction } = {}) {
     const previousState = JSON.parse(JSON.stringify(state));
     mutate();
-    appendAuditEntry(describeMutation(previousState, state));
+    appendAuditEntry(
+      auditAction === undefined
+        ? describeMutation(previousState, state)
+        : auditAction,
+    );
 
     if (await persistState()) {
       stateMutationSequence += 1;
@@ -2514,7 +2530,7 @@
     });
     elements.mobileThemeButton.addEventListener("click", () => {
       const themes = Object.keys(THEMES);
-      const currentIndex = themes.indexOf(state.settings.theme);
+      const currentIndex = themes.indexOf(activeThemeKey());
       changeTheme(themes[(currentIndex + 1) % themes.length]);
     });
 
@@ -3462,7 +3478,6 @@
 
       state = await loadState();
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
-      applyTheme(state.settings.theme);
       if (currentUser) {
         const refreshedUser = state.users.find((user) => user.id === currentUser.id);
         if (!refreshedUser) {
@@ -3470,11 +3485,16 @@
           return;
         }
         currentUser = refreshedUser;
+        // Erst nach dem Auffrischen des Kontos, damit ein an einem anderen
+        // Arbeitsplatz gewaehltes Farbthema uebernommen wird.
+        applyTheme(activeThemeKey());
         if (currentUser.mustChangePassword) {
           completeLogin(currentUser);
           showToast("Das Passwort wurde zurückgesetzt. Bitte legen Sie ein neues Passwort fest.");
           return;
         }
+      } else {
+        applyTheme(activeThemeKey());
       }
       renderAll();
       showToast(
@@ -3536,7 +3556,7 @@
         return;
       }
       currentUser = refreshedUser;
-      applyTheme(state.settings.theme);
+      applyTheme(activeThemeKey());
       if (currentUser.mustChangePassword) {
         completeLogin(currentUser);
         showToast(
@@ -3618,18 +3638,49 @@
     renderSidebarSystemStatus();
   }
 
+  // Das Farbthema gehoert zum Benutzerkonto, nicht zum Datenbestand: Wer sich
+  // anmeldet, bringt seine eigene Auswahl mit. state.settings.theme bleibt die
+  // gemeinsame Vorgabe - sie gilt vor der Anmeldung und fuer Konten, die noch
+  // nie ein eigenes Thema gewaehlt haben.
+  function activeThemeKey() {
+    return normalizeTheme(currentUser?.theme || state.settings.theme);
+  }
+
   async function changeTheme(theme) {
     const nextTheme = normalizeTheme(theme);
-    if (nextTheme === state.settings.theme) {
+    if (!currentUser) {
+      // Ohne Anmeldung gibt es kein Konto, das die Wahl aufbewahren koennte.
+      applyTheme(nextTheme);
+      showToast(
+        "Das Farbthema gilt vorerst nur für diese Sitzung. Nach der Anmeldung wird es für das Benutzerkonto gespeichert.",
+      );
+      return;
+    }
+    if (nextTheme === activeThemeKey()) {
       applyTheme(nextTheme);
       return;
     }
 
-    const committed = await commitStateMutation(() => {
-      state.settings.theme = nextTheme;
-    });
-    applyTheme(state.settings.theme);
-    if (committed) showToast(`Farbthema „${THEMES[nextTheme]}“ wurde aktiviert.`);
+    const committed = await commitStateMutation(
+      () => {
+        const account = state.users.find((user) => user.id === currentUser.id);
+        if (account) account.theme = nextTheme;
+        currentUser.theme = nextTheme;
+      },
+      // Eine Anzeigeeinstellung eines einzelnen Kontos ist keine fachliche
+      // Aenderung und hat im Änderungsprotokoll nichts verloren.
+      { auditAction: "" },
+    );
+    if (committed) {
+      currentUser =
+        state.users.find((user) => user.id === currentUser.id) || currentUser;
+    }
+    applyTheme(activeThemeKey());
+    if (committed) {
+      showToast(
+        `Farbthema „${THEMES[nextTheme]}“ wurde für „${currentUser.username}“ gespeichert.`,
+      );
+    }
   }
 
   function applyTheme(theme) {
@@ -3807,6 +3858,8 @@
   ) {
     currentUser = user;
     sessionStorage.setItem(SESSION_USER_KEY, user.id);
+    // Jede Anmeldung bringt das Farbthema des Kontos mit.
+    applyTheme(activeThemeKey());
     elements.loginForm.reset();
     elements.loginError.textContent = "";
     if (elements.loginDialog.open) elements.loginDialog.close();
@@ -3835,6 +3888,8 @@
 
   function showLoginDialog() {
     currentUser = null;
+    // Ohne angemeldetes Konto gilt wieder die gemeinsame Vorgabe.
+    applyTheme(activeThemeKey());
     clearAutomaticBackupTimer();
     automaticBackupPassword = "";
     startupBackupSynchronized = false;
@@ -15131,7 +15186,7 @@
       }
       elements.settingsMariaDbPassword.value = "";
       elements.settingsMariaDbBootstrapToken.value = "";
-      applyTheme(state.settings.theme);
+      // completeLogin setzt das Farbthema des Kontos.
       completeLogin(remoteUser);
       showView("settings", false);
       showToast(
@@ -15511,12 +15566,14 @@
     selectedCompletionEmployeeIds.clear();
     selectedEmployeeIds.clear();
     attendanceDraft.clear();
-    applyTheme(state.settings.theme);
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {
       showLoginDialog();
       return false;
     }
+    // Nach dem Auffrischen des Kontos, damit das Farbthema aus der Sicherung
+    // greift.
+    applyTheme(activeThemeKey());
     renderAll();
     showToast(
       usersFromBackup

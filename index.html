@@ -128,6 +128,11 @@
         <rect x="4" y="10" width="16" height="11" rx="2" />
         <path d="M8 10V7a4 4 0 0 1 8 0v3" />
       </symbol>
+      <symbol id="icon-logout" viewBox="0 0 24 24">
+        <path d="M10 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <path d="m16 17 5-5-5-5" />
+        <path d="M21 12H10" />
+      </symbol>
       <symbol id="icon-empty" viewBox="0 0 24 24">
         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
@@ -282,7 +287,7 @@
               <svg><use href="#icon-edit"></use></svg>
             </button>
             <button type="button" data-logout aria-label="Abmelden" title="Abmelden">
-              <svg><use href="#icon-close"></use></svg>
+              <svg><use href="#icon-logout"></use></svg>
             </button>
           </div>
         </section>
@@ -1260,7 +1265,10 @@
                 </div>
               </div>
               <p class="settings-description">
-                Das gewählte Erscheinungsbild wird für diesen Datenbestand gespeichert.
+                Das gewählte Erscheinungsbild wird für das angemeldete
+                Benutzerkonto gespeichert und gilt an jedem Arbeitsplatz, an dem
+                sich dieses Konto anmeldet. Andere Konten behalten ihr eigenes
+                Farbthema.
               </p>
               <label class="settings-field">
                 <span>Aktives Farbthema</span>
@@ -1909,7 +1917,7 @@
 <p>Im lokalen Einzelplatzmodus wird <code>index.html</code> in einem aktuellen Browser geöffnet. Beim ersten Start führt TeO durch die Einrichtung des ersten Administratorkontos.</p>
 <p>Für den gemeinsamen Betrieb über MariaDB wird die Anwendung über den TeO-Server aufgerufen. Die technische Einrichtung ist im Abschnitt „Datenspeicherung und MariaDB“ beschrieben.</p>
 <h3 id="hilfe-erste-sinnvolle-schritte">Erste sinnvolle Schritte</h3>
-<ol><li>Unter <strong>Einstellungen</strong> das gewünschte Farbthema und die Sicherungserinnerung festlegen.</li><li>Unter <strong>Mitarbeiter</strong> Personalstammdaten, Stellenanteile, Berufe und Qualifikationen erfassen.</li><li>Stationsleitung und stellvertretende Stationsleitung kennzeichnen.</li><li>Unter <strong>Einstellungen → Feste Dienstwochenenden</strong> die beiden verantwortlichen Personen bestimmen.</li><li>Pflichtfortbildungen, Teamsitzungen, Termine und Geräte katalogisieren.</li><li>Eine erste vollständige Datensicherung exportieren.</li></ol>
+<ol><li>Unter <strong>Einstellungen</strong> das gewünschte Farbthema – es gilt für das eigene Benutzerkonto – und die Sicherungserinnerung festlegen.</li><li>Unter <strong>Mitarbeiter</strong> Personalstammdaten, Stellenanteile, Berufe und Qualifikationen erfassen.</li><li>Stationsleitung und stellvertretende Stationsleitung kennzeichnen.</li><li>Unter <strong>Einstellungen → Feste Dienstwochenenden</strong> die beiden verantwortlichen Personen bestimmen.</li><li>Pflichtfortbildungen, Teamsitzungen, Termine und Geräte katalogisieren.</li><li>Eine erste vollständige Datensicherung exportieren.</li></ol>
 <h3 id="hilfe-grundprinzip-der-speicherung">Grundprinzip der Speicherung</h3>
 <p>Änderungen werden im lokalen Modus automatisch in localForage beziehungsweise IndexedDB gespeichert. Im MariaDB-Modus werden sie an den zentralen Server übertragen. Der zusätzliche <strong>Sicherungsexport</strong> ist trotzdem erforderlich, damit eine unabhängige Wiederherstellungsdatei vorhanden ist.</p>
 <p>Nach Änderungen zeigt TeO deshalb oben im Inhaltsbereich eine Warnleiste an. Sie verschwindet erst nach einem erfolgreichen Sicherungsexport.</p>
@@ -1942,7 +1950,7 @@
 <p>Jedes angemeldete Konto bedient TeO vollständig. Die Rollentrennung betrifft ausschließlich die Verwaltung der Anwendung selbst, nicht die tägliche Arbeit.</p>
 <h3 id="hilfe-normale-benutzer">Normale Benutzer</h3>
 <p>Normale Benutzer dürfen alles, was zur regulären Bedienung gehört:</p>
-<ul><li>Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen</li><li>Berufe und Zusatzqualifikationen verwalten</li><li>Pflichtfortbildungen, Fortbildungsreihen und Nachweise verwalten</li><li>Teamsitzungen, Teilnahmen und Termine verwalten</li><li>Geräte und Geräteeinweisungen verwalten</li><li>Urlaubsansprüche und Abwesenheitsplanung bearbeiten</li><li>Dienstwochenenden konfigurieren und Simulationen übernehmen</li><li>Datenqualität prüfen, Telefonliste und E-Mail-Adressen exportieren</li><li>Daten sichern, prüfen und Sicherungen importieren</li><li>das eigene Passwort und das Farbthema ändern</li></ul>
+<ul><li>Mitarbeiter anlegen, bearbeiten, deaktivieren und löschen</li><li>Berufe und Zusatzqualifikationen verwalten</li><li>Pflichtfortbildungen, Fortbildungsreihen und Nachweise verwalten</li><li>Teamsitzungen, Teilnahmen und Termine verwalten</li><li>Geräte und Geräteeinweisungen verwalten</li><li>Urlaubsansprüche und Abwesenheitsplanung bearbeiten</li><li>Dienstwochenenden konfigurieren und Simulationen übernehmen</li><li>Datenqualität prüfen, Telefonliste und E-Mail-Adressen exportieren</li><li>Daten sichern, prüfen und Sicherungen importieren</li><li>das eigene Passwort und das eigene Farbthema ändern</li></ul>
 <h3 id="hilfe-administratoren">Administratoren</h3>
 <p>Administratoren dürfen zusätzlich drei Einstellungen ändern:</p>
 <ul><li><strong>Speicherort</strong> – zwischen lokalem Browserspeicher und MariaDB wechseln</li><li><strong>Benutzer verwalten</strong> – siehe unten</li><li><strong>Sicherungserinnerung</strong> – nach wie vielen Tagen TeO zur Sicherung mahnt</li><li><strong>Dialoge schließen</strong> – ob ein Klick neben einen Dialog diesen schließt</li><li><strong>Schulferien</strong> – die in der Urlaubsplanung markierten Ferienzeiträume</li></ul>
@@ -2195,7 +2203,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-einstellungen-und-administration">
 <h2 id="hilfe-einstellungen-und-administration">Einstellungen und Administration</h2>
 <p>Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint unter <strong>Einstellungen</strong> in der Sidebar und zusätzlich als Abschnittsnavigation oben auf der Einstellungsseite:</p>
-<ul><li><strong>Allgemein:</strong> Farbthema und Verhalten beim Schließen von Dialogen</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen, Memo-/ToDo-Kategorien und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung sowie manuelle und automatische Datensicherungen</li></ul>
+<ul><li><strong>Allgemein:</strong> Farbthema und Verhalten beim Schließen von Dialogen; das Farbthema gehört zum angemeldeten Benutzerkonto und begleitet es an jeden Arbeitsplatz, während andere Konten ihr eigenes Farbthema behalten</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen, Memo-/ToDo-Kategorien und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung sowie manuelle und automatische Datensicherungen</li></ul>
 <p>Beim Wechsel eines Untermenüs werden nur die zugehörigen Einstellungskarten angezeigt. Administratorgeschützte Funktionen bleiben weiterhin ausschließlich für Administratoren sichtbar.</p>
 <p>Die Einstellungsseite bündelt:</p>
 <ul><li>Farbthema</li><li>Dienstwochenendverantwortliche</li><li>lokales oder MariaDB-Backend</li><li>Benutzerverwaltung</li><li>Berufe und Qualifikationen</li><li>Memo-/ToDo-Kategorien</li><li>Datenqualitätsprüfung</li><li>Sicherungserinnerung</li><li>Import, Export und Sicherungsprüfung</li><li>verschlüsselten Export</li><li>Änderungsprotokoll</li></ul>
@@ -2255,6 +2263,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-004-038-000-farbthema-je-benutzerkonto">004.038.000 – Farbthema je Benutzerkonto</h3>
+<ul><li><strong>Neu:</strong> Das Farbthema gehört zum Benutzerkonto: Jede Anmeldung bringt die eigene Auswahl mit, an jedem Arbeitsplatz, ohne die Ansicht der übrigen Konten zu verändern</li><li><strong>Verbessert:</strong> Das Farbthema aus den Einstellungen bleibt die gemeinsame Vorgabe – sie gilt vor der Anmeldung und für Konten, die noch nie ein eigenes Thema gewählt haben</li><li><strong>Verbessert:</strong> Ein Themenwechsel erscheint nicht mehr im Änderungsprotokoll; er betrifft nur die Anzeige eines einzelnen Kontos</li><li><strong>Verbessert:</strong> Die Abmeldung in der Sidebar trägt statt des Schließen-Kreuzes ein eigenes Symbol</li></ul>
 <h3 id="hilfe-004-037-008-strengere-csp-und-schlankeres-paket">004.037.008 – Strengere CSP und schlankeres Paket</h3>
 <ul><li><strong>Verbessert:</strong> Die Anwendung kommt ohne style-Attribute aus; die CSP des Servers verbietet sie jetzt vollständig (<code>style-src-attr &#039;none&#039;</code>)</li><li><strong>Verbessert:</strong> Die Statusauskunft des Servers nennt Revision und Schemastand nur noch einer angemeldeten Sitzung</li><li><strong>Verbessert:</strong> Die Anmeldedrosselung zählt jeden Versuch atomar, bevor sie entscheidet – gleichzeitige Anfragen kommen nicht mehr am Limit vorbei</li><li><strong>Verbessert:</strong> <code>app.html</code> ist keine 240 KB große Kopie von <code>index.html</code> mehr, sondern eine Weiterleitung</li><li><strong>Verbessert:</strong> Einheitlich englische Bezeichner im Programmcode</li></ul>
 <h3 id="hilfe-004-037-007-sicherungszeitpunkt-und-datenbankabgleich">004.037.007 – Sicherungszeitpunkt und Datenbankabgleich</h3>
