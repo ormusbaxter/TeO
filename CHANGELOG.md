@@ -7,6 +7,7 @@
 - **Behoben:** `npm test` und damit `npm run verify` und das Paketskript liefen unter Windows nicht – der Testaufruf verließ sich auf die Auflösung von Platzhaltern durch die Shell, die es dort nicht gibt
 - **Neu:** Ein GitHub-Workflow baut das Paket und legt die Veröffentlichung mit Titel, Text und Prüfsumme an; Titel und Text stammen aus diesem Änderungsverzeichnis
 - **Verbessert:** Wochenendverteilung, Urlaubsplanung und Terminkalender tragen in der Seitenleiste und in der mobilen Navigation je ein eigenes Symbol statt dreimal des Kalenderblatts
+- **Verbessert:** Jede Ansicht wiederholt das Symbol ihres Menüpunkts klein vor der Bereichszeile über der Überschrift
 
 ### 004.038.000 – Farbthema je Benutzerkonto
 

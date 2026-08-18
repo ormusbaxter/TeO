@@ -959,6 +959,18 @@ svg {
   text-transform: uppercase;
 }
 
+.page-header .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.page-header .eyebrow-icon {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2;
+}
+
 .button {
   display: inline-flex;
   min-height: 42px;
