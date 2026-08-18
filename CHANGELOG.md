@@ -9,6 +9,7 @@
 - **Verbessert:** Wochenendverteilung, Urlaubsplanung und Terminkalender tragen in der Seitenleiste und in der mobilen Navigation je ein eigenes Symbol statt dreimal des Kalenderblatts
 - **Verbessert:** Jede Ansicht wiederholt das Symbol ihres Menüpunkts klein vor der Bereichszeile über der Überschrift
 - **Verbessert:** Die Warnung „Datensicherung erforderlich“ steht nicht mehr über der Kopfzeile der Ansicht, sondern als Einblendung unten rechts bei den übrigen Meldungen – dauerhaft sichtbar und über Ansicht, Dialog und Abdunklung
+- **Verbessert:** Die Kopfzeile jeder Ansicht ist eine eigene Karte und bleibt beim Blättern oben stehen; sobald sie klebt, klappt sie auf eine Zeile mit Bereichssymbol, Titel und Schaltflächen ein
 
 ### 004.038.000 – Farbthema je Benutzerkonto
 

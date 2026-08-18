@@ -551,6 +551,7 @@
   let deviceInstructionDeviceSearchTerm = "";
   const cleanFormSnapshots = new WeakMap();
   let activeSettingsSection = "general";
+  let stickyHeaderFrame = 0;
 
   const elements = {
     navEmployeeCount: document.querySelector("#navEmployeeCount"),
@@ -2443,6 +2444,33 @@
       const hash = window.location.hash.replace("#", "");
       if (HASH_VIEWS[hash]) showView(HASH_VIEWS[hash], false);
     });
+
+    window.addEventListener("scroll", requestStickyHeaderUpdate, { passive: true });
+    window.addEventListener("resize", requestStickyHeaderUpdate);
+    updateStickyHeader();
+  }
+
+  // Der Seitenkopf klebt per CSS; ob er gerade klebt, weiss allein die
+  // Position. Erreicht er seinen Halt, klappt er auf eine Zeile ein.
+  function updateStickyHeader() {
+    stickyHeaderFrame = 0;
+    const header = document.querySelector(".view.is-active .page-header");
+    if (!header) return;
+    const styles = window.getComputedStyle(header);
+    if (styles.position !== "sticky") {
+      header.classList.remove("is-stuck");
+      return;
+    }
+    const offset = Number.parseFloat(styles.top) || 0;
+    header.classList.toggle(
+      "is-stuck",
+      header.getBoundingClientRect().top <= offset + 0.5,
+    );
+  }
+
+  function requestStickyHeaderUpdate() {
+    if (stickyHeaderFrame) return;
+    stickyHeaderFrame = window.requestAnimationFrame(updateStickyHeader);
   }
 
   function showView(view, updateHash = true) {
@@ -2509,6 +2537,10 @@
     }
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+    document
+      .querySelectorAll(".page-header.is-stuck")
+      .forEach((header) => header.classList.remove("is-stuck"));
+    requestStickyHeaderUpdate();
   }
 
   function showSettingsSection(section = "general") {
