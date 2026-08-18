@@ -14,6 +14,8 @@
 - **Verbessert:** Das Farbthema „Windows 95“ bringt auch die Bildlaufleisten im Stil der Zeit mit: gerasterte Bahn, erhabener Schieber und quadratische Pfeilfelder, die beim Drücken einsinken
 - **Verbessert:** Das Farbthema „Windows 95“ reicht jetzt bis in Schaltflächen und Menü: graue Flächen mit erhabener Kante, die beim Drücken einsinkt, ein Menü mit navyblauer Hervorhebung, eingelassene Eingabefelder – und überall eckige statt runder Ecken
 - **Behoben:** Beim Tippen in ein Datumsfeld blieb die graue Beschriftung „TT.MM.JJJJ“ stehen und verdeckte die Eingabe – ein unvollständiges Datum hat noch keinen Wert. Während der Eingabe zeigt das Feld jetzt seine eigene Anzeige, nach dem Verlassen wieder das Datum in deutscher Schreibweise
+- **Verbessert:** Die Geräteansicht öffnet sich jetzt in einem Wimpernschlag statt nach anderthalb Sekunden: Die Einweisungsmatrix wird erst ausgemessen, wenn sie ins Bild kommt, das Einweisungsprotokoll lädt seitenweise und beantwortet die Frage nach den Einweisungen einer Zelle aus einem Verzeichnis statt aus dem gesamten Bestand
+- **Verbessert:** Fortbildungsstände werden aus einem Verzeichnis der Nachweise beantwortet; die Auswertung eines mehrjährigen Archivs dauert damit einen Bruchteil der bisherigen Zeit
 - **Behoben:** In den Schemata „Dunkel“, „Nord“, „Dracula“ und „Catppuccin Latte“ standen die Meldungen unten rechts als weiße Schrift auf heller Fläche und waren praktisch unlesbar; jedes Schema bringt jetzt eigene Farben für Fläche, Schrift und Symbole mit
 
 ### 004.038.000 – Farbthema je Benutzerkonto

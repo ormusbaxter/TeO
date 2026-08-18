@@ -542,6 +542,11 @@
   // wann der Nachweis erfasst wurde.
   let deviceInstructionSortKey = "createdAt";
   const VISIBLE_DEVICE_INSTRUCTION_ROWS = 10;
+  // Sichtbar sind zehn Zeilen, der Kasten scrollt. Alles auf einmal
+  // aufzubauen kostet bei einem gewachsenen Protokoll mehr als eine
+  // Sekunde - der Rest kommt auf Wunsch nach.
+  const DEVICE_INSTRUCTION_LOG_PAGE = 50;
+  let deviceInstructionLogLimit = DEVICE_INSTRUCTION_LOG_PAGE;
   // So viele Geraete bleiben in der Auswahl sichtbar, weitere sind scrollbar.
   const VISIBLE_INSTRUCTION_DEVICES = 5;
   // Mehrere Geraete koennen mit denselben Angaben auf einmal dokumentiert

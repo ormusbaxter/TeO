@@ -6387,6 +6387,17 @@ body.is-device-matrix-maximized {
   outline-offset: -3px;
 }
 
+/* Die Matrix ist die groesste Flaeche der Anwendung: 60 Geraete mal 60
+   Mitarbeiter sind mehrere tausend Zellen, deren Aufbau den Wechsel in die
+   Ansicht um mehr als eine Sekunde verzoegert hat - obwohl sie beim Oeffnen
+   noch gar nicht im Bild ist. Mit content-visibility ueberspringt der Browser
+   ihr Layout, solange sie ausserhalb des Sichtfelds liegt; contain-intrinsic-
+   size haelt dabei die Bildlaufhoehe stabil. */
+#deviceInstructionMatrix {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
 .device-matrix-table {
   width: 100%;
   min-width: max-content;
@@ -6867,6 +6878,13 @@ button.device-employee-overview-row:hover {
   color: var(--slate-500);
   font-size: 0.64rem;
   font-weight: 700;
+}
+
+/* Der Nachladeknopf gehoert in den Bildlauf des Protokolls und sitzt am Ende
+   der Liste. */
+.device-instruction-log-more {
+  width: calc(100% - 24px);
+  margin: 8px 12px 12px;
 }
 
 .device-instruction-log {
