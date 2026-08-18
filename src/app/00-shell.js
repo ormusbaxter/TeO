@@ -1111,6 +1111,7 @@
     printEmployeePhoneListButton: document.querySelector(
       "#printEmployeePhoneListButton",
     ),
+    notificationStack: document.querySelector("#notificationStack"),
     toastRegion: document.querySelector("#toastRegion"),
   };
 

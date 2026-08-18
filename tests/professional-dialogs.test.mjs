@@ -23,23 +23,26 @@ test("Sicherungen und Telefonliste verwenden integrierte TeO-Dialoge", async () 
   assert.match(indexHtml, /id="phoneListPrintSurface"/);
   assert.match(
     indexHtml,
-    /class="toast-region"[^>]*id="toastRegion"[^>]*popover="manual"/s,
+    /class="notification-stack" id="notificationStack" popover="manual"/s,
   );
-  assert.match(appSource, /toastRegion\.showPopover\(\)/);
-  assert.match(appSource, /toastRegion\.hidePopover\(\)/);
-  assert.match(appSource, /function syncToastRegionLayer\(\)/);
-  assert.match(appSource, /document\.body\.append\(elements\.toastRegion\)/);
-  assert.doesNotMatch(appSource, /activeDialog\.append\(elements\.toastRegion\)/);
+  assert.match(appSource, /stack\.showPopover\(\)/);
+  assert.match(appSource, /stack\.hidePopover\(\)/);
+  assert.match(appSource, /function syncNotificationLayer\(\)/);
+  assert.match(appSource, /document\.body\.append\(stack\)/);
+  assert.doesNotMatch(
+    appSource,
+    /activeDialog\.append\(elements\.(?:toastRegion|notificationStack)\)/,
+  );
   assert.match(
     appSource,
-    /if \(popoverOpen\) elements\.toastRegion\.hidePopover\(\);[\s\S]*document\.body\.append\(elements\.toastRegion\);[\s\S]*elements\.toastRegion\.showPopover\(\)/,
+    /if \(popoverOpen\) stack\.hidePopover\(\);[\s\S]*document\.body\.append\(stack\);[\s\S]*stack\.showPopover\(\)/,
   );
-  assert.match(appSource, /setTimeout\(syncToastRegionLayer, 0\)/);
+  assert.match(appSource, /setTimeout\(syncNotificationLayer, 0\)/);
   assert.match(
     styles,
-    /\.toast-region::backdrop\s*\{[^}]*background: transparent;[^}]*backdrop-filter: none;/s,
+    /\.notification-stack::backdrop\s*\{[^}]*background: transparent;[^}]*backdrop-filter: none;/s,
   );
-  assert.doesNotMatch(styles, /\.modal > \.toast-region/);
+  assert.doesNotMatch(styles, /\.modal > \.(?:toast-region|notification-stack)/);
   assert.match(
     styles,
     /@page phone-list\s*\{[^}]*size: A4 portrait;[^}]*margin: 0;/s,

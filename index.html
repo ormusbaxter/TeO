@@ -384,28 +384,6 @@
           </div>
         </header>
 
-        <section
-          class="database-save-warning"
-          id="databaseSaveWarning"
-          role="status"
-          aria-live="polite"
-          hidden
-        >
-          <svg aria-hidden="true"><use href="#icon-alert"></use></svg>
-          <strong>Datensicherung erforderlich:</strong>
-          <span id="databaseSaveWarningText">
-            Änderungen wurden gespeichert, aber noch nicht exportiert.
-          </span>
-          <button
-            class="button button-compact database-save-warning-action"
-            id="databaseSaveWarningExportButton"
-            type="button"
-          >
-            <svg><use href="#icon-download"></use></svg>
-            Jetzt exportieren
-          </button>
-        </section>
-
         <section class="view is-active" id="dashboardView" data-view-panel="dashboard">
           <div class="page-header">
             <div>
@@ -2394,7 +2372,7 @@
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
 <h3 id="hilfe-004-039-000-terminkalender-als-monatsansicht">004.039.000 – Terminkalender als Monatsansicht</h3>
-<ul><li><strong>Neu:</strong> Der Terminkalender lässt sich zwischen der Liste und einem Monatsraster mit einem Feld je Tag umschalten; die Auswahl und der angesehene Monat bleiben im Browser gespeichert</li><li><strong>Neu:</strong> Im Monatsraster legt ein Klick auf einen Tag einen Termin für genau diesen Tag an, ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten</li><li><strong>Neu:</strong> Das Monatsraster hebt den heutigen Tag hervor, setzt Wochenenden und Feiertage in Nordrhein-Westfalen ab und klappt ab dem vierten Termin eines Tages den Rest über „+n weitere“ auf</li><li><strong>Verbessert:</strong> Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar</li><li><strong>Behoben:</strong> <code>npm test</code> und damit <code>npm run verify</code> und das Paketskript liefen unter Windows nicht – der Testaufruf verließ sich auf die Auflösung von Platzhaltern durch die Shell, die es dort nicht gibt</li><li><strong>Neu:</strong> Ein GitHub-Workflow baut das Paket und legt die Veröffentlichung mit Titel, Text und Prüfsumme an; Titel und Text stammen aus diesem Änderungsverzeichnis</li><li><strong>Verbessert:</strong> Wochenendverteilung, Urlaubsplanung und Terminkalender tragen in der Seitenleiste und in der mobilen Navigation je ein eigenes Symbol statt dreimal des Kalenderblatts</li><li><strong>Verbessert:</strong> Jede Ansicht wiederholt das Symbol ihres Menüpunkts klein vor der Bereichszeile über der Überschrift</li></ul>
+<ul><li><strong>Neu:</strong> Der Terminkalender lässt sich zwischen der Liste und einem Monatsraster mit einem Feld je Tag umschalten; die Auswahl und der angesehene Monat bleiben im Browser gespeichert</li><li><strong>Neu:</strong> Im Monatsraster legt ein Klick auf einen Tag einen Termin für genau diesen Tag an, ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten</li><li><strong>Neu:</strong> Das Monatsraster hebt den heutigen Tag hervor, setzt Wochenenden und Feiertage in Nordrhein-Westfalen ab und klappt ab dem vierten Termin eines Tages den Rest über „+n weitere“ auf</li><li><strong>Verbessert:</strong> Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar</li><li><strong>Behoben:</strong> <code>npm test</code> und damit <code>npm run verify</code> und das Paketskript liefen unter Windows nicht – der Testaufruf verließ sich auf die Auflösung von Platzhaltern durch die Shell, die es dort nicht gibt</li><li><strong>Neu:</strong> Ein GitHub-Workflow baut das Paket und legt die Veröffentlichung mit Titel, Text und Prüfsumme an; Titel und Text stammen aus diesem Änderungsverzeichnis</li><li><strong>Verbessert:</strong> Wochenendverteilung, Urlaubsplanung und Terminkalender tragen in der Seitenleiste und in der mobilen Navigation je ein eigenes Symbol statt dreimal des Kalenderblatts</li><li><strong>Verbessert:</strong> Jede Ansicht wiederholt das Symbol ihres Menüpunkts klein vor der Bereichszeile über der Überschrift</li><li><strong>Verbessert:</strong> Die Warnung „Datensicherung erforderlich“ steht nicht mehr über der Kopfzeile der Ansicht, sondern als Einblendung unten rechts bei den übrigen Meldungen – dauerhaft sichtbar und über Ansicht, Dialog und Abdunklung</li></ul>
 <h3 id="hilfe-004-038-000-farbthema-je-benutzerkonto">004.038.000 – Farbthema je Benutzerkonto</h3>
 <ul><li><strong>Neu:</strong> Das Farbthema gehört zum Benutzerkonto: Jede Anmeldung bringt die eigene Auswahl mit, an jedem Arbeitsplatz, ohne die Ansicht der übrigen Konten zu verändern</li><li><strong>Verbessert:</strong> Das Farbthema aus den Einstellungen bleibt die gemeinsame Vorgabe – sie gilt vor der Anmeldung und für Konten, die noch nie ein eigenes Thema gewählt haben</li><li><strong>Verbessert:</strong> Ein Themenwechsel erscheint nicht mehr im Änderungsprotokoll; er betrifft nur die Anzeige eines einzelnen Kontos</li><li><strong>Verbessert:</strong> Die Abmeldung in der Sidebar trägt statt des Schließen-Kreuzes ein eigenes Symbol</li></ul>
 <h3 id="hilfe-004-037-008-strengere-csp-und-schlankeres-paket">004.037.008 – Strengere CSP und schlankeres Paket</h3>
@@ -4413,13 +4391,40 @@ npm run verify</code></pre>
       </div>
     </dialog>
 
-    <div
-      class="toast-region"
-      id="toastRegion"
-      popover="manual"
-      aria-live="polite"
-      aria-atomic="true"
-    ></div>
+    <!-- Alle Einblendungen unten rechts teilen sich eine Ebene: das Popover
+         hebt sie ueber Ansicht, Dialoge und Backdrop. Die Warnung steht unten,
+         damit neue Meldungen darueber aufwachsen. -->
+    <div class="notification-stack" id="notificationStack" popover="manual">
+      <div
+        class="toast-region"
+        id="toastRegion"
+        aria-live="polite"
+        aria-atomic="true"
+      ></div>
+      <section
+        class="database-save-warning"
+        id="databaseSaveWarning"
+        role="status"
+        aria-live="polite"
+        hidden
+      >
+        <svg aria-hidden="true"><use href="#icon-alert"></use></svg>
+        <p class="database-save-warning-message">
+          <strong>Datensicherung erforderlich:</strong>
+          <span id="databaseSaveWarningText">
+            Änderungen wurden gespeichert, aber noch nicht exportiert.
+          </span>
+        </p>
+        <button
+          class="button button-compact database-save-warning-action"
+          id="databaseSaveWarningExportButton"
+          type="button"
+        >
+          <svg><use href="#icon-download"></use></svg>
+          Jetzt exportieren
+        </button>
+      </section>
+    </div>
 
     <noscript>
       <div class="noscript-message">

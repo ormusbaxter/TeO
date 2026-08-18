@@ -680,43 +680,42 @@ svg {
 }
 
 .database-save-warning {
-  display: flex;
-  min-height: 44px;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 22px;
-  padding: 8px 10px 8px 14px;
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 9px 10px;
+  align-items: start;
+  padding: 12px 14px;
   color: #6f3a03;
   font-size: 0.75rem;
   line-height: 1.35;
-  white-space: nowrap;
+  pointer-events: auto;
   border: 1px solid #efbd75;
   border-left: 5px solid var(--orange-700);
   border-radius: 10px;
   background: var(--orange-100);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  animation: toast-in 200ms ease both;
 }
 
 .database-save-warning > svg {
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
+  margin-top: 1px;
   color: var(--orange-700);
 }
 
-.database-save-warning > strong {
-  white-space: nowrap;
+.database-save-warning-message {
+  margin: 0;
 }
 
-.database-save-warning > span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.database-save-warning-message > strong {
+  margin-right: 4px;
 }
 
 .database-save-warning-action {
-  flex: 0 0 auto;
-  margin-left: auto;
+  grid-column: 2;
+  justify-self: start;
   color: #fff;
   border-color: var(--orange-700);
   background: var(--orange-700);
@@ -4616,7 +4615,7 @@ legend {
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 
-.toast-region {
+.notification-stack {
   position: fixed;
   z-index: 100;
   inset: auto 24px 24px auto;
@@ -4633,9 +4632,19 @@ legend {
   background: transparent;
 }
 
-.toast-region::backdrop {
+.notification-stack::backdrop {
   background: transparent;
   backdrop-filter: none;
+}
+
+.toast-region {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.toast-region:empty {
+  display: none;
 }
 
 .toast {
@@ -4869,25 +4878,12 @@ legend {
   }
 
   .database-save-warning {
-    align-items: flex-start;
-    flex-wrap: wrap;
-    margin-top: -8px;
     padding: 10px 12px;
-    white-space: normal;
-  }
-
-  .database-save-warning > strong {
-    white-space: normal;
-  }
-
-  .database-save-warning > span {
-    overflow: visible;
   }
 
   .database-save-warning-action {
     width: 100%;
     justify-content: center;
-    margin-left: 0;
   }
 
   .help-layout {
@@ -5322,7 +5318,7 @@ legend {
     margin: 0 -20px;
   }
 
-  .toast-region {
+  .notification-stack {
     right: 16px;
     bottom: 84px;
     left: 16px;
@@ -9872,7 +9868,7 @@ body.is-vacation-planner-maximized {
   body > .app-layout,
   body > .mobile-nav,
   body > dialog:not(#trainingMatrixDialog),
-  body > .toast-region,
+  body > .notification-stack,
   body > noscript {
     display: none !important;
   }

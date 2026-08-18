@@ -47,7 +47,7 @@
   body > .app-layout,
   body > .mobile-nav,
   body > dialog:not(#trainingMatrixDialog),
-  body > .toast-region,
+  body > .notification-stack,
   body > noscript {
     display: none !important;
   }
