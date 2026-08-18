@@ -720,6 +720,10 @@ html[data-theme="windows-95"] {
   --shadow-sm: 1px 1px 0 rgb(0 0 0 / 22%);
   --shadow-md: 4px 4px 0 rgb(0 0 0 / 26%);
   --shadow-lg: 8px 8px 0 rgb(0 0 0 / 30%);
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
 }
 
 html[data-theme="windows-95"] body {
@@ -746,22 +750,291 @@ html[data-theme="windows-95"] :is(.panel, .stat-card, .modal, .page-header) {
   background: #d4d0c8;
 }
 
-html[data-theme="windows-95"] .button-primary {
-  color: #ffffff;
-  border-color: #ffffff #000040 #000040 #ffffff;
-  background: #000080;
-  box-shadow: 2px 2px 0 rgb(0 0 0 / 28%);
+/* Schaltflaechen von Windows 95: graues Gesicht, erhabene Kante aus vier
+   Innenschatten, kein Schweben beim Zeigen. Gedrueckt kehrt sich die Kante um.
+   Farbe trugen die Schaltflaechen der Zeit nicht - die Standardschaltflaeche
+   erkennt man am zusaetzlichen schwarzen Rahmen, nicht am Blau. */
+html[data-theme="windows-95"] :is(.button, .icon-button, .mobile-theme-button) {
+  color: #000000;
+  border: 0;
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #000000,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #808080;
+}
+
+html[data-theme="windows-95"] :is(.button, .icon-button, .mobile-theme-button):hover {
+  color: #000000;
+  transform: none;
+  background: #c8c4bc;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #000000,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #808080;
+}
+
+html[data-theme="windows-95"] :is(.button, .icon-button, .mobile-theme-button):active {
+  transform: none;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
+html[data-theme="windows-95"] :is(.button, .icon-button):focus-visible {
+  outline: 1px dotted #000000;
+  outline-offset: -4px;
+}
+
+html[data-theme="windows-95"] .button-primary,
+html[data-theme="windows-95"] .button-primary:hover {
+  color: #000000;
+  background: #c0c0c0;
+  box-shadow:
+    0 0 0 1px #000000,
+    inset 1px 1px #ffffff,
+    inset -1px -1px #000000,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #808080;
 }
 
 html[data-theme="windows-95"] .button-primary:hover {
-  background: #000066;
+  background: #c8c4bc;
 }
 
-html[data-theme="windows-95"] .button-secondary {
+html[data-theme="windows-95"] .button-primary:active {
+  box-shadow:
+    0 0 0 1px #000000,
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
+html[data-theme="windows-95"] :is(.button-danger, .button-danger:hover) {
+  color: #800000;
+}
+
+html[data-theme="windows-95"] :is(.button-secondary, .button-ghost) {
   color: #000000;
-  border-color: #ffffff #808080 #808080 #ffffff;
+}
+
+/* Menue: Die Seitenleiste ist eine graue Flaeche mit erhabener Kante, die
+   Eintraege heben sich navyblau hervor wie im Startmenue. */
+html[data-theme="windows-95"] .sidebar {
+  color: #000000;
+  background: #c0c0c0;
+  box-shadow:
+    inset -1px 0 #000000,
+    inset -2px 0 #808080;
+}
+
+html[data-theme="windows-95"] .brand strong {
+  color: #000000;
+}
+
+html[data-theme="windows-95"] .brand small,
+html[data-theme="windows-95"] .nav-order-hint {
+  color: #404040;
+}
+
+html[data-theme="windows-95"] :is(
+    .nav-item,
+    .nav-order-reset,
+    .settings-sidebar-subnav button
+  ) {
+  color: #000000;
+  background: transparent;
+  box-shadow: none;
+  transition: none;
+}
+
+html[data-theme="windows-95"] :is(
+    .nav-item:hover,
+    .nav-item.is-active,
+    .nav-item.is-dragging,
+    .nav-order-reset:hover,
+    .settings-sidebar-subnav button:hover,
+    .settings-sidebar-subnav button.is-active
+  ) {
+  color: #ffffff;
+  background: #000080;
+  box-shadow: none;
+}
+
+html[data-theme="windows-95"] .settings-sidebar-subnav {
+  border-left-color: #808080;
+}
+
+html[data-theme="windows-95"] :is(.nav-count, .nav-item.is-active .nav-count) {
+  color: #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff;
+}
+
+html[data-theme="windows-95"] .user-session {
+  border: 0;
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff;
+}
+
+html[data-theme="windows-95"] .user-session-icon {
+  color: #ffffff;
+  background: #000080;
+}
+
+html[data-theme="windows-95"] .user-session strong {
+  color: #000000;
+}
+
+html[data-theme="windows-95"] .user-session small {
+  color: #404040;
+}
+
+html[data-theme="windows-95"] .user-session-actions button {
+  color: #000000;
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #000000,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #808080;
+}
+
+html[data-theme="windows-95"] .user-session-actions button:hover {
+  color: #000000;
+  background: #c8c4bc;
+}
+
+html[data-theme="windows-95"] .user-session-actions button:active {
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
+html[data-theme="windows-95"] .mobile-header {
+  border-bottom: 1px solid #808080;
+  background: #c0c0c0;
+  backdrop-filter: none;
+}
+
+html[data-theme="windows-95"] .mobile-nav {
+  border-top: 0;
+  background: #c0c0c0;
+  box-shadow:
+    inset 0 1px #ffffff,
+    inset 0 2px #dfdfdf;
+  backdrop-filter: none;
+}
+
+html[data-theme="windows-95"] .mobile-nav button {
+  color: #000000;
+  background: transparent;
+}
+
+html[data-theme="windows-95"] .mobile-nav button.is-active {
+  color: #ffffff;
+  background: #000080;
+}
+
+/* Die Filterschalter des Fristenmonitors verhalten sich wie Werkzeugtasten:
+   ausgewaehlt bleiben sie eingedrueckt. */
+html[data-theme="windows-95"] .deadline-filter-chip span {
+  color: #000000;
+  border: 0;
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #000000,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #808080;
+  transition: none;
+}
+
+html[data-theme="windows-95"] .deadline-filter-chip input:checked + span {
+  color: #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
+/* Der Fussbereich eines Fensters trug dieselbe graue Flaeche wie der Rest. */
+html[data-theme="windows-95"] .modal-footer {
+  border-top-color: #808080;
+  background: #d4d0c8;
+}
+
+/* Bereichs- und Umschaltleisten sind Werkzeugleisten: erhabene Felder, das
+   gewaehlte bleibt eingedrueckt stehen. */
+html[data-theme="windows-95"] :is(.settings-section-nav, .segmented-control) {
+  border: 0;
   background: #c0c0c0;
 }
+
+html[data-theme="windows-95"]
+  :is(.settings-section-nav, .segmented-control)
+  button {
+  color: #000000;
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #000000,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #808080;
+}
+
+html[data-theme="windows-95"]
+  :is(.settings-section-nav, .segmented-control)
+  button:hover {
+  color: #000000;
+  background: #c8c4bc;
+}
+
+html[data-theme="windows-95"]
+  :is(.settings-section-nav, .segmented-control)
+  button.is-active {
+  color: #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
+/* Eingabefelder waren eingelassene weisse Kaesten. */
+html[data-theme="windows-95"]
+  :is(input, select, textarea):not([type="checkbox"], [type="radio"]) {
+  color: #000000;
+  border: 0;
+  background: #ffffff;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
+/* Ecken: Windows 95 kannte keine. Die Marken decken nur einen Teil der
+   Rundungen ab, die uebrigen stehen als feste Werte im Stylesheet - deshalb
+   die Holzhammer-Regel. */
+html[data-theme="windows-95"] * {
+  border-radius: 0 !important;
+}
+
 
 /* Die Bildlaufleiste von Windows 95: gerasterte Bahn, erhabener Schieber und
    quadratische Pfeilfelder. Der Rahmen entsteht wie bei den Schaltflaechen aus
