@@ -37,7 +37,14 @@ test("Der Seitenkopf ist eine klebende Karte und klappt beim Blättern ein", asy
   );
 
   assert.match(appSource, /function updateStickyHeader\(\)/);
-  assert.match(appSource, /classList\.toggle\(\s*"is-stuck"/s);
+  assert.match(appSource, /classList\.add\("is-stuck"\)/);
+  assert.match(appSource, /classList\.remove\("is-stuck"\)/);
+  // Der Abstand zwischen Ein- und Aufklappen ist die Kopfhoehe: Einklappen
+  // verkuerzt die Seite, und ohne Abstand schaukelt sich das auf.
+  assert.match(
+    appSource,
+    /viewTop <= offset - header\.getBoundingClientRect\(\)\.height/,
+  );
   assert.match(
     appSource,
     /addEventListener\("scroll", requestStickyHeaderUpdate, \{ passive: true \}\)/,

@@ -53,6 +53,14 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Der Browser haelt beim Wachsen und Schrumpfen von Inhalt die Blickposition
+   fest (scroll anchoring). Klappt der Seitenkopf ein, zoege er die Seite genau
+   um den Hoehensprung zurueck - der Kopf stuende sofort wieder aufgeklappt da
+   und das Spiel begaenne bei jedem Rad-Tick von vorn. */
+html {
+  overflow-anchor: none;
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;

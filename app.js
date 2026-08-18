@@ -2450,11 +2450,20 @@
     updateStickyHeader();
   }
 
-  // Der Seitenkopf klebt per CSS; ob er gerade klebt, weiss allein die
-  // Position. Erreicht er seinen Halt, klappt er auf eine Zeile ein.
+  // Der Seitenkopf klebt per CSS; ob er eingeklappt ist, entscheidet die
+  // Bildlaufhoehe. Gemessen wird die Oberkante der Ansicht, nicht die des
+  // Kopfes: Die des Kopfes steht beim Kleben fest, die der Ansicht wandert
+  // weiter und bleibt vom Einklappen unberuehrt.
+  //
+  // Zwischen Einklappen und Aufklappen liegt bewusst die volle Kopfhoehe.
+  // Einklappen verkuerzt die Seite; reicht der Inhalt knapp, kappt der Browser
+  // die Bildlaufhoehe und schiebt die Ansicht zurueck nach unten. Ohne diesen
+  // Abstand faende der Kopf sich sofort wieder aufgeklappt - und das Spiel
+  // begaenne von vorn, bei jedem Rad-Tick.
   function updateStickyHeader() {
     stickyHeaderFrame = 0;
-    const header = document.querySelector(".view.is-active .page-header");
+    const view = document.querySelector(".view.is-active");
+    const header = view?.querySelector(".page-header");
     if (!header) return;
     const styles = window.getComputedStyle(header);
     if (styles.position !== "sticky") {
@@ -2462,10 +2471,14 @@
       return;
     }
     const offset = Number.parseFloat(styles.top) || 0;
-    header.classList.toggle(
-      "is-stuck",
-      header.getBoundingClientRect().top <= offset + 0.5,
-    );
+    const viewTop = view.getBoundingClientRect().top;
+    if (header.classList.contains("is-stuck")) {
+      if (viewTop >= offset - 4) header.classList.remove("is-stuck");
+      return;
+    }
+    if (viewTop <= offset - header.getBoundingClientRect().height) {
+      header.classList.add("is-stuck");
+    }
   }
 
   function requestStickyHeaderUpdate() {
