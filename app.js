@@ -1112,6 +1112,7 @@
     printEmployeePhoneListButton: document.querySelector(
       "#printEmployeePhoneListButton",
     ),
+    notificationStack: document.querySelector("#notificationStack"),
     toastRegion: document.querySelector("#toastRegion"),
   };
 
@@ -3330,7 +3331,7 @@
 
     document.querySelectorAll("dialog").forEach((dialog) => {
       dialog.addEventListener("close", () => {
-        window.setTimeout(syncToastRegionLayer, 0);
+        window.setTimeout(syncNotificationLayer, 0);
       });
       if (dialog.hasAttribute("data-persistent-dialog")) {
         dialog.addEventListener("cancel", (event) => event.preventDefault());
@@ -15683,9 +15684,24 @@
   function renderDatabaseSaveWarning() {
     const visible = Boolean(currentUser && databaseSaveReminderArmed);
     elements.databaseSaveWarning.hidden = !visible;
-    if (!visible) return;
-    elements.databaseSaveWarningText.textContent =
-      "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert.";
+    if (visible) {
+      elements.databaseSaveWarningText.textContent =
+        "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert.";
+    }
+    // Die Warnung teilt sich die oberste Ebene mit den Meldungen: erscheint sie
+    // als einzige, muss das Popover geoeffnet werden, verschwindet sie als
+    // letzte, wieder geschlossen.
+    if (visible) {
+      syncNotificationLayer();
+      return;
+    }
+    if (
+      !elements.toastRegion.childElementCount &&
+      typeof elements.notificationStack.hidePopover === "function" &&
+      elements.notificationStack.matches(":popover-open")
+    ) {
+      elements.notificationStack.hidePopover();
+    }
   }
 
   async function renderBrowserStorageStatus() {
@@ -17013,25 +17029,32 @@
       .replaceAll("'", "&#039;");
   }
 
-  function syncToastRegionLayer() {
+  function hasVisibleNotification() {
+    return Boolean(
+      elements.toastRegion.childElementCount ||
+        !elements.databaseSaveWarning.hidden,
+    );
+  }
+
+  function syncNotificationLayer() {
+    const stack = elements.notificationStack;
     const popoverOpen =
-      typeof elements.toastRegion.hidePopover === "function" &&
-      elements.toastRegion.matches(":popover-open");
+      typeof stack.hidePopover === "function" && stack.matches(":popover-open");
 
     // Ein bereits geoeffnetes Popover kann in der Top-Layer-Reihenfolge hinter
     // einem spaeter geoeffneten Dialog liegen. Vor jeder Meldung kurz schliessen
-    // und neu oeffnen, damit die Region ueber Dialog und Backdrop einsortiert wird.
-    if (popoverOpen) elements.toastRegion.hidePopover();
-    if (elements.toastRegion.parentElement !== document.body) {
-      document.body.append(elements.toastRegion);
+    // und neu oeffnen, damit die Ebene ueber Dialog und Backdrop einsortiert wird.
+    if (popoverOpen) stack.hidePopover();
+    if (stack.parentElement !== document.body) {
+      document.body.append(stack);
     }
     if (
-      elements.toastRegion.childElementCount &&
-      typeof elements.toastRegion.showPopover === "function" &&
-      !elements.toastRegion.matches(":popover-open")
+      hasVisibleNotification() &&
+      typeof stack.showPopover === "function" &&
+      !stack.matches(":popover-open")
     ) {
       try {
-        elements.toastRegion.showPopover();
+        stack.showPopover();
       } catch (error) {
         console.warn("Die Statusmeldung konnte nicht in die oberste Ebene gehoben werden.", error);
       }
@@ -17057,20 +17080,17 @@
     }
 
     elements.toastRegion.append(toast);
-    syncToastRegionLayer();
+    syncNotificationLayer();
     window.setTimeout(() => {
       toast.classList.add("is-leaving");
       window.setTimeout(() => {
         toast.remove();
         if (
-          !elements.toastRegion.childElementCount &&
-          typeof elements.toastRegion.hidePopover === "function" &&
-          elements.toastRegion.matches(":popover-open")
+          !hasVisibleNotification() &&
+          typeof elements.notificationStack.hidePopover === "function" &&
+          elements.notificationStack.matches(":popover-open")
         ) {
-          elements.toastRegion.hidePopover();
-        }
-        if (!elements.toastRegion.childElementCount) {
-          syncToastRegionLayer();
+          elements.notificationStack.hidePopover();
         }
       }, 190);
     }, 3400);

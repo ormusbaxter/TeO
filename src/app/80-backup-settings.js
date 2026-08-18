@@ -1823,9 +1823,24 @@
   function renderDatabaseSaveWarning() {
     const visible = Boolean(currentUser && databaseSaveReminderArmed);
     elements.databaseSaveWarning.hidden = !visible;
-    if (!visible) return;
-    elements.databaseSaveWarningText.textContent =
-      "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert.";
+    if (visible) {
+      elements.databaseSaveWarningText.textContent =
+        "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert.";
+    }
+    // Die Warnung teilt sich die oberste Ebene mit den Meldungen: erscheint sie
+    // als einzige, muss das Popover geoeffnet werden, verschwindet sie als
+    // letzte, wieder geschlossen.
+    if (visible) {
+      syncNotificationLayer();
+      return;
+    }
+    if (
+      !elements.toastRegion.childElementCount &&
+      typeof elements.notificationStack.hidePopover === "function" &&
+      elements.notificationStack.matches(":popover-open")
+    ) {
+      elements.notificationStack.hidePopover();
+    }
   }
 
   async function renderBrowserStorageStatus() {

@@ -164,13 +164,40 @@
       </div>
     </dialog>
 
-    <div
-      class="toast-region"
-      id="toastRegion"
-      popover="manual"
-      aria-live="polite"
-      aria-atomic="true"
-    ></div>
+    <!-- Alle Einblendungen unten rechts teilen sich eine Ebene: das Popover
+         hebt sie ueber Ansicht, Dialoge und Backdrop. Die Warnung steht unten,
+         damit neue Meldungen darueber aufwachsen. -->
+    <div class="notification-stack" id="notificationStack" popover="manual">
+      <div
+        class="toast-region"
+        id="toastRegion"
+        aria-live="polite"
+        aria-atomic="true"
+      ></div>
+      <section
+        class="database-save-warning"
+        id="databaseSaveWarning"
+        role="status"
+        aria-live="polite"
+        hidden
+      >
+        <svg aria-hidden="true"><use href="#icon-alert"></use></svg>
+        <p class="database-save-warning-message">
+          <strong>Datensicherung erforderlich:</strong>
+          <span id="databaseSaveWarningText">
+            Änderungen wurden gespeichert, aber noch nicht exportiert.
+          </span>
+        </p>
+        <button
+          class="button button-compact database-save-warning-action"
+          id="databaseSaveWarningExportButton"
+          type="button"
+        >
+          <svg><use href="#icon-download"></use></svg>
+          Jetzt exportieren
+        </button>
+      </section>
+    </div>
 
     <noscript>
       <div class="noscript-message">
