@@ -1,10 +1,5 @@
-### 004.039.000 – Terminkalender als Monatsansicht
+### 004.040.000 – Eigene Symbole, klebende Kopfzeile und schnellere Ansichten
 
-- **Neu:** Der Terminkalender lässt sich zwischen der Liste und einem Monatsraster mit einem Feld je Tag umschalten; die Auswahl und der angesehene Monat bleiben im Browser gespeichert
-- **Neu:** Im Monatsraster legt ein Klick auf einen Tag einen Termin für genau diesen Tag an, ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten
-- **Neu:** Das Monatsraster hebt den heutigen Tag hervor, setzt Wochenenden und Feiertage in Nordrhein-Westfalen ab und klappt ab dem vierten Termin eines Tages den Rest über „+n weitere“ auf
-- **Verbessert:** Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar
-- **Behoben:** `npm test` und damit `npm run verify` und das Paketskript liefen unter Windows nicht – der Testaufruf verließ sich auf die Auflösung von Platzhaltern durch die Shell, die es dort nicht gibt
 - **Neu:** Ein GitHub-Workflow baut das Paket und legt die Veröffentlichung mit Titel, Text und Prüfsumme an; Titel und Text stammen aus diesem Änderungsverzeichnis
 - **Verbessert:** Wochenendverteilung, Urlaubsplanung und Terminkalender tragen in der Seitenleiste und in der mobilen Navigation je ein eigenes Symbol statt dreimal des Kalenderblatts
 - **Verbessert:** Jede Ansicht wiederholt das Symbol ihres Menüpunkts klein vor der Bereichszeile über der Überschrift
@@ -13,10 +8,18 @@
 - **Verbessert:** Die Filterleiste der Geräteansichten kommt ohne Trennlinie zum Inhalt darunter aus
 - **Verbessert:** Das Farbthema „Windows 95“ bringt auch die Bildlaufleisten im Stil der Zeit mit: gerasterte Bahn, erhabener Schieber und quadratische Pfeilfelder, die beim Drücken einsinken
 - **Verbessert:** Das Farbthema „Windows 95“ reicht jetzt bis in Schaltflächen und Menü: graue Flächen mit erhabener Kante, die beim Drücken einsinkt, ein Menü mit navyblauer Hervorhebung, eingelassene Eingabefelder – und überall eckige statt runder Ecken
-- **Behoben:** Beim Tippen in ein Datumsfeld blieb die graue Beschriftung „TT.MM.JJJJ“ stehen und verdeckte die Eingabe – ein unvollständiges Datum hat noch keinen Wert. Während der Eingabe zeigt das Feld jetzt seine eigene Anzeige, nach dem Verlassen wieder das Datum in deutscher Schreibweise
 - **Verbessert:** Die Geräteansicht öffnet sich jetzt in einem Wimpernschlag statt nach anderthalb Sekunden: Die Einweisungsmatrix wird erst ausgemessen, wenn sie ins Bild kommt, das Einweisungsprotokoll lädt seitenweise und beantwortet die Frage nach den Einweisungen einer Zelle aus einem Verzeichnis statt aus dem gesamten Bestand
 - **Verbessert:** Fortbildungsstände werden aus einem Verzeichnis der Nachweise beantwortet; die Auswertung eines mehrjährigen Archivs dauert damit einen Bruchteil der bisherigen Zeit
+- **Behoben:** `npm test` und damit `npm run verify` und das Paketskript liefen unter Windows nicht – der Testaufruf verließ sich auf die Auflösung von Platzhaltern durch die Shell, die es dort nicht gibt
+- **Behoben:** Beim Tippen in ein Datumsfeld blieb die graue Beschriftung „TT.MM.JJJJ“ stehen und verdeckte die Eingabe – ein unvollständiges Datum hat noch keinen Wert. Während der Eingabe zeigt das Feld jetzt seine eigene Anzeige, nach dem Verlassen wieder das Datum in deutscher Schreibweise
 - **Behoben:** In den Schemata „Dunkel“, „Nord“, „Dracula“ und „Catppuccin Latte“ standen die Meldungen unten rechts als weiße Schrift auf heller Fläche und waren praktisch unlesbar; jedes Schema bringt jetzt eigene Farben für Fläche, Schrift und Symbole mit
+
+### 004.039.000 – Terminkalender als Monatsansicht
+
+- **Neu:** Der Terminkalender lässt sich zwischen der Liste und einem Monatsraster mit einem Feld je Tag umschalten; die Auswahl und der angesehene Monat bleiben im Browser gespeichert
+- **Neu:** Im Monatsraster legt ein Klick auf einen Tag einen Termin für genau diesen Tag an, ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten
+- **Neu:** Das Monatsraster hebt den heutigen Tag hervor, setzt Wochenenden und Feiertage in Nordrhein-Westfalen ab und klappt ab dem vierten Termin eines Tages den Rest über „+n weitere“ auf
+- **Verbessert:** Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar
 
 ### 004.038.000 – Farbthema je Benutzerkonto
 
