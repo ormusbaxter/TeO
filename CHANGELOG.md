@@ -12,6 +12,7 @@
 - **Verbessert:** Die Kopfzeile jeder Ansicht ist eine eigene Karte und bleibt beim Blättern oben stehen; sobald sie klebt, klappt sie auf eine Zeile mit Bereichssymbol, Titel und Schaltflächen ein
 - **Verbessert:** Die Filterleiste der Geräteansichten kommt ohne Trennlinie zum Inhalt darunter aus
 - **Verbessert:** Das Farbthema „Windows 95“ bringt auch die Bildlaufleisten im Stil der Zeit mit: gerasterte Bahn, erhabener Schieber und quadratische Pfeilfelder, die beim Drücken einsinken
+- **Behoben:** In den Schemata „Dunkel“, „Nord“, „Dracula“ und „Catppuccin Latte“ standen die Meldungen unten rechts als weiße Schrift auf heller Fläche und waren praktisch unlesbar; jedes Schema bringt jetzt eigene Farben für Fläche, Schrift und Symbole mit
 
 ### 004.038.000 – Farbthema je Benutzerkonto
 

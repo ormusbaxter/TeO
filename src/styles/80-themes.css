@@ -187,6 +187,13 @@ html[data-theme="dark"] .sidebar {
     #0c141d;
 }
 
+/* Die Meldung braucht eine eigene Flaeche: --navy-900 ist im dunklen Schema
+   eine helle Marke, weisse Schrift darauf waere unlesbar. */
+html[data-theme="dark"] {
+  --toast-surface: #26364a;
+  --toast-border: rgb(255 255 255 / 14%);
+}
+
 html[data-theme="dark"] .brand-mark {
   background: linear-gradient(145deg, #357fce, #20568f);
 }
@@ -362,6 +369,22 @@ html[data-theme="nord"] {
   --shadow-lg: 0 24px 70px rgb(15 18 24 / 48%);
 }
 
+/* Nord und Dracula kehren --navy-900 ebenso um; beide bekommen ihre eigene
+   dunkle Flaeche und die Akzente ihrer Palette. */
+html[data-theme="nord"] {
+  --toast-surface: #3b4252;
+  --toast-text: #eceff4;
+  --toast-border: rgb(236 239 244 / 16%);
+  --toast-success-icon: #a3be8c;
+  --toast-success-tint: rgb(163 190 140 / 14%);
+  /* Nordrot ist auf dunklem Grund zu satt fuer das Symbol; die aufgehellte
+     Fassung haelt den Farbton und bleibt lesbar. */
+  --toast-error-icon: #e88f97;
+  --toast-error-tint: rgb(232 143 151 / 12%);
+  --toast-warning-icon: #ebcb8b;
+  --toast-warning-tint: rgb(235 203 139 / 14%);
+}
+
 /* Dracula: https://draculatheme.com/ */
 html[data-theme="dracula"] {
   --navy-950: #f8f8f2;
@@ -406,6 +429,18 @@ html[data-theme="dracula"] {
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
   --shadow-md: 0 12px 32px rgb(0 0 0 / 34%);
   --shadow-lg: 0 24px 70px rgb(0 0 0 / 50%);
+}
+
+html[data-theme="dracula"] {
+  --toast-surface: #44475a;
+  --toast-text: #f8f8f2;
+  --toast-border: rgb(248 248 242 / 16%);
+  --toast-success-icon: #50fa7b;
+  --toast-success-tint: rgb(80 250 123 / 14%);
+  --toast-error-icon: #ff8f8f;
+  --toast-error-tint: rgb(255 143 143 / 14%);
+  --toast-warning-icon: #ffb86c;
+  --toast-warning-tint: rgb(255 184 108 / 14%);
 }
 
 :is(html[data-theme="nord"], html[data-theme="dracula"]) body {
@@ -592,6 +627,19 @@ html[data-theme="catppuccin-latte"] {
   --shadow-sm: 0 1px 2px rgb(76 79 105 / 7%);
   --shadow-md: 0 12px 32px rgb(76 79 105 / 13%);
   --shadow-lg: 0 24px 70px rgb(76 79 105 / 20%);
+}
+
+/* Latte ist hell; --navy-900 ist hier ein mittleres Grau. Die dunklere
+   Grundmarke traegt die weisse Schrift deutlich besser. */
+html[data-theme="catppuccin-latte"] {
+  --toast-surface: #4c4f69;
+  --toast-text: #eff1f5;
+  --toast-success-icon: #a6e3a1;
+  --toast-success-tint: rgb(166 227 161 / 14%);
+  --toast-error-icon: #f5a3b6;
+  --toast-error-tint: rgb(245 163 182 / 10%);
+  --toast-warning-icon: #f9e2af;
+  --toast-warning-tint: rgb(249 226 175 / 14%);
 }
 
 html[data-theme="catppuccin-latte"] body {

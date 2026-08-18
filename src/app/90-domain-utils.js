@@ -1122,7 +1122,9 @@
 
   function showToast(message, type = "success") {
     const toast = document.createElement("div");
-    toast.className = "toast";
+    // Die Art steht als Klasse am Element; die Farben dazu kommen aus den
+    // Farbmarken, damit jedes Farbschema eigene setzen kann.
+    toast.className = `toast is-${type === "error" || type === "warning" ? type : "success"}`;
     toast.innerHTML = `
       <span class="toast-icon" aria-hidden="true">
         <svg><use href="#icon-${type === "success" ? "check" : "alert"}"></use></svg>
@@ -1130,13 +1132,6 @@
       <span></span>
     `;
     toast.querySelector("span:last-child").textContent = message;
-    if (type === "error") {
-      toast.querySelector(".toast-icon").style.color = "#ffabb2";
-      toast.querySelector(".toast-icon").style.background = "rgb(230 88 101 / 15%)";
-    } else if (type === "warning") {
-      toast.querySelector(".toast-icon").style.color = "#f4c86d";
-      toast.querySelector(".toast-icon").style.background = "rgb(230 170 66 / 15%)";
-    }
 
     elements.toastRegion.append(toast);
     syncNotificationLayer();
