@@ -127,6 +127,21 @@ button:disabled {
   color: transparent;
 }
 
+/* Waehrend der Eingabe zeigt das Feld seine eigene Segmentanzeige: Der Wert
+   eines unvollstaendigen Datums ist leer, die eigene Anzeige stuende deshalb
+   auf "TT.MM.JJJJ" und verdeckte, was gerade getippt wird. */
+.formatted-date-shell .formatted-date-input:focus {
+  color: var(--slate-800) !important;
+}
+
+.formatted-date-input:focus::-webkit-datetime-edit {
+  color: inherit;
+}
+
+.formatted-date-shell:focus-within .formatted-date-display {
+  display: none;
+}
+
 .formatted-date-display {
   position: absolute;
   z-index: 1;
