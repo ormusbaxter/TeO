@@ -693,7 +693,7 @@ html[data-theme="windows-95"] .nav-item.is-active {
   box-shadow: inset 2px 2px #0000aa, inset -2px -2px #000040;
 }
 
-html[data-theme="windows-95"] :is(.panel, .stat-card, .modal) {
+html[data-theme="windows-95"] :is(.panel, .stat-card, .modal, .page-header) {
   border-color: #ffffff #808080 #808080 #ffffff;
   background: #d4d0c8;
 }

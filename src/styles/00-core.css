@@ -741,21 +741,101 @@ svg {
   }
 }
 
+/* Der Seitenkopf ist eine eigene Karte und bleibt beim Blaettern oben stehen.
+   Sobald er klebt, klappt er auf eine Zeile ein: Bereichssymbol, Titel und
+   Aktionen bleiben erreichbar, Bereichszeile und Beschreibung treten ab. */
 .page-header {
+  position: sticky;
+  z-index: 12;
+  top: 12px;
   display: flex;
   gap: 24px;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  min-height: 74px;
-  margin-bottom: 30px;
+  padding: 20px 24px;
+  margin-bottom: 26px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--white), var(--blue-50));
+  box-shadow: var(--shadow-sm);
+  transition:
+    padding 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .page-header h1 {
-  margin: 4px 0 5px;
+  margin: 6px 0 5px;
   color: var(--navy-950);
-  font-size: clamp(1.8rem, 3vw, 2.35rem);
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
   line-height: 1.12;
   letter-spacing: -0.035em;
+}
+
+.page-header-text {
+  min-width: 0;
+}
+
+.page-header.is-stuck {
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--white) 93%, transparent);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(14px);
+}
+
+.page-header.is-stuck .page-header-text {
+  display: flex;
+  min-width: min(100%, 15rem);
+  flex: 0 1 auto;
+  gap: 11px;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Eingeklappt zaehlt die Zeile: Die Schaltflaechen bekommen die Breite, die
+   sie brauchen, der Titel gibt notfalls nach und kuerzt mit Auslassung. */
+.page-header.is-stuck .header-actions {
+  flex: 1 1 auto;
+}
+
+.page-header.is-stuck .eyebrow {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--blue-100);
+}
+
+.page-header.is-stuck .eyebrow > span,
+.page-header.is-stuck .page-subtitle {
+  display: none;
+}
+
+.page-header.is-stuck .eyebrow-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.page-header.is-stuck h1 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-header.is-stuck .button {
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 0.74rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-header {
+    transition: none;
+  }
 }
 
 .page-subtitle {
@@ -4978,8 +5058,14 @@ legend {
   }
 
   .page-header {
+    top: 71px;
     align-items: flex-start;
+    padding: 16px 18px;
     margin-bottom: 21px;
+  }
+
+  .page-header.is-stuck {
+    padding: 9px 12px;
   }
 
   .page-header .button {
@@ -4987,7 +5073,11 @@ legend {
   }
 
   .page-header h1 {
-    font-size: 1.65rem;
+    font-size: 1.55rem;
+  }
+
+  .page-header.is-stuck h1 {
+    font-size: 1.05rem;
   }
 
   .page-subtitle {
@@ -5328,6 +5418,19 @@ legend {
 @media (max-width: 470px) {
   .page-header {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Auf dem Schirm eines Telefons bleibt eingeklappt nur die Orientierung:
+     Symbol und Titel. Die Schaltflaechen sind einen Wisch nach oben wieder da,
+     statt als Rutschleiste die Zeile zu fuellen. */
+  .page-header.is-stuck {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .page-header.is-stuck .header-actions {
+    display: none;
   }
 
   .page-header > .button,

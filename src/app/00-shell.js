@@ -550,6 +550,7 @@
   let deviceInstructionDeviceSearchTerm = "";
   const cleanFormSnapshots = new WeakMap();
   let activeSettingsSection = "general";
+  let stickyHeaderFrame = 0;
 
   const elements = {
     navEmployeeCount: document.querySelector("#navEmployeeCount"),
