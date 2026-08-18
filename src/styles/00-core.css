@@ -6276,7 +6276,6 @@ body.is-device-matrix-maximized {
   gap: 10px;
   align-items: flex-end;
   padding: 16px 18px;
-  border-bottom: 1px solid var(--slate-100);
   flex-wrap: wrap;
 }
 
