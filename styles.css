@@ -8474,6 +8474,110 @@ html[data-theme="windows-95"] .button-secondary {
   background: #c0c0c0;
 }
 
+/* Die Bildlaufleiste von Windows 95: gerasterte Bahn, erhabener Schieber und
+   quadratische Pfeilfelder. Der Rahmen entsteht wie bei den Schaltflaechen aus
+   vier Innenschatten - aussen Weiss und Schwarz, innen Hellgrau und Grau.
+   Chromium und Safari zeichnen die Teile ueber die -webkit-Pseudoelemente;
+   Firefox kennt nur die beiden Farben und bekommt wenigstens diese. */
+/* Chromium schaltet die -webkit-Pseudoelemente ab, sobald ein Element die
+   Standardeigenschaften setzt. Firefox kennt die Pseudoelemente nicht und
+   bekommt deshalb nur dort die beiden Farben. */
+@supports not selector(::-webkit-scrollbar) {
+  html[data-theme="windows-95"] {
+    scrollbar-color: #c0c0c0 #dfdfdf;
+  }
+}
+
+/* Zwei Bereiche bestellen sonst schmale Leisten in eigenen Farben - damit
+   waeren sie aus demselben Grund von der Gestaltung ausgenommen. */
+html[data-theme="windows-95"] .settings-section-nav,
+html[data-theme="windows-95"] .training-matrix-horizontal-scroll {
+  scrollbar-color: auto;
+  scrollbar-width: auto;
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar,
+html[data-theme="windows-95"] *::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar-track,
+html[data-theme="windows-95"] *::-webkit-scrollbar-track {
+  background-color: #c0c0c0;
+  background-image: repeating-conic-gradient(#ffffff 0% 25%, #c0c0c0 0% 50%);
+  background-size: 2px 2px;
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar-thumb,
+html[data-theme="windows-95"] *::-webkit-scrollbar-thumb {
+  border: 0;
+  border-radius: 0;
+  background: #c0c0c0;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #000000,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #808080;
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar-button,
+html[data-theme="windows-95"] *::-webkit-scrollbar-button {
+  width: 16px;
+  height: 16px;
+  background-color: #c0c0c0;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #000000,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #808080;
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar-button:vertical:decrement,
+html[data-theme="windows-95"] *::-webkit-scrollbar-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 7 4'%3E%3Cpath d='M0 4 3.5 0 7 4Z' fill='%23000000'/%3E%3C/svg%3E");
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar-button:vertical:increment,
+html[data-theme="windows-95"] *::-webkit-scrollbar-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 7 4'%3E%3Cpath d='M0 0 3.5 4 7 0Z' fill='%23000000'/%3E%3C/svg%3E");
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar-button:horizontal:decrement,
+html[data-theme="windows-95"] *::-webkit-scrollbar-button:horizontal:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7' viewBox='0 0 4 7'%3E%3Cpath d='M4 0 0 3.5 4 7Z' fill='%23000000'/%3E%3C/svg%3E");
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar-button:horizontal:increment,
+html[data-theme="windows-95"] *::-webkit-scrollbar-button:horizontal:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7' viewBox='0 0 4 7'%3E%3Cpath d='M0 0 4 3.5 0 7Z' fill='%23000000'/%3E%3C/svg%3E");
+}
+
+/* Ohne diese Zeile setzt Chromium an jedes Ende ein Pfeilpaar. */
+html[data-theme="windows-95"]::-webkit-scrollbar-button:start:increment,
+html[data-theme="windows-95"] *::-webkit-scrollbar-button:start:increment,
+html[data-theme="windows-95"]::-webkit-scrollbar-button:end:decrement,
+html[data-theme="windows-95"] *::-webkit-scrollbar-button:end:decrement {
+  display: none;
+}
+
+html[data-theme="windows-95"]::-webkit-scrollbar-corner,
+html[data-theme="windows-95"] *::-webkit-scrollbar-corner {
+  background: #c0c0c0;
+}
+
+/* Gedrueckt kehrt sich der Rahmen um - das Pfeilfeld sinkt ein. */
+html[data-theme="windows-95"]::-webkit-scrollbar-button:active,
+html[data-theme="windows-95"] *::-webkit-scrollbar-button:active {
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
 @page {
   size: A4 landscape;
   margin: 10mm;
