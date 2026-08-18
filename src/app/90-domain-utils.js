@@ -61,24 +61,81 @@
     const training = getTraining(trainingId);
     return training
       ? latestCompletionForTraining(employeeId, training)
-      : state.completions
-          .filter(
-            (completion) =>
-              completion.employeeId === employeeId &&
-              completion.trainingId === trainingId,
-          )
-          .sort(sortCompletionsDescending)[0];
+      : completionsFor(employeeId, `training:${trainingId}`)[0];
   }
 
   function latestCompletionForTraining(employeeId, training, completedOnOrBefore = "") {
-    return state.completions
-      .filter(
-        (completion) =>
-          completion.employeeId === employeeId &&
-          completionMatchesTraining(completion, training) &&
-          (!completedOnOrBefore || completion.completedOn <= completedOnOrBefore),
-      )
-      .sort(sortCompletionsDescending)[0];
+    const completions = completionsFor(employeeId, completionMatchKey(training));
+    return completedOnOrBefore
+      ? completions.find(
+          (completion) => completion.completedOn <= completedOnOrBefore,
+        )
+      : completions[0];
+  }
+
+  // Eine wiederkehrende Fortbildung zaehlt jeden Nachweis ihrer Reihe, eine
+  // einmalige nur die eigenen. Beides laesst sich als Schluessel schreiben -
+  // damit findet der Index in einem Griff, was completionMatchesTraining
+  // sonst fuer jeden Nachweis einzeln entscheidet.
+  function completionMatchKey(training) {
+    return training.recurrenceMonths && training.seriesId
+      ? `series:${training.seriesId}`
+      : `training:${training.id}`;
+  }
+
+  function completionsFor(employeeId, matchKey) {
+    return completionIndex().get(`${employeeId}|${matchKey}`) || [];
+  }
+
+  // Die Matrix fragt fuer jede Zelle nach dem letzten Nachweis. Ohne Index
+  // durchsucht jede dieser Fragen den gesamten Bestand; bei 70 Mitarbeitern,
+  // 14 Fortbildungen und einem mehrjaehrigen Archiv sind das Millionen von
+  // Vergleichen je Aufbau. Der Index entsteht in einem Durchgang und haelt,
+  // solange Nachweise und Fortbildungen dieselben Sammlungen bleiben - genau
+  // wie bei indexById, denn beide werden bei jeder Aenderung neu aufgebaut.
+  const completionIndexCache = {
+    completions: null,
+    completionCount: -1,
+    trainings: null,
+    trainingCount: -1,
+    index: new Map(),
+  };
+
+  function completionIndex() {
+    const cache = completionIndexCache;
+    if (
+      cache.completions === state.completions &&
+      cache.completionCount === state.completions.length &&
+      cache.trainings === state.trainings &&
+      cache.trainingCount === state.trainings.length
+    ) {
+      return cache.index;
+    }
+
+    const index = new Map();
+    const add = (key, completion) => {
+      const bucket = index.get(key);
+      if (bucket) bucket.push(completion);
+      else index.set(key, [completion]);
+    };
+    for (const completion of state.completions) {
+      add(`${completion.employeeId}|training:${completion.trainingId}`, completion);
+      const completedTraining = getTraining(completion.trainingId);
+      if (completedTraining?.recurrenceMonths && completedTraining.seriesId) {
+        add(
+          `${completion.employeeId}|series:${completedTraining.seriesId}`,
+          completion,
+        );
+      }
+    }
+    for (const bucket of index.values()) bucket.sort(sortCompletionsDescending);
+
+    cache.completions = state.completions;
+    cache.completionCount = state.completions.length;
+    cache.trainings = state.trainings;
+    cache.trainingCount = state.trainings.length;
+    cache.index = index;
+    return index;
   }
 
   function sortCompletionsDescending(a, b) {
@@ -505,6 +562,7 @@
 
     deviceParticipantSearchTerm = "";
     deviceInstructionSearchTerm = "";
+    deviceInstructionLogLimit = DEVICE_INSTRUCTION_LOG_PAGE;
     deviceInstructionDeviceSearchTerm = "";
     elements.deviceParticipantSearch.value = "";
     elements.deviceInstructionSearch.value = "";

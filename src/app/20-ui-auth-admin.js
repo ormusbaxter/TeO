@@ -851,11 +851,13 @@
       deviceInstructionSearchTerm = event.target.value
         .trim()
         .toLocaleLowerCase("de-DE");
+      deviceInstructionLogLimit = DEVICE_INSTRUCTION_LOG_PAGE;
       renderDeviceInstructionList();
     });
     elements.deviceInstructionSort.addEventListener("change", (event) => {
       deviceInstructionSortKey =
         event.target.value === "createdAt" ? "createdAt" : "date";
+      deviceInstructionLogLimit = DEVICE_INSTRUCTION_LOG_PAGE;
       renderDeviceInstructionList();
     });
     elements.deviceInstructionDeviceSearch.addEventListener("input", (event) => {

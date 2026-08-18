@@ -1189,9 +1189,11 @@
       return;
     }
 
+    const shown = instructions.slice(0, deviceInstructionLogLimit);
+    const remaining = instructions.length - shown.length;
     elements.deviceInstructionList.innerHTML = `
       <div class="device-instruction-log">
-        ${instructions
+        ${shown
           .map((instruction) => {
             const device = getDevice(instruction.deviceId);
             if (!device) return "";
@@ -1268,6 +1270,19 @@
             `;
           })
           .join("")}
+        ${
+          remaining
+            ? `
+              <button
+                class="button button-secondary device-instruction-log-more"
+                type="button"
+                data-show-more-device-instructions
+              >
+                Weitere ${remaining} Einweisung${remaining === 1 ? "" : "en"} anzeigen
+              </button>
+            `
+            : ""
+        }
       </div>
     `;
     limitDeviceInstructionLogHeight();
@@ -1291,17 +1306,59 @@
 
   function getDeviceInstructionPercentage(deviceId, employees) {
     if (!employees.length) return 0;
-    const instructedEmployeeIds = new Set(
-      state.deviceInstructions
-        .filter((instruction) => instruction.deviceId === deviceId)
-        .flatMap((instruction) =>
-          instruction.participants.map((participant) => participant.employeeId),
-        ),
-    );
+    const instructedEmployeeIds =
+      deviceInstructionIndex().byDevice.get(deviceId) || EMPTY_EMPLOYEE_IDS;
     const instructedCount = employees.filter((employee) =>
       instructedEmployeeIds.has(employee.id),
     ).length;
     return Math.round((instructedCount / employees.length) * 100);
+  }
+
+  // Die Einweisungsmatrix stellt je Zelle dieselbe Frage: Welche Einweisungen
+  // hat dieser Mitarbeiter an diesem Geraet? Ohne Index durchsucht jede der
+  // Tausenden Zellen den gesamten Bestand samt Teilnehmerlisten. Ein Durchgang
+  // beantwortet alle Fragen; der Index haelt, solange die Sammlung dieselbe
+  // bleibt - sie wird bei jeder Aenderung neu aufgebaut.
+  const EMPTY_EMPLOYEE_IDS = new Set();
+  const deviceInstructionIndexCache = {
+    instructions: null,
+    count: -1,
+    value: { byPair: new Map(), byDevice: new Map() },
+  };
+
+  function deviceInstructionIndex() {
+    const cache = deviceInstructionIndexCache;
+    if (
+      cache.instructions === state.deviceInstructions &&
+      cache.count === state.deviceInstructions.length
+    ) {
+      return cache.value;
+    }
+
+    const byPair = new Map();
+    const byDevice = new Map();
+    for (const instruction of state.deviceInstructions) {
+      let employeeIds = byDevice.get(instruction.deviceId);
+      if (!employeeIds) {
+        employeeIds = new Set();
+        byDevice.set(instruction.deviceId, employeeIds);
+      }
+      for (const participant of instruction.participants) {
+        employeeIds.add(participant.employeeId);
+        const key = `${instruction.deviceId}|${participant.employeeId}`;
+        const bucket = byPair.get(key);
+        if (bucket) bucket.push(instruction);
+        else byPair.set(key, [instruction]);
+      }
+    }
+    for (const bucket of byPair.values()) {
+      bucket.sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    cache.instructions = state.deviceInstructions;
+    cache.count = state.deviceInstructions.length;
+    cache.value = { byPair, byDevice };
+    return cache.value;
   }
 
   // Gemeinsam genutzt von der Einweisungsmatrix und der Jahresauswertung der
@@ -1313,15 +1370,8 @@
   }
 
   function renderDeviceMatrixCell(employee, device) {
-    const instructions = state.deviceInstructions
-      .filter(
-        (instruction) =>
-          instruction.deviceId === device.id &&
-          instruction.participants.some(
-            (participant) => participant.employeeId === employee.id,
-          ),
-      )
-      .sort((a, b) => b.date.localeCompare(a.date));
+    const instructions =
+      deviceInstructionIndex().byPair.get(`${device.id}|${employee.id}`) || [];
     if (!instructions.length) {
       return `
         <td>
@@ -1418,6 +1468,20 @@
   }
 
   function handleDeviceInstructionListAction(event) {
+    const moreButton = event.target.closest("[data-show-more-device-instructions]");
+    if (moreButton) {
+      // Die Blickposition im Protokoll bleibt erhalten, sonst spraenge der
+      // Kasten beim Nachladen an den Anfang zurueck.
+      const log = moreButton.closest(".device-instruction-log");
+      const scrollTop = log?.scrollTop || 0;
+      deviceInstructionLogLimit += DEVICE_INSTRUCTION_LOG_PAGE;
+      renderDeviceInstructionList();
+      const refreshed = elements.deviceInstructionList.querySelector(
+        ".device-instruction-log",
+      );
+      if (refreshed) refreshed.scrollTop = scrollTop;
+      return;
+    }
     const editButton = event.target.closest("[data-edit-device-instruction]");
     if (editButton) {
       openDeviceInstructionDialog(
