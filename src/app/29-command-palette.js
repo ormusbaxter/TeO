@@ -290,7 +290,7 @@
         hint: `${formatDate(appointment.date)}${appointment.location ? ` · ${appointment.location}` : ""}`,
         run: () => {
           showView("appointments");
-          openAppointmentDialog(appointment.id);
+          selectRecordInspector("appointment", appointment.id);
         },
       })),
       ...state.memos
@@ -302,7 +302,7 @@
           hint: memo.category || formatDate(memo.date),
           run: () => {
             showView("memos");
-            openMemoDialog(memo.id);
+            selectRecordInspector("memo", memo.id);
           },
         })),
       ...state.trainings.map((training) => ({
@@ -332,7 +332,7 @@
         hint: device.category || "",
         run: () => {
           showView("device-management");
-          openDeviceDialog(device.id);
+          selectRecordInspector("device", device.id);
         },
       })),
     ];

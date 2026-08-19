@@ -38,6 +38,7 @@
     bindKeyboardShortcuts();
     bindCommandPalette();
     bindViewFilterChips();
+    bindRecordInspectors();
     bindTableComfort();
     bindDesktopWorkspace();
     bindWhatsNew();

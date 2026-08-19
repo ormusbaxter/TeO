@@ -11182,20 +11182,58 @@ body.is-vacation-planner-maximized {
   border-top: 1px solid var(--slate-200);
 }
 
-.employee-workspace {
+.record-workspace {
   display: grid;
   min-width: 0;
 }
 
-.employee-workspace:has(.employee-inspector:not([hidden])) {
+.record-workspace:has(.record-inspector:not([hidden])) {
   grid-template-columns: minmax(650px, 1fr) minmax(310px, 25vw);
 }
 
-.employee-workspace > #employeeTable {
+.record-workspace > :first-child {
   min-width: 0;
+  /* Ohne diese Zeile zoege die hohe Schnellansicht die Karten daneben auf
+     ihre Hoehe. */
+  align-self: start;
 }
 
-.employee-inspector {
+/* Die angesehene Karte wird wie die angesehene Tabellenzeile hervorgehoben. */
+:is(.meeting-card, .memo-card, .device-card).is-inspected {
+  outline: 2px solid var(--blue-600);
+  outline-offset: -2px;
+}
+
+:is(.meeting-card, .memo-card, .device-card)[data-record-card] {
+  cursor: pointer;
+}
+
+/* Der Kopf der Schnellansicht ohne Bild: Statt des Bildzeichens der Person
+   steht dort das Symbol der Datenart. */
+.record-inspector-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--blue-700);
+  border-radius: var(--radius-md);
+  background: var(--blue-50);
+}
+
+.record-inspector-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.record-inspector-text {
+  margin: 0;
+  color: var(--slate-700);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.record-inspector {
   position: sticky;
   top: 84px;
   align-self: start;
@@ -11205,38 +11243,38 @@ body.is-vacation-planner-maximized {
   background: var(--white);
 }
 
-.employee-inspector > div {
+.record-inspector > div {
   padding: 20px;
 }
 
-.employee-inspector-header {
+.record-inspector-header {
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 12px;
   align-items: start;
 }
 
-.employee-inspector-header h2,
-.employee-inspector-header p {
+.record-inspector-header h2,
+.record-inspector-header p {
   margin: 0;
 }
 
-.employee-inspector-header small {
+.record-inspector-header small {
   color: var(--slate-500);
 }
 
-.employee-inspector-actions {
+.record-inspector-actions {
   display: flex;
   gap: 7px;
   margin: 18px 0;
 }
 
-.employee-inspector-actions .button {
+.record-inspector-actions .button {
   flex: 1;
   padding-inline: 10px;
 }
 
-.employee-inspector-facts {
+.record-inspector-facts {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
@@ -11247,18 +11285,24 @@ body.is-vacation-planner-maximized {
   background: var(--slate-200);
 }
 
-.employee-inspector-facts div {
+.record-inspector-facts div {
   min-width: 0;
   padding: 10px;
   background: var(--white);
 }
 
-.employee-inspector-facts dt {
+/* Bei ungerader Anzahl fuellt die letzte Angabe die Zeile, statt ein leeres
+   Feld danebenstehen zu lassen. */
+.record-inspector-facts div:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.record-inspector-facts dt {
   color: var(--slate-500);
   font-size: 0.62rem;
 }
 
-.employee-inspector-facts dd {
+.record-inspector-facts dd {
   overflow: hidden;
   margin: 4px 0 0;
   color: var(--slate-800);
@@ -11267,11 +11311,11 @@ body.is-vacation-planner-maximized {
   text-overflow: ellipsis;
 }
 
-.employee-inspector-section {
+.record-inspector-section {
   margin-top: 20px;
 }
 
-.employee-inspector-section h3 {
+.record-inspector-section h3 {
   margin: 0 0 10px;
   font-size: 0.76rem;
 }
@@ -11501,11 +11545,11 @@ body.is-resizing-column {
 }
 
 @media (max-width: 1199px) {
-  .employee-workspace:has(.employee-inspector:not([hidden])) {
+  .record-workspace:has(.record-inspector:not([hidden])) {
     grid-template-columns: 1fr;
   }
 
-  .employee-inspector {
+  .record-inspector {
     position: static;
     max-height: none;
     border-top: 1px solid var(--slate-200);

@@ -1,3 +1,8 @@
+### 4.44.0 – Schnellansicht für alle Datenarten
+
+- **Neu:** Termine, Memos und Geräte haben dieselbe Schnellansicht wie die Mitarbeiter: Ein Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster – öffnet rechts eine Übersicht mit den Eckdaten, ohne dass ein Dialog die Liste verdeckt. Von dort führen **Anheften**, **Bearbeiten** und je nach Datenart **Kalender**, **Erledigt** oder **Übersicht** weiter; der Stift auf der Karte öffnet wie bisher direkt den Bearbeitungsdialog
+- **Verbessert:** Geräte erscheinen jetzt ebenfalls in Verlauf und Favoriten von **Strg + K**; Termine, Memos und Geräte öffnen von dort die Schnellansicht statt eines Dialogs
+
 ### 4.43.4 – Termin direkt im Dialog löschen
 
 - **Neu:** Beim Bearbeiten eines Termins steht die Löschaktion direkt im Dialog bereit; sie verwendet weiterhin die Sicherheitsabfrage und kann anschließend rückgängig gemacht werden

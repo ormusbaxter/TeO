@@ -148,7 +148,7 @@ und ist nicht Teil der Datensicherung. Ist ein gemerkter Wert später entfallen
   werden; Auswahl und Name bleiben ohnehin am linken Rand stehen. Diese
   Einstellungen gelten nur am jeweiligen Arbeitsplatz.
 
-### Mitarbeiter-Schnellansicht
+### Schnellansicht
 
 Ein Klick auf eine freie Stelle einer Mitarbeiterzeile öffnet rechts neben der
 Tabelle eine Schnellansicht. Sie zeigt Status, Stellenumfang, Dienstwochenende,
@@ -156,6 +156,22 @@ Kontakt, Fortbildungsstand und Qualifikationen, ohne die Liste zu verlassen.
 Von dort lässt sich der Mitarbeiter bearbeiten, seine Gesamtakte öffnen oder
 für den Schnellzugriff anheften. Mit **Pfeil hoch** und **Pfeil runter** bewegt
 sich der Fokus durch die Tabellenzeilen, **Enter** öffnet die Schnellansicht.
+
+Dieselbe Schnellansicht gibt es für **Termine**, **Memos** und **Geräte**: Ein
+Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster –
+öffnet sie rechts neben der Liste.
+
+| Datenart | Angaben | Aktionen |
+| --- | --- | --- |
+| Termin | Datum, Uhrzeit, Ort, Kategorie, angepinnt, Teilnehmerliste, Beschreibung | Anheften · Bearbeiten · **Kalender** (springt in den Monat des Termins) |
+| Memo / ToDo | Datum, Kategorie, Sichtbarkeit, Status, angepinnt, Beschreibung | Anheften · Bearbeiten · **Erledigt** beziehungsweise **Wieder öffnen** |
+| Gerät | Hersteller, Produkt, Kategorie, Anlage 1, Bestand, Einweisungsquote, Einweisungsberechtigte | Anheften · Bearbeiten · **Übersicht** (Einweisungen des Geräts) |
+
+Die Schaltflächen auf der Karte behalten ihre Aufgabe: Der Stift öffnet weiterhin
+unmittelbar den Bearbeitungsdialog, der Papierkorb löscht. Persönliche Memos
+anderer Konten erscheinen auch hier nicht. Angeheftete Datensätze und die zuletzt
+geöffneten stehen in **Strg + K** und führen von dort wieder in die
+Schnellansicht.
 
 ### Arbeitsliste und Dashboard
 
