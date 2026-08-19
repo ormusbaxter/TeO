@@ -278,6 +278,7 @@
 
   function renderEmployees() {
     renderEmployeeFilterOptions();
+    renderViewFilterChips("employees");
     const filtered = filteredEmployeesForTable();
     updateEmailExportButton();
     updateUsernameExportButton();
@@ -321,11 +322,9 @@
                 />
               </th>
               ${renderEmployeeSortHeader("name", "Mitarbeiter")}
-              ${renderEmployeeSortHeader("profession", "Beruf")}
-              ${renderEmployeeSortHeader("employment", "Umfang")}
-              ${renderEmployeeSortHeader("qualifications", "Qualifikationen")}
-              ${renderEmployeeSortHeader("trainings", "Fortbildungen")}
-              ${renderEmployeeSortHeader("status", "Status")}
+              ${visibleEmployeeColumns()
+                .map((column) => renderEmployeeSortHeader(column.key, column.label))
+                .join("")}
               <th><span class="sr-only">Aktionen</span></th>
             </tr>
           </thead>
@@ -387,6 +386,7 @@
       .filter(([, selected]) => selected)
       .map(([key]) => qualificationLabel(key));
     const trainingStats = getEmployeeTrainingStats(employee.id);
+    const cells = employeeRowCells(employee, { selectedQualifications, trainingStats });
 
     return `
       <tr>
@@ -398,7 +398,7 @@
             ${selectedEmployeeIds.has(employee.id) ? "checked" : ""}
           />
         </td>
-        <td>
+        <td data-column="name">
           <div class="employee-cell">
             ${renderAvatar(employee)}
             <div>
@@ -416,56 +416,9 @@
             </div>
           </div>
         </td>
-        <td>
-          <span class="profession-cell">
-            <strong>${escapeHtml(employee.profession)}</strong>
-            <small>Dienstwochenende: ${escapeHtml(
-              serviceWeekendLabel(employee.serviceWeekend),
-            )}</small>
-          </span>
-        </td>
-        <td><strong>${employee.employmentPercent}&thinsp;%</strong></td>
-        <td>
-          <div class="qualification-tags">
-            ${
-              selectedQualifications.length
-                ? selectedQualifications
-                    .slice(0, 2)
-                    .map((qualification) => `<span class="tag">${escapeHtml(qualification)}</span>`)
-                    .join("") +
-                  (selectedQualifications.length > 2
-                    ? `<span class="tag tag-muted">+${selectedQualifications.length - 2}</span>`
-                    : "")
-                : '<span class="tag tag-muted">Keine</span>'
-            }
-          </div>
-        </td>
-        <td>
-          <div class="table-progress">
-            <div
-              class="progress-track"
-              role="progressbar"
-              aria-label="${escapeHtml(fullName(employee))}: ${trainingStats.percent} Prozent der Pflichtfortbildungen aktuell"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow="${trainingStats.percent}"
-            >
-              <div class="progress-bar"${dynamicStyle({ "--progress": `${trainingStats.percent}%` })}></div>
-            </div>
-            <span>${trainingStats.current}/${trainingStats.total}</span>
-          </div>
-        </td>
-        <td>
-          <span class="status-badge ${
-            employee.employmentStatus === "inactive"
-              ? "inactive"
-              : employee.employmentStatus === "onboarding"
-                ? "onboarding"
-                : ""
-          }">
-            ${escapeHtml(employeeStatusLabel(employee))}
-          </span>
-        </td>
+        ${visibleEmployeeColumns()
+          .map((column) => cells[column.key])
+          .join("")}
         <td>
           <div class="table-actions">
             <button
@@ -518,11 +471,78 @@
     `;
   }
 
+  // Die wählbaren Spalten der Mitarbeitertabelle. Name, Auswahl und Aktionen
+  // stehen immer; alles dazwischen lässt sich abwählen.
+  function employeeRowCells(employee, { selectedQualifications, trainingStats }) {
+    return {
+      profession: `
+        <td data-column="profession">
+          <span class="profession-cell">
+            <strong>${escapeHtml(employee.profession)}</strong>
+            <small>Dienstwochenende: ${escapeHtml(
+              serviceWeekendLabel(employee.serviceWeekend),
+            )}</small>
+          </span>
+        </td>
+      `,
+      employment: `
+        <td data-column="employment"><strong>${employee.employmentPercent}&thinsp;%</strong></td>
+      `,
+      qualifications: `
+        <td data-column="qualifications">
+          <div class="qualification-tags">
+            ${
+              selectedQualifications.length
+                ? selectedQualifications
+                    .slice(0, 2)
+                    .map((qualification) => `<span class="tag">${escapeHtml(qualification)}</span>`)
+                    .join("") +
+                  (selectedQualifications.length > 2
+                    ? `<span class="tag tag-muted">+${selectedQualifications.length - 2}</span>`
+                    : "")
+                : '<span class="tag tag-muted">Keine</span>'
+            }
+          </div>
+        </td>
+      `,
+      trainings: `
+        <td data-column="trainings">
+          <div class="table-progress">
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-label="${escapeHtml(fullName(employee))}: ${trainingStats.percent} Prozent der Pflichtfortbildungen aktuell"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="${trainingStats.percent}"
+            >
+              <div class="progress-bar"${dynamicStyle({ "--progress": `${trainingStats.percent}%` })}></div>
+            </div>
+            <span>${trainingStats.current}/${trainingStats.total}</span>
+          </div>
+        </td>
+      `,
+      status: `
+        <td data-column="status">
+          <span class="status-badge ${
+            employee.employmentStatus === "inactive"
+              ? "inactive"
+              : employee.employmentStatus === "onboarding"
+                ? "onboarding"
+                : ""
+          }">
+            ${escapeHtml(employeeStatusLabel(employee))}
+          </span>
+        </td>
+      `,
+    };
+  }
+
   function renderEmployeeSortHeader(key, label) {
     const active = employeeSortKey === key;
     const direction = active ? (employeeSortDirection === "asc" ? "▲" : "▼") : "";
     return `
-      <th>
+      <th data-column="${key}">
         <button
           class="table-sort-button ${active ? "is-active" : ""}"
           type="button"

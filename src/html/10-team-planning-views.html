@@ -124,7 +124,18 @@
               <button class="button button-ghost" id="resetEmployeeFilters" type="button">
                 Filter zurücksetzen
               </button>
+              <button
+                class="button button-ghost"
+                id="openEmployeeColumnsButton"
+                type="button"
+                title="Sichtbare Spalten der Tabelle wählen"
+              >
+                <svg><use href="#icon-columns"></use></svg>
+                Spalten
+              </button>
             </div>
+            <div class="filter-chip-bar" data-filter-chips="employees" hidden></div>
+            <div class="filter-chip-bar" data-filter-chips="employees" hidden></div>
             <div class="employee-bulk-bar" id="employeeBulkBar" hidden>
               <strong id="employeeBulkCount">0 ausgewählt</strong>
               <button class="button button-secondary" id="openBulkEditButton" type="button">

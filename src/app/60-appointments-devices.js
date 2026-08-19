@@ -1,4 +1,5 @@
   function renderAppointments() {
+    renderViewFilterChips("appointments");
     const today = todayIso();
     const pinnedAppointments = state.appointments
       .filter(
@@ -672,6 +673,8 @@
   }
 
   function renderDevices() {
+    renderViewFilterChips("devices");
+    renderViewFilterChips("device-management");
     const categories = [
       ...new Set(state.devices.map((device) => device.category)),
     ].sort((a, b) => a.localeCompare(b, "de"));

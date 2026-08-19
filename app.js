@@ -1082,6 +1082,15 @@
     bulkQualificationState: document.querySelector("#bulkQualificationState"),
     dataQualityDialog: document.querySelector("#dataQualityDialog"),
     dataQualityContent: document.querySelector("#dataQualityContent"),
+    whatsNewDialog: document.querySelector("#whatsNewDialog"),
+    whatsNewSubtitle: document.querySelector("#whatsNewSubtitle"),
+    whatsNewVersion: document.querySelector("#whatsNewVersion"),
+    whatsNewEntries: document.querySelector("#whatsNewEntries"),
+    whatsNewHelpButton: document.querySelector("#whatsNewHelpButton"),
+    tableDensityToggle: document.querySelector("#tableDensityToggle"),
+    openEmployeeColumnsButton: document.querySelector("#openEmployeeColumnsButton"),
+    employeeColumnsDialog: document.querySelector("#employeeColumnsDialog"),
+    employeeColumnsList: document.querySelector("#employeeColumnsList"),
     commandPalette: document.querySelector("#commandPalette"),
     commandPaletteInput: document.querySelector("#commandPaletteInput"),
     commandPaletteResults: document.querySelector("#commandPaletteResults"),
@@ -1174,6 +1183,9 @@
     bindSidebarCollapse();
     bindKeyboardShortcuts();
     bindCommandPalette();
+    bindViewFilterChips();
+    bindTableComfort();
+    bindWhatsNew();
     bindDialogTriggers();
     bindForms();
     bindFilters();
@@ -1188,6 +1200,9 @@
     const initialHash = window.location.hash.replace("#", "");
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
+    // Erst nach dem ersten Aufbau: Vorher stehen in den Auswahlfeldern weder
+    // Berufe noch Kategorien, ein gemerkter Wert liefe ins Leere.
+    restoreRememberedViewFilters();
     restoreAuthenticationSession();
     if (discardedUserAccounts > 0) {
       showToast(
@@ -4065,6 +4080,9 @@
     document.body.classList.remove("is-auth-locked");
     if (elements.changePasswordDialog.open) elements.changePasswordDialog.close();
     scheduleAutomaticBackup();
+    // Erst jetzt: Vor der Anmeldung steht die Anwendung noch hinter der
+    // Sperre, und ein Hinweis darueber waere im Weg.
+    showWhatsNewIfUpdated();
   }
 
   function showLoginDialog() {
@@ -5035,6 +5053,79 @@
     }
   }
 
+  // „Was ist neu“ nach einer neuen Fassung.
+  //
+  // Das Änderungsverzeichnis steckt ohnehin in der Hilfe; dieser Hinweis holt
+  // den Abschnitt der laufenden Fassung einmalig nach vorn. Die zuletzt
+  // gesehene Fassung liegt im Browserprofil: Sie beschreibt diesen
+  // Arbeitsplatz, nicht den Datenbestand - an einem zweiten Rechner soll der
+  // Hinweis erneut erscheinen.
+  const LAST_SEEN_VERSION_KEY = "teo-last-seen-version-v1";
+
+  function bindWhatsNew() {
+    elements.whatsNewHelpButton?.addEventListener("click", () => {
+      elements.whatsNewDialog.close();
+      showView("help");
+      document
+        .querySelector("#hilfe-anderungshistorie")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function readLastSeenVersion() {
+    try {
+      return localStorage.getItem(LAST_SEEN_VERSION_KEY) || "";
+    } catch (error) {
+      console.warn("Die zuletzt gesehene Fassung ist unlesbar.", error);
+      return "";
+    }
+  }
+
+  function rememberSeenVersion(version) {
+    try {
+      localStorage.setItem(LAST_SEEN_VERSION_KEY, version);
+    } catch (error) {
+      console.warn("Die gesehene Fassung konnte nicht gemerkt werden.", error);
+    }
+  }
+
+  // Beim ersten Start überhaupt wird nur gemerkt: Wer TeO gerade einrichtet,
+  // braucht keine Liste der Änderungen gegenüber einer Fassung, die er nie
+  // benutzt hat.
+  function showWhatsNewIfUpdated() {
+    const version = projectBuildNumber();
+    const lastSeen = readLastSeenVersion();
+    if (lastSeen === version) return false;
+
+    rememberSeenVersion(version);
+    if (!lastSeen) return false;
+    return openWhatsNewDialog(version, lastSeen);
+  }
+
+  function openWhatsNewDialog(version, lastSeen = "") {
+    const section = changelogSectionMarkup(version);
+    if (!section || !elements.whatsNewDialog) return false;
+
+    elements.whatsNewVersion.textContent = section.title;
+    elements.whatsNewEntries.innerHTML = section.entries;
+    elements.whatsNewSubtitle.textContent = lastSeen
+      ? `Zuletzt benutzt: Fassung ${lastSeen}. Das hat sich seitdem geändert:`
+      : "Das ist in dieser Fassung neu:";
+    elements.whatsNewDialog.showModal();
+    return true;
+  }
+
+  // Der Abschnitt steht schon im Markup der Hilfe - als Überschrift der
+  // Fassung und der Aufzählung dahinter. Er wird von dort übernommen, damit es
+  // nicht zwei Fassungen desselben Textes gibt.
+  function changelogSectionMarkup(version) {
+    const headings = [...document.querySelectorAll(".help-section h3")];
+    const heading = headings.find((item) => item.textContent.trim().startsWith(version));
+    const list = heading?.nextElementSibling;
+    if (!heading || list?.tagName !== "UL") return null;
+    return { title: heading.textContent.trim(), entries: list.innerHTML };
+  }
+
   // Reihenfolge der Hauptnavigation. Sie ist eine persoenliche Vorliebe und
   // gehoert deshalb nicht in den geteilten Datenbestand: Im MariaDB-Modus
   // wuerde sie sonst fuer alle gelten, und ein normales Konto koennte sie
@@ -5326,6 +5417,417 @@
     );
 
     elements.resetSidebarOrderButton?.addEventListener("click", resetSidebarOrder);
+  }
+
+  // Aktive Filter als Chips - und die Möglichkeit, eine Einstellung zu merken.
+  //
+  // Die Chips sind bewusst nur eine Sicht auf die vorhandenen Bedienelemente:
+  // Sie lesen ihre Beschriftung aus Schaltfläche, Auswahlfeld oder Suchfeld und
+  // setzen zum Entfernen genau dort den Standardwert - mit demselben Ereignis,
+  // das auch eine Bedienung von Hand auslöst. So gibt es keinen zweiten Ort,
+  // an dem Filterzustände gepflegt werden müssten.
+  const VIEW_FILTER_KEY = "teo-view-filters-v1";
+
+  function viewFilterControls() {
+    return {
+      employees: [
+        { kind: "search", element: elements.employeeSearch, label: "Suche" },
+        { kind: "segmented", attribute: "data-status-filter", label: "Status", fallback: "all" },
+        { kind: "select", element: elements.employeeProfessionFilter, label: "Beruf" },
+        {
+          kind: "select",
+          element: elements.employeeQualificationFilter,
+          label: "Qualifikation",
+        },
+        { kind: "select", element: elements.employeeWeekendFilter, label: "Dienstwochenende" },
+      ],
+      appointments: [
+        { kind: "search", element: elements.appointmentSearch, label: "Suche" },
+        {
+          kind: "segmented",
+          attribute: "data-appointment-filter",
+          label: "Zeitraum",
+          fallback: "all",
+        },
+      ],
+      memos: [
+        { kind: "search", element: elements.memoSearch, label: "Suche" },
+        { kind: "select", element: elements.memoCategoryFilter, label: "Kategorie" },
+        {
+          kind: "segmented",
+          attribute: "data-memo-status",
+          label: "Status",
+          fallback: "open",
+        },
+      ],
+      devices: [
+        { kind: "search", element: elements.deviceSearch, label: "Suche" },
+        {
+          kind: "select",
+          element: elements.deviceInventoryFilter,
+          label: "Gerätebestand",
+          fallback: "current",
+        },
+        { kind: "select", element: elements.deviceAnnexFilter, label: "Anlage 1" },
+        { kind: "select", element: elements.deviceCategoryFilter, label: "Gerätekategorie" },
+        {
+          kind: "select",
+          element: elements.deviceEmployeeStatusFilter,
+          label: "Mitarbeiterstatus",
+          fallback: "employed",
+        },
+        { kind: "search", element: elements.deviceEmployeeSearch, label: "Mitarbeiter" },
+      ],
+      "device-management": [
+        { kind: "search", element: elements.deviceManagementSearch, label: "Suche" },
+        {
+          kind: "select",
+          element: elements.deviceManagementInventoryFilter,
+          label: "Gerätebestand",
+          fallback: "current",
+        },
+        { kind: "select", element: elements.deviceManagementAnnexFilter, label: "Anlage 1" },
+        {
+          kind: "select",
+          element: elements.deviceManagementCategoryFilter,
+          label: "Gerätekategorie",
+        },
+        {
+          kind: "select",
+          element: elements.deviceManagementAuthorizationFilter,
+          label: "Einweisungsberechtigung",
+        },
+      ],
+    };
+  }
+
+  // Der Standardwert eines Filters: das, was „kein Filter“ bedeutet.
+  function viewFilterFallback(control) {
+    return control.fallback || "all";
+  }
+
+  function viewFilterValue(control) {
+    if (control.kind === "segmented") {
+      return (
+        document.querySelector(`[${control.attribute}].is-active`)?.getAttribute(control.attribute) ||
+        viewFilterFallback(control)
+      );
+    }
+    return control.element?.value ?? "";
+  }
+
+  // Was der Chip zeigt: bei Auswahlfeldern die gewählte Zeile, bei
+  // Schaltflächen ihre Beschriftung, bei der Suche das Eingetippte.
+  function viewFilterDisplay(control) {
+    if (control.kind === "search") return control.element?.value.trim() || "";
+    if (control.kind === "segmented") {
+      const active = document.querySelector(`[${control.attribute}].is-active`);
+      if (!active || active.getAttribute(control.attribute) === viewFilterFallback(control)) {
+        return "";
+      }
+      return active.textContent.trim();
+    }
+    const select = control.element;
+    if (!select || select.value === viewFilterFallback(control)) return "";
+    return select.selectedOptions[0]?.textContent.trim() || select.value;
+  }
+
+  // Zurücksetzen heißt: das Bedienelement auf den Standard stellen und das
+  // Ereignis auslösen, auf das die Ansicht ohnehin hört.
+  function clearViewFilter(control) {
+    if (control.kind === "segmented") {
+      document
+        .querySelector(`[${control.attribute}="${viewFilterFallback(control)}"]`)
+        ?.click();
+      return;
+    }
+    if (!control.element) return;
+    if (control.kind === "search") {
+      control.element.value = "";
+      control.element.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+    control.element.value = viewFilterFallback(control);
+    control.element.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function applyViewFilterValue(control, value) {
+    if (control.kind === "segmented") {
+      document.querySelector(`[${control.attribute}="${value}"]`)?.click();
+      return;
+    }
+    if (!control.element) return;
+    if (control.kind === "select" && !control.element.querySelector(`option[value="${value}"]`)) {
+      // Ein Beruf oder eine Kategorie kann inzwischen entfallen sein.
+      return;
+    }
+    control.element.value = value;
+    control.element.dispatchEvent(
+      new Event(control.kind === "search" ? "input" : "change", { bubbles: true }),
+    );
+  }
+
+  function renderViewFilterChips(view) {
+    const container = document.querySelector(`[data-filter-chips="${view}"]`);
+    const controls = viewFilterControls()[view];
+    if (!container || !controls) return;
+
+    const active = controls
+      .map((control, index) => ({ control, index, display: viewFilterDisplay(control) }))
+      .filter((entry) => entry.display);
+    const remembered = Boolean(storedViewFilters()[view]);
+
+    container.hidden = !active.length && !remembered;
+    if (container.hidden) {
+      container.innerHTML = "";
+      return;
+    }
+
+    container.innerHTML = `
+      <span class="filter-chip-label">${active.length ? "Aktive Filter" : "Keine Filter aktiv"}</span>
+      ${active
+        .map(
+          (entry) => `
+            <button
+              class="filter-chip"
+              type="button"
+              data-clear-filter="${entry.index}"
+              title="${escapeHtml(`${entry.control.label}-Filter entfernen`)}"
+            >
+              <span>${escapeHtml(entry.control.label)}: <strong>${escapeHtml(entry.display)}</strong></span>
+              <svg aria-hidden="true"><use href="#icon-close"></use></svg>
+            </button>
+          `,
+        )
+        .join("")}
+      <button class="filter-chip-remember" type="button" data-remember-filters>
+        <svg aria-hidden="true"><use href="#icon-${remembered ? "trash" : "star"}"></use></svg>
+        ${remembered ? "Gemerkte Ansicht aufheben" : "Ansicht merken"}
+      </button>
+    `;
+  }
+
+  function handleViewFilterChipClick(event) {
+    const container = event.target.closest("[data-filter-chips]");
+    if (!container) return;
+    const view = container.dataset.filterChips;
+    const controls = viewFilterControls()[view];
+    if (!controls) return;
+
+    const chip = event.target.closest("[data-clear-filter]");
+    if (chip) {
+      clearViewFilter(controls[Number(chip.dataset.clearFilter)]);
+      renderViewFilterChips(view);
+      return;
+    }
+
+    if (event.target.closest("[data-remember-filters]")) toggleRememberedView(view, controls);
+  }
+
+  function storedViewFilters() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(VIEW_FILTER_KEY) || "{}");
+      return stored && typeof stored === "object" ? stored : {};
+    } catch (error) {
+      console.warn("Die gemerkten Ansichten sind unlesbar.", error);
+      return {};
+    }
+  }
+
+  function writeStoredViewFilters(value) {
+    try {
+      localStorage.setItem(VIEW_FILTER_KEY, JSON.stringify(value));
+    } catch (error) {
+      console.warn("Die gemerkte Ansicht konnte nicht gespeichert werden.", error);
+    }
+  }
+
+  // Gemerkt wird im Browserprofil, nicht im Datenbestand: Ein Filter ist eine
+  // persönliche Arbeitsweise und geht andere Arbeitsplätze nichts an.
+  function toggleRememberedView(view, controls) {
+    const stored = storedViewFilters();
+    if (stored[view]) {
+      delete stored[view];
+      writeStoredViewFilters(stored);
+      showToast("Die gemerkte Ansicht wurde aufgehoben.");
+    } else {
+      stored[view] = controls.map((control) => viewFilterValue(control));
+      writeStoredViewFilters(stored);
+      showToast("Diese Ansicht wird beim nächsten Start wiederhergestellt.");
+    }
+    renderViewFilterChips(view);
+  }
+
+  // Beim Start: Erst nachdem die Ansichten einmal aufgebaut sind, stehen in den
+  // Auswahlfeldern die Berufe und Kategorien - vorher ginge ein gemerkter Wert
+  // ins Leere.
+  function restoreRememberedViewFilters() {
+    const stored = storedViewFilters();
+    const controls = viewFilterControls();
+    for (const [view, values] of Object.entries(stored)) {
+      if (!Array.isArray(values) || !controls[view]) continue;
+      controls[view].forEach((control, index) => {
+        const value = values[index];
+        if (value === undefined || value === viewFilterValue(control)) return;
+        applyViewFilterValue(control, value);
+      });
+      renderViewFilterChips(view);
+    }
+  }
+
+  function bindViewFilterChips() {
+    document.querySelectorAll("[data-filter-chips]").forEach((container) => {
+      container.addEventListener("click", handleViewFilterChipClick);
+    });
+  }
+
+  // Tabellenkomfort: Zeilendichte, Spaltenwahl und Mehrfachauswahl.
+  //
+  // Alle drei sind persönliche Arbeitsweisen und liegen deshalb im
+  // Browserprofil, nicht im geteilten Datenbestand.
+  const TABLE_DENSITY_KEY = "teo-table-density-v1";
+  const EMPLOYEE_COLUMN_KEY = "teo-employee-columns-v1";
+
+  // Name, Auswahl und Aktionen stehen immer; diese fünf sind wählbar.
+  const EMPLOYEE_COLUMNS = Object.freeze([
+    { key: "profession", label: "Beruf" },
+    { key: "employment", label: "Umfang" },
+    { key: "qualifications", label: "Qualifikationen" },
+    { key: "trainings", label: "Fortbildungen" },
+    { key: "status", label: "Status" },
+  ]);
+
+  let hiddenEmployeeColumns = new Set();
+  // Die zuletzt angeklickte Zeile - Ausgangspunkt für die Auswahl mit
+  // Umschalttaste.
+  let lastEmployeeSelectionIndex = -1;
+  let employeeSelectionShiftPressed = false;
+
+  function visibleEmployeeColumns() {
+    return EMPLOYEE_COLUMNS.filter((column) => !hiddenEmployeeColumns.has(column.key));
+  }
+
+  function bindTableComfort() {
+    applyTableDensity(readStoredTableDensity());
+    hiddenEmployeeColumns = readStoredHiddenEmployeeColumns();
+
+    elements.tableDensityToggle?.addEventListener("change", (event) => {
+      const density = event.target.checked ? "compact" : "comfortable";
+      applyTableDensity(density);
+      try {
+        localStorage.setItem(TABLE_DENSITY_KEY, density);
+      } catch (error) {
+        console.warn("Die Zeilendichte konnte nicht gespeichert werden.", error);
+      }
+    });
+
+    elements.openEmployeeColumnsButton?.addEventListener("click", openEmployeeColumnsDialog);
+    elements.employeeColumnsList?.addEventListener("change", handleEmployeeColumnChange);
+
+    // Ob die Umschalttaste gedrueckt war, steht nur am Klick - das
+    // change-Ereignis der Auswahlkaestchen kennt keine Zusatztasten. Der Klick
+    // kommt zuerst, deshalb liegt die Antwort bereit, wenn change eintrifft.
+    elements.employeeTable?.addEventListener("click", (event) => {
+      if (event.target.closest("[data-select-employee]")) {
+        employeeSelectionShiftPressed = event.shiftKey;
+      }
+    });
+  }
+
+  function takeEmployeeSelectionShift() {
+    const pressed = employeeSelectionShiftPressed;
+    employeeSelectionShiftPressed = false;
+    return pressed;
+  }
+
+  function applyTableDensity(density) {
+    const compact = density === "compact";
+    document.body.classList.toggle("is-compact-tables", compact);
+    if (elements.tableDensityToggle) elements.tableDensityToggle.checked = compact;
+  }
+
+  function readStoredTableDensity() {
+    try {
+      return localStorage.getItem(TABLE_DENSITY_KEY) === "compact" ? "compact" : "comfortable";
+    } catch (error) {
+      console.warn("Die gespeicherte Zeilendichte ist unlesbar.", error);
+      return "comfortable";
+    }
+  }
+
+  function readStoredHiddenEmployeeColumns() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(EMPLOYEE_COLUMN_KEY) || "[]");
+      const known = new Set(EMPLOYEE_COLUMNS.map((column) => column.key));
+      return new Set((Array.isArray(stored) ? stored : []).filter((key) => known.has(key)));
+    } catch (error) {
+      console.warn("Die gespeicherte Spaltenwahl ist unlesbar.", error);
+      return new Set();
+    }
+  }
+
+  function openEmployeeColumnsDialog() {
+    elements.employeeColumnsList.innerHTML = EMPLOYEE_COLUMNS.map(
+      (column) => `
+        <label class="checkbox-field">
+          <input
+            type="checkbox"
+            data-employee-column="${column.key}"
+            ${hiddenEmployeeColumns.has(column.key) ? "" : "checked"}
+          />
+          <span>${escapeHtml(column.label)}</span>
+        </label>
+      `,
+    ).join("");
+    elements.employeeColumnsDialog.showModal();
+  }
+
+  function handleEmployeeColumnChange(event) {
+    const checkbox = event.target.closest("[data-employee-column]");
+    if (!checkbox) return;
+    const key = checkbox.dataset.employeeColumn;
+
+    if (checkbox.checked) hiddenEmployeeColumns.delete(key);
+    else hiddenEmployeeColumns.add(key);
+
+    // Ganz ohne Spalte bliebe eine Namensliste - das ist erlaubt, aber die
+    // Sortierung muss dann auf den Namen zurückfallen, sonst sortierte die
+    // Tabelle nach einer Spalte, die niemand mehr sieht.
+    if (hiddenEmployeeColumns.has(employeeSortKey)) employeeSortKey = "name";
+
+    try {
+      localStorage.setItem(EMPLOYEE_COLUMN_KEY, JSON.stringify([...hiddenEmployeeColumns]));
+    } catch (error) {
+      console.warn("Die Spaltenwahl konnte nicht gespeichert werden.", error);
+    }
+    renderEmployees();
+  }
+
+  // Umschalt-Klick wählt von der zuletzt angeklickten Zeile bis zur jetzigen -
+  // wie in einer Dateiliste. Maßgeblich ist die gezeigte Reihenfolge, nicht die
+  // im Datenbestand.
+  function applyEmployeeSelectionRange(employeeId, checked) {
+    const visible = filteredEmployeesForTable();
+    const index = visible.findIndex((employee) => employee.id === employeeId);
+    if (index < 0) return false;
+    if (lastEmployeeSelectionIndex < 0 || lastEmployeeSelectionIndex >= visible.length) {
+      lastEmployeeSelectionIndex = index;
+      return false;
+    }
+
+    const [from, to] = [lastEmployeeSelectionIndex, index].sort((a, b) => a - b);
+    visible.slice(from, to + 1).forEach((employee) => {
+      if (checked) selectedEmployeeIds.add(employee.id);
+      else selectedEmployeeIds.delete(employee.id);
+    });
+    lastEmployeeSelectionIndex = index;
+    return true;
+  }
+
+  function rememberEmployeeSelectionAnchor(employeeId) {
+    lastEmployeeSelectionIndex = filteredEmployeesForTable().findIndex(
+      (employee) => employee.id === employeeId,
+    );
   }
 
   // Tastenkuerzel fuer die Arbeit am Schreibtisch. Sie greifen nur, wenn
@@ -9038,6 +9540,7 @@
 
   function renderEmployees() {
     renderEmployeeFilterOptions();
+    renderViewFilterChips("employees");
     const filtered = filteredEmployeesForTable();
     updateEmailExportButton();
     updateUsernameExportButton();
@@ -9081,11 +9584,9 @@
                 />
               </th>
               ${renderEmployeeSortHeader("name", "Mitarbeiter")}
-              ${renderEmployeeSortHeader("profession", "Beruf")}
-              ${renderEmployeeSortHeader("employment", "Umfang")}
-              ${renderEmployeeSortHeader("qualifications", "Qualifikationen")}
-              ${renderEmployeeSortHeader("trainings", "Fortbildungen")}
-              ${renderEmployeeSortHeader("status", "Status")}
+              ${visibleEmployeeColumns()
+                .map((column) => renderEmployeeSortHeader(column.key, column.label))
+                .join("")}
               <th><span class="sr-only">Aktionen</span></th>
             </tr>
           </thead>
@@ -9147,6 +9648,7 @@
       .filter(([, selected]) => selected)
       .map(([key]) => qualificationLabel(key));
     const trainingStats = getEmployeeTrainingStats(employee.id);
+    const cells = employeeRowCells(employee, { selectedQualifications, trainingStats });
 
     return `
       <tr>
@@ -9158,7 +9660,7 @@
             ${selectedEmployeeIds.has(employee.id) ? "checked" : ""}
           />
         </td>
-        <td>
+        <td data-column="name">
           <div class="employee-cell">
             ${renderAvatar(employee)}
             <div>
@@ -9176,56 +9678,9 @@
             </div>
           </div>
         </td>
-        <td>
-          <span class="profession-cell">
-            <strong>${escapeHtml(employee.profession)}</strong>
-            <small>Dienstwochenende: ${escapeHtml(
-              serviceWeekendLabel(employee.serviceWeekend),
-            )}</small>
-          </span>
-        </td>
-        <td><strong>${employee.employmentPercent}&thinsp;%</strong></td>
-        <td>
-          <div class="qualification-tags">
-            ${
-              selectedQualifications.length
-                ? selectedQualifications
-                    .slice(0, 2)
-                    .map((qualification) => `<span class="tag">${escapeHtml(qualification)}</span>`)
-                    .join("") +
-                  (selectedQualifications.length > 2
-                    ? `<span class="tag tag-muted">+${selectedQualifications.length - 2}</span>`
-                    : "")
-                : '<span class="tag tag-muted">Keine</span>'
-            }
-          </div>
-        </td>
-        <td>
-          <div class="table-progress">
-            <div
-              class="progress-track"
-              role="progressbar"
-              aria-label="${escapeHtml(fullName(employee))}: ${trainingStats.percent} Prozent der Pflichtfortbildungen aktuell"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-valuenow="${trainingStats.percent}"
-            >
-              <div class="progress-bar"${dynamicStyle({ "--progress": `${trainingStats.percent}%` })}></div>
-            </div>
-            <span>${trainingStats.current}/${trainingStats.total}</span>
-          </div>
-        </td>
-        <td>
-          <span class="status-badge ${
-            employee.employmentStatus === "inactive"
-              ? "inactive"
-              : employee.employmentStatus === "onboarding"
-                ? "onboarding"
-                : ""
-          }">
-            ${escapeHtml(employeeStatusLabel(employee))}
-          </span>
-        </td>
+        ${visibleEmployeeColumns()
+          .map((column) => cells[column.key])
+          .join("")}
         <td>
           <div class="table-actions">
             <button
@@ -9278,11 +9733,78 @@
     `;
   }
 
+  // Die wählbaren Spalten der Mitarbeitertabelle. Name, Auswahl und Aktionen
+  // stehen immer; alles dazwischen lässt sich abwählen.
+  function employeeRowCells(employee, { selectedQualifications, trainingStats }) {
+    return {
+      profession: `
+        <td data-column="profession">
+          <span class="profession-cell">
+            <strong>${escapeHtml(employee.profession)}</strong>
+            <small>Dienstwochenende: ${escapeHtml(
+              serviceWeekendLabel(employee.serviceWeekend),
+            )}</small>
+          </span>
+        </td>
+      `,
+      employment: `
+        <td data-column="employment"><strong>${employee.employmentPercent}&thinsp;%</strong></td>
+      `,
+      qualifications: `
+        <td data-column="qualifications">
+          <div class="qualification-tags">
+            ${
+              selectedQualifications.length
+                ? selectedQualifications
+                    .slice(0, 2)
+                    .map((qualification) => `<span class="tag">${escapeHtml(qualification)}</span>`)
+                    .join("") +
+                  (selectedQualifications.length > 2
+                    ? `<span class="tag tag-muted">+${selectedQualifications.length - 2}</span>`
+                    : "")
+                : '<span class="tag tag-muted">Keine</span>'
+            }
+          </div>
+        </td>
+      `,
+      trainings: `
+        <td data-column="trainings">
+          <div class="table-progress">
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-label="${escapeHtml(fullName(employee))}: ${trainingStats.percent} Prozent der Pflichtfortbildungen aktuell"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="${trainingStats.percent}"
+            >
+              <div class="progress-bar"${dynamicStyle({ "--progress": `${trainingStats.percent}%` })}></div>
+            </div>
+            <span>${trainingStats.current}/${trainingStats.total}</span>
+          </div>
+        </td>
+      `,
+      status: `
+        <td data-column="status">
+          <span class="status-badge ${
+            employee.employmentStatus === "inactive"
+              ? "inactive"
+              : employee.employmentStatus === "onboarding"
+                ? "onboarding"
+                : ""
+          }">
+            ${escapeHtml(employeeStatusLabel(employee))}
+          </span>
+        </td>
+      `,
+    };
+  }
+
   function renderEmployeeSortHeader(key, label) {
     const active = employeeSortKey === key;
     const direction = active ? (employeeSortDirection === "asc" ? "▲" : "▼") : "";
     return `
-      <th>
+      <th data-column="${key}">
         <button
           class="table-sort-button ${active ? "is-active" : ""}"
           type="button"
@@ -10072,6 +10594,7 @@
 
   function renderMemos() {
     renderMemoCategoryOptions();
+    renderViewFilterChips("memos");
     const allVisible = visibleMemos();
     const memos = filteredMemos();
     elements.memoSummary.innerHTML = `
@@ -10388,6 +10911,7 @@
   }
 
   function renderAppointments() {
+    renderViewFilterChips("appointments");
     const today = todayIso();
     const pinnedAppointments = state.appointments
       .filter(
@@ -11061,6 +11585,8 @@
   }
 
   function renderDevices() {
+    renderViewFilterChips("devices");
+    renderViewFilterChips("device-management");
     const categories = [
       ...new Set(state.devices.map((device) => device.category)),
     ].sort((a, b) => a.localeCompare(b, "de"));
@@ -13448,8 +13974,18 @@
     }
     const checkbox = event.target.closest("[data-select-employee]");
     if (!checkbox) return;
-    if (checkbox.checked) selectedEmployeeIds.add(checkbox.dataset.selectEmployee);
-    else selectedEmployeeIds.delete(checkbox.dataset.selectEmployee);
+    const employeeId = checkbox.dataset.selectEmployee;
+    if (checkbox.checked) selectedEmployeeIds.add(employeeId);
+    else selectedEmployeeIds.delete(employeeId);
+
+    // Mit gedrueckter Umschalttaste gilt die Aenderung fuer alles zwischen der
+    // zuletzt angeklickten und dieser Zeile - dann muss die Tabelle neu
+    // aufgebaut werden, damit die Haken dazwischen mitgehen.
+    if (takeEmployeeSelectionShift() && applyEmployeeSelectionRange(employeeId, checkbox.checked)) {
+      renderEmployees();
+      return;
+    }
+    rememberEmployeeSelectionAnchor(employeeId);
     updateEmployeeBulkBar();
   }
 
@@ -15918,6 +16454,9 @@
       document.body.classList.remove("is-auth-locked");
       applyAccessControl();
       scheduleAutomaticBackup();
+      // Der zweite Weg in die freigeschaltete Anwendung - completeLogin endet
+      // hier vorzeitig, weil erst der Datenbestand geladen werden musste.
+      showWhatsNewIfUpdated();
       showToast(
         volume.warning
           ? backupVolumeMessage(volume)

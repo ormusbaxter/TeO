@@ -1264,6 +1264,9 @@
       document.body.classList.remove("is-auth-locked");
       applyAccessControl();
       scheduleAutomaticBackup();
+      // Der zweite Weg in die freigeschaltete Anwendung - completeLogin endet
+      // hier vorzeitig, weil erst der Datenbestand geladen werden musste.
+      showWhatsNewIfUpdated();
       showToast(
         volume.warning
           ? backupVolumeMessage(volume)
