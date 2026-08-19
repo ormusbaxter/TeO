@@ -41,6 +41,25 @@ Entwicklungsinterne Hinweise gehören nicht in die `README.md`, sondern hierher.
 | `npm test` | Testlauf (`node --test`) |
 | `npm run verify` | Build, Prüfung und Tests zusammen |
 
+## Veröffentlichen
+
+Der Workflow `Release` legt Paket und GitHub-Release an. Der Weg dorthin:
+
+1. `npm run version:fix|feature|major`, CHANGELOG-Eintrag, bauen, committen,
+   nach `main` mergen und pushen.
+2. Den Workflow `Release` auf `main` starten – ohne Eingaben. Er baut das
+   Paket, lässt `npm run verify` laufen und **setzt den Tag erst danach**
+   selbst; die Fassung liest er aus `package.json`.
+
+Ein Tag von Hand ist damit nicht mehr nötig, funktioniert aber weiter: Ein
+Push von `v*` startet denselben Workflow. Zeigt ein gleichnamiger Tag bereits
+auf einen anderen Stand, bricht der Lauf ab, statt ihn zu verschieben.
+
+Aus einer Sitzung von Claude Code im Web lassen sich Zweige pushen, Tags nicht
+(GitHub weist `refs/tags` mit HTTP 403 ab). Deshalb der Umweg über den
+Workflow: Ihn zu starten ist erlaubt, und den Tag setzt dann der Lauf selbst
+mit dem `GITHUB_TOKEN`.
+
 ## Oberfläche
 
 - Symbole sind Strichgrafiken in der Inline-Sprite in
