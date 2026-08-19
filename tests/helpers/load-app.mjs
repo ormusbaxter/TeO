@@ -23,6 +23,12 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       setCurrentUser(value) { currentUser = value; },
       setActiveView(value) { activeView = value; },
       getActiveView() { return activeView; },
+      setAppointmentFilters(value = {}) {
+        appointmentSearchTerm = value.search || "";
+        appointmentPeriodFilter = value.period || "all";
+        if (value.year) appointmentCalendarYear = value.year;
+        if (value.month) appointmentCalendarMonth = value.month;
+      },
       setEmployeeFilters(value = {}) {
         employeeStatusFilter = value.status || "all";
         employeeProfessionFilter = value.profession || "all";

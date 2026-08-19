@@ -246,9 +246,77 @@
       });
     });
     elements.appointmentCalendarGrid.innerHTML = cells.join("");
-    elements.appointmentCalendarNote.textContent = monthCount
-      ? `${monthCount} ${monthCount === 1 ? "Termin" : "Termine"} im ${monthLabel}. Auf einen Tag klicken, um einen Termin anzulegen, auf einen Eintrag, um ihn zu bearbeiten.`
-      : `Im ${monthLabel} ist kein Termin eingetragen. Auf einen Tag klicken, um einen anzulegen.`;
+    elements.appointmentCalendarNote.innerHTML = appointmentSearchTerm
+      ? renderAppointmentCalendarSearchNote(monthLabel, today)
+      : monthCount
+        ? `${monthCount} ${monthCount === 1 ? "Termin" : "Termine"} im ${monthLabel}. Auf einen Tag klicken, um einen Termin anzulegen, auf einen Eintrag, um ihn zu bearbeiten.`
+        : `Im ${monthLabel} ist kein Termin eingetragen. Auf einen Tag klicken, um einen anzulegen.`;
+  }
+
+  // Das Monatsraster zeigt einen Monat, die Suche gilt aber dem gesamten
+  // Bestand: Ein Treffer im Dezember ist im August nicht zu sehen, und ohne
+  // Hinweis sieht es aus, als fände die Suche nichts. Die Zeile unter dem
+  // Raster zaehlt deshalb alle Treffer und fuehrt zum naechsten ausserhalb
+  // des gezeigten Monats.
+  function handleAppointmentCalendarNoteAction(event) {
+    const jumpButton = event.target.closest("[data-appointment-search-jump]");
+    if (jumpButton) {
+      const [year, month] = jumpButton.dataset.appointmentSearchJump
+        .split("-")
+        .map(Number);
+      setAppointmentCalendarMonth(year, month);
+      return;
+    }
+    if (event.target.closest("[data-clear-appointment-search]")) {
+      appointmentSearchTerm = "";
+      elements.appointmentSearch.value = "";
+      renderAppointments();
+    }
+  }
+
+  function appointmentSearchMatches(today) {
+    return state.appointments
+      .filter((appointment) => appointmentMatchesFilters(appointment, today))
+      .sort(sortAppointments);
+  }
+
+  function renderAppointmentCalendarSearchNote(monthLabel, today) {
+    const matches = appointmentSearchMatches(today);
+    const monthPrefix = `${appointmentCalendarYear}-${String(
+      appointmentCalendarMonth,
+    ).padStart(2, "0")}`;
+    const inMonth = matches.filter((appointment) =>
+      appointment.date.startsWith(monthPrefix),
+    );
+    const outside = matches.filter(
+      (appointment) => !appointment.date.startsWith(monthPrefix),
+    );
+
+    if (!matches.length) {
+      return `Kein Termin passt zur Suche. <button class="appointment-calendar-note-action" type="button" data-clear-appointment-search>Suche zurücksetzen</button>`;
+    }
+
+    const found = `${inMonth.length || "Kein"} Treffer im ${monthLabel}`;
+    if (!outside.length) {
+      return `${found}. Auf einen Eintrag klicken, um ihn zu bearbeiten.`;
+    }
+
+    // Der naechste Treffer ist der, dessen Datum dem gezeigten Monat am
+    // naechsten liegt - vorwaerts wie rueckwaerts.
+    const reference = Date.parse(`${monthPrefix}-15T12:00:00.000Z`);
+    const nearest = outside.reduce((closest, appointment) =>
+      Math.abs(Date.parse(`${appointment.date}T12:00:00.000Z`) - reference) <
+      Math.abs(Date.parse(`${closest.date}T12:00:00.000Z`) - reference)
+        ? appointment
+        : closest,
+    );
+    const elsewhere =
+      outside.length === 1
+        ? "1 weiterer in einem anderen Monat"
+        : `${outside.length} weitere in anderen Monaten`;
+    return `${found}, ${elsewhere}. <button class="appointment-calendar-note-action" type="button" data-appointment-search-jump="${
+      nearest.date
+    }">Zum Treffer am ${formatDate(nearest.date)}</button>`;
   }
 
   // Alle Tage, die das Monatsraster zeigt: der Monat selbst, davor die Tage
