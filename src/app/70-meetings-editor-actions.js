@@ -1429,10 +1429,9 @@
           return false;
         }
         if (!attendanceSearchTerm) return true;
-        return [employee.firstName, employee.lastName, employee.profession]
-          .join(" ")
-          .toLocaleLowerCase("de-DE")
-          .includes(attendanceSearchTerm);
+        return searchKey(
+          [employee.firstName, employee.lastName, employee.profession].join(" "),
+        ).includes(attendanceSearchTerm);
       })
       .sort(sortEmployees);
   }
@@ -1649,10 +1648,9 @@
     return activeEmployeeList()
       .filter((employee) => {
         if (!completionSearchTerm) return true;
-        return [employee.firstName, employee.lastName, employee.profession]
-          .join(" ")
-          .toLocaleLowerCase("de-DE")
-          .includes(completionSearchTerm);
+        return searchKey(
+          [employee.firstName, employee.lastName, employee.profession].join(" "),
+        ).includes(completionSearchTerm);
       })
       .sort(sortEmployees);
   }

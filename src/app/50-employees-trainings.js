@@ -374,12 +374,9 @@
         }
         if (!employeeSearchTerm) return true;
 
-        const haystack = [
-          employee.firstName,
-          employee.lastName,
-        ]
-          .join(" ")
-          .toLocaleLowerCase("de-DE");
+        const haystack = searchKey(
+          [employee.firstName, employee.lastName].join(" "),
+        );
         return haystack.includes(employeeSearchTerm);
       })
       .sort(compareEmployeesForTable);

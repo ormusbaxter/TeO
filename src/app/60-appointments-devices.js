@@ -114,16 +114,16 @@
   function appointmentMatchesSearch(appointment) {
     if (!appointmentSearchTerm) return true;
 
-    return [
-      appointment.title,
-      appointment.description,
-      appointment.location,
-      appointmentCategoryLabel(appointment),
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLocaleLowerCase("de-DE")
-      .includes(appointmentSearchTerm);
+    return searchKey(
+      [
+        appointment.title,
+        appointment.description,
+        appointment.location,
+        appointmentCategoryLabel(appointment),
+      ]
+        .filter(Boolean)
+        .join(" "),
+    ).includes(appointmentSearchTerm);
   }
 
   function appointmentMatchesFilters(appointment, today) {
@@ -877,10 +877,11 @@
         ) {
           return false;
         }
-        if (!searchTerm) return true;
-        return `${device.productName} ${device.manufacturer}`
-          .toLocaleLowerCase("de-DE")
-          .includes(searchTerm);
+        const normalizedSearchTerm = searchKey(searchTerm);
+        if (!normalizedSearchTerm) return true;
+        return searchKey(
+          `${device.productName} ${device.manufacturer}`,
+        ).includes(normalizedSearchTerm);
       })
       .sort(
         (a, b) =>
@@ -1111,9 +1112,7 @@
         }
         return (
           !deviceEmployeeSearchTerm ||
-          fullName(employee)
-            .toLocaleLowerCase("de-DE")
-            .includes(deviceEmployeeSearchTerm)
+          searchKey(fullName(employee)).includes(deviceEmployeeSearchTerm)
         );
       })
       .sort(sortEmployees);
@@ -1215,9 +1214,7 @@
     searchTerm = deviceInstructionSearchTerm,
     sortKey = deviceInstructionSortKey,
   } = {}) {
-    const normalizedSearchTerm = String(searchTerm)
-      .trim()
-      .toLocaleLowerCase("de-DE");
+    const normalizedSearchTerm = searchKey(searchTerm);
     const nachEingabe = sortKey === "createdAt";
 
     return [...state.deviceInstructions]
@@ -1228,20 +1225,21 @@
           .map((participant) => getEmployee(participant.employeeId))
           .filter(Boolean)
           .map(fullName);
-        const searchableText = [
-          device?.productName,
-          device?.manufacturer,
-          instruction.instructorName,
-          instruction.instructorType === "employee"
-            ? "Interne Einweisung"
-            : "Herstellereinweisung",
-          instruction.date,
-          String(instruction.createdAt || "").slice(0, 10),
-          ...participantNames,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLocaleLowerCase("de-DE");
+        const searchableText = searchKey(
+          [
+            device?.productName,
+            device?.manufacturer,
+            instruction.instructorName,
+            instruction.instructorType === "employee"
+              ? "Interne Einweisung"
+              : "Herstellereinweisung",
+            instruction.date,
+            String(instruction.createdAt || "").slice(0, 10),
+            ...participantNames,
+          ]
+            .filter(Boolean)
+            .join(" "),
+        );
         return searchableText.includes(normalizedSearchTerm);
       })
       .sort((a, b) =>
@@ -1807,9 +1805,9 @@
       .filter(
         (device) =>
           !deviceInstructionDeviceSearchTerm ||
-          `${device.manufacturer} ${device.productName}`
-            .toLocaleLowerCase("de-DE")
-            .includes(deviceInstructionDeviceSearchTerm),
+          searchKey(`${device.manufacturer} ${device.productName}`).includes(
+            deviceInstructionDeviceSearchTerm,
+          ),
       )
       .sort(
         (a, b) =>
@@ -1930,9 +1928,7 @@
       .filter(
         (employee) =>
           !deviceParticipantSearchTerm ||
-          fullName(employee)
-            .toLocaleLowerCase("de-DE")
-            .includes(deviceParticipantSearchTerm),
+          searchKey(fullName(employee)).includes(deviceParticipantSearchTerm),
       )
       .sort(compareDeviceInstructionEmployees);
   }
@@ -2223,9 +2219,7 @@
       employmentFilter = "employed",
     } = {},
   ) {
-    const normalizedSearch = String(searchTerm)
-      .trim()
-      .toLocaleLowerCase("de-DE");
+    const normalizedSearch = searchKey(searchTerm);
     return overview.filter(({ employee, isInstructed }) => {
       if (instructionFilter === "instructed" && !isInstructed) return false;
       if (instructionFilter === "missing" && isInstructed) return false;
@@ -2243,11 +2237,9 @@
       }
       return (
         !normalizedSearch ||
-        [fullName(employee), employee.profession]
-          .filter(Boolean)
-          .join(" ")
-          .toLocaleLowerCase("de-DE")
-          .includes(normalizedSearch)
+        searchKey(
+          [fullName(employee), employee.profession].filter(Boolean).join(" "),
+        ).includes(normalizedSearch)
       );
     });
   }

@@ -1137,6 +1137,27 @@
     }).observe(document.body, { childList: true, subtree: true });
   }
 
+  // Jede Suche in TeO vergleicht ueber diesen Schluessel. Er macht sie
+  // nachsichtig: Gross- und Kleinschreibung, Akzente und Umlaute spielen keine
+  // Rolle, "ae", "oe" und "ue" gelten wie ä, ö und ü, und ß, s und ss sind
+  // untereinander austauschbar - "Strasse", "Strase" und "Straße" finden
+  // einander. Der Preis ist bekannt: "Klasse" findet auch "Klase". Ein
+  // Suchfeld darf grosszuegig sein, ein Vergleich von Benutzernamen nicht -
+  // dort bleibt es beim genauen Vergleich.
+  function searchKey(value) {
+    return String(value ?? "")
+      .normalize("NFKD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLocaleLowerCase("de-DE")
+      .replace(/ß/g, "ss")
+      .replace(/ae/g, "a")
+      .replace(/oe/g, "o")
+      .replace(/ue/g, "u")
+      .replace(/ss/g, "s")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function escapeHtml(value) {
     return String(value ?? "")
       .replaceAll("&", "&amp;")

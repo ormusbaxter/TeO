@@ -3047,12 +3047,12 @@
     });
 
     elements.employeeSearch.addEventListener("input", (event) => {
-      employeeSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      employeeSearchTerm = searchKey(event.target.value);
       renderEmployees();
     });
 
     elements.appointmentSearch.addEventListener("input", (event) => {
-      appointmentSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      appointmentSearchTerm = searchKey(event.target.value);
       renderAppointments();
     });
 
@@ -3092,7 +3092,7 @@
     );
 
     elements.memoSearch.addEventListener("input", (event) => {
-      memoSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      memoSearchTerm = searchKey(event.target.value);
       renderMemos();
     });
     elements.memoCategoryFilter.addEventListener("change", (event) => {
@@ -3141,7 +3141,7 @@
     });
 
     elements.completionEmployeeSearch.addEventListener("input", (event) => {
-      completionSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      completionSearchTerm = searchKey(event.target.value);
       renderCompletionEmployeeList();
     });
 
@@ -3171,7 +3171,7 @@
     });
 
     elements.attendanceSearch.addEventListener("input", (event) => {
-      attendanceSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      attendanceSearchTerm = searchKey(event.target.value);
       renderAttendanceList();
     });
 
@@ -3231,15 +3231,11 @@
       renderDevices();
     });
     elements.deviceSearch.addEventListener("input", (event) => {
-      deviceSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceSearchTerm = searchKey(event.target.value);
       renderDeviceInstructionMatrix();
     });
     elements.deviceManagementSearch.addEventListener("input", (event) => {
-      deviceManagementSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceManagementSearchTerm = searchKey(event.target.value);
       renderDevices();
     });
     elements.exportDeviceCatalogExcelButton.addEventListener(
@@ -3276,15 +3272,11 @@
       renderDeviceInstructionMatrix();
     });
     elements.deviceEmployeeSearch.addEventListener("input", (event) => {
-      deviceEmployeeSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceEmployeeSearchTerm = searchKey(event.target.value);
       renderDeviceInstructionMatrix();
     });
     elements.deviceOverviewSearch.addEventListener("input", (event) => {
-      deviceOverviewSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceOverviewSearchTerm = searchKey(event.target.value);
       renderDeviceOverview();
     });
     elements.deviceOverviewInstructionFilter.addEventListener(
@@ -3302,9 +3294,7 @@
       },
     );
     elements.deviceParticipantSearch.addEventListener("input", (event) => {
-      deviceParticipantSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceParticipantSearchTerm = searchKey(event.target.value);
       renderDeviceParticipantList();
     });
     elements.deviceParticipantList.addEventListener("change", (event) => {
@@ -3314,9 +3304,7 @@
       toggleVisibleDeviceParticipants();
     });
     elements.deviceInstructionSearch.addEventListener("input", (event) => {
-      deviceInstructionSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceInstructionSearchTerm = searchKey(event.target.value);
       deviceInstructionLogLimit = DEVICE_INSTRUCTION_LOG_PAGE;
       renderDeviceInstructionList();
     });
@@ -3327,9 +3315,7 @@
       renderDeviceInstructionList();
     });
     elements.deviceInstructionDeviceSearch.addEventListener("input", (event) => {
-      deviceInstructionDeviceSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceInstructionDeviceSearchTerm = searchKey(event.target.value);
       renderInstructionDeviceList();
     });
     elements.deviceInstructionDeviceList.addEventListener("change", (event) => {
@@ -3341,12 +3327,12 @@
   }
 
   function filterHelpTopics() {
-    const query = normalizeHelpSearch(elements.helpSearch.value);
+    const query = searchKey(elements.helpSearch.value);
     const sections = [...document.querySelectorAll("[data-help-section]")];
     let visibleCount = 0;
     sections.forEach((section) => {
       const matches =
-        !query || normalizeHelpSearch(section.textContent).includes(query);
+        !query || searchKey(section.textContent).includes(query);
       section.hidden = !matches;
       if (matches) visibleCount += 1;
       const headingId = section.dataset.helpHeading;
@@ -3361,14 +3347,6 @@
     elements.helpNoResults.hidden = visibleCount > 0;
   }
 
-  function normalizeHelpSearch(value) {
-    return String(value || "")
-      .normalize("NFKD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLocaleLowerCase("de-DE")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
 
   function bindDelegatedActions() {
     elements.employeeTable.addEventListener("click", handleEmployeeTableAction);
@@ -6855,18 +6833,17 @@
   }
 
   function filterVacationEmployees(employees) {
-    const searchTerm = vacationEmployeeSearchTerm.trim().toLocaleLowerCase("de-DE");
+    const searchTerm = searchKey(vacationEmployeeSearchTerm);
     if (!searchTerm) return employees;
     return employees.filter((employee) =>
-      [
-        fullName(employee),
-        employee.lastName,
-        employee.firstName,
-        employee.username,
-      ]
-        .join(" ")
-        .toLocaleLowerCase("de-DE")
-        .includes(searchTerm),
+      searchKey(
+        [
+          fullName(employee),
+          employee.lastName,
+          employee.firstName,
+          employee.username,
+        ].join(" "),
+      ).includes(searchTerm),
     );
   }
 
@@ -8574,12 +8551,9 @@
         }
         if (!employeeSearchTerm) return true;
 
-        const haystack = [
-          employee.firstName,
-          employee.lastName,
-        ]
-          .join(" ")
-          .toLocaleLowerCase("de-DE");
+        const haystack = searchKey(
+          [employee.firstName, employee.lastName].join(" "),
+        );
         return haystack.includes(employeeSearchTerm);
       })
       .sort(compareEmployeesForTable);
@@ -9480,9 +9454,9 @@
           return false;
         }
         if (!memoSearchTerm) return true;
-        return `${memo.title} ${memo.description} ${memo.category}`
-          .toLocaleLowerCase("de-DE")
-          .includes(memoSearchTerm);
+        return searchKey(
+          `${memo.title} ${memo.description} ${memo.category}`,
+        ).includes(memoSearchTerm);
       })
       .sort(sortMemos);
   }
@@ -9946,16 +9920,16 @@
   function appointmentMatchesSearch(appointment) {
     if (!appointmentSearchTerm) return true;
 
-    return [
-      appointment.title,
-      appointment.description,
-      appointment.location,
-      appointmentCategoryLabel(appointment),
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLocaleLowerCase("de-DE")
-      .includes(appointmentSearchTerm);
+    return searchKey(
+      [
+        appointment.title,
+        appointment.description,
+        appointment.location,
+        appointmentCategoryLabel(appointment),
+      ]
+        .filter(Boolean)
+        .join(" "),
+    ).includes(appointmentSearchTerm);
   }
 
   function appointmentMatchesFilters(appointment, today) {
@@ -10709,10 +10683,11 @@
         ) {
           return false;
         }
-        if (!searchTerm) return true;
-        return `${device.productName} ${device.manufacturer}`
-          .toLocaleLowerCase("de-DE")
-          .includes(searchTerm);
+        const normalizedSearchTerm = searchKey(searchTerm);
+        if (!normalizedSearchTerm) return true;
+        return searchKey(
+          `${device.productName} ${device.manufacturer}`,
+        ).includes(normalizedSearchTerm);
       })
       .sort(
         (a, b) =>
@@ -10943,9 +10918,7 @@
         }
         return (
           !deviceEmployeeSearchTerm ||
-          fullName(employee)
-            .toLocaleLowerCase("de-DE")
-            .includes(deviceEmployeeSearchTerm)
+          searchKey(fullName(employee)).includes(deviceEmployeeSearchTerm)
         );
       })
       .sort(sortEmployees);
@@ -11047,9 +11020,7 @@
     searchTerm = deviceInstructionSearchTerm,
     sortKey = deviceInstructionSortKey,
   } = {}) {
-    const normalizedSearchTerm = String(searchTerm)
-      .trim()
-      .toLocaleLowerCase("de-DE");
+    const normalizedSearchTerm = searchKey(searchTerm);
     const nachEingabe = sortKey === "createdAt";
 
     return [...state.deviceInstructions]
@@ -11060,20 +11031,21 @@
           .map((participant) => getEmployee(participant.employeeId))
           .filter(Boolean)
           .map(fullName);
-        const searchableText = [
-          device?.productName,
-          device?.manufacturer,
-          instruction.instructorName,
-          instruction.instructorType === "employee"
-            ? "Interne Einweisung"
-            : "Herstellereinweisung",
-          instruction.date,
-          String(instruction.createdAt || "").slice(0, 10),
-          ...participantNames,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLocaleLowerCase("de-DE");
+        const searchableText = searchKey(
+          [
+            device?.productName,
+            device?.manufacturer,
+            instruction.instructorName,
+            instruction.instructorType === "employee"
+              ? "Interne Einweisung"
+              : "Herstellereinweisung",
+            instruction.date,
+            String(instruction.createdAt || "").slice(0, 10),
+            ...participantNames,
+          ]
+            .filter(Boolean)
+            .join(" "),
+        );
         return searchableText.includes(normalizedSearchTerm);
       })
       .sort((a, b) =>
@@ -11639,9 +11611,9 @@
       .filter(
         (device) =>
           !deviceInstructionDeviceSearchTerm ||
-          `${device.manufacturer} ${device.productName}`
-            .toLocaleLowerCase("de-DE")
-            .includes(deviceInstructionDeviceSearchTerm),
+          searchKey(`${device.manufacturer} ${device.productName}`).includes(
+            deviceInstructionDeviceSearchTerm,
+          ),
       )
       .sort(
         (a, b) =>
@@ -11762,9 +11734,7 @@
       .filter(
         (employee) =>
           !deviceParticipantSearchTerm ||
-          fullName(employee)
-            .toLocaleLowerCase("de-DE")
-            .includes(deviceParticipantSearchTerm),
+          searchKey(fullName(employee)).includes(deviceParticipantSearchTerm),
       )
       .sort(compareDeviceInstructionEmployees);
   }
@@ -12055,9 +12025,7 @@
       employmentFilter = "employed",
     } = {},
   ) {
-    const normalizedSearch = String(searchTerm)
-      .trim()
-      .toLocaleLowerCase("de-DE");
+    const normalizedSearch = searchKey(searchTerm);
     return overview.filter(({ employee, isInstructed }) => {
       if (instructionFilter === "instructed" && !isInstructed) return false;
       if (instructionFilter === "missing" && isInstructed) return false;
@@ -12075,11 +12043,9 @@
       }
       return (
         !normalizedSearch ||
-        [fullName(employee), employee.profession]
-          .filter(Boolean)
-          .join(" ")
-          .toLocaleLowerCase("de-DE")
-          .includes(normalizedSearch)
+        searchKey(
+          [fullName(employee), employee.profession].filter(Boolean).join(" "),
+        ).includes(normalizedSearch)
       );
     });
   }
@@ -13762,10 +13728,9 @@
           return false;
         }
         if (!attendanceSearchTerm) return true;
-        return [employee.firstName, employee.lastName, employee.profession]
-          .join(" ")
-          .toLocaleLowerCase("de-DE")
-          .includes(attendanceSearchTerm);
+        return searchKey(
+          [employee.firstName, employee.lastName, employee.profession].join(" "),
+        ).includes(attendanceSearchTerm);
       })
       .sort(sortEmployees);
   }
@@ -13982,10 +13947,9 @@
     return activeEmployeeList()
       .filter((employee) => {
         if (!completionSearchTerm) return true;
-        return [employee.firstName, employee.lastName, employee.profession]
-          .join(" ")
-          .toLocaleLowerCase("de-DE")
-          .includes(completionSearchTerm);
+        return searchKey(
+          [employee.firstName, employee.lastName, employee.profession].join(" "),
+        ).includes(completionSearchTerm);
       })
       .sort(sortEmployees);
   }
@@ -17322,6 +17286,27 @@
         });
       });
     }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  // Jede Suche in TeO vergleicht ueber diesen Schluessel. Er macht sie
+  // nachsichtig: Gross- und Kleinschreibung, Akzente und Umlaute spielen keine
+  // Rolle, "ae", "oe" und "ue" gelten wie ä, ö und ü, und ß, s und ss sind
+  // untereinander austauschbar - "Strasse", "Strase" und "Straße" finden
+  // einander. Der Preis ist bekannt: "Klasse" findet auch "Klase". Ein
+  // Suchfeld darf grosszuegig sein, ein Vergleich von Benutzernamen nicht -
+  // dort bleibt es beim genauen Vergleich.
+  function searchKey(value) {
+    return String(value ?? "")
+      .normalize("NFKD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLocaleLowerCase("de-DE")
+      .replace(/ß/g, "ss")
+      .replace(/ae/g, "a")
+      .replace(/oe/g, "o")
+      .replace(/ue/g, "u")
+      .replace(/ss/g, "s")
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
   function escapeHtml(value) {
