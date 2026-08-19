@@ -52,7 +52,7 @@ test("Änderungshistorie und feststehende Namensspalte bleiben lesbar", async ()
     fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
   ]);
 
-  assert.match(changelog, /^### 4\.43\.1[\s\S]*?### 4\.43\.0[\s\S]*?### 4\.42\.0/);
+  assert.match(changelog, /^### 4\.43\.2[\s\S]*?### 4\.43\.1[\s\S]*?### 4\.43\.0[\s\S]*?### 4\.42\.0/);
   assert.equal((changelog.match(/^### 4\.43\.0/gm) || []).length, 1);
   assert.match(
     styles,

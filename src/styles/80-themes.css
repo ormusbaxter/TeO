@@ -827,7 +827,7 @@ html[data-theme="windows-95"] :is(.button-secondary, .button-ghost) {
    Eintraege heben sich navyblau hervor wie im Startmenue. */
 html[data-theme="windows-95"] .sidebar {
   color: #000000;
-  background: #c0c0c0;
+  background: #d4d0c8;
   box-shadow:
     inset -1px 0 #000000,
     inset -2px 0 #808080;
@@ -937,7 +937,7 @@ html[data-theme="windows-95"] :is(.nav-count, .nav-item.is-active .nav-count) {
 
 html[data-theme="windows-95"] .user-session {
   border: 0;
-  background: #c0c0c0;
+  background: #d4d0c8;
   box-shadow:
     inset 1px 1px #808080,
     inset -1px -1px #ffffff;
@@ -954,6 +954,35 @@ html[data-theme="windows-95"] .user-session strong {
 
 html[data-theme="windows-95"] .user-session small {
   color: #404040;
+}
+
+html[data-theme="windows-95"] :is(.sidebar-system-status, .sidebar-note) {
+  color: #000000;
+  border: 0;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff;
+}
+
+html[data-theme="windows-95"] :is(
+    .sidebar-system-status-header strong,
+    .sidebar-system-status dd,
+    .sidebar-note strong
+  ) {
+  color: #000000;
+}
+
+html[data-theme="windows-95"] :is(
+    .sidebar-system-status dt,
+    .sidebar-system-status > small,
+    .sidebar-note p
+  ) {
+  color: #404040;
+}
+
+html[data-theme="windows-95"] .sidebar-system-status > small {
+  border-top-color: #808080;
 }
 
 html[data-theme="windows-95"] .user-session-actions button {

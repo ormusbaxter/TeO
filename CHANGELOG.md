@@ -1,3 +1,7 @@
+### 4.43.2 – Einheitliche Windows-95-Seitenleiste
+
+- **Behoben:** Im Windows-95-Theme verwendet die Seitenleiste jetzt dasselbe Grau wie die Inhaltsfenster; Konto, Systemstatus und Programminfo tragen dazu passende schwarze beziehungsweise dunkelgraue Texte
+
 ### 4.43.1 – Korrekte Änderungshistorie und Tabellenköpfe
 
 - **Behoben:** Der Abschnitt für 4.43.0 stand am Ende der Änderungshistorie statt an erster Stelle und wirkte dadurch wie ein veralteter oder fehlender Stand
