@@ -714,6 +714,10 @@
               <button class="button button-secondary" id="openBulkEditButton" type="button">
                 Auswahl bearbeiten
               </button>
+              <button class="button button-danger" id="deleteEmployeeSelection" type="button">
+                <svg><use href="#icon-trash"></use></svg>
+                Auswahl löschen
+              </button>
               <button class="button button-ghost" id="clearEmployeeSelection" type="button">
                 Auswahl aufheben
               </button>
@@ -983,6 +987,17 @@
 
           <div class="filter-chip-bar" data-filter-chips="appointments" hidden></div>
           <div class="training-summary" id="appointmentSummary"></div>
+          <div class="record-bulk-bar" id="appointmentBulkBar" hidden>
+            <strong id="appointmentBulkCount">0 ausgewählt</strong>
+            <span class="record-bulk-actions" id="appointmentBulkActions"></span>
+            <button
+              class="button button-ghost button-compact"
+              type="button"
+              data-clear-record-selection
+            >
+              Auswahl aufheben
+            </button>
+          </div>
           <div class="record-workspace" id="appointmentWorkspace">
             <div class="record-workspace-main">
           <section class="meeting-list" id="appointmentList"></section>
@@ -1091,6 +1106,17 @@
 
           <div class="filter-chip-bar" data-filter-chips="memos" hidden></div>
           <div class="training-summary" id="memoSummary"></div>
+          <div class="record-bulk-bar" id="memoBulkBar" hidden>
+            <strong id="memoBulkCount">0 ausgewählt</strong>
+            <span class="record-bulk-actions" id="memoBulkActions"></span>
+            <button
+              class="button button-ghost button-compact"
+              type="button"
+              data-clear-record-selection
+            >
+              Auswahl aufheben
+            </button>
+          </div>
           <div class="record-workspace" id="memoWorkspace">
             <section class="memo-list" id="memoList"></section>
             <aside
@@ -1394,6 +1420,17 @@
                 <p class="eyebrow">Gerätekatalog</p>
                 <h2>Angelegte Geräte</h2>
               </div>
+            </div>
+            <div class="record-bulk-bar" id="deviceBulkBar" hidden>
+              <strong id="deviceBulkCount">0 ausgewählt</strong>
+              <span class="record-bulk-actions" id="deviceBulkActions"></span>
+              <button
+                class="button button-ghost button-compact"
+                type="button"
+                data-clear-record-selection
+              >
+                Auswahl aufheben
+              </button>
             </div>
             <div class="record-workspace" id="deviceWorkspace">
               <div class="training-list" id="deviceCatalog"></div>
@@ -2142,6 +2179,15 @@
 <p>Dieselbe Schnellansicht gibt es für <strong>Termine</strong>, <strong>Memos</strong> und <strong>Geräte</strong>: Ein Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster – öffnet sie rechts neben der Liste.</p>
 <p>| Datenart | Angaben | Aktionen | | --- | --- | --- | | Termin | Datum, Uhrzeit, Ort, Kategorie, angepinnt, Teilnehmerliste, Beschreibung | Anheften · Bearbeiten · <strong>Kalender</strong> (springt in den Monat des Termins) | | Memo / ToDo | Datum, Kategorie, Sichtbarkeit, Status, angepinnt, Beschreibung | Anheften · Bearbeiten · <strong>Erledigt</strong> beziehungsweise <strong>Wieder öffnen</strong> | | Gerät | Hersteller, Produkt, Kategorie, Anlage 1, Bestand, Einweisungsquote, Einweisungsberechtigte | Anheften · Bearbeiten · <strong>Übersicht</strong> (Einweisungen des Geräts) |</p>
 <p>Die Schaltflächen auf der Karte behalten ihre Aufgabe: Der Stift öffnet weiterhin unmittelbar den Bearbeitungsdialog, der Papierkorb löscht. Persönliche Memos anderer Konten erscheinen auch hier nicht. Angeheftete Datensätze und die zuletzt geöffneten stehen in <strong>Strg + K</strong> und führen von dort wieder in die Schnellansicht.</p>
+<h3 id="hilfe-mehrere-eintrage-auf-einmal">Mehrere Einträge auf einmal</h3>
+<p>Termine, Memos und Geräte lassen sich wie Dateien in einer Liste auswählen:</p>
+<ul><li><strong>Strg + Klick</strong> nimmt eine Karte hinzu oder wieder heraus.</li><li><strong>Umschalt + Klick</strong> wählt alles bis zur zuletzt angeklickten Karte.</li><li>Ein gewöhnlicher Klick hebt die Auswahl wieder auf und öffnet die Schnellansicht, <strong>Esc</strong> hebt sie ebenfalls auf.</li></ul>
+<p>Über der Liste erscheint dann eine Leiste mit der Zahl der ausgewählten Einträge und den Sammelaktionen: Termine anpinnen oder lösen, Memos erledigen oder wieder öffnen, Geräte im Bestand führen oder ausbuchen – und jeweils <strong>Löschen</strong>. Jede Sammelaktion ist <strong>eine</strong> Änderung: Sie steht als eine Zeile im Änderungsprotokoll und lässt sich unmittelbar danach mit <strong>Rückgängig</strong> oder <strong>Strg + Z</strong> zurücknehmen. Gelöscht wird nur nach Rückfrage. Was ein Filter ausblendet, fällt aus der Auswahl heraus – eine Sammelaktion trifft immer genau das, was auch zu sehen ist.</p>
+<p>In der Mitarbeitertabelle gilt das Bekannte weiter: Auswahlkästchen, <strong>Umschalt + Klick</strong> für einen Bereich, dazu jetzt <strong>Auswahl löschen</strong> neben <strong>Auswahl bearbeiten</strong>.</p>
+<h3 id="hilfe-kontextmenu">Kontextmenü</h3>
+<p>Die rechte Maustaste öffnet auf einer Mitarbeiterzeile und auf jeder Karte ein Kontextmenü:</p>
+<ul><li><strong>Einzelner Eintrag</strong> – Schnellansicht, Bearbeiten und die weiteren Aktionen der Datenart (Gesamtakte, Kalender, Erledigt, Übersicht), Löschen sowie <strong>Zur Auswahl hinzufügen</strong>.</li><li><strong>Teil einer Mehrfachauswahl</strong> – stattdessen die Sammelaktionen für alle ausgewählten Einträge.</li></ul>
+<p><strong>Esc</strong> schließt das Menü, ein Klick daneben ebenfalls.</p>
 <h3 id="hilfe-arbeitsliste-und-dashboard">Arbeitsliste und Dashboard</h3>
 <p>Die Arbeitsliste auf der Übersicht führt die wichtigsten offenen Punkte aus mehreren Bereichen zusammen: überfällige und anstehende Fristen, Termine, offene Memos und Datenqualitätsprobleme mit hoher Priorität. <strong>Überfällig</strong> und <strong>7 Tage</strong> begrenzen die Liste auf den unmittelbar relevanten Zeitraum. Ein Klick führt direkt zum betreffenden Datensatz.</p>
 <p>Über <strong>Dashboard anpassen</strong> werden Arbeitsliste, Fristen, Fortbildungsübersicht und zuletzt bearbeitete Mitarbeiter ein- oder ausgeblendet und neu angeordnet. Die Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum gemeinsamen Datenbestand oder zur Datensicherung.</p>
@@ -2162,7 +2208,7 @@
 <p>Gesucht wird so nachsichtig wie überall in TeO: Umlaute dürfen fehlen oder ausgeschrieben sein, „ß“ und „ss“ finden einander. Treffer am Wortanfang stehen vor Treffern in der Mitte. Je Gruppe erscheinen die fünf besten Treffer; die Palette zeigt außerdem nur, was das angemeldete Konto ohnehin sehen darf.</p>
 <h3 id="hilfe-tastenkurzel">Tastenkürzel</h3>
 <p>Am Schreibtisch lässt sich TeO weitgehend über die Tastatur bedienen. Die Kürzel gelten überall, solange kein Eingabefeld und kein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.</p>
-<p>| Taste | Wirkung | | --- | --- | | <strong>Strg + K</strong> | Suchen und ausführen: Ansicht, Eintrag oder Aktion | | <strong>?</strong> | Übersicht aller Tastenkürzel öffnen | | <strong>/</strong> | Suchfeld der gezeigten Ansicht anspringen | | <strong>n</strong> | Neuen Eintrag der gezeigten Ansicht anlegen | | <strong>Strg + Z</strong> | Letzte Löschung oder Massenänderung zurücknehmen | | <strong>Esc</strong> | Dialog schließen, Vollbild verlassen |</p>
+<p>| Taste | Wirkung | | --- | --- | | <strong>Strg + K</strong> | Suchen und ausführen: Ansicht, Eintrag oder Aktion | | <strong>?</strong> | Übersicht aller Tastenkürzel öffnen | | <strong>/</strong> | Suchfeld der gezeigten Ansicht anspringen | | <strong>n</strong> | Neuen Eintrag der gezeigten Ansicht anlegen | | <strong>Strg + Z</strong> | Letzte Löschung oder Massenänderung zurücknehmen | | <strong>Esc</strong> | Dialog schließen, Vollbild verlassen, Auswahl aufheben | | <strong>Strg + Klick</strong> | Karte zur Mehrfachauswahl hinzunehmen | | <strong>Umschalt + Klick</strong> | Alle Karten bis zur zuletzt angeklickten auswählen |</p>
 <p>Die Ansicht wechselt mit <strong>g</strong> gefolgt vom Buchstaben des Bereichs: <strong>u</strong> Übersicht, <strong>m</strong> Mitarbeiter, <strong>w</strong> Wochenendverteilung, <strong>p</strong> Urlaubsplanung, <strong>t</strong> Terminkalender, <strong>o</strong> Memo / ToDo, <strong>f</strong> Pflichtfortbildungen, <strong>s</strong> Teamsitzungen, <strong>g</strong> Geräteeinweisungen, <strong>v</strong> Geräteverwaltung, <strong>e</strong> Einstellungen, <strong>h</strong> Hilfe. Nach dem <strong>g</strong> bleibt eineinhalb Sekunden Zeit für den zweiten Anschlag. Dieselbe Übersicht öffnet die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe.</p>
 <h3 id="hilfe-loschungen-zurucknehmen">Löschungen zurücknehmen</h3>
 <p>Nach dem Löschen eines Datensatzes und nach einer Sammelbearbeitung bietet die Meldung unten rechts <strong>Rückgängig</strong> an; dasselbe leistet <strong>Strg + Z</strong>. Damit kehrt der Datenbestand in den Zustand unmittelbar vor dieser Änderung zurück.</p>
@@ -2497,7 +2543,7 @@
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
 <h3 id="hilfe-4-44-0-schnellansicht-fur-alle-datenarten">4.44.0 – Schnellansicht für alle Datenarten</h3>
-<ul><li><strong>Neu:</strong> Termine, Memos und Geräte haben dieselbe Schnellansicht wie die Mitarbeiter: Ein Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster – öffnet rechts eine Übersicht mit den Eckdaten, ohne dass ein Dialog die Liste verdeckt. Von dort führen <strong>Anheften</strong>, <strong>Bearbeiten</strong> und je nach Datenart <strong>Kalender</strong>, <strong>Erledigt</strong> oder <strong>Übersicht</strong> weiter; der Stift auf der Karte öffnet wie bisher direkt den Bearbeitungsdialog</li><li><strong>Verbessert:</strong> Geräte erscheinen jetzt ebenfalls in Verlauf und Favoriten von <strong>Strg + K</strong>; Termine, Memos und Geräte öffnen von dort die Schnellansicht statt eines Dialogs</li></ul>
+<ul><li><strong>Neu:</strong> Termine, Memos und Geräte haben dieselbe Schnellansicht wie die Mitarbeiter: Ein Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster – öffnet rechts eine Übersicht mit den Eckdaten, ohne dass ein Dialog die Liste verdeckt. Von dort führen <strong>Anheften</strong>, <strong>Bearbeiten</strong> und je nach Datenart <strong>Kalender</strong>, <strong>Erledigt</strong> oder <strong>Übersicht</strong> weiter; der Stift auf der Karte öffnet wie bisher direkt den Bearbeitungsdialog</li><li><strong>Neu:</strong> Die rechte Maustaste öffnet ein Kontextmenü – auf Mitarbeiterzeilen und auf den Karten der Termine, Memos und Geräte. Es zeigt Schnellansicht, Bearbeiten und die weiteren Aktionen des Eintrags; gehört er zu einer Mehrfachauswahl, stehen dort die Sammelaktionen</li><li><strong>Neu:</strong> Termine, Memos und Geräte lassen sich mehrfach auswählen: <strong>Strg + Klick</strong> nimmt eine Karte hinzu, <strong>Umschalt + Klick</strong> alle bis zur zuletzt angeklickten, <strong>Esc</strong> hebt die Auswahl auf. Die Leiste über der Liste führt die Sammelaktionen – anpinnen, erledigen, Bestand ändern und löschen –, jede davon als ein Schritt, der sich zurücknehmen lässt</li><li><strong>Neu:</strong> Auch mehrere Mitarbeiter lassen sich auf einmal löschen; der Umfang entspricht dem einzelnen Löschen und ist ebenso zurücknehmbar</li><li><strong>Verbessert:</strong> Geräte erscheinen jetzt ebenfalls in Verlauf und Favoriten von <strong>Strg + K</strong>; Termine, Memos und Geräte öffnen von dort die Schnellansicht statt eines Dialogs</li></ul>
 <h3 id="hilfe-4-43-4-termin-direkt-im-dialog-loschen">4.43.4 – Termin direkt im Dialog löschen</h3>
 <ul><li><strong>Neu:</strong> Beim Bearbeiten eines Termins steht die Löschaktion direkt im Dialog bereit; sie verwendet weiterhin die Sicherheitsabfrage und kann anschließend rückgängig gemacht werden</li></ul>
 <h3 id="hilfe-4-43-3-klarer-lokaler-speicherstatus">4.43.3 – Klarer lokaler Speicherstatus</h3>
@@ -3399,6 +3445,14 @@ npm run verify</code></pre>
               <div>
                 <dt><kbd>h</kbd> <kbd>g</kbd> <kbd>m</kbd></dt>
                 <dd>Im Datumsfeld: heute, gestern, morgen eintragen</dd>
+              </div>
+              <div>
+                <dt><kbd>Strg</kbd> + Klick</dt>
+                <dd>Karte zur Mehrfachauswahl hinzunehmen</dd>
+              </div>
+              <div>
+                <dt><kbd>Umschalt</kbd> + Klick</dt>
+                <dd>Alle Karten bis zur zuletzt angeklickten auswählen</dd>
               </div>
               <div>
                 <dt><kbd>Esc</kbd></dt>
@@ -4753,6 +4807,14 @@ npm run verify</code></pre>
     <!-- Alle Einblendungen unten rechts teilen sich eine Ebene: das Popover
          hebt sie ueber Ansicht, Dialoge und Backdrop. Die Warnung steht unten,
          damit neue Meldungen darueber aufwachsen. -->
+    <div
+      class="context-menu"
+      id="contextMenu"
+      role="menu"
+      aria-label="Kontextmenü"
+      hidden
+    ></div>
+
     <div class="notification-stack" id="notificationStack" popover="manual">
       <div
         class="toast-region"

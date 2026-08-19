@@ -146,6 +146,9 @@
       if (card.tagName === "BUTTON" || !["Enter", " "].includes(event.key)) return;
       event.preventDefault();
     }
+    // Mit Strg oder Umschalt geht es um die Mehrfachauswahl, nicht um die
+    // Schnellansicht.
+    if (handleRecordSelectionClick(type, event, card.dataset.recordCard)) return;
     selectRecordInspector(type, card.dataset.recordCard);
   }
 
@@ -175,6 +178,7 @@
     }
     renderRecordInspector(type);
     highlightInspectedRecord(type);
+    refreshRecordSelection(type);
   }
 
   function highlightInspectedRecord(type) {

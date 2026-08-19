@@ -173,6 +173,41 @@ anderer Konten erscheinen auch hier nicht. Angeheftete Datensätze und die zulet
 geöffneten stehen in **Strg + K** und führen von dort wieder in die
 Schnellansicht.
 
+### Mehrere Einträge auf einmal
+
+Termine, Memos und Geräte lassen sich wie Dateien in einer Liste auswählen:
+
+- **Strg + Klick** nimmt eine Karte hinzu oder wieder heraus.
+- **Umschalt + Klick** wählt alles bis zur zuletzt angeklickten Karte.
+- Ein gewöhnlicher Klick hebt die Auswahl wieder auf und öffnet die
+  Schnellansicht, **Esc** hebt sie ebenfalls auf.
+
+Über der Liste erscheint dann eine Leiste mit der Zahl der ausgewählten Einträge
+und den Sammelaktionen: Termine anpinnen oder lösen, Memos erledigen oder wieder
+öffnen, Geräte im Bestand führen oder ausbuchen – und jeweils **Löschen**. Jede
+Sammelaktion ist **eine** Änderung: Sie steht als eine Zeile im
+Änderungsprotokoll und lässt sich unmittelbar danach mit **Rückgängig** oder
+**Strg + Z** zurücknehmen. Gelöscht wird nur nach Rückfrage. Was ein Filter
+ausblendet, fällt aus der Auswahl heraus – eine Sammelaktion trifft immer genau
+das, was auch zu sehen ist.
+
+In der Mitarbeitertabelle gilt das Bekannte weiter: Auswahlkästchen, **Umschalt
++ Klick** für einen Bereich, dazu jetzt **Auswahl löschen** neben **Auswahl
+bearbeiten**.
+
+### Kontextmenü
+
+Die rechte Maustaste öffnet auf einer Mitarbeiterzeile und auf jeder Karte ein
+Kontextmenü:
+
+- **Einzelner Eintrag** – Schnellansicht, Bearbeiten und die weiteren Aktionen
+  der Datenart (Gesamtakte, Kalender, Erledigt, Übersicht), Löschen sowie
+  **Zur Auswahl hinzufügen**.
+- **Teil einer Mehrfachauswahl** – stattdessen die Sammelaktionen für alle
+  ausgewählten Einträge.
+
+**Esc** schließt das Menü, ein Klick daneben ebenfalls.
+
 ### Arbeitsliste und Dashboard
 
 Die Arbeitsliste auf der Übersicht führt die wichtigsten offenen Punkte aus
@@ -275,7 +310,9 @@ im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.
 | **/** | Suchfeld der gezeigten Ansicht anspringen |
 | **n** | Neuen Eintrag der gezeigten Ansicht anlegen |
 | **Strg + Z** | Letzte Löschung oder Massenänderung zurücknehmen |
-| **Esc** | Dialog schließen, Vollbild verlassen |
+| **Esc** | Dialog schließen, Vollbild verlassen, Auswahl aufheben |
+| **Strg + Klick** | Karte zur Mehrfachauswahl hinzunehmen |
+| **Umschalt + Klick** | Alle Karten bis zur zuletzt angeklickten auswählen |
 
 Die Ansicht wechselt mit **g** gefolgt vom Buchstaben des Bereichs: **u**
 Übersicht, **m** Mitarbeiter, **w** Wochenendverteilung, **p**

@@ -85,6 +85,14 @@
 
     if (event.ctrlKey || event.metaKey || event.altKey) return;
 
+    // Esc raeumt eine Mehrfachauswahl ab - dieselbe Taste, die auch einen
+    // Dialog schliesst und das Vollbild verlaesst.
+    if (event.key === "Escape" && hasRecordSelection()) {
+      event.preventDefault();
+      clearAllRecordSelections();
+      return;
+    }
+
     const key = event.key.toLowerCase();
 
     // Der zweite Anschlag nach „g“. Er gilt auch dort, wo einzelne Buchstaben

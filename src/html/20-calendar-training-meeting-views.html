@@ -80,6 +80,17 @@
 
           <div class="filter-chip-bar" data-filter-chips="appointments" hidden></div>
           <div class="training-summary" id="appointmentSummary"></div>
+          <div class="record-bulk-bar" id="appointmentBulkBar" hidden>
+            <strong id="appointmentBulkCount">0 ausgewählt</strong>
+            <span class="record-bulk-actions" id="appointmentBulkActions"></span>
+            <button
+              class="button button-ghost button-compact"
+              type="button"
+              data-clear-record-selection
+            >
+              Auswahl aufheben
+            </button>
+          </div>
           <div class="record-workspace" id="appointmentWorkspace">
             <div class="record-workspace-main">
           <section class="meeting-list" id="appointmentList"></section>
@@ -188,6 +199,17 @@
 
           <div class="filter-chip-bar" data-filter-chips="memos" hidden></div>
           <div class="training-summary" id="memoSummary"></div>
+          <div class="record-bulk-bar" id="memoBulkBar" hidden>
+            <strong id="memoBulkCount">0 ausgewählt</strong>
+            <span class="record-bulk-actions" id="memoBulkActions"></span>
+            <button
+              class="button button-ghost button-compact"
+              type="button"
+              data-clear-record-selection
+            >
+              Auswahl aufheben
+            </button>
+          </div>
           <div class="record-workspace" id="memoWorkspace">
             <section class="memo-list" id="memoList"></section>
             <aside
