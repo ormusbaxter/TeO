@@ -1731,6 +1731,7 @@
     elements.mobileAccountButton.title = currentUser
       ? `Benutzerkonto: ${currentUser.username}`
       : "Benutzerkonto";
+    updateSidebarFooterSummaries();
     renderDatabaseSaveWarning();
   }
 
@@ -2453,6 +2454,9 @@
     }
     elements.sidebarSyncLabel.textContent = detail;
     elements.sidebarSyncLabel.title = detail;
+    // Eingeklappt bleibt vom Block nur der Punkt - der Kurzhinweis muss den
+    // neuen Stand mittragen, auch wenn sonst nichts neu aufgebaut wurde.
+    updateSidebarFooterSummaries();
   }
 
   function backendServerLabel() {

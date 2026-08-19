@@ -4271,6 +4271,7 @@
     elements.mobileAccountButton.title = currentUser
       ? `Benutzerkonto: ${currentUser.username}`
       : "Benutzerkonto";
+    updateSidebarFooterSummaries();
     renderDatabaseSaveWarning();
   }
 
@@ -4993,6 +4994,9 @@
     }
     elements.sidebarSyncLabel.textContent = detail;
     elements.sidebarSyncLabel.title = detail;
+    // Eingeklappt bleibt vom Block nur der Punkt - der Kurzhinweis muss den
+    // neuen Stand mittragen, auch wenn sonst nichts neu aufgebaut wurde.
+    updateSidebarFooterSummaries();
   }
 
   function backendServerLabel() {
@@ -5364,6 +5368,59 @@
       const count = item.querySelector(".nav-count")?.textContent.trim() || "";
       if (label) item.title = count ? `${label} (${count})` : label;
     });
+
+    updateSidebarFooterSummaries(collapsed);
+  }
+
+  // Konto, Systemstatus und Namenszug am Fuß der Seitenleiste schrumpfen
+  // eingeklappt auf ihr Symbol. Der Kurzhinweis trägt dann, was sonst
+  // danebenstünde - je Angabe eine Zeile, damit er lesbar bleibt.
+  function updateSidebarFooterSummaries(
+    collapsed = document.body.classList.contains("is-sidebar-collapsed"),
+  ) {
+    setSidebarSummary(document.querySelector(".user-session"), collapsed, () => {
+      const name = elements.currentUsername?.textContent.trim() || "";
+      const role = elements.currentUserRole?.textContent.trim() || "";
+      return [name && `Angemeldet: ${name}`, role && role !== "–" ? role : ""]
+        .filter(Boolean)
+        .join("\n");
+    });
+
+    setSidebarSummary(elements.sidebarSystemStatus, collapsed, () => {
+      const status = elements.sidebarSystemStatus;
+      const headline = status.querySelector(".sidebar-system-status-header strong");
+      const rows = [...status.querySelectorAll("dl > div")].map((row) =>
+        [
+          row.querySelector("dt")?.textContent.trim(),
+          row.querySelector("dd")?.textContent.trim(),
+        ]
+          .filter(Boolean)
+          .join(": "),
+      );
+      return [headline?.textContent.trim(), ...rows, status.querySelector("small")?.textContent.trim()]
+        .filter(Boolean)
+        .join("\n");
+    });
+
+    setSidebarSummary(document.querySelector(".sidebar-note"), collapsed, () =>
+      [
+        elements.projectBuildLabel?.textContent.trim(),
+        document.querySelector(".sidebar-note p")?.textContent.trim(),
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    );
+  }
+
+  function setSidebarSummary(element, collapsed, summary) {
+    if (!element) return;
+    if (!collapsed) {
+      element.removeAttribute("title");
+      return;
+    }
+    const text = summary();
+    if (text) element.title = text;
+    else element.removeAttribute("title");
   }
 
   function readStoredSidebarCollapsed() {

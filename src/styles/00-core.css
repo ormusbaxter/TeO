@@ -242,10 +242,11 @@ body.is-sidebar-collapsed :is(
     .nav-order-hint,
     .nav-order-reset span,
     .settings-sidebar-subnav,
-    .user-session > div,
+    .user-session > div:not(.user-session-actions),
     .sidebar-system-status-header strong,
     .sidebar-system-status dl,
-    .sidebar-system-status > small
+    .sidebar-system-status > small,
+    .sidebar-note > div
   ) {
   display: none;
 }
@@ -266,23 +267,61 @@ body.is-sidebar-collapsed .main-nav {
   margin-top: 22px;
 }
 
+/* Der Fuß der Seitenleiste im eingeklappten Zustand: Konto, Systemstatus und
+   Namenszug schrumpfen auf je ein Zeichen. Was dabei wegfällt, steht als
+   Kurzhinweis am Block - eine Zeile je Angabe, wie im aufgeklappten Zustand. */
+/* Die drei Kacheln am Fuß sind gleich breit und gleich hoch - sonst stünden
+   drei verschieden große Reste untereinander. */
+body.is-sidebar-collapsed :is(.user-session, .sidebar-system-status, .sidebar-note) {
+  width: 100%;
+}
+
+body.is-sidebar-collapsed :is(.sidebar-system-status, .sidebar-note) {
+  min-height: 44px;
+  align-content: center;
+}
+
 body.is-sidebar-collapsed .user-session {
   grid-template-columns: auto;
   justify-items: center;
+  gap: 8px;
   padding: 9px 6px;
 }
 
 body.is-sidebar-collapsed .user-session-actions {
   flex-direction: column;
+  gap: 6px;
+}
+
+body.is-sidebar-collapsed .user-session-actions button {
+  width: 28px;
+  height: 28px;
 }
 
 body.is-sidebar-collapsed .sidebar-system-status {
+  display: grid;
   padding: 10px 6px;
   justify-items: center;
 }
 
 body.is-sidebar-collapsed .sidebar-system-status-header {
   justify-content: center;
+  margin-bottom: 0;
+}
+
+/* Der Punkt trägt allein die Aussage und darf deshalb etwas größer sein. */
+body.is-sidebar-collapsed .sidebar-system-status-dot {
+  width: 11px;
+  height: 11px;
+}
+
+body.is-sidebar-collapsed .sidebar-note {
+  justify-content: center;
+  padding: 10px 6px;
+}
+
+body.is-sidebar-collapsed .sidebar-note-icon {
+  margin: 0;
 }
 
 .sidebar-head {
