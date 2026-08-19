@@ -1,3 +1,7 @@
+### 004.040.001 – Suche im Monatsraster
+
+- **Behoben:** Im Monatsraster des Terminkalenders sah eine Suche wirkungslos aus, sobald der gesuchte Termin in einem anderen Monat lag: Das Raster zeigt nur den gewählten Monat, ein Treffer im Dezember blieb im August also unsichtbar. Die Zeile unter dem Raster nennt jetzt die Zahl der Treffer im gezeigten Monat, weist auf Treffer in anderen Monaten hin und führt auf Klick zum nächstgelegenen
+
 ### 004.040.000 – Eigene Symbole, klebende Kopfzeile und schnellere Ansichten
 
 - **Neu:** Ein GitHub-Workflow baut das Paket und legt die Veröffentlichung mit Titel, Text und Prüfsumme an; Titel und Text stammen aus diesem Änderungsverzeichnis

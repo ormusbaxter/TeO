@@ -624,6 +624,10 @@
       "click",
       showAppointmentCalendarToday,
     );
+    elements.appointmentCalendarNote.addEventListener(
+      "click",
+      handleAppointmentCalendarNoteAction,
+    );
 
     elements.memoSearch.addEventListener("input", (event) => {
       memoSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");

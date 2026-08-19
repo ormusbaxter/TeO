@@ -10356,6 +10356,21 @@ body.is-vacation-planner-maximized {
   font-size: 0.72rem;
 }
 
+/* Fuehrt zum naechsten Treffer ausserhalb des gezeigten Monats. */
+.appointment-calendar-note-action {
+  padding: 0;
+  cursor: pointer;
+  color: var(--blue-700);
+  font: inherit;
+  font-weight: 700;
+  border: 0;
+  background: transparent;
+}
+
+.appointment-calendar-note-action:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 900px) {
   .appointment-calendar-day {
     min-height: 88px;
