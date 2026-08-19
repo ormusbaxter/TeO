@@ -87,6 +87,20 @@ test("Der Fuß der Seitenleiste hat eine eigene Minimalansicht", async () => {
     /body\.is-sidebar-collapsed :is\(\.sidebar-system-status, \.sidebar-note\) \{\s*min-height: 44px;/,
   );
 
+  // Das Untermenü der Einstellungen bleibt eingeklappt weg. Die Regel, die es
+  // bei aktiver Ansicht zeigt, ist spezifischer als die allgemeine
+  // Ausblendliste - ohne diese Gegenregel stünde es abgeschnitten in der Spur.
+  assert.match(
+    styles,
+    /body\.is-sidebar-collapsed\s*\n?\s*\.nav-item\[data-view="settings"\]\.is-active\s*\n?\s*\+ \.settings-sidebar-subnav \{\s*display: none;/,
+  );
+  // Sie muss hinter der Regel stehen, die das Untermenü zeigt.
+  assert.ok(
+    styles.indexOf('body.is-sidebar-collapsed\n  .nav-item[data-view="settings"]') >
+      styles.indexOf('.nav-item[data-view="settings"].is-active + .settings-sidebar-subnav {'),
+    "Die Gegenregel steht nach der Regel, die sie aufhebt",
+  );
+
   // Was wegfällt, steht als Kurzhinweis am Block - eine Zeile je Angabe.
   assert.match(appSource, /function updateSidebarFooterSummaries\(/);
   assert.match(appSource, /`Angemeldet: \$\{name\}`/);

@@ -176,6 +176,9 @@ Kurzhinweis. Ein erneuter Klick klappt sie wieder auf. Der Zustand wird im
 Browserprofil gespeichert und gilt beim nächsten Start wieder – er gehört wie
 die Reihenfolge der Navigation nicht zum gemeinsamen Datenbestand.
 
+Das Untermenü der Einstellungen entfällt im eingeklappten Zustand – die fünf
+Bereiche stehen ohnehin als Leiste über den Einstellungen selbst.
+
 Auch der Fuß der Seitenleiste schrumpft mit: Angemeldetes Konto, Systemstatus
 und Namenszug stehen dann als drei gleich große Kacheln untereinander – Konto
 mit den Schaltflächen für Benutzerverwaltung und Abmelden, Status als farbiger
