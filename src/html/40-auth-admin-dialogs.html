@@ -560,6 +560,24 @@
       </div>
     </dialog>
 
+    <dialog class="modal modal-small" id="dashboardLayoutDialog" aria-labelledby="dashboardLayoutTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Persönlicher Arbeitsplatz</p>
+          <h2 id="dashboardLayoutTitle">Dashboard anpassen</h2>
+          <p class="modal-subtitle">Bereiche ausblenden oder in die gewünschte Reihenfolge bringen.</p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Schließen"><svg><use href="#icon-close"></use></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="dashboard-layout-list" id="dashboardLayoutList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-ghost" id="resetDashboardLayoutButton" type="button">Standard wiederherstellen</button>
+        <button class="button button-primary" type="button" data-close-dialog>Fertig</button>
+      </div>
+    </dialog>
+
     <dialog class="command-palette" id="commandPalette" aria-labelledby="commandPaletteTitle">
       <h2 class="sr-only" id="commandPaletteTitle">Suchen und ausführen</h2>
       <div class="command-palette-field">
@@ -585,6 +603,7 @@
         role="listbox"
         aria-label="Treffer"
       ></div>
+      <div class="command-palette-preview" id="commandPalettePreview" aria-live="polite"></div>
       <p class="command-palette-footer">
         <span><kbd>↑</kbd><kbd>↓</kbd> wählen</span>
         <span><kbd>Enter</kbd> öffnen</span>

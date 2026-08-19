@@ -310,7 +310,7 @@
 
     elements.employeeTable.innerHTML = `
       <div class="table-scroll">
-        <table class="data-table employee-table">
+        <table class="data-table employee-table"${employeeTableStyle()}>
           <thead>
             <tr>
               <th class="selection-column">
@@ -334,6 +334,7 @@
         </table>
       </div>
     `;
+    renderEmployeeInspector();
   }
 
   function filteredEmployeesForTable() {
@@ -389,7 +390,7 @@
     const cells = employeeRowCells(employee, { selectedQualifications, trainingStats });
 
     return `
-      <tr>
+      <tr data-employee-row="${employee.id}" tabindex="0" class="${employeeInspectorId === employee.id ? "is-inspected" : ""}">
         <td class="selection-column">
           <input
             type="checkbox"
@@ -398,7 +399,7 @@
             ${selectedEmployeeIds.has(employee.id) ? "checked" : ""}
           />
         </td>
-        <td data-column="name">
+        <td data-column="name"${employeeColumnStyle("name")}>
           <div class="employee-cell">
             ${renderAvatar(employee)}
             <div>
@@ -476,7 +477,7 @@
   function employeeRowCells(employee, { selectedQualifications, trainingStats }) {
     return {
       profession: `
-        <td data-column="profession">
+        <td data-column="profession" class="${pinnedEmployeeColumn === "profession" ? "is-pinned-column" : ""}"${employeeColumnStyle("profession")}>
           <span class="profession-cell">
             <strong>${escapeHtml(employee.profession)}</strong>
             <small>Dienstwochenende: ${escapeHtml(
@@ -486,10 +487,10 @@
         </td>
       `,
       employment: `
-        <td data-column="employment"><strong>${employee.employmentPercent}&thinsp;%</strong></td>
+        <td data-column="employment" class="${pinnedEmployeeColumn === "employment" ? "is-pinned-column" : ""}"${employeeColumnStyle("employment")}><strong>${employee.employmentPercent}&thinsp;%</strong></td>
       `,
       qualifications: `
-        <td data-column="qualifications">
+        <td data-column="qualifications" class="${pinnedEmployeeColumn === "qualifications" ? "is-pinned-column" : ""}"${employeeColumnStyle("qualifications")}>
           <div class="qualification-tags">
             ${
               selectedQualifications.length
@@ -506,7 +507,7 @@
         </td>
       `,
       trainings: `
-        <td data-column="trainings">
+        <td data-column="trainings" class="${pinnedEmployeeColumn === "trainings" ? "is-pinned-column" : ""}"${employeeColumnStyle("trainings")}>
           <div class="table-progress">
             <div
               class="progress-track"
@@ -523,7 +524,7 @@
         </td>
       `,
       status: `
-        <td data-column="status">
+        <td data-column="status" class="${pinnedEmployeeColumn === "status" ? "is-pinned-column" : ""}"${employeeColumnStyle("status")}>
           <span class="status-badge ${
             employee.employmentStatus === "inactive"
               ? "inactive"
@@ -542,7 +543,7 @@
     const active = employeeSortKey === key;
     const direction = active ? (employeeSortDirection === "asc" ? "▲" : "▼") : "";
     return `
-      <th data-column="${key}">
+      <th data-column="${key}" class="${pinnedEmployeeColumn === key ? "is-pinned-column" : ""}"${employeeColumnStyle(key)}>
         <button
           class="table-sort-button ${active ? "is-active" : ""}"
           type="button"
@@ -551,6 +552,7 @@
         >
           ${escapeHtml(label)} <span aria-hidden="true">${direction}</span>
         </button>
+        <span class="column-resize-handle" data-resize-employee-column="${key}" aria-hidden="true"></span>
       </th>
     `;
   }

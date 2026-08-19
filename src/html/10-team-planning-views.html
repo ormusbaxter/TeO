@@ -11,52 +11,26 @@
             <div class="header-actions">
               <button
                 class="button button-secondary"
-                id="openCatalogManagementButton"
-                type="button"
-              >
-                <svg><use href="#icon-edit"></use></svg>
-                Berufe &amp; Qualifikationen
-              </button>
-              <button
-                class="button button-secondary"
-                id="openWeekendOverviewButton"
-                type="button"
-              >
-                <svg><use href="#icon-calendar"></use></svg>
-                Dienstwochenenden
-              </button>
-              <button
-                class="button button-secondary"
                 id="openDataQualityButton"
                 type="button"
               >
                 <svg><use href="#icon-alert"></use></svg>
                 Datenqualität
               </button>
-              <button
-                class="button button-secondary"
-                id="copyActiveEmailsButton"
-                type="button"
-              >
-                <svg><use href="#icon-copy"></use></svg>
-                <span id="copyActiveEmailsLabel">E-Mails kopieren</span>
-              </button>
-              <button
-                class="button button-secondary"
-                id="copyUsernamesButton"
-                type="button"
-              >
-                <svg><use href="#icon-copy"></use></svg>
-                <span id="copyUsernamesLabel">Benutzernamen kopieren</span>
-              </button>
-              <button
-                class="button button-secondary"
-                id="exportEmployeePhoneListButton"
-                type="button"
-              >
-                <svg><use href="#icon-print"></use></svg>
-                <span id="exportEmployeePhoneListLabel">Telefonliste drucken</span>
-              </button>
+              <details class="action-menu" id="employeeMoreActions">
+                <summary class="button button-secondary">
+                  <svg><use href="#icon-more"></use></svg>
+                  Mehr
+                </summary>
+                <div class="action-menu-popover">
+                  <button id="openCatalogManagementButton" type="button"><svg><use href="#icon-edit"></use></svg>Berufe &amp; Qualifikationen</button>
+                  <button id="openWeekendOverviewButton" type="button"><svg><use href="#icon-calendar"></use></svg>Dienstwochenenden</button>
+                  <hr />
+                  <button id="copyActiveEmailsButton" type="button"><svg><use href="#icon-copy"></use></svg><span id="copyActiveEmailsLabel">E-Mails kopieren</span></button>
+                  <button id="copyUsernamesButton" type="button"><svg><use href="#icon-copy"></use></svg><span id="copyUsernamesLabel">Benutzernamen kopieren</span></button>
+                  <button id="exportEmployeePhoneListButton" type="button"><svg><use href="#icon-print"></use></svg><span id="exportEmployeePhoneListLabel">Telefonliste drucken</span></button>
+                </div>
+              </details>
               <button class="button button-primary" type="button" data-open-employee>
                 <svg><use href="#icon-plus"></use></svg>
                 Mitarbeiter anlegen
@@ -145,7 +119,12 @@
                 Auswahl aufheben
               </button>
             </div>
-            <div id="employeeTable"></div>
+            <div class="employee-workspace" id="employeeWorkspace">
+              <div id="employeeTable"></div>
+              <aside class="employee-inspector" id="employeeInspector" aria-label="Mitarbeiter-Schnellansicht" hidden>
+                <div id="employeeInspectorContent"></div>
+              </aside>
+            </div>
           </section>
         </section>
 

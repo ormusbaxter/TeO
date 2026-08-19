@@ -4,6 +4,9 @@
   // Browserprofil, nicht im geteilten Datenbestand.
   const TABLE_DENSITY_KEY = "teo-table-density-v1";
   const EMPLOYEE_COLUMN_KEY = "teo-employee-columns-v1";
+  const EMPLOYEE_COLUMN_ORDER_KEY = "teo-employee-column-order-v1";
+  const EMPLOYEE_PINNED_COLUMN_KEY = "teo-employee-pinned-column-v1";
+  const EMPLOYEE_COLUMN_WIDTHS_KEY = "teo-employee-column-widths-v1";
 
   // Name, Auswahl und Aktionen stehen immer; diese fünf sind wählbar.
   const EMPLOYEE_COLUMNS = Object.freeze([
@@ -15,18 +18,24 @@
   ]);
 
   let hiddenEmployeeColumns = new Set();
+  let employeeColumnOrder = EMPLOYEE_COLUMNS.map((column) => column.key);
+  let pinnedEmployeeColumn = "";
+  let employeeColumnWidths = {};
   // Die zuletzt angeklickte Zeile - Ausgangspunkt für die Auswahl mit
   // Umschalttaste.
   let lastEmployeeSelectionIndex = -1;
   let employeeSelectionShiftPressed = false;
 
   function visibleEmployeeColumns() {
-    return EMPLOYEE_COLUMNS.filter((column) => !hiddenEmployeeColumns.has(column.key));
+    return employeeColumnOrder
+      .map((key) => EMPLOYEE_COLUMNS.find((column) => column.key === key))
+      .filter((column) => column && !hiddenEmployeeColumns.has(column.key));
   }
 
   function bindTableComfort() {
     applyTableDensity(readStoredTableDensity());
     hiddenEmployeeColumns = readStoredHiddenEmployeeColumns();
+    readEmployeeGridPreferences();
 
     elements.tableDensityToggle?.addEventListener("change", (event) => {
       const density = event.target.checked ? "compact" : "comfortable";
@@ -40,6 +49,7 @@
 
     elements.openEmployeeColumnsButton?.addEventListener("click", openEmployeeColumnsDialog);
     elements.employeeColumnsList?.addEventListener("change", handleEmployeeColumnChange);
+    elements.employeeColumnsList?.addEventListener("click", handleEmployeeColumnOrderAction);
 
     // Ob die Umschalttaste gedrueckt war, steht nur am Klick - das
     // change-Ereignis der Auswahlkaestchen kennt keine Zusatztasten. Der Klick
@@ -86,18 +96,24 @@
   }
 
   function openEmployeeColumnsDialog() {
-    elements.employeeColumnsList.innerHTML = EMPLOYEE_COLUMNS.map(
+    elements.employeeColumnsList.innerHTML = employeeColumnOrder.map((key) => EMPLOYEE_COLUMNS.find((column) => column.key === key)).filter(Boolean).map(
       (column) => `
-        <label class="checkbox-field">
-          <input
-            type="checkbox"
-            data-employee-column="${column.key}"
-            ${hiddenEmployeeColumns.has(column.key) ? "" : "checked"}
-          />
-          <span>${escapeHtml(column.label)}</span>
-        </label>
+        <div class="column-choice-row">
+          <label class="checkbox-field">
+            <input type="checkbox" data-employee-column="${column.key}" ${hiddenEmployeeColumns.has(column.key) ? "" : "checked"} />
+            <span>${escapeHtml(column.label)}</span>
+          </label>
+          <label class="column-pin-choice" title="Spalte beim horizontalen Scrollen fixieren">
+            <input type="radio" name="employeePinnedColumn" data-pin-employee-column="${column.key}" ${pinnedEmployeeColumn === column.key ? "checked" : ""} />
+            <span>Fixieren</span>
+          </label>
+          <span class="column-order-actions">
+            <button class="icon-button" type="button" data-move-employee-column="${column.key}" data-direction="up" aria-label="${escapeHtml(column.label)} nach links"><span aria-hidden="true">←</span></button>
+            <button class="icon-button" type="button" data-move-employee-column="${column.key}" data-direction="down" aria-label="${escapeHtml(column.label)} nach rechts"><span aria-hidden="true">→</span></button>
+          </span>
+        </div>
       `,
-    ).join("");
+    ).join("") + `<button class="button button-ghost column-unpin-button" type="button" data-unpin-employee-column>Fixierung aufheben</button>`;
     elements.employeeColumnsDialog.showModal();
   }
 
@@ -120,6 +136,80 @@
       console.warn("Die Spaltenwahl konnte nicht gespeichert werden.", error);
     }
     renderEmployees();
+  }
+
+  function readEmployeeGridPreferences() {
+    try {
+      const storedOrder = JSON.parse(localStorage.getItem(EMPLOYEE_COLUMN_ORDER_KEY) || "[]");
+      const known = EMPLOYEE_COLUMNS.map((column) => column.key);
+      if (Array.isArray(storedOrder)) {
+        employeeColumnOrder = [...storedOrder.filter((key) => known.includes(key)), ...known.filter((key) => !storedOrder.includes(key))];
+      }
+      const storedPinned = localStorage.getItem(EMPLOYEE_PINNED_COLUMN_KEY) || "";
+      pinnedEmployeeColumn = known.includes(storedPinned) ? storedPinned : "";
+      const widths = JSON.parse(localStorage.getItem(EMPLOYEE_COLUMN_WIDTHS_KEY) || "{}");
+      employeeColumnWidths = widths && typeof widths === "object" ? widths : {};
+    } catch (error) {
+      console.warn("Die Tabellenanordnung konnte nicht gelesen werden.", error);
+    }
+  }
+
+  function storeEmployeeGridPreferences() {
+    try {
+      localStorage.setItem(EMPLOYEE_COLUMN_ORDER_KEY, JSON.stringify(employeeColumnOrder));
+      localStorage.setItem(EMPLOYEE_PINNED_COLUMN_KEY, pinnedEmployeeColumn);
+      localStorage.setItem(EMPLOYEE_COLUMN_WIDTHS_KEY, JSON.stringify(employeeColumnWidths));
+    } catch (error) {
+      console.warn("Die Tabellenanordnung konnte nicht gespeichert werden.", error);
+    }
+  }
+
+  function handleEmployeeColumnOrderAction(event) {
+    const unpin = event.target.closest("[data-unpin-employee-column]");
+    if (unpin) {
+      pinnedEmployeeColumn = "";
+      storeEmployeeGridPreferences();
+      openEmployeeColumnsDialog();
+      renderEmployees();
+      return;
+    }
+    const move = event.target.closest("[data-move-employee-column]");
+    if (move) {
+      const index = employeeColumnOrder.indexOf(move.dataset.moveEmployeeColumn);
+      const target = index + (move.dataset.direction === "up" ? -1 : 1);
+      if (index >= 0 && target >= 0 && target < employeeColumnOrder.length) {
+        [employeeColumnOrder[index], employeeColumnOrder[target]] = [employeeColumnOrder[target], employeeColumnOrder[index]];
+        storeEmployeeGridPreferences();
+        openEmployeeColumnsDialog();
+        renderEmployees();
+      }
+      return;
+    }
+    const pin = event.target.closest("[data-pin-employee-column]");
+    if (pin) {
+      pinnedEmployeeColumn = pin.dataset.pinEmployeeColumn;
+      storeEmployeeGridPreferences();
+      renderEmployees();
+    }
+  }
+
+  function employeeColumnStyle(key) {
+    const width = Number(employeeColumnWidths[key]);
+    return Number.isFinite(width) && width >= 80
+      ? dynamicStyle({ "--employee-column-width": `${width}px` })
+      : "";
+  }
+
+  function setEmployeeColumnWidth(key, width) {
+    employeeColumnWidths[key] = Math.max(80, Math.min(520, Math.round(width)));
+    storeEmployeeGridPreferences();
+  }
+
+  function employeeTableStyle() {
+    const nameWidth = Number(employeeColumnWidths.name);
+    return Number.isFinite(nameWidth) && nameWidth >= 80
+      ? dynamicStyle({ "--employee-name-width": `${nameWidth}px` })
+      : "";
   }
 
   // Umschalt-Klick wählt von der zuletzt angeklickten Zeile bis zur jetzigen -

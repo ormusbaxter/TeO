@@ -496,6 +496,7 @@
   // tools/check.mjs prueft, dass jede Filter- und Suchvariable hier vorkommt,
   // damit ein spaeter ergaenzter Filter nicht vergessen wird.
   function resetListFilters() {
+    workQueueFilter = "all";
     employeeStatusFilter = "all";
     employeeSearchTerm = "";
     employeeProfessionFilter = "all";
