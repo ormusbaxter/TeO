@@ -6,6 +6,8 @@
     throw new Error("Die TeO-Projektmetadaten konnten nicht geladen werden.");
   }
   const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
+  const LOCAL_SAVE_TIMESTAMP_KEY =
+    "intensivteam-personalverwaltung-last-save-v1";
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
   const AUTO_BACKUP_CONFIG_KEY = "intensivteam-auto-backup-config-v1";
   const AUTO_BACKUP_DIRECTORY_KEY = "intensivteam-auto-backup-directory-v1";
@@ -452,6 +454,7 @@
   let backendConnectionStatus = "local";
   let backendLastContactAt = "";
   let backendLastSyncAt = "";
+  let localLastSaveAt = "";
   let backendConnectionError = "";
   let remoteSyncTimer = null;
   let remoteUpdateNoticeRevision = 0;

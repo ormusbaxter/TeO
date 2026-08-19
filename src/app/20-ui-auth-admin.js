@@ -2400,6 +2400,13 @@
     if (!elements.sidebarSystemStatus) return;
     const localMode = !isMariaDbMode();
     const status = localMode ? "local" : backendConnectionStatus;
+    const rows = [...elements.sidebarSystemStatus.querySelectorAll("dl > div")];
+    const terms = rows.map((row) => row.querySelector("dt"));
+    const remoteTerms = ["Backend", "Server", "Revision", "DB-Schema"];
+    terms.forEach((term, index) => {
+      if (term) term.textContent = remoteTerms[index];
+      if (rows[index]) rows[index].hidden = false;
+    });
     elements.sidebarSystemStatus.classList.toggle("is-local", status === "local");
     elements.sidebarSystemStatus.classList.toggle(
       "is-connected",
@@ -2409,13 +2416,20 @@
 
     if (localMode) {
       elements.sidebarConnectionLabel.textContent = "Lokal bereit";
-      elements.sidebarBackendLabel.textContent = "Browser · localForage";
-      elements.sidebarServerLabel.textContent = "Dieses Browserprofil";
-      elements.sidebarRevisionLabel.textContent = "lokal";
-      elements.sidebarSchemaLabel.textContent = "IndexedDB";
-      elements.sidebarSyncLabel.textContent = "Automatische lokale Speicherung";
+      if (terms[0]) terms[0].textContent = "Speicherort";
+      if (terms[1]) terms[1].textContent = "Zuletzt gespeichert";
+      rows.slice(2).forEach((row) => {
+        row.hidden = true;
+      });
+      elements.sidebarBackendLabel.textContent = "Dieses Browserprofil";
+      elements.sidebarServerLabel.textContent = localLastSaveAt
+        ? formatSidebarStatusDateTime(localLastSaveAt)
+        : "Noch nicht erfasst";
+      elements.sidebarSyncLabel.textContent =
+        "Automatische lokale Speicherung aktiv";
       elements.sidebarServerLabel.title = "";
       elements.sidebarSyncLabel.title = "";
+      updateSidebarFooterSummaries();
       return;
     }
 
@@ -2471,6 +2485,19 @@
     const date = new Date(value);
     if (!Number.isFinite(date.getTime())) return "–";
     return date.toLocaleTimeString("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }
+
+  function formatSidebarStatusDateTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "–";
+    return date.toLocaleString("de-DE", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",

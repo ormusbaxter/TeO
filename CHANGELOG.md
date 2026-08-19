@@ -1,3 +1,7 @@
+### 4.43.3 – Klarer lokaler Speicherstatus
+
+- **Verbessert:** Im lokalen Modus fasst der Systemstatus die technischen Angaben zu zwei verständlichen Punkten zusammen: Speicherort und Zeitpunkt der letzten erfolgreichen Speicherung mit Datum und Uhrzeit
+
 ### 4.43.2 – Einheitliche Windows-95-Seitenleiste
 
 - **Behoben:** Im Windows-95-Theme verwendet die Seitenleiste jetzt dasselbe Grau wie die Inhaltsfenster; Konto, Systemstatus und Programminfo tragen dazu passende schwarze beziehungsweise dunkelgraue Texte

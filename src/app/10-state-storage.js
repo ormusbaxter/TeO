@@ -19,6 +19,7 @@
     backendMode = backendConfig.mode;
     backendConnectionStatus = isMariaDbMode() ? "checking" : "local";
     state = await loadState();
+    localLastSaveAt = await loadLocalSaveTimestamp();
     await loadAutomaticBackupConfiguration();
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -177,6 +178,22 @@
 
   function isMariaDbMode() {
     return backendMode === "mariadb";
+  }
+
+  async function loadLocalSaveTimestamp() {
+    if (isMariaDbMode()) return "";
+    try {
+      const value = String(
+        (await dataStore.getItem(LOCAL_SAVE_TIMESTAMP_KEY)) || "",
+      );
+      return Number.isFinite(new Date(value).getTime()) ? value : "";
+    } catch (error) {
+      console.warn(
+        "Der Zeitpunkt der letzten lokalen Speicherung konnte nicht geladen werden.",
+        error,
+      );
+      return "";
+    }
   }
 
   async function loadMariaDbState() {
@@ -1204,6 +1221,7 @@
     } else {
       try {
         await dataStore.setItem(STORAGE_KEY, state);
+        localLastSaveAt = new Date().toISOString();
       } catch (error) {
         console.error("Daten konnten nicht gespeichert werden.", error);
         showToast(
@@ -1212,6 +1230,15 @@
         );
         return false;
       }
+      try {
+        await dataStore.setItem(LOCAL_SAVE_TIMESTAMP_KEY, localLastSaveAt);
+      } catch (error) {
+        console.warn(
+          "Der Zeitpunkt der lokalen Speicherung konnte nicht vorgemerkt werden.",
+          error,
+        );
+      }
+      renderSidebarSystemStatus();
     }
 
     try {

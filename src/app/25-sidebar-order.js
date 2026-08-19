@@ -257,14 +257,16 @@
     setSidebarSummary(elements.sidebarSystemStatus, collapsed, () => {
       const status = elements.sidebarSystemStatus;
       const headline = status.querySelector(".sidebar-system-status-header strong");
-      const rows = [...status.querySelectorAll("dl > div")].map((row) =>
-        [
-          row.querySelector("dt")?.textContent.trim(),
-          row.querySelector("dd")?.textContent.trim(),
-        ]
-          .filter(Boolean)
-          .join(": "),
-      );
+      const rows = [...status.querySelectorAll("dl > div")]
+        .filter((row) => !row.hidden)
+        .map((row) =>
+          [
+            row.querySelector("dt")?.textContent.trim(),
+            row.querySelector("dd")?.textContent.trim(),
+          ]
+            .filter(Boolean)
+            .join(": "),
+        );
       return [headline?.textContent.trim(), ...rows, status.querySelector("small")?.textContent.trim()]
         .filter(Boolean)
         .join("\n");
