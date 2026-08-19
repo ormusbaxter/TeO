@@ -1,5 +1,6 @@
 ### 4.42.0 – Tastatur und Rückgängig
 
+- **Behoben:** In der eingeklappten Seitenleiste stand das Untermenü der Einstellungen abgeschnitten in der schmalen Spur. Es entfällt dort jetzt – dieselben fünf Bereiche stehen als Leiste über den Einstellungen selbst
 - **Behoben:** Beim Anklicken von Teilnehmern – etwa in „Geräteeinweisung dokumentieren“ und beim Fortbildungsnachweis – markierte ein verrutschter oder doppelter Klick den Namen statt das Auswahlkästchen zu treffen. Auswahlkarten, Auswahlkästchen und die Auswahlspalte der Mitarbeitertabelle lassen sich jetzt nicht mehr markieren; der übrige Text bleibt zum Kopieren markierbar
 - **Neu:** Schnelleingabe in jedem Datumsfeld: Bei aktivem Feld trägt **h** das heutige Datum ein, **g** das gestrige und **m** das morgige – nützlich beim Dokumentieren von Geräteeinweisungen und Fortbildungsnachweisen. Felder mit einer Grenze nehmen ein Datum außerhalb nicht an, Ziffern funktionieren unverändert
 - **Verbessert:** Die eingeklappte Seitenleiste hat jetzt auch am Fuß eine Minimalansicht: Konto, Systemstatus und Namenszug stehen als gleich große Kacheln untereinander, die Schaltflächen für Benutzerverwaltung und Abmelden bleiben erreichbar, und die weggefallenen Angaben – Benutzername, Rolle, Verbindung, Backend, Server, Revision, DB-Schema, Fassung – nennt der Kurzhinweis der jeweiligen Kachel

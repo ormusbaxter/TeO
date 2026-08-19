@@ -553,6 +553,16 @@ body.is-sidebar-collapsed .sidebar-toggle svg {
   display: grid;
 }
 
+/* Eingeklappt bleibt das Untermenü weg: Auf 52 Bildpunkten wären fünf
+   Wortmarken nur abgeschnitten zu lesen. Verloren geht dabei nichts - dieselben
+   fünf Bereiche stehen als Leiste über den Einstellungen selbst. Diese Regel
+   braucht dieselbe Spezifität wie die Zeile darüber, sonst gewinnt jene. */
+body.is-sidebar-collapsed
+  .nav-item[data-view="settings"].is-active
+  + .settings-sidebar-subnav {
+  display: none;
+}
+
 .settings-sidebar-subnav button {
   padding: 6px 9px;
   cursor: pointer;
