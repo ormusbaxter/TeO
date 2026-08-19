@@ -70,3 +70,29 @@ test("Die Suche im Monatsraster weist auf Treffer in anderen Monaten hin", async
   assert.match(leer, /Kein Termin passt zur Suche/);
   assert.match(leer, /data-clear-appointment-search/);
 });
+
+test("Ein Suchbegriff gilt auch für angepinnte Termine, ein Zeitraumfilter nicht", async () => {
+  const app = await loadAppFunctions(["appointmentIsVisible"]);
+  const state = createMinimalState();
+  const angepinnt = appointment("p1", "Jahresgespräch", "2026-07-02", {
+    pinned: true,
+  });
+  const gewöhnlich = appointment("n1", "Begehung Hygiene", "2026-07-02");
+  state.appointments = [angepinnt, gewöhnlich];
+  app.setState(state);
+  const heute = "2026-08-18";
+
+  // Angepinnt bleibt sichtbar, obwohl der Zeitraumfilter nur Anstehendes zeigt.
+  app.setAppointmentFilters({ period: "upcoming" });
+  assert.equal(app.appointmentIsVisible(angepinnt, heute), true);
+  assert.equal(app.appointmentIsVisible(gewöhnlich, heute), false);
+
+  // Bei einer Suche zählt auch für ihn der Begriff - sonst sähe er wie ein
+  // Treffer aus und die Suche wirkungslos.
+  app.setAppointmentFilters({ period: "all", search: "begehung" });
+  assert.equal(app.appointmentIsVisible(angepinnt, heute), false);
+  assert.equal(app.appointmentIsVisible(gewöhnlich, heute), true);
+
+  app.setAppointmentFilters({ period: "all", search: "jahresgespräch" });
+  assert.equal(app.appointmentIsVisible(angepinnt, heute), true);
+});
