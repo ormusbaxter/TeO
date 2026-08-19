@@ -1284,6 +1284,7 @@
     );
     updateEmailExportButton();
     updateUsernameExportButton();
+    updateSidebarCollapsedLabels();
     for (const view of Object.keys(VIEW_RENDERERS)) {
       if (view !== activeView) staleViews.add(view);
     }
