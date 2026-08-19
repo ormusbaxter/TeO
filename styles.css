@@ -4466,6 +4466,10 @@ body.is-sidebar-collapsed
   background: #fafbfd;
 }
 
+.modal-footer-delete {
+  margin-right: auto;
+}
+
 fieldset {
   min-width: 0;
   margin: 0;

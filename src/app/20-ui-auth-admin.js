@@ -491,6 +491,10 @@
     elements.completionForm.addEventListener("submit", handleCompletionSubmit);
     elements.meetingForm.addEventListener("submit", handleMeetingSubmit);
     elements.appointmentForm.addEventListener("submit", handleAppointmentSubmit);
+    elements.deleteAppointmentButton.addEventListener(
+      "click",
+      requestDeleteAppointmentFromDialog,
+    );
     elements.memoForm.addEventListener("submit", handleMemoSubmit);
     elements.memoCategoryForm.addEventListener("submit", addMemoCategory);
     elements.memoCategoryList.addEventListener("click", handleMemoCategoryAction);

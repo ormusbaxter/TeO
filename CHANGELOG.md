@@ -1,3 +1,7 @@
+### 4.43.4 – Termin direkt im Dialog löschen
+
+- **Neu:** Beim Bearbeiten eines Termins steht die Löschaktion direkt im Dialog bereit; sie verwendet weiterhin die Sicherheitsabfrage und kann anschließend rückgängig gemacht werden
+
 ### 4.43.3 – Klarer lokaler Speicherstatus
 
 - **Verbessert:** Im lokalen Modus fasst der Systemstatus die technischen Angaben zu zwei verständlichen Punkten zusammen: Speicherort und Zeitpunkt der letzten erfolgreichen Speicherung mit Datum und Uhrzeit

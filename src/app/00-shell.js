@@ -931,6 +931,7 @@
     appointmentForm: document.querySelector("#appointmentForm"),
     appointmentDialogTitle: document.querySelector("#appointmentDialogTitle"),
     appointmentSubmitLabel: document.querySelector("#appointmentSubmitLabel"),
+    deleteAppointmentButton: document.querySelector("#deleteAppointmentButton"),
     appointmentPinned: document.querySelector("#appointmentPinned"),
     appointmentParticipantList: document.querySelector(
       "#appointmentParticipantList",

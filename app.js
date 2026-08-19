@@ -932,6 +932,7 @@
     appointmentForm: document.querySelector("#appointmentForm"),
     appointmentDialogTitle: document.querySelector("#appointmentDialogTitle"),
     appointmentSubmitLabel: document.querySelector("#appointmentSubmitLabel"),
+    deleteAppointmentButton: document.querySelector("#deleteAppointmentButton"),
     appointmentPinned: document.querySelector("#appointmentPinned"),
     appointmentParticipantList: document.querySelector(
       "#appointmentParticipantList",
@@ -3062,6 +3063,10 @@
     elements.completionForm.addEventListener("submit", handleCompletionSubmit);
     elements.meetingForm.addEventListener("submit", handleMeetingSubmit);
     elements.appointmentForm.addEventListener("submit", handleAppointmentSubmit);
+    elements.deleteAppointmentButton.addEventListener(
+      "click",
+      requestDeleteAppointmentFromDialog,
+    );
     elements.memoForm.addEventListener("submit", handleMemoSubmit);
     elements.memoCategoryForm.addEventListener("submit", addMemoCategory);
     elements.memoCategoryList.addEventListener("click", handleMemoCategoryAction);
@@ -15145,6 +15150,7 @@
     elements.appointmentSubmitLabel.textContent = appointment
       ? "Änderungen speichern"
       : "Termin speichern";
+    elements.deleteAppointmentButton.hidden = !appointment;
 
     if (appointment) {
       document.querySelector("#appointmentId").value = appointment.id;
@@ -15250,7 +15256,17 @@
     window.setTimeout(() => document.body.classList.remove("print-appointment"), 0);
   }
 
-  function requestDeleteAppointment(appointmentId) {
+  function requestDeleteAppointmentFromDialog() {
+    const appointmentId = document.querySelector("#appointmentId").value;
+    if (appointmentId) {
+      requestDeleteAppointment(appointmentId, { closeDialog: true });
+    }
+  }
+
+  function requestDeleteAppointment(
+    appointmentId,
+    { closeDialog = false } = {},
+  ) {
     const appointment = getAppointment(appointmentId);
     if (!appointment) return;
 
@@ -15267,6 +15283,9 @@
           );
         }, { undo: "Termin gelöscht" });
         if (!committed) return;
+        if (closeDialog && elements.appointmentDialog.open) {
+          elements.appointmentDialog.close();
+        }
         showUndoToast("Termin wurde gelöscht.");
       },
     });
