@@ -78,6 +78,15 @@ test("Urlaubseinstellungen und Termin-Druckablauf sind vollständig verdrahtet",
   const appointmentDialog = dialogHtml.slice(dialogHtml.indexOf('id="appointmentDialog"'));
   assert.doesNotMatch(trainingDialog, /appointmentParticipantList|Speichern &amp; Drucken/);
   assert.match(appointmentDialog, /id="appointmentParticipantList"/);
+  assert.match(
+    appointmentDialog,
+    /id="deleteAppointmentButton"[\s\S]*?Termin löschen/,
+  );
+  assert.match(appSource, /deleteAppointmentButton\.hidden = !appointment/);
+  assert.match(
+    appSource,
+    /requestDeleteAppointment\(appointmentId, \{ closeDialog: true \}\)/,
+  );
   assert.match(appointmentDialog, /value="print"[^>]*>[\s\S]*Speichern &amp; Drucken/);
   assert.match(footerHtml, /id="appointmentPrintSurface"/);
   assert.match(appSource, /openAppointmentDialog\(button\.dataset\.deadlineAppointment\)/);

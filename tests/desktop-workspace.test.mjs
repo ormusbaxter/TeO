@@ -54,7 +54,7 @@ test("Änderungshistorie und feststehende Namensspalte bleiben lesbar", async ()
 
   assert.match(
     changelog,
-    /^### 4\.43\.3[\s\S]*?### 4\.43\.2[\s\S]*?### 4\.43\.1[\s\S]*?### 4\.43\.0[\s\S]*?### 4\.42\.0/,
+    /^### 4\.43\.4[\s\S]*?### 4\.43\.3[\s\S]*?### 4\.43\.2[\s\S]*?### 4\.43\.1[\s\S]*?### 4\.43\.0[\s\S]*?### 4\.42\.0/,
   );
   assert.equal((changelog.match(/^### 4\.43\.0/gm) || []).length, 1);
   assert.match(
