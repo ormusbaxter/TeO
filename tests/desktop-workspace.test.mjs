@@ -45,3 +45,21 @@ test("Seltene Mitarbeiteraktionen stehen in einem Mehr-Menü", async () => {
   assert.match(html, /<details class="action-menu" id="employeeMoreActions">/);
   assert.match(html, /id="openCatalogManagementButton"[\s\S]*?id="exportEmployeePhoneListButton"/);
 });
+
+test("Änderungshistorie und feststehende Namensspalte bleiben lesbar", async () => {
+  const [changelog, styles] = await Promise.all([
+    fs.readFile(path.join(projectRoot, "CHANGELOG.md"), "utf8"),
+    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
+  ]);
+
+  assert.match(changelog, /^### 4\.43\.1[\s\S]*?### 4\.43\.0[\s\S]*?### 4\.42\.0/);
+  assert.equal((changelog.match(/^### 4\.43\.0/gm) || []).length, 1);
+  assert.match(
+    styles,
+    /\.employee-table :is\(th, td\)\[data-column="name"\] \{[\s\S]*?width: var\(--employee-column-width, 250px\);/,
+  );
+  assert.match(
+    styles,
+    /\.employee-table :is\(th, td\)\[data-column\] \{\s*width: var\(--employee-column-width\);/,
+  );
+});
