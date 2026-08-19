@@ -41,6 +41,7 @@
     bindRecordInspectors();
     bindRecordSelection();
     bindContextMenu();
+    bindDragAndDrop();
     bindTableComfort();
     bindDesktopWorkspace();
     bindWhatsNew();

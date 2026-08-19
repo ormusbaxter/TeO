@@ -11654,6 +11654,30 @@ body.is-resizing-column {
   color: var(--red-700);
 }
 
+/* Ziehen im Raster: Der Zeiger zeigt den Griff, und der Tag unter dem Zeiger
+   hebt sich ab, solange ein Termin über ihm schwebt. */
+body.is-dragging-planner,
+body.is-dragging-appointment {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body.is-dragging-planner .vacation-day-cell,
+body.is-dragging-appointment .appointment-calendar-entry {
+  cursor: grabbing;
+}
+
+.appointment-calendar-entry {
+  cursor: grab;
+}
+
+.appointment-calendar-day.is-drop-target {
+  outline: 2px dashed var(--blue-600);
+  outline-offset: -2px;
+  background: var(--blue-50);
+}
+
 @page phone-list {
   size: A4 portrait;
   margin: 0;
