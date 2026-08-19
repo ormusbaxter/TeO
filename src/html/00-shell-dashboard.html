@@ -425,9 +425,30 @@
               <h1 id="dashboardGreeting">Guten Tag!</h1>
               <p class="page-subtitle">Personal und Pflichtfortbildungen kompakt im Blick.</p>
             </div>
+            <div class="header-actions">
+              <button class="button button-secondary" id="openDashboardLayoutButton" type="button">
+                <svg><use href="#icon-columns"></use></svg>
+                Dashboard anpassen
+              </button>
+            </div>
           </div>
 
-          <div class="dashboard-priority-grid" id="dashboardPriorityGrid">
+          <section class="panel dashboard-work-queue" id="dashboardWorkQueuePanel" data-dashboard-widget="work-queue">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Arbeitsliste</p>
+                <h2>Was jetzt Aufmerksamkeit braucht</h2>
+              </div>
+              <div class="segmented-control dashboard-work-filter" role="group" aria-label="Arbeitsliste filtern">
+                <button class="is-active" type="button" data-work-queue-filter="all" aria-pressed="true">Alles</button>
+                <button type="button" data-work-queue-filter="overdue" aria-pressed="false">Überfällig</button>
+                <button type="button" data-work-queue-filter="week" aria-pressed="false">7 Tage</button>
+              </div>
+            </div>
+            <div id="dashboardWorkQueue"></div>
+          </section>
+
+          <div class="dashboard-priority-grid" id="dashboardPriorityGrid" data-dashboard-widget="deadlines">
           <section class="panel deadline-panel" aria-labelledby="deadlineOverviewTitle">
             <div class="panel-header deadline-panel-header">
               <div>
@@ -491,7 +512,7 @@
           </section>
           </div>
 
-          <div class="dashboard-grid">
+          <div class="dashboard-grid" data-dashboard-widget="overview">
             <section class="panel panel-large">
               <div class="panel-header">
                 <div>
@@ -559,7 +580,7 @@
           </div>
 
 
-          <section class="panel recent-panel">
+          <section class="panel recent-panel" data-dashboard-widget="recent">
             <div class="panel-header">
               <div>
                 <p class="eyebrow">Team</p>

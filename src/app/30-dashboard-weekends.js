@@ -418,6 +418,7 @@
   function openEmployeeDossier(employeeId) {
     const employee = getEmployee(employeeId);
     if (!employee) return;
+    trackWorkspaceRecord("employee", employeeId);
     const selectedQualifications = state.catalogs.qualifications.filter(
       (qualification) => employee.qualifications[qualification.id],
     );

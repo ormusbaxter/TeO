@@ -199,6 +199,7 @@
   function openMemoDialog(memoId = null) {
     const memo = memoId ? getMemo(memoId) : null;
     if (memo && !memoVisibleToCurrentUser(memo)) return;
+    if (memo) trackWorkspaceRecord("memo", memo.id);
     renderMemoCategoryOptions();
     elements.memoForm.reset();
     document.querySelector("#memoId").value = "";

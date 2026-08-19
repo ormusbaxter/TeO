@@ -38,6 +38,7 @@
     bindCommandPalette();
     bindViewFilterChips();
     bindTableComfort();
+    bindDesktopWorkspace();
     bindWhatsNew();
     bindDialogTriggers();
     bindForms();

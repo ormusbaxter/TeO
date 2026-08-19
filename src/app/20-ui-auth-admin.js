@@ -1238,7 +1238,7 @@
   // Inhalte von Dialogen stehen bewusst nicht hier: Sie werden beim Oeffnen
   // des Dialogs aufgebaut und sind dadurch immer aktuell.
   const VIEW_RENDERERS = {
-    dashboard: [renderDashboard, renderDeadlineOverview, renderDashboardMemos],
+    dashboard: [renderDashboard, renderDeadlineOverview, renderDashboardMemos, renderDesktopWorkspace],
     employees: [renderEmployees],
     weekends: [renderWeekendDistribution],
     vacations: [renderVacationPlanner],

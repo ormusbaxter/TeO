@@ -142,6 +142,33 @@ und ist nicht Teil der Datensicherung. Ist ein gemerkter Wert später entfallen
 - **Feste erste Spalte** – in der Einweisungsmatrix und in der Jahresauswertung
   der Pflichtfortbildungen bleibt die Namensspalte beim seitlichen Blättern
   stehen.
+- **Spaltenbreite und Reihenfolge** – in der Mitarbeitertabelle lässt sich die
+  rechte Kante einer Überschrift ziehen. Im Dialog **Spalten** ordnen die
+  Pfeile die wählbaren Spalten neu an. Eine davon kann zusätzlich fixiert
+  werden; Auswahl und Name bleiben ohnehin am linken Rand stehen. Diese
+  Einstellungen gelten nur am jeweiligen Arbeitsplatz.
+
+### Mitarbeiter-Schnellansicht
+
+Ein Klick auf eine freie Stelle einer Mitarbeiterzeile öffnet rechts neben der
+Tabelle eine Schnellansicht. Sie zeigt Status, Stellenumfang, Dienstwochenende,
+Kontakt, Fortbildungsstand und Qualifikationen, ohne die Liste zu verlassen.
+Von dort lässt sich der Mitarbeiter bearbeiten, seine Gesamtakte öffnen oder
+für den Schnellzugriff anheften. Mit **Pfeil hoch** und **Pfeil runter** bewegt
+sich der Fokus durch die Tabellenzeilen, **Enter** öffnet die Schnellansicht.
+
+### Arbeitsliste und Dashboard
+
+Die Arbeitsliste auf der Übersicht führt die wichtigsten offenen Punkte aus
+mehreren Bereichen zusammen: überfällige und anstehende Fristen, Termine,
+offene Memos und Datenqualitätsprobleme mit hoher Priorität. **Überfällig** und
+**7 Tage** begrenzen die Liste auf den unmittelbar relevanten Zeitraum. Ein
+Klick führt direkt zum betreffenden Datensatz.
+
+Über **Dashboard anpassen** werden Arbeitsliste, Fristen, Fortbildungsübersicht
+und zuletzt bearbeitete Mitarbeiter ein- oder ausgeblendet und neu angeordnet.
+Die Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum
+gemeinsamen Datenbestand oder zur Datensicherung.
 
 ### Was ist neu?
 
@@ -192,18 +219,24 @@ Server, Revision und DB-Schema sowie Fassung und Urheberrecht.
 einzelnes Feld für alles. Während der Eingabe zeigt es, gruppiert und
 untereinander:
 
+- **Favoriten, zuletzt geöffnet und letzte Befehle** – angeheftete sowie zuletzt
+  verwendete Mitarbeiter, Termine und Memos und die zuletzt ausgeführten
+  Ansichten oder Aktionen
 - **Ansichten** – jeder Bereich der Anwendung, mit seinem Tastenkürzel dahinter
 - **Aktionen** – Anlegen eines Mitarbeiters, Termins, Memos, einer Fortbildung,
   eines Nachweises, einer Teamsitzung, einer Geräteeinweisung oder eines
   Geräts; dazu Sicherung exportieren, Datenqualität prüfen, Berufe und
   Qualifikationen, Tastenkürzel und Abmelden. Administratoren finden hier
   außerdem Änderungsprotokoll und Benutzerverwaltung
+- **Direktbefehle** – unter anderem die überfällige Arbeitsliste und der Filter
+  für aktuell beschäftigte Mitarbeiter
 - **Datensätze** – Mitarbeiter, Termine, Memos, Pflichtfortbildungen,
   Teamsitzungen und Geräte, sobald etwas eingegeben wurde
 
 **Pfeil hoch** und **Pfeil runter** wählen, **Enter** öffnet, **Esc** schließt.
 Ein gewählter Datensatz wechselt in seine Ansicht und öffnet ihn dort
-unmittelbar zum Bearbeiten – ein Mitarbeiter seine Gesamtakte.
+unmittelbar zum Bearbeiten. Die Vorschau unter der Trefferliste nennt Gruppe,
+Bezeichnung und Zusatz des gerade markierten Eintrags.
 
 Gesucht wird so nachsichtig wie überall in TeO: Umlaute dürfen fehlen oder
 ausgeschrieben sein, „ß“ und „ss“ finden einander. Treffer am Wortanfang stehen

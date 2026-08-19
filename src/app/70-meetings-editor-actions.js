@@ -686,6 +686,7 @@
     document.querySelector("#employeeStatus").value = "active";
 
     const employee = employeeId ? getEmployee(employeeId) : null;
+    if (employee) trackWorkspaceRecord("employee", employee.id);
     renderEmployeeCatalogFields(employee);
     elements.employeeDialogTitle.textContent = employee ? "Mitarbeiter bearbeiten" : "Mitarbeiter anlegen";
     elements.employeeSubmitLabel.textContent = employee ? "Änderungen speichern" : "Mitarbeiter speichern";
@@ -1154,6 +1155,7 @@
     elements.appointmentPinned.checked = false;
 
     const appointment = appointmentId ? getAppointment(appointmentId) : null;
+    if (appointment) trackWorkspaceRecord("appointment", appointment.id);
     elements.appointmentDialogTitle.textContent = appointment
       ? "Termin bearbeiten"
       : "Termin anlegen";

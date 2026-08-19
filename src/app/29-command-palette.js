@@ -60,6 +60,7 @@
   function runCommandPaletteEntry(index) {
     const entry = commandPaletteMatches[index];
     if (!entry) return;
+    trackWorkspaceCommand(entry);
     elements.commandPalette.close();
     entry.run();
   }
@@ -75,6 +76,8 @@
         text: "Kein Eintrag, keine Ansicht und keine Aktion passt zu dieser Eingabe.",
         compact: true,
       });
+      const preview = document.querySelector("#commandPalettePreview");
+      if (preview) preview.textContent = "";
       return;
     }
 
@@ -109,13 +112,16 @@
     elements.commandPaletteResults
       .querySelector(".command-palette-option.is-active")
       ?.scrollIntoView({ block: "nearest" });
+    const activeEntry = commandPaletteMatches[commandPaletteIndex];
+    const preview = document.querySelector("#commandPalettePreview");
+    if (preview) preview.innerHTML = `<span>${escapeHtml(activeEntry.group)}</span><strong>${escapeHtml(activeEntry.label)}</strong><small>${escapeHtml(activeEntry.hint || "Mit Enter ausführen")}</small>`;
   }
 
   // Ohne Eingabe stehen Ansichten und Aktionen bereit - die Palette ist dann
   // ein Inhaltsverzeichnis. Datensätze kommen erst mit einem Suchbegriff dazu,
   // sonst wäre die Liste nur lang.
   function matchingCommandPaletteEntries(query) {
-    const groups = [commandPaletteViews(), commandPaletteActions()];
+    const groups = [workspaceCommandPaletteEntries(), commandPaletteViews(), commandPaletteActions()];
     if (query) groups.push(commandPaletteRecords());
 
     const matches = [];
@@ -201,6 +207,27 @@
         icon: "icon-check",
         keywords: "Plausibilität Auffälligkeiten",
         run: () => openDataQualityDialog(),
+      },
+      {
+        label: "Arbeitsliste: Überfällig",
+        icon: "icon-alert",
+        keywords: "Dashboard Fristen offen Aufgaben",
+        run: () => {
+          workQueueFilter = "overdue";
+          showView("dashboard");
+          renderDesktopWorkspace();
+          document.querySelector("#dashboardWorkQueuePanel")?.scrollIntoView({ block: "start" });
+        },
+      },
+      {
+        label: "Mitarbeiter: aktuell Beschäftigte",
+        icon: "icon-users",
+        keywords: "Filter aktiv Einarbeitung",
+        run: () => {
+          employeeStatusFilter = "employed";
+          showView("employees");
+          renderEmployees();
+        },
       },
       {
         label: "Berufe und Qualifikationen",
