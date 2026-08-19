@@ -1,6 +1,6 @@
 {
   "name": "teo-team-employee-organizer",
-  "version": "4.43.1",
+  "version": "4.43.2",
   "private": true,
   "type": "module",
   "description": "Mitarbeiter- und Organisationsverwaltung für eine Intensivstation",

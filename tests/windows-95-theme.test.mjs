@@ -33,7 +33,7 @@ test("Das Windows-95-Thema kleidet Schaltflächen, Menü und Ecken im Stil der Z
   // Menue: graue Flaeche, navyblaue Hervorhebung.
   assert.match(
     styles,
-    /html\[data-theme="windows-95"\] \.sidebar\s*\{[^}]*background: #c0c0c0;/s,
+    /html\[data-theme="windows-95"\] \.sidebar\s*\{[^}]*background: #d4d0c8;/s,
   );
   assert.match(
     styles,
@@ -48,5 +48,20 @@ test("Das Windows-95-Thema kleidet Schaltflächen, Menü und Ecken im Stil der Z
   assert.equal(
     (styles.match(/border-radius: 0 !important/g) ?? []).length,
     1,
+  );
+
+  // Seitenleiste und Inhaltsfenster verwenden dasselbe Grau. Die hellen
+  // Schriftfarben der dunklen Standard-Sidebar duerfen im Fuss nicht bleiben.
+  assert.match(
+    styles,
+    /html\[data-theme="windows-95"\] :is\(\.panel, \.stat-card, \.modal, \.page-header\) \{[^}]*background: #d4d0c8;/s,
+  );
+  assert.match(
+    styles,
+    /html\[data-theme="windows-95"\] :is\(\s*\.sidebar-system-status-header strong,[\s\S]*?\.sidebar-note strong\s*\) \{\s*color: #000000;/s,
+  );
+  assert.match(
+    styles,
+    /html\[data-theme="windows-95"\] :is\(\s*\.sidebar-system-status dt,[\s\S]*?\.sidebar-note p\s*\) \{\s*color: #404040;/s,
   );
 });
