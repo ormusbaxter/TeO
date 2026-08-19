@@ -210,8 +210,11 @@ Auch der Fuß der Seitenleiste schrumpft mit: Angemeldetes Konto, Systemstatus
 und Namenszug stehen dann als drei gleich große Kacheln untereinander – Konto
 mit den Schaltflächen für Benutzerverwaltung und Abmelden, Status als farbiger
 Punkt, darunter das Programmzeichen. Alles, was dabei wegfällt, nennt der
-Kurzhinweis der jeweiligen Kachel: Benutzername und Rolle, Verbindung, Backend,
-Server, Revision und DB-Schema sowie Fassung und Urheberrecht.
+Kurzhinweis der jeweiligen Kachel: Benutzername und Rolle, Verbindung und
+Speicherstatus sowie Fassung und Urheberrecht. Im lokalen Modus zeigt der
+Systemstatus nur den Speicherort im Browserprofil und Datum samt Uhrzeit der
+letzten erfolgreichen Speicherung; im MariaDB-Modus bleiben Backend, Server,
+Revision und DB-Schema sichtbar.
 
 ### Suchen und ausführen (Befehlspalette)
 

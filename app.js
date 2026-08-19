@@ -7,6 +7,8 @@
     throw new Error("Die TeO-Projektmetadaten konnten nicht geladen werden.");
   }
   const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
+  const LOCAL_SAVE_TIMESTAMP_KEY =
+    "intensivteam-personalverwaltung-last-save-v1";
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
   const AUTO_BACKUP_CONFIG_KEY = "intensivteam-auto-backup-config-v1";
   const AUTO_BACKUP_DIRECTORY_KEY = "intensivteam-auto-backup-directory-v1";
@@ -453,6 +455,7 @@
   let backendConnectionStatus = "local";
   let backendLastContactAt = "";
   let backendLastSyncAt = "";
+  let localLastSaveAt = "";
   let backendConnectionError = "";
   let remoteSyncTimer = null;
   let remoteUpdateNoticeRevision = 0;
@@ -1166,6 +1169,7 @@
     backendMode = backendConfig.mode;
     backendConnectionStatus = isMariaDbMode() ? "checking" : "local";
     state = await loadState();
+    localLastSaveAt = await loadLocalSaveTimestamp();
     await loadAutomaticBackupConfiguration();
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -1324,6 +1328,22 @@
 
   function isMariaDbMode() {
     return backendMode === "mariadb";
+  }
+
+  async function loadLocalSaveTimestamp() {
+    if (isMariaDbMode()) return "";
+    try {
+      const value = String(
+        (await dataStore.getItem(LOCAL_SAVE_TIMESTAMP_KEY)) || "",
+      );
+      return Number.isFinite(new Date(value).getTime()) ? value : "";
+    } catch (error) {
+      console.warn(
+        "Der Zeitpunkt der letzten lokalen Speicherung konnte nicht geladen werden.",
+        error,
+      );
+      return "";
+    }
   }
 
   async function loadMariaDbState() {
@@ -2351,6 +2371,7 @@
     } else {
       try {
         await dataStore.setItem(STORAGE_KEY, state);
+        localLastSaveAt = new Date().toISOString();
       } catch (error) {
         console.error("Daten konnten nicht gespeichert werden.", error);
         showToast(
@@ -2359,6 +2380,15 @@
         );
         return false;
       }
+      try {
+        await dataStore.setItem(LOCAL_SAVE_TIMESTAMP_KEY, localLastSaveAt);
+      } catch (error) {
+        console.warn(
+          "Der Zeitpunkt der lokalen Speicherung konnte nicht vorgemerkt werden.",
+          error,
+        );
+      }
+      renderSidebarSystemStatus();
     }
 
     try {
@@ -4941,6 +4971,13 @@
     if (!elements.sidebarSystemStatus) return;
     const localMode = !isMariaDbMode();
     const status = localMode ? "local" : backendConnectionStatus;
+    const rows = [...elements.sidebarSystemStatus.querySelectorAll("dl > div")];
+    const terms = rows.map((row) => row.querySelector("dt"));
+    const remoteTerms = ["Backend", "Server", "Revision", "DB-Schema"];
+    terms.forEach((term, index) => {
+      if (term) term.textContent = remoteTerms[index];
+      if (rows[index]) rows[index].hidden = false;
+    });
     elements.sidebarSystemStatus.classList.toggle("is-local", status === "local");
     elements.sidebarSystemStatus.classList.toggle(
       "is-connected",
@@ -4950,13 +4987,20 @@
 
     if (localMode) {
       elements.sidebarConnectionLabel.textContent = "Lokal bereit";
-      elements.sidebarBackendLabel.textContent = "Browser · localForage";
-      elements.sidebarServerLabel.textContent = "Dieses Browserprofil";
-      elements.sidebarRevisionLabel.textContent = "lokal";
-      elements.sidebarSchemaLabel.textContent = "IndexedDB";
-      elements.sidebarSyncLabel.textContent = "Automatische lokale Speicherung";
+      if (terms[0]) terms[0].textContent = "Speicherort";
+      if (terms[1]) terms[1].textContent = "Zuletzt gespeichert";
+      rows.slice(2).forEach((row) => {
+        row.hidden = true;
+      });
+      elements.sidebarBackendLabel.textContent = "Dieses Browserprofil";
+      elements.sidebarServerLabel.textContent = localLastSaveAt
+        ? formatSidebarStatusDateTime(localLastSaveAt)
+        : "Noch nicht erfasst";
+      elements.sidebarSyncLabel.textContent =
+        "Automatische lokale Speicherung aktiv";
       elements.sidebarServerLabel.title = "";
       elements.sidebarSyncLabel.title = "";
+      updateSidebarFooterSummaries();
       return;
     }
 
@@ -5012,6 +5056,19 @@
     const date = new Date(value);
     if (!Number.isFinite(date.getTime())) return "–";
     return date.toLocaleTimeString("de-DE", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }
+
+  function formatSidebarStatusDateTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "–";
+    return date.toLocaleString("de-DE", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
@@ -5725,14 +5782,16 @@
     setSidebarSummary(elements.sidebarSystemStatus, collapsed, () => {
       const status = elements.sidebarSystemStatus;
       const headline = status.querySelector(".sidebar-system-status-header strong");
-      const rows = [...status.querySelectorAll("dl > div")].map((row) =>
-        [
-          row.querySelector("dt")?.textContent.trim(),
-          row.querySelector("dd")?.textContent.trim(),
-        ]
-          .filter(Boolean)
-          .join(": "),
-      );
+      const rows = [...status.querySelectorAll("dl > div")]
+        .filter((row) => !row.hidden)
+        .map((row) =>
+          [
+            row.querySelector("dt")?.textContent.trim(),
+            row.querySelector("dd")?.textContent.trim(),
+          ]
+            .filter(Boolean)
+            .join(": "),
+        );
       return [headline?.textContent.trim(), ...rows, status.querySelector("small")?.textContent.trim()]
         .filter(Boolean)
         .join("\n");
