@@ -1690,8 +1690,8 @@
           state.deviceInstructions = state.deviceInstructions.filter(
             (instruction) => instruction.deviceId !== deviceId,
           );
-        });
-        if (committed) showToast("Gerät wurde gelöscht.");
+        }, { undo: "Gerät gelöscht" });
+        if (committed) showUndoToast("Gerät wurde gelöscht.");
       },
     });
   }
@@ -2477,12 +2477,12 @@
           state.deviceInstructions = state.deviceInstructions.filter(
             (item) => item.id !== instructionId,
           );
-        });
+        }, { undo: "Einweisungsnachweis gelöscht" });
         if (!committed) return;
         if (elements.deviceInstructionHistoryDialog.open) {
           elements.deviceInstructionHistoryDialog.close();
         }
-        showToast("Einweisungsnachweis wurde gelöscht.");
+        showUndoToast("Einweisungsnachweis wurde gelöscht.");
       },
     });
   }

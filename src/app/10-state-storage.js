@@ -34,6 +34,7 @@
     bindNavigation();
     bindSidebarOrder();
     bindSidebarCollapse();
+    bindKeyboardShortcuts();
     bindDialogTriggers();
     bindForms();
     bindFilters();
@@ -1220,7 +1221,13 @@
   // Zeichenkette laesst den Protokolleintrag ganz weg - fuer Aenderungen, die
   // nur die Anzeige eines einzelnen Kontos betreffen und den fachlichen
   // Datenbestand unberuehrt lassen.
-  async function commitStateMutation(mutate, { auditAction } = {}) {
+  //
+  // undo benennt die Aenderung fuer ein spaeteres Zuruecknehmen („Mitarbeiter
+  // gelöscht“). Der Schnappschuss davor entsteht ohnehin fuer den Ruecklauf,
+  // ein Schritt zurueck kostet also nur, ihn aufzuheben. Ohne undo verfaellt
+  // der zuletzt gemerkte Schritt: Was danach passiert ist, laesst sich nicht
+  // mehr ueberspringen.
+  async function commitStateMutation(mutate, { auditAction, undo = "" } = {}) {
     // Die Kopie fuer den Ruecklauf entsteht ueber JSON: In Chromium ist der
     // Umweg ueber Text fuer diesen Bestand messbar schneller als
     // structuredClone (6,5 ms gegenueber 11 ms bei 3600 Nachweisen).
@@ -1235,11 +1242,17 @@
     if (await persistState()) {
       stateMutationSequence += 1;
       databaseSaveReminderArmed = true;
+      undoableMutation = undo ? { label: undo, state: previousState } : null;
       renderAll();
       scheduleAutomaticBackup();
       return true;
     }
 
+    // Nach einem Ruecklauf auf den eigenen Stand bleibt ein gemerkter Schritt
+    // gueltig - der Datenbestand ist derselbe wie zuvor. Hat dagegen der
+    // Server einen anderen Stand geschickt, passt der Schnappschuss nicht mehr
+    // dazu und wuerde fremde Aenderungen ueberschreiben.
+    if (pendingRemoteConflictState) undoableMutation = null;
     state = pendingRemoteConflictState || previousState;
     pendingRemoteConflictState = null;
     if (currentUser) {
@@ -1255,6 +1268,42 @@
     }
     renderAll();
     return false;
+  }
+
+  function hasUndoableMutation() {
+    return Boolean(undoableMutation);
+  }
+
+  // Nimmt den zuletzt gemeldeten Schritt zurueck. Das Zuruecknehmen ist selbst
+  // eine Aenderung: Es wird gespeichert und steht im Protokoll, damit im
+  // Nachhinein nachvollziehbar bleibt, was wann verschwand und wiederkam.
+  async function undoLastMutation() {
+    if (!undoableMutation) {
+      showToast("Es ist kein Schritt gemerkt, der sich zurücknehmen lässt.", "warning");
+      return false;
+    }
+    const { label, state: snapshot } = undoableMutation;
+    undoableMutation = null;
+    const committed = await commitStateMutation(
+      () => {
+        // Das Protokoll bleibt, wie es ist: Der Schnappschuss kennt den
+        // zurueckgenommenen Schritt noch nicht, und ein Protokoll, das die
+        // eigene Geschichte loescht, waere keins. Nach dem Zuruecknehmen
+        // stehen beide Zeilen darin - die Aenderung und ihre Ruecknahme.
+        const auditLog = state.auditLog;
+        state = snapshot;
+        state.auditLog = auditLog;
+        // Der wiederhergestellte Bestand traegt eigene Kontoobjekte; ohne
+        // diesen Abgleich zeigte die Oberflaeche weiter auf das alte.
+        if (currentUser) {
+          currentUser =
+            state.users.find((user) => user.id === currentUser.id) || currentUser;
+        }
+      },
+      { auditAction: `Rückgängig gemacht: ${label}` },
+    );
+    if (committed) showToast(`${label} – wieder hergestellt.`);
+    return committed;
   }
 
   // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn

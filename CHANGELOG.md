@@ -1,3 +1,8 @@
+### 4.42.0 – Tastatur und Rückgängig
+
+- **Neu:** TeO lässt sich über die Tastatur bedienen: **?** zeigt alle Kürzel, **/** springt in das Suchfeld der gezeigten Ansicht, **n** legt dort einen neuen Eintrag an, **g** gefolgt von einem Buchstaben wechselt die Ansicht (etwa **g m** zu den Mitarbeitern). Die Kürzel ruhen, solange ein Eingabefeld oder ein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung. Die Übersicht öffnet auch die Schaltfläche **Tastenkürzel** in der Hilfe
+- **Neu:** Gelöschte Datensätze und Sammelbearbeitungen lassen sich zurücknehmen – über **Rückgängig** in der Meldung unten rechts oder mit **Strg + Z**. Zurück geht es einen Schritt, und zwar den zuletzt gemeldeten; das Zurücknehmen selbst steht mit im Änderungsprotokoll, sodass Löschung und Rücknahme beide nachvollziehbar bleiben. Angeboten wird es beim Löschen von Mitarbeitern, Terminen, Memos, Fortbildungen, Nachweisen, Teamsitzungen, Geräten, Einweisungsnachweisen und Katalogeinträgen sowie nach einer Sammelbearbeitung
+
 ### 4.41.0 – Nachsichtige Suche
 
 - **Neu:** Die Seitenleiste lässt sich über den Winkel neben dem Namenszug nach links einklappen; eingeklappt bleibt eine schmale Spur mit den Symbolen der Menüpunkte, deren Beschriftung beim Zeigen als Kurzhinweis samt Zähler erscheint. Der Zustand bleibt im Browser gespeichert

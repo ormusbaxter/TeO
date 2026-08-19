@@ -154,6 +154,10 @@
         <circle cx="12" cy="12" r="9" />
         <path d="M9.8 9a2.4 2.4 0 1 1 3.7 2c-1 .7-1.5 1.2-1.5 2.5M12 17h.01" />
       </symbol>
+      <symbol id="icon-keyboard" viewBox="0 0 24 24">
+        <rect x="2.5" y="6" width="19" height="12" rx="2" />
+        <path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6 12.8h.01M9.5 12.8h.01M13 12.8h.01M16.5 12.8h.01M8 15.6h8" />
+      </symbol>
       <symbol id="icon-device" viewBox="0 0 24 24">
         <rect x="3" y="4" width="18" height="12" rx="2" />
         <path d="M8 20h8M12 16v4M7 8h4M7 11h2" />
@@ -1994,6 +1998,12 @@
                 Funktionen, Betriebshinweise und Datenschutzinformationen zu TeO.
               </p>
             </div>
+            <div class="header-actions">
+              <button class="button button-secondary" id="openShortcutsButton" type="button">
+                <svg><use href="#icon-keyboard"></use></svg>
+                Tastenkürzel
+              </button>
+            </div>
           </div>
           <section class="panel help-search-panel" aria-label="Hilfe durchsuchen">
             <label class="search-field help-search-field">
@@ -2056,6 +2066,15 @@
 <h3 id="hilfe-datums-und-zeitangaben">Datums- und Zeitangaben</h3>
 <p>Datumswerte werden einheitlich als <code>TT.MM.JJJJ</code> dargestellt. Intern speichert TeO Datumswerte im ISO-Format, damit Sortierung und Berechnung zuverlässig funktionieren.</p>
 <p>Uhrzeiten werden im 24-Stunden-Format <code>HH:MM</code> angezeigt.</p>
+<h3 id="hilfe-seitenleiste-einklappen">Seitenleiste einklappen</h3>
+<p>Der Winkel neben dem Namenszug klappt die Seitenleiste nach links ein. Im eingeklappten Zustand bleibt eine schmale Spur mit den Symbolen der Menüpunkte; wer mit der Maus darauf zeigt, sieht Bezeichnung und Zähler als Kurzhinweis. Ein erneuter Klick klappt sie wieder auf. Der Zustand wird im Browserprofil gespeichert und gilt beim nächsten Start wieder – er gehört wie die Reihenfolge der Navigation nicht zum gemeinsamen Datenbestand.</p>
+<h3 id="hilfe-tastenkurzel">Tastenkürzel</h3>
+<p>Am Schreibtisch lässt sich TeO weitgehend über die Tastatur bedienen. Die Kürzel gelten überall, solange kein Eingabefeld und kein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.</p>
+<p>| Taste | Wirkung | | --- | --- | | <strong>?</strong> | Übersicht aller Tastenkürzel öffnen | | <strong>/</strong> | Suchfeld der gezeigten Ansicht anspringen | | <strong>n</strong> | Neuen Eintrag der gezeigten Ansicht anlegen | | <strong>Strg + Z</strong> | Letzte Löschung oder Massenänderung zurücknehmen | | <strong>Esc</strong> | Dialog schließen, Vollbild verlassen |</p>
+<p>Die Ansicht wechselt mit <strong>g</strong> gefolgt vom Buchstaben des Bereichs: <strong>u</strong> Übersicht, <strong>m</strong> Mitarbeiter, <strong>w</strong> Wochenendverteilung, <strong>p</strong> Urlaubsplanung, <strong>t</strong> Terminkalender, <strong>o</strong> Memo / ToDo, <strong>f</strong> Pflichtfortbildungen, <strong>s</strong> Teamsitzungen, <strong>g</strong> Geräteeinweisungen, <strong>v</strong> Geräteverwaltung, <strong>e</strong> Einstellungen, <strong>h</strong> Hilfe. Nach dem <strong>g</strong> bleibt eineinhalb Sekunden Zeit für den zweiten Anschlag. Dieselbe Übersicht öffnet die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe.</p>
+<h3 id="hilfe-loschungen-zurucknehmen">Löschungen zurücknehmen</h3>
+<p>Nach dem Löschen eines Datensatzes und nach einer Sammelbearbeitung bietet die Meldung unten rechts <strong>Rückgängig</strong> an; dasselbe leistet <strong>Strg + Z</strong>. Damit kehrt der Datenbestand in den Zustand unmittelbar vor dieser Änderung zurück.</p>
+<p>Zurück geht es immer nur einen Schritt, und zwar den zuletzt gemeldeten: Sobald eine weitere Änderung gespeichert wurde, ist der vorherige Schritt nicht mehr verfügbar. Das Zurücknehmen ist selbst eine Änderung – im Änderungsprotokoll stehen anschließend beide Zeilen, die Löschung und ihre Rücknahme. Für ältere Stände bleibt die Datensicherung der Weg zurück.</p>
 <h3 id="hilfe-reihenfolge-der-navigation-anpassen">Reihenfolge der Navigation anpassen</h3>
 <p>Die Einträge der Seitenleiste lassen sich in eine eigene Reihenfolge bringen:</p>
 <ul><li><strong>Ziehen</strong> – einen Eintrag anfassen und nach oben oder unten schieben. Ein gewöhnlicher Klick wechselt weiterhin die Ansicht; als Ziehen zählt erst eine Bewegung von mehr als sechs Bildpunkten.</li><li><strong>Tastatur</strong> – Eintrag anwählen und mit <strong>Alt + Pfeil hoch</strong> beziehungsweise <strong>Alt + Pfeil runter</strong> verschieben.</li><li><strong>Zurücksetzen</strong> – die Schaltfläche über den Anmeldeinformationen erscheint nur, wenn eine eigene Reihenfolge gesetzt ist.</li></ul>
@@ -2385,6 +2404,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-42-0-tastatur-und-ruckgangig">4.42.0 – Tastatur und Rückgängig</h3>
+<ul><li><strong>Neu:</strong> TeO lässt sich über die Tastatur bedienen: <strong>?</strong> zeigt alle Kürzel, <strong>/</strong> springt in das Suchfeld der gezeigten Ansicht, <strong>n</strong> legt dort einen neuen Eintrag an, <strong>g</strong> gefolgt von einem Buchstaben wechselt die Ansicht (etwa <strong>g m</strong> zu den Mitarbeitern). Die Kürzel ruhen, solange ein Eingabefeld oder ein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung. Die Übersicht öffnet auch die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe</li><li><strong>Neu:</strong> Gelöschte Datensätze und Sammelbearbeitungen lassen sich zurücknehmen – über <strong>Rückgängig</strong> in der Meldung unten rechts oder mit <strong>Strg + Z</strong>. Zurück geht es einen Schritt, und zwar den zuletzt gemeldeten; das Zurücknehmen selbst steht mit im Änderungsprotokoll, sodass Löschung und Rücknahme beide nachvollziehbar bleiben. Angeboten wird es beim Löschen von Mitarbeitern, Terminen, Memos, Fortbildungen, Nachweisen, Teamsitzungen, Geräten, Einweisungsnachweisen und Katalogeinträgen sowie nach einer Sammelbearbeitung</li></ul>
 <h3 id="hilfe-4-41-0-nachsichtige-suche">4.41.0 – Nachsichtige Suche</h3>
 <ul><li><strong>Neu:</strong> Die Seitenleiste lässt sich über den Winkel neben dem Namenszug nach links einklappen; eingeklappt bleibt eine schmale Spur mit den Symbolen der Menüpunkte, deren Beschriftung beim Zeigen als Kurzhinweis samt Zähler erscheint. Der Zustand bleibt im Browser gespeichert</li><li><strong>Neu:</strong> Alle Suchfelder der Anwendung sehen über die Schreibweise hinweg: Umlaute lassen sich ohne Punkte oder als „ae“, „oe“ und „ue“ eingeben, „ß“, „ss“ und „s“ finden einander, Akzente werden ignoriert. „Müller“ findet man mit „muller“ oder „mueller“, „Weiß“ mit „weiss“ oder „weis“ – in Mitarbeitern, Terminen, Memos, Geräten, Teilnahmelisten und der Hilfe</li><li><strong>Verbessert:</strong> Die Fassung wird ohne führende Nullen geschrieben – „4.41.0“ statt „004.041.000“, in der Anwendung, im Änderungsverzeichnis und im Namen des Offline-Zwischenspeichers. Ältere Abschnitte dieses Verzeichnisses behalten ihre Schreibweise und bleiben auffindbar</li><li><strong>Behoben:</strong> Im Monatsraster des Terminkalenders sah eine Suche wirkungslos aus, sobald der gesuchte Termin in einem anderen Monat lag: Das Raster zeigt nur den gewählten Monat, ein Treffer im Dezember blieb im August also unsichtbar. Die Zeile unter dem Raster nennt jetzt die Zahl der Treffer im gezeigten Monat, weist auf Treffer in anderen Monaten hin und führt auf Klick zum nächstgelegenen</li><li><strong>Behoben:</strong> Angepinnte Termine blieben auch bei einer Suche stehen und sahen dort wie Treffer aus – in der Liste wie im Monatsraster. Ein Suchbegriff gilt jetzt auch für sie; vom Zeitraumfilter bleiben sie wie bisher ausgenommen</li></ul>
 <h3 id="hilfe-004-040-000-eigene-symbole-klebende-kopfzeile-und-schnellere-ansichten">004.040.000 – Eigene Symbole, klebende Kopfzeile und schnellere Ansichten</h3>
@@ -3132,6 +3153,109 @@ npm run verify</code></pre>
         </button>
       </div>
       <div class="modal-body" id="dataQualityContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="shortcutsDialog" aria-labelledby="shortcutsDialogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Arbeiten mit der Tastatur</p>
+          <h2 id="shortcutsDialogTitle">Tastenkürzel</h2>
+          <p class="modal-subtitle">
+            Gelten überall, solange kein Eingabefeld und kein Dialog den Fokus hat.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="shortcut-groups">
+          <section class="shortcut-group">
+            <h3>Arbeiten</h3>
+            <dl class="shortcut-list">
+              <div>
+                <dt><kbd>?</kbd></dt>
+                <dd>Diese Übersicht öffnen</dd>
+              </div>
+              <div>
+                <dt><kbd>/</kbd></dt>
+                <dd>Suche der gezeigten Ansicht</dd>
+              </div>
+              <div>
+                <dt><kbd>n</kbd></dt>
+                <dd>Neuen Eintrag der gezeigten Ansicht anlegen</dd>
+              </div>
+              <div>
+                <dt><kbd>Strg</kbd> + <kbd>Z</kbd></dt>
+                <dd>Letzte Löschung oder Massenänderung zurücknehmen</dd>
+              </div>
+              <div>
+                <dt><kbd>Esc</kbd></dt>
+                <dd>Dialog schließen, Vollbild verlassen</dd>
+              </div>
+            </dl>
+          </section>
+          <section class="shortcut-group">
+            <h3>Ansicht wechseln</h3>
+            <p class="shortcut-hint">
+              Erst <kbd>g</kbd>, dann den Buchstaben der Ansicht.
+            </p>
+            <dl class="shortcut-list">
+              <div>
+                <dt><kbd>g</kbd> <kbd>u</kbd></dt>
+                <dd>Übersicht</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>m</kbd></dt>
+                <dd>Mitarbeiter</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>w</kbd></dt>
+                <dd>Wochenendverteilung</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>p</kbd></dt>
+                <dd>Urlaubsplanung</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>t</kbd></dt>
+                <dd>Terminkalender</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>o</kbd></dt>
+                <dd>Memo / ToDo</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>f</kbd></dt>
+                <dd>Pflichtfortbildungen</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>s</kbd></dt>
+                <dd>Teamsitzungen</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>g</kbd></dt>
+                <dd>Geräteeinweisungen</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>v</kbd></dt>
+                <dd>Geräteverwaltung</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>e</kbd></dt>
+                <dd>Einstellungen</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>h</kbd></dt>
+                <dd>Hilfe</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </div>
       <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>

@@ -11,7 +11,7 @@
 // wirkt dadurch nur bei der ersten Installation - dort übernimmt der
 // Zwischenspeicher sofort, statt erst beim nächsten Aufruf.
 
-const CACHE_NAME = "teo-shell-4.41.0";
+const CACHE_NAME = "teo-shell-4.42.0";
 
 // Alles, was TeO zum Starten braucht. Fehlt hier eine Datei, startet die
 // Anwendung ohne Netz nicht - tests/service-worker.test.mjs gleicht die Liste

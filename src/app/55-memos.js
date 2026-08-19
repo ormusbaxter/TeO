@@ -290,8 +290,8 @@
       callback: async () => {
         const committed = await commitStateMutation(() => {
           state.memos = state.memos.filter((item) => item.id !== memoId);
-        });
-        if (committed) showToast("Memo / ToDo wurde gelöscht.");
+        }, { undo: "Memo / ToDo gelöscht" });
+        if (committed) showUndoToast("Memo / ToDo wurde gelöscht.");
       },
     });
   }
@@ -372,10 +372,10 @@
         const committed = await commitStateMutation(() => {
           state.catalogs.memoCategories.splice(index, 1);
           state.memos = state.memos.map((memo) => memo.category === category ? { ...memo, category: "", updatedAt: now } : memo);
-        });
+        }, { undo: "Memo-/ToDo-Kategorie gelöscht" });
         if (!committed) return;
         renderMemoCategorySettings();
-        showToast("Memo-/ToDo-Kategorie wurde gelöscht.");
+        showUndoToast("Memo-/ToDo-Kategorie wurde gelöscht.");
       },
     });
   }
