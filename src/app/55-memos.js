@@ -65,6 +65,7 @@
 
   function renderMemos() {
     renderMemoCategoryOptions();
+    renderViewFilterChips("memos");
     const allVisible = visibleMemos();
     const memos = filteredMemos();
     elements.memoSummary.innerHTML = `

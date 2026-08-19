@@ -1540,6 +1540,9 @@
     document.body.classList.remove("is-auth-locked");
     if (elements.changePasswordDialog.open) elements.changePasswordDialog.close();
     scheduleAutomaticBackup();
+    // Erst jetzt: Vor der Anmeldung steht die Anwendung noch hinter der
+    // Sperre, und ein Hinweis darueber waere im Weg.
+    showWhatsNewIfUpdated();
   }
 
   function showLoginDialog() {

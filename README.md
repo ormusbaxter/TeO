@@ -104,6 +104,48 @@ Der Qualifikationsfilter bietet zusätzlich **Keine Qualifikation**. Damit
 lassen sich gezielt Mitarbeiter anzeigen, denen aktuell keine
 Zusatzqualifikation zugewiesen ist.
 
+### Aktive Filter und gemerkte Ansichten
+
+Sobald ein Filter greift, erscheint unter der Filterleiste eine Zeile mit allen
+aktiven Filtern als Chips – jeder mit seiner Bezeichnung und dem gewählten Wert.
+Eine leere Liste nennt damit ihren Grund. Ein Klick auf das × eines Chips
+entfernt genau diesen Filter; **Filter zurücksetzen** räumt weiterhin alle auf
+einmal ab. Chips gibt es in **Mitarbeitern**, im **Terminkalender**, bei
+**Memo / ToDo**, in den **Geräteeinweisungen** und in der **Geräteverwaltung**.
+
+Rechts in derselben Zeile steht **Ansicht merken**. Damit werden die aktuellen
+Filter dieser Ansicht im Browserprofil abgelegt und beim nächsten Start wieder
+eingestellt – nützlich etwa für „nur aktive Pflegefachkräfte“ als tägliche
+Arbeitsansicht. **Gemerkte Ansicht aufheben** entfernt sie wieder. Wie die
+Reihenfolge der Navigation gilt das nur für diesen Rechner und diesen Browser
+und ist nicht Teil der Datensicherung. Ist ein gemerkter Wert später entfallen
+– etwa ein gelöschter Beruf –, wird er beim Start übersprungen.
+
+### Tabellen anpassen
+
+- **Kompakte Tabellen** – in den Einstellungen unter **Darstellung**. Die
+  Zeilen rücken enger zusammen, Zweitzeilen wie Kontaktdaten treten zurück; im
+  gleichen Bildausschnitt sind damit rund zwanzig statt zwölf Mitarbeiter
+  sichtbar. Die Einstellung gilt nur an diesem Arbeitsplatz.
+- **Spalten** – die Schaltfläche in der Filterleiste der Mitarbeiter wählt aus,
+  welche Spalten die Tabelle zeigt. Name und Aktionen bleiben immer stehen. War
+  nach einer Spalte sortiert, die abgewählt wird, sortiert die Tabelle wieder
+  nach dem Namen.
+- **Mehrere Zeilen auswählen** – ein Klick auf ein Auswahlkästchen, dann ein
+  Klick mit gedrückter **Umschalttaste** auf ein zweites: Alles dazwischen wird
+  mitgewählt beziehungsweise mit abgewählt.
+- **Feste erste Spalte** – in der Einweisungsmatrix und in der Jahresauswertung
+  der Pflichtfortbildungen bleibt die Namensspalte beim seitlichen Blättern
+  stehen.
+
+### Was ist neu?
+
+Nach einer neuen Programmfassung erscheint beim ersten Start ein Hinweis mit den
+Änderungen genau dieser Fassung – derselbe Abschnitt, der auch in der
+**Änderungshistorie** dieser Hilfe steht. **Ganze Änderungsliste** führt dorthin.
+Der Hinweis erscheint einmal je Fassung und Arbeitsplatz; bei einer
+Neueinrichtung bleibt er aus.
+
 ### Datums- und Zeitangaben
 
 Datumswerte werden einheitlich als `TT.MM.JJJJ` dargestellt. Intern speichert

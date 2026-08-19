@@ -87,6 +87,7 @@
                 <input id="deviceEmployeeSearch" type="search" placeholder="Name eingeben" />
               </label>
             </div>
+            <div class="filter-chip-bar" data-filter-chips="devices" hidden></div>
             <div id="deviceInstructionMatrix"></div>
           </section>
 
@@ -199,6 +200,7 @@
                 </select>
               </label>
             </div>
+            <div class="filter-chip-bar" data-filter-chips="device-management" hidden></div>
           </section>
 
           <section class="device-catalog-section">
@@ -251,6 +253,13 @@
                 sich dieses Konto anmeldet. Andere Konten behalten ihr eigenes
                 Farbthema.
               </p>
+              <label class="checkbox-field settings-density-field">
+                <input id="tableDensityToggle" type="checkbox" />
+                <span>
+                  Kompakte Tabellen – engere Zeilen, mehr Einträge im Bild.
+                  Diese Einstellung gilt nur an diesem Arbeitsplatz.
+                </span>
+              </label>
               <label class="settings-field">
                 <span>Aktives Farbthema</span>
                 <select data-theme-select aria-label="Farbthema auswählen">

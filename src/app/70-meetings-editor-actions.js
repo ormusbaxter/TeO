@@ -566,8 +566,18 @@
     }
     const checkbox = event.target.closest("[data-select-employee]");
     if (!checkbox) return;
-    if (checkbox.checked) selectedEmployeeIds.add(checkbox.dataset.selectEmployee);
-    else selectedEmployeeIds.delete(checkbox.dataset.selectEmployee);
+    const employeeId = checkbox.dataset.selectEmployee;
+    if (checkbox.checked) selectedEmployeeIds.add(employeeId);
+    else selectedEmployeeIds.delete(employeeId);
+
+    // Mit gedrueckter Umschalttaste gilt die Aenderung fuer alles zwischen der
+    // zuletzt angeklickten und dieser Zeile - dann muss die Tabelle neu
+    // aufgebaut werden, damit die Haken dazwischen mitgehen.
+    if (takeEmployeeSelectionShift() && applyEmployeeSelectionRange(employeeId, checkbox.checked)) {
+      renderEmployees();
+      return;
+    }
+    rememberEmployeeSelectionAnchor(employeeId);
     updateEmployeeBulkBar();
   }
 

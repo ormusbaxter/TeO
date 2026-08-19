@@ -36,6 +36,9 @@
     bindSidebarCollapse();
     bindKeyboardShortcuts();
     bindCommandPalette();
+    bindViewFilterChips();
+    bindTableComfort();
+    bindWhatsNew();
     bindDialogTriggers();
     bindForms();
     bindFilters();
@@ -50,6 +53,9 @@
     const initialHash = window.location.hash.replace("#", "");
     showView(HASH_VIEWS[initialHash] || "dashboard", false);
     renderAll();
+    // Erst nach dem ersten Aufbau: Vorher stehen in den Auswahlfeldern weder
+    // Berufe noch Kategorien, ein gemerkter Wert liefe ins Leere.
+    restoreRememberedViewFilters();
     restoreAuthenticationSession();
     if (discardedUserAccounts > 0) {
       showToast(

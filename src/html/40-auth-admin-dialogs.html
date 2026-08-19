@@ -515,6 +515,51 @@
       </div>
     </dialog>
 
+    <dialog class="modal whats-new-dialog" id="whatsNewDialog" aria-labelledby="whatsNewDialogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Neue Fassung</p>
+          <h2 id="whatsNewDialogTitle">Was ist neu?</h2>
+          <p class="modal-subtitle" id="whatsNewSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h3 class="whats-new-version" id="whatsNewVersion"></h3>
+        <ul class="whats-new-entries" id="whatsNewEntries"></ul>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="whatsNewHelpButton" type="button">
+          <svg><use href="#icon-help"></use></svg>
+          Ganze Änderungsliste
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Verstanden</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="employeeColumnsDialog" aria-labelledby="employeeColumnsDialogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Mitarbeitertabelle</p>
+          <h2 id="employeeColumnsDialogTitle">Sichtbare Spalten</h2>
+          <p class="modal-subtitle">
+            Name und Aktionen stehen immer. Die Wahl gilt nur an diesem Arbeitsplatz.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="column-choice-list" id="employeeColumnsList"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
     <dialog class="command-palette" id="commandPalette" aria-labelledby="commandPaletteTitle">
       <h2 class="sr-only" id="commandPaletteTitle">Suchen und ausführen</h2>
       <div class="command-palette-field">

@@ -154,6 +154,10 @@
         <circle cx="12" cy="12" r="9" />
         <path d="M9.8 9a2.4 2.4 0 1 1 3.7 2c-1 .7-1.5 1.2-1.5 2.5M12 17h.01" />
       </symbol>
+      <symbol id="icon-columns" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M9.5 4v16M15 4v16" />
+      </symbol>
       <symbol id="icon-keyboard" viewBox="0 0 24 24">
         <rect x="2.5" y="6" width="19" height="12" rx="2" />
         <path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6 12.8h.01M9.5 12.8h.01M13 12.8h.01M16.5 12.8h.01M8 15.6h8" />
@@ -698,7 +702,18 @@
               <button class="button button-ghost" id="resetEmployeeFilters" type="button">
                 Filter zurücksetzen
               </button>
+              <button
+                class="button button-ghost"
+                id="openEmployeeColumnsButton"
+                type="button"
+                title="Sichtbare Spalten der Tabelle wählen"
+              >
+                <svg><use href="#icon-columns"></use></svg>
+                Spalten
+              </button>
             </div>
+            <div class="filter-chip-bar" data-filter-chips="employees" hidden></div>
+            <div class="filter-chip-bar" data-filter-chips="employees" hidden></div>
             <div class="employee-bulk-bar" id="employeeBulkBar" hidden>
               <strong id="employeeBulkCount">0 ausgewählt</strong>
               <button class="button button-secondary" id="openBulkEditButton" type="button">
@@ -966,6 +981,7 @@
             </div>
           </div>
 
+          <div class="filter-chip-bar" data-filter-chips="appointments" hidden></div>
           <div class="training-summary" id="appointmentSummary"></div>
           <section class="meeting-list" id="appointmentList"></section>
           <section
@@ -1061,6 +1077,7 @@
             </div>
           </div>
 
+          <div class="filter-chip-bar" data-filter-chips="memos" hidden></div>
           <div class="training-summary" id="memoSummary"></div>
           <section class="memo-list" id="memoList"></section>
         </section>
@@ -1233,6 +1250,7 @@
                 <input id="deviceEmployeeSearch" type="search" placeholder="Name eingeben" />
               </label>
             </div>
+            <div class="filter-chip-bar" data-filter-chips="devices" hidden></div>
             <div id="deviceInstructionMatrix"></div>
           </section>
 
@@ -1345,6 +1363,7 @@
                 </select>
               </label>
             </div>
+            <div class="filter-chip-bar" data-filter-chips="device-management" hidden></div>
           </section>
 
           <section class="device-catalog-section">
@@ -1397,6 +1416,13 @@
                 sich dieses Konto anmeldet. Andere Konten behalten ihr eigenes
                 Farbthema.
               </p>
+              <label class="checkbox-field settings-density-field">
+                <input id="tableDensityToggle" type="checkbox" />
+                <span>
+                  Kompakte Tabellen – engere Zeilen, mehr Einträge im Bild.
+                  Diese Einstellung gilt nur an diesem Arbeitsplatz.
+                </span>
+              </label>
               <label class="settings-field">
                 <span>Aktives Farbthema</span>
                 <select data-theme-select aria-label="Farbthema auswählen">
@@ -2074,6 +2100,13 @@
 <p>In der Mitarbeiterverwaltung berücksichtigt auch <strong>E-Mails kopieren</strong> nur die aktuell gefilterte Liste.</p>
 <p>Die Mitarbeitersuche durchsucht ausschließlich Vor- und Nachnamen. Mit dem Statusfilter <strong>Aktiv + In Einarbeitung</strong> lassen sich alle aktuell beschäftigten Personen gemeinsam anzeigen.</p>
 <p>Der Qualifikationsfilter bietet zusätzlich <strong>Keine Qualifikation</strong>. Damit lassen sich gezielt Mitarbeiter anzeigen, denen aktuell keine Zusatzqualifikation zugewiesen ist.</p>
+<h3 id="hilfe-aktive-filter-und-gemerkte-ansichten">Aktive Filter und gemerkte Ansichten</h3>
+<p>Sobald ein Filter greift, erscheint unter der Filterleiste eine Zeile mit allen aktiven Filtern als Chips – jeder mit seiner Bezeichnung und dem gewählten Wert. Eine leere Liste nennt damit ihren Grund. Ein Klick auf das × eines Chips entfernt genau diesen Filter; <strong>Filter zurücksetzen</strong> räumt weiterhin alle auf einmal ab. Chips gibt es in <strong>Mitarbeitern</strong>, im <strong>Terminkalender</strong>, bei <strong>Memo / ToDo</strong>, in den <strong>Geräteeinweisungen</strong> und in der <strong>Geräteverwaltung</strong>.</p>
+<p>Rechts in derselben Zeile steht <strong>Ansicht merken</strong>. Damit werden die aktuellen Filter dieser Ansicht im Browserprofil abgelegt und beim nächsten Start wieder eingestellt – nützlich etwa für „nur aktive Pflegefachkräfte“ als tägliche Arbeitsansicht. <strong>Gemerkte Ansicht aufheben</strong> entfernt sie wieder. Wie die Reihenfolge der Navigation gilt das nur für diesen Rechner und diesen Browser und ist nicht Teil der Datensicherung. Ist ein gemerkter Wert später entfallen – etwa ein gelöschter Beruf –, wird er beim Start übersprungen.</p>
+<h3 id="hilfe-tabellen-anpassen">Tabellen anpassen</h3>
+<ul><li><strong>Kompakte Tabellen</strong> – in den Einstellungen unter <strong>Darstellung</strong>. Die Zeilen rücken enger zusammen, Zweitzeilen wie Kontaktdaten treten zurück; im gleichen Bildausschnitt sind damit rund zwanzig statt zwölf Mitarbeiter sichtbar. Die Einstellung gilt nur an diesem Arbeitsplatz.</li><li><strong>Spalten</strong> – die Schaltfläche in der Filterleiste der Mitarbeiter wählt aus, welche Spalten die Tabelle zeigt. Name und Aktionen bleiben immer stehen. War nach einer Spalte sortiert, die abgewählt wird, sortiert die Tabelle wieder nach dem Namen.</li><li><strong>Mehrere Zeilen auswählen</strong> – ein Klick auf ein Auswahlkästchen, dann ein Klick mit gedrückter <strong>Umschalttaste</strong> auf ein zweites: Alles dazwischen wird mitgewählt beziehungsweise mit abgewählt.</li><li><strong>Feste erste Spalte</strong> – in der Einweisungsmatrix und in der Jahresauswertung der Pflichtfortbildungen bleibt die Namensspalte beim seitlichen Blättern stehen.</li></ul>
+<h3 id="hilfe-was-ist-neu">Was ist neu?</h3>
+<p>Nach einer neuen Programmfassung erscheint beim ersten Start ein Hinweis mit den Änderungen genau dieser Fassung – derselbe Abschnitt, der auch in der <strong>Änderungshistorie</strong> dieser Hilfe steht. <strong>Ganze Änderungsliste</strong> führt dorthin. Der Hinweis erscheint einmal je Fassung und Arbeitsplatz; bei einer Neueinrichtung bleibt er aus.</p>
 <h3 id="hilfe-datums-und-zeitangaben">Datums- und Zeitangaben</h3>
 <p>Datumswerte werden einheitlich als <code>TT.MM.JJJJ</code> dargestellt. Intern speichert TeO Datumswerte im ISO-Format, damit Sortierung und Berechnung zuverlässig funktionieren.</p>
 <p>Uhrzeiten werden im 24-Stunden-Format <code>HH:MM</code> angezeigt.</p>
@@ -2421,7 +2454,7 @@
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
 <h3 id="hilfe-4-42-0-tastatur-und-ruckgangig">4.42.0 – Tastatur und Rückgängig</h3>
-<ul><li><strong>Neu:</strong> <strong>Strg + K</strong> öffnet eine Befehlspalette – ein Feld für alles: Sie findet Ansichten, Aktionen und Datensätze (Mitarbeiter, Termine, Memos, Fortbildungen, Teamsitzungen, Geräte) und führt beim Bestätigen aus, was gewählt wurde. Ein Datensatz wechselt dabei in seine Ansicht und öffnet sich dort zum Bearbeiten. Gesucht wird so nachsichtig wie überall, Treffer am Wortanfang stehen vorn, und gezeigt wird nur, was das angemeldete Konto sehen darf. Der Einstieg steht als Knopf <strong>Suchen</strong> über der Navigation</li><li><strong>Neu:</strong> TeO lässt sich über die Tastatur bedienen: <strong>?</strong> zeigt alle Kürzel, <strong>/</strong> springt in das Suchfeld der gezeigten Ansicht, <strong>n</strong> legt dort einen neuen Eintrag an, <strong>g</strong> gefolgt von einem Buchstaben wechselt die Ansicht (etwa <strong>g m</strong> zu den Mitarbeitern). Die Kürzel ruhen, solange ein Eingabefeld oder ein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung. Die Übersicht öffnet auch die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe</li><li><strong>Neu:</strong> Gelöschte Datensätze und Sammelbearbeitungen lassen sich zurücknehmen – über <strong>Rückgängig</strong> in der Meldung unten rechts oder mit <strong>Strg + Z</strong>. Zurück geht es einen Schritt, und zwar den zuletzt gemeldeten; das Zurücknehmen selbst steht mit im Änderungsprotokoll, sodass Löschung und Rücknahme beide nachvollziehbar bleiben. Angeboten wird es beim Löschen von Mitarbeitern, Terminen, Memos, Fortbildungen, Nachweisen, Teamsitzungen, Geräten, Einweisungsnachweisen und Katalogeinträgen sowie nach einer Sammelbearbeitung</li></ul>
+<ul><li><strong>Neu:</strong> Aktive Filter stehen als Chips unter der Filterleiste – in Mitarbeitern, Terminkalender, Memo / ToDo, Geräteeinweisungen und Geräteverwaltung. Jeder Chip nennt Filter und Wert und lässt sich einzeln wegklicken, sodass eine leere Liste ihren Grund nennt. <strong>Ansicht merken</strong> legt die Filter einer Ansicht im Browser ab und stellt sie beim nächsten Start wieder her</li><li><strong>Neu:</strong> Tabellen lassen sich anpassen: <strong>Kompakte Tabellen</strong> in den Einstellungen rückt die Zeilen enger zusammen – rund zwanzig statt zwölf Mitarbeiter im Bild –, die Schaltfläche <strong>Spalten</strong> wählt die sichtbaren Spalten der Mitarbeitertabelle, und ein Klick mit gedrückter <strong>Umschalttaste</strong> wählt alle Zeilen bis zur zuletzt angeklickten mit aus</li><li><strong>Neu:</strong> In der Einweisungsmatrix und in der Jahresauswertung der Pflichtfortbildungen bleibt die Namensspalte beim seitlichen Blättern stehen – bisher wusste man nach ein paar Geräten nicht mehr, wessen Zeile man liest</li><li><strong>Neu:</strong> Nach einer neuen Fassung zeigt ein Hinweis beim ersten Start, was sich geändert hat – der Abschnitt aus der Änderungshistorie der Hilfe, einmal je Fassung und Arbeitsplatz</li><li><strong>Neu:</strong> <strong>Strg + K</strong> öffnet eine Befehlspalette – ein Feld für alles: Sie findet Ansichten, Aktionen und Datensätze (Mitarbeiter, Termine, Memos, Fortbildungen, Teamsitzungen, Geräte) und führt beim Bestätigen aus, was gewählt wurde. Ein Datensatz wechselt dabei in seine Ansicht und öffnet sich dort zum Bearbeiten. Gesucht wird so nachsichtig wie überall, Treffer am Wortanfang stehen vorn, und gezeigt wird nur, was das angemeldete Konto sehen darf. Der Einstieg steht als Knopf <strong>Suchen</strong> über der Navigation</li><li><strong>Neu:</strong> TeO lässt sich über die Tastatur bedienen: <strong>?</strong> zeigt alle Kürzel, <strong>/</strong> springt in das Suchfeld der gezeigten Ansicht, <strong>n</strong> legt dort einen neuen Eintrag an, <strong>g</strong> gefolgt von einem Buchstaben wechselt die Ansicht (etwa <strong>g m</strong> zu den Mitarbeitern). Die Kürzel ruhen, solange ein Eingabefeld oder ein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung. Die Übersicht öffnet auch die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe</li><li><strong>Neu:</strong> Gelöschte Datensätze und Sammelbearbeitungen lassen sich zurücknehmen – über <strong>Rückgängig</strong> in der Meldung unten rechts oder mit <strong>Strg + Z</strong>. Zurück geht es einen Schritt, und zwar den zuletzt gemeldeten; das Zurücknehmen selbst steht mit im Änderungsprotokoll, sodass Löschung und Rücknahme beide nachvollziehbar bleiben. Angeboten wird es beim Löschen von Mitarbeitern, Terminen, Memos, Fortbildungen, Nachweisen, Teamsitzungen, Geräten, Einweisungsnachweisen und Katalogeinträgen sowie nach einer Sammelbearbeitung</li></ul>
 <h3 id="hilfe-4-41-0-nachsichtige-suche">4.41.0 – Nachsichtige Suche</h3>
 <ul><li><strong>Neu:</strong> Die Seitenleiste lässt sich über den Winkel neben dem Namenszug nach links einklappen; eingeklappt bleibt eine schmale Spur mit den Symbolen der Menüpunkte, deren Beschriftung beim Zeigen als Kurzhinweis samt Zähler erscheint. Der Zustand bleibt im Browser gespeichert</li><li><strong>Neu:</strong> Alle Suchfelder der Anwendung sehen über die Schreibweise hinweg: Umlaute lassen sich ohne Punkte oder als „ae“, „oe“ und „ue“ eingeben, „ß“, „ss“ und „s“ finden einander, Akzente werden ignoriert. „Müller“ findet man mit „muller“ oder „mueller“, „Weiß“ mit „weiss“ oder „weis“ – in Mitarbeitern, Terminen, Memos, Geräten, Teilnahmelisten und der Hilfe</li><li><strong>Verbessert:</strong> Die Fassung wird ohne führende Nullen geschrieben – „4.41.0“ statt „004.041.000“, in der Anwendung, im Änderungsverzeichnis und im Namen des Offline-Zwischenspeichers. Ältere Abschnitte dieses Verzeichnisses behalten ihre Schreibweise und bleiben auffindbar</li><li><strong>Behoben:</strong> Im Monatsraster des Terminkalenders sah eine Suche wirkungslos aus, sobald der gesuchte Termin in einem anderen Monat lag: Das Raster zeigt nur den gewählten Monat, ein Treffer im Dezember blieb im August also unsichtbar. Die Zeile unter dem Raster nennt jetzt die Zahl der Treffer im gezeigten Monat, weist auf Treffer in anderen Monaten hin und führt auf Klick zum nächstgelegenen</li><li><strong>Behoben:</strong> Angepinnte Termine blieben auch bei einer Suche stehen und sahen dort wie Treffer aus – in der Liste wie im Monatsraster. Ein Suchbegriff gilt jetzt auch für sie; vom Zeitraumfilter bleiben sie wie bisher ausgenommen</li></ul>
 <h3 id="hilfe-004-040-000-eigene-symbole-klebende-kopfzeile-und-schnellere-ansichten">004.040.000 – Eigene Symbole, klebende Kopfzeile und schnellere Ansichten</h3>
@@ -3169,6 +3202,51 @@ npm run verify</code></pre>
         </button>
       </div>
       <div class="modal-body" id="dataQualityContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal whats-new-dialog" id="whatsNewDialog" aria-labelledby="whatsNewDialogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Neue Fassung</p>
+          <h2 id="whatsNewDialogTitle">Was ist neu?</h2>
+          <p class="modal-subtitle" id="whatsNewSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h3 class="whats-new-version" id="whatsNewVersion"></h3>
+        <ul class="whats-new-entries" id="whatsNewEntries"></ul>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="whatsNewHelpButton" type="button">
+          <svg><use href="#icon-help"></use></svg>
+          Ganze Änderungsliste
+        </button>
+        <button class="button button-primary" type="button" data-close-dialog>Verstanden</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal" id="employeeColumnsDialog" aria-labelledby="employeeColumnsDialogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Mitarbeitertabelle</p>
+          <h2 id="employeeColumnsDialogTitle">Sichtbare Spalten</h2>
+          <p class="modal-subtitle">
+            Name und Aktionen stehen immer. Die Wahl gilt nur an diesem Arbeitsplatz.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="column-choice-list" id="employeeColumnsList"></div>
+      </div>
       <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
