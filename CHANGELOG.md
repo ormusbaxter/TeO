@@ -1,3 +1,17 @@
+### 4.43.1 – Korrekte Änderungshistorie und Tabellenköpfe
+
+- **Behoben:** Der Abschnitt für 4.43.0 stand am Ende der Änderungshistorie statt an erster Stelle und wirkte dadurch wie ein veralteter oder fehlender Stand
+- **Behoben:** Die feststehende Namensspalte der Mitarbeitertabelle überdeckte einen Teil der folgenden Spalte; bei **Beruf** blieb dadurch im ungünstigsten Fall nur das letzte „F“ sichtbar
+
+### 4.43.0 – Desktop-Arbeitsplatz
+
+- **Neu:** Ein Klick auf eine Mitarbeiterzeile öffnet rechts eine Schnellansicht mit Stammdaten, Fortbildungsstand, Qualifikationen und den Aktionen **Anheften**, **Bearbeiten** und **Gesamtakte**. Pfeiltasten wechseln in der Tabelle zwischen den Zeilen
+- **Neu:** Die Mitarbeitertabelle lässt sich wie ein Desktop-Datengrid einrichten: Spaltenbreiten sind ziehbar, die Reihenfolge ist wählbar und eine zusätzliche Spalte kann beim horizontalen Blättern fixiert werden. Die persönliche Anordnung bleibt im Browserprofil gespeichert
+- **Verbessert:** Im Kopf der Mitarbeiteransicht bleiben Datenqualität und das Anlegen direkt sichtbar; seltenere Katalog-, Wochenend- und Exportaktionen stehen gesammelt unter **Mehr**
+- **Neu:** Das Dashboard bündelt überfällige Fristen, anstehende Termine, offene Memos und wichtige Datenqualitätsprobleme in einer gemeinsamen Arbeitsliste mit den Filtern **Alles**, **Überfällig** und **7 Tage**
+- **Neu:** Mitarbeiter lassen sich in der Schnellansicht anheften. Favoriten, zuletzt geöffnete Mitarbeiter, Termine und Memos sowie die letzten Befehle erscheinen in **Strg + K**; eine Vorschau beschreibt den markierten Treffer. Neue Direktbefehle führen außerdem zur überfälligen Arbeitsliste und zu den aktuell Beschäftigten
+- **Neu:** Über **Dashboard anpassen** lassen sich Arbeitsliste, Fristen, Übersichten und zuletzt bearbeitete Mitarbeiter pro Arbeitsplatz ein- oder ausblenden und neu anordnen
+
 ### 4.42.0 – Tastatur und Rückgängig
 
 - **Behoben:** In der eingeklappten Seitenleiste stand das Untermenü der Einstellungen abgeschnitten in der schmalen Spur. Es entfällt dort jetzt – dieselben fünf Bereiche stehen als Leiste über den Einstellungen selbst
@@ -421,11 +435,3 @@
 - **Neu:** Lokaler IndexedDB-Betrieb sowie gemeinsamer Betrieb mit Node.js und MariaDB
 - **Neu:** Benutzeranmeldung, Rollen, Datensicherung, Fristenmonitor und Änderungsprotokoll
 - **Verbessert:** Datenrevisionen und gehärtete Synchronisierung verhindern unbemerkte Überschreibungen
-### 4.43.0 – Desktop-Arbeitsplatz
-
-- **Neu:** Ein Klick auf eine Mitarbeiterzeile öffnet rechts eine Schnellansicht mit Stammdaten, Fortbildungsstand, Qualifikationen und den Aktionen **Anheften**, **Bearbeiten** und **Gesamtakte**. Pfeiltasten wechseln in der Tabelle zwischen den Zeilen
-- **Neu:** Die Mitarbeitertabelle lässt sich wie ein Desktop-Datengrid einrichten: Spaltenbreiten sind ziehbar, die Reihenfolge ist wählbar und eine zusätzliche Spalte kann beim horizontalen Blättern fixiert werden. Die persönliche Anordnung bleibt im Browserprofil gespeichert
-- **Verbessert:** Im Kopf der Mitarbeiteransicht bleiben Datenqualität und das Anlegen direkt sichtbar; seltenere Katalog-, Wochenend- und Exportaktionen stehen gesammelt unter **Mehr**
-- **Neu:** Das Dashboard bündelt überfällige Fristen, anstehende Termine, offene Memos und wichtige Datenqualitätsprobleme in einer gemeinsamen Arbeitsliste mit den Filtern **Alles**, **Überfällig** und **7 Tage**
-- **Neu:** Mitarbeiter lassen sich in der Schnellansicht anheften. Favoriten, zuletzt geöffnete Mitarbeiter, Termine und Memos sowie die letzten Befehle erscheinen in **Strg + K**; eine Vorschau beschreibt den markierten Treffer. Neue Direktbefehle führen außerdem zur überfälligen Arbeitsliste und zu den aktuell Beschäftigten
-- **Neu:** Über **Dashboard anpassen** lassen sich Arbeitsliste, Fristen, Übersichten und zuletzt bearbeitete Mitarbeiter pro Arbeitsplatz ein- oder ausblenden und neu anordnen

@@ -1628,9 +1628,8 @@ body.is-vacation-planner-maximized {
 }
 
 .employee-table :is(th, td)[data-column] {
-  width: var(--employee-column-width, auto);
-  min-width: var(--employee-column-width, 80px);
-  max-width: var(--employee-column-width, none);
+  width: var(--employee-column-width);
+  min-width: 80px;
 }
 
 .employee-table th[data-column] {
@@ -1668,7 +1667,7 @@ body.is-resizing-column {
   background: var(--slate-50);
 }
 
-.employee-table [data-column="name"] {
+.employee-table :is(th, td)[data-column="name"] {
   position: sticky;
   z-index: 4;
   left: 45px;
