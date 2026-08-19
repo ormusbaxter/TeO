@@ -4,16 +4,19 @@ name: Release
 # als GitHub-Release. Titel und Text stammen aus CHANGELOG.md; beim manuellen
 # Start lassen sie sich überschreiben.
 #
-# Ein Tag-Push veröffentlicht damit von selbst. Wer den Tag vor der
-# Veröffentlichung noch prüfen möchte, startet den Lauf stattdessen von Hand.
+# Ein Tag-Push veröffentlicht damit von selbst. Beim Start von Hand darf der
+# Tag auch noch fehlen: Der Lauf bestimmt die Fassung dann aus package.json des
+# gebauten Stands und setzt den Tag selbst - aber erst, wenn Build, Prüfung und
+# Tests durchgelaufen sind. Zum Veröffentlichen genügt damit ein Start dieses
+# Workflows.
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag der Fassung, z. B. v4.39.0"
-        required: true
+        description: "Tag der Fassung, z. B. v4.41.0 (leer = aus package.json)"
+        required: false
       ref:
-        description: "Stand, der gebaut wird (leer = der Tag selbst)"
+        description: "Stand, der gebaut wird (leer = der Tag bzw. der gewählte Zweig)"
         required: false
       title:
         description: "Titel (leer = aus CHANGELOG.md)"
@@ -58,10 +61,45 @@ jobs:
         shell: powershell
         run: npm run release:package
 
+      # Ohne Tag-Eingabe nennt package.json die Fassung. Ob Tag, package.json
+      # und CHANGELOG.md dieselbe Fassung meinen, prüft release-notes.mjs im
+      # übernächsten Schritt ohnehin.
+      - name: Fassung bestimmen
+        id: fassung
+        env:
+          RELEASE_TAG: ${{ inputs.tag || (github.event_name == 'push' && github.ref_name) || '' }}
+        run: |
+          $tag = $env:RELEASE_TAG
+          if (-not $tag) { $tag = "v" + (node -p "require('./package.json').version") }
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          Write-Host "Veröffentlicht wird $tag."
+
+      # Getaggt wird erst nach bestandener Prüfung. Ein vorhandener Tag bleibt
+      # unangetastet: Zeigt er auf denselben Stand, ist nichts zu tun; zeigt er
+      # woandershin, bricht der Lauf ab, statt Geschichte umzuschreiben.
+      - name: Tag setzen
+        env:
+          RELEASE_TAG: ${{ steps.fassung.outputs.tag }}
+        run: |
+          $tag = $env:RELEASE_TAG
+          $head = git rev-parse HEAD
+          $zeile = git ls-remote --tags origin "refs/tags/$tag"
+          if ($zeile) {
+            $vorhanden = ($zeile -split "\s+")[0]
+            if ($vorhanden -ne $head) {
+              Write-Error "Der Tag $tag zeigt auf $vorhanden, gebaut wurde $head."
+              exit 1
+            }
+            Write-Host "Der Tag $tag steht bereits auf diesem Stand."
+            exit 0
+          }
+          git tag $tag
+          git push origin $tag
+
       - name: Titel und Text bestimmen
         id: notes
         env:
-          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          RELEASE_TAG: ${{ steps.fassung.outputs.tag }}
           RELEASE_TITLE: ${{ inputs.title }}
           RELEASE_NOTES: ${{ inputs.notes }}
         run: node tools/release-notes.mjs $env:RELEASE_TAG release-notes.md
