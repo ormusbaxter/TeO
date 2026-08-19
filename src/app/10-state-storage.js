@@ -39,6 +39,8 @@
     bindCommandPalette();
     bindViewFilterChips();
     bindRecordInspectors();
+    bindRecordSelection();
+    bindContextMenu();
     bindTableComfort();
     bindDesktopWorkspace();
     bindWhatsNew();

@@ -11561,6 +11561,99 @@ body.is-resizing-column {
   }
 }
 
+/* Mehrfachauswahl der Karten: gewählte Karten stehen farbig, die Leiste
+   darüber nennt die Zahl und die Sammelaktionen. */
+:is(.meeting-card, .memo-card, .device-card).is-selected {
+  border-color: var(--blue-600);
+  background: var(--blue-50);
+  box-shadow: inset 3px 0 0 var(--blue-700);
+}
+
+.record-bulk-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  color: var(--blue-700);
+  border: 1px solid var(--blue-100);
+  border-radius: var(--radius-md);
+  background: var(--blue-50);
+  flex-wrap: wrap;
+}
+
+.record-bulk-bar[hidden] {
+  display: none;
+}
+
+.record-bulk-bar strong {
+  margin-right: auto;
+  font-size: 0.72rem;
+}
+
+.record-bulk-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+/* Das Kontextmenü folgt dem Zeiger; die Stelle kommt als Marke aus dem
+   Programm, weil sie erst beim Öffnen feststeht. */
+.context-menu {
+  position: fixed;
+  z-index: 120;
+  top: var(--context-menu-top, 0);
+  left: var(--context-menu-left, 0);
+  display: grid;
+  min-width: 210px;
+  padding: 6px;
+  gap: 2px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+
+.context-menu[hidden] {
+  display: none;
+}
+
+.context-menu-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  color: var(--slate-800);
+  font: inherit;
+  font-size: 0.76rem;
+  text-align: left;
+  cursor: pointer;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.context-menu-item svg {
+  width: 15px;
+  height: 15px;
+  color: var(--slate-500);
+}
+
+.context-menu-item:hover,
+.context-menu-item:focus-visible {
+  background: var(--blue-50);
+  outline: none;
+}
+
+.context-menu-item.is-danger {
+  color: var(--red-700);
+}
+
+.context-menu-item.is-danger svg {
+  color: var(--red-700);
+}
+
 @page phone-list {
   size: A4 portrait;
   margin: 0;

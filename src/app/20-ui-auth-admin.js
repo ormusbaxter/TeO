@@ -465,6 +465,9 @@
       applyStorageBackend,
     );
     elements.openBulkEditButton.addEventListener("click", openBulkEditDialog);
+    elements.deleteEmployeeSelection?.addEventListener("click", () =>
+      deleteEmployees([...selectedEmployeeIds]),
+    );
     elements.clearEmployeeSelection.addEventListener("click", clearEmployeeSelection);
     elements.printEmployeeDossierButton.addEventListener("click", printEmployeeDossier);
   }
