@@ -33,6 +33,7 @@
 
     bindNavigation();
     bindSidebarOrder();
+    bindSidebarCollapse();
     bindDialogTriggers();
     bindForms();
     bindFilters();

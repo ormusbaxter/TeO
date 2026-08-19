@@ -178,15 +178,28 @@
 
     <div class="app-layout">
       <aside class="sidebar" aria-label="Hauptnavigation">
-        <a class="brand" href="#uebersicht" aria-label="TeO Startseite">
-          <span class="brand-mark">
-            <svg><use href="#icon-logo"></use></svg>
-          </span>
-          <span>
-            <strong>TeO</strong>
-            <small>Team &amp; Employee Organizer</small>
-          </span>
-        </a>
+        <div class="sidebar-head">
+          <a class="brand" href="#uebersicht" aria-label="TeO Startseite">
+            <span class="brand-mark">
+              <svg><use href="#icon-logo"></use></svg>
+            </span>
+            <span class="brand-text">
+              <strong>TeO</strong>
+              <small>Team &amp; Employee Organizer</small>
+            </span>
+          </a>
+          <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            type="button"
+            aria-controls="mainNav"
+            aria-expanded="true"
+            title="Navigation einklappen"
+          >
+            <svg aria-hidden="true"><use href="#icon-chevron"></use></svg>
+            <span class="sr-only">Navigation einklappen</span>
+          </button>
+        </div>
 
         <nav class="main-nav" id="mainNav">
           <button class="nav-item is-active" type="button" data-view="dashboard">

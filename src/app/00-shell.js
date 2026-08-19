@@ -604,6 +604,7 @@
     appointmentCategory: document.querySelector("#appointmentCategory"),
     mainNav: document.querySelector("#mainNav"),
     resetSidebarOrderButton: document.querySelector("#resetSidebarOrderButton"),
+    sidebarToggle: document.querySelector("#sidebarToggle"),
     sidebarOrderStatus: document.querySelector("#sidebarOrderStatus"),
     settingsSidebarSubnav: document.querySelector("#settingsSidebarSubnav"),
     copyActiveEmailsLabel: document.querySelector("#copyActiveEmailsLabel"),

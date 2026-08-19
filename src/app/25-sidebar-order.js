@@ -4,6 +4,9 @@
   // wegen der Admin-Vorbehalte an den Einstellungen gar nicht mehr aendern.
   // Sie liegt darum im Browserprofil und ist nicht Teil der Sicherung.
   const SIDEBAR_ORDER_KEY = "teo-sidebar-order-v1";
+  // Auch der eingeklappte Zustand ist eine persoenliche Vorliebe und liegt
+  // deshalb im Browserprofil, nicht im geteilten Datenbestand.
+  const SIDEBAR_COLLAPSE_KEY = "teo-sidebar-collapsed-v1";
   const DRAG_THRESHOLD_PX = 6;
 
   let sidebarDragState = null;
@@ -201,6 +204,62 @@
       item.focus();
       announceSidebarOrder(item, resolveSidebarOrder());
     }
+  }
+
+  function applySidebarCollapsed(collapsed) {
+    document.body.classList.toggle("is-sidebar-collapsed", collapsed);
+    const toggle = elements.sidebarToggle;
+    if (toggle) {
+      const label = collapsed ? "Navigation ausklappen" : "Navigation einklappen";
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.title = label;
+      const description = toggle.querySelector(".sr-only");
+      if (description) description.textContent = label;
+    }
+
+    updateSidebarCollapsedLabels(collapsed);
+  }
+
+  // Eingeklappt bleibt vom Eintrag nur das Symbol. Die Beschriftung steht
+  // weiter im Markup - Vorleseprogramme lesen sie, und beim Zeigen nennt sie
+  // der Kurzhinweis, zusammen mit dem Zaehler. Der Zaehler aendert sich mit
+  // dem Datenbestand, deshalb ruft renderAll() diese Auffrischung mit.
+  function updateSidebarCollapsedLabels(
+    collapsed = document.body.classList.contains("is-sidebar-collapsed"),
+  ) {
+    sidebarNavItems().forEach((item) => {
+      if (!collapsed) {
+        item.removeAttribute("title");
+        return;
+      }
+      const label = item.querySelector("span")?.textContent.trim() || "";
+      const count = item.querySelector(".nav-count")?.textContent.trim() || "";
+      if (label) item.title = count ? `${label} (${count})` : label;
+    });
+  }
+
+  function readStoredSidebarCollapsed() {
+    try {
+      return localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === "1";
+    } catch (error) {
+      console.warn("Der gespeicherte Zustand der Seitenleiste ist unlesbar.", error);
+      return false;
+    }
+  }
+
+  function toggleSidebarCollapsed() {
+    const collapsed = !document.body.classList.contains("is-sidebar-collapsed");
+    applySidebarCollapsed(collapsed);
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSE_KEY, collapsed ? "1" : "0");
+    } catch (error) {
+      console.warn("Der Zustand der Seitenleiste konnte nicht gespeichert werden.", error);
+    }
+  }
+
+  function bindSidebarCollapse() {
+    applySidebarCollapsed(readStoredSidebarCollapsed());
+    elements.sidebarToggle?.addEventListener("click", toggleSidebarCollapsed);
   }
 
   function bindSidebarOrder() {

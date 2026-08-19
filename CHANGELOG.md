@@ -1,5 +1,6 @@
 ### 4.41.0 – Nachsichtige Suche
 
+- **Neu:** Die Seitenleiste lässt sich über den Winkel neben dem Namenszug nach links einklappen; eingeklappt bleibt eine schmale Spur mit den Symbolen der Menüpunkte, deren Beschriftung beim Zeigen als Kurzhinweis samt Zähler erscheint. Der Zustand bleibt im Browser gespeichert
 - **Neu:** Alle Suchfelder der Anwendung sehen über die Schreibweise hinweg: Umlaute lassen sich ohne Punkte oder als „ae“, „oe“ und „ue“ eingeben, „ß“, „ss“ und „s“ finden einander, Akzente werden ignoriert. „Müller“ findet man mit „muller“ oder „mueller“, „Weiß“ mit „weiss“ oder „weis“ – in Mitarbeitern, Terminen, Memos, Geräten, Teilnahmelisten und der Hilfe
 - **Verbessert:** Die Fassung wird ohne führende Nullen geschrieben – „4.41.0“ statt „004.041.000“, in der Anwendung, im Änderungsverzeichnis und im Namen des Offline-Zwischenspeichers. Ältere Abschnitte dieses Verzeichnisses behalten ihre Schreibweise und bleiben auffindbar
 - **Behoben:** Im Monatsraster des Terminkalenders sah eine Suche wirkungslos aus, sobald der gesuchte Termin in einem anderen Monat lag: Das Raster zeigt nur den gewählten Monat, ein Treffer im Dezember blieb im August also unsichtbar. Die Zeile unter dem Raster nennt jetzt die Zahl der Treffer im gezeigten Monat, weist auf Treffer in anderen Monaten hin und führt auf Klick zum nächstgelegenen

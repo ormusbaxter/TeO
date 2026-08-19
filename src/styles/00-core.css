@@ -197,6 +197,13 @@ svg {
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100vh;
+  transition: grid-template-columns 200ms ease;
+}
+
+/* Eingeklappt bleibt von der Seitenleiste eine Spur mit den Symbolen. Die
+   Breite steht als Marke an einer Stelle; Raster und Leiste folgen ihr. */
+body.is-sidebar-collapsed {
+  --sidebar-width: 76px;
 }
 
 .sidebar {
@@ -207,6 +214,10 @@ svg {
   width: var(--sidebar-width);
   flex-direction: column;
   padding: 28px 18px 22px;
+  overflow-x: hidden;
+  transition:
+    width 200ms ease,
+    padding 200ms ease;
   overflow-y: auto;
   color: #dce7f1;
   background:
@@ -214,12 +225,112 @@ svg {
     var(--navy-950);
 }
 
+/* Der eingeklappte Zustand raeumt alles ab, was Breite braucht, und stellt
+   die Symbole mittig. Die Beschriftungen bleiben im Markup - sie sind fuer
+   Vorleseprogramme weiter da und liegen beim Zeigen als Kurzhinweis an. */
+body.is-sidebar-collapsed .sidebar {
+  padding-right: 12px;
+  padding-left: 12px;
+  align-items: center;
+}
+
+body.is-sidebar-collapsed :is(
+    .brand-text,
+    .nav-item span,
+    .nav-order-hint,
+    .nav-order-reset span,
+    .settings-sidebar-subnav,
+    .user-session > div,
+    .sidebar-system-status-header strong,
+    .sidebar-system-status dl,
+    .sidebar-system-status > small
+  ) {
+  display: none;
+}
+
+body.is-sidebar-collapsed .sidebar-head {
+  flex-direction: column;
+  gap: 12px;
+}
+
+body.is-sidebar-collapsed :is(.nav-item, .nav-order-reset) {
+  grid-template-columns: 22px;
+  justify-content: center;
+  padding: 12px 0;
+}
+
+body.is-sidebar-collapsed .main-nav {
+  width: 100%;
+  margin-top: 28px;
+}
+
+body.is-sidebar-collapsed .user-session {
+  grid-template-columns: auto;
+  justify-items: center;
+  padding: 9px 6px;
+}
+
+body.is-sidebar-collapsed .user-session-actions {
+  flex-direction: column;
+}
+
+body.is-sidebar-collapsed .sidebar-system-status {
+  padding: 10px 6px;
+  justify-items: center;
+}
+
+body.is-sidebar-collapsed .sidebar-system-status-header {
+  justify-content: center;
+}
+
+.sidebar-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .brand {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 12px;
   color: inherit;
   text-decoration: none;
+}
+
+.sidebar-toggle {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  cursor: pointer;
+  place-items: center;
+  color: #afc0cf;
+  border: 0;
+  border-radius: 9px;
+  background: rgb(255 255 255 / 6%);
+  transition:
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.sidebar-toggle:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 12%);
+}
+
+/* Der Winkel zeigt in die Richtung, in die der naechste Klick fuehrt: offen
+   nach links zum Einklappen, zugeklappt nach rechts zum Aufklappen. */
+.sidebar-toggle svg {
+  width: 16px;
+  height: 16px;
+  transform: rotate(180deg);
+  transition: transform 200ms ease;
+}
+
+body.is-sidebar-collapsed .sidebar-toggle svg {
+  transform: none;
 }
 
 .brand-mark {
@@ -865,7 +976,10 @@ svg {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-header {
+  .page-header,
+  .app-layout,
+  .sidebar,
+  .sidebar-toggle svg {
     transition: none;
   }
 }
