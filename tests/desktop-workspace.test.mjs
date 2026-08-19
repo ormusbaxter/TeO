@@ -13,7 +13,12 @@ test("Der Desktop-Arbeitsplatz verbindet Schnellansicht und Datengrid", async ()
     fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
   ]);
 
-  assert.match(html, /class="employee-workspace"[\s\S]*?id="employeeInspector"/);
+  // Die Bauform teilt sich die Mitarbeitertabelle seit 4.44.0 mit den
+  // Schnellansichten der uebrigen Datenarten.
+  assert.match(
+    html,
+    /class="employee-workspace record-workspace"[\s\S]*?id="employeeInspector"/,
+  );
   assert.match(app, /function selectEmployeeInspector\(employeeId\)/);
   assert.match(app, /data-resize-employee-column/);
   assert.match(app, /EMPLOYEE_COLUMN_ORDER_KEY/);
@@ -52,11 +57,26 @@ test("Änderungshistorie und feststehende Namensspalte bleiben lesbar", async ()
     fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
   ]);
 
-  assert.match(
-    changelog,
-    /^### 4\.43\.4[\s\S]*?### 4\.43\.3[\s\S]*?### 4\.43\.2[\s\S]*?### 4\.43\.1[\s\S]*?### 4\.43\.0[\s\S]*?### 4\.42\.0/,
+  // Die neueste Fassung steht oben, jede aeltere darunter - geprueft wird die
+  // Reihenfolge selbst, nicht eine feste Liste von Fassungen.
+  const fassungen = [...changelog.matchAll(/^### (\d+)\.(\d+)\.(\d+)/gm)].map(
+    ([, major, minor, patch]) => [Number(major), Number(minor), Number(patch)],
   );
-  assert.equal((changelog.match(/^### 4\.43\.0/gm) || []).length, 1);
+  assert.ok(fassungen.length >= 5, "Das Verzeichnis nennt mehrere Fassungen");
+  for (let index = 1; index < fassungen.length; index += 1) {
+    const vorher = fassungen[index - 1];
+    const jetzt = fassungen[index];
+    assert.ok(
+      vorher.join(".") !== jetzt.join("."),
+      `Die Fassung ${jetzt.join(".")} steht doppelt im Verzeichnis`,
+    );
+    assert.ok(
+      vorher[0] > jetzt[0] ||
+        (vorher[0] === jetzt[0] && vorher[1] > jetzt[1]) ||
+        (vorher[0] === jetzt[0] && vorher[1] === jetzt[1] && vorher[2] > jetzt[2]),
+      `Die Fassung ${jetzt.join(".")} steht vor der aelteren ${vorher.join(".")}`,
+    );
+  }
   assert.match(
     styles,
     /\.employee-table :is\(th, td\)\[data-column="name"\] \{[\s\S]*?width: var\(--employee-column-width, 250px\);/,

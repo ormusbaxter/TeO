@@ -80,6 +80,8 @@
 
           <div class="filter-chip-bar" data-filter-chips="appointments" hidden></div>
           <div class="training-summary" id="appointmentSummary"></div>
+          <div class="record-workspace" id="appointmentWorkspace">
+            <div class="record-workspace-main">
           <section class="meeting-list" id="appointmentList"></section>
           <section
             class="panel appointment-calendar"
@@ -130,6 +132,16 @@
             <div class="appointment-calendar-grid" id="appointmentCalendarGrid"></div>
             <p class="appointment-calendar-note" id="appointmentCalendarNote"></p>
           </section>
+            </div>
+            <aside
+              class="record-inspector"
+              id="appointmentInspector"
+              aria-label="Termin-Schnellansicht"
+              hidden
+            >
+              <div id="appointmentInspectorContent"></div>
+            </aside>
+          </div>
         </section>
 
         <section class="view" id="memosView" data-view-panel="memos">
@@ -176,7 +188,17 @@
 
           <div class="filter-chip-bar" data-filter-chips="memos" hidden></div>
           <div class="training-summary" id="memoSummary"></div>
-          <section class="memo-list" id="memoList"></section>
+          <div class="record-workspace" id="memoWorkspace">
+            <section class="memo-list" id="memoList"></section>
+            <aside
+              class="record-inspector"
+              id="memoInspector"
+              aria-label="Memo-Schnellansicht"
+              hidden
+            >
+              <div id="memoInspectorContent"></div>
+            </aside>
+          </div>
         </section>
 
         <section class="view" id="trainingsView" data-view-panel="trainings">

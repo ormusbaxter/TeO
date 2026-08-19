@@ -1,4 +1,11 @@
+  // Der Aufbau hat mehrere Ausgaenge; die Schnellansicht wird deshalb aussen
+  // aufgefrischt, wenn die Liste in jedem Fall neu steht.
   function renderAppointments() {
+    renderAppointmentsView();
+    refreshRecordInspector("appointment");
+  }
+
+  function renderAppointmentsView() {
     renderViewFilterChips("appointments");
     const today = todayIso();
     const pinnedAppointments = state.appointments
@@ -435,8 +442,9 @@
           class="appointment-calendar-entry ${appointment.pinned ? "is-pinned" : ""}"
           type="button"
           data-appointment-card="${appointment.id}"
+          data-record-card="${appointment.id}"
           title="${escapeHtml(`${appointment.title} · ${details.join(" · ")}`)}"
-          aria-label="${escapeHtml(`${appointment.title} bearbeiten. ${details.join(", ")}`)}"
+          aria-label="${escapeHtml(`${appointment.title} öffnen. ${details.join(", ")}`)}"
         >
           <span class="appointment-calendar-entry-icon">
             <svg><use href="#icon-${appointmentCategoryIcon(appointment)}"></use></svg>
@@ -471,11 +479,9 @@
       return;
     }
 
-    const entry = event.target.closest("[data-appointment-card]");
-    if (entry) {
-      openAppointmentDialog(entry.dataset.appointmentCard);
-      return;
-    }
+    // Ein Eintrag im Raster oeffnet die Schnellansicht (22-record-inspector),
+    // nicht mehr den Dialog.
+    if (event.target.closest("[data-appointment-card]")) return;
 
     const day = event.target.closest("[data-calendar-day]");
     if (day) openAppointmentDialog(null, { date: day.dataset.calendarDay });
@@ -540,6 +546,7 @@
       <article
         class="meeting-card appointment-card ${appointment.pinned ? "is-pinned" : ""} ${daysUntil < 0 ? "is-past" : ""}"
         data-appointment-card="${appointment.id}"
+        data-record-card="${appointment.id}"
         tabindex="0"
         aria-label="Termindetails zu ${escapeHtml(appointment.title)} öffnen"
       >
@@ -842,6 +849,7 @@
 
     renderDeviceInstructionMatrix();
     renderDeviceInstructionList();
+    refreshRecordInspector("device");
   }
 
   function filteredDevices({
@@ -1002,9 +1010,12 @@
     ).size;
     const authorizedEmployees = getDeviceAuthorizedEmployees(device.id);
     return `
-      <article class="training-card device-card ${
-        device.currentInventory ? "" : "is-former"
-      }">
+      <article
+        class="training-card device-card ${device.currentInventory ? "" : "is-former"}"
+        data-record-card="${device.id}"
+        tabindex="0"
+        aria-label="Schnellansicht zu ${escapeHtml(deviceLabel(device))} öffnen"
+      >
         <div class="training-card-main">
           <div class="training-title-row">
             <span class="training-icon">

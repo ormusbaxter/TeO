@@ -84,17 +84,17 @@
     const favorite = workspaceRecordIsFavorite("employee", employee.id);
     inspector.hidden = false;
     content.innerHTML = `
-      <div class="employee-inspector-header">
+      <div class="record-inspector-header">
         ${renderAvatar(employee)}
         <div><p class="eyebrow">Schnellansicht</p><h2>${escapeHtml(fullName(employee))}</h2><small>${escapeHtml(employee.profession || "Beruf nicht angegeben")}</small></div>
         <button class="icon-button" type="button" data-inspector-close aria-label="Schnellansicht schließen"><svg><use href="#icon-close"></use></svg></button>
       </div>
-      <div class="employee-inspector-actions">
+      <div class="record-inspector-actions">
         <button class="button button-secondary" type="button" data-inspector-favorite="${employee.id}" aria-pressed="${favorite}"><svg><use href="#icon-star"></use></svg>${favorite ? "Angeheftet" : "Anheften"}</button>
         <button class="button button-secondary" type="button" data-inspector-edit="${employee.id}"><svg><use href="#icon-edit"></use></svg>Bearbeiten</button>
         <button class="button button-primary" type="button" data-inspector-dossier="${employee.id}">Gesamtakte</button>
       </div>
-      <dl class="employee-inspector-facts">
+      <dl class="record-inspector-facts">
         <div><dt>Status</dt><dd>${escapeHtml(employeeStatusLabel(employee))}</dd></div>
         <div><dt>Stellenumfang</dt><dd>${employee.employmentPercent}&thinsp;%</dd></div>
         <div><dt>Dienstwochenende</dt><dd>${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</dd></div>
@@ -102,7 +102,7 @@
         <div><dt>Telefon</dt><dd>${escapeHtml(employee.phone || "–")}</dd></div>
         <div><dt>E-Mail</dt><dd>${escapeHtml(employee.email || "–")}</dd></div>
       </dl>
-      <section class="employee-inspector-section"><h3>Qualifikationen</h3><div class="qualification-tags">${qualifications.length ? qualifications.map((item) => `<span class="tag">${escapeHtml(item.label)}</span>`).join("") : '<span class="tag tag-muted">Keine</span>'}</div></section>
+      <section class="record-inspector-section"><h3>Qualifikationen</h3><div class="qualification-tags">${qualifications.length ? qualifications.map((item) => `<span class="tag">${escapeHtml(item.label)}</span>`).join("") : '<span class="tag tag-muted">Keine</span>'}</div></section>
     `;
   }
 
@@ -234,11 +234,17 @@
     }
     if (item.type === "appointment") {
       const appointment = state.appointments.find((entry) => entry.id === item.id);
-      return appointment && { group: "Termine", icon: "icon-calendar", label: appointment.title, hint: formatDate(appointment.date), run: () => { showView("appointments"); openAppointmentDialog(appointment.id); } };
+      return appointment && { group: "Termine", icon: "icon-calendar", label: appointment.title, hint: formatDate(appointment.date), run: () => { showView("appointments"); selectRecordInspector("appointment", appointment.id); } };
     }
     if (item.type === "memo") {
       const memo = state.memos.find((entry) => entry.id === item.id);
-      return memo && memoVisibleToCurrentUser(memo) && { group: "Memo / ToDo", icon: "icon-memo", label: memo.title, hint: formatDate(memo.date), run: () => { showView("memos"); openMemoDialog(memo.id); } };
+      return memo && memoVisibleToCurrentUser(memo) && { group: "Memo / ToDo", icon: "icon-memo", label: memo.title, hint: formatDate(memo.date), run: () => { showView("memos"); selectRecordInspector("memo", memo.id); } };
+    }
+    // Geraete kamen mit der Schnellansicht dazu und gehoeren seitdem ebenso in
+    // Verlauf und Favoriten.
+    if (item.type === "device") {
+      const device = getDevice(item.id);
+      return device && { group: "Geräte", icon: "icon-device", label: deviceLabel(device), hint: device.category || "", run: () => { showView("device-management"); selectRecordInspector("device", device.id); } };
     }
     return null;
   }

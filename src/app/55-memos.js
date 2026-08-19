@@ -64,6 +64,11 @@
   }
 
   function renderMemos() {
+    renderMemosView();
+    refreshRecordInspector("memo");
+  }
+
+  function renderMemosView() {
     renderMemoCategoryOptions();
     renderViewFilterChips("memos");
     const allVisible = visibleMemos();
@@ -123,7 +128,7 @@
       `Erstellt von ${memoCreatorLabel(memo)}`,
     ];
     return `
-      <article class="meeting-card memo-card ${memo.pinned ? "is-pinned" : ""} ${memo.completed ? "is-completed" : ""}" data-memo-card="${memo.id}" tabindex="0" aria-label="${escapeHtml(memo.title)} öffnen">
+      <article class="meeting-card memo-card ${memo.pinned ? "is-pinned" : ""} ${memo.completed ? "is-completed" : ""}" data-memo-card="${memo.id}" data-record-card="${memo.id}" tabindex="0" aria-label="${escapeHtml(memo.title)} öffnen">
         <div class="meeting-card-main">
           <div class="training-title-row">
             <span class="training-icon memo-icon"><svg><use href="#icon-memo"></use></svg></span>
@@ -186,10 +191,7 @@
       if (action === "delete-memo") requestDeleteMemo(id);
       return;
     }
-    const card = event.target.closest("[data-memo-card]");
-    if (!card || (event.type === "keydown" && !["Enter", " "].includes(event.key))) return;
-    if (event.type === "keydown") event.preventDefault();
-    openMemoDialog(card.dataset.memoCard);
+    // Die Karte selbst oeffnet die Schnellansicht (siehe 22-record-inspector).
   }
 
   function getMemo(memoId) {

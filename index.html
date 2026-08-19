@@ -718,9 +718,9 @@
                 Auswahl aufheben
               </button>
             </div>
-            <div class="employee-workspace" id="employeeWorkspace">
+            <div class="employee-workspace record-workspace" id="employeeWorkspace">
               <div id="employeeTable"></div>
-              <aside class="employee-inspector" id="employeeInspector" aria-label="Mitarbeiter-Schnellansicht" hidden>
+              <aside class="employee-inspector record-inspector" id="employeeInspector" aria-label="Mitarbeiter-Schnellansicht" hidden>
                 <div id="employeeInspectorContent"></div>
               </aside>
             </div>
@@ -983,6 +983,8 @@
 
           <div class="filter-chip-bar" data-filter-chips="appointments" hidden></div>
           <div class="training-summary" id="appointmentSummary"></div>
+          <div class="record-workspace" id="appointmentWorkspace">
+            <div class="record-workspace-main">
           <section class="meeting-list" id="appointmentList"></section>
           <section
             class="panel appointment-calendar"
@@ -1033,6 +1035,16 @@
             <div class="appointment-calendar-grid" id="appointmentCalendarGrid"></div>
             <p class="appointment-calendar-note" id="appointmentCalendarNote"></p>
           </section>
+            </div>
+            <aside
+              class="record-inspector"
+              id="appointmentInspector"
+              aria-label="Termin-Schnellansicht"
+              hidden
+            >
+              <div id="appointmentInspectorContent"></div>
+            </aside>
+          </div>
         </section>
 
         <section class="view" id="memosView" data-view-panel="memos">
@@ -1079,7 +1091,17 @@
 
           <div class="filter-chip-bar" data-filter-chips="memos" hidden></div>
           <div class="training-summary" id="memoSummary"></div>
-          <section class="memo-list" id="memoList"></section>
+          <div class="record-workspace" id="memoWorkspace">
+            <section class="memo-list" id="memoList"></section>
+            <aside
+              class="record-inspector"
+              id="memoInspector"
+              aria-label="Memo-Schnellansicht"
+              hidden
+            >
+              <div id="memoInspectorContent"></div>
+            </aside>
+          </div>
         </section>
 
         <section class="view" id="trainingsView" data-view-panel="trainings">
@@ -1373,7 +1395,17 @@
                 <h2>Angelegte Geräte</h2>
               </div>
             </div>
-            <div class="training-list" id="deviceCatalog"></div>
+            <div class="record-workspace" id="deviceWorkspace">
+              <div class="training-list" id="deviceCatalog"></div>
+              <aside
+                class="record-inspector"
+                id="deviceInspector"
+                aria-label="Geräte-Schnellansicht"
+                hidden
+              >
+                <div id="deviceInspectorContent"></div>
+              </aside>
+            </div>
           </section>
         </section>
 
@@ -2105,8 +2137,11 @@
 <p>Rechts in derselben Zeile steht <strong>Ansicht merken</strong>. Damit werden die aktuellen Filter dieser Ansicht im Browserprofil abgelegt und beim nächsten Start wieder eingestellt – nützlich etwa für „nur aktive Pflegefachkräfte“ als tägliche Arbeitsansicht. <strong>Gemerkte Ansicht aufheben</strong> entfernt sie wieder. Wie die Reihenfolge der Navigation gilt das nur für diesen Rechner und diesen Browser und ist nicht Teil der Datensicherung. Ist ein gemerkter Wert später entfallen – etwa ein gelöschter Beruf –, wird er beim Start übersprungen.</p>
 <h3 id="hilfe-tabellen-anpassen">Tabellen anpassen</h3>
 <ul><li><strong>Kompakte Tabellen</strong> – in den Einstellungen unter <strong>Darstellung</strong>. Die Zeilen rücken enger zusammen, Zweitzeilen wie Kontaktdaten treten zurück; im gleichen Bildausschnitt sind damit rund zwanzig statt zwölf Mitarbeiter sichtbar. Die Einstellung gilt nur an diesem Arbeitsplatz.</li><li><strong>Spalten</strong> – die Schaltfläche in der Filterleiste der Mitarbeiter wählt aus, welche Spalten die Tabelle zeigt. Name und Aktionen bleiben immer stehen. War nach einer Spalte sortiert, die abgewählt wird, sortiert die Tabelle wieder nach dem Namen.</li><li><strong>Mehrere Zeilen auswählen</strong> – ein Klick auf ein Auswahlkästchen, dann ein Klick mit gedrückter <strong>Umschalttaste</strong> auf ein zweites: Alles dazwischen wird mitgewählt beziehungsweise mit abgewählt.</li><li><strong>Kein versehentliches Markieren</strong> – in Auswahlkarten und Auswahlspalten (etwa den Teilnehmerlisten beim Dokumentieren von Geräteeinweisungen und Fortbildungsnachweisen) lässt sich der Text nicht mehr markieren; ein verrutschter oder doppelter Klick trifft damit weiter das Kästchen. Der übrige Text der Anwendung bleibt zum Kopieren markierbar.</li><li><strong>Feste erste Spalte</strong> – in der Einweisungsmatrix und in der Jahresauswertung der Pflichtfortbildungen bleibt die Namensspalte beim seitlichen Blättern stehen.</li><li><strong>Spaltenbreite und Reihenfolge</strong> – in der Mitarbeitertabelle lässt sich die rechte Kante einer Überschrift ziehen. Im Dialog <strong>Spalten</strong> ordnen die Pfeile die wählbaren Spalten neu an. Eine davon kann zusätzlich fixiert werden; Auswahl und Name bleiben ohnehin am linken Rand stehen. Diese Einstellungen gelten nur am jeweiligen Arbeitsplatz.</li></ul>
-<h3 id="hilfe-mitarbeiter-schnellansicht">Mitarbeiter-Schnellansicht</h3>
+<h3 id="hilfe-schnellansicht">Schnellansicht</h3>
 <p>Ein Klick auf eine freie Stelle einer Mitarbeiterzeile öffnet rechts neben der Tabelle eine Schnellansicht. Sie zeigt Status, Stellenumfang, Dienstwochenende, Kontakt, Fortbildungsstand und Qualifikationen, ohne die Liste zu verlassen. Von dort lässt sich der Mitarbeiter bearbeiten, seine Gesamtakte öffnen oder für den Schnellzugriff anheften. Mit <strong>Pfeil hoch</strong> und <strong>Pfeil runter</strong> bewegt sich der Fokus durch die Tabellenzeilen, <strong>Enter</strong> öffnet die Schnellansicht.</p>
+<p>Dieselbe Schnellansicht gibt es für <strong>Termine</strong>, <strong>Memos</strong> und <strong>Geräte</strong>: Ein Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster – öffnet sie rechts neben der Liste.</p>
+<p>| Datenart | Angaben | Aktionen | | --- | --- | --- | | Termin | Datum, Uhrzeit, Ort, Kategorie, angepinnt, Teilnehmerliste, Beschreibung | Anheften · Bearbeiten · <strong>Kalender</strong> (springt in den Monat des Termins) | | Memo / ToDo | Datum, Kategorie, Sichtbarkeit, Status, angepinnt, Beschreibung | Anheften · Bearbeiten · <strong>Erledigt</strong> beziehungsweise <strong>Wieder öffnen</strong> | | Gerät | Hersteller, Produkt, Kategorie, Anlage 1, Bestand, Einweisungsquote, Einweisungsberechtigte | Anheften · Bearbeiten · <strong>Übersicht</strong> (Einweisungen des Geräts) |</p>
+<p>Die Schaltflächen auf der Karte behalten ihre Aufgabe: Der Stift öffnet weiterhin unmittelbar den Bearbeitungsdialog, der Papierkorb löscht. Persönliche Memos anderer Konten erscheinen auch hier nicht. Angeheftete Datensätze und die zuletzt geöffneten stehen in <strong>Strg + K</strong> und führen von dort wieder in die Schnellansicht.</p>
 <h3 id="hilfe-arbeitsliste-und-dashboard">Arbeitsliste und Dashboard</h3>
 <p>Die Arbeitsliste auf der Übersicht führt die wichtigsten offenen Punkte aus mehreren Bereichen zusammen: überfällige und anstehende Fristen, Termine, offene Memos und Datenqualitätsprobleme mit hoher Priorität. <strong>Überfällig</strong> und <strong>7 Tage</strong> begrenzen die Liste auf den unmittelbar relevanten Zeitraum. Ein Klick führt direkt zum betreffenden Datensatz.</p>
 <p>Über <strong>Dashboard anpassen</strong> werden Arbeitsliste, Fristen, Fortbildungsübersicht und zuletzt bearbeitete Mitarbeiter ein- oder ausgeblendet und neu angeordnet. Die Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum gemeinsamen Datenbestand oder zur Datensicherung.</p>
@@ -2461,6 +2496,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-44-0-schnellansicht-fur-alle-datenarten">4.44.0 – Schnellansicht für alle Datenarten</h3>
+<ul><li><strong>Neu:</strong> Termine, Memos und Geräte haben dieselbe Schnellansicht wie die Mitarbeiter: Ein Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster – öffnet rechts eine Übersicht mit den Eckdaten, ohne dass ein Dialog die Liste verdeckt. Von dort führen <strong>Anheften</strong>, <strong>Bearbeiten</strong> und je nach Datenart <strong>Kalender</strong>, <strong>Erledigt</strong> oder <strong>Übersicht</strong> weiter; der Stift auf der Karte öffnet wie bisher direkt den Bearbeitungsdialog</li><li><strong>Verbessert:</strong> Geräte erscheinen jetzt ebenfalls in Verlauf und Favoriten von <strong>Strg + K</strong>; Termine, Memos und Geräte öffnen von dort die Schnellansicht statt eines Dialogs</li></ul>
 <h3 id="hilfe-4-43-4-termin-direkt-im-dialog-loschen">4.43.4 – Termin direkt im Dialog löschen</h3>
 <ul><li><strong>Neu:</strong> Beim Bearbeiten eines Termins steht die Löschaktion direkt im Dialog bereit; sie verwendet weiterhin die Sicherheitsabfrage und kann anschließend rückgängig gemacht werden</li></ul>
 <h3 id="hilfe-4-43-3-klarer-lokaler-speicherstatus">4.43.3 – Klarer lokaler Speicherstatus</h3>

@@ -647,12 +647,8 @@
       return;
     }
 
-    const card = event.target.closest("[data-appointment-card]");
-    if (!card || (event.type === "keydown" && !["Enter", " "].includes(event.key))) {
-      return;
-    }
-    if (event.type === "keydown") event.preventDefault();
-    openAppointmentDialog(card.dataset.appointmentCard);
+    // Die Karte selbst oeffnet die Schnellansicht (22-record-inspector); zum
+    // Bearbeiten fuehrt der Stift auf der Karte.
   }
 
   async function toggleAppointmentPinned(appointmentId) {

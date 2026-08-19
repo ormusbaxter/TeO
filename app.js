@@ -1189,6 +1189,7 @@
     bindKeyboardShortcuts();
     bindCommandPalette();
     bindViewFilterChips();
+    bindRecordInspectors();
     bindTableComfort();
     bindDesktopWorkspace();
     bindWhatsNew();
@@ -5120,6 +5121,298 @@
     }
   }
 
+  // Schnellansicht für Termine, Memos und Geräte - dieselbe Bauform wie die
+  // Mitarbeiter-Schnellansicht des Arbeitsplatzes: Ein Klick auf die Karte
+  // öffnet rechts eine Übersicht mit den Eckdaten und den drei häufigsten
+  // Aktionen, ohne dass ein Dialog die Liste verdeckt.
+  //
+  // Beschrieben wird je Datenart nur, was sie ausmacht; Aufbau, Auswahl,
+  // Hervorhebung und Verlauf sind für alle gleich.
+  let inspectedRecords = {};
+
+  function recordInspectorDefinitions() {
+    return {
+      appointment: {
+        view: "appointments",
+        inspector: "#appointmentInspector",
+        content: "#appointmentInspectorContent",
+        container: "#appointmentWorkspace",
+        icon: "icon-calendar",
+        eyebrow: "Termin",
+        find: (id) => state.appointments.find((entry) => entry.id === id),
+        title: (appointment) => appointment.title,
+        subtitle: (appointment) =>
+          [formatDate(appointment.date), formatAppointmentTime(appointment)]
+            .filter(Boolean)
+            .join(" · "),
+        facts: (appointment) => [
+          ["Datum", formatDate(appointment.date)],
+          ["Uhrzeit", formatAppointmentTime(appointment) || "Ganztägig"],
+          ["Ort", appointment.location || "–"],
+          ["Kategorie", appointmentCategoryLabel(appointment) || "Ohne Kategorie"],
+          ["Wichtig", appointment.pinned ? "Angepinnt" : "Nein"],
+          ["Teilnehmerliste", appointment.participantList ? "Ja" : "Nein"],
+        ],
+        sections: (appointment) => [
+          { title: "Beschreibung", text: appointment.description || "Keine Beschreibung hinterlegt." },
+        ],
+        actions: (appointment) => [
+          { label: "Bearbeiten", icon: "icon-edit", run: () => openAppointmentDialog(appointment.id) },
+          {
+            label: "Kalender",
+            icon: "icon-calendar",
+            primary: true,
+            run: () => showAppointmentInCalendar(appointment),
+          },
+        ],
+      },
+      memo: {
+        view: "memos",
+        inspector: "#memoInspector",
+        content: "#memoInspectorContent",
+        container: "#memoWorkspace",
+        icon: "icon-memo",
+        eyebrow: "Memo / ToDo",
+        find: (id) => {
+          const memo = getMemo(id);
+          return memoVisibleToCurrentUser(memo) ? memo : null;
+        },
+        title: (memo) => memo.title,
+        subtitle: (memo) => [memo.category || "Ohne Kategorie", formatDate(memo.date)].join(" · "),
+        facts: (memo) => [
+          ["Datum", formatDate(memo.date)],
+          ["Kategorie", memo.category || "Ohne Kategorie"],
+          ["Sichtbarkeit", memo.visibility === "private" ? "Nur in meiner Ansicht" : "Für alle"],
+          ["Status", memo.completed ? "Erledigt" : "Offen"],
+          ["Wichtig", memo.pinned ? "Angepinnt" : "Nein"],
+        ],
+        sections: (memo) => [
+          { title: "Beschreibung", text: memo.description || "Keine Beschreibung hinterlegt." },
+        ],
+        actions: (memo) => [
+          { label: "Bearbeiten", icon: "icon-edit", run: () => openMemoDialog(memo.id) },
+          {
+            label: memo.completed ? "Wieder öffnen" : "Erledigt",
+            icon: "icon-check",
+            primary: true,
+            run: () => void toggleMemoCompleted(memo.id),
+          },
+        ],
+      },
+      device: {
+        view: "device-management",
+        inspector: "#deviceInspector",
+        content: "#deviceInspectorContent",
+        container: "#deviceWorkspace",
+        icon: "icon-device",
+        eyebrow: "Gerät",
+        find: (id) => getDevice(id),
+        title: (device) => deviceLabel(device),
+        subtitle: (device) => device.category || "Ohne Kategorie",
+        facts: (device) => [
+          ["Hersteller", device.manufacturer],
+          ["Produkt", device.productName],
+          ["Kategorie", device.category || "–"],
+          ["Anlage 1", device.annex1 ? "Ja" : "Nein"],
+          ["Bestand", device.currentInventory ? "Aktuell" : "Nicht mehr im Bestand"],
+          [
+            "Eingewiesen",
+            `${getDeviceInstructionPercentage(device.id, activeEmployeeList())} %`,
+          ],
+        ],
+        sections: (device) => {
+          const authorized = getDeviceAuthorizedEmployees(device.id);
+          return [
+            {
+              title: "Einweisungsberechtigt",
+              tags: authorized.length ? authorized.map(fullName) : ["Niemand hinterlegt"],
+            },
+          ];
+        },
+        actions: (device) => [
+          { label: "Bearbeiten", icon: "icon-edit", run: () => openDeviceDialog(device.id) },
+          {
+            label: "Übersicht",
+            icon: "icon-eye",
+            primary: true,
+            run: () => openDeviceOverview(device.id),
+          },
+        ],
+      },
+    };
+  }
+
+  function bindRecordInspectors() {
+    for (const [type, definition] of Object.entries(recordInspectorDefinitions())) {
+      const container = document.querySelector(definition.container);
+      container?.addEventListener("click", (event) => handleRecordCardActivation(type, event));
+      container?.addEventListener("keydown", (event) => handleRecordCardActivation(type, event));
+      document
+        .querySelector(definition.inspector)
+        ?.addEventListener("click", (event) => handleRecordInspectorAction(type, event));
+    }
+  }
+
+  // Die Karte selbst öffnet die Schnellansicht; ihre Schaltflächen behalten
+  // ihre Aufgabe. Mit der Tastatur gilt dasselbe über Eingabe und Leertaste.
+  function handleRecordCardActivation(type, event) {
+    const card = event.target.closest("[data-record-card]");
+    if (!card) return;
+    // Schaltflächen innerhalb der Karte behalten ihre Aufgabe. Ist die Karte
+    // selbst eine Schaltfläche - so wie ein Eintrag im Monatsraster -, zählt
+    // sie natürlich weiter als Karte.
+    const control = event.target.closest("button, input, a, select, textarea");
+    if (control && control !== card) return;
+    if (event.type === "keydown") {
+      // Eine Schaltfläche löst bei Eingabe und Leertaste selbst einen Klick
+      // aus; ein zweiter Weg wäre einer zu viel.
+      if (card.tagName === "BUTTON" || !["Enter", " "].includes(event.key)) return;
+      event.preventDefault();
+    }
+    selectRecordInspector(type, card.dataset.recordCard);
+  }
+
+  function selectRecordInspector(type, id) {
+    const definition = recordInspectorDefinitions()[type];
+    if (!definition?.find(id)) return;
+    inspectedRecords[type] = id;
+    trackWorkspaceRecord(type, id);
+    renderRecordInspector(type);
+    highlightInspectedRecord(type);
+  }
+
+  function closeRecordInspector(type) {
+    inspectedRecords[type] = "";
+    renderRecordInspector(type);
+    highlightInspectedRecord(type);
+  }
+
+  // Nach jedem Neuaufbau der Liste: Die Karten sind neu, die Hervorhebung muss
+  // wieder gesetzt werden. Ist der Datensatz verschwunden - gelöscht oder
+  // weggefiltert -, schließt sich die Schnellansicht.
+  function refreshRecordInspector(type) {
+    const definition = recordInspectorDefinitions()[type];
+    if (!definition) return;
+    if (inspectedRecords[type] && !definition.find(inspectedRecords[type])) {
+      inspectedRecords[type] = "";
+    }
+    renderRecordInspector(type);
+    highlightInspectedRecord(type);
+  }
+
+  function highlightInspectedRecord(type) {
+    const definition = recordInspectorDefinitions()[type];
+    document.querySelectorAll(`${definition.container} [data-record-card]`).forEach((card) => {
+      card.classList.toggle("is-inspected", card.dataset.recordCard === inspectedRecords[type]);
+    });
+  }
+
+  function renderRecordInspector(type) {
+    const definition = recordInspectorDefinitions()[type];
+    const inspector = document.querySelector(definition.inspector);
+    const content = document.querySelector(definition.content);
+    const record = inspectedRecords[type] ? definition.find(inspectedRecords[type]) : null;
+    if (!inspector || !content) return;
+    if (!record) {
+      inspector.hidden = true;
+      content.innerHTML = "";
+      return;
+    }
+
+    const favorite = workspaceRecordIsFavorite(type, record.id);
+    inspector.hidden = false;
+    content.innerHTML = `
+      <div class="record-inspector-header">
+        <span class="record-inspector-icon"><svg><use href="#${definition.icon}"></use></svg></span>
+        <div>
+          <p class="eyebrow">${escapeHtml(definition.eyebrow)}</p>
+          <h2>${escapeHtml(definition.title(record))}</h2>
+          <small>${escapeHtml(definition.subtitle(record))}</small>
+        </div>
+        <button class="icon-button" type="button" data-inspector-close aria-label="Schnellansicht schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="record-inspector-actions">
+        <button
+          class="button button-secondary"
+          type="button"
+          data-inspector-favorite
+          aria-pressed="${favorite}"
+        >
+          <svg><use href="#icon-star"></use></svg>${favorite ? "Angeheftet" : "Anheften"}
+        </button>
+        ${definition
+          .actions(record)
+          .map(
+            (action, index) => `
+              <button
+                class="button ${action.primary ? "button-primary" : "button-secondary"}"
+                type="button"
+                data-inspector-action="${index}"
+              >
+                ${action.icon ? `<svg><use href="#${action.icon}"></use></svg>` : ""}${escapeHtml(action.label)}
+              </button>
+            `,
+          )
+          .join("")}
+      </div>
+      <dl class="record-inspector-facts">
+        ${definition
+          .facts(record)
+          .map(
+            ([label, value]) =>
+              `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(String(value))}</dd></div>`,
+          )
+          .join("")}
+      </dl>
+      ${definition
+        .sections(record)
+        .map(
+          (section) => `
+            <section class="record-inspector-section">
+              <h3>${escapeHtml(section.title)}</h3>
+              ${
+                section.tags
+                  ? `<div class="qualification-tags">${section.tags
+                      .map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`)
+                      .join("")}</div>`
+                  : `<p class="record-inspector-text">${escapeHtml(section.text)}</p>`
+              }
+            </section>
+          `,
+        )
+        .join("")}
+    `;
+  }
+
+  function handleRecordInspectorAction(type, event) {
+    const definition = recordInspectorDefinitions()[type];
+    const record = inspectedRecords[type] ? definition.find(inspectedRecords[type]) : null;
+    if (!record) return;
+
+    if (event.target.closest("[data-inspector-close]")) {
+      closeRecordInspector(type);
+      return;
+    }
+    if (event.target.closest("[data-inspector-favorite]")) {
+      toggleWorkspaceFavorite(type, record.id);
+      renderRecordInspector(type);
+      return;
+    }
+    const action = event.target.closest("[data-inspector-action]");
+    if (action) definition.actions(record)[Number(action.dataset.inspectorAction)]?.run();
+  }
+
+  // „Im Kalender“ wechselt in die Monatsansicht und blättert zum Monat des
+  // Termins - sonst zeigte der Kalender weiter irgendeinen anderen.
+  function showAppointmentInCalendar(appointment) {
+    const date = parseLocalDate(appointment.date);
+    if (!date) return;
+    setAppointmentViewMode("calendar");
+    setAppointmentCalendarMonth(date.getFullYear(), date.getMonth() + 1);
+  }
+
   // „Was ist neu“ nach einer neuen Fassung.
   //
   // Das Änderungsverzeichnis steckt ohnehin in der Hilfe; dieser Hinweis holt
@@ -5279,17 +5572,17 @@
     const favorite = workspaceRecordIsFavorite("employee", employee.id);
     inspector.hidden = false;
     content.innerHTML = `
-      <div class="employee-inspector-header">
+      <div class="record-inspector-header">
         ${renderAvatar(employee)}
         <div><p class="eyebrow">Schnellansicht</p><h2>${escapeHtml(fullName(employee))}</h2><small>${escapeHtml(employee.profession || "Beruf nicht angegeben")}</small></div>
         <button class="icon-button" type="button" data-inspector-close aria-label="Schnellansicht schließen"><svg><use href="#icon-close"></use></svg></button>
       </div>
-      <div class="employee-inspector-actions">
+      <div class="record-inspector-actions">
         <button class="button button-secondary" type="button" data-inspector-favorite="${employee.id}" aria-pressed="${favorite}"><svg><use href="#icon-star"></use></svg>${favorite ? "Angeheftet" : "Anheften"}</button>
         <button class="button button-secondary" type="button" data-inspector-edit="${employee.id}"><svg><use href="#icon-edit"></use></svg>Bearbeiten</button>
         <button class="button button-primary" type="button" data-inspector-dossier="${employee.id}">Gesamtakte</button>
       </div>
-      <dl class="employee-inspector-facts">
+      <dl class="record-inspector-facts">
         <div><dt>Status</dt><dd>${escapeHtml(employeeStatusLabel(employee))}</dd></div>
         <div><dt>Stellenumfang</dt><dd>${employee.employmentPercent}&thinsp;%</dd></div>
         <div><dt>Dienstwochenende</dt><dd>${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</dd></div>
@@ -5297,7 +5590,7 @@
         <div><dt>Telefon</dt><dd>${escapeHtml(employee.phone || "–")}</dd></div>
         <div><dt>E-Mail</dt><dd>${escapeHtml(employee.email || "–")}</dd></div>
       </dl>
-      <section class="employee-inspector-section"><h3>Qualifikationen</h3><div class="qualification-tags">${qualifications.length ? qualifications.map((item) => `<span class="tag">${escapeHtml(item.label)}</span>`).join("") : '<span class="tag tag-muted">Keine</span>'}</div></section>
+      <section class="record-inspector-section"><h3>Qualifikationen</h3><div class="qualification-tags">${qualifications.length ? qualifications.map((item) => `<span class="tag">${escapeHtml(item.label)}</span>`).join("") : '<span class="tag tag-muted">Keine</span>'}</div></section>
     `;
   }
 
@@ -5429,11 +5722,17 @@
     }
     if (item.type === "appointment") {
       const appointment = state.appointments.find((entry) => entry.id === item.id);
-      return appointment && { group: "Termine", icon: "icon-calendar", label: appointment.title, hint: formatDate(appointment.date), run: () => { showView("appointments"); openAppointmentDialog(appointment.id); } };
+      return appointment && { group: "Termine", icon: "icon-calendar", label: appointment.title, hint: formatDate(appointment.date), run: () => { showView("appointments"); selectRecordInspector("appointment", appointment.id); } };
     }
     if (item.type === "memo") {
       const memo = state.memos.find((entry) => entry.id === item.id);
-      return memo && memoVisibleToCurrentUser(memo) && { group: "Memo / ToDo", icon: "icon-memo", label: memo.title, hint: formatDate(memo.date), run: () => { showView("memos"); openMemoDialog(memo.id); } };
+      return memo && memoVisibleToCurrentUser(memo) && { group: "Memo / ToDo", icon: "icon-memo", label: memo.title, hint: formatDate(memo.date), run: () => { showView("memos"); selectRecordInspector("memo", memo.id); } };
+    }
+    // Geraete kamen mit der Schnellansicht dazu und gehoeren seitdem ebenso in
+    // Verlauf und Favoriten.
+    if (item.type === "device") {
+      const device = getDevice(item.id);
+      return device && { group: "Geräte", icon: "icon-device", label: deviceLabel(device), hint: device.category || "", run: () => { showView("device-management"); selectRecordInspector("device", device.id); } };
     }
     return null;
   }
@@ -6816,7 +7115,7 @@
         hint: `${formatDate(appointment.date)}${appointment.location ? ` · ${appointment.location}` : ""}`,
         run: () => {
           showView("appointments");
-          openAppointmentDialog(appointment.id);
+          selectRecordInspector("appointment", appointment.id);
         },
       })),
       ...state.memos
@@ -6828,7 +7127,7 @@
           hint: memo.category || formatDate(memo.date),
           run: () => {
             showView("memos");
-            openMemoDialog(memo.id);
+            selectRecordInspector("memo", memo.id);
           },
         })),
       ...state.trainings.map((training) => ({
@@ -6858,7 +7157,7 @@
         hint: device.category || "",
         run: () => {
           showView("device-management");
-          openDeviceDialog(device.id);
+          selectRecordInspector("device", device.id);
         },
       })),
     ];
@@ -11172,6 +11471,11 @@
   }
 
   function renderMemos() {
+    renderMemosView();
+    refreshRecordInspector("memo");
+  }
+
+  function renderMemosView() {
     renderMemoCategoryOptions();
     renderViewFilterChips("memos");
     const allVisible = visibleMemos();
@@ -11231,7 +11535,7 @@
       `Erstellt von ${memoCreatorLabel(memo)}`,
     ];
     return `
-      <article class="meeting-card memo-card ${memo.pinned ? "is-pinned" : ""} ${memo.completed ? "is-completed" : ""}" data-memo-card="${memo.id}" tabindex="0" aria-label="${escapeHtml(memo.title)} öffnen">
+      <article class="meeting-card memo-card ${memo.pinned ? "is-pinned" : ""} ${memo.completed ? "is-completed" : ""}" data-memo-card="${memo.id}" data-record-card="${memo.id}" tabindex="0" aria-label="${escapeHtml(memo.title)} öffnen">
         <div class="meeting-card-main">
           <div class="training-title-row">
             <span class="training-icon memo-icon"><svg><use href="#icon-memo"></use></svg></span>
@@ -11294,10 +11598,7 @@
       if (action === "delete-memo") requestDeleteMemo(id);
       return;
     }
-    const card = event.target.closest("[data-memo-card]");
-    if (!card || (event.type === "keydown" && !["Enter", " "].includes(event.key))) return;
-    if (event.type === "keydown") event.preventDefault();
-    openMemoDialog(card.dataset.memoCard);
+    // Die Karte selbst oeffnet die Schnellansicht (siehe 22-record-inspector).
   }
 
   function getMemo(memoId) {
@@ -11490,7 +11791,14 @@
     });
   }
 
+  // Der Aufbau hat mehrere Ausgaenge; die Schnellansicht wird deshalb aussen
+  // aufgefrischt, wenn die Liste in jedem Fall neu steht.
   function renderAppointments() {
+    renderAppointmentsView();
+    refreshRecordInspector("appointment");
+  }
+
+  function renderAppointmentsView() {
     renderViewFilterChips("appointments");
     const today = todayIso();
     const pinnedAppointments = state.appointments
@@ -11927,8 +12235,9 @@
           class="appointment-calendar-entry ${appointment.pinned ? "is-pinned" : ""}"
           type="button"
           data-appointment-card="${appointment.id}"
+          data-record-card="${appointment.id}"
           title="${escapeHtml(`${appointment.title} · ${details.join(" · ")}`)}"
-          aria-label="${escapeHtml(`${appointment.title} bearbeiten. ${details.join(", ")}`)}"
+          aria-label="${escapeHtml(`${appointment.title} öffnen. ${details.join(", ")}`)}"
         >
           <span class="appointment-calendar-entry-icon">
             <svg><use href="#icon-${appointmentCategoryIcon(appointment)}"></use></svg>
@@ -11963,11 +12272,9 @@
       return;
     }
 
-    const entry = event.target.closest("[data-appointment-card]");
-    if (entry) {
-      openAppointmentDialog(entry.dataset.appointmentCard);
-      return;
-    }
+    // Ein Eintrag im Raster oeffnet die Schnellansicht (22-record-inspector),
+    // nicht mehr den Dialog.
+    if (event.target.closest("[data-appointment-card]")) return;
 
     const day = event.target.closest("[data-calendar-day]");
     if (day) openAppointmentDialog(null, { date: day.dataset.calendarDay });
@@ -12032,6 +12339,7 @@
       <article
         class="meeting-card appointment-card ${appointment.pinned ? "is-pinned" : ""} ${daysUntil < 0 ? "is-past" : ""}"
         data-appointment-card="${appointment.id}"
+        data-record-card="${appointment.id}"
         tabindex="0"
         aria-label="Termindetails zu ${escapeHtml(appointment.title)} öffnen"
       >
@@ -12334,6 +12642,7 @@
 
     renderDeviceInstructionMatrix();
     renderDeviceInstructionList();
+    refreshRecordInspector("device");
   }
 
   function filteredDevices({
@@ -12494,9 +12803,12 @@
     ).size;
     const authorizedEmployees = getDeviceAuthorizedEmployees(device.id);
     return `
-      <article class="training-card device-card ${
-        device.currentInventory ? "" : "is-former"
-      }">
+      <article
+        class="training-card device-card ${device.currentInventory ? "" : "is-former"}"
+        data-record-card="${device.id}"
+        tabindex="0"
+        aria-label="Schnellansicht zu ${escapeHtml(deviceLabel(device))} öffnen"
+      >
         <div class="training-card-main">
           <div class="training-title-row">
             <span class="training-icon">
@@ -14635,12 +14947,8 @@
       return;
     }
 
-    const card = event.target.closest("[data-appointment-card]");
-    if (!card || (event.type === "keydown" && !["Enter", " "].includes(event.key))) {
-      return;
-    }
-    if (event.type === "keydown") event.preventDefault();
-    openAppointmentDialog(card.dataset.appointmentCard);
+    // Die Karte selbst oeffnet die Schnellansicht (22-record-inspector); zum
+    // Bearbeiten fuehrt der Stift auf der Karte.
   }
 
   async function toggleAppointmentPinned(appointmentId) {
