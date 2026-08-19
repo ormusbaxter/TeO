@@ -163,6 +163,13 @@ Kurzhinweis. Ein erneuter Klick klappt sie wieder auf. Der Zustand wird im
 Browserprofil gespeichert und gilt beim nächsten Start wieder – er gehört wie
 die Reihenfolge der Navigation nicht zum gemeinsamen Datenbestand.
 
+Auch der Fuß der Seitenleiste schrumpft mit: Angemeldetes Konto, Systemstatus
+und Namenszug stehen dann als drei gleich große Kacheln untereinander – Konto
+mit den Schaltflächen für Benutzerverwaltung und Abmelden, Status als farbiger
+Punkt, darunter das Programmzeichen. Alles, was dabei wegfällt, nennt der
+Kurzhinweis der jeweiligen Kachel: Benutzername und Rolle, Verbindung, Backend,
+Server, Revision und DB-Schema sowie Fassung und Urheberrecht.
+
 ### Suchen und ausführen (Befehlspalette)
 
 **Strg + K** – oder der Knopf **Suchen** über der Navigation – öffnet ein

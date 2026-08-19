@@ -64,3 +64,45 @@ test("Die Seitenleiste laesst sich auf die Symbole einklappen", async () => {
   );
   assert.match(appSource, /updateSidebarCollapsedLabels\(\);/);
 });
+
+test("Der Fuß der Seitenleiste hat eine eigene Minimalansicht", async () => {
+  const [appSource, styles] = await Promise.all([
+    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
+    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
+  ]);
+
+  // Beschriftungen treten ab - die Schaltflächen des Kontos aber nicht, sonst
+  // wären Benutzerverwaltung und Abmelden eingeklappt nicht mehr erreichbar.
+  assert.match(styles, /\.user-session > div:not\(\.user-session-actions\),/);
+  assert.match(styles, /\.sidebar-note > div\s*\n\s*\) \{\s*display: none;/);
+
+  // Konto, Systemstatus und Namenszug stehen als gleich breite Kacheln
+  // untereinander.
+  assert.match(
+    styles,
+    /body\.is-sidebar-collapsed :is\(\.user-session, \.sidebar-system-status, \.sidebar-note\) \{\s*width: 100%;/,
+  );
+  assert.match(
+    styles,
+    /body\.is-sidebar-collapsed :is\(\.sidebar-system-status, \.sidebar-note\) \{\s*min-height: 44px;/,
+  );
+
+  // Was wegfällt, steht als Kurzhinweis am Block - eine Zeile je Angabe.
+  assert.match(appSource, /function updateSidebarFooterSummaries\(/);
+  assert.match(appSource, /`Angemeldet: \$\{name\}`/);
+  assert.match(appSource, /\[\.\.\.status\.querySelectorAll\("dl > div"\)\]/);
+  // Aufgeklappt verschwindet der Hinweis wieder.
+  assert.match(
+    appSource,
+    /function setSidebarSummary\(element, collapsed, summary\) \{[\s\S]*?if \(!collapsed\) \{\s*element\.removeAttribute\("title"\);/,
+  );
+
+  // Der Systemstatus ändert sich auch ohne neuen Aufbau der Ansichten, das
+  // Konto beim An- und Abmelden - beide ziehen den Hinweis nach.
+  // Aufgerufen aus dem Umschalten, aus dem Systemstatus und aus der
+  // Zugriffssteuerung; die Erklärung dahinter ist die Definition selbst.
+  assert.ok(
+    [...appSource.matchAll(/updateSidebarFooterSummaries\(/g)].length >= 4,
+    "Der Hinweis wird an allen Stellen nachgezogen, an denen sich sein Inhalt ändert",
+  );
+});
