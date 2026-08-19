@@ -18337,8 +18337,15 @@
     return `${day}.${month}.${year}`;
   }
 
+  // Schnelleingabe im Datumsfeld: „h“ trägt heute ein, „g“ gestern, „m“
+  // morgen. Ein Datumsfeld nimmt ohnehin nur Ziffern an - Buchstaben waren
+  // dort bisher wirkungslos und stehen deshalb frei zur Verfügung.
+  const DATE_INPUT_SHORTCUTS = Object.freeze({ h: 0, g: -1, m: 1 });
+  const DATE_INPUT_SHORTCUT_HINT = "Tastatur: h = heute, g = gestern, m = morgen";
+
   function initializeFormattedDateInputs() {
     refreshFormattedDateInputs();
+    document.addEventListener("keydown", handleDateInputShortcut, true);
     document.addEventListener("input", handleFormattedDateInput, true);
     document.addEventListener("change", handleFormattedDateInput, true);
     dateInputObserver = new MutationObserver(() => {
@@ -18366,6 +18373,9 @@
         shell.append(display);
         input.classList.add("formatted-date-input");
       }
+      // Ein Kürzel, von dem niemand weiß, gibt es nicht: Der Kurzhinweis des
+      // Feldes nennt es, sofern das Feld nicht schon einen eigenen trägt.
+      if (!input.title) input.title = DATE_INPUT_SHORTCUT_HINT;
       updateFormattedDateInput(input);
     });
   }
@@ -18374,6 +18384,38 @@
     if (event.target?.matches?.('input[type="date"]')) {
       updateFormattedDateInput(event.target);
     }
+  }
+
+  function handleDateInputShortcut(event) {
+    if (event.ctrlKey || event.altKey || event.metaKey || event.defaultPrevented) return;
+    const input = event.target;
+    if (!input?.matches?.('input[type="date"]') || input.readOnly || input.disabled) {
+      return;
+    }
+    const offset = DATE_INPUT_SHORTCUTS[event.key.toLowerCase()];
+    if (offset === undefined) return;
+
+    const value = shiftDaysFromToday(offset);
+    // Ein Feld mit Grenze - etwa ein Nachweis, der nicht in der Zukunft liegen
+    // darf - bleibt unberuehrt, statt einen unzulaessigen Wert zu erhalten.
+    if ((input.min && value < input.min) || (input.max && value > input.max)) return;
+
+    event.preventDefault();
+    input.value = value;
+    // Dieselben Ereignisse wie bei einer Eingabe von Hand: Anzeige, Prüfungen
+    // und die Erkennung ungespeicherter Formulare hängen daran.
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function shiftDaysFromToday(dayOffset) {
+    const date = new Date();
+    date.setDate(date.getDate() + dayOffset);
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-");
   }
 
   function updateFormattedDateInput(input) {

@@ -48,6 +48,18 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
     console,
     crypto: globalThis.crypto,
     Blob: globalThis.Blob || class Blob {},
+    // Die Anwendung loest Ereignisse wie eine Bedienung von Hand aus - etwa
+    // beim Entfernen eines Filter-Chips oder bei der Schnelleingabe im
+    // Datumsfeld. Ohne Browser genuegt dafuer ein Ersatz, der Art und
+    // Blasenverhalten mitfuehrt.
+    Event:
+      globalThis.Event ||
+      class Event {
+        constructor(type, options = {}) {
+          this.type = type;
+          this.bubbles = Boolean(options.bubbles);
+        }
+      },
     atob: globalThis.atob,
     btoa: globalThis.btoa,
     Date,

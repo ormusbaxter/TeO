@@ -152,6 +152,14 @@ Datumswerte werden einheitlich als `TT.MM.JJJJ` dargestellt. Intern speichert
 TeO Datumswerte im ISO-Format, damit Sortierung und Berechnung zuverlässig
 funktionieren.
 
+In jedem Datumsfeld gibt es eine Schnelleingabe: Ist das Feld aktiv, trägt
+**h** das heutige Datum ein, **g** das gestrige und **m** das morgige. Das
+spart bei Einweisungs- und Fortbildungsnachweisen den Griff zur Zahlenreihe.
+Die Tasten stehen auch im Kurzhinweis des Feldes. Felder mit einer Grenze
+bleiben unberührt, wenn das Datum sie verletzen würde – ein Nachweis, der nicht
+in der Zukunft liegen darf, nimmt **m** also nicht an. Ziffern funktionieren
+unverändert.
+
 Uhrzeiten werden im 24-Stunden-Format `HH:MM` angezeigt.
 
 ### Seitenleiste einklappen
