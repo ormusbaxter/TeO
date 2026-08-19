@@ -17,12 +17,29 @@ const packageJson = JSON.parse(
   fs.readFileSync(path.join(projectRoot, "package.json"), "utf8"),
 );
 
-test("Tagname und dreistellige Buildnummer beschreiben dieselbe Fassung", () => {
+test("Tagname und Buildnummer beschreiben dieselbe Fassung", () => {
   assert.equal(normalizeVersion("v4.39.0"), "4.39.0");
   assert.equal(normalizeVersion("4.39.0"), "4.39.0");
+  // Die dreistellige Schreibweise gilt nur noch den alten Abschnitten.
   assert.equal(paddedBuildNumber("4.39.0"), "004.039.000");
   assert.throws(() => normalizeVersion("v4.39"), /Fassungsbezeichnung/);
   assert.throws(() => normalizeVersion(""), /Fassungsbezeichnung/);
+});
+
+test("beide Schreibweisen der Überschrift führen zum Abschnitt", () => {
+  const beispiel = [
+    "### 4.41.0 – Neue Schreibweise",
+    "",
+    "- **Neu:** ein Eintrag",
+    "",
+    "### 004.040.000 – Alte Schreibweise",
+    "",
+    "- **Verbessert:** ein anderer Eintrag",
+    "",
+  ].join("\n");
+
+  assert.equal(changelogSection(beispiel, "4.41.0").title, "Neue Schreibweise");
+  assert.equal(changelogSection(beispiel, "4.40.0").title, "Alte Schreibweise");
 });
 
 test("der Text einer Veröffentlichung stammt aus dem passenden Changelog-Abschnitt", () => {

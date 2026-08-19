@@ -1,15 +1,17 @@
 // Baut Titel und Text einer GitHub-Veroeffentlichung aus CHANGELOG.md.
 //
-// Die Buildnummer steht im Changelog dreistellig (004.039.000), der Tag nennt
-// sie in der ueblichen Schreibweise (v4.39.0). Beide Formen muessen auf
-// dieselbe Fassung zeigen, sonst bricht der Lauf ab: Ein Release mit dem Text
-// einer anderen Fassung waere schlimmer als gar keiner.
+// Changelog, Tag und package.json nennen die Fassung seit 4.41.0 gleich
+// (4.41.0); die aelteren Abschnitte schreiben sie dreistellig (004.039.000).
+// Beide Formen muessen auf dieselbe Fassung zeigen, sonst bricht der Lauf ab:
+// Ein Release mit dem Text einer anderen Fassung waere schlimmer als gar
+// keiner.
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
+// Die dreistellige Schreibweise der Abschnitte bis 004.040.000.
 export function paddedBuildNumber(version) {
   return version
     .split(".")
@@ -28,13 +30,21 @@ export function normalizeVersion(tag) {
 }
 
 // Liefert Titelzusatz und Aufzaehlung des passenden Changelog-Abschnitts.
+// Ueberschriften tragen die Fassung ohne fuehrende Nullen; die Abschnitte bis
+// einschliesslich 004.040.000 schreiben sie dreistellig, deshalb werden beide
+// Schreibweisen gesucht.
 export function changelogSection(changelog, version) {
-  const padded = paddedBuildNumber(version).replaceAll(".", "\\.");
-  const heading = new RegExp(`^### ${padded}(?:\\s+[–-]\\s+(.+))?$`, "m");
+  const schreibweisen = [version, paddedBuildNumber(version)].map((form) =>
+    form.replaceAll(".", "\\."),
+  );
+  const heading = new RegExp(
+    `^### (?:${schreibweisen.join("|")})(?:\\s+[–-]\\s+(.+))?$`,
+    "m",
+  );
   const match = heading.exec(changelog);
   if (!match) {
     throw new Error(
-      `CHANGELOG.md enthält keinen Abschnitt für ${paddedBuildNumber(version)}.`,
+      `CHANGELOG.md enthält keinen Abschnitt für ${version}.`,
     );
   }
   const start = match.index + match[0].length;

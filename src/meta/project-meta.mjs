@@ -15,8 +15,10 @@ export const PROJECT_META = Object.freeze({
   backupFormatVersion: 1,
 });
 
+// Die Fassung wird ohne fuehrende Nullen geschrieben: 4.41.0 statt
+// 004.041.000 - dieselbe Schreibweise wie im Tag und in package.json.
 export function projectBuildNumber(meta = PROJECT_META) {
   return [meta.version.major, meta.version.minor, meta.version.patch]
-    .map((value) => String(value || 0).padStart(3, "0"))
+    .map((value) => String(value || 0))
     .join(".");
 }
