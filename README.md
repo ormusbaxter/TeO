@@ -229,6 +229,13 @@ Nach einer neuen Programmfassung erscheint beim ersten Start ein Hinweis mit den
 Der Hinweis erscheint einmal je Fassung und Arbeitsplatz; bei einer
 Neueinrichtung bleibt er aus.
 
+### Termine im Monatsraster verschieben
+
+Ein Termin lässt sich im Monatsraster mit der Maus auf einen anderen Tag ziehen.
+Der Zieltag hebt sich während des Ziehens ab; beim Loslassen wird das Datum
+geändert und die Meldung bietet **Rückgängig** an. Ein Klick ohne Ziehen öffnet
+weiterhin die Schnellansicht des Termins.
+
 ### Datums- und Zeitangaben
 
 Datumswerte werden einheitlich als `TT.MM.JJJJ` dargestellt. Intern speichert
@@ -712,6 +719,14 @@ falls dabei Abwesenheitsgrenzen überschritten werden.
 
 Die Navigation folgt der sichtbaren Tabelle: Ist ein Namensfilter gesetzt,
 springen die Pfeiltasten nur zwischen den angezeigten Zeilen.
+
+### Mit der Maus über mehrere Tage ziehen
+
+Im Monatsraster lässt sich mit gedrückter Maustaste über mehrere Felder ziehen –
+auch über mehrere Zeilen hinweg. Beim Loslassen erhalten alle überstrichenen
+Felder die in der Leiste gewählte Eintragsart. Das entspricht der
+Bereichsauswahl über **Umschalt + Pfeiltaste** und ist wie jede andere Änderung
+zurücknehmbar. Ein einzelner Klick setzt weiterhin genau ein Feld.
 
 ### Nach Mitarbeitern filtern
 
