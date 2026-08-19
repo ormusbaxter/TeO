@@ -134,6 +134,11 @@ und ist nicht Teil der Datensicherung. Ist ein gemerkter Wert später entfallen
 - **Mehrere Zeilen auswählen** – ein Klick auf ein Auswahlkästchen, dann ein
   Klick mit gedrückter **Umschalttaste** auf ein zweites: Alles dazwischen wird
   mitgewählt beziehungsweise mit abgewählt.
+- **Kein versehentliches Markieren** – in Auswahlkarten und Auswahlspalten
+  (etwa den Teilnehmerlisten beim Dokumentieren von Geräteeinweisungen und
+  Fortbildungsnachweisen) lässt sich der Text nicht mehr markieren; ein
+  verrutschter oder doppelter Klick trifft damit weiter das Kästchen. Der
+  übrige Text der Anwendung bleibt zum Kopieren markierbar.
 - **Feste erste Spalte** – in der Einweisungsmatrix und in der Jahresauswertung
   der Pflichtfortbildungen bleibt die Namensspalte beim seitlichen Blättern
   stehen.

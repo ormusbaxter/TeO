@@ -5785,9 +5785,11 @@
     // change-Ereignis der Auswahlkaestchen kennt keine Zusatztasten. Der Klick
     // kommt zuerst, deshalb liegt die Antwort bereit, wenn change eintrifft.
     elements.employeeTable?.addEventListener("click", (event) => {
-      if (event.target.closest("[data-select-employee]")) {
-        employeeSelectionShiftPressed = event.shiftKey;
-      }
+      if (!event.target.closest("[data-select-employee]")) return;
+      employeeSelectionShiftPressed = event.shiftKey;
+      // Ein Umschalt-Klick markiert im Browser sonst alles zwischen den beiden
+      // Kästchen - gemeint war die Zeilenauswahl, nicht der Text.
+      if (event.shiftKey) window.getSelection()?.removeAllRanges();
     });
   }
 

@@ -4775,6 +4775,17 @@ legend {
   overflow-y: auto;
 }
 
+/* Auswahlkarten und Auswahlkästchen sind zum Anklicken da, nicht zum Lesen:
+   Ohne diese Sperre markiert schon ein leicht verrutschter Klick den Namen des
+   Mitarbeiters, und der nächste Klick trifft die Markierung statt das
+   Kästchen. Der Fließtext der Anwendung bleibt unberührt markierbar. */
+.selection-card,
+.checkbox-field,
+.data-table .selection-column {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .selection-card {
   display: flex;
   min-width: 0;
