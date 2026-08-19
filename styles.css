@@ -238,6 +238,8 @@ body.is-sidebar-collapsed .sidebar {
 body.is-sidebar-collapsed :is(
     .brand-text,
     .nav-item span,
+    .sidebar-search span,
+    .sidebar-search kbd,
     .nav-order-hint,
     .nav-order-reset span,
     .settings-sidebar-subnav,
@@ -262,7 +264,7 @@ body.is-sidebar-collapsed :is(.nav-item, .nav-order-reset) {
 
 body.is-sidebar-collapsed .main-nav {
   width: 100%;
-  margin-top: 28px;
+  margin-top: 22px;
 }
 
 body.is-sidebar-collapsed .user-session {
@@ -373,7 +375,8 @@ body.is-sidebar-collapsed .sidebar-toggle svg {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 48px;
+  /* Der Abstand zum Namenszug kommt jetzt vom Sucheinstieg darueber. */
+  margin-top: 22px;
 }
 
 /* Sortierhinweis und Zuruecksetzen stehen unmittelbar ueber den
@@ -4903,6 +4906,190 @@ legend {
   pointer-events: auto;
 }
 
+/* Der Einstieg in die Befehlspalette sitzt zwischen Namenszug und Menü und
+   sieht aus wie das Suchfeld, das er öffnet. Eingeklappt bleibt das Symbol. */
+.sidebar-search {
+  display: grid;
+  width: 100%;
+  margin: 22px 0 0;
+  padding: 9px 11px;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  color: #a9bccd;
+  font: inherit;
+  font-size: 0.74rem;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 6%);
+  transition:
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.sidebar-search:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 12%);
+}
+
+.sidebar-search svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sidebar-search kbd {
+  padding: 2px 6px;
+  color: #9fb2c4;
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 5px;
+}
+
+body.is-sidebar-collapsed .sidebar-search {
+  grid-template-columns: 18px;
+  justify-content: center;
+  padding: 9px 0;
+}
+
+/* Die Befehlspalette steht als schmales Feld im oberen Drittel - dort, wo der
+   Blick beim Tippen ohnehin liegt, und nicht mittig über der Arbeit. */
+.command-palette {
+  width: min(620px, calc(100vw - 32px));
+  max-height: min(560px, calc(100vh - 120px));
+  margin: 12vh auto auto;
+  padding: 0;
+  overflow: hidden;
+  color: var(--slate-800);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+
+.command-palette::backdrop {
+  background: rgb(9 23 38 / 60%);
+  backdrop-filter: blur(3px);
+  animation: backdrop-in 160ms ease both;
+}
+
+.command-palette-field {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.command-palette-field svg {
+  width: 18px;
+  height: 18px;
+  color: var(--slate-400);
+}
+
+.command-palette-field input {
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  border: 0;
+  background: transparent;
+}
+
+.command-palette-field input:focus {
+  outline: none;
+}
+
+.command-palette-results {
+  max-height: 380px;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.command-palette-group {
+  margin: 10px 8px 4px;
+  color: var(--slate-500);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.command-palette-group:first-child {
+  margin-top: 2px;
+}
+
+.command-palette-option {
+  display: grid;
+  width: 100%;
+  padding: 9px 10px;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+}
+
+.command-palette-option svg {
+  width: 17px;
+  height: 17px;
+  color: var(--slate-500);
+}
+
+.command-palette-option.is-active {
+  color: var(--blue-700);
+  background: var(--blue-50);
+}
+
+.command-palette-option.is-active svg {
+  color: var(--blue-600);
+}
+
+.command-palette-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-palette-hint {
+  color: var(--slate-500);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.command-palette-footer {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 10px 16px;
+  color: var(--slate-500);
+  font-size: 0.68rem;
+  border-top: 1px solid var(--slate-100);
+  background: var(--slate-50);
+}
+
+.command-palette-footer kbd {
+  margin-right: 3px;
+  padding: 1px 5px;
+  font: inherit;
+  font-size: 0.64rem;
+  font-weight: 800;
+  border: 1px solid var(--slate-300);
+  border-radius: 4px;
+  background: var(--white);
+}
+
 /* Die Kuerzeluebersicht: zwei Spalten, solange der Platz reicht. Die Tasten
    stehen links in gleicher Breite, damit die Beschreibungen eine Kante
    bilden. */
@@ -8887,6 +9074,63 @@ html[data-theme="windows-95"] :is(
 
 html[data-theme="windows-95"] .settings-sidebar-subnav {
   border-left-color: #808080;
+}
+
+/* Sucheinstieg und Einklapp-Knopf sitzen hier auf hellem Grau statt auf
+   dunklem Blau: Die hellen Auflagen der Grundfassung waeren darauf nicht zu
+   sehen. Beide werden zu erhabenen Schaltflaechen im Stil der Zeit. */
+html[data-theme="windows-95"] :is(.sidebar-search, .sidebar-toggle) {
+  color: #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #808080,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #000000;
+  border: 0;
+  transition: none;
+}
+
+html[data-theme="windows-95"] :is(.sidebar-search:hover, .sidebar-toggle:hover) {
+  color: #000000;
+  background: #c8c4bc;
+}
+
+html[data-theme="windows-95"] :is(.sidebar-search:active, .sidebar-toggle:active) {
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
+html[data-theme="windows-95"] .sidebar-search kbd {
+  color: #404040;
+  border-color: #808080;
+}
+
+/* Die Befehlspalette ist ein Fenster: grauer Rahmen, weisses Eingabefeld. */
+html[data-theme="windows-95"] .command-palette {
+  border: 2px solid #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #808080,
+    4px 4px 0 rgb(0 0 0 / 26%);
+}
+
+html[data-theme="windows-95"] :is(.command-palette-field, .command-palette-footer) {
+  border-color: #808080;
+  background: #d4d0c8;
+}
+
+html[data-theme="windows-95"] .command-palette-option.is-active {
+  color: #ffffff;
+  background: #000080;
+}
+
+html[data-theme="windows-95"] .command-palette-option.is-active :is(svg, .command-palette-hint) {
+  color: #ffffff;
 }
 
 html[data-theme="windows-95"] :is(.nav-count, .nav-item.is-active .nav-count) {

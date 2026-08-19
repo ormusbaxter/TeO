@@ -870,6 +870,63 @@ html[data-theme="windows-95"] .settings-sidebar-subnav {
   border-left-color: #808080;
 }
 
+/* Sucheinstieg und Einklapp-Knopf sitzen hier auf hellem Grau statt auf
+   dunklem Blau: Die hellen Auflagen der Grundfassung waeren darauf nicht zu
+   sehen. Beide werden zu erhabenen Schaltflaechen im Stil der Zeit. */
+html[data-theme="windows-95"] :is(.sidebar-search, .sidebar-toggle) {
+  color: #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #808080,
+    inset 2px 2px #dfdfdf,
+    inset -2px -2px #000000;
+  border: 0;
+  transition: none;
+}
+
+html[data-theme="windows-95"] :is(.sidebar-search:hover, .sidebar-toggle:hover) {
+  color: #000000;
+  background: #c8c4bc;
+}
+
+html[data-theme="windows-95"] :is(.sidebar-search:active, .sidebar-toggle:active) {
+  box-shadow:
+    inset 1px 1px #808080,
+    inset -1px -1px #ffffff,
+    inset 2px 2px #000000,
+    inset -2px -2px #dfdfdf;
+}
+
+html[data-theme="windows-95"] .sidebar-search kbd {
+  color: #404040;
+  border-color: #808080;
+}
+
+/* Die Befehlspalette ist ein Fenster: grauer Rahmen, weisses Eingabefeld. */
+html[data-theme="windows-95"] .command-palette {
+  border: 2px solid #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #808080,
+    4px 4px 0 rgb(0 0 0 / 26%);
+}
+
+html[data-theme="windows-95"] :is(.command-palette-field, .command-palette-footer) {
+  border-color: #808080;
+  background: #d4d0c8;
+}
+
+html[data-theme="windows-95"] .command-palette-option.is-active {
+  color: #ffffff;
+  background: #000080;
+}
+
+html[data-theme="windows-95"] .command-palette-option.is-active :is(svg, .command-palette-hint) {
+  color: #ffffff;
+}
+
 html[data-theme="windows-95"] :is(.nav-count, .nav-item.is-active .nav-count) {
   color: #000000;
   background: #d4d0c8;

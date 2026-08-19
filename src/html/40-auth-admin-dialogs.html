@@ -515,6 +515,38 @@
       </div>
     </dialog>
 
+    <dialog class="command-palette" id="commandPalette" aria-labelledby="commandPaletteTitle">
+      <h2 class="sr-only" id="commandPaletteTitle">Suchen und ausführen</h2>
+      <div class="command-palette-field">
+        <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+        <input
+          id="commandPaletteInput"
+          type="text"
+          role="combobox"
+          aria-expanded="true"
+          aria-controls="commandPaletteResults"
+          aria-autocomplete="list"
+          placeholder="Ansicht, Eintrag oder Aktion suchen …"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="icon-button" type="button" data-close-dialog aria-label="Schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div
+        class="command-palette-results"
+        id="commandPaletteResults"
+        role="listbox"
+        aria-label="Treffer"
+      ></div>
+      <p class="command-palette-footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> wählen</span>
+        <span><kbd>Enter</kbd> öffnen</span>
+        <span><kbd>Esc</kbd> schließen</span>
+      </p>
+    </dialog>
+
     <dialog class="modal" id="shortcutsDialog" aria-labelledby="shortcutsDialogTitle">
       <div class="modal-header">
         <div>
@@ -533,6 +565,10 @@
           <section class="shortcut-group">
             <h3>Arbeiten</h3>
             <dl class="shortcut-list">
+              <div>
+                <dt><kbd>Strg</kbd> + <kbd>K</kbd></dt>
+                <dd>Suchen und ausführen: Ansicht, Eintrag oder Aktion</dd>
+              </div>
               <div>
                 <dt><kbd>?</kbd></dt>
                 <dd>Diese Übersicht öffnen</dd>

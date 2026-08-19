@@ -206,6 +206,17 @@
           </button>
         </div>
 
+        <button
+          class="sidebar-search"
+          id="openCommandPaletteButton"
+          type="button"
+          title="Suchen und ausführen (Strg + K)"
+        >
+          <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+          <span>Suchen</span>
+          <kbd>Strg K</kbd>
+        </button>
+
         <nav class="main-nav" id="mainNav">
           <button class="nav-item is-active" type="button" data-view="dashboard">
             <svg><use href="#icon-dashboard"></use></svg>
@@ -2068,9 +2079,14 @@
 <p>Uhrzeiten werden im 24-Stunden-Format <code>HH:MM</code> angezeigt.</p>
 <h3 id="hilfe-seitenleiste-einklappen">Seitenleiste einklappen</h3>
 <p>Der Winkel neben dem Namenszug klappt die Seitenleiste nach links ein. Im eingeklappten Zustand bleibt eine schmale Spur mit den Symbolen der Menüpunkte; wer mit der Maus darauf zeigt, sieht Bezeichnung und Zähler als Kurzhinweis. Ein erneuter Klick klappt sie wieder auf. Der Zustand wird im Browserprofil gespeichert und gilt beim nächsten Start wieder – er gehört wie die Reihenfolge der Navigation nicht zum gemeinsamen Datenbestand.</p>
+<h3 id="hilfe-suchen-und-ausfuhren-befehlspalette">Suchen und ausführen (Befehlspalette)</h3>
+<p><strong>Strg + K</strong> – oder der Knopf <strong>Suchen</strong> über der Navigation – öffnet ein einzelnes Feld für alles. Während der Eingabe zeigt es, gruppiert und untereinander:</p>
+<ul><li><strong>Ansichten</strong> – jeder Bereich der Anwendung, mit seinem Tastenkürzel dahinter</li><li><strong>Aktionen</strong> – Anlegen eines Mitarbeiters, Termins, Memos, einer Fortbildung, eines Nachweises, einer Teamsitzung, einer Geräteeinweisung oder eines Geräts; dazu Sicherung exportieren, Datenqualität prüfen, Berufe und Qualifikationen, Tastenkürzel und Abmelden. Administratoren finden hier außerdem Änderungsprotokoll und Benutzerverwaltung</li><li><strong>Datensätze</strong> – Mitarbeiter, Termine, Memos, Pflichtfortbildungen, Teamsitzungen und Geräte, sobald etwas eingegeben wurde</li></ul>
+<p><strong>Pfeil hoch</strong> und <strong>Pfeil runter</strong> wählen, <strong>Enter</strong> öffnet, <strong>Esc</strong> schließt. Ein gewählter Datensatz wechselt in seine Ansicht und öffnet ihn dort unmittelbar zum Bearbeiten – ein Mitarbeiter seine Gesamtakte.</p>
+<p>Gesucht wird so nachsichtig wie überall in TeO: Umlaute dürfen fehlen oder ausgeschrieben sein, „ß“ und „ss“ finden einander. Treffer am Wortanfang stehen vor Treffern in der Mitte. Je Gruppe erscheinen die fünf besten Treffer; die Palette zeigt außerdem nur, was das angemeldete Konto ohnehin sehen darf.</p>
 <h3 id="hilfe-tastenkurzel">Tastenkürzel</h3>
 <p>Am Schreibtisch lässt sich TeO weitgehend über die Tastatur bedienen. Die Kürzel gelten überall, solange kein Eingabefeld und kein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.</p>
-<p>| Taste | Wirkung | | --- | --- | | <strong>?</strong> | Übersicht aller Tastenkürzel öffnen | | <strong>/</strong> | Suchfeld der gezeigten Ansicht anspringen | | <strong>n</strong> | Neuen Eintrag der gezeigten Ansicht anlegen | | <strong>Strg + Z</strong> | Letzte Löschung oder Massenänderung zurücknehmen | | <strong>Esc</strong> | Dialog schließen, Vollbild verlassen |</p>
+<p>| Taste | Wirkung | | --- | --- | | <strong>Strg + K</strong> | Suchen und ausführen: Ansicht, Eintrag oder Aktion | | <strong>?</strong> | Übersicht aller Tastenkürzel öffnen | | <strong>/</strong> | Suchfeld der gezeigten Ansicht anspringen | | <strong>n</strong> | Neuen Eintrag der gezeigten Ansicht anlegen | | <strong>Strg + Z</strong> | Letzte Löschung oder Massenänderung zurücknehmen | | <strong>Esc</strong> | Dialog schließen, Vollbild verlassen |</p>
 <p>Die Ansicht wechselt mit <strong>g</strong> gefolgt vom Buchstaben des Bereichs: <strong>u</strong> Übersicht, <strong>m</strong> Mitarbeiter, <strong>w</strong> Wochenendverteilung, <strong>p</strong> Urlaubsplanung, <strong>t</strong> Terminkalender, <strong>o</strong> Memo / ToDo, <strong>f</strong> Pflichtfortbildungen, <strong>s</strong> Teamsitzungen, <strong>g</strong> Geräteeinweisungen, <strong>v</strong> Geräteverwaltung, <strong>e</strong> Einstellungen, <strong>h</strong> Hilfe. Nach dem <strong>g</strong> bleibt eineinhalb Sekunden Zeit für den zweiten Anschlag. Dieselbe Übersicht öffnet die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe.</p>
 <h3 id="hilfe-loschungen-zurucknehmen">Löschungen zurücknehmen</h3>
 <p>Nach dem Löschen eines Datensatzes und nach einer Sammelbearbeitung bietet die Meldung unten rechts <strong>Rückgängig</strong> an; dasselbe leistet <strong>Strg + Z</strong>. Damit kehrt der Datenbestand in den Zustand unmittelbar vor dieser Änderung zurück.</p>
@@ -2405,7 +2421,7 @@
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
 <h3 id="hilfe-4-42-0-tastatur-und-ruckgangig">4.42.0 – Tastatur und Rückgängig</h3>
-<ul><li><strong>Neu:</strong> TeO lässt sich über die Tastatur bedienen: <strong>?</strong> zeigt alle Kürzel, <strong>/</strong> springt in das Suchfeld der gezeigten Ansicht, <strong>n</strong> legt dort einen neuen Eintrag an, <strong>g</strong> gefolgt von einem Buchstaben wechselt die Ansicht (etwa <strong>g m</strong> zu den Mitarbeitern). Die Kürzel ruhen, solange ein Eingabefeld oder ein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung. Die Übersicht öffnet auch die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe</li><li><strong>Neu:</strong> Gelöschte Datensätze und Sammelbearbeitungen lassen sich zurücknehmen – über <strong>Rückgängig</strong> in der Meldung unten rechts oder mit <strong>Strg + Z</strong>. Zurück geht es einen Schritt, und zwar den zuletzt gemeldeten; das Zurücknehmen selbst steht mit im Änderungsprotokoll, sodass Löschung und Rücknahme beide nachvollziehbar bleiben. Angeboten wird es beim Löschen von Mitarbeitern, Terminen, Memos, Fortbildungen, Nachweisen, Teamsitzungen, Geräten, Einweisungsnachweisen und Katalogeinträgen sowie nach einer Sammelbearbeitung</li></ul>
+<ul><li><strong>Neu:</strong> <strong>Strg + K</strong> öffnet eine Befehlspalette – ein Feld für alles: Sie findet Ansichten, Aktionen und Datensätze (Mitarbeiter, Termine, Memos, Fortbildungen, Teamsitzungen, Geräte) und führt beim Bestätigen aus, was gewählt wurde. Ein Datensatz wechselt dabei in seine Ansicht und öffnet sich dort zum Bearbeiten. Gesucht wird so nachsichtig wie überall, Treffer am Wortanfang stehen vorn, und gezeigt wird nur, was das angemeldete Konto sehen darf. Der Einstieg steht als Knopf <strong>Suchen</strong> über der Navigation</li><li><strong>Neu:</strong> TeO lässt sich über die Tastatur bedienen: <strong>?</strong> zeigt alle Kürzel, <strong>/</strong> springt in das Suchfeld der gezeigten Ansicht, <strong>n</strong> legt dort einen neuen Eintrag an, <strong>g</strong> gefolgt von einem Buchstaben wechselt die Ansicht (etwa <strong>g m</strong> zu den Mitarbeitern). Die Kürzel ruhen, solange ein Eingabefeld oder ein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung. Die Übersicht öffnet auch die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe</li><li><strong>Neu:</strong> Gelöschte Datensätze und Sammelbearbeitungen lassen sich zurücknehmen – über <strong>Rückgängig</strong> in der Meldung unten rechts oder mit <strong>Strg + Z</strong>. Zurück geht es einen Schritt, und zwar den zuletzt gemeldeten; das Zurücknehmen selbst steht mit im Änderungsprotokoll, sodass Löschung und Rücknahme beide nachvollziehbar bleiben. Angeboten wird es beim Löschen von Mitarbeitern, Terminen, Memos, Fortbildungen, Nachweisen, Teamsitzungen, Geräten, Einweisungsnachweisen und Katalogeinträgen sowie nach einer Sammelbearbeitung</li></ul>
 <h3 id="hilfe-4-41-0-nachsichtige-suche">4.41.0 – Nachsichtige Suche</h3>
 <ul><li><strong>Neu:</strong> Die Seitenleiste lässt sich über den Winkel neben dem Namenszug nach links einklappen; eingeklappt bleibt eine schmale Spur mit den Symbolen der Menüpunkte, deren Beschriftung beim Zeigen als Kurzhinweis samt Zähler erscheint. Der Zustand bleibt im Browser gespeichert</li><li><strong>Neu:</strong> Alle Suchfelder der Anwendung sehen über die Schreibweise hinweg: Umlaute lassen sich ohne Punkte oder als „ae“, „oe“ und „ue“ eingeben, „ß“, „ss“ und „s“ finden einander, Akzente werden ignoriert. „Müller“ findet man mit „muller“ oder „mueller“, „Weiß“ mit „weiss“ oder „weis“ – in Mitarbeitern, Terminen, Memos, Geräten, Teilnahmelisten und der Hilfe</li><li><strong>Verbessert:</strong> Die Fassung wird ohne führende Nullen geschrieben – „4.41.0“ statt „004.041.000“, in der Anwendung, im Änderungsverzeichnis und im Namen des Offline-Zwischenspeichers. Ältere Abschnitte dieses Verzeichnisses behalten ihre Schreibweise und bleiben auffindbar</li><li><strong>Behoben:</strong> Im Monatsraster des Terminkalenders sah eine Suche wirkungslos aus, sobald der gesuchte Termin in einem anderen Monat lag: Das Raster zeigt nur den gewählten Monat, ein Treffer im Dezember blieb im August also unsichtbar. Die Zeile unter dem Raster nennt jetzt die Zahl der Treffer im gezeigten Monat, weist auf Treffer in anderen Monaten hin und führt auf Klick zum nächstgelegenen</li><li><strong>Behoben:</strong> Angepinnte Termine blieben auch bei einer Suche stehen und sahen dort wie Treffer aus – in der Liste wie im Monatsraster. Ein Suchbegriff gilt jetzt auch für sie; vom Zeitraumfilter bleiben sie wie bisher ausgenommen</li></ul>
 <h3 id="hilfe-004-040-000-eigene-symbole-klebende-kopfzeile-und-schnellere-ansichten">004.040.000 – Eigene Symbole, klebende Kopfzeile und schnellere Ansichten</h3>
@@ -3158,6 +3174,38 @@ npm run verify</code></pre>
       </div>
     </dialog>
 
+    <dialog class="command-palette" id="commandPalette" aria-labelledby="commandPaletteTitle">
+      <h2 class="sr-only" id="commandPaletteTitle">Suchen und ausführen</h2>
+      <div class="command-palette-field">
+        <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+        <input
+          id="commandPaletteInput"
+          type="text"
+          role="combobox"
+          aria-expanded="true"
+          aria-controls="commandPaletteResults"
+          aria-autocomplete="list"
+          placeholder="Ansicht, Eintrag oder Aktion suchen …"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="icon-button" type="button" data-close-dialog aria-label="Schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div
+        class="command-palette-results"
+        id="commandPaletteResults"
+        role="listbox"
+        aria-label="Treffer"
+      ></div>
+      <p class="command-palette-footer">
+        <span><kbd>↑</kbd><kbd>↓</kbd> wählen</span>
+        <span><kbd>Enter</kbd> öffnen</span>
+        <span><kbd>Esc</kbd> schließen</span>
+      </p>
+    </dialog>
+
     <dialog class="modal" id="shortcutsDialog" aria-labelledby="shortcutsDialogTitle">
       <div class="modal-header">
         <div>
@@ -3176,6 +3224,10 @@ npm run verify</code></pre>
           <section class="shortcut-group">
             <h3>Arbeiten</h3>
             <dl class="shortcut-list">
+              <div>
+                <dt><kbd>Strg</kbd> + <kbd>K</kbd></dt>
+                <dd>Suchen und ausführen: Ansicht, Eintrag oder Aktion</dd>
+              </div>
               <div>
                 <dt><kbd>?</kbd></dt>
                 <dd>Diese Übersicht öffnen</dd>
