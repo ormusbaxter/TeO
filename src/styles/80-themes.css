@@ -903,6 +903,16 @@ html[data-theme="windows-95"] .sidebar-search kbd {
   border-color: #808080;
 }
 
+/* Auch die Schnellansicht ist ein Fenster - erhaben statt beschattet. */
+html[data-theme="windows-95"] .record-inspector {
+  border: 2px solid #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #808080,
+    4px 4px 0 rgb(0 0 0 / 26%);
+}
+
 /* Die Befehlspalette ist ein Fenster: grauer Rahmen, weisses Eingabefeld. */
 html[data-theme="windows-95"] .command-palette {
   border: 2px solid #000000;

@@ -155,3 +155,34 @@ test("Verlauf, Favoriten und Palette führen in dieselbe Schnellansicht", async 
     /if \(inspectedRecords\[type\] && !definition\.find\(inspectedRecords\[type\]\)\) \{\s*inspectedRecords\[type\] = "";/,
   );
 });
+
+test("Die Schnellansicht hebt sich in jedem Thema von der Fläche darunter ab", async () => {
+  const styles = await fs.readFile(path.join(projectRoot, "styles.css"), "utf8");
+
+  // Rahmen, Rundung und Schatten - in mehreren Themes ist „weiß“ derselbe Wert
+  // wie die Karte daneben, dann tragen sie die Abgrenzung allein.
+  assert.match(
+    styles,
+    /\.record-inspector \{[^}]*border: 1px solid var\(--slate-200\);[^}]*border-radius: var\(--radius-lg\);/s,
+  );
+  assert.match(styles, /\.record-inspector \{[^}]*box-shadow: var\(--shadow-md\);/s);
+
+  // Die Tönung entsteht aus den Farbmarken des Themes; ohne color-mix bleibt
+  // die gewöhnliche Fläche stehen - deshalb zwei Deklarationen.
+  assert.match(
+    styles,
+    /\.record-inspector \{[^}]*background: var\(--white\);\s*background: color-mix\(in srgb, var\(--white\) 86%, var\(--slate-200\)\);/s,
+  );
+
+  // Abstand zur Liste, damit Rahmen und Schatten wirken können.
+  assert.match(
+    styles,
+    /\.record-workspace:has\(\.record-inspector:not\(\[hidden\]\)\) \{[^}]*gap: 16px;/s,
+  );
+
+  // Windows 95 kennt keine Schatten - dort ist sie ein erhabenes Fenster.
+  assert.match(
+    styles,
+    /html\[data-theme="windows-95"\] \.record-inspector \{[^}]*border: 2px solid #000000;/s,
+  );
+});

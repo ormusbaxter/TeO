@@ -9330,6 +9330,16 @@ html[data-theme="windows-95"] .sidebar-search kbd {
   border-color: #808080;
 }
 
+/* Auch die Schnellansicht ist ein Fenster - erhaben statt beschattet. */
+html[data-theme="windows-95"] .record-inspector {
+  border: 2px solid #000000;
+  background: #d4d0c8;
+  box-shadow:
+    inset 1px 1px #ffffff,
+    inset -1px -1px #808080,
+    4px 4px 0 rgb(0 0 0 / 26%);
+}
+
 /* Die Befehlspalette ist ein Fenster: grauer Rahmen, weisses Eingabefeld. */
 html[data-theme="windows-95"] .command-palette {
   border: 2px solid #000000;
@@ -11189,6 +11199,7 @@ body.is-vacation-planner-maximized {
 
 .record-workspace:has(.record-inspector:not([hidden])) {
   grid-template-columns: minmax(650px, 1fr) minmax(310px, 25vw);
+  gap: 16px;
 }
 
 .record-workspace > :first-child {
@@ -11233,14 +11244,23 @@ body.is-vacation-planner-maximized {
   white-space: pre-line;
 }
 
+/* Die Schnellansicht liegt neben Karten und Tabellen, die dieselbe Flaeche
+   benutzen - in mehreren Themes ist „weiss“ sogar derselbe Wert wie die Flaeche
+   daneben. Sie hebt sich deshalb dreifach ab: umlaufender Rahmen, Schatten und
+   eine leicht getoente Flaeche. Die Toenung entsteht aus den Farbmarken des
+   jeweiligen Themes, gilt also fuer helle wie dunkle gleichermassen; kennt ein
+   Browser color-mix nicht, bleibt es bei der gewoehnlichen Flaeche. */
 .record-inspector {
   position: sticky;
   top: 84px;
   align-self: start;
   max-height: calc(100vh - 105px);
   overflow: auto;
-  border-left: 1px solid var(--slate-200);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
   background: var(--white);
+  background: color-mix(in srgb, var(--white) 86%, var(--slate-200));
+  box-shadow: var(--shadow-md);
 }
 
 .record-inspector > div {
