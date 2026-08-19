@@ -1,7 +1,9 @@
   function renderAppointments() {
     const today = todayIso();
     const pinnedAppointments = state.appointments
-      .filter((appointment) => appointment.pinned)
+      .filter(
+        (appointment) => appointment.pinned && appointmentMatchesSearch(appointment),
+      )
       .sort(sortAppointments);
     const matchingAppointments = state.appointments.filter(
       (appointment) =>
@@ -96,13 +98,20 @@
     `;
   }
 
-  // Angepinnte Termine bleiben bewusst an jedem Filter vorbei sichtbar; sie
-  // sind als wichtig markiert und sollen nicht durch einen Zeitraumfilter
-  // verschwinden. Fuer alle uebrigen entscheiden Zeitraum und Suchbegriff.
-  function appointmentMatchesFilters(appointment, today) {
+  // Angepinnte Termine bleiben bewusst am Zeitraumfilter vorbei sichtbar; sie
+  // sind als wichtig markiert und sollen nicht verschwinden, weil gerade nur
+  // anstehende Termine gezeigt werden. Ein Suchbegriff ist etwas anderes: Wer
+  // sucht, will genau die passenden Termine sehen - ein angepinnter Termin,
+  // der stehen bleibt, sieht aus wie ein Treffer und laesst die Suche
+  // wirkungslos erscheinen.
+  function appointmentMatchesPeriod(appointment, today) {
     if (appointmentPeriodFilter === "upcoming" && appointment.date < today) return false;
     if (appointmentPeriodFilter === "today" && appointment.date !== today) return false;
     if (appointmentPeriodFilter === "past" && appointment.date >= today) return false;
+    return true;
+  }
+
+  function appointmentMatchesSearch(appointment) {
     if (!appointmentSearchTerm) return true;
 
     return [
@@ -115,6 +124,19 @@
       .join(" ")
       .toLocaleLowerCase("de-DE")
       .includes(appointmentSearchTerm);
+  }
+
+  function appointmentMatchesFilters(appointment, today) {
+    return (
+      appointmentMatchesPeriod(appointment, today) &&
+      appointmentMatchesSearch(appointment)
+    );
+  }
+
+  function appointmentIsVisible(appointment, today) {
+    return appointment.pinned
+      ? appointmentMatchesSearch(appointment)
+      : appointmentMatchesFilters(appointment, today);
   }
 
   function renderAppointmentViewControls() {
@@ -216,10 +238,7 @@
     ]);
     const appointmentsByDate = new Map();
     state.appointments
-      .filter(
-        (appointment) =>
-          appointment.pinned || appointmentMatchesFilters(appointment, today),
-      )
+      .filter((appointment) => appointmentIsVisible(appointment, today))
       .sort(sortAppointments)
       .forEach((appointment) => {
         const entries = appointmentsByDate.get(appointment.date) || [];
@@ -276,7 +295,7 @@
 
   function appointmentSearchMatches(today) {
     return state.appointments
-      .filter((appointment) => appointmentMatchesFilters(appointment, today))
+      .filter((appointment) => appointmentIsVisible(appointment, today))
       .sort(sortAppointments);
   }
 
