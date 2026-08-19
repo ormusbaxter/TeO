@@ -121,6 +121,30 @@ Kurzhinweis. Ein erneuter Klick klappt sie wieder auf. Der Zustand wird im
 Browserprofil gespeichert und gilt beim nächsten Start wieder – er gehört wie
 die Reihenfolge der Navigation nicht zum gemeinsamen Datenbestand.
 
+### Suchen und ausführen (Befehlspalette)
+
+**Strg + K** – oder der Knopf **Suchen** über der Navigation – öffnet ein
+einzelnes Feld für alles. Während der Eingabe zeigt es, gruppiert und
+untereinander:
+
+- **Ansichten** – jeder Bereich der Anwendung, mit seinem Tastenkürzel dahinter
+- **Aktionen** – Anlegen eines Mitarbeiters, Termins, Memos, einer Fortbildung,
+  eines Nachweises, einer Teamsitzung, einer Geräteeinweisung oder eines
+  Geräts; dazu Sicherung exportieren, Datenqualität prüfen, Berufe und
+  Qualifikationen, Tastenkürzel und Abmelden. Administratoren finden hier
+  außerdem Änderungsprotokoll und Benutzerverwaltung
+- **Datensätze** – Mitarbeiter, Termine, Memos, Pflichtfortbildungen,
+  Teamsitzungen und Geräte, sobald etwas eingegeben wurde
+
+**Pfeil hoch** und **Pfeil runter** wählen, **Enter** öffnet, **Esc** schließt.
+Ein gewählter Datensatz wechselt in seine Ansicht und öffnet ihn dort
+unmittelbar zum Bearbeiten – ein Mitarbeiter seine Gesamtakte.
+
+Gesucht wird so nachsichtig wie überall in TeO: Umlaute dürfen fehlen oder
+ausgeschrieben sein, „ß“ und „ss“ finden einander. Treffer am Wortanfang stehen
+vor Treffern in der Mitte. Je Gruppe erscheinen die fünf besten Treffer; die
+Palette zeigt außerdem nur, was das angemeldete Konto ohnehin sehen darf.
+
 ### Tastenkürzel
 
 Am Schreibtisch lässt sich TeO weitgehend über die Tastatur bedienen. Die
@@ -129,6 +153,7 @@ im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.
 
 | Taste | Wirkung |
 | --- | --- |
+| **Strg + K** | Suchen und ausführen: Ansicht, Eintrag oder Aktion |
 | **?** | Übersicht aller Tastenkürzel öffnen |
 | **/** | Suchfeld der gezeigten Ansicht anspringen |
 | **n** | Neuen Eintrag der gezeigten Ansicht anlegen |

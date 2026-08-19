@@ -66,6 +66,14 @@
     if (!shortcutsAvailable(event)) return;
     const targetOwnsKeys = keysBelongToTarget(event.target);
 
+    // Strg+K oeffnet die Befehlspalette - auch aus einem Eingabefeld heraus,
+    // denn sie ist selbst ein Eingabefeld und ersetzt keins.
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      openCommandPalette();
+      return;
+    }
+
     // Strg+Z nur ausserhalb von Eingaben: Dort gehoert das Zuruecknehmen dem
     // Browser und seinem Eingabeverlauf, nicht dem Datenbestand.
     if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.key.toLowerCase() === "z") {
