@@ -2388,7 +2388,7 @@
 
   function projectBuildNumber() {
     return [PROJECT_VERSION.major, PROJECT_VERSION.minor, PROJECT_VERSION.patch]
-      .map((part) => String(part || 0).padStart(3, "0"))
+      .map((part) => String(part || 0))
       .join(".");
   }
 

@@ -150,8 +150,8 @@ for (const teil of ["major", "minor", "patch"]) {
 }
 assert.match(
   projectBuildNumber(PROJECT_META),
-  /^\d{3}\.\d{3}\.\d{3}$/,
-  "Die Buildnummer muss dem Format major.minor.patch mit je drei Stellen folgen",
+  /^\d+\.\d+\.\d+$/,
+  "Die Buildnummer muss dem Format major.minor.patch folgen",
 );
 assert.match(
   appSource,
