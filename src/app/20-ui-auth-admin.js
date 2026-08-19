@@ -585,12 +585,12 @@
     });
 
     elements.employeeSearch.addEventListener("input", (event) => {
-      employeeSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      employeeSearchTerm = searchKey(event.target.value);
       renderEmployees();
     });
 
     elements.appointmentSearch.addEventListener("input", (event) => {
-      appointmentSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      appointmentSearchTerm = searchKey(event.target.value);
       renderAppointments();
     });
 
@@ -630,7 +630,7 @@
     );
 
     elements.memoSearch.addEventListener("input", (event) => {
-      memoSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      memoSearchTerm = searchKey(event.target.value);
       renderMemos();
     });
     elements.memoCategoryFilter.addEventListener("change", (event) => {
@@ -679,7 +679,7 @@
     });
 
     elements.completionEmployeeSearch.addEventListener("input", (event) => {
-      completionSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      completionSearchTerm = searchKey(event.target.value);
       renderCompletionEmployeeList();
     });
 
@@ -709,7 +709,7 @@
     });
 
     elements.attendanceSearch.addEventListener("input", (event) => {
-      attendanceSearchTerm = event.target.value.trim().toLocaleLowerCase("de-DE");
+      attendanceSearchTerm = searchKey(event.target.value);
       renderAttendanceList();
     });
 
@@ -769,15 +769,11 @@
       renderDevices();
     });
     elements.deviceSearch.addEventListener("input", (event) => {
-      deviceSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceSearchTerm = searchKey(event.target.value);
       renderDeviceInstructionMatrix();
     });
     elements.deviceManagementSearch.addEventListener("input", (event) => {
-      deviceManagementSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceManagementSearchTerm = searchKey(event.target.value);
       renderDevices();
     });
     elements.exportDeviceCatalogExcelButton.addEventListener(
@@ -814,15 +810,11 @@
       renderDeviceInstructionMatrix();
     });
     elements.deviceEmployeeSearch.addEventListener("input", (event) => {
-      deviceEmployeeSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceEmployeeSearchTerm = searchKey(event.target.value);
       renderDeviceInstructionMatrix();
     });
     elements.deviceOverviewSearch.addEventListener("input", (event) => {
-      deviceOverviewSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceOverviewSearchTerm = searchKey(event.target.value);
       renderDeviceOverview();
     });
     elements.deviceOverviewInstructionFilter.addEventListener(
@@ -840,9 +832,7 @@
       },
     );
     elements.deviceParticipantSearch.addEventListener("input", (event) => {
-      deviceParticipantSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceParticipantSearchTerm = searchKey(event.target.value);
       renderDeviceParticipantList();
     });
     elements.deviceParticipantList.addEventListener("change", (event) => {
@@ -852,9 +842,7 @@
       toggleVisibleDeviceParticipants();
     });
     elements.deviceInstructionSearch.addEventListener("input", (event) => {
-      deviceInstructionSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceInstructionSearchTerm = searchKey(event.target.value);
       deviceInstructionLogLimit = DEVICE_INSTRUCTION_LOG_PAGE;
       renderDeviceInstructionList();
     });
@@ -865,9 +853,7 @@
       renderDeviceInstructionList();
     });
     elements.deviceInstructionDeviceSearch.addEventListener("input", (event) => {
-      deviceInstructionDeviceSearchTerm = event.target.value
-        .trim()
-        .toLocaleLowerCase("de-DE");
+      deviceInstructionDeviceSearchTerm = searchKey(event.target.value);
       renderInstructionDeviceList();
     });
     elements.deviceInstructionDeviceList.addEventListener("change", (event) => {
@@ -879,12 +865,12 @@
   }
 
   function filterHelpTopics() {
-    const query = normalizeHelpSearch(elements.helpSearch.value);
+    const query = searchKey(elements.helpSearch.value);
     const sections = [...document.querySelectorAll("[data-help-section]")];
     let visibleCount = 0;
     sections.forEach((section) => {
       const matches =
-        !query || normalizeHelpSearch(section.textContent).includes(query);
+        !query || searchKey(section.textContent).includes(query);
       section.hidden = !matches;
       if (matches) visibleCount += 1;
       const headingId = section.dataset.helpHeading;
@@ -899,14 +885,6 @@
     elements.helpNoResults.hidden = visibleCount > 0;
   }
 
-  function normalizeHelpSearch(value) {
-    return String(value || "")
-      .normalize("NFKD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLocaleLowerCase("de-DE")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
 
   function bindDelegatedActions() {
     elements.employeeTable.addEventListener("click", handleEmployeeTableAction);

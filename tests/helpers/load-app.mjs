@@ -24,7 +24,7 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       setActiveView(value) { activeView = value; },
       getActiveView() { return activeView; },
       setAppointmentFilters(value = {}) {
-        appointmentSearchTerm = value.search || "";
+        appointmentSearchTerm = searchKey(value.search || "");
         appointmentPeriodFilter = value.period || "all";
         if (value.year) appointmentCalendarYear = value.year;
         if (value.month) appointmentCalendarMonth = value.month;
@@ -34,7 +34,7 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
         employeeProfessionFilter = value.profession || "all";
         employeeQualificationFilter = value.qualification || "all";
         employeeWeekendFilter = value.weekend || "all";
-        employeeSearchTerm = value.search || "";
+        employeeSearchTerm = searchKey(value.search || "");
       }
     };`,
   );

@@ -353,18 +353,17 @@
   }
 
   function filterVacationEmployees(employees) {
-    const searchTerm = vacationEmployeeSearchTerm.trim().toLocaleLowerCase("de-DE");
+    const searchTerm = searchKey(vacationEmployeeSearchTerm);
     if (!searchTerm) return employees;
     return employees.filter((employee) =>
-      [
-        fullName(employee),
-        employee.lastName,
-        employee.firstName,
-        employee.username,
-      ]
-        .join(" ")
-        .toLocaleLowerCase("de-DE")
-        .includes(searchTerm),
+      searchKey(
+        [
+          fullName(employee),
+          employee.lastName,
+          employee.firstName,
+          employee.username,
+        ].join(" "),
+      ).includes(searchTerm),
     );
   }
 

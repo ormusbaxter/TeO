@@ -88,6 +88,11 @@ Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können
 kombiniert werden. Filter beziehen sich immer auf die aktuell sichtbare
 Ansicht.
 
+Alle Suchfelder sind nachsichtig geschrieben: Groß- und Kleinschreibung spielt
+keine Rolle, Umlaute lassen sich auch ohne Punkte oder als „ae“, „oe“ und „ue“
+eingeben, und „ß“, „ss“ und „s“ finden einander. „Müller“ wird also auch mit
+„muller“ oder „mueller“ gefunden, „Weiß“ mit „weiss“ oder „weis“.
+
 In der Mitarbeiterverwaltung berücksichtigt auch **E-Mails kopieren** nur die
 aktuell gefilterte Liste.
 

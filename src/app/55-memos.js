@@ -30,9 +30,9 @@
           return false;
         }
         if (!memoSearchTerm) return true;
-        return `${memo.title} ${memo.description} ${memo.category}`
-          .toLocaleLowerCase("de-DE")
-          .includes(memoSearchTerm);
+        return searchKey(
+          `${memo.title} ${memo.description} ${memo.category}`,
+        ).includes(memoSearchTerm);
       })
       .sort(sortMemos);
   }
