@@ -157,26 +157,21 @@
     });
   }
 
+  // Was „Anlegen“ in der gezeigten Ansicht bedeutet. Der Knopf am unteren
+  // Rand und das Tastenkuerzel „n“ gehen denselben Weg.
+  function openCreateDialogForActiveView() {
+    const type = elements.mobileCreateButton.dataset.createType;
+    if (type === "training") openTrainingDialog();
+    else if (type === "meeting") openMeetingDialog();
+    else if (type === "appointment") openAppointmentDialog();
+    else if (type === "memo") openMemoDialog();
+    else if (type === "device-instruction") openDeviceInstructionDialog();
+    else if (type === "device") openDeviceDialog();
+    else openEmployeeDialog();
+  }
+
   function bindDialogTriggers() {
-    elements.mobileCreateButton.addEventListener("click", () => {
-      if (elements.mobileCreateButton.dataset.createType === "training") {
-        openTrainingDialog();
-      } else if (elements.mobileCreateButton.dataset.createType === "meeting") {
-        openMeetingDialog();
-      } else if (elements.mobileCreateButton.dataset.createType === "appointment") {
-        openAppointmentDialog();
-      } else if (elements.mobileCreateButton.dataset.createType === "memo") {
-        openMemoDialog();
-      } else if (
-        elements.mobileCreateButton.dataset.createType === "device-instruction"
-      ) {
-        openDeviceInstructionDialog();
-      } else if (elements.mobileCreateButton.dataset.createType === "device") {
-        openDeviceDialog();
-      } else {
-        openEmployeeDialog();
-      }
-    });
+    elements.mobileCreateButton.addEventListener("click", openCreateDialogForActiveView);
 
     document.querySelectorAll("[data-theme-select]").forEach((select) => {
       select.addEventListener("change", () => changeTheme(select.value));
@@ -2252,10 +2247,10 @@
       callback: async () => {
         const committed = await commitStateMutation(() => {
           state.catalogs.professions.splice(index, 1);
-        });
+        }, { undo: "Beruf gelöscht" });
         if (!committed) return;
         renderCatalogManagement();
-        showToast("Beruf wurde gelöscht.");
+        showUndoToast("Beruf wurde gelöscht.");
       },
     });
   }
@@ -2333,10 +2328,10 @@
             delete employee.qualifications[id];
             delete employee.qualificationExpiries[id];
           });
-        });
+        }, { undo: "Zusatzqualifikation gelöscht" });
         if (!committed) return;
         renderCatalogManagement();
-        showToast("Zusatzqualifikation wurde gelöscht.");
+        showUndoToast("Zusatzqualifikation wurde gelöscht.");
       },
     });
   }

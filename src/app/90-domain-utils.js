@@ -1199,7 +1199,10 @@
     }
   }
 
-  function showToast(message, type = "success") {
+  // action haengt einen Knopf an die Meldung („Rückgängig“). Eine Meldung mit
+  // Knopf bleibt laenger stehen - sie will nicht nur gelesen, sondern noch
+  // getroffen werden - und verschwindet, sobald der Knopf gedrueckt wurde.
+  function showToast(message, type = "success", { action = null } = {}) {
     const toast = document.createElement("div");
     // Die Art steht als Klasse am Element; die Farben dazu kommen aus den
     // Farbmarken, damit jedes Farbschema eigene setzen kann.
@@ -1208,9 +1211,22 @@
       <span class="toast-icon" aria-hidden="true">
         <svg><use href="#icon-${type === "success" ? "check" : "alert"}"></use></svg>
       </span>
-      <span></span>
+      <span class="toast-text"></span>
     `;
-    toast.querySelector("span:last-child").textContent = message;
+    toast.querySelector(".toast-text").textContent = message;
+
+    if (action) {
+      const button = document.createElement("button");
+      button.className = "toast-action";
+      button.type = "button";
+      button.textContent = action.label;
+      button.addEventListener("click", () => {
+        toast.remove();
+        syncNotificationLayer();
+        action.onSelect();
+      });
+      toast.append(button);
+    }
 
     elements.toastRegion.append(toast);
     syncNotificationLayer();
@@ -1226,6 +1242,18 @@
           elements.notificationStack.hidePopover();
         }
       }, 190);
-    }, 3400);
+    }, action ? 9000 : 3400);
+  }
+
+  // Meldet eine Aenderung und bietet im selben Atemzug an, sie zurueckzunehmen.
+  function showUndoToast(message) {
+    showToast(message, "success", {
+      action: {
+        label: "Rückgängig",
+        onSelect: () => {
+          void undoLastMutation();
+        },
+      },
+    });
   }
 })();

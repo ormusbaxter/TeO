@@ -515,6 +515,109 @@
       </div>
     </dialog>
 
+    <dialog class="modal" id="shortcutsDialog" aria-labelledby="shortcutsDialogTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Arbeiten mit der Tastatur</p>
+          <h2 id="shortcutsDialogTitle">Tastenkürzel</h2>
+          <p class="modal-subtitle">
+            Gelten überall, solange kein Eingabefeld und kein Dialog den Fokus hat.
+          </p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="shortcut-groups">
+          <section class="shortcut-group">
+            <h3>Arbeiten</h3>
+            <dl class="shortcut-list">
+              <div>
+                <dt><kbd>?</kbd></dt>
+                <dd>Diese Übersicht öffnen</dd>
+              </div>
+              <div>
+                <dt><kbd>/</kbd></dt>
+                <dd>Suche der gezeigten Ansicht</dd>
+              </div>
+              <div>
+                <dt><kbd>n</kbd></dt>
+                <dd>Neuen Eintrag der gezeigten Ansicht anlegen</dd>
+              </div>
+              <div>
+                <dt><kbd>Strg</kbd> + <kbd>Z</kbd></dt>
+                <dd>Letzte Löschung oder Massenänderung zurücknehmen</dd>
+              </div>
+              <div>
+                <dt><kbd>Esc</kbd></dt>
+                <dd>Dialog schließen, Vollbild verlassen</dd>
+              </div>
+            </dl>
+          </section>
+          <section class="shortcut-group">
+            <h3>Ansicht wechseln</h3>
+            <p class="shortcut-hint">
+              Erst <kbd>g</kbd>, dann den Buchstaben der Ansicht.
+            </p>
+            <dl class="shortcut-list">
+              <div>
+                <dt><kbd>g</kbd> <kbd>u</kbd></dt>
+                <dd>Übersicht</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>m</kbd></dt>
+                <dd>Mitarbeiter</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>w</kbd></dt>
+                <dd>Wochenendverteilung</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>p</kbd></dt>
+                <dd>Urlaubsplanung</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>t</kbd></dt>
+                <dd>Terminkalender</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>o</kbd></dt>
+                <dd>Memo / ToDo</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>f</kbd></dt>
+                <dd>Pflichtfortbildungen</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>s</kbd></dt>
+                <dd>Teamsitzungen</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>g</kbd></dt>
+                <dd>Geräteeinweisungen</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>v</kbd></dt>
+                <dd>Geräteverwaltung</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>e</kbd></dt>
+                <dd>Einstellungen</dd>
+              </div>
+              <div>
+                <dt><kbd>g</kbd> <kbd>h</kbd></dt>
+                <dd>Hilfe</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
     <dialog class="modal modal-large" id="auditLogDialog" aria-labelledby="auditLogTitle">
       <div class="modal-header">
         <div>

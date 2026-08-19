@@ -443,6 +443,11 @@
   let backendMode = "local";
   let remoteRevision = 0;
   let pendingRemoteConflictState = null;
+  // Der letzte Schritt, der sich zurücknehmen lässt: der Datenbestand, wie er
+  // vor der Änderung aussah, und ihre Bezeichnung für Meldung und Protokoll.
+  // Jede weitere Änderung räumt ihn ab - zurück geht es immer nur einen
+  // Schritt, und zwar den zuletzt gemeldeten.
+  let undoableMutation = null;
   let backendStartupError = "";
   let backendHealth = null;
   let backendConnectionStatus = "local";
@@ -1077,6 +1082,8 @@
     bulkQualificationState: document.querySelector("#bulkQualificationState"),
     dataQualityDialog: document.querySelector("#dataQualityDialog"),
     dataQualityContent: document.querySelector("#dataQualityContent"),
+    shortcutsDialog: document.querySelector("#shortcutsDialog"),
+    openShortcutsButton: document.querySelector("#openShortcutsButton"),
     auditLogDialog: document.querySelector("#auditLogDialog"),
     auditLogContent: document.querySelector("#auditLogContent"),
     exportAuditLogCsvButton: document.querySelector("#exportAuditLogCsvButton"),
@@ -1161,6 +1168,7 @@
     bindNavigation();
     bindSidebarOrder();
     bindSidebarCollapse();
+    bindKeyboardShortcuts();
     bindDialogTriggers();
     bindForms();
     bindFilters();
@@ -2347,7 +2355,13 @@
   // Zeichenkette laesst den Protokolleintrag ganz weg - fuer Aenderungen, die
   // nur die Anzeige eines einzelnen Kontos betreffen und den fachlichen
   // Datenbestand unberuehrt lassen.
-  async function commitStateMutation(mutate, { auditAction } = {}) {
+  //
+  // undo benennt die Aenderung fuer ein spaeteres Zuruecknehmen („Mitarbeiter
+  // gelöscht“). Der Schnappschuss davor entsteht ohnehin fuer den Ruecklauf,
+  // ein Schritt zurueck kostet also nur, ihn aufzuheben. Ohne undo verfaellt
+  // der zuletzt gemerkte Schritt: Was danach passiert ist, laesst sich nicht
+  // mehr ueberspringen.
+  async function commitStateMutation(mutate, { auditAction, undo = "" } = {}) {
     // Die Kopie fuer den Ruecklauf entsteht ueber JSON: In Chromium ist der
     // Umweg ueber Text fuer diesen Bestand messbar schneller als
     // structuredClone (6,5 ms gegenueber 11 ms bei 3600 Nachweisen).
@@ -2362,11 +2376,17 @@
     if (await persistState()) {
       stateMutationSequence += 1;
       databaseSaveReminderArmed = true;
+      undoableMutation = undo ? { label: undo, state: previousState } : null;
       renderAll();
       scheduleAutomaticBackup();
       return true;
     }
 
+    // Nach einem Ruecklauf auf den eigenen Stand bleibt ein gemerkter Schritt
+    // gueltig - der Datenbestand ist derselbe wie zuvor. Hat dagegen der
+    // Server einen anderen Stand geschickt, passt der Schnappschuss nicht mehr
+    // dazu und wuerde fremde Aenderungen ueberschreiben.
+    if (pendingRemoteConflictState) undoableMutation = null;
     state = pendingRemoteConflictState || previousState;
     pendingRemoteConflictState = null;
     if (currentUser) {
@@ -2382,6 +2402,42 @@
     }
     renderAll();
     return false;
+  }
+
+  function hasUndoableMutation() {
+    return Boolean(undoableMutation);
+  }
+
+  // Nimmt den zuletzt gemeldeten Schritt zurueck. Das Zuruecknehmen ist selbst
+  // eine Aenderung: Es wird gespeichert und steht im Protokoll, damit im
+  // Nachhinein nachvollziehbar bleibt, was wann verschwand und wiederkam.
+  async function undoLastMutation() {
+    if (!undoableMutation) {
+      showToast("Es ist kein Schritt gemerkt, der sich zurücknehmen lässt.", "warning");
+      return false;
+    }
+    const { label, state: snapshot } = undoableMutation;
+    undoableMutation = null;
+    const committed = await commitStateMutation(
+      () => {
+        // Das Protokoll bleibt, wie es ist: Der Schnappschuss kennt den
+        // zurueckgenommenen Schritt noch nicht, und ein Protokoll, das die
+        // eigene Geschichte loescht, waere keins. Nach dem Zuruecknehmen
+        // stehen beide Zeilen darin - die Aenderung und ihre Ruecknahme.
+        const auditLog = state.auditLog;
+        state = snapshot;
+        state.auditLog = auditLog;
+        // Der wiederhergestellte Bestand traegt eigene Kontoobjekte; ohne
+        // diesen Abgleich zeigte die Oberflaeche weiter auf das alte.
+        if (currentUser) {
+          currentUser =
+            state.users.find((user) => user.id === currentUser.id) || currentUser;
+        }
+      },
+      { auditAction: `Rückgängig gemacht: ${label}` },
+    );
+    if (committed) showToast(`${label} – wieder hergestellt.`);
+    return committed;
   }
 
   // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn
@@ -2621,26 +2677,21 @@
     });
   }
 
+  // Was „Anlegen“ in der gezeigten Ansicht bedeutet. Der Knopf am unteren
+  // Rand und das Tastenkuerzel „n“ gehen denselben Weg.
+  function openCreateDialogForActiveView() {
+    const type = elements.mobileCreateButton.dataset.createType;
+    if (type === "training") openTrainingDialog();
+    else if (type === "meeting") openMeetingDialog();
+    else if (type === "appointment") openAppointmentDialog();
+    else if (type === "memo") openMemoDialog();
+    else if (type === "device-instruction") openDeviceInstructionDialog();
+    else if (type === "device") openDeviceDialog();
+    else openEmployeeDialog();
+  }
+
   function bindDialogTriggers() {
-    elements.mobileCreateButton.addEventListener("click", () => {
-      if (elements.mobileCreateButton.dataset.createType === "training") {
-        openTrainingDialog();
-      } else if (elements.mobileCreateButton.dataset.createType === "meeting") {
-        openMeetingDialog();
-      } else if (elements.mobileCreateButton.dataset.createType === "appointment") {
-        openAppointmentDialog();
-      } else if (elements.mobileCreateButton.dataset.createType === "memo") {
-        openMemoDialog();
-      } else if (
-        elements.mobileCreateButton.dataset.createType === "device-instruction"
-      ) {
-        openDeviceInstructionDialog();
-      } else if (elements.mobileCreateButton.dataset.createType === "device") {
-        openDeviceDialog();
-      } else {
-        openEmployeeDialog();
-      }
-    });
+    elements.mobileCreateButton.addEventListener("click", openCreateDialogForActiveView);
 
     document.querySelectorAll("[data-theme-select]").forEach((select) => {
       select.addEventListener("change", () => changeTheme(select.value));
@@ -4716,10 +4767,10 @@
       callback: async () => {
         const committed = await commitStateMutation(() => {
           state.catalogs.professions.splice(index, 1);
-        });
+        }, { undo: "Beruf gelöscht" });
         if (!committed) return;
         renderCatalogManagement();
-        showToast("Beruf wurde gelöscht.");
+        showUndoToast("Beruf wurde gelöscht.");
       },
     });
   }
@@ -4797,10 +4848,10 @@
             delete employee.qualifications[id];
             delete employee.qualificationExpiries[id];
           });
-        });
+        }, { undo: "Zusatzqualifikation gelöscht" });
         if (!committed) return;
         renderCatalogManagement();
-        showToast("Zusatzqualifikation wurde gelöscht.");
+        showUndoToast("Zusatzqualifikation wurde gelöscht.");
       },
     });
   }
@@ -5270,6 +5321,143 @@
     );
 
     elements.resetSidebarOrderButton?.addEventListener("click", resetSidebarOrder);
+  }
+
+  // Tastenkuerzel fuer die Arbeit am Schreibtisch. Sie greifen nur, wenn
+  // gerade nichts anderes die Tastatur braucht: kein Eingabefeld, kein offener
+  // Dialog, keine Anmeldemaske. Zu jedem Kuerzel gehoert die Uebersicht hinter
+  // „?“ - ein unentdecktes Kuerzel ist keins.
+  const VIEW_SHORTCUTS = {
+    u: "dashboard",
+    m: "employees",
+    w: "weekends",
+    p: "vacations",
+    t: "appointments",
+    o: "memos",
+    f: "trainings",
+    s: "meetings",
+    g: "devices",
+    v: "device-management",
+    e: "settings",
+    h: "help",
+  };
+
+  // „g“ leitet einen Ansichtswechsel ein und wartet auf den Buchstaben. Wer
+  // sich vertippt oder abgelenkt wird, tippt kurz darauf wieder normal.
+  const VIEW_JUMP_TIMEOUT_MS = 1500;
+  let viewJumpArmedAt = 0;
+
+  // In der Erfassungsphase, damit der zweite Anschlag nach „g“ vor den
+  // Buchstaben des Urlaubsplaners kommt: Dort steht „u“ fuer Urlaub, und ohne
+  // diesen Vorrang schriebe „g u“ einen Urlaubstag, statt zur Uebersicht zu
+  // wechseln.
+  function bindKeyboardShortcuts() {
+    document.addEventListener("keydown", handleGlobalShortcut, true);
+    elements.openShortcutsButton?.addEventListener("click", openShortcutsDialog);
+  }
+
+  function openShortcutsDialog() {
+    elements.shortcutsDialog?.showModal();
+  }
+
+  function isTextEntry(target) {
+    if (!(target instanceof HTMLElement)) return false;
+    return (
+      target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)
+    );
+  }
+
+  // Die Zellen des Urlaubsplaners lesen Buchstaben als Eintragsarten - „u“
+  // steht dort fuer Urlaub, „n“ fuer Nachtdienst.
+  function isVacationCell(target) {
+    return Boolean(
+      target instanceof HTMLElement &&
+        target.closest("[data-vacation-employee][data-vacation-date]"),
+    );
+  }
+
+  // Wo einzelne Buchstaben schon vergeben sind, ruhen die Kuerzel.
+  function keysBelongToTarget(target) {
+    return isTextEntry(target) || isVacationCell(target);
+  }
+
+  function shortcutsAvailable(event) {
+    if (event.defaultPrevented || event.isComposing) return false;
+    if (document.body.classList.contains("is-auth-locked")) return false;
+    return !document.querySelector("dialog[open]");
+  }
+
+  function handleGlobalShortcut(event) {
+    if (!shortcutsAvailable(event)) return;
+    const targetOwnsKeys = keysBelongToTarget(event.target);
+
+    // Strg+Z nur ausserhalb von Eingaben: Dort gehoert das Zuruecknehmen dem
+    // Browser und seinem Eingabeverlauf, nicht dem Datenbestand.
+    if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.key.toLowerCase() === "z") {
+      if (isTextEntry(event.target) || !hasUndoableMutation()) return;
+      event.preventDefault();
+      void undoLastMutation();
+      return;
+    }
+
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const key = event.key.toLowerCase();
+
+    // Der zweite Anschlag nach „g“. Er gilt auch dort, wo einzelne Buchstaben
+    // sonst vergeben sind - wer „g“ getippt hat, meint einen Ansichtswechsel.
+    if (viewJumpArmedAt && event.timeStamp - viewJumpArmedAt <= VIEW_JUMP_TIMEOUT_MS) {
+      viewJumpArmedAt = 0;
+      const view = VIEW_SHORTCUTS[key];
+      if (!view) return;
+      event.preventDefault();
+      event.stopPropagation();
+      showView(view);
+      return;
+    }
+    viewJumpArmedAt = 0;
+
+    if (key === "g" && !isTextEntry(event.target)) {
+      viewJumpArmedAt = event.timeStamp;
+      event.preventDefault();
+      return;
+    }
+
+    if (targetOwnsKeys) return;
+
+    if (event.key === "?") {
+      event.preventDefault();
+      openShortcutsDialog();
+      return;
+    }
+
+    if (key === "/") {
+      const search = activeViewSearchField();
+      if (!search) return;
+      event.preventDefault();
+      search.focus();
+      search.select();
+      return;
+    }
+
+    if (key === "n") {
+      // In Einstellungen und Hilfe gibt es nichts anzulegen; dort ruht das
+      // Kuerzel, statt einen fremden Dialog aufzuziehen.
+      if (elements.mobileCreateButton.hidden) return;
+      event.preventDefault();
+      openCreateDialogForActiveView();
+    }
+  }
+
+  // Das erste Suchfeld der gezeigten Ansicht. Ueber die Ansicht gesucht statt
+  // ueber eine Liste von Kennungen: So bekommt jede neue Ansicht ihr Kuerzel,
+  // ohne dass hier etwas nachgetragen werden muss.
+  function activeViewSearchField() {
+    const panel = document.querySelector("[data-view-panel].is-active");
+    if (!panel) return null;
+    return [...panel.querySelectorAll('input[type="search"]')].find(
+      (field) => !field.disabled && field.offsetParent !== null,
+    );
   }
 
   function renderDashboard() {
@@ -8340,13 +8528,13 @@
         }
         employee.updatedAt = now;
       });
-    });
+    }, { undo: `Massenänderung an ${selectedEmployeeIds.size} Mitarbeitern` });
     if (!committed) return;
     markFormClean(elements.bulkEditForm);
     elements.bulkEditDialog.close();
     const changedCount = selectedEmployeeIds.size;
     selectedEmployeeIds.clear();
-    showToast(`${changedCount} Mitarbeiter wurden aktualisiert.`);
+    showUndoToast(`${changedCount} Mitarbeiter wurden aktualisiert.`);
   }
 
   function openDataQualityDialog() {
@@ -9776,8 +9964,8 @@
       callback: async () => {
         const committed = await commitStateMutation(() => {
           state.memos = state.memos.filter((item) => item.id !== memoId);
-        });
-        if (committed) showToast("Memo / ToDo wurde gelöscht.");
+        }, { undo: "Memo / ToDo gelöscht" });
+        if (committed) showUndoToast("Memo / ToDo wurde gelöscht.");
       },
     });
   }
@@ -9858,10 +10046,10 @@
         const committed = await commitStateMutation(() => {
           state.catalogs.memoCategories.splice(index, 1);
           state.memos = state.memos.map((memo) => memo.category === category ? { ...memo, category: "", updatedAt: now } : memo);
-        });
+        }, { undo: "Memo-/ToDo-Kategorie gelöscht" });
         if (!committed) return;
         renderMemoCategorySettings();
-        showToast("Memo-/ToDo-Kategorie wurde gelöscht.");
+        showUndoToast("Memo-/ToDo-Kategorie wurde gelöscht.");
       },
     });
   }
@@ -11558,8 +11746,8 @@
           state.deviceInstructions = state.deviceInstructions.filter(
             (instruction) => instruction.deviceId !== deviceId,
           );
-        });
-        if (committed) showToast("Gerät wurde gelöscht.");
+        }, { undo: "Gerät gelöscht" });
+        if (committed) showUndoToast("Gerät wurde gelöscht.");
       },
     });
   }
@@ -12345,12 +12533,12 @@
           state.deviceInstructions = state.deviceInstructions.filter(
             (item) => item.id !== instructionId,
           );
-        });
+        }, { undo: "Einweisungsnachweis gelöscht" });
         if (!committed) return;
         if (elements.deviceInstructionHistoryDialog.open) {
           elements.deviceInstructionHistoryDialog.close();
         }
-        showToast("Einweisungsnachweis wurde gelöscht.");
+        showUndoToast("Einweisungsnachweis wurde gelöscht.");
       },
     });
   }
@@ -13363,10 +13551,10 @@
               (expectedEmployeeId) => expectedEmployeeId !== employeeId,
             );
           });
-        });
+        }, { undo: "Mitarbeiter gelöscht" });
         if (!committed) return;
 
-        showToast("Mitarbeiter wurde gelöscht.");
+        showUndoToast("Mitarbeiter wurde gelöscht.");
       },
     });
   }
@@ -13483,10 +13671,10 @@
           state.completions = state.completions.filter(
             (completion) => completion.trainingId !== trainingId,
           );
-        });
+        }, { undo: "Pflichtfortbildung gelöscht" });
         if (!committed) return;
 
-        showToast("Pflichtfortbildung wurde gelöscht.");
+        showUndoToast("Pflichtfortbildung wurde gelöscht.");
       },
     });
   }
@@ -13631,9 +13819,9 @@
           state.appointments = state.appointments.filter(
             (item) => item.id !== appointmentId,
           );
-        });
+        }, { undo: "Termin gelöscht" });
         if (!committed) return;
-        showToast("Termin wurde gelöscht.");
+        showUndoToast("Termin wurde gelöscht.");
       },
     });
   }
@@ -13729,10 +13917,10 @@
           state.meetingAttendances = state.meetingAttendances.filter(
             (attendance) => attendance.meetingId !== meetingId,
           );
-        });
+        }, { undo: "Teamsitzung gelöscht" });
         if (!committed) return;
 
-        showToast("Teamsitzung wurde gelöscht.");
+        showUndoToast("Teamsitzung wurde gelöscht.");
       },
     });
   }
@@ -14123,10 +14311,10 @@
       callback: async () => {
         const committed = await commitStateMutation(() => {
           state.completions = state.completions.filter((item) => item.id !== completionId);
-        });
+        }, { undo: "Fortbildungsnachweis gelöscht" });
         if (!committed) return;
 
-        showToast("Fortbildungsnachweis wurde gelöscht.");
+        showUndoToast("Fortbildungsnachweis wurde gelöscht.");
       },
     });
   }
@@ -17412,7 +17600,10 @@
     }
   }
 
-  function showToast(message, type = "success") {
+  // action haengt einen Knopf an die Meldung („Rückgängig“). Eine Meldung mit
+  // Knopf bleibt laenger stehen - sie will nicht nur gelesen, sondern noch
+  // getroffen werden - und verschwindet, sobald der Knopf gedrueckt wurde.
+  function showToast(message, type = "success", { action = null } = {}) {
     const toast = document.createElement("div");
     // Die Art steht als Klasse am Element; die Farben dazu kommen aus den
     // Farbmarken, damit jedes Farbschema eigene setzen kann.
@@ -17421,9 +17612,22 @@
       <span class="toast-icon" aria-hidden="true">
         <svg><use href="#icon-${type === "success" ? "check" : "alert"}"></use></svg>
       </span>
-      <span></span>
+      <span class="toast-text"></span>
     `;
-    toast.querySelector("span:last-child").textContent = message;
+    toast.querySelector(".toast-text").textContent = message;
+
+    if (action) {
+      const button = document.createElement("button");
+      button.className = "toast-action";
+      button.type = "button";
+      button.textContent = action.label;
+      button.addEventListener("click", () => {
+        toast.remove();
+        syncNotificationLayer();
+        action.onSelect();
+      });
+      toast.append(button);
+    }
 
     elements.toastRegion.append(toast);
     syncNotificationLayer();
@@ -17439,6 +17643,18 @@
           elements.notificationStack.hidePopover();
         }
       }, 190);
-    }, 3400);
+    }, action ? 9000 : 3400);
+  }
+
+  // Meldet eine Aenderung und bietet im selben Atemzug an, sie zurueckzunehmen.
+  function showUndoToast(message) {
+    showToast(message, "success", {
+      action: {
+        label: "Rückgängig",
+        onSelect: () => {
+          void undoLastMutation();
+        },
+      },
+    });
   }
 })();

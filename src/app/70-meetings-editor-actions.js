@@ -1002,10 +1002,10 @@
               (expectedEmployeeId) => expectedEmployeeId !== employeeId,
             );
           });
-        });
+        }, { undo: "Mitarbeiter gelöscht" });
         if (!committed) return;
 
-        showToast("Mitarbeiter wurde gelöscht.");
+        showUndoToast("Mitarbeiter wurde gelöscht.");
       },
     });
   }
@@ -1122,10 +1122,10 @@
           state.completions = state.completions.filter(
             (completion) => completion.trainingId !== trainingId,
           );
-        });
+        }, { undo: "Pflichtfortbildung gelöscht" });
         if (!committed) return;
 
-        showToast("Pflichtfortbildung wurde gelöscht.");
+        showUndoToast("Pflichtfortbildung wurde gelöscht.");
       },
     });
   }
@@ -1270,9 +1270,9 @@
           state.appointments = state.appointments.filter(
             (item) => item.id !== appointmentId,
           );
-        });
+        }, { undo: "Termin gelöscht" });
         if (!committed) return;
-        showToast("Termin wurde gelöscht.");
+        showUndoToast("Termin wurde gelöscht.");
       },
     });
   }
@@ -1368,10 +1368,10 @@
           state.meetingAttendances = state.meetingAttendances.filter(
             (attendance) => attendance.meetingId !== meetingId,
           );
-        });
+        }, { undo: "Teamsitzung gelöscht" });
         if (!committed) return;
 
-        showToast("Teamsitzung wurde gelöscht.");
+        showUndoToast("Teamsitzung wurde gelöscht.");
       },
     });
   }
@@ -1762,10 +1762,10 @@
       callback: async () => {
         const committed = await commitStateMutation(() => {
           state.completions = state.completions.filter((item) => item.id !== completionId);
-        });
+        }, { undo: "Fortbildungsnachweis gelöscht" });
         if (!committed) return;
 
-        showToast("Fortbildungsnachweis wurde gelöscht.");
+        showUndoToast("Fortbildungsnachweis wurde gelöscht.");
       },
     });
   }

@@ -4891,6 +4891,100 @@ legend {
   animation: toast-out 180ms ease both;
 }
 
+.toast-text {
+  flex: 1 1 auto;
+}
+
+/* Die Meldungsschicht laesst Klicks durch, damit sie die Arbeit darunter nicht
+   blockiert. Eine Meldung mit Knopf will aber getroffen werden und nimmt
+   Klicks deshalb selbst an. */
+.toast:has(.toast-action) {
+  pointer-events: auto;
+}
+
+/* Die Kuerzeluebersicht: zwei Spalten, solange der Platz reicht. Die Tasten
+   stehen links in gleicher Breite, damit die Beschreibungen eine Kante
+   bilden. */
+.shortcut-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+}
+
+.shortcut-group h3 {
+  margin: 0 0 10px;
+  color: var(--slate-800);
+  font-size: 0.78rem;
+}
+
+.shortcut-hint {
+  margin: -4px 0 10px;
+  color: var(--slate-600);
+  font-size: 0.72rem;
+}
+
+.shortcut-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+}
+
+.shortcut-list > div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+
+.shortcut-list dt {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.shortcut-list dd {
+  margin: 0;
+  color: var(--slate-700);
+  font-size: 0.76rem;
+}
+
+.shortcut-list kbd,
+.shortcut-hint kbd {
+  min-width: 22px;
+  padding: 2px 6px;
+  color: var(--slate-800);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
+  border: 1px solid var(--slate-300);
+  border-radius: 5px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--slate-300);
+}
+
+/* Der Knopf sitzt in der Meldung selbst - dort, wo der Blick nach dem Lesen
+   ohnehin ankommt. Die Meldung mit Knopf steht laenger als eine ohne. */
+.toast-action {
+  flex: 0 0 auto;
+  padding: 6px 11px;
+  color: inherit;
+  font: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+  border: 1px solid var(--toast-border);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 10%);
+  transition:
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.toast-action:hover {
+  border-color: rgb(255 255 255 / 30%);
+  background: rgb(255 255 255 / 20%);
+}
+
 .toast-icon {
   display: grid;
   width: 22px;

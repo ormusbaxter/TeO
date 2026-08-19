@@ -442,6 +442,11 @@
   let backendMode = "local";
   let remoteRevision = 0;
   let pendingRemoteConflictState = null;
+  // Der letzte Schritt, der sich zurücknehmen lässt: der Datenbestand, wie er
+  // vor der Änderung aussah, und ihre Bezeichnung für Meldung und Protokoll.
+  // Jede weitere Änderung räumt ihn ab - zurück geht es immer nur einen
+  // Schritt, und zwar den zuletzt gemeldeten.
+  let undoableMutation = null;
   let backendStartupError = "";
   let backendHealth = null;
   let backendConnectionStatus = "local";
@@ -1076,6 +1081,8 @@
     bulkQualificationState: document.querySelector("#bulkQualificationState"),
     dataQualityDialog: document.querySelector("#dataQualityDialog"),
     dataQualityContent: document.querySelector("#dataQualityContent"),
+    shortcutsDialog: document.querySelector("#shortcutsDialog"),
+    openShortcutsButton: document.querySelector("#openShortcutsButton"),
     auditLogDialog: document.querySelector("#auditLogDialog"),
     auditLogContent: document.querySelector("#auditLogContent"),
     exportAuditLogCsvButton: document.querySelector("#exportAuditLogCsvButton"),

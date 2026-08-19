@@ -112,6 +112,49 @@ funktionieren.
 
 Uhrzeiten werden im 24-Stunden-Format `HH:MM` angezeigt.
 
+### Seitenleiste einklappen
+
+Der Winkel neben dem Namenszug klappt die Seitenleiste nach links ein. Im
+eingeklappten Zustand bleibt eine schmale Spur mit den Symbolen der
+Menüpunkte; wer mit der Maus darauf zeigt, sieht Bezeichnung und Zähler als
+Kurzhinweis. Ein erneuter Klick klappt sie wieder auf. Der Zustand wird im
+Browserprofil gespeichert und gilt beim nächsten Start wieder – er gehört wie
+die Reihenfolge der Navigation nicht zum gemeinsamen Datenbestand.
+
+### Tastenkürzel
+
+Am Schreibtisch lässt sich TeO weitgehend über die Tastatur bedienen. Die
+Kürzel gelten überall, solange kein Eingabefeld und kein Dialog den Fokus hat;
+im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.
+
+| Taste | Wirkung |
+| --- | --- |
+| **?** | Übersicht aller Tastenkürzel öffnen |
+| **/** | Suchfeld der gezeigten Ansicht anspringen |
+| **n** | Neuen Eintrag der gezeigten Ansicht anlegen |
+| **Strg + Z** | Letzte Löschung oder Massenänderung zurücknehmen |
+| **Esc** | Dialog schließen, Vollbild verlassen |
+
+Die Ansicht wechselt mit **g** gefolgt vom Buchstaben des Bereichs: **u**
+Übersicht, **m** Mitarbeiter, **w** Wochenendverteilung, **p**
+Urlaubsplanung, **t** Terminkalender, **o** Memo / ToDo, **f**
+Pflichtfortbildungen, **s** Teamsitzungen, **g** Geräteeinweisungen, **v**
+Geräteverwaltung, **e** Einstellungen, **h** Hilfe. Nach dem **g** bleibt
+eineinhalb Sekunden Zeit für den zweiten Anschlag. Dieselbe Übersicht öffnet
+die Schaltfläche **Tastenkürzel** in der Hilfe.
+
+### Löschungen zurücknehmen
+
+Nach dem Löschen eines Datensatzes und nach einer Sammelbearbeitung bietet die
+Meldung unten rechts **Rückgängig** an; dasselbe leistet **Strg + Z**. Damit
+kehrt der Datenbestand in den Zustand unmittelbar vor dieser Änderung zurück.
+
+Zurück geht es immer nur einen Schritt, und zwar den zuletzt gemeldeten: Sobald
+eine weitere Änderung gespeichert wurde, ist der vorherige Schritt nicht mehr
+verfügbar. Das Zurücknehmen ist selbst eine Änderung – im Änderungsprotokoll
+stehen anschließend beide Zeilen, die Löschung und ihre Rücknahme. Für ältere
+Stände bleibt die Datensicherung der Weg zurück.
+
 ### Reihenfolge der Navigation anpassen
 
 Die Einträge der Seitenleiste lassen sich in eine eigene Reihenfolge bringen:

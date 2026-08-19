@@ -101,13 +101,13 @@
         }
         employee.updatedAt = now;
       });
-    });
+    }, { undo: `Massenänderung an ${selectedEmployeeIds.size} Mitarbeitern` });
     if (!committed) return;
     markFormClean(elements.bulkEditForm);
     elements.bulkEditDialog.close();
     const changedCount = selectedEmployeeIds.size;
     selectedEmployeeIds.clear();
-    showToast(`${changedCount} Mitarbeiter wurden aktualisiert.`);
+    showUndoToast(`${changedCount} Mitarbeiter wurden aktualisiert.`);
   }
 
   function openDataQualityDialog() {
