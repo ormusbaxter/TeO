@@ -6,6 +6,7 @@
 - **Neu:** Die rechte Maustaste öffnet ein Kontextmenü – auf Mitarbeiterzeilen und auf den Karten der Termine, Memos und Geräte. Es zeigt Schnellansicht, Bearbeiten und die weiteren Aktionen des Eintrags; gehört er zu einer Mehrfachauswahl, stehen dort die Sammelaktionen
 - **Neu:** Termine, Memos und Geräte lassen sich mehrfach auswählen: **Strg + Klick** nimmt eine Karte hinzu, **Umschalt + Klick** alle bis zur zuletzt angeklickten, **Esc** hebt die Auswahl auf. Die Leiste über der Liste führt die Sammelaktionen – anpinnen, erledigen, Bestand ändern und löschen –, jede davon als ein Schritt, der sich zurücknehmen lässt
 - **Neu:** Auch mehrere Mitarbeiter lassen sich auf einmal löschen; der Umfang entspricht dem einzelnen Löschen und ist ebenso zurücknehmbar
+- **Verbessert:** Die Schnellansicht hebt sich mit Rahmen, Rundung, Schatten und leicht getönter Fläche von den Karten daneben ab. In mehreren Farbthemen ist die Fläche der Karten dieselbe wie die der Schnellansicht – dort waren die Grenzen bisher nicht zu erkennen. Im Windows-95-Thema ist sie ein erhabenes Fenster
 - **Verbessert:** Geräte erscheinen jetzt ebenfalls in Verlauf und Favoriten von **Strg + K**; Termine, Memos und Geräte öffnen von dort die Schnellansicht statt eines Dialogs
 
 ### 4.43.4 – Termin direkt im Dialog löschen
