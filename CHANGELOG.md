@@ -8,6 +8,8 @@
 - **Neu:** Auch mehrere Mitarbeiter lassen sich auf einmal löschen; der Umfang entspricht dem einzelnen Löschen und ist ebenso zurücknehmbar
 - **Verbessert:** Die Schnellansicht hebt sich mit Rahmen, Rundung, Schatten und leicht getönter Fläche von den Karten daneben ab. In mehreren Farbthemen ist die Fläche der Karten dieselbe wie die der Schnellansicht – dort waren die Grenzen bisher nicht zu erkennen. Im Windows-95-Thema ist sie ein erhabenes Fenster
 - **Verbessert:** Geräte erscheinen jetzt ebenfalls in Verlauf und Favoriten von **Strg + K**; Termine, Memos und Geräte öffnen von dort die Schnellansicht statt eines Dialogs
+- **Verbessert:** TeO startet schlanker: Das Handbuch wird erst aufgebaut, wenn die Hilfe zum ersten Mal gebraucht wird. Beim Start entstehen dadurch rund 2500 statt 4100 Elemente – jeder Ansichtswechsel wird dadurch etwas flüssiger
+- **Verbessert:** Die Suche in der Hilfe reagiert unmittelbar. Sie verglich bisher bei jedem Tastendruck den vollständigen Text aller Themen; der Suchschlüssel entsteht jetzt einmal je Abschnitt
 
 ### 4.43.4 – Termin direkt im Dialog löschen
 

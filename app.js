@@ -585,6 +585,8 @@
     helpSearchStatus: document.querySelector("#helpSearchStatus"),
     clearHelpSearch: document.querySelector("#clearHelpSearch"),
     helpNoResults: document.querySelector("#helpNoResults"),
+    helpContentHost: document.querySelector("#helpContentHost"),
+    helpContentTemplate: document.querySelector("#helpContentTemplate"),
     mobileThemeButton: document.querySelector("#mobileThemeButton"),
     mobileAccountButton: document.querySelector("#mobileAccountButton"),
     currentUsername: document.querySelector("#currentUsername"),
@@ -2592,12 +2594,15 @@
       });
     });
 
-    document.querySelectorAll("[data-help-target]").forEach((button) => {
-      button.addEventListener("click", () => {
-        document
-          .getElementById(button.dataset.helpTarget)
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+    // Das Inhaltsverzeichnis der Hilfe entsteht erst beim Einhaengen des
+    // Handbuchs. Der Aufruf wird deshalb am Behaelter abgefangen, der von
+    // Anfang an im Dokument steht.
+    elements.helpContentHost?.addEventListener("click", (event) => {
+      const button = event.target.closest?.("[data-help-target]");
+      if (!button) return;
+      document
+        .getElementById(button.dataset.helpTarget)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
     window.addEventListener("hashchange", () => {
@@ -2653,6 +2658,7 @@
     activeView = view;
 
     document.body.classList.toggle("is-vacation-view", view === "vacations");
+    if (view === "help") ensureHelpContent();
     if (view === "dashboard") renderDashboardGreeting();
     elements.mobileCreateButton.hidden = ["settings", "help"].includes(view);
 
@@ -3444,23 +3450,64 @@
     });
   }
 
+  // Das Handbuch steht beim Start in einer Vorlage und gehoert damit noch
+  // nicht zum Dokument. Eingehaengt wird es beim ersten Bedarf: beim Wechsel
+  // in die Hilfe, bei der ersten Suche und wenn „Was ist neu“ den Abschnitt
+  // der laufenden Fassung von dort holt. Die Knoten werden verschoben, nicht
+  // kopiert - die Vorlage ist danach leer.
+  let helpContentAttached = false;
+
+  function ensureHelpContent() {
+    if (helpContentAttached) return;
+    helpContentAttached = true;
+    const template = elements.helpContentTemplate;
+    if (!template?.content || !elements.helpContentHost) return;
+    elements.helpContentHost.append(template.content);
+  }
+
+  // Wo das Handbuch gerade steht: im Dokument, sobald es eingehaengt ist -
+  // sonst in seiner Vorlage. Wer nur darin nachschlaegt, soll es dafuer nicht
+  // aufbauen muessen. „Was ist neu“ tut genau das, und zwar beim Start.
+  function helpContentRoot() {
+    if (helpContentAttached) return document;
+    const template = elements.helpContentTemplate;
+    return template?.content?.querySelectorAll ? template.content : document;
+  }
+
+  // Die Suche verglich bisher bei jedem Tastendruck den Text saemtlicher
+  // Abschnitte - rund 130 KB, jedes Mal durch die Normalisierung von
+  // searchKey. Das Handbuch aendert sich zur Laufzeit nicht, deshalb entsteht
+  // der Suchschluessel je Abschnitt genau einmal.
+  let helpTopics = null;
+
+  function helpTopicList() {
+    if (helpTopics) return helpTopics;
+    ensureHelpContent();
+    helpTopics = [...document.querySelectorAll("[data-help-section]")].map(
+      (section) => ({
+        section,
+        navButton: document.querySelector(
+          `[data-help-nav-target="${section.dataset.helpHeading}"]`,
+        ),
+        key: searchKey(section.textContent),
+      }),
+    );
+    return helpTopics;
+  }
+
   function filterHelpTopics() {
     const query = searchKey(elements.helpSearch.value);
-    const sections = [...document.querySelectorAll("[data-help-section]")];
+    const topics = helpTopicList();
     let visibleCount = 0;
-    sections.forEach((section) => {
-      const matches =
-        !query || searchKey(section.textContent).includes(query);
-      section.hidden = !matches;
+    topics.forEach((topic) => {
+      const matches = !query || topic.key.includes(query);
+      topic.section.hidden = !matches;
       if (matches) visibleCount += 1;
-      const headingId = section.dataset.helpHeading;
-      document
-        .querySelector(`[data-help-nav-target="${headingId}"]`)
-        ?.toggleAttribute("hidden", !matches);
+      topic.navButton?.toggleAttribute("hidden", !matches);
     });
     elements.helpSearchStatus.textContent = query
-      ? `${visibleCount} von ${sections.length} Themen gefunden`
-      : `${sections.length} Hilfethemen`;
+      ? `${visibleCount} von ${topics.length} Themen gefunden`
+      : `${topics.length} Hilfethemen`;
     elements.clearHelpSearch.hidden = !query;
     elements.helpNoResults.hidden = visibleCount > 0;
   }
@@ -4303,10 +4350,11 @@
 
   function applyAccessControl() {
     const admin = isAdmin();
+    // Die Rolle am body genuegt: Das Stylesheet blendet die als Verwaltung
+    // markierten Elemente aus, solange sie nicht „admin“ lautet. Die Schleife
+    // davor lief bei jedem Aufbau einer Ansicht ueber das gesamte Dokument
+    // und setzte dabei nur, was die Regel schon entschieden hatte.
     document.body.dataset.userRole = currentUser?.role || "guest";
-    document.querySelectorAll("[data-admin-only]").forEach((element) => {
-      element.hidden = !admin;
-    });
     elements.currentUsername.textContent = currentUser?.username || "Nicht angemeldet";
     elements.currentUserRole.textContent = currentUser
       ? admin
@@ -5895,7 +5943,10 @@
   // Fassung und der Aufzählung dahinter. Er wird von dort übernommen, damit es
   // nicht zwei Fassungen desselben Textes gibt.
   function changelogSectionMarkup(version) {
-    const headings = [...document.querySelectorAll(".help-section h3")];
+    // Der Hinweis erscheint vor dem ersten Besuch der Hilfe. Gelesen wird
+    // deshalb dort, wo das Handbuch gerade liegt - beim Start in seiner
+    // Vorlage, die dafuer nicht ins Dokument muss.
+    const headings = [...helpContentRoot().querySelectorAll(".help-section h3")];
     const heading = headings.find((item) => item.textContent.trim().startsWith(version));
     const list = heading?.nextElementSibling;
     if (!heading || list?.tagName !== "UL") return null;

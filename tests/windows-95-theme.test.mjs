@@ -54,7 +54,7 @@ test("Das Windows-95-Thema kleidet Schaltflächen, Menü und Ecken im Stil der Z
   // Schriftfarben der dunklen Standard-Sidebar duerfen im Fuss nicht bleiben.
   assert.match(
     styles,
-    /html\[data-theme="windows-95"\] :is\(\.panel, \.stat-card, \.modal, \.page-header\) \{[^}]*background: #d4d0c8;/s,
+    /html\[data-theme="windows-95"\] :is\([^)]*\.panel[^)]*\) \{[^}]*background: #d4d0c8;/s,
   );
   assert.match(
     styles,

@@ -544,7 +544,6 @@
   body.print-weekend-overview :is(
       .meeting-stat-card,
       .catalog-section,
-      .weekend-employee-list button,
       .weekend-comparison-panel,
       .weekend-distribution-group,
       .weekend-distribution-employee

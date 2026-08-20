@@ -42,7 +42,7 @@ test("Der Hinweis zeigt den Abschnitt aus der eingebetteten Hilfe", async () => 
   // Hilfe übernommen.
   assert.match(
     appSource,
-    /const headings = \[\.\.\.document\.querySelectorAll\("\.help-section h3"\)\];/,
+    /const headings = \[\.\.\.[\w.()]*\.querySelectorAll\("\.help-section h3"\)\];/,
   );
   assert.match(
     appSource,

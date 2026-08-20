@@ -64,7 +64,10 @@
   // Fassung und der Aufzählung dahinter. Er wird von dort übernommen, damit es
   // nicht zwei Fassungen desselben Textes gibt.
   function changelogSectionMarkup(version) {
-    const headings = [...document.querySelectorAll(".help-section h3")];
+    // Der Hinweis erscheint vor dem ersten Besuch der Hilfe. Gelesen wird
+    // deshalb dort, wo das Handbuch gerade liegt - beim Start in seiner
+    // Vorlage, die dafuer nicht ins Dokument muss.
+    const headings = [...helpContentRoot().querySelectorAll(".help-section h3")];
     const heading = headings.find((item) => item.textContent.trim().startsWith(version));
     const list = heading?.nextElementSibling;
     if (!heading || list?.tagName !== "UL") return null;
