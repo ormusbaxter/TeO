@@ -1313,6 +1313,9 @@ Verfügbare Farbthemen sind Standard, Dark Mode, Solarized Light, Nord, Dracula,
 Gruvbox Dark, Tokyo Night, Catppuccin Latte, Windows 95, Cellitinnen und
 Cellitinnen Rot. Die Auswahl wird mit dem Datenbestand gespeichert.
 
+Die Anmeldemaske nennt die aktuell eingesetzte Software-Version und den
+Copyright-Hinweis bereits vor der Anmeldung.
+
 Die Datenqualitätsprüfung sucht unter anderem nach:
 
 - möglichen Dubletten

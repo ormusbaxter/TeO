@@ -5987,6 +5987,18 @@ body.is-sidebar-collapsed .sidebar-search {
   margin-top: 14px;
 }
 
+.auth-software-meta {
+  display: grid;
+  gap: 3px;
+  margin: 16px 0 -6px;
+  padding-top: 15px;
+  color: var(--slate-600);
+  border-top: 1px solid var(--slate-100);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
 /* `.modal form` legt das Formular an, das einen ganzen Dialog umschließt.
    Dieses Formular liegt im Dialogkörper und braucht deshalb eine höhere
    Spezifität, sonst erbt es Flex-Spalte und Höhenbegrenzung. */

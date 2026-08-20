@@ -6,6 +6,7 @@
 - **Verbessert:** Geräteliste und Einweisungsmatrix bauen spürbar sparsamer auf. Für jedes Gerät wurde bisher der gesamte Einweisungsbestand durchsucht, um die berechtigten Mitarbeiter zu ermitteln – auch dann, wenn gar nicht danach gefiltert war. Bei 40 Geräten waren das 41 Durchgänge statt einem
 - **Neu:** Solarized Light, Gruvbox Dark und Tokyo Night erweitern die Themenauswahl um eine augenschonende helle und zwei kontrastreiche dunkle Paletten
 - **Verbessert:** Native Formulare, Planungsmarkierungen und Meldungen übernehmen auch in den neuen dunklen Themes die passende Darstellung
+- **Verbessert:** Die Anmeldemaske zeigt bereits vor der Anmeldung die aktuelle Software-Version und den Copyright-Hinweis
 
 ### 4.44.0 – Schnellansicht für alle Datenarten
 

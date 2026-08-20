@@ -609,6 +609,7 @@
     dashboardTrainingProgress: document.querySelector("#dashboardTrainingProgress"),
     dashboardGreeting: document.querySelector("#dashboardGreeting"),
     projectBuildLabel: document.querySelector("#projectBuildLabel"),
+    loginProjectVersion: document.querySelector("#loginProjectVersion"),
     deadlineOverview: document.querySelector("#deadlineOverview"),
     deadlineHorizon: document.querySelector("#deadlineHorizon"),
     deadlineFilters: [...document.querySelectorAll("[data-deadline-filter]")],

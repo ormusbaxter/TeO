@@ -2446,7 +2446,9 @@
   }
 
   function renderProjectMetadata() {
-    elements.projectBuildLabel.textContent = `${PROJECT_NAME} - ${projectBuildNumber()}`;
+    const buildNumber = projectBuildNumber();
+    elements.projectBuildLabel.textContent = `${PROJECT_NAME} - ${buildNumber}`;
+    elements.loginProjectVersion.textContent = `Version ${buildNumber}`;
   }
 
   function renderSidebarSystemStatus() {
