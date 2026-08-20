@@ -46,6 +46,9 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
   }
 
   const dom = withDom ? createDomStub() : null;
+  // Derselbe Speicher unter beiden Namen: Die Anwendung greift auf das freie
+  // localStorage zu, ein Test schaut ueber dom.window.localStorage hinein.
+  const browserStorage = createStorageStub();
   const emptyElement = () => null;
   const context = {
     console,
@@ -82,7 +85,7 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
           querySelector: emptyElement,
           querySelectorAll: () => [],
         },
-    localStorage: createStorageStub(),
+    localStorage: browserStorage,
     navigator: {},
     sessionStorage: createStorageStub(),
     // Kein Ausbreiten: Sonst waere dom.window eine Kopie, und was ein Test
@@ -92,6 +95,7 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       TeOProjectMeta: PROJECT_META,
       TeOStateSchema: { validateStateShape },
       crypto: globalThis.crypto,
+      localStorage: browserStorage,
     }),
   };
   context.globalThis = context;

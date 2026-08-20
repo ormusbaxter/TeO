@@ -8332,6 +8332,14 @@ html[data-theme="dark"] {
   --toast-border: rgb(255 255 255 / 14%);
 }
 
+/* Die dunkle Palette kehrt --blue-700 zu einem hellen Blau um. Die
+   Grundregel setzt darauf weiße Schrift - das ergibt 2,15:1 und ist nicht
+   lesbar. Die Hauptaktion trägt hier deshalb dunkle Schrift, wie in den
+   übrigen dunklen Schemata auch. */
+html[data-theme="dark"] :is(.button-primary, .button-primary:hover) {
+  color: #10202f;
+}
+
 html[data-theme="dark"] .brand-mark {
   background: linear-gradient(145deg, #357fce, #20568f);
 }

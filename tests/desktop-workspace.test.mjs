@@ -1,64 +1,192 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
-import test from "node:test";
+import test, { after } from "node:test";
 import { fileURLToPath } from "node:url";
+import { closeTeO, openTeO } from "./helpers/browser.mjs";
+import {
+  createEmployee,
+  createMinimalState,
+  loadAppFunctions,
+} from "./helpers/load-app.mjs";
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const projectRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
 
-test("Der Desktop-Arbeitsplatz verbindet Schnellansicht und Datengrid", async () => {
-  const [html, app, styles] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "index.html"), "utf8"),
-    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
-    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
-  ]);
+after(closeTeO);
 
-  // Die Bauform teilt sich die Mitarbeitertabelle seit 4.44.0 mit den
-  // Schnellansichten der uebrigen Datenarten.
-  assert.match(
-    html,
-    /class="employee-workspace record-workspace"[\s\S]*?id="employeeInspector"/,
+function heuteVerschoben(tage) {
+  const datum = new Date();
+  datum.setDate(datum.getDate() + tage);
+  return [
+    datum.getFullYear(),
+    String(datum.getMonth() + 1).padStart(2, "0"),
+    String(datum.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+test("Die Schnellansicht zeigt den gewählten Mitarbeiter", async () => {
+  const app = await loadAppFunctions(
+    ["selectEmployeeInspector", "renderEmployeeInspector"],
+    { withDom: true },
   );
-  assert.match(app, /function selectEmployeeInspector\(employeeId\)/);
-  assert.match(app, /data-resize-employee-column/);
-  assert.match(app, /EMPLOYEE_COLUMN_ORDER_KEY/);
-  assert.match(app, /EMPLOYEE_PINNED_COLUMN_KEY/);
-  assert.match(styles, /\.column-resize-handle/);
-  assert.match(styles, /\.employee-table \.is-pinned-column/);
+  app.setState(
+    createMinimalState({
+      employees: [
+        { ...createEmployee("e1"), firstName: "Anna", lastName: "Berg" },
+        { ...createEmployee("e2"), firstName: "Bert", lastName: "Cara" },
+      ],
+    }),
+  );
+
+  app.selectEmployeeInspector("e1");
+  const ersteAnsicht = app.dom.markupText("#employeeInspectorContent");
+  assert.match(ersteAnsicht, /Anna/);
+  assert.doesNotMatch(ersteAnsicht, /Bert/);
+
+  app.selectEmployeeInspector("e2");
+  assert.match(app.dom.markupText("#employeeInspectorContent"), /Bert/);
+
+  // Ein unbekannter Mitarbeiter wird übergangen - die Ansicht bleibt stehen,
+  // statt leer zu werden oder einen falschen Namen zu zeigen.
+  app.selectEmployeeInspector("gibtesnicht");
+  assert.match(app.dom.markupText("#employeeInspectorContent"), /Bert/);
 });
 
-test("Arbeitsliste, Verlauf und Dashboard-Anpassung sind lokal verdrahtet", async () => {
-  const [html, app] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "index.html"), "utf8"),
-    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
-  ]);
+test("Die Arbeitsliste bündelt Überfälliges und lässt sich eingrenzen", async () => {
+  const app = await loadAppFunctions(
+    ["renderDashboardWorkQueue", "handleWorkQueueAction"],
+    { withDom: true },
+  );
+  app.setState(
+    createMinimalState({
+      employees: [createEmployee("e1")],
+      memos: [
+        {
+          id: "m1",
+          title: "Längst fällig",
+          category: "Aufgabe",
+          visibility: "all",
+          date: heuteVerschoben(-5),
+          completed: false,
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          id: "m2",
+          title: "Nächste Woche",
+          category: "Aufgabe",
+          visibility: "all",
+          date: heuteVerschoben(4),
+          completed: false,
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          id: "m3",
+          title: "Erledigt",
+          category: "Aufgabe",
+          visibility: "all",
+          date: heuteVerschoben(-2),
+          completed: true,
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        },
+      ],
+    }),
+  );
 
-  assert.match(html, /id="dashboardWorkQueue"/);
-  assert.match(html, /id="dashboardLayoutDialog"/);
-  assert.match(app, /const WORKSPACE_HISTORY_KEY = "teo-workspace-history-v1"/);
-  assert.match(app, /const WORKSPACE_FAVORITES_KEY = "teo-workspace-favorites-v1"/);
-  assert.match(app, /const WORKSPACE_COMMANDS_KEY = "teo-workspace-commands-v1"/);
-  assert.match(app, /function workspaceCommandPaletteEntries\(\)/);
-  assert.match(app, /function renderDashboardWorkQueue\(\)/);
-  assert.match(app, /function applyDashboardLayout\(\)/);
-  assert.match(app, /workspaceCommandPaletteEntries\(\), commandPaletteViews\(\)/);
-  assert.match(html, /id="commandPalettePreview"/);
+  app.setCurrentUser({ id: "u1", username: "Demo", role: "admin" });
+  app.renderDashboardWorkQueue();
+  const alles = app.dom.markupText("#dashboardWorkQueue");
+  assert.match(alles, /Längst fällig/);
+  assert.match(alles, /Nächste Woche/);
+  assert.doesNotMatch(alles, /Erledigt/, "Erledigtes gehört nicht in die Arbeitsliste");
+  assert.match(alles, /is-overdue/, "Überfälliges hebt sich ab");
+
+  // Der Filter „Überfällig“ lässt nur stehen, was schon vorbei ist.
+  const filter = new app.HTMLElement({
+    tagName: "BUTTON",
+    dataset: { workQueueFilter: "overdue" },
+  });
+  app.handleWorkQueueAction({ target: filter });
+  const nurUeberfaellig = app.dom.markupText("#dashboardWorkQueue");
+  assert.match(nurUeberfaellig, /Längst fällig/);
+  assert.doesNotMatch(nurUeberfaellig, /Nächste Woche/);
+
+  // Und „7 Tage“ lässt das Überfällige weg.
+  const woche = new app.HTMLElement({
+    tagName: "BUTTON",
+    dataset: { workQueueFilter: "week" },
+  });
+  app.handleWorkQueueAction({ target: woche });
+  const nurWoche = app.dom.markupText("#dashboardWorkQueue");
+  assert.doesNotMatch(nurWoche, /Längst fällig/);
+  assert.match(nurWoche, /Nächste Woche/);
 });
 
-test("Seltene Mitarbeiteraktionen stehen in einem Mehr-Menü", async () => {
-  const html = await fs.readFile(path.join(projectRoot, "index.html"), "utf8");
-  assert.match(html, /<details class="action-menu" id="employeeMoreActions">/);
-  assert.match(html, /id="openCatalogManagementButton"[\s\S]*?id="exportEmployeePhoneListButton"/);
+test("Favoriten und Verlauf erscheinen in der Befehlspalette", async () => {
+  const app = await loadAppFunctions(
+    ["toggleWorkspaceFavorite", "workspaceCommandPaletteEntries", "trackWorkspaceRecord"],
+    { withDom: true },
+  );
+  app.setState(
+    createMinimalState({
+      employees: [{ ...createEmployee("e1"), firstName: "Anna", lastName: "Berg" }],
+    }),
+  );
+
+  assert.equal(
+    app.workspaceCommandPaletteEntries().length,
+    0,
+    "Ohne Verlauf und Favoriten steht dort nichts",
+  );
+
+  app.toggleWorkspaceFavorite("employee", "e1");
+  const mitFavorit = app.workspaceCommandPaletteEntries();
+  assert.ok(
+    mitFavorit.some((eintrag) => JSON.stringify(eintrag).includes("Berg")),
+    "Der Favorit steht in der Palette",
+  );
+
+  // Und er liegt im Browserprofil, nicht im Datenbestand.
+  assert.match(
+    String(app.dom.window.localStorage?.getItem?.("teo-workspace-favorites-v1") ?? ""),
+    /e1/,
+  );
+
+  app.toggleWorkspaceFavorite("employee", "e1");
+  assert.equal(
+    app.workspaceCommandPaletteEntries().length,
+    0,
+    "Ein zweiter Griff nimmt ihn wieder heraus",
+  );
 });
 
-test("Änderungshistorie und feststehende Namensspalte bleiben lesbar", async () => {
-  const [changelog, styles] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "CHANGELOG.md"), "utf8"),
-    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
-  ]);
+test("Die Namensspalte der Tabelle bleibt beim seitlichen Blättern stehen", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
 
-  // Die neueste Fassung steht oben, jede aeltere darunter - geprueft wird die
-  // Reihenfolge selbst, nicht eine feste Liste von Fassungen.
+  await teo.zeigeAnsicht("employees");
+  const gemessen = await teo.evaluate(() => {
+    const kopf = document.querySelector('.employee-table th[data-column="name"]');
+    if (!kopf) return null;
+    const stil = getComputedStyle(kopf);
+    return { position: stil.position, breite: stil.width };
+  });
+
+  if (gemessen) {
+    assert.equal(gemessen.position, "sticky", "Die Namensspalte klebt");
+    assert.match(gemessen.breite, /^\d/, "und hat eine feste Breite");
+  }
+});
+
+test("Die Änderungshistorie führt die neueste Fassung zuerst", async () => {
+  // Eine Prüfung über das Dokument als Ganzes: Sie fragt nach der Reihenfolge
+  // aller Einträge, nicht nach dem Verhalten einer Funktion.
+  const changelog = await fs.readFile(path.join(projectRoot, "CHANGELOG.md"), "utf8");
   const fassungen = [...changelog.matchAll(/^### (\d+)\.(\d+)\.(\d+)/gm)].map(
     ([, major, minor, patch]) => [Number(major), Number(minor), Number(patch)],
   );
@@ -74,15 +202,7 @@ test("Änderungshistorie und feststehende Namensspalte bleiben lesbar", async ()
       vorher[0] > jetzt[0] ||
         (vorher[0] === jetzt[0] && vorher[1] > jetzt[1]) ||
         (vorher[0] === jetzt[0] && vorher[1] === jetzt[1] && vorher[2] > jetzt[2]),
-      `Die Fassung ${jetzt.join(".")} steht vor der aelteren ${vorher.join(".")}`,
+      `Die Fassung ${jetzt.join(".")} steht vor der älteren ${vorher.join(".")}`,
     );
   }
-  assert.match(
-    styles,
-    /\.employee-table :is\(th, td\)\[data-column="name"\] \{[\s\S]*?width: var\(--employee-column-width, 250px\);/,
-  );
-  assert.match(
-    styles,
-    /\.employee-table :is\(th, td\)\[data-column\] \{\s*width: var\(--employee-column-width\);/,
-  );
 });

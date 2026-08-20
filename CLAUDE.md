@@ -59,12 +59,11 @@ holt sie einmalig mit `npm ci`; in der CI laufen sie nach `npm run verify`.
   ungenutzte Funktion oder ein unbekannter Bezeichner auf. `tools/lint.mjs`
   rechnet die Fundstelle anschließend auf die Quelldatei zurück, meldet also
   `src/app/40-vacations.js:1660` statt `app.js:10727`.
-- **Playwright** für `tests/browser-smoke.test.mjs`. Alle übrigen Tests laufen
-  ohne Browser gegen den DOM-Ersatz in `tests/helpers/load-app.mjs`; dieser eine
-  startet TeO wirklich und prüft, was der Ersatz nicht kann – dass die
-  Oberfläche hochkommt, die Hilfe erst bei Bedarf entsteht und die Adminsperre
-  greift. Ohne installiertes Playwright überspringt er sich, `npm test` bleibt
-  also grün.
+- **Playwright** für die Tests, die TeO wirklich starten. Sie beantworten die
+  Frage, ob eine Regel im Stylesheet auch *wirkt* – der DOM-Ersatz kann das
+  nicht, und eine abgeschriebene Regel bestätigt nur, dass dort steht, was dort
+  steht. Ohne installiertes Playwright überspringen sie sich mit Ansage,
+  `npm test` bleibt also grün.
 
 ## Tests schreiben
 
@@ -85,9 +84,33 @@ Listen aus dem vm-Kontext tragen dessen `Array`-Prototyp. `assert.deepEqual`
 aus `node:assert/strict` stößt sich daran; verglichen wird deshalb über
 `.join(",")`.
 
+Für alles Sichtbare `tests/helpers/browser.mjs`:
+
+```js
+const teo = await openTeO(t, { angemeldetAls: "admin" });
+if (!teo) return;                       // Playwright fehlt, Test übersprungen
+await teo.zeigeAnsicht("employees");
+await teo.stil(".page-header", "position");   // errechneter Stilwert
+await teo.farbeAn("#teoProbeToast");          // Bildpunkt, für „liegt obenauf?“
+await teo.evaluate(() => …);                  // Rumpf läuft in der Seite
+```
+
+`after(closeTeO)` nicht vergessen. Jeder Aufruf von `openTeO` lädt die Seite
+neu, damit Tests sich nicht gegenseitig den Zustand verstellen; Übergänge und
+Animationen sind abgeschaltet, sonst misst man den Startwert statt des
+Ergebnisses.
+
+Zwei Fallstricke: `elementFromPoint` beantwortet **nicht**, ob etwas obenauf
+liegt – eine Meldungsschicht ist durchlässig für Klicks und taucht in der
+Trefferliste gar nicht auf; dafür ist `farbeAn` da. Und ein direkt gesetztes
+`data-theme` lässt aus, was `applyTheme` sonst noch tut – gewechselt wird über
+`[data-theme-select]`.
+
 Am Quelltext prüfen ist dort richtig, wo es um den Bestand im Ganzen geht –
-etwa ob zu jedem `showUndoToast` auch ein gemerkter Schritt gehört. Das lässt
-sich an keinem einzelnen Beispiel zeigen.
+etwa ob zu jedem `showUndoToast` auch ein gemerkter Schritt gehört, ob nirgends
+ein Browserdialog aufgeht, oder ob das Bauergebnis stimmt (`help-build`,
+`release-notes`, `web-app-manifest`). Auch Druckregeln bleiben dort: Sie wirken
+erst im Druckerzeugnis. Solche Prüfungen tragen ihre Begründung am Ort.
 
 ## Veröffentlichen
 

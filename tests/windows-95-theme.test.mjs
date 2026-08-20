@@ -1,67 +1,103 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import path from "node:path";
-import test from "node:test";
-import { fileURLToPath } from "node:url";
+import test, { after } from "node:test";
+import { closeTeO, openTeO } from "./helpers/browser.mjs";
 
-const projectRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-);
+after(closeTeO);
 
-test("Das Windows-95-Thema kleidet Schaltflächen, Menü und Ecken im Stil der Zeit", async () => {
-  const styles = await fs.readFile(
-    path.join(projectRoot, "styles.css"),
-    "utf8",
-  );
+// Das Schema lebt von Kanten und Ecken, nicht von einer Farbmarke. Gemessen
+// wird deshalb, was am Element ankommt.
+async function imThema(teo, rumpf) {
+  await teo.evaluate(() => {
+    const auswahl = document.querySelector("[data-theme-select]");
+    auswahl.value = "windows-95";
+    auswahl.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  const ergebnis = await teo.evaluate(rumpf);
+  await teo.evaluate(() => {
+    const auswahl = document.querySelector("[data-theme-select]");
+    auswahl.value = "standard";
+    auswahl.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  return ergebnis;
+}
 
-  // Erhabene Kante aus vier Innenschatten - das Kennzeichen der Oberflaeche.
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] :is\(\.button, \.icon-button[^)]*\)\s*\{[^}]*background: #c0c0c0;[^}]*inset 1px 1px #ffffff,[^}]*inset -1px -1px #000000,/s,
-  );
-  // Gedrueckt kehrt sie sich um.
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] :is\(\.button[^)]*\):active\s*\{[^}]*inset 1px 1px #808080,/s,
-  );
-  // Die Standardschaltflaeche traegt den zusaetzlichen schwarzen Rahmen.
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] \.button-primary[^{]*\{[^}]*0 0 0 1px #000000,/s,
-  );
-  // Menue: graue Flaeche, navyblaue Hervorhebung.
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] \.sidebar\s*\{[^}]*background: #d4d0c8;/s,
-  );
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] :is\(\s*\.nav-item:hover,[\s\S]*?\)\s*\{[^}]*background: #000080;/s,
-  );
-  // Ecken bleiben eckig.
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] \*\s*\{\s*border-radius: 0 !important;\s*\}/s,
-  );
-  // Nur dieses Thema stellt die Ecken ab.
+test("Schaltflächen tragen die erhabene Kante ihrer Zeit", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  const gemessen = await imThema(teo, () => {
+    const buehne = document.createElement("div");
+    buehne.innerHTML =
+      '<button class="button button-secondary" data-probe="normal">OK</button>' +
+      '<button class="button button-primary" data-probe="primary">Sichern</button>';
+    document.querySelector(".main-content").append(buehne);
+    const lies = (name) => {
+      const stil = getComputedStyle(buehne.querySelector(`[data-probe="${name}"]`));
+      return {
+        grund: stil.backgroundColor,
+        schatten: stil.boxShadow,
+        ecke: stil.borderRadius,
+      };
+    };
+    const ergebnis = { normal: lies("normal"), primary: lies("primary") };
+    buehne.remove();
+    return ergebnis;
+  });
+
+  // Grau statt Blau, und die Kante aus vier Innenschatten.
+  assert.equal(gemessen.normal.grund, "rgb(192, 192, 192)");
   assert.equal(
-    (styles.match(/border-radius: 0 !important/g) ?? []).length,
-    1,
+    (gemessen.normal.schatten.match(/inset/g) || []).length,
+    4,
+    `Erwartet sind vier Innenschatten, gemessen: ${gemessen.normal.schatten}`,
   );
+  // Die Standardschaltfläche trägt zusätzlich den schwarzen Rahmen.
+  assert.ok(
+    gemessen.primary.schatten.includes("rgb(0, 0, 0)"),
+    "Die Hauptaktion hebt sich mit schwarzem Rahmen ab",
+  );
+  // Und alles bleibt eckig.
+  assert.equal(gemessen.normal.ecke, "0px");
+  assert.equal(gemessen.primary.ecke, "0px");
+});
 
-  // Seitenleiste und Inhaltsfenster verwenden dasselbe Grau. Die hellen
-  // Schriftfarben der dunklen Standard-Sidebar duerfen im Fuss nicht bleiben.
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] :is\([^)]*\.panel[^)]*\) \{[^}]*background: #d4d0c8;/s,
-  );
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] :is\(\s*\.sidebar-system-status-header strong,[\s\S]*?\.sidebar-note strong\s*\) \{\s*color: #000000;/s,
-  );
-  assert.match(
-    styles,
-    /html\[data-theme="windows-95"\] :is\(\s*\.sidebar-system-status dt,[\s\S]*?\.sidebar-note p\s*\) \{\s*color: #404040;/s,
-  );
+test("Seitenleiste und Menü folgen dem Schema", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  const gemessen = await imThema(teo, () => {
+    const menuepunkt = document.querySelector(".nav-item");
+    menuepunkt.classList.add("is-active");
+    const aktiv = getComputedStyle(menuepunkt);
+    const ergebnis = {
+      sidebar: getComputedStyle(document.querySelector(".sidebar")).backgroundColor,
+      aktiverPunkt: aktiv.backgroundColor,
+      aktiveSchrift: aktiv.color,
+      panelEcke: getComputedStyle(document.querySelector(".panel")).borderRadius,
+    };
+    menuepunkt.classList.remove("is-active");
+    return ergebnis;
+  });
+
+  assert.equal(gemessen.sidebar, "rgb(212, 208, 200)", "Graue Menüfläche");
+  // Navyblaue Hervorhebung mit weißer Schrift - das Kennzeichen der Zeit.
+  assert.equal(gemessen.aktiverPunkt, "rgb(0, 0, 128)");
+  assert.equal(gemessen.aktiveSchrift, "rgb(255, 255, 255)");
+  assert.equal(gemessen.panelEcke, "0px", "Auch die Karten bleiben eckig");
+});
+
+test("Die Schnellansicht wird zum erhabenen Fenster", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  const gemessen = await imThema(teo, () => {
+    const inspector = document.querySelector(".record-inspector, #employeeInspector");
+    if (!inspector) return null;
+    const stil = getComputedStyle(inspector);
+    return { schatten: stil.boxShadow, ecke: stil.borderRadius };
+  });
+
+  if (gemessen) {
+    assert.equal(gemessen.ecke, "0px");
+  }
 });

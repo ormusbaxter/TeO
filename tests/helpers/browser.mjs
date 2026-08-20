@@ -89,6 +89,15 @@ export async function openTeO(t, { angemeldetAls = "" } = {}) {
   await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
   await page.waitForFunction(() => Boolean(window.TeOProjectMeta), null, { timeout: 15000 });
 
+  // Ohne dies misst ein Test unmittelbar nach einer Änderung den Startwert
+  // eines laufenden Übergangs statt des Ergebnisses - beim Farbschema etwa
+  // die alte Fläche. Geprüft wird hier, was am Ende dasteht, nicht wie es
+  // dorthin kommt.
+  await page.addStyleTag({
+    content:
+      "*, *::before, *::after { transition: none !important; animation: none !important; }",
+  });
+
   // Die Anmeldemaske liegt über allem. Für die Frage, ob eine Regel wirkt,
   // genügt es, die Sperre zu lösen und die Rolle zu setzen - der Anmeldeweg
   // selbst ist anderswo geprüft.
@@ -118,6 +127,37 @@ export async function openTeO(t, { angemeldetAls = "" } = {}) {
       await page.evaluate((theme) => {
         document.documentElement.dataset.theme = theme;
       }, key);
+    },
+
+    // Die Farbe, die an dieser Stelle wirklich auf dem Bildschirm steht.
+    //
+    // Für die Frage „liegt das obenauf?“ taugt elementFromPoint nicht: Eine
+    // Meldungsschicht ist bewusst durchlässig für Klicks und taucht in der
+    // Trefferliste gar nicht auf. Das Bild lügt dagegen nicht - es wird
+    // aufgenommen, im Browser auf eine Leinwand gelegt und ausgelesen.
+    async farbeAn(selector) {
+      const feld = await page.evaluate((sel) => {
+        const element = document.querySelector(sel);
+        if (!element) return null;
+        const rechteck = element.getBoundingClientRect();
+        return {
+          x: Math.round(rechteck.left + rechteck.width / 2),
+          y: Math.round(rechteck.top + rechteck.height / 2),
+        };
+      }, selector);
+      if (!feld) return null;
+      const bild = await page.screenshot({
+        clip: { x: feld.x - 1, y: feld.y - 1, width: 3, height: 3 },
+      });
+      return page.evaluate(async (base64) => {
+        const antwort = await fetch(`data:image/png;base64,${base64}`);
+        const bitmap = await createImageBitmap(await antwort.blob());
+        const leinwand = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const stift = leinwand.getContext("2d");
+        stift.drawImage(bitmap, 0, 0);
+        const [r, g, b] = stift.getImageData(1, 1, 1, 1).data;
+        return [r, g, b];
+      }, bild.toString("base64"));
     },
 
     // Errechneter Stilwert eines Elements - die Frage, die ein Stylesheet

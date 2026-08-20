@@ -20,6 +20,8 @@ const browserGlobals = {
   fetch: "readonly",
   CSS: "readonly",
   MutationObserver: "readonly",
+  createImageBitmap: "readonly",
+  OffscreenCanvas: "readonly",
   setTimeout: "readonly",
   clearTimeout: "readonly",
   setInterval: "readonly",

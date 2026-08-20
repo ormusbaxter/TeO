@@ -10,6 +10,7 @@
 - **Verbessert:** Geräte erscheinen jetzt ebenfalls in Verlauf und Favoriten von **Strg + K**; Termine, Memos und Geräte öffnen von dort die Schnellansicht statt eines Dialogs
 - **Verbessert:** TeO startet schlanker: Das Handbuch wird erst aufgebaut, wenn die Hilfe zum ersten Mal gebraucht wird. Beim Start entstehen dadurch rund 2500 statt 4100 Elemente – jeder Ansichtswechsel wird dadurch etwas flüssiger
 - **Verbessert:** Die Suche in der Hilfe reagiert unmittelbar. Sie verglich bisher bei jedem Tastendruck den vollständigen Text aller Themen; der Suchschlüssel entsteht jetzt einmal je Abschnitt
+- **Behoben:** Im Farbschema **Dark Mode** stand die Beschriftung der Hauptaktion – etwa **Sichern** – in Weiß auf hellblauem Grund und war kaum zu lesen (Kontrast 2,2:1 statt der geforderten 4,5:1). Sie ist jetzt dunkel, wie in den übrigen dunklen Schemata auch
 
 ### 4.43.4 – Termin direkt im Dialog löschen
 
