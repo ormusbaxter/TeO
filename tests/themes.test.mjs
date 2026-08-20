@@ -20,8 +20,11 @@ const themeStyles = fs.readFileSync(
 );
 
 const themes = [
+  ["solarized-light", "Solarized Light"],
   ["nord", "Nord"],
   ["dracula", "Dracula"],
+  ["gruvbox-dark", "Gruvbox Dark"],
+  ["tokyo-night", "Tokyo Night"],
   ["catppuccin-latte", "Catppuccin Latte"],
   ["windows-95", "Windows 95"],
 ];
@@ -43,11 +46,13 @@ test("Windows 3.11 wird nicht mehr als Farbthema angeboten", () => {
 test("die zusätzlichen dunklen Themes aktivieren native dunkle Formulare", () => {
   assert.match(
     shellSource,
-    /const DARK_THEMES = new Set\(\["dark", "nord", "dracula"\]\)/,
+    /const DARK_THEMES = new Set\(\[[\s\S]*"dark",[\s\S]*"nord",[\s\S]*"dracula",[\s\S]*"gruvbox-dark",[\s\S]*"tokyo-night",[\s\S]*\]\)/,
   );
   assert.match(uiSource, /DARK_THEMES\.has\(activeTheme\)/);
   assert.match(themeStyles, /html\[data-theme="nord"\][\s\S]*color-scheme: dark/);
   assert.match(themeStyles, /html\[data-theme="dracula"\][\s\S]*color-scheme: dark/);
+  assert.match(themeStyles, /html\[data-theme="gruvbox-dark"\][\s\S]*color-scheme: dark/);
+  assert.match(themeStyles, /html\[data-theme="tokyo-night"\][\s\S]*color-scheme: dark/);
 });
 
 test("Text und Primäraktionen der neuen Paletten besitzen ausreichenden Kontrast", () => {
@@ -60,6 +65,12 @@ test("Text und Primäraktionen der neuen Paletten besitzen ausreichenden Kontras
     ["#ffffff", "#1e66f5"],
     ["#000000", "#d4d0c8"],
     ["#ffffff", "#000080"],
+    ["#073642", "#f6f0dc"],
+    ["#ffffff", "#006d80"],
+    ["#fbf1c7", "#282828"],
+    ["#282828", "#fabd2f"],
+    ["#c0caf5", "#1a1b26"],
+    ["#16161e", "#7aa2f7"],
   ];
 
   for (const [foreground, background] of pairs) {

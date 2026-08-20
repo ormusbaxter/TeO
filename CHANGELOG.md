@@ -1,6 +1,8 @@
 ### 4.43.4 – Termin direkt im Dialog löschen
 
 - **Neu:** Beim Bearbeiten eines Termins steht die Löschaktion direkt im Dialog bereit; sie verwendet weiterhin die Sicherheitsabfrage und kann anschließend rückgängig gemacht werden
+- **Neu:** Solarized Light, Gruvbox Dark und Tokyo Night erweitern die Themenauswahl um eine augenschonende helle und zwei kontrastreiche dunkle Paletten
+- **Verbessert:** Native Formulare, Planungsmarkierungen und Meldungen übernehmen auch in den neuen dunklen Themes die passende Darstellung
 
 ### 4.43.3 – Klarer lokaler Speicherstatus
 

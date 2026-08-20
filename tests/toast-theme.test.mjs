@@ -35,7 +35,15 @@ test("Meldungen holen ihre Farben aus Farbmarken statt aus festen Werten", async
 
   // Diese Schemata kehren --navy-900 zu einer hellen Marke um. Ohne eigene
   // Flaeche stuende weisse Schrift auf hellem Grund.
-  for (const theme of ["dark", "nord", "dracula", "catppuccin-latte"]) {
+  for (const theme of [
+    "dark",
+    "nord",
+    "dracula",
+    "gruvbox-dark",
+    "tokyo-night",
+    "catppuccin-latte",
+    "solarized-light",
+  ]) {
     assert.match(
       styles,
       new RegExp(`html\\[data-theme="${theme}"\\][^{]*\\{[^}]*--toast-surface:`, "s"),

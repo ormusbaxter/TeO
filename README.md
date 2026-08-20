@@ -1241,9 +1241,9 @@ Die Einstellungsseite bündelt:
 - verschlüsselten Export
 - Änderungsprotokoll
 
-Verfügbare Farbthemen sind Standard, Dark Mode, Nord, Dracula,
-Catppuccin Latte, Windows 95, Cellitinnen und Cellitinnen Rot. Die Auswahl wird
-mit dem Datenbestand gespeichert.
+Verfügbare Farbthemen sind Standard, Dark Mode, Solarized Light, Nord, Dracula,
+Gruvbox Dark, Tokyo Night, Catppuccin Latte, Windows 95, Cellitinnen und
+Cellitinnen Rot. Die Auswahl wird mit dem Datenbestand gespeichert.
 
 Die Datenqualitätsprüfung sucht unter anderem nach:
 
