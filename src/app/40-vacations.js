@@ -1657,7 +1657,7 @@
   function getNrwSchoolVacations(year) {
     const vacationDays = new Map();
     schoolVacationPeriods().forEach((period) => {
-      let date = parseLocalDate(period.start);
+      const date = parseLocalDate(period.start);
       const end = parseLocalDate(period.end);
       while (date && end && date <= end) {
         if (date.getFullYear() === year) {

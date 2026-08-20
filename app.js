@@ -4114,7 +4114,7 @@
       (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
     );
 
-    let passwordMatches = false;
+    let passwordMatches;
     try {
       passwordMatches = user ? await verifyPassword(password, user) : false;
     } catch (error) {
@@ -5588,7 +5588,7 @@
   //
   // Beschrieben wird je Datenart nur, was sie ausmacht; Aufbau, Auswahl,
   // Hervorhebung und Verlauf sind für alle gleich.
-  let inspectedRecords = {};
+  const inspectedRecords = {};
 
   function recordInspectorDefinitions() {
     return {
@@ -10724,7 +10724,7 @@
   function getNrwSchoolVacations(year) {
     const vacationDays = new Map();
     schoolVacationPeriods().forEach((period) => {
-      let date = parseLocalDate(period.start);
+      const date = parseLocalDate(period.start);
       const end = parseLocalDate(period.end);
       while (date && end && date <= end) {
         if (date.getFullYear() === year) {
@@ -19785,7 +19785,7 @@
     textArea.select();
     textArea.setSelectionRange(0, text.length);
 
-    let copied = false;
+    let copied;
     try {
       copied = document.execCommand("copy");
     } finally {

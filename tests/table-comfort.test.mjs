@@ -77,7 +77,7 @@ test("Die wählbaren Spalten passen zu Tabelle und Sortierung", async () => {
 
   // Jede wählbare Spalte muss sich auch sortieren lassen - die Kopfzeile
   // entsteht aus derselben Liste.
-  const sortKeys = appSource.match(/const values = \{([\s\S]*?)\n    \};/)[1];
+  const sortKeys = appSource.match(/const values = \{([\s\S]*?)\n {4}\};/)[1];
   for (const key of columns) {
     assert.ok(sortKeys.includes(`${key}:`), `Die Sortierung kennt ${key}`);
   }

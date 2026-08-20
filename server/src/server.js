@@ -107,7 +107,7 @@ app.use((request, response, next) => {
 app.use((request, response, next) => {
   const origin = request.headers.origin;
   if (!origin) return next();
-  let sameOrigin = false;
+  let sameOrigin;
   try {
     sameOrigin = new URL(origin).origin === `${request.protocol}://${request.get("host")}`;
   } catch {

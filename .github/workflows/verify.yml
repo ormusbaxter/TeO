@@ -16,8 +16,9 @@ jobs:
         with:
           node-version: "20"
 
-      # TeO kommt im Wurzelverzeichnis ohne Abhängigkeiten aus, deshalb ist
-      # kein npm install nötig.
+      # Der ausgelieferte Stand kommt ohne Abhängigkeiten aus - npm run verify
+      # braucht deshalb kein npm ci und läuft an jedem Arbeitsplatz, an dem
+      # node steht.
       - name: Build, Strukturprüfung und Tests
         run: npm run verify
 
@@ -35,3 +36,23 @@ jobs:
       # Der Server hat eigene Abhängigkeiten, node --check braucht sie nicht.
       - name: Serverquellen prüfen
         run: npm run check --prefix server
+
+      # Ab hier mit Entwicklungswerkzeugen. Sie gehören nicht zum
+      # ausgelieferten Stand und stehen deshalb hinter npm run verify: Was
+      # oben grün ist, ist auch ohne sie grün.
+      - name: Entwicklungswerkzeuge holen
+        run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
+      - name: Regelprüfung
+        run: npm run lint
+
+      # Alle übrigen Tests laufen ohne Browser. Dieser eine startet TeO
+      # wirklich - ohne ihn bliebe ungeprüft, ob die Oberfläche überhaupt
+      # hochkommt.
+      - name: Browser holen
+        run: npx playwright install --with-deps chromium
+
+      - name: Rauchtest im Browser
+        run: node --test tests/browser-smoke.test.mjs

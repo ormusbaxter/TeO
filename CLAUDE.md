@@ -40,6 +40,54 @@ Entwicklungsinterne Hinweise gehören nicht in die `README.md`, sondern hierher.
 | `npm run check` | Strukturprüfung (`tools/check.mjs`) |
 | `npm test` | Testlauf (`node --test`) |
 | `npm run verify` | Build, Prüfung und Tests zusammen |
+| `npm run lint` | ESLint über Quellen, Werkzeuge, Tests und Server |
+
+## Entwicklungswerkzeuge
+
+`npm run verify` bleibt abhängigkeitsfrei: Build, Strukturprüfung und Tests
+laufen mit `git clone` und `node`, ohne `npm install`. Der ausgelieferte Stand
+ist davon ohnehin unberührt – `tools/New-ReleasePackage.ps1` kopiert eine feste
+Liste von Dateien, kein `node_modules`.
+
+Darüber hinaus gibt es zwei Entwicklungsabhängigkeiten. Wer sie benutzen will,
+holt sie einmalig mit `npm ci`; in der CI laufen sie nach `npm run verify`.
+
+- **ESLint** über `npm run lint`. Geprüft wird der Browserteil am erzeugten
+  `app.js`, nicht an den Dateien in `src/app/`: Die sind einzeln kein gültiges
+  Programm – `00-shell.js` öffnet die IIFE, `90-domain-utils.js` schließt sie –,
+  und erst zusammengesetzt stimmt der Gültigkeitsbereich. Nur dort fällt eine
+  ungenutzte Funktion oder ein unbekannter Bezeichner auf. `tools/lint.mjs`
+  rechnet die Fundstelle anschließend auf die Quelldatei zurück, meldet also
+  `src/app/40-vacations.js:1660` statt `app.js:10727`.
+- **Playwright** für `tests/browser-smoke.test.mjs`. Alle übrigen Tests laufen
+  ohne Browser gegen den DOM-Ersatz in `tests/helpers/load-app.mjs`; dieser eine
+  startet TeO wirklich und prüft, was der Ersatz nicht kann – dass die
+  Oberfläche hochkommt, die Hilfe erst bei Bedarf entsteht und die Adminsperre
+  greift. Ohne installiertes Playwright überspringt er sich, `npm test` bleibt
+  also grün.
+
+## Tests schreiben
+
+Verhalten prüfen, nicht Quelltext. `loadAppFunctions` holt Funktionen aus
+`app.js` in einen vm-Kontext; `withDom: true` legt einen DOM-Ersatz dazu:
+
+- `setDataStore(store)` – Speicher hinterlegen, damit `commitStateMutation`
+  und `undoLastMutation` durchlaufen
+- `dom.setQuery(selektor, element)` – Antwort auf `querySelector` festlegen,
+  `null` eingeschlossen (ohne das erfindet der Ersatz für jede Abfrage ein
+  Element, und Prüfungen wie „kein offener Dialog“ gehen ins Leere)
+- `dom.setQueryAll(selektor, liste)` – Trefferliste hinterlegen
+- `dom.setElementFromPoint(fn)` – was beim Ziehen unter dem Zeiger liegt
+- `new app.HTMLElement({ tagName, dataset, classes, parentElement })` – ein
+  Element mit `closest()`, `matches()`, `classList` und `dataset`
+
+Listen aus dem vm-Kontext tragen dessen `Array`-Prototyp. `assert.deepEqual`
+aus `node:assert/strict` stößt sich daran; verglichen wird deshalb über
+`.join(",")`.
+
+Am Quelltext prüfen ist dort richtig, wo es um den Bestand im Ganzen geht –
+etwa ob zu jedem `showUndoToast` auch ein gemerkter Schritt gehört. Das lässt
+sich an keinem einzelnen Beispiel zeigen.
 
 ## Veröffentlichen
 

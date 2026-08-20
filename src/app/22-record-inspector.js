@@ -5,7 +5,7 @@
   //
   // Beschrieben wird je Datenart nur, was sie ausmacht; Aufbau, Auswahl,
   // Hervorhebung und Verlauf sind für alle gleich.
-  let inspectedRecords = {};
+  const inspectedRecords = {};
 
   function recordInspectorDefinitions() {
     return {

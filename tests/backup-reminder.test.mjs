@@ -61,7 +61,7 @@ test("Die Sicherungswarnung liegt als Einblendung in der Meldungsebene", async (
   // Die Warnung steht in der Meldungsebene unten rechts und nicht mehr im
   // Seitenfluss ueber der Kopfzeile der jeweiligen Ansicht.
   const stack = indexHtml.match(
-    /<div class="notification-stack"[\s\S]*?\n    <\/div>/,
+    /<div class="notification-stack"[\s\S]*?\n {4}<\/div>/,
   );
   assert.ok(stack, "Die Meldungsebene fehlt in index.html.");
   assert.match(stack[0], /id="toastRegion"/);

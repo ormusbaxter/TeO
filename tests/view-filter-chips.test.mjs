@@ -31,8 +31,8 @@ test("Jede gefilterte Ansicht hat eine Leiste für ihre aktiven Filter", async (
   // Die Beschreibung der Bedienelemente deckt genau diese Ansichten ab.
   const beschrieben = [
     ...appSource
-      .match(/function viewFilterControls\(\) \{\s*return \{([\s\S]*?)\n    \};\n  \}/)[1]
-      .matchAll(/^      "?([a-z-]+)"?: \[/gm),
+      .match(/function viewFilterControls\(\) \{\s*return \{([\s\S]*?)\n {4}\};\n {2}\}/)[1]
+      .matchAll(/^ {6}"?([a-z-]+)"?: \[/gm),
   ].map(([, view]) => view);
   assert.deepEqual(beschrieben.sort().join(","), [...VIEWS].sort().join(","));
 });

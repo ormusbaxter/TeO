@@ -18,6 +18,9 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
     `globalThis.__teoTest = {
       ${exposed},
       setState(value) { state = value; },
+      // Ohne Browser gibt es keinen Speicher. Wer eine Aenderung samt
+      // Speichern und Ruecklauf pruefen will, legt hier einen hin.
+      setDataStore(value) { dataStore = value; },
       getState() { return state; },
       getStateMutationSequence() { return stateMutationSequence; },
       setCurrentUser(value) { currentUser = value; },
@@ -62,6 +65,10 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       },
     atob: globalThis.atob,
     btoa: globalThis.btoa,
+    // Die Anwendung fragt an mehreren Stellen `target instanceof HTMLElement`,
+    // bevor sie eine Taste oder einen Klick deutet. Ohne diese Kennung im
+    // Kontext liefe jede solche Pruefung in einen ReferenceError.
+    HTMLElement: StubHtmlElement,
     Date,
     Intl,
     TextDecoder,
@@ -75,9 +82,9 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
           querySelector: emptyElement,
           querySelectorAll: () => [],
         },
-    localStorage: {},
+    localStorage: createStorageStub(),
     navigator: {},
-    sessionStorage: {},
+    sessionStorage: createStorageStub(),
     window: {
       TeOProjectMeta: PROJECT_META,
       TeOStateSchema: { validateStateShape },
@@ -89,7 +96,161 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
   context.window.window = context.window;
   vm.createContext(context);
   new vm.Script(instrumented, { filename: "app.js" }).runInContext(context);
-  return dom ? { ...context.__teoTest, dom } : context.__teoTest;
+  return dom
+    ? { ...context.__teoTest, dom, HTMLElement: StubHtmlElement }
+    : { ...context.__teoTest, HTMLElement: StubHtmlElement };
+}
+
+// Der Browserspeicher, so weit die Anwendung ihn benutzt. Zuvor stand dort
+// ein leeres Objekt: Jeder Zugriff warf, die Anwendung fing es ab und schrieb
+// eine Warnung - gemerkte Einstellungen liessen sich so nicht pruefen.
+function createStorageStub() {
+  const entries = new Map();
+  return {
+    getItem: (key) => (entries.has(key) ? entries.get(key) : null),
+    setItem: (key, value) => entries.set(key, String(value)),
+    removeItem: (key) => entries.delete(key),
+    clear: () => entries.clear(),
+    key: (index) => [...entries.keys()][index] ?? null,
+    get length() {
+      return entries.size;
+    },
+  };
+}
+
+// Eine Klassenliste, die sich merkt, was in ihr steht. Der frühere Ersatz
+// nahm alles an und antwortete auf contains() immer mit false - jede Prüfung
+// „ist diese Klasse gesetzt?“ ging damit ins Leere, ohne dass ein Test es
+// bemerkte.
+function createClassList(initial = []) {
+  const classes = new Set(initial);
+  return {
+    add(...names) {
+      for (const name of names) classes.add(name);
+    },
+    remove(...names) {
+      for (const name of names) classes.delete(name);
+    },
+    toggle(name, force) {
+      const next = force === undefined ? !classes.has(name) : Boolean(force);
+      if (next) classes.add(name);
+      else classes.delete(name);
+      return next;
+    },
+    contains: (name) => classes.has(name),
+    get value() {
+      return [...classes].join(" ");
+    },
+  };
+}
+
+// Aus data-vacation-employee wird vacationEmployee - dieselbe Umsetzung, die
+// der Browser fuer dataset vornimmt.
+function datasetKey(attributeName) {
+  return attributeName
+    .replace(/^data-/, "")
+    .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+// Genug Selektorverstaendnis fuer das, was die Anwendung tatsaechlich fragt:
+// Elementname, Klassen und Attribute mit oder ohne Wert, beliebig kombiniert
+// - etwa [data-vacation-employee][data-vacation-date] oder dialog[open].
+function matchesSelector(element, selector) {
+  const parts = selector.trim().match(/^([a-zA-Z][\w-]*)?((?:[.#[][^.#[]*)*)$/);
+  if (!parts) return false;
+  const [, tagName, rest = ""] = parts;
+  if (tagName && element.tagName !== tagName.toUpperCase()) return false;
+  for (const token of rest.match(/[.#[][^.#[]*/g) || []) {
+    if (token.startsWith(".")) {
+      if (!element.classList.contains(token.slice(1))) return false;
+      continue;
+    }
+    if (token.startsWith("#")) {
+      if (element.id !== token.slice(1)) return false;
+      continue;
+    }
+    const attribute = token.slice(1, -1).match(/^([^=\]]+)(?:="?([^"\]]*)"?)?$/);
+    if (!attribute) return false;
+    const [, name, expected] = attribute;
+    const value = element.getAttribute(name);
+    if (value === null || value === undefined) return false;
+    if (expected !== undefined && String(value) !== expected) return false;
+  }
+  return true;
+}
+
+// Ein Element, wie die Anwendung es anfasst: mit Klassen, Attributen, dataset
+// und einer Abstammung fuer closest(). Tests bauen sich damit den Ausschnitt
+// der Oberflaeche, um den es ihnen geht.
+export class StubHtmlElement {
+  constructor({
+    tagName = "DIV",
+    id = "",
+    attributes = {},
+    dataset = {},
+    classes = [],
+    isContentEditable = false,
+    parentElement = null,
+    value = "",
+  } = {}) {
+    this.tagName = tagName.toUpperCase();
+    this.id = id;
+    this.dataset = { ...dataset };
+    this.ownAttributes = { ...attributes };
+    this.isContentEditable = isContentEditable;
+    this.parentElement = parentElement;
+    this.classList = createClassList(classes);
+    this.value = value;
+    this.hidden = false;
+    this.disabled = false;
+    this.textContent = "";
+  }
+
+  getAttribute(name) {
+    if (name in this.ownAttributes) return this.ownAttributes[name];
+    const key = datasetKey(name);
+    return key in this.dataset ? this.dataset[key] : null;
+  }
+
+  hasAttribute(name) {
+    return this.getAttribute(name) !== null;
+  }
+
+  setAttribute(name, value) {
+    this.ownAttributes[name] = String(value);
+  }
+
+  toggleAttribute(name, force) {
+    const next = force === undefined ? !this.hasAttribute(name) : Boolean(force);
+    if (next) this.ownAttributes[name] = "";
+    else delete this.ownAttributes[name];
+    return next;
+  }
+
+  matches(selector) {
+    return matchesSelector(this, selector);
+  }
+
+  closest(selector) {
+    let node = this;
+    while (node) {
+      if (node.matches?.(selector)) return node;
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  querySelectorAll() {
+    return [];
+  }
+
+  querySelector() {
+    return null;
+  }
+
+  focus() {}
+
+  select() {}
 }
 
 // Eine Bedienoberflaeche laesst sich ohne Browser nicht nachbauen, wohl aber
@@ -120,12 +281,7 @@ function createDomStub() {
       files: [],
       style: {},
       dataset: {},
-      classList: {
-        add() {},
-        remove() {},
-        toggle() {},
-        contains: () => false,
-      },
+      classList: createClassList(),
     };
     return new Proxy(target, {
       get(object, property) {
@@ -153,7 +309,12 @@ function createDomStub() {
     });
   };
 
+  // Hinterlegte Antworten gehen vor. Nur so laesst sich pruefen, was
+  // geschieht, wenn ein Element *nicht* da ist - etwa kein offener Dialog.
+  const queryResults = new Map();
+  let elementAtPoint = () => null;
   const querySelector = (selector) => {
+    if (queryResults.has(selector)) return queryResults.get(selector);
     let element = elements.get(selector);
     if (!element) {
       element = createElement(selector);
@@ -172,6 +333,9 @@ function createDomStub() {
       getElementById: (id) => querySelector(`#${id}`),
       createElement: () => createElement(),
       createDocumentFragment: () => createElement(),
+      // Beim Ziehen fragt die Anwendung, was unter dem Zeiger liegt. Ohne
+      // Bildschirm beantwortet das ein hinterlegter Handgriff.
+      elementFromPoint: (x, y) => elementAtPoint(x, y),
       addEventListener() {},
       removeEventListener() {},
     },
@@ -194,6 +358,12 @@ function createDomStub() {
     },
     setQueryAll(selector, found) {
       queryAllResults.set(selector, found);
+    },
+    setQuery(selector, found) {
+      queryResults.set(selector, found);
+    },
+    setElementFromPoint(handler) {
+      elementAtPoint = handler;
     },
     resetMarkup() {
       markup.clear();
