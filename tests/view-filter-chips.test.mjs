@@ -1,75 +1,122 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import path from "node:path";
-import test from "node:test";
-import { fileURLToPath } from "node:url";
+import test, { after } from "node:test";
+import { closeTeO, openTeO } from "./helpers/browser.mjs";
 
-const projectRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-);
+after(closeTeO);
 
-const VIEWS = ["employees", "appointments", "memos", "devices", "device-management"];
+const ANSICHTEN = ["employees", "appointments", "memos", "devices", "device-management"];
 
-test("Jede gefilterte Ansicht hat eine Leiste für ihre aktiven Filter", async () => {
-  const [appSource, indexHtml] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
-    fs.readFile(path.join(projectRoot, "index.html"), "utf8"),
-  ]);
+test("Jede gefilterte Ansicht hat eine Leiste für ihre aktiven Filter", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
 
-  for (const view of VIEWS) {
-    assert.ok(
-      indexHtml.includes(`data-filter-chips="${view}"`),
-      `Die Ansicht ${view} trägt eine Chip-Leiste`,
-    );
-    assert.ok(
-      appSource.includes(`renderViewFilterChips("${view}")`),
-      `Die Ansicht ${view} baut ihre Chips beim Aufbau mit auf`,
-    );
-  }
-
-  // Die Beschreibung der Bedienelemente deckt genau diese Ansichten ab.
-  const beschrieben = [
-    ...appSource
-      .match(/function viewFilterControls\(\) \{\s*return \{([\s\S]*?)\n {4}\};\n {2}\}/)[1]
-      .matchAll(/^ {6}"?([a-z-]+)"?: \[/gm),
-  ].map(([, view]) => view);
-  assert.deepEqual(beschrieben.sort().join(","), [...VIEWS].sort().join(","));
+  const vorhanden = await teo.evaluate(() =>
+    [...document.querySelectorAll("[data-filter-chips]")].map(
+      (leiste) => leiste.dataset.filterChips,
+    ),
+  );
+  assert.equal(
+    [...vorhanden].sort().join(","),
+    [...ANSICHTEN].sort().join(","),
+    "Genau diese Ansichten führen eine Chip-Leiste",
+  );
 });
 
-test("Ein Chip entfernt seinen Filter über das vorhandene Bedienelement", async () => {
-  const appSource = await fs.readFile(path.join(projectRoot, "app.js"), "utf8");
+test("Ein Filter erscheint als Chip und lässt sich darüber wieder entfernen", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
 
-  // Kein zweiter Ort für Filterzustände: Zum Entfernen wird dasselbe Ereignis
-  // ausgelöst, das auch eine Bedienung von Hand erzeugt.
-  assert.match(
-    appSource,
-    /function clearViewFilter\(control\) \{[\s\S]*?\.click\(\);[\s\S]*?dispatchEvent\(new Event\("input", \{ bubbles: true \}\)\);[\s\S]*?dispatchEvent\(new Event\("change", \{ bubbles: true \}\)\);/,
+  await teo.zeigeAnsicht("employees");
+
+  // Suchbegriff eintippen wie von Hand.
+  const mitFilter = await teo.evaluate(() => {
+    const suche = document.querySelector("#employeeSearch");
+    suche.value = "Meier";
+    suche.dispatchEvent(new Event("input", { bubbles: true }));
+    const leiste = document.querySelector('[data-filter-chips="employees"]');
+    const chips = [...leiste.querySelectorAll("[data-clear-filter]")];
+    return {
+      leisteSichtbar: !leiste.hidden,
+      beschriftungen: chips.map((chip) => chip.textContent.replace(/\s+/g, " ").trim()),
+    };
+  });
+
+  assert.equal(mitFilter.leisteSichtbar, true, "Die Leiste zeigt sich mit dem Filter");
+  // Die Beschriftung kommt aus dem Bedienelement selbst - hier aus dem
+  // Eingetippten.
+  assert.equal(
+    mitFilter.beschriftungen.join(" | "),
+    "Suche: Meier",
+    "Der Chip nennt Filter und Wert",
   );
 
-  // Die Beschriftung kommt aus dem Bedienelement selbst - gewählte Zeile,
-  // gedrückte Schaltfläche oder Eingetipptes.
-  assert.match(appSource, /select\.selectedOptions\[0\]\?\.textContent\.trim\(\)/);
-  assert.match(appSource, /if \(control\.kind === "search"\) return control\.element\?\.value\.trim\(\)/);
+  // Und ein Klick auf den Chip räumt genau dieses Bedienelement ab.
+  const nachKlick = await teo.evaluate(() => {
+    document
+      .querySelector('[data-filter-chips="employees"] [data-clear-filter]')
+      .click();
+    const leiste = document.querySelector('[data-filter-chips="employees"]');
+    return {
+      suchfeld: document.querySelector("#employeeSearch").value,
+      chips: leiste.querySelectorAll("[data-clear-filter]").length,
+    };
+  });
+
+  assert.equal(nachKlick.suchfeld, "", "Das Suchfeld ist leer");
+  assert.equal(nachKlick.chips, 0, "Und der Chip ist weg");
 });
 
-test("Eine gemerkte Ansicht überlebt den Neustart", async () => {
-  const appSource = await fs.readFile(path.join(projectRoot, "app.js"), "utf8");
+test("Mehrere Filter stehen nebeneinander, jeder mit eigenem Chip", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
 
-  assert.match(appSource, /const VIEW_FILTER_KEY = "teo-view-filters-v1";/);
-  assert.match(
-    appSource,
-    /stored\[view\] = controls\.map\(\(control\) => viewFilterValue\(control\)\);/,
+  await teo.zeigeAnsicht("employees");
+  const chips = await teo.evaluate(() => {
+    const suche = document.querySelector("#employeeSearch");
+    suche.value = "Meier";
+    suche.dispatchEvent(new Event("input", { bubbles: true }));
+    const status = document.querySelector('[data-status-filter]:not([data-status-filter="all"])');
+    status?.click();
+    return [
+      ...document.querySelectorAll('[data-filter-chips="employees"] [data-clear-filter]'),
+    ].map((chip) => chip.textContent.replace(/\s+/g, " ").trim());
+  });
+
+  assert.equal(chips.length, 2, `Erwartet zwei Chips, gefunden: ${chips.join(" | ")}`);
+  assert.ok(chips.some((chip) => chip.startsWith("Suche:")));
+  assert.ok(chips.some((chip) => chip.startsWith("Status:")));
+});
+
+test("Eine gemerkte Ansicht überlebt den Neustart", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  await teo.zeigeAnsicht("employees");
+  await teo.evaluate(() => {
+    const suche = document.querySelector("#employeeSearch");
+    suche.value = "Meier";
+    suche.dispatchEvent(new Event("input", { bubbles: true }));
+    document
+      .querySelector('[data-filter-chips="employees"] [data-remember-filters]')
+      .click();
+  });
+
+  const gemerkt = await teo.evaluate(() => localStorage.getItem("teo-view-filters-v1"));
+  assert.ok(gemerkt, "Die Ansicht liegt im Browserprofil");
+  assert.match(gemerkt, /Meier/);
+
+  // Neu geladen steht der Filter wieder da - und zwar im Bedienelement,
+  // nicht nur als Chip.
+  const nachNeustart = await openTeO(t, { angemeldetAls: "admin" });
+  await nachNeustart.zeigeAnsicht("employees");
+  const wiederhergestellt = await nachNeustart.page.waitForFunction(
+    () => document.querySelector("#employeeSearch").value || null,
+    null,
+    { timeout: 5000 },
   );
-  // Wiederhergestellt wird erst nach dem ersten Aufbau: Vorher stehen in den
-  // Auswahlfeldern weder Berufe noch Kategorien.
-  assert.match(
-    appSource,
-    /renderAll\(\);[\s\S]{0,220}restoreRememberedViewFilters\(\);/,
-  );
-  // Ein entfallener Beruf darf die Wiederherstellung nicht sprengen.
-  assert.match(
-    appSource,
-    /if \(control\.kind === "select" && !control\.element\.querySelector\(`option\[value="\$\{value\}"\]`\)\) \{\s*\/\/[^\n]*\n\s*return;/,
-  );
+  assert.equal(await wiederhergestellt.jsonValue(), "Meier");
+
+  await nachNeustart.evaluate(() => {
+    localStorage.removeItem("teo-view-filters-v1");
+  });
 });

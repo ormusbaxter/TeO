@@ -1,45 +1,80 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import path from "node:path";
-import test from "node:test";
-import { fileURLToPath } from "node:url";
+import test, { after } from "node:test";
+import { closeTeO, openTeO } from "./helpers/browser.mjs";
+import { createMinimalState, loadAppFunctions } from "./helpers/load-app.mjs";
 
-const projectRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-);
+after(closeTeO);
 
-test("Auswahlzeilen lassen sich anklicken, ohne ihren Text zu markieren", async () => {
-  const [styles, appSource] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
-    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
-  ]);
+test("Auswahlflächen markieren beim Klicken keinen Text", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
 
-  // Auswahlkarten (Teilnehmer, Geräte, Mitarbeiter im Nachweis), einfache
-  // Auswahlkästchen und die Auswahlspalte der Tabelle sind zum Anklicken da.
-  assert.match(
-    styles,
-    /\.selection-card,\s*\.checkbox-field,\s*\.data-table \.selection-column \{\s*user-select: none;\s*-webkit-user-select: none;/,
-  );
+  // Gefragt ist nicht, ob die Regel im Stylesheet steht, sondern ob sie am
+  // Element ankommt. Die Flächen werden dafür im Dokument angelegt - im
+  // Aufbau, in dem die Anwendung sie verwendet.
+  const gemessen = await teo.evaluate(() => {
+    const buehne = document.createElement("div");
+    buehne.innerHTML = `
+      <label class="selection-card"><input type="checkbox" /><span>Karte</span></label>
+      <label class="checkbox-field"><input type="checkbox" /><span>Kästchen</span></label>
+      <table class="data-table"><tbody><tr><td class="selection-column">x</td></tr></tbody></table>
+      <div class="panel"><p>Fließtext</p></div>`;
+    document.querySelector(".main-content").append(buehne);
+    const lies = (selector) =>
+      getComputedStyle(buehne.querySelector(selector)).userSelect;
+    const ergebnis = {
+      selectionCard: lies(".selection-card"),
+      checkboxField: lies(".checkbox-field"),
+      selectionColumn: lies(".data-table .selection-column"),
+      panel: lies(".panel"),
+      tabelle: getComputedStyle(buehne.querySelector(".data-table")).userSelect,
+      body: getComputedStyle(document.body).userSelect,
+      view: getComputedStyle(document.querySelector(".view")).userSelect,
+      mainContent: getComputedStyle(document.querySelector(".main-content")).userSelect,
+    };
+    buehne.remove();
+    return ergebnis;
+  });
 
-  // Beim Umschalt-Klick markiert der Browser sonst alles zwischen den beiden
-  // Kästchen - die Zeilenauswahl war gemeint, nicht der Text.
-  assert.match(
-    appSource,
-    /if \(event\.shiftKey\) window\.getSelection\(\)\?\.removeAllRanges\(\);/,
-  );
+  for (const feld of ["selectionCard", "checkboxField", "selectionColumn"]) {
+    assert.equal(gemessen[feld], "none", `${feld} ist zum Anklicken da, nicht zum Markieren`);
+  }
+
+  // Und der Fließtext bleibt markierbar - sonst ließe sich keine Nummer und
+  // kein Name mehr herauskopieren.
+  for (const feld of ["body", "view", "mainContent", "panel", "tabelle"]) {
+    assert.notEqual(gemessen[feld], "none", `${feld} muss markierbar bleiben`);
+  }
 });
 
-test("Der Fließtext der Anwendung bleibt markierbar", async () => {
-  const styles = await fs.readFile(path.join(projectRoot, "styles.css"), "utf8");
+test("Der Umschalt-Klick räumt die Textmarkierung des Browsers ab", async () => {
+  const app = await loadAppFunctions(["bindTableComfort"], { withDom: true });
+  app.setState(createMinimalState());
 
-  // Keine pauschale Sperre auf Seite, Inhalt oder Karten - sonst ließe sich
-  // kein Name und keine Nummer mehr herauskopieren.
-  for (const selektor of ["body", ".main-content", ".view", ".panel", ".data-table"]) {
-    const regel = new RegExp(
-      `^\\${selektor.startsWith(".") ? "" : ""}${selektor.replace(".", "\\.")} \\{[^}]*user-select: none`,
-      "m",
-    );
-    assert.doesNotMatch(styles, regel, `${selektor} sperrt die Markierung nicht`);
-  }
+  let abgeraeumt = 0;
+  app.dom.window.getSelection = () => ({
+    removeAllRanges() {
+      abgeraeumt += 1;
+    },
+  });
+  app.bindTableComfort();
+
+  const kaestchen = new app.HTMLElement({
+    tagName: "INPUT",
+    dataset: { selectEmployee: "e1" },
+  });
+
+  // Ohne Umschalt bleibt die Markierung unberührt.
+  app.dom.dispatch("#employeeTable", "click", { target: kaestchen, shiftKey: false });
+  assert.equal(abgeraeumt, 0);
+
+  // Mit Umschalt markierte der Browser sonst alles zwischen den beiden
+  // Kästchen - gemeint war die Zeilenauswahl, nicht der Text.
+  app.dom.dispatch("#employeeTable", "click", { target: kaestchen, shiftKey: true });
+  assert.equal(abgeraeumt, 1);
+
+  // Ein Klick neben ein Auswahlkästchen geht die Auswahl nichts an.
+  const zelle = new app.HTMLElement({ tagName: "TD" });
+  app.dom.dispatch("#employeeTable", "click", { target: zelle, shiftKey: true });
+  assert.equal(abgeraeumt, 1);
 });

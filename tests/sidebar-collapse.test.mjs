@@ -1,122 +1,83 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import path from "node:path";
-import test from "node:test";
-import { fileURLToPath } from "node:url";
+import test, { after } from "node:test";
+import { closeTeO, openTeO } from "./helpers/browser.mjs";
 
-const projectRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-);
+after(closeTeO);
 
-test("Die Seitenleiste laesst sich auf die Symbole einklappen", async () => {
-  const [appSource, indexHtml, styles] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
-    fs.readFile(path.join(projectRoot, "index.html"), "utf8"),
-    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
-  ]);
+// Was beim Einklappen sichtbar bleiben muss und was abtreten soll - gemessen
+// am errechneten Stil, nicht an der Regel, die ihn erzeugt.
+async function leseZustand(teo) {
+  return teo.evaluate(() => {
+    const sichtbar = (element) =>
+      Boolean(element) && getComputedStyle(element).display !== "none";
+    const menuepunkt = document.querySelector(".nav-item");
+    return {
+      breite: getComputedStyle(document.body).getPropertyValue("--sidebar-width").trim(),
+      eingeklappt: document.body.classList.contains("is-sidebar-collapsed"),
+      aria: document.querySelector("#sidebarToggle").getAttribute("aria-expanded"),
+      namenszug: sichtbar(document.querySelector(".brand-text")),
+      menuebeschriftung: sichtbar(menuepunkt?.querySelector("span")),
+      menuesymbol: sichtbar(menuepunkt?.querySelector("svg")),
+      kontoaktionen: sichtbar(document.querySelector(".user-session-actions")),
+      kurzhinweis: menuepunkt?.getAttribute("title") || "",
+      spalten: getComputedStyle(menuepunkt).gridTemplateColumns,
+    };
+  });
+}
 
-  // Die Schaltflaeche sitzt neben dem Namenszug und sagt Vorleseprogrammen,
-  // welchen Bereich sie steuert und ob er offen steht.
-  assert.match(
-    indexHtml,
-    /<button\s+class="sidebar-toggle"\s+id="sidebarToggle"[^>]*aria-controls="mainNav"[^>]*aria-expanded="true"/s,
-    "Der Umschalter steuert die Hauptnavigation und meldet seinen Zustand",
-  );
+test("Die Seitenleiste klappt auf die Symbole ein und wieder auf", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
 
-  // Eingeklappt bleibt eine schmale Spur; die Breite steht an einer Stelle,
-  // damit Raster und Leiste nicht auseinanderlaufen.
-  assert.match(
-    styles,
-    /body\.is-sidebar-collapsed\s*\{\s*--sidebar-width: 76px;\s*\}/,
-    "Der eingeklappte Zustand setzt die Breite der Seitenleiste neu",
-  );
-  assert.match(
-    styles,
-    /body\.is-sidebar-collapsed :is\(\s*\.brand-text,\s*\.nav-item span,/s,
-    "Alle Beschriftungen der Seitenleiste treten eingeklappt ab",
-  );
-  assert.match(
-    styles,
-    /body\.is-sidebar-collapsed :is\(\.nav-item, \.nav-order-reset\)\s*\{[^}]*grid-template-columns: 22px;/s,
-    "Eingeklappt bleibt vom Menuepunkt die Spalte mit dem Symbol",
-  );
+  const offen = await leseZustand(teo);
+  assert.equal(offen.eingeklappt, false);
+  assert.equal(offen.aria, "true", "Der Umschalter meldet seinen Zustand");
+  assert.equal(offen.namenszug, true);
+  assert.equal(offen.menuebeschriftung, true);
 
-  // Der Zustand ist eine persoenliche Vorliebe und liegt im Browserprofil.
-  assert.match(appSource, /const SIDEBAR_COLLAPSE_KEY = "teo-sidebar-collapsed-v1";/);
-  assert.match(
-    appSource,
-    /function toggleSidebarCollapsed\(\)[\s\S]*?localStorage\.setItem\(\s*SIDEBAR_COLLAPSE_KEY,/,
-    "Ein Klick merkt sich den Zustand",
-  );
-  assert.match(
-    appSource,
-    /function bindSidebarCollapse\(\)[\s\S]*?applySidebarCollapsed\(readStoredSidebarCollapsed\(\)\)/,
-    "Beim Start gilt der gespeicherte Zustand",
-  );
-  assert.match(appSource, /bindSidebarCollapse\(\);/);
+  await teo.evaluate(() => document.querySelector("#sidebarToggle").click());
+  const zu = await leseZustand(teo);
 
-  // Ohne Beschriftung traegt der Kurzhinweis den Namen samt Zaehler nach,
-  // und der Zaehler aendert sich mit dem Datenbestand.
-  assert.match(
-    appSource,
-    /item\.title = count \? `\$\{label\} \(\$\{count\}\)` : label;/,
+  assert.equal(zu.eingeklappt, true);
+  assert.equal(zu.aria, "false");
+  assert.equal(zu.breite, "76px", "Eingeklappt bleibt eine schmale Spur");
+  assert.equal(zu.namenszug, false, "Der Namenszug tritt ab");
+  assert.equal(zu.menuebeschriftung, false, "Die Beschriftung tritt ab");
+  assert.equal(zu.menuesymbol, true, "Das Symbol bleibt - daran wird bedient");
+  assert.equal(
+    zu.kontoaktionen,
+    true,
+    "Benutzerverwaltung und Abmelden bleiben erreichbar",
   );
-  assert.match(appSource, /updateSidebarCollapsedLabels\(\);/);
+  // Ohne Beschriftung trägt der Kurzhinweis den Namen nach; ein unbenannter
+  // Menüpunkt wäre eingeklappt nicht mehr zu deuten.
+  assert.ok(zu.kurzhinweis.length > 0, "Der Menüpunkt nennt sich im Kurzhinweis");
+  assert.match(zu.spalten, /^\d+(\.\d+)?px$/, "Es bleibt die Spalte mit dem Symbol");
+
+  await teo.evaluate(() => document.querySelector("#sidebarToggle").click());
+  const wiederOffen = await leseZustand(teo);
+  assert.equal(wiederOffen.eingeklappt, false);
+  assert.equal(wiederOffen.menuebeschriftung, true);
 });
 
-test("Der Fuß der Seitenleiste hat eine eigene Minimalansicht", async () => {
-  const [appSource, styles] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
-    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
-  ]);
+test("Der eingeklappte Zustand überlebt den nächsten Start", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
 
-  // Beschriftungen treten ab - die Schaltflächen des Kontos aber nicht, sonst
-  // wären Benutzerverwaltung und Abmelden eingeklappt nicht mehr erreichbar.
-  assert.match(styles, /\.user-session > div:not\(\.user-session-actions\),/);
-  assert.match(styles, /\.sidebar-note > div\s*\n\s*\) \{\s*display: none;/);
+  await teo.evaluate(() => document.querySelector("#sidebarToggle").click());
+  const gemerkt = await teo.evaluate(() =>
+    localStorage.getItem("teo-sidebar-collapsed-v1"),
+  );
+  assert.ok(gemerkt, "Die Vorliebe liegt im Browserprofil");
 
-  // Konto, Systemstatus und Namenszug stehen als gleich breite Kacheln
-  // untereinander.
-  assert.match(
-    styles,
-    /body\.is-sidebar-collapsed :is\(\.user-session, \.sidebar-system-status, \.sidebar-note\) \{\s*width: 100%;/,
-  );
-  assert.match(
-    styles,
-    /body\.is-sidebar-collapsed :is\(\.sidebar-system-status, \.sidebar-note\) \{\s*min-height: 44px;/,
-  );
+  // Neu geladen gilt sie weiter - der Zustand ist eine persönliche
+  // Einstellung des Arbeitsplatzes, keine des Datenbestands.
+  const nachNeustart = await openTeO(t, { angemeldetAls: "admin" });
+  const zustand = await leseZustand(nachNeustart);
+  assert.equal(zustand.eingeklappt, true);
+  assert.equal(zustand.breite, "76px");
 
-  // Das Untermenü der Einstellungen bleibt eingeklappt weg. Die Regel, die es
-  // bei aktiver Ansicht zeigt, ist spezifischer als die allgemeine
-  // Ausblendliste - ohne diese Gegenregel stünde es abgeschnitten in der Spur.
-  assert.match(
-    styles,
-    /body\.is-sidebar-collapsed\s*\n?\s*\.nav-item\[data-view="settings"\]\.is-active\s*\n?\s*\+ \.settings-sidebar-subnav \{\s*display: none;/,
-  );
-  // Sie muss hinter der Regel stehen, die das Untermenü zeigt.
-  assert.ok(
-    styles.indexOf('body.is-sidebar-collapsed\n  .nav-item[data-view="settings"]') >
-      styles.indexOf('.nav-item[data-view="settings"].is-active + .settings-sidebar-subnav {'),
-    "Die Gegenregel steht nach der Regel, die sie aufhebt",
-  );
-
-  // Was wegfällt, steht als Kurzhinweis am Block - eine Zeile je Angabe.
-  assert.match(appSource, /function updateSidebarFooterSummaries\(/);
-  assert.match(appSource, /`Angemeldet: \$\{name\}`/);
-  assert.match(appSource, /\[\.\.\.status\.querySelectorAll\("dl > div"\)\]/);
-  // Aufgeklappt verschwindet der Hinweis wieder.
-  assert.match(
-    appSource,
-    /function setSidebarSummary\(element, collapsed, summary\) \{[\s\S]*?if \(!collapsed\) \{\s*element\.removeAttribute\("title"\);/,
-  );
-
-  // Der Systemstatus ändert sich auch ohne neuen Aufbau der Ansichten, das
-  // Konto beim An- und Abmelden - beide ziehen den Hinweis nach.
-  // Aufgerufen aus dem Umschalten, aus dem Systemstatus und aus der
-  // Zugriffssteuerung; die Erklärung dahinter ist die Definition selbst.
-  assert.ok(
-    [...appSource.matchAll(/updateSidebarFooterSummaries\(/g)].length >= 4,
-    "Der Hinweis wird an allen Stellen nachgezogen, an denen sich sein Inhalt ändert",
-  );
+  await nachNeustart.evaluate(() => {
+    localStorage.removeItem("teo-sidebar-collapsed-v1");
+  });
 });

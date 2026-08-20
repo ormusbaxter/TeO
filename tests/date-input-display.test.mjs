@@ -1,34 +1,73 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import path from "node:path";
-import test from "node:test";
-import { fileURLToPath } from "node:url";
+import test, { after } from "node:test";
+import { closeTeO, openTeO } from "./helpers/browser.mjs";
 
-const projectRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-);
+after(closeTeO);
 
-test("Datumsfelder zeigen während der Eingabe die eigene Segmentanzeige", async () => {
-  const [appSource, styles] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
-    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
-  ]);
+test("Datumsfelder tragen eine eigene Anzeige im deutschen Format", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
 
-  // Ein unvollstaendiges Datum hat einen leeren Wert - die eigene Anzeige
-  // stuende deshalb waehrend des Tippens auf dem Platzhalter.
-  assert.match(appSource, /const displayValue = formattedValue \|\| "TT\.MM\.JJJJ";/);
+  const gemessen = await teo.evaluate(async () => {
+    const input = document.querySelector("#birthDate");
+    const shell = input.closest(".formatted-date-shell");
+    const display = shell?.querySelector(".formatted-date-display");
 
-  assert.match(
-    styles,
-    /\.formatted-date-shell \.formatted-date-input:focus\s*\{[^}]*color: var\(--slate-800\) !important;/s,
-  );
-  assert.match(
-    styles,
-    /\.formatted-date-input:focus::-webkit-datetime-edit\s*\{[^}]*color: inherit;/s,
-  );
-  assert.match(
-    styles,
-    /\.formatted-date-shell:focus-within \.formatted-date-display\s*\{\s*display: none;\s*\}/s,
+    const leer = display?.textContent;
+    input.value = "1990-03-07";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    const gefuellt = display?.textContent;
+
+    return {
+      umhuellt: Boolean(shell),
+      leer,
+      gefuellt,
+      platzhalterklasse: display?.classList.contains("is-placeholder"),
+    };
+  });
+
+  assert.equal(gemessen.umhuellt, true, "Das Feld steht in seiner Hülle");
+  // Ein unvollständiges Datum hat einen leeren Wert - dann steht dort der
+  // Platzhalter, nicht nichts.
+  assert.equal(gemessen.leer, "TT.MM.JJJJ");
+  assert.equal(gemessen.gefuellt, "07.03.1990");
+});
+
+test("Beim Tippen tritt die eigene Anzeige zurück", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  // Die Zusage lautet: Während der Eingabe zeigt das Feld seine eigenen
+  // Segmente, nicht die nachgebildete Anzeige darüber. Ob die Regel im
+  // Stylesheet steht, sagt darüber nichts - gemessen wird, was ankommt.
+  const gemessen = await teo.evaluate(async () => {
+    const input = document.querySelector("#birthDate");
+    // Das Feld steht in einem Dialog. Ein geschlossener Dialog nimmt keinen
+    // Eingabefokus an - also wird er geöffnet, wie beim Anlegen auch.
+    input.closest("dialog").showModal();
+    const display = input
+      .closest(".formatted-date-shell")
+      .querySelector(".formatted-date-display");
+
+    const ruhend = getComputedStyle(display).display;
+    input.focus();
+    const beimTippen = {
+      anzeige: getComputedStyle(display).display,
+      feldfarbe: getComputedStyle(input).color,
+    };
+    input.blur();
+    const ruhendeFeldfarbe = getComputedStyle(input).color;
+    input.closest("dialog").close();
+    return { ruhend, beimTippen, ruhendeFeldfarbe };
+  });
+
+  assert.notEqual(gemessen.ruhend, "none", "Ohne Eingabe ist die Anzeige sichtbar");
+  assert.equal(gemessen.beimTippen.anzeige, "none", "Beim Tippen tritt sie ab");
+  // Und das Feld selbst wird dabei sichtbar - ruhend ist es durchsichtig
+  // gestellt, damit nicht beides übereinander steht.
+  assert.notEqual(
+    gemessen.beimTippen.feldfarbe,
+    gemessen.ruhendeFeldfarbe,
+    "Das Feld zeigt beim Tippen seine eigenen Segmente",
   );
 });

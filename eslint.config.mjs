@@ -137,19 +137,20 @@ export default [
   },
 
   {
-    files: ["tools/**/*.mjs", "tests/**/*.mjs", "src/meta/*.mjs", "src/shared/*.mjs", "eslint.config.mjs"],
+    files: ["tools/**/*.mjs", "src/meta/*.mjs", "src/shared/*.mjs", "eslint.config.mjs"],
     languageOptions: { ecmaVersion: 2023, sourceType: "module", globals: nodeGlobals },
     rules: sharedRules,
   },
 
-  // Der Rauchtest schickt Rümpfe in den Browser: Innerhalb von
-  // page.evaluate() gilt dort die Umgebung der Seite, nicht die von Node.
+  // Tests laufen in Node, schicken aber Rümpfe in den Browser: Innerhalb von
+  // page.evaluate() gilt die Umgebung der Seite. Beide Sätze zusammen, damit
+  // die Prüfung nicht an jedem solchen Rumpf hängen bleibt.
   {
-    files: ["tests/browser-smoke.test.mjs"],
+    files: ["tests/**/*.mjs"],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: "module",
-      globals: { ...nodeGlobals, ...browserGlobals },
+      globals: { ...nodeGlobals, ...browserGlobals, KeyboardEvent: "readonly" },
     },
     rules: sharedRules,
   },

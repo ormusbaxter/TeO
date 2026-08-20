@@ -85,12 +85,14 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
     localStorage: createStorageStub(),
     navigator: {},
     sessionStorage: createStorageStub(),
-    window: {
+    // Kein Ausbreiten: Sonst waere dom.window eine Kopie, und was ein Test
+    // nachtraeglich daran setzt - etwa getSelection - kaeme in der Anwendung
+    // nie an.
+    window: Object.assign(dom ? dom.window : {}, {
       TeOProjectMeta: PROJECT_META,
       TeOStateSchema: { validateStateShape },
       crypto: globalThis.crypto,
-      ...(dom ? dom.window : {}),
-    },
+    }),
   };
   context.globalThis = context;
   context.window.window = context.window;
@@ -264,6 +266,7 @@ function createDomStub() {
   const queryAllResults = new Map();
 
   const createElement = (selector = "") => {
+    const listeners = new Map();
     const target = {
       tagName: "DIV",
       id: selector.replace(/^#/, ""),
@@ -282,6 +285,23 @@ function createDomStub() {
       style: {},
       dataset: {},
       classList: createClassList(),
+      // Gebundene Behandlungen werden gemerkt, damit ein Test sie ausloesen
+      // kann. Zuvor verschluckte der Ersatz jede Bindung - alles, was in
+      // einem Ereignis steckt, blieb dadurch ungeprueft.
+      addEventListener(type, handler) {
+        if (typeof handler !== "function") return;
+        const forType = listeners.get(type) || [];
+        forType.push(handler);
+        listeners.set(type, forType);
+      },
+      removeEventListener(type, handler) {
+        const forType = listeners.get(type) || [];
+        const position = forType.indexOf(handler);
+        if (position >= 0) forType.splice(position, 1);
+      },
+      dispatch(type, event = {}) {
+        for (const handler of [...(listeners.get(type) || [])]) handler(event);
+      },
     };
     return new Proxy(target, {
       get(object, property) {
@@ -301,7 +321,7 @@ function createDomStub() {
       },
       set(object, property, value) {
         if (property === "innerHTML" && selector) {
-          markup.set(selector, String(value).length);
+          markup.set(selector, String(value));
         }
         object[property] = value;
         return true;
@@ -354,7 +374,12 @@ function createDomStub() {
     // Wie viel Markup zuletzt in dieses Element geschrieben wurde. Null
     // bedeutet: seit dem Zuruecksetzen wurde es nicht aufgebaut.
     markupLength(selector) {
-      return markup.get(selector) || 0;
+      return (markup.get(selector) || "").length;
+    },
+    // Das zuletzt hineingeschriebene Markup. Ob eine Ansicht ueberhaupt
+    // aufgebaut wurde, beantwortet markupLength; was in ihr steht, dies hier.
+    markupText(selector) {
+      return markup.get(selector) || "";
     },
     setQueryAll(selector, found) {
       queryAllResults.set(selector, found);
@@ -364,6 +389,11 @@ function createDomStub() {
     },
     setElementFromPoint(handler) {
       elementAtPoint = handler;
+    },
+    // Loest ein Ereignis an dem Element aus, das unter diesem Selektor
+    // gefuehrt wird - der Weg zu allem, was in einer Bindung steckt.
+    dispatch(selector, type, event = {}) {
+      querySelector(selector).dispatch(type, event);
     },
     resetMarkup() {
       markup.clear();
