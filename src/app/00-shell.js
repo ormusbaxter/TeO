@@ -192,14 +192,23 @@
   const THEMES = {
     standard: "Standard",
     dark: "Dark Mode",
+    "solarized-light": "Solarized Light",
     nord: "Nord",
     dracula: "Dracula",
+    "gruvbox-dark": "Gruvbox Dark",
+    "tokyo-night": "Tokyo Night",
     "catppuccin-latte": "Catppuccin Latte",
     "windows-95": "Windows 95",
     cellitinnen: "Cellitinnen",
     "cellitinnen-red": "Cellitinnen Rot",
   };
-  const DARK_THEMES = new Set(["dark", "nord", "dracula"]);
+  const DARK_THEMES = new Set([
+    "dark",
+    "nord",
+    "dracula",
+    "gruvbox-dark",
+    "tokyo-night",
+  ]);
 
   const PASSWORD_ITERATIONS = 210000;
   const USER_FIRST_NAME_FALLBACKS = {

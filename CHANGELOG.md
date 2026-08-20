@@ -4,6 +4,8 @@
 - **Verbessert:** TeO startet schlanker: Das Handbuch wird erst aufgebaut, wenn die Hilfe zum ersten Mal gebraucht wird. Beim Start entstehen dadurch rund 2500 statt 4100 Elemente – jeder Ansichtswechsel wird dadurch etwas flüssiger
 - **Verbessert:** Die Suche in der Hilfe reagiert unmittelbar. Sie verglich bisher bei jedem Tastendruck den vollständigen Text aller Themen; der Suchschlüssel entsteht jetzt einmal je Abschnitt
 - **Verbessert:** Geräteliste und Einweisungsmatrix bauen spürbar sparsamer auf. Für jedes Gerät wurde bisher der gesamte Einweisungsbestand durchsucht, um die berechtigten Mitarbeiter zu ermitteln – auch dann, wenn gar nicht danach gefiltert war. Bei 40 Geräten waren das 41 Durchgänge statt einem
+- **Neu:** Solarized Light, Gruvbox Dark und Tokyo Night erweitern die Themenauswahl um eine augenschonende helle und zwei kontrastreiche dunkle Paletten
+- **Verbessert:** Native Formulare, Planungsmarkierungen und Meldungen übernehmen auch in den neuen dunklen Themes die passende Darstellung
 
 ### 4.44.0 – Schnellansicht für alle Datenarten
 

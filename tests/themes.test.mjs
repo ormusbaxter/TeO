@@ -7,13 +7,16 @@ after(closeTeO);
 const THEMEN = [
   ["standard", "Standard"],
   ["dark", "Dark Mode"],
+  ["solarized-light", "Solarized Light"],
   ["nord", "Nord"],
   ["dracula", "Dracula"],
+  ["gruvbox-dark", "Gruvbox Dark"],
+  ["tokyo-night", "Tokyo Night"],
   ["catppuccin-latte", "Catppuccin Latte"],
   ["windows-95", "Windows 95"],
 ];
 
-const DUNKLE_THEMEN = ["dark", "nord", "dracula"];
+const DUNKLE_THEMEN = ["dark", "nord", "dracula", "gruvbox-dark", "tokyo-night"];
 
 function relativeHelligkeit([r, g, b]) {
   const kanal = (wert) => {

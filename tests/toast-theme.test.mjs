@@ -41,8 +41,11 @@ function alsRgb(wert) {
 const THEMEN = [
   "standard",
   "dark",
+  "solarized-light",
   "nord",
   "dracula",
+  "gruvbox-dark",
+  "tokyo-night",
   "catppuccin-latte",
   "cellitinnen",
   "cellitinnen-red",

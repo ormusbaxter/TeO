@@ -8589,28 +8589,138 @@ html[data-theme="dracula"] {
   --toast-warning-tint: rgb(255 184 108 / 14%);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) body {
+/* Gruvbox Dark: https://github.com/morhetz/gruvbox */
+html[data-theme="gruvbox-dark"] {
+  --navy-950: #fbf1c7;
+  --navy-900: #ebdbb2;
+  --navy-800: #d5c4a1;
+  --blue-700: #83a598;
+  --blue-600: #8ec07c;
+  --blue-100: #3d5149;
+  --blue-50: #354740;
+  --teal-700: #8ec07c;
+  --teal-100: #3b4d3f;
+  --orange-700: #fe8019;
+  --orange-100: #5a3b25;
+  --red-700: #fb4934;
+  --red-100: #58342f;
+  --green-700: #b8bb26;
+  --green-100: #414526;
+  --slate-900: #fbf1c7;
+  --slate-800: #ebdbb2;
+  --slate-700: #d5c4a1;
+  --slate-600: #bdae93;
+  --slate-500: #a89984;
+  --slate-400: #928374;
+  --slate-300: #665c54;
+  --slate-200: #504945;
+  --slate-100: #3c3836;
+  --slate-50: #32302f;
+  --white: #32302f;
+  --theme-page: #282828;
+  --theme-sidebar: #1d2021;
+  --theme-surface: #32302f;
+  --theme-surface-alt: #3c3836;
+  --theme-header: #35312f;
+  --theme-mobile-header: rgb(40 40 40 / 94%);
+  --theme-mobile-nav: rgb(50 48 47 / 97%);
+  --theme-primary: #fabd2f;
+  --theme-primary-hover: #d79921;
+  --theme-primary-text: #282828;
+  --theme-brand-start: #fabd2f;
+  --theme-brand-end: #fe8019;
+  --theme-glow: rgb(250 189 47 / 13%);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 32%);
+  --shadow-md: 0 12px 32px rgb(0 0 0 / 38%);
+  --shadow-lg: 0 24px 70px rgb(0 0 0 / 52%);
+  --toast-surface: #3c3836;
+  --toast-text: #fbf1c7;
+  --toast-border: rgb(251 241 199 / 16%);
+  --toast-success-icon: #b8bb26;
+  --toast-success-tint: rgb(184 187 38 / 14%);
+  --toast-error-icon: #fb705f;
+  --toast-error-tint: rgb(251 112 95 / 14%);
+  --toast-warning-icon: #fabd2f;
+  --toast-warning-tint: rgb(250 189 47 / 14%);
+}
+
+/* Tokyo Night: https://github.com/enkia/tokyo-night-vscode-theme */
+html[data-theme="tokyo-night"] {
+  --navy-950: #c0caf5;
+  --navy-900: #a9b1d6;
+  --navy-800: #9aa5ce;
+  --blue-700: #7aa2f7;
+  --blue-600: #7dcfff;
+  --blue-100: #334267;
+  --blue-50: #2c3858;
+  --teal-700: #73daca;
+  --teal-100: #2d4b4b;
+  --orange-700: #e0af68;
+  --orange-100: #50422f;
+  --red-700: #f7768e;
+  --red-100: #503440;
+  --green-700: #9ece6a;
+  --green-100: #354735;
+  --slate-900: #c0caf5;
+  --slate-800: #a9b1d6;
+  --slate-700: #9aa5ce;
+  --slate-600: #7f89ad;
+  --slate-500: #6f7898;
+  --slate-400: #565f89;
+  --slate-300: #414868;
+  --slate-200: #3b4261;
+  --slate-100: #292e42;
+  --slate-50: #24283b;
+  --white: #24283b;
+  --theme-page: #1a1b26;
+  --theme-sidebar: #16161e;
+  --theme-surface: #24283b;
+  --theme-surface-alt: #292e42;
+  --theme-header: #202434;
+  --theme-mobile-header: rgb(26 27 38 / 94%);
+  --theme-mobile-nav: rgb(36 40 59 / 97%);
+  --theme-primary: #7aa2f7;
+  --theme-primary-hover: #89b4fa;
+  --theme-primary-text: #16161e;
+  --theme-brand-start: #7aa2f7;
+  --theme-brand-end: #bb9af7;
+  --theme-glow: rgb(122 162 247 / 14%);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
+  --shadow-md: 0 12px 32px rgb(0 0 0 / 36%);
+  --shadow-lg: 0 24px 70px rgb(0 0 0 / 52%);
+  --toast-surface: #292e42;
+  --toast-text: #c0caf5;
+  --toast-border: rgb(192 202 245 / 16%);
+  --toast-success-icon: #9ece6a;
+  --toast-success-tint: rgb(158 206 106 / 14%);
+  --toast-error-icon: #f7768e;
+  --toast-error-tint: rgb(247 118 142 / 14%);
+  --toast-warning-icon: #e0af68;
+  --toast-warning-tint: rgb(224 175 104 / 14%);
+}
+
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) body {
   color: var(--slate-900);
   background:
     radial-gradient(circle at 78% -20%, var(--theme-glow), transparent 33rem),
     var(--theme-page);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .sidebar {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .sidebar {
   background:
     linear-gradient(180deg, rgb(255 255 255 / 3%), transparent 40%),
     var(--theme-sidebar);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .brand-mark {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .brand-mark {
   background: linear-gradient(145deg, var(--theme-brand-start), var(--theme-brand-end));
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .panel {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .panel {
   background: var(--theme-surface);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) :is(
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) :is(
     .summary-chip,
     .training-card,
     .meeting-card,
@@ -8633,7 +8743,7 @@ html[data-theme="dracula"] {
   background: var(--theme-surface);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) :is(
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) :is(
     .training-card-details,
     .modal-footer,
     .data-table tbody tr:hover,
@@ -8644,7 +8754,7 @@ html[data-theme="dracula"] {
   background: var(--theme-surface-alt);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) :is(
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) :is(
     .button-secondary,
     .button-ghost,
     .segmented-control button.is-active,
@@ -8662,22 +8772,22 @@ html[data-theme="dracula"] {
   background: var(--theme-surface);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .button-primary {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .button-primary {
   color: var(--theme-primary-text);
   background: var(--theme-primary);
   box-shadow: 0 6px 15px rgb(0 0 0 / 22%);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .button-primary:hover {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .button-primary:hover {
   color: var(--theme-primary-text);
   background: var(--theme-primary-hover);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .button-secondary {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .button-secondary {
   color: var(--blue-700);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) :is(
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) :is(
     .training-matrix-table thead th,
     .training-matrix-table thead th:first-child,
     .device-matrix-table thead th,
@@ -8686,60 +8796,150 @@ html[data-theme="dracula"] {
   background: var(--theme-header);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .meeting-pie-chart::after {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .meeting-pie-chart::after {
   background: var(--theme-surface);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"])
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"])
   .device-matrix-status.is-manufacturer-officer {
   color: var(--orange-700);
   background: var(--orange-100);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .settings-card-icon-admin {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .settings-card-icon-admin {
   color: var(--blue-700);
   background: var(--blue-100);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .mobile-header {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .mobile-header {
   border-color: var(--slate-200);
   background: var(--theme-mobile-header);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .mobile-nav {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .mobile-nav {
   border-color: var(--slate-200);
   background: var(--theme-mobile-nav);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .brand-mobile strong {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .brand-mobile strong {
   color: var(--navy-950);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .efficiency-hint {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .efficiency-hint {
   border-color: var(--blue-600);
   background: var(--blue-50);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) .database-save-warning {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) .database-save-warning {
   color: var(--orange-700);
   border-color: var(--orange-700);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"])
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"])
   .database-save-warning-action {
   color: var(--theme-primary-text);
   border-color: var(--orange-700);
   background: var(--orange-700);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"])
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"])
   .database-save-warning-action:hover {
   color: var(--theme-primary-text);
   background: var(--theme-primary-hover);
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) input {
+:is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"]) input {
   color-scheme: dark;
+}
+
+/* Solarized Light: https://ethanschoonover.com/solarized/ */
+html[data-theme="solarized-light"] {
+  --navy-950: #073642;
+  --navy-900: #164e5b;
+  --navy-800: #285f6b;
+  --blue-700: #006d80;
+  --blue-600: #087f8c;
+  --blue-100: #cde5e4;
+  --blue-50: #e5f1ef;
+  --teal-700: #14756f;
+  --teal-100: #d8e9e4;
+  --orange-700: #9a5800;
+  --orange-100: #f4e2c0;
+  --red-700: #b82832;
+  --red-100: #f1d9d6;
+  --green-700: #557200;
+  --green-100: #e3e8c9;
+  --slate-900: #073642;
+  --slate-800: #36545b;
+  --slate-700: #586e75;
+  --slate-600: #657b83;
+  --slate-500: #7c8e91;
+  --slate-400: #93a1a1;
+  --slate-300: #b7bfba;
+  --slate-200: #cbd1c8;
+  --slate-100: #e2dfcf;
+  --slate-50: #eee8d5;
+  --white: #fffdf4;
+  --shadow-sm: 0 1px 2px rgb(7 54 66 / 8%);
+  --shadow-md: 0 12px 32px rgb(7 54 66 / 14%);
+  --shadow-lg: 0 24px 70px rgb(7 54 66 / 21%);
+  --toast-surface: #073642;
+  --toast-text: #fdf6e3;
+  --toast-border: rgb(253 246 227 / 16%);
+  --toast-success-icon: #b7ca62;
+  --toast-success-tint: rgb(183 202 98 / 14%);
+  --toast-error-icon: #f08c88;
+  --toast-error-tint: rgb(240 140 136 / 14%);
+  --toast-warning-icon: #f2c36b;
+  --toast-warning-tint: rgb(242 195 107 / 14%);
+}
+
+html[data-theme="solarized-light"] body {
+  background:
+    radial-gradient(circle at 78% -20%, rgb(38 139 210 / 10%), transparent 33rem),
+    #f6f0dc;
+}
+
+html[data-theme="solarized-light"] .sidebar {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 5%), transparent 40%),
+    #073642;
+}
+
+html[data-theme="solarized-light"] .brand-mark {
+  background: linear-gradient(145deg, #2aa198, #006d80);
+}
+
+html[data-theme="solarized-light"] .nav-item.is-active {
+  background: linear-gradient(90deg, rgb(255 255 255 / 17%), rgb(255 255 255 / 7%));
+  box-shadow: inset 3px 0 #67c7bf;
+}
+
+html[data-theme="solarized-light"] .button-primary {
+  background: #006d80;
+  box-shadow: 0 6px 15px rgb(0 109 128 / 22%);
+}
+
+html[data-theme="solarized-light"] .button-primary:hover {
+  background: #00596a;
+  box-shadow: 0 8px 20px rgb(0 109 128 / 30%);
+}
+
+html[data-theme="solarized-light"] .button-secondary {
+  border-color: #b7bfba;
+}
+
+html[data-theme="solarized-light"] :is(
+    .search-field:focus-within,
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus,
+    .compact-field select:focus,
+    .bulk-attendance-bar select:focus,
+    .attendance-status-field select:focus
+  ) {
+  border-color: #2aa198;
+  box-shadow: 0 0 0 3px rgb(42 161 152 / 15%);
 }
 
 /* Catppuccin Latte: https://catppuccin.com/palette/ */
@@ -10443,7 +10643,13 @@ body.is-vacation-planner-maximized {
   opacity: 0.55;
 }
 
-:is(html[data-theme="dark"], html[data-theme="nord"], html[data-theme="dracula"]) :is(
+:is(
+    html[data-theme="dark"],
+    html[data-theme="nord"],
+    html[data-theme="dracula"],
+    html[data-theme="gruvbox-dark"],
+    html[data-theme="tokyo-night"]
+  ) :is(
     .legend-weekend-weekend_a,
     .vacation-weekend-weekend_a,
     .vacation-employee-weekend-weekend_a
@@ -10451,7 +10657,13 @@ body.is-vacation-planner-maximized {
   background: rgb(40 120 227 / 20%) !important;
 }
 
-:is(html[data-theme="dark"], html[data-theme="nord"], html[data-theme="dracula"]) :is(
+:is(
+    html[data-theme="dark"],
+    html[data-theme="nord"],
+    html[data-theme="dracula"],
+    html[data-theme="gruvbox-dark"],
+    html[data-theme="tokyo-night"]
+  ) :is(
     .legend-weekend-weekend_b,
     .vacation-weekend-weekend_b,
     .vacation-employee-weekend-weekend_b
