@@ -8,7 +8,7 @@ import {
 
 // Baut einen Bestand, wie er über Jahre entsteht: viele Geräte, viele
 // Mitarbeiter und für jedes Paar eine Einweisung.
-function createInstructionState(deviceCount, employeeCount) {
+function createInstructionState(deviceCount, employeeCount, instructedPairs = 0) {
   const employees = Array.from({ length: employeeCount }, (_, index) =>
     createEmployee(`employee-${index}`),
   );
@@ -22,8 +22,14 @@ function createInstructionState(deviceCount, employeeCount) {
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
   }));
-  const deviceInstructions = devices.flatMap((device, deviceIndex) =>
-    employees.map((employee, employeeIndex) => ({
+  // Ohne Angabe bekommt jedes Paar seine Einweisung. Mit Angabe nur die
+  // ersten n Geräte und Mitarbeiter - dann bleibt der Bestand gleich groß,
+  // während die Matrix wächst.
+  const eingewiesen = instructedPairs
+    ? { devices: devices.slice(0, instructedPairs), employees: employees.slice(0, instructedPairs) }
+    : { devices, employees };
+  const deviceInstructions = eingewiesen.devices.flatMap((device, deviceIndex) =>
+    eingewiesen.employees.map((employee, employeeIndex) => ({
       id: `instruction-${deviceIndex}-${employeeIndex}`,
       deviceId: device.id,
       date: "2026-02-01",
@@ -66,35 +72,46 @@ test("Der Index findet die Einweisung eines Paares in einem Griff", async () => 
   );
 });
 
-test("Die Matrix wächst nicht quadratisch mit dem Bestand", async () => {
+test("Die Matrix durchläuft den Bestand einmal, nicht je Zelle", async () => {
   const app = await loadAppFunctions(["renderDeviceInstructionMatrix"], {
     withDom: true,
   });
 
-  const messe = (deviceCount, employeeCount) => {
-    app.setState(createInstructionState(deviceCount, employeeCount));
-    // Ein Durchlauf zum Aufwärmen, damit nicht die erste Übersetzung gemessen
-    // wird.
+  // Gezählt statt gestoppt: Eine Zeitmessung streut auf einem geteilten
+  // Rechner um ein Vielfaches und sagt am Ende mehr über die Auslastung als
+  // über den Aufbau. Die Frage lässt sich genauer stellen - wie viele
+  // Einweisungen liest die Anwendung beim Aufbau überhaupt? Der Index
+  // durchläuft sie einmal, unabhängig von der Größe der Matrix. Ohne ihn
+  // durchsucht sie jede Zelle von vorn.
+  //
+  // Der Bestand an Einweisungen bleibt dabei gleich; nur die Matrix wächst.
+  const zaehleGelesen = (deviceCount, employeeCount) => {
+    const state = createInstructionState(deviceCount, employeeCount, 5);
+    let gelesen = 0;
+    state.deviceInstructions = new Proxy(state.deviceInstructions, {
+      get(ziel, schluessel) {
+        if (typeof schluessel === "string" && /^\d+$/.test(schluessel)) {
+          gelesen += 1;
+        }
+        return ziel[schluessel];
+      },
+    });
+    app.setState(state);
     app.renderDeviceInstructionMatrix();
-    const start = process.hrtime.bigint();
-    app.renderDeviceInstructionMatrix();
-    return Number(process.hrtime.bigint() - start) / 1e6;
+    return gelesen;
   };
 
-  const klein = messe(10, 20);
-  const gross = messe(40, 80);
+  const klein = zaehleGelesen(5, 6);
+  const gross = zaehleGelesen(20, 24);
 
-  // Sechzehnfache Zellzahl. Mit dem Index kostet das ungefähr das Sechsfache
-  // - der feste Aufwand für das Markup überwiegt bei der kleinen Messung.
-  // Fragte jede Zelle wieder den ganzen Bestand ab, wären es rund das
-  // Siebzigfache; gemessen wurden 4,8 -> 27,7 ms mit Index und 3,4 -> 237,8 ms
-  // ohne. Die Grenze liegt weit zwischen beiden, damit die Prüfung nicht an
-  // der Tagesform des Rechners hängt und den Rückfall trotzdem sicher fängt.
-  const verhaeltnis = gross / Math.max(klein, 0.05);
-  assert.ok(
-    verhaeltnis < 20,
-    `Sechzehnfache Zellzahl kostete das ${verhaeltnis.toFixed(1)}-fache (${klein.toFixed(1)} ms -> ${gross.toFixed(1)} ms)`,
+  // Sechzehnmal so viele Zellen, derselbe Bestand: Der Aufwand bleibt gleich.
+  assert.equal(
+    gross,
+    klein,
+    `Sechzehnfache Zellzahl las ${gross} statt ${klein} Einweisungen - der Aufbau durchsucht den Bestand offenbar mehrfach`,
   );
+  // Und ein Durchgang genügt: 25 Einweisungen, 25 gelesene Einträge.
+  assert.equal(gross, 25, `Ein Durchgang wären 25 Einträge, gelesen wurden ${gross}`);
 });
 
 test("Das Einweisungsprotokoll kommt seitenweise", async () => {

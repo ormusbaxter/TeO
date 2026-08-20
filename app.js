@@ -13457,21 +13457,28 @@
         if (categoryFilter !== "all" && device.category !== categoryFilter) {
           return false;
         }
-        const authorizedEmployees = getDeviceAuthorizedEmployees(device.id);
-        if (authorizationFilter === "assigned" && !authorizedEmployees.length) {
-          return false;
-        }
-        if (authorizationFilter === "unassigned" && authorizedEmployees.length) {
-          return false;
-        }
-        if (
-          authorizationFilter.startsWith("employee:") &&
-          !authorizedEmployees.some(
-            (employee) =>
-              employee.id === authorizationFilter.slice("employee:".length),
-          )
-        ) {
-          return false;
+        // Die Berechtigten je Geraet zu ermitteln kostet einen Durchgang
+        // durch alle Einweisungen. Gefragt wird danach nur, wenn auch
+        // danach gefiltert wird - sonst zahlte jeder Aufbau der Geraeteliste
+        // und der Matrix einen Durchgang je Geraet, ohne dass das Ergebnis
+        // jemanden interessiert.
+        if (authorizationFilter !== "all") {
+          const authorizedEmployees = getDeviceAuthorizedEmployees(device.id);
+          if (authorizationFilter === "assigned" && !authorizedEmployees.length) {
+            return false;
+          }
+          if (authorizationFilter === "unassigned" && authorizedEmployees.length) {
+            return false;
+          }
+          if (
+            authorizationFilter.startsWith("employee:") &&
+            !authorizedEmployees.some(
+              (employee) =>
+                employee.id === authorizationFilter.slice("employee:".length),
+            )
+          ) {
+            return false;
+          }
         }
         const normalizedSearchTerm = searchKey(searchTerm);
         if (!normalizedSearchTerm) return true;
