@@ -816,7 +816,7 @@
     textArea.select();
     textArea.setSelectionRange(0, text.length);
 
-    let copied = false;
+    let copied;
     try {
       copied = document.execCommand("copy");
     } finally {

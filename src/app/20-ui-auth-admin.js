@@ -1534,7 +1534,7 @@
       (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
     );
 
-    let passwordMatches = false;
+    let passwordMatches;
     try {
       passwordMatches = user ? await verifyPassword(password, user) : false;
     } catch (error) {
