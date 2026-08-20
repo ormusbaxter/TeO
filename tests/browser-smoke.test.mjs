@@ -75,6 +75,24 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
     await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
     await page.waitForFunction(() => Boolean(window.TeOProjectMeta), null, { timeout: 10000 });
 
+    const loginInformation = await page.evaluate(() => ({
+      dialogOpen: document.querySelector("#loginDialog").open,
+      version: document.querySelector("#loginProjectVersion").textContent.trim(),
+      copyright: document.querySelector("#loginCopyright").textContent.trim(),
+      expectedVersion: [
+        window.TeOProjectMeta.version.major,
+        window.TeOProjectMeta.version.minor,
+        window.TeOProjectMeta.version.patch,
+      ].join("."),
+    }));
+    assert.equal(loginInformation.dialogOpen, true, "Die Anmeldemaske ist sichtbar");
+    assert.equal(
+      loginInformation.version,
+      `Version ${loginInformation.expectedVersion}`,
+      "Die Anmeldemaske zeigt die aktuelle Software-Version",
+    );
+    assert.equal(loginInformation.copyright, "© 2026 Oliver Becker");
+
     // Das Handbuch wartet in seiner Vorlage.
     const beimStart = await page.evaluate(() => ({
       imDokument: document.querySelectorAll("[data-help-section]").length,

@@ -610,6 +610,7 @@
     dashboardTrainingProgress: document.querySelector("#dashboardTrainingProgress"),
     dashboardGreeting: document.querySelector("#dashboardGreeting"),
     projectBuildLabel: document.querySelector("#projectBuildLabel"),
+    loginProjectVersion: document.querySelector("#loginProjectVersion"),
     deadlineOverview: document.querySelector("#deadlineOverview"),
     deadlineHorizon: document.querySelector("#deadlineHorizon"),
     deadlineFilters: [...document.querySelectorAll("[data-deadline-filter]")],
@@ -5035,7 +5036,9 @@
   }
 
   function renderProjectMetadata() {
-    elements.projectBuildLabel.textContent = `${PROJECT_NAME} - ${projectBuildNumber()}`;
+    const buildNumber = projectBuildNumber();
+    elements.projectBuildLabel.textContent = `${PROJECT_NAME} - ${buildNumber}`;
+    elements.loginProjectVersion.textContent = `Version ${buildNumber}`;
   }
 
   function renderSidebarSystemStatus() {
