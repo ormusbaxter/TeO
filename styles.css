@@ -167,8 +167,10 @@ button:disabled {
   display: none !important;
 }
 
-body[data-user-role="user"] [data-admin-only],
-body[data-user-role="guest"] [data-admin-only] {
+/* Die Sperre haengt allein an der Rolle am body. Umgekehrt formuliert, damit
+   sie auch vor der ersten Anmeldung und bei einer unbekannten Rolle greift:
+   Sichtbar wird ein Verwaltungselement nur fuer „admin“. */
+body:not([data-user-role="admin"]) [data-admin-only] {
   display: none !important;
 }
 
@@ -684,18 +686,6 @@ body.is-sidebar-collapsed
   border-top: 1px solid rgb(255 255 255 / 7%);
 }
 
-.theme-selector {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-top: auto;
-  margin-bottom: 12px;
-  padding: 13px 14px;
-  border: 1px solid rgb(255 255 255 / 9%);
-  border-radius: 12px;
-  background: rgb(255 255 255 / 4%);
-}
-
 .user-session {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr) auto;
@@ -768,43 +758,6 @@ body.is-sidebar-collapsed
 .user-session-actions svg {
   width: 13px;
   height: 13px;
-}
-
-.theme-selector > span {
-  display: flex;
-  gap: 7px;
-  align-items: center;
-  color: #afc0cf;
-  font-size: 0.67rem;
-  font-weight: 750;
-}
-
-.theme-selector svg {
-  width: 15px;
-  height: 15px;
-}
-
-.theme-selector select {
-  width: 100%;
-  min-height: 34px;
-  padding: 6px 9px;
-  color: #dce7f1;
-  font-size: 0.68rem;
-  font-weight: 700;
-  border: 1px solid rgb(255 255 255 / 13%);
-  border-radius: 8px;
-  outline: 0;
-  background: rgb(255 255 255 / 7%);
-}
-
-.theme-selector select option {
-  color: var(--slate-900);
-  background: var(--white);
-}
-
-.theme-selector select:focus {
-  border-color: #77b6ff;
-  box-shadow: 0 0 0 3px rgb(119 182 255 / 15%);
 }
 
 .sidebar-note-icon {
@@ -1335,102 +1288,6 @@ body.is-sidebar-collapsed
   gap: 10px;
   flex-wrap: wrap;
   justify-content: flex-end;
-}
-
-/* Die vier Spuren entstehen unabhaengig von der Kartenzahl. Die derzeit
-   einzelne Kennzahl behaelt dadurch ihre gewohnte Breite. */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 22px;
-}
-
-.stat-card {
-  position: relative;
-  min-height: 136px;
-  padding: 22px;
-  overflow: hidden;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-lg);
-  background: rgb(255 255 255 / 90%);
-  box-shadow: var(--shadow-sm);
-}
-
-.stat-card::after {
-  position: absolute;
-  right: -26px;
-  bottom: -32px;
-  width: 100px;
-  height: 100px;
-  content: "";
-  border-radius: 50%;
-  background: var(--stat-wash, var(--blue-50));
-}
-
-.stat-top {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.stat-label {
-  color: var(--slate-600);
-  font-size: 0.76rem;
-  font-weight: 700;
-}
-
-.stat-icon {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  color: var(--stat-color, var(--blue-700));
-  border-radius: 10px;
-  background: var(--stat-wash, var(--blue-100));
-}
-
-.stat-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.stat-value {
-  position: relative;
-  z-index: 1;
-  display: block;
-  margin-top: 14px;
-  color: var(--navy-950);
-  font-size: 1.8rem;
-  font-weight: 750;
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-.stat-detail {
-  position: relative;
-  z-index: 1;
-  display: block;
-  margin-top: 7px;
-  color: var(--slate-500);
-  font-size: 0.68rem;
-}
-
-.stat-card.stat-teal {
-  --stat-color: var(--teal-700);
-  --stat-wash: var(--teal-100);
-}
-
-.stat-card.stat-orange {
-  --stat-color: var(--orange-700);
-  --stat-wash: var(--orange-100);
-}
-
-.stat-card.stat-red {
-  --stat-color: var(--red-700);
-  --stat-wash: var(--red-100);
 }
 
 .dashboard-grid {
@@ -4608,36 +4465,6 @@ legend {
   margin: 0;
 }
 
-.status-toggle-card {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 16px;
-  padding: 12px 14px;
-  cursor: pointer;
-  border: 1px solid var(--slate-200);
-  border-radius: 9px;
-  background: var(--slate-50);
-}
-
-.status-toggle-card strong,
-.status-toggle-card small {
-  display: block;
-}
-
-.status-toggle-card strong {
-  color: var(--slate-700);
-  font-size: 0.69rem;
-}
-
-.status-toggle-card small {
-  margin-top: 3px;
-  color: var(--slate-500);
-  font-size: 0.65rem;
-  line-height: 1.4;
-}
-
 .switch {
   position: relative;
   display: inline-flex;
@@ -5432,10 +5259,6 @@ body.is-sidebar-collapsed .sidebar-search {
 }
 
 @media (max-width: 1180px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .employee-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -5796,29 +5619,6 @@ body.is-sidebar-collapsed .sidebar-search {
     flex: 1 1 160px;
   }
 
-  .desktop-only,
-  .desktop-only-flex {
-    display: none !important;
-  }
-
-  .stats-grid {
-    gap: 10px;
-  }
-
-  .stat-card {
-    min-height: 122px;
-    padding: 16px;
-    border-radius: 14px;
-  }
-
-  .stat-value {
-    font-size: 1.55rem;
-  }
-
-  .stat-label {
-    font-size: 0.68rem;
-  }
-
   .panel,
   .training-card,
   .meeting-card {
@@ -6092,18 +5892,6 @@ body.is-sidebar-collapsed .sidebar-search {
     padding: 15px;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-card {
-    min-height: 105px;
-  }
-
-  .stat-value {
-    margin-top: 8px;
-  }
-
   .panel-header {
     align-items: flex-start;
   }
@@ -6179,14 +5967,6 @@ body.is-sidebar-collapsed .sidebar-search {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-.theme-selector + .sidebar-note {
-  margin-top: 0;
-}
-
-.user-session + .theme-selector {
-  margin-top: 0;
 }
 
 .auth-dialog {
@@ -6656,8 +6436,7 @@ body.is-sidebar-collapsed .sidebar-search {
   }
 }
 
-.deadline-summary,
-.weekend-stat-grid {
+.deadline-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
@@ -7832,30 +7611,6 @@ button.device-employee-overview-row:hover {
   font-weight: 600;
 }
 
-.weekend-stat-grid {
-  padding: 0;
-}
-
-.weekend-stat-grid .meeting-stat-card {
-  cursor: pointer;
-  text-align: left;
-  border: 1px solid var(--slate-200);
-}
-
-.balance-hint {
-  margin: 14px 0;
-  padding: 10px 12px;
-  color: var(--green-700);
-  font-size: 0.68rem;
-  border-radius: 9px;
-  background: var(--green-100);
-}
-
-.balance-hint.is-warning {
-  color: var(--orange-700);
-  background: var(--orange-100);
-}
-
 .weekend-group-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -7868,44 +7623,6 @@ button.device-employee-overview-row:hover {
 
 .weekend-group-grid h3 small {
   color: var(--slate-500);
-}
-
-.weekend-employee-list {
-  display: grid;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.weekend-employee-list button {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 7px;
-  cursor: pointer;
-  text-align: left;
-  border: 0;
-  border-radius: 8px;
-  background: var(--white);
-}
-
-.weekend-employee-list button:hover {
-  background: var(--blue-50);
-}
-
-.weekend-employee-list strong,
-.weekend-employee-list small {
-  display: block;
-}
-
-.weekend-employee-list strong {
-  color: var(--slate-800);
-  font-size: 0.66rem;
-}
-
-.weekend-employee-list small {
-  margin-top: 2px;
-  color: var(--slate-500);
-  font-size: 0.58rem;
 }
 
 .employee-status-field {
@@ -8358,7 +8075,6 @@ button.device-employee-overview-row:hover {
 
   .deadline-summary,
   .dossier-summary-grid,
-  .weekend-stat-grid,
   .weekend-group-grid {
     grid-template-columns: 1fr;
   }
@@ -8564,11 +8280,6 @@ html[data-theme="cellitinnen-red"] :is(.sidebar-note-icon, .user-session-icon) {
   background: rgb(255 255 255 / 12%);
 }
 
-html[data-theme="cellitinnen-red"] .theme-selector select:focus {
-  border-color: var(--cellitinnen-red-shade);
-  box-shadow: 0 0 0 3px rgb(243 176 158 / 18%);
-}
-
 html[data-theme="dark"] {
   --navy-950: #f4f7fa;
   --navy-900: #e8eef4;
@@ -8625,7 +8336,7 @@ html[data-theme="dark"] .brand-mark {
   background: linear-gradient(145deg, #357fce, #20568f);
 }
 
-html[data-theme="dark"] :is(.panel, .stat-card) {
+html[data-theme="dark"] .panel {
   background: rgb(23 34 44 / 96%);
 }
 
@@ -8887,7 +8598,7 @@ html[data-theme="dracula"] {
   background: linear-gradient(145deg, var(--theme-brand-start), var(--theme-brand-end));
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) :is(.panel, .stat-card) {
+:is(html[data-theme="nord"], html[data-theme="dracula"]) .panel {
   background: var(--theme-surface);
 }
 
@@ -9172,7 +8883,7 @@ html[data-theme="windows-95"] .nav-item.is-active {
   box-shadow: inset 2px 2px #0000aa, inset -2px -2px #000040;
 }
 
-html[data-theme="windows-95"] :is(.panel, .stat-card, .modal, .page-header) {
+html[data-theme="windows-95"] :is(.panel, .modal, .page-header) {
   border-color: #ffffff #808080 #808080 #ffffff;
   background: #d4d0c8;
 }
@@ -9689,10 +9400,6 @@ html[data-theme="windows-95"] *::-webkit-scrollbar-button:active {
 .vacation-controls .compact-field input,
 .vacation-controls .compact-field select {
   min-height: 42px;
-}
-
-.compact-input-suffix {
-  min-width: 145px;
 }
 
 .vacation-legend {
@@ -10765,8 +10472,7 @@ body.is-vacation-planner-maximized {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .vacation-controls .compact-field,
-  .compact-input-suffix {
+  .vacation-controls .compact-field {
     min-width: 0;
   }
 
@@ -12244,7 +11950,6 @@ body.is-dragging-appointment .appointment-calendar-entry {
   body.print-weekend-overview :is(
       .meeting-stat-card,
       .catalog-section,
-      .weekend-employee-list button,
       .weekend-comparison-panel,
       .weekend-distribution-group,
       .weekend-distribution-employee

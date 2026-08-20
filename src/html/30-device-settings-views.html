@@ -922,7 +922,19 @@
               <span>Versuchen Sie einen allgemeineren Suchbegriff.</span>
             </div>
           </div>
-          <!-- README_HELP_CONTENT -->
+          <!--
+            Das Handbuch ist der groesste Einzelposten des Startdokuments: gut
+            1600 der rund 4100 Elemente von index.html entfallen darauf. Es
+            liegt deshalb in einer Vorlage und wird erst eingehaengt, wenn die
+            Hilfe zum ersten Mal gebraucht wird. Bis dahin bleibt es aus jeder
+            dokumentweiten Abfrage heraus - und die laufen bei jedem Aufbau
+            einer Ansicht. Eine eigene Datei waere noch sparsamer, liesse sich
+            per Doppelklick (file://) aber nicht mehr nachladen.
+          -->
+          <div id="helpContentHost"></div>
+          <template id="helpContentTemplate">
+            <!-- README_HELP_CONTENT -->
+          </template>
         </section>
       </main>
     </div>

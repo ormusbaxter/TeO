@@ -584,6 +584,8 @@
     helpSearchStatus: document.querySelector("#helpSearchStatus"),
     clearHelpSearch: document.querySelector("#clearHelpSearch"),
     helpNoResults: document.querySelector("#helpNoResults"),
+    helpContentHost: document.querySelector("#helpContentHost"),
+    helpContentTemplate: document.querySelector("#helpContentTemplate"),
     mobileThemeButton: document.querySelector("#mobileThemeButton"),
     mobileAccountButton: document.querySelector("#mobileAccountButton"),
     currentUsername: document.querySelector("#currentUsername"),

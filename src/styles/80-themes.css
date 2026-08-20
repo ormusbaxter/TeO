@@ -137,11 +137,6 @@ html[data-theme="cellitinnen-red"] :is(.sidebar-note-icon, .user-session-icon) {
   background: rgb(255 255 255 / 12%);
 }
 
-html[data-theme="cellitinnen-red"] .theme-selector select:focus {
-  border-color: var(--cellitinnen-red-shade);
-  box-shadow: 0 0 0 3px rgb(243 176 158 / 18%);
-}
-
 html[data-theme="dark"] {
   --navy-950: #f4f7fa;
   --navy-900: #e8eef4;
@@ -198,7 +193,7 @@ html[data-theme="dark"] .brand-mark {
   background: linear-gradient(145deg, #357fce, #20568f);
 }
 
-html[data-theme="dark"] :is(.panel, .stat-card) {
+html[data-theme="dark"] .panel {
   background: rgb(23 34 44 / 96%);
 }
 
@@ -460,7 +455,7 @@ html[data-theme="dracula"] {
   background: linear-gradient(145deg, var(--theme-brand-start), var(--theme-brand-end));
 }
 
-:is(html[data-theme="nord"], html[data-theme="dracula"]) :is(.panel, .stat-card) {
+:is(html[data-theme="nord"], html[data-theme="dracula"]) .panel {
   background: var(--theme-surface);
 }
 
@@ -745,7 +740,7 @@ html[data-theme="windows-95"] .nav-item.is-active {
   box-shadow: inset 2px 2px #0000aa, inset -2px -2px #000040;
 }
 
-html[data-theme="windows-95"] :is(.panel, .stat-card, .modal, .page-header) {
+html[data-theme="windows-95"] :is(.panel, .modal, .page-header) {
   border-color: #ffffff #808080 #808080 #ffffff;
   background: #d4d0c8;
 }

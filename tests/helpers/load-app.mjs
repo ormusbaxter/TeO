@@ -98,6 +98,9 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
 function createDomStub() {
   const markup = new Map();
   const elements = new Map();
+  // Listenabfragen liefern ohne Zutun nichts. Wer eine Funktion prueft, die
+  // ueber eine Auswahl laeuft, hinterlegt sie hier mit setQueryAll().
+  const queryAllResults = new Map();
 
   const createElement = (selector = "") => {
     const target = {
@@ -165,7 +168,7 @@ function createDomStub() {
       body: createElement(),
       head: createElement(),
       querySelector,
-      querySelectorAll: () => [],
+      querySelectorAll: (selector) => queryAllResults.get(selector) || [],
       getElementById: (id) => querySelector(`#${id}`),
       createElement: () => createElement(),
       createDocumentFragment: () => createElement(),
@@ -188,6 +191,9 @@ function createDomStub() {
     // bedeutet: seit dem Zuruecksetzen wurde es nicht aufgebaut.
     markupLength(selector) {
       return markup.get(selector) || 0;
+    },
+    setQueryAll(selector, found) {
+      queryAllResults.set(selector, found);
     },
     resetMarkup() {
       markup.clear();

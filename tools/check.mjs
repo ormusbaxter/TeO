@@ -54,6 +54,45 @@ assert.equal(
   (cssSource.match(/}/g) || []).length,
   "styles.css enthält unausgeglichene geschweifte Klammern",
 );
+
+// Klassen, die niemand mehr benutzt, bleiben sonst unbemerkt liegen: Beim
+// Aufraeumen dieser Pruefung waren es 18, darunter der vollstaendige Bausatz
+// der alten Kennzahlkarten. Verglichen wird gegen ganze Namen aus index.html
+// und app.js - „meeting-stat-card“ soll „stat-card“ nicht am Leben halten.
+//
+// Zusammengesetzte Namen wie `planner-entry-${type}` stehen nirgends
+// vollstaendig im Quelltext. Als benutzt gilt deshalb auch, was mit einem
+// Wortanfang beginnt, der dort unmittelbar vor einem eingesetzten Wert steht.
+// Die Ausnahme ist damit an die Stelle gebunden, die sie braucht, statt an
+// eine gepflegte Liste.
+const declaredClasses = new Set(
+  [
+    ...cssSource
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, "''")
+      .replace(/url\([^)]*\)/g, "url()")
+      .matchAll(/\.(-?[_a-zA-Z][\w-]*)/g),
+  ].map((match) => match[1]),
+);
+const markupSource = `${htmlSource}${appSource}`;
+const usedWords = new Set(markupSource.match(/[A-Za-z_][\w-]*/g) || []);
+const composedPrefixes = [
+  ...new Set(
+    [...markupSource.matchAll(/([A-Za-z_][\w-]*-)\$\{/g)].map(
+      (match) => match[1],
+    ),
+  ),
+];
+const orphanedClasses = [...declaredClasses].filter(
+  (className) =>
+    !usedWords.has(className) &&
+    !composedPrefixes.some((prefix) => className.startsWith(prefix)),
+);
+assert.deepEqual(
+  orphanedClasses,
+  [],
+  `styles.css beschreibt Klassen, die weder index.html noch app.js verwenden: ${orphanedClasses.join(", ")}`,
+);
 assert.doesNotMatch(
   appSource,
   /INITIAL_USERS|EMPLOYEE_EMAIL_ASSIGNMENTS/,
@@ -122,17 +161,25 @@ assert.doesNotMatch(
   "Die Mitarbeiterpflege darf keine Administratorprüfung mehr enthalten",
 );
 // Die Sperren gehören ausschließlich in die statische Oberfläche. Würde app.js
-// weitere data-admin-only-Markierungen erzeugen, blieben Schaltflächen für
-// normale Konten unsichtbar, ohne dass es in index.html auffällt.
+// data-admin-only-Markierungen erzeugen, blieben Schaltflächen für normale
+// Konten unsichtbar, ohne dass es in index.html auffällt.
 assert.equal(
   (appSource.match(/data-admin-only/g) || []).length,
-  1,
-  "app.js darf data-admin-only nur zum Anwenden der Sperre verwenden, nicht in gerenderten Vorlagen",
+  0,
+  "data-admin-only gehört nach index.html, nicht in gerenderte Vorlagen",
 );
+// Ausgeblendet wird ausschließlich über die Rolle am body. Eine Schleife in
+// app.js wiederholte nur, was die Regel ohnehin entscheidet - und das bei
+// jedem Aufbau einer Ansicht über das gesamte Dokument.
 assert.match(
   appSource,
-  /querySelectorAll\("\[data-admin-only\]"\)/,
-  "Die Sperre muss beim Anwenden der Zugriffsrechte weiterhin ausgewertet werden",
+  /document\.body\.dataset\.userRole = /,
+  "Die Zugriffsrechte müssen die Rolle am body hinterlegen",
+);
+assert.match(
+  cssSource,
+  /body:not\(\[data-user-role="admin"\]\) \[data-admin-only\] \{\s*display: none !important;/,
+  "Das Stylesheet muss Verwaltungselemente für jede Rolle außer admin ausblenden",
 );
 assert.deepEqual(
   JSON.parse(JSON.stringify(metaContext.window.TeOProjectMeta)),
