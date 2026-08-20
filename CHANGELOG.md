@@ -1,3 +1,10 @@
+### 4.44.1 – Schlankerer Start und lesbarer Dark Mode
+
+- **Behoben:** Im Farbschema **Dark Mode** stand die Beschriftung der Hauptaktion – etwa **Sichern** – in Weiß auf hellblauem Grund und war kaum zu lesen (Kontrast 2,2:1 statt der geforderten 4,5:1). Sie ist jetzt dunkel, wie in den übrigen dunklen Schemata auch
+- **Verbessert:** TeO startet schlanker: Das Handbuch wird erst aufgebaut, wenn die Hilfe zum ersten Mal gebraucht wird. Beim Start entstehen dadurch rund 2500 statt 4100 Elemente – jeder Ansichtswechsel wird dadurch etwas flüssiger
+- **Verbessert:** Die Suche in der Hilfe reagiert unmittelbar. Sie verglich bisher bei jedem Tastendruck den vollständigen Text aller Themen; der Suchschlüssel entsteht jetzt einmal je Abschnitt
+- **Verbessert:** Geräteliste und Einweisungsmatrix bauen spürbar sparsamer auf. Für jedes Gerät wurde bisher der gesamte Einweisungsbestand durchsucht, um die berechtigten Mitarbeiter zu ermitteln – auch dann, wenn gar nicht danach gefiltert war. Bei 40 Geräten waren das 41 Durchgänge statt einem
+
 ### 4.44.0 – Schnellansicht für alle Datenarten
 
 - **Neu:** Termine, Memos und Geräte haben dieselbe Schnellansicht wie die Mitarbeiter: Ein Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster – öffnet rechts eine Übersicht mit den Eckdaten, ohne dass ein Dialog die Liste verdeckt. Von dort führen **Anheften**, **Bearbeiten** und je nach Datenart **Kalender**, **Erledigt** oder **Übersicht** weiter; der Stift auf der Karte öffnet wie bisher direkt den Bearbeitungsdialog
@@ -8,10 +15,6 @@
 - **Neu:** Auch mehrere Mitarbeiter lassen sich auf einmal löschen; der Umfang entspricht dem einzelnen Löschen und ist ebenso zurücknehmbar
 - **Verbessert:** Die Schnellansicht hebt sich mit Rahmen, Rundung, Schatten und leicht getönter Fläche von den Karten daneben ab. In mehreren Farbthemen ist die Fläche der Karten dieselbe wie die der Schnellansicht – dort waren die Grenzen bisher nicht zu erkennen. Im Windows-95-Thema ist sie ein erhabenes Fenster
 - **Verbessert:** Geräte erscheinen jetzt ebenfalls in Verlauf und Favoriten von **Strg + K**; Termine, Memos und Geräte öffnen von dort die Schnellansicht statt eines Dialogs
-- **Verbessert:** TeO startet schlanker: Das Handbuch wird erst aufgebaut, wenn die Hilfe zum ersten Mal gebraucht wird. Beim Start entstehen dadurch rund 2500 statt 4100 Elemente – jeder Ansichtswechsel wird dadurch etwas flüssiger
-- **Verbessert:** Die Suche in der Hilfe reagiert unmittelbar. Sie verglich bisher bei jedem Tastendruck den vollständigen Text aller Themen; der Suchschlüssel entsteht jetzt einmal je Abschnitt
-- **Behoben:** Im Farbschema **Dark Mode** stand die Beschriftung der Hauptaktion – etwa **Sichern** – in Weiß auf hellblauem Grund und war kaum zu lesen (Kontrast 2,2:1 statt der geforderten 4,5:1). Sie ist jetzt dunkel, wie in den übrigen dunklen Schemata auch
-- **Verbessert:** Geräteliste und Einweisungsmatrix bauen spürbar sparsamer auf. Für jedes Gerät wurde bisher der gesamte Einweisungsbestand durchsucht, um die berechtigten Mitarbeiter zu ermitteln – auch dann, wenn gar nicht danach gefiltert war. Bei 40 Geräten waren das 41 Durchgänge statt einem
 
 ### 4.43.4 – Termin direkt im Dialog löschen
 
