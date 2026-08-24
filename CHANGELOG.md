@@ -1,4 +1,4 @@
-### 4.44.1 – Schlankerer Start und lesbarer Dark Mode
+### 4.45.0 – Neue Farbthemen und schlankerer Start
 
 - **Behoben:** Im Farbschema **Dark Mode** stand die Beschriftung der Hauptaktion – etwa **Sichern** – in Weiß auf hellblauem Grund und war kaum zu lesen (Kontrast 2,2:1 statt der geforderten 4,5:1). Sie ist jetzt dunkel, wie in den übrigen dunklen Schemata auch
 - **Verbessert:** TeO startet schlanker: Das Handbuch wird erst aufgebaut, wenn die Hilfe zum ersten Mal gebraucht wird. Beim Start entstehen dadurch rund 2500 statt 4100 Elemente – jeder Ansichtswechsel wird dadurch etwas flüssiger

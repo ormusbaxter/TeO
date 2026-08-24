@@ -76,7 +76,13 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
     await page.waitForFunction(() => Boolean(window.TeOProjectMeta), null, { timeout: 10000 });
 
     const loginInformation = await page.evaluate(() => ({
-      dialogOpen: document.querySelector("#loginDialog").open,
+      // Beim allerersten Start gibt es noch kein Konto; dann führt TeO durch
+      // die Einrichtung statt durch die Anmeldung. Verlangt ist beides Mal
+      // dasselbe: Die Oberfläche bleibt gesperrt, bis jemand angemeldet ist.
+      offenerAuthDialog: [...document.querySelectorAll("dialog[open]")]
+        .map((dialog) => dialog.id)
+        .find((id) => ["setupDialog", "loginDialog"].includes(id)),
+      gesperrt: document.body.classList.contains("is-auth-locked"),
       version: document.querySelector("#loginProjectVersion").textContent.trim(),
       copyright: document.querySelector("#loginCopyright").textContent.trim(),
       expectedVersion: [
@@ -85,7 +91,13 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
         window.TeOProjectMeta.version.patch,
       ].join("."),
     }));
-    assert.equal(loginInformation.dialogOpen, true, "Die Anmeldemaske ist sichtbar");
+    assert.ok(
+      loginInformation.offenerAuthDialog,
+      "Vor der Anmeldung steht Einrichtung oder Anmeldung offen",
+    );
+    assert.equal(loginInformation.gesperrt, true, "Die Oberfläche bleibt gesperrt");
+    // Und die Anmeldemaske trägt Fassung und Copyright, ohne dass sich jemand
+    // anmelden muss - eingesetzt beim Start, nicht erst beim Öffnen.
     assert.equal(
       loginInformation.version,
       `Version ${loginInformation.expectedVersion}`,
