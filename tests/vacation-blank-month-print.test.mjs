@@ -83,8 +83,45 @@ test("Das Monatsblatt führt alle aktiven Mitarbeiter alphabetisch untereinander
 
   // Je Mitarbeiter eine Zeile, dazu die Kopfzeile.
   assert.equal((markup.match(/<tr>/g) || []).length, 5);
-  // Und Umfang sowie Dienstwochenende stehen unter dem Namen.
-  assert.match(markup, /75 % · Wochenende B/);
+  // Unter dem Namen stehen Umfang und Jahresanspruch - die Zahl, die beim
+  // Ausfüllen von Hand gebraucht wird. Bei 75 % von 30 Tagen sind das 22,5.
+  assert.match(markup, /75 % · 22,5 Urlaubstage/);
+});
+
+test("Unter dem Namen steht der Jahresanspruch, nicht das Dienstwochenende", async () => {
+  const app = await loadMonthPrintApp();
+  // Alle im Fixture arbeiten mit 75 %; Grundlage sind 30 Tage bei voller
+  // Stelle, macht 22,5. Berta Adler (e2) hat drei zusätzliche Tage.
+  app.getState().vacationEntitlements = [
+    { id: "v1", employeeId: "e2", year: 2026, additionalDays: 3 },
+  ];
+
+  const markup = renderMonth(app, 1);
+
+  assert.match(markup, /Adler, Berta<\/strong>\s*<small>75 % · 25,5 Urlaubstage/);
+  // Das Dienstwochenende steht nicht mehr darunter - es ist als Umrandung in
+  // den Tagesspalten abzulesen.
+  assert.doesNotMatch(markup, /· Wochenende [AB]/);
+  assert.match(markup, /is-own-weekend/);
+
+  // Ohne Zusatztage bleibt es beim anteiligen Grundanspruch.
+  assert.match(markup, /Zimmer, Anna<\/strong>\s*<small>75 % · 22,5 Urlaubstage/);
+
+  // Ein anderes Jahr hat einen eigenen Anspruch - die Zusatztage von 2026
+  // gelten dort nicht.
+  const anderesJahr = await loadMonthPrintApp(2027);
+  anderesJahr.getState().vacationEntitlements = [
+    { id: "v1", employeeId: "e2", year: 2026, additionalDays: 3 },
+  ];
+  assert.match(
+    anderesJahr.renderBlankVacationMonthPrintDocument(
+      1,
+      anderesJahr.vacationEmployeesForBlankYearPrint(),
+      anderesJahr.getNrwHolidays(2027),
+      anderesJahr.getNrwSchoolVacations(2027),
+    ),
+    /Adler, Berta<\/strong>\s*<small>75 % · 22,5 Urlaubstage/,
+  );
 });
 
 test("Die Spalten decken genau die Tage des Monats ab", async () => {
@@ -174,7 +211,6 @@ test("Jedes Blatt eines Monats nennt Monat und Seite", async () => {
     app.renderBlankVacationMonthPrintDocument(7, sheetEmployees, holidays, schoolVacations, {
       sheet: index + 1,
       sheetCount: sheets.length,
-      totalEmployees: employees.length,
     }),
   );
 
@@ -188,8 +224,10 @@ test("Jedes Blatt eines Monats nennt Monat und Seite", async () => {
       new RegExp(`Seite ${index + 1} von 3`),
       `Blatt ${index + 1} nennt seine Seite`,
     );
-    // Gezählt wird das ganze Team, nicht der Ausschnitt auf diesem Blatt.
-    assert.match(markup, /<strong>45<\/strong>/);
+    // Sonst steht im Kopf nichts: keine Bezeichnung der Vordruckart, keine
+    // Mitarbeiterzahl - beides sagt beim Ausfüllen nichts.
+    assert.doesNotMatch(markup, /Leere Monatsplanung/);
+    assert.doesNotMatch(markup, /Mitarbeiter<\/span>/);
   });
 });
 
@@ -223,7 +261,7 @@ test("Ein volles Blatt passt auf die Seite - auch mit langen Namen", async (t) =
       })),
       holidays,
       schoolVacations,
-      { sheet: 1, sheetCount: 2, totalEmployees: 40 },
+      { sheet: 1, sheetCount: 2 },
     );
 
   await teo.page.setViewportSize({ width: 1062, height: 900 });
@@ -303,7 +341,6 @@ test("Die versprochene Seitenzahl entspricht dem, was der Drucker ausgibt", asyn
       app.renderBlankVacationMonthPrintDocument(7, sheetEmployees, holidays, schoolVacations, {
         sheet: index + 1,
         sheetCount: sheets.length,
-        totalEmployees: employees.length,
       }),
     )
     .join("");

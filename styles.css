@@ -11970,18 +11970,9 @@ body.is-dragging-appointment .appointment-calendar-entry {
     border-bottom: 0.35mm solid #9ba6b2;
   }
 
-  .vacation-blank-month-header :is(h1, p),
+  .vacation-blank-month-header h1,
   .vacation-blank-month-document footer {
     margin: 0;
-  }
-
-  .vacation-blank-month-header p {
-    margin-bottom: 1mm;
-    color: #596779;
-    font-size: 7pt;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   .vacation-blank-month-header h1 {
@@ -11989,21 +11980,11 @@ body.is-dragging-appointment .appointment-calendar-entry {
     line-height: 1.1;
   }
 
-  .vacation-blank-month-meta {
-    display: grid;
-    gap: 1mm;
-    text-align: right;
-  }
-
-  .vacation-blank-month-meta strong {
-    font-size: 14pt;
-  }
-
   .vacation-blank-month-sheet {
+    font-size: 9pt;
     font-weight: 800;
   }
 
-  .vacation-blank-month-meta span,
   .vacation-blank-month-document .vacation-blank-year-legend,
   .vacation-blank-month-document footer {
     font-size: 6.5pt;
