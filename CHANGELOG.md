@@ -1,3 +1,8 @@
+### 4.46.0 – Leere Monatsplanungen zum Ausfüllen
+
+- **Neu:** Die Urlaubsplanung druckt **leere Monatsplanungen**: je Monat des gewählten Jahres ein DIN-A4-Blatt quer, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch untereinander und die Tage des Monats als Spalten. Feiertage, Schulferien und das eigene Dienstwochenende sind vermerkt, die Felder bleiben leer. Ein großes Team läuft auf ein zweites Blatt weiter; wer nur einen Monat braucht, wählt die Seite im Druckdialog
+- **Verbessert:** Das Handbuch beschreibt jetzt beide leeren Vordrucke – die Jahresübersicht je Mitarbeiter und die neue Monatsplanung
+
 ### 4.45.0 – Neue Farbthemen und schlankerer Start
 
 - **Behoben:** Im Farbschema **Dark Mode** stand die Beschriftung der Hauptaktion – etwa **Sichern** – in Weiß auf hellblauem Grund und war kaum zu lesen (Kontrast 2,2:1 statt der geforderten 4,5:1). Sie ist jetzt dunkel, wie in den übrigen dunklen Schemata auch

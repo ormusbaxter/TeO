@@ -764,6 +764,12 @@
     vacationBlankYearPrintSurface: document.querySelector(
       "#vacationBlankYearPrintSurface",
     ),
+    printBlankVacationMonthPlansButton: document.querySelector(
+      "#printBlankVacationMonthPlansButton",
+    ),
+    vacationBlankMonthPrintSurface: document.querySelector(
+      "#vacationBlankMonthPrintSurface",
+    ),
     vacationSummary: document.querySelector("#vacationSummary"),
     vacationPlannerWidget: document.querySelector("#vacationPlannerWidget"),
     vacationPlanner: document.querySelector("#vacationPlanner"),
@@ -2969,6 +2975,10 @@
     elements.printBlankVacationYearOverviewsButton.addEventListener(
       "click",
       printBlankVacationYearOverviews,
+    );
+    elements.printBlankVacationMonthPlansButton.addEventListener(
+      "click",
+      printBlankVacationMonthPlans,
     );
     elements.toggleVacationPlannerMaximizeButton.addEventListener(
       "click",
@@ -10162,6 +10172,179 @@
         </footer>
       </article>
     `;
+  }
+
+  // Leere Monatsplanungen zum Ausfuellen von Hand: je Monat ein Blatt, darauf
+  // alle aktiven Mitarbeiter alphabetisch untereinander und die Tage des
+  // Monats als Spalten. Das Gegenstueck zu den leeren Jahresuebersichten, die
+  // je Mitarbeiter ein Blatt fuellen - dieselben Beschaeftigten, dieselben
+  // Kalendermerkmale, nur andersherum aufgeteilt.
+  //
+  // Gedruckt wird das ganze Jahr. Wer nur einen Monat braucht, waehlt im
+  // Druckdialog die Seite aus; zwoelf Blaetter neu aufzubauen ist billiger als
+  // eine zweite Bedienung dafuer.
+  function printBlankVacationMonthPlans() {
+    const employees = vacationEmployeesForBlankYearPrint();
+    if (!employees.length) {
+      showToast(
+        "Es sind keine aktiven oder einzuarbeitenden Mitarbeiter vorhanden.",
+        "error",
+      );
+      return;
+    }
+
+    // Feiertage und Schulferien gelten fuer alle zwoelf Blaetter; einmal
+    // ermittelt genuegt.
+    const holidays = getNrwHolidays(vacationYear);
+    const schoolVacations = getNrwSchoolVacations(vacationYear);
+    elements.vacationBlankMonthPrintSurface.innerHTML = Array.from(
+      { length: 12 },
+      (_, index) =>
+        renderBlankVacationMonthPrintDocument(
+          index + 1,
+          employees,
+          holidays,
+          schoolVacations,
+        ),
+    ).join("");
+    document.body.classList.add("print-vacation-blank-month");
+    window.print();
+    window.setTimeout(() => {
+      document.body.classList.remove("print-vacation-blank-month");
+      elements.vacationBlankMonthPrintSurface.innerHTML = "";
+    }, 0);
+  }
+
+  function renderBlankVacationMonthPrintDocument(
+    month,
+    employees,
+    holidays,
+    schoolVacations,
+  ) {
+    const monthLabel = dateFormat({ month: "long", year: "numeric" }).format(
+      new Date(vacationYear, month - 1, 1, 12),
+    );
+    const daysInMonth = new Date(vacationYear, month, 0).getDate();
+    const days = Array.from({ length: daysInMonth }, (_, index) => index + 1);
+    return `
+      <article class="vacation-blank-month-document">
+        <header class="vacation-blank-month-header">
+          <div>
+            <p>Leere Monatsplanung</p>
+            <h1>${escapeHtml(monthLabel)}</h1>
+          </div>
+          <div class="vacation-blank-month-meta">
+            <strong>${employees.length}</strong>
+            <span>Mitarbeiter</span>
+          </div>
+        </header>
+        <div class="vacation-blank-year-legend" aria-label="Legende">
+          <span><i class="vacation-blank-holiday-swatch"></i> Feiertag NRW</span>
+          <span><i class="vacation-blank-school-vacation-swatch"></i> Schulferien NRW</span>
+          <span><i class="vacation-year-weekend-swatch is-weekend_a"></i> ${escapeHtml(serviceWeekendLabel("weekend_a"))}</span>
+          <span><i class="vacation-year-weekend-swatch is-weekend_b"></i> ${escapeHtml(serviceWeekendLabel("weekend_b"))}</span>
+          <span><i class="vacation-blank-own-weekend-swatch"></i> Eigenes Dienstwochenende</span>
+        </div>
+        <table class="vacation-blank-month-table">
+          <thead>
+            <tr>
+              <th class="vacation-blank-month-name-column" scope="col">Mitarbeiter</th>
+              ${days
+                .map((day) =>
+                  renderBlankVacationMonthDayHeader(
+                    month,
+                    day,
+                    holidays,
+                    schoolVacations,
+                  ),
+                )
+                .join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${employees
+              .map((employee) =>
+                renderBlankVacationMonthRow(
+                  month,
+                  days,
+                  employee,
+                  holidays,
+                  schoolVacations,
+                ),
+              )
+              .join("")}
+          </tbody>
+        </table>
+        <footer>
+          <span>Urlaubsplanung ${vacationYear}</span>
+          <span>Stand ${formatDate(todayIso())}</span>
+        </footer>
+      </article>
+    `;
+  }
+
+  function renderBlankVacationMonthDayHeader(
+    month,
+    day,
+    holidays,
+    schoolVacations,
+  ) {
+    const date = blankVacationMonthDate(month, day);
+    const metadata = getVacationDayMetadata(date, holidays, schoolVacations);
+    const weekday = dateFormat({ weekday: "short" }).format(parseLocalDate(date));
+    return `
+      <th class="${metadata.className}" scope="col" title="${escapeHtml(metadata.title)}">
+        <span class="vacation-blank-month-day">${day}</span>
+        <span class="vacation-blank-month-weekday">${escapeHtml(weekday)}</span>
+      </th>
+    `;
+  }
+
+  function renderBlankVacationMonthRow(
+    month,
+    days,
+    employee,
+    holidays,
+    schoolVacations,
+  ) {
+    return `
+      <tr>
+        <th class="vacation-blank-month-name-column" scope="row">
+          <strong>${escapeHtml(fullName(employee))}</strong>
+          <small>${escapeHtml(
+            [
+              `${employee.employmentPercent} %`,
+              serviceWeekendLabel(employee.serviceWeekend),
+            ].join(" · "),
+          )}</small>
+        </th>
+        ${days
+          .map((day) => {
+            const date = blankVacationMonthDate(month, day);
+            const metadata = getVacationDayMetadata(
+              date,
+              holidays,
+              schoolVacations,
+            );
+            // Das eigene Dienstwochenende hebt sich hervor - beim Ausfuellen
+            // von Hand ist das die Angabe, auf die es ankommt.
+            const ownWeekend =
+              metadata.weekendGroup === employee.serviceWeekend
+                ? "is-own-weekend"
+                : "";
+            return `<td class="${metadata.className} ${ownWeekend}"></td>`;
+          })
+          .join("")}
+      </tr>
+    `;
+  }
+
+  function blankVacationMonthDate(month, day) {
+    return [
+      vacationYear,
+      String(month).padStart(2, "0"),
+      String(day).padStart(2, "0"),
+    ].join("-");
   }
 
   function renderVacationYearMatrix(entries, employee) {

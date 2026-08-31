@@ -380,6 +380,10 @@
       "click",
       printBlankVacationYearOverviews,
     );
+    elements.printBlankVacationMonthPlansButton.addEventListener(
+      "click",
+      printBlankVacationMonthPlans,
+    );
     elements.toggleVacationPlannerMaximizeButton.addEventListener(
       "click",
       toggleVacationPlannerMaximized,

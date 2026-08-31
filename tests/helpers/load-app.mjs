@@ -21,6 +21,12 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       // Ohne Browser gibt es keinen Speicher. Wer eine Aenderung samt
       // Speichern und Ruecklauf pruefen will, legt hier einen hin.
       setDataStore(value) { dataStore = value; },
+      // Die Urlaubsansichten haengen am gewaehlten Jahr und Monat; ohne
+      // Bedienelemente laesst sich beides nur hier setzen.
+      setVacationPeriod(year, month) {
+        if (year) vacationYear = year;
+        if (month) vacationMonth = month;
+      },
       getState() { return state; },
       getStateMutationSequence() { return stateMutationSequence; },
       setCurrentUser(value) { currentUser = value; },
