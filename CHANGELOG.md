@@ -1,4 +1,4 @@
-### 4.47.0 – Ein Konto und ein Schlüssel für alle Arbeitsplätze
+### 4.47.0 – Mehrplatzbetrieb und leere Monatsplanungen
 
 - **Behoben:** Ein Konto galt bisher nur an dem Arbeitsplatz, an dem es angelegt wurde. Der Startabgleich lud zwar den gemeinsamen Datenbestand, behielt aber die örtlichen Konten und verwarf die aus der Datei – beim nächsten Sichern verschwanden sie auch dort. Der Startabgleich übernimmt die Konten jetzt aus `teo-autosicherung.json`; ein einmal angelegtes Konto arbeitet damit an jedem Arbeitsplatz mit seinem Passwort. Der Import von Hand lässt die vorhandenen Konten unverändert wie bisher
 - **Behoben:** Ein zweiter Arbeitsplatz erzeugte für dieselbe Datei einen neuen Sicherungsschlüssel und machte den bisherigen damit wertlos. Der Schlüssel gehört jetzt zum Datenbestand: Sein Verzeichnis mit den Schlüsselhüllen aller Konten reist in der gemeinsamen Datei mit. Jeder Arbeitsplatz entsperrt ihn mit dem gewohnten Login-Passwort – ein einmal geschützter Datenbestand bleibt ohne neues Passwort bearbeitbar
@@ -6,9 +6,6 @@
 - **Neu:** Der Startdialog gibt wahlweise den Sicherungsordner frei, statt nur die einzelne Datei zu wählen. Die Verknüpfung gilt dann auch für die nächste Sitzung, und die Dateiauswahl entfällt künftig
 - **Neu:** Hat ein anderer Arbeitsplatz `teo-autosicherung.json` zwischenzeitlich geschrieben, überschreibt TeO sie nicht mehr stillschweigend, sondern meldet es. Über **Jetzt automatisch sichern** lässt sich nach ausdrücklicher Bestätigung dennoch überschreiben
 - **Verbessert:** Ein an einem anderen Arbeitsplatz angelegtes Konto bekommt seine Schlüsselhülle beim ersten Login selbst. Nach dem Wiederherstellungsschlüssel fragt TeO erst, wenn auch das Verzeichnis der gemeinsamen Datei keine passende Hülle kennt
-
-### 4.46.0 – Leere Monatsplanungen zum Ausfüllen
-
 - **Neu:** Die Urlaubsplanung druckt **leere Monatsplanungen**: je Monat des gewählten Jahres ein DIN-A4-Blatt quer, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch untereinander – nach Nachname, Vorname – und die Tage des Monats als Spalten. Unter jedem Namen stehen Beschäftigungsumfang und Jahresurlaubsanspruch. Feiertage, Schulferien und das eigene Dienstwochenende sind vermerkt, die Felder bleiben leer. Wer nur einen Monat braucht, wählt die Seiten im Druckdialog
 - **Neu:** Braucht ein Monat mehr als ein Blatt – auf eines passen 20 Mitarbeiter –, trägt jedes Blatt den Monat im Kopf und daneben **Seite x von y** für diesen Monat. So lässt sich ein Stapel wieder sortieren
 - **Verbessert:** Das Handbuch beschreibt jetzt beide leeren Vordrucke – die Jahresübersicht je Mitarbeiter und die neue Monatsplanung
