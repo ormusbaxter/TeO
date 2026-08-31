@@ -24,6 +24,18 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       getState() { return state; },
       getStateMutationSequence() { return stateMutationSequence; },
       setCurrentUser(value) { currentUser = value; },
+      getCurrentUser() { return currentUser; },
+      // Die Konfiguration der automatischen Sicherung entsteht sonst erst beim
+      // Start im Browser. Tests zum Schluesselverzeichnis legen sie hier hin.
+      setAutomaticBackupSettings(value) { automaticBackupSettings = value; },
+      getAutomaticBackupSettings() { return automaticBackupSettings; },
+      setAutomaticBackupPassword(value) { automaticBackupPassword = value; },
+      getAutomaticBackupPassword() { return automaticBackupPassword; },
+      setAutomaticBackupDirectoryHandle(value) {
+        automaticBackupDirectoryHandle = value;
+      },
+      setSharedBackupFileStamp(value) { sharedBackupFileStamp = value; },
+      getSharedBackupFileStamp() { return sharedBackupFileStamp; },
       setActiveView(value) { activeView = value; },
       getActiveView() { return activeView; },
       setAppointmentFilters(value = {}) {

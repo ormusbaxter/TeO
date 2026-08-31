@@ -30,6 +30,22 @@ const MIME = {
 
 let shared = null;
 
+// Die Browserdatei gehört nicht zum Paket, sie wird getrennt geholt. Fehlt
+// sie oder passt sie nicht zur installierten Playwright-Fassung, gilt dasselbe
+// wie bei fehlendem Playwright: Der Test überspringt sich mit Ansage, statt den
+// ganzen Lauf scheitern zu lassen. Die Meldung nennt den Grund und den Befehl.
+async function startBrowser(playwright, t) {
+  try {
+    return await playwright.chromium.launch();
+  } catch (error) {
+    t.skip(
+      "Playwright findet keinen Browser - „npx playwright install chromium“ " +
+        `holt ihn nach (${String(error.message).split("\n")[0]})`,
+    );
+    return null;
+  }
+}
+
 async function loadPlaywright() {
   try {
     return await import("playwright");
@@ -74,14 +90,26 @@ export async function openTeO(t, { angemeldetAls = "" } = {}) {
   }
 
   if (!shared) {
+    // Erst den Browser starten, dann den Server: Scheitert der Start - etwa
+    // weil die Browserdatei zur installierten Playwright-Fassung fehlt -,
+    // bliebe sonst ein lauschender Server offen. Der Testlauf endete dann nie,
+    // weil node auf den offenen Anschluss wartet, und würde abgewürgt statt
+    // einen Befund zu melden.
+    const browser = await startBrowser(playwright, t);
+    if (!browser) return null;
     const { server, port } = await startServer();
-    const browser = await playwright.chromium.launch();
-    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    shared = { server, port, browser, page, problems: [] };
-    page.on("pageerror", (error) => shared.problems.push(`Skriptfehler: ${error.message}`));
-    page.on("console", (message) => {
-      if (message.type() === "error") shared.problems.push(`Konsole: ${message.text()}`);
-    });
+    try {
+      const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+      shared = { server, port, browser, page, problems: [] };
+      page.on("pageerror", (error) => shared.problems.push(`Skriptfehler: ${error.message}`));
+      page.on("console", (message) => {
+        if (message.type() === "error") shared.problems.push(`Konsole: ${message.text()}`);
+      });
+    } catch (error) {
+      server.close();
+      await browser.close();
+      throw error;
+    }
   }
 
   const { page, port } = shared;
@@ -177,7 +205,10 @@ export async function openTeO(t, { angemeldetAls = "" } = {}) {
 
 export async function closeTeO() {
   if (!shared) return;
-  await shared.browser.close();
-  shared.server.close();
+  const { browser, server } = shared;
+  // Zuerst vergessen, dann schließen: Bricht das Schließen ab, soll kein
+  // halber Stand liegen bleiben, den der nächste Aufruf weiterverwendet.
   shared = null;
+  await browser.close().catch(() => {});
+  server.close();
 }

@@ -1,3 +1,12 @@
+### 4.45.0 – Ein Konto und ein Schlüssel für alle Arbeitsplätze
+
+- **Behoben:** Ein Konto galt bisher nur an dem Arbeitsplatz, an dem es angelegt wurde. Der Startabgleich lud zwar den gemeinsamen Datenbestand, behielt aber die örtlichen Konten und verwarf die aus der Datei – beim nächsten Sichern verschwanden sie auch dort. Der Startabgleich übernimmt die Konten jetzt aus `teo-autosicherung.json`; ein einmal angelegtes Konto arbeitet damit an jedem Arbeitsplatz mit seinem Passwort. Der Import von Hand lässt die vorhandenen Konten unverändert wie bisher
+- **Behoben:** Ein zweiter Arbeitsplatz erzeugte für dieselbe Datei einen neuen Sicherungsschlüssel und machte den bisherigen damit wertlos. Der Schlüssel gehört jetzt zum Datenbestand: Sein Verzeichnis mit den Schlüsselhüllen aller Konten reist in der gemeinsamen Datei mit. Jeder Arbeitsplatz entsperrt ihn mit dem gewohnten Login-Passwort – ein einmal geschützter Datenbestand bleibt ohne neues Passwort bearbeitbar
+- **Neu:** Beim ersten Start an einem weiteren Arbeitsplatz fragt TeO, ob ein neuer Datenbestand entstehen oder der vorhandene geöffnet werden soll. **Vorhandenen Datenbestand öffnen** gibt den Sicherungsordner frei und meldet mit dem bereits vorhandenen Konto an; Ordnerverknüpfung, Schlüssel und Daten kommen in einem Schritt. Die frühere Pflicht-Ersteinrichtung entfällt damit
+- **Neu:** Der Startdialog gibt wahlweise den Sicherungsordner frei, statt nur die einzelne Datei zu wählen. Die Verknüpfung gilt dann auch für die nächste Sitzung, und die Dateiauswahl entfällt künftig
+- **Neu:** Hat ein anderer Arbeitsplatz `teo-autosicherung.json` zwischenzeitlich geschrieben, überschreibt TeO sie nicht mehr stillschweigend, sondern meldet es. Über **Jetzt automatisch sichern** lässt sich nach ausdrücklicher Bestätigung dennoch überschreiben
+- **Verbessert:** Ein an einem anderen Arbeitsplatz angelegtes Konto bekommt seine Schlüsselhülle beim ersten Login selbst. Nach dem Wiederherstellungsschlüssel fragt TeO erst, wenn auch das Verzeichnis der gemeinsamen Datei keine passende Hülle kennt
+
 ### 4.44.1 – Schlankerer Start und lesbarer Dark Mode
 
 - **Behoben:** Im Farbschema **Dark Mode** stand die Beschriftung der Hauptaktion – etwa **Sichern** – in Weiß auf hellblauem Grund und war kaum zu lesen (Kontrast 2,2:1 statt der geforderten 4,5:1). Sie ist jetzt dunkel, wie in den übrigen dunklen Schemata auch

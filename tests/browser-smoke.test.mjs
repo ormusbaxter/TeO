@@ -62,8 +62,19 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
     return;
   }
 
+  // Erst der Browser, dann der Server - ein gescheiterter Browserstart ließe
+  // sonst einen lauschenden Server zurück und der Testlauf endete nie.
+  let browser;
+  try {
+    browser = await playwright.chromium.launch();
+  } catch (error) {
+    t.skip(
+      "Playwright findet keinen Browser - „npx playwright install chromium“ " +
+        `holt ihn nach (${String(error.message).split("\n")[0]})`,
+    );
+    return;
+  }
   const { server, port } = await startServer();
-  const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
   const problems = [];
   page.on("pageerror", (error) => problems.push(`Skriptfehler: ${error.message}`));
@@ -75,8 +86,14 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
     await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
     await page.waitForFunction(() => Boolean(window.TeOProjectMeta), null, { timeout: 10000 });
 
-    const loginInformation = await page.evaluate(() => ({
-      dialogOpen: document.querySelector("#loginDialog").open,
+    // Ein frisches Browserprofil kennt noch keinen Datenbestand. Dann fragt
+    // TeO zuerst, woher er kommt - die Anmeldemaske folgt erst danach. Geprüft
+    // wird hier deshalb die Sperre und der offene Dialog, nicht das Anmeldefeld.
+    const startInformation = await page.evaluate(() => ({
+      gesperrt: document.body.classList.contains("is-auth-locked"),
+      offeneDialoge: [...document.querySelectorAll("dialog[open]")].map(
+        (dialog) => dialog.id,
+      ),
       version: document.querySelector("#loginProjectVersion").textContent.trim(),
       copyright: document.querySelector("#loginCopyright").textContent.trim(),
       expectedVersion: [
@@ -85,13 +102,18 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
         window.TeOProjectMeta.version.patch,
       ].join("."),
     }));
-    assert.equal(loginInformation.dialogOpen, true, "Die Anmeldemaske ist sichtbar");
+    assert.equal(startInformation.gesperrt, true, "Die Anwendung startet gesperrt");
     assert.equal(
-      loginInformation.version,
-      `Version ${loginInformation.expectedVersion}`,
+      startInformation.offeneDialoge.join(","),
+      "dataOriginDialog",
+      "Ohne Konten fragt TeO zuerst nach der Herkunft des Datenbestands",
+    );
+    assert.equal(
+      startInformation.version,
+      `Version ${startInformation.expectedVersion}`,
       "Die Anmeldemaske zeigt die aktuelle Software-Version",
     );
-    assert.equal(loginInformation.copyright, "© 2026 Oliver Becker");
+    assert.equal(startInformation.copyright, "© 2026 Oliver Becker");
 
     // Das Handbuch wartet in seiner Vorlage.
     const beimStart = await page.evaluate(() => ({

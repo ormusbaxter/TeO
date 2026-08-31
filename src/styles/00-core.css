@@ -5987,6 +5987,64 @@ body.is-sidebar-collapsed .sidebar-search {
   margin-top: 14px;
 }
 
+/* Erststart: die beiden Wege in den Datenbestand. Als Schaltflächen gebaut,
+   damit Tastatur und Vorlesehilfen sie als Auswahl bekommen. */
+.data-origin-choices {
+  display: grid;
+  gap: 11px;
+}
+
+.data-origin-choice {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 15px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.data-origin-choice:hover:not(:disabled),
+.data-origin-choice:focus-visible {
+  border-color: var(--blue-600);
+  background: var(--blue-50);
+}
+
+.data-origin-choice:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.data-origin-choice svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  margin-top: 2px;
+  color: var(--blue-600);
+}
+
+.data-origin-choice > span {
+  display: grid;
+  gap: 4px;
+}
+
+.data-origin-choice strong {
+  font-size: 0.96rem;
+}
+
+.data-origin-choice small {
+  color: var(--slate-600);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .auth-software-meta {
   display: grid;
   gap: 3px;
