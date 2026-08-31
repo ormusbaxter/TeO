@@ -800,9 +800,14 @@ Mitarbeiter: zwölf Monatszeilen, 31 Tagesspalten.
 
 **Leere Monatsplanungen** druckt umgekehrt ein Blatt je Monat des gewählten
 Jahres, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch
-untereinander und die Tage des Monats als Spalten. Ein großes Team läuft auf
-ein zweites Blatt weiter. Wer nur einen einzelnen Monat braucht, wählt die
-Seite im Druckdialog aus.
+untereinander – nach Nachname, Vorname – und die Tage des Monats als Spalten.
+
+Auf ein Blatt passen 20 Mitarbeiter. Ein größeres Team verteilt sich auf
+mehrere Blätter je Monat; jedes trägt dann den Monat im Kopf und daneben
+**Seite x von y** für diesen Monat, damit ein Stapel sich wieder sortieren
+lässt. Bei nur einem Blatt je Monat entfällt die Seitenangabe.
+
+Wer nur einen einzelnen Monat braucht, wählt die Seiten im Druckdialog aus.
 
 Beide Vordrucke sind auf DIN A4 quer ausgelegt.
 
