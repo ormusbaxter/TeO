@@ -33,6 +33,7 @@ async function loadMonthPrintApp(year = 2026) {
       "normalizeState",
       "renderBlankVacationMonthPrintDocument",
       "vacationEmployeesForBlankYearPrint",
+      "blankVacationMonthSheets",
       "getNrwHolidays",
       "getNrwSchoolVacations",
     ],
@@ -73,12 +74,12 @@ test("Das Monatsblatt führt alle aktiven Mitarbeiter alphabetisch untereinander
     ),
   ].map(([, name]) => name);
   assert.equal(
-    namen.join(", "),
-    "Berta Adler, Rita Krause, Fatma Öztürk, Anna Zimmer",
+    namen.join(" | "),
+    "Adler, Berta | Krause, Rita | Öztürk, Fatma | Zimmer, Anna",
     "Nach Nachnamen sortiert - Öztürk gehört nach deutscher Ordnung hinter Krause",
   );
   // Ausgetretene stehen nicht darauf; einzuarbeitende schon.
-  assert.doesNotMatch(markup, /Clara Alt/);
+  assert.doesNotMatch(markup, /Alt, Clara/);
 
   // Je Mitarbeiter eine Zeile, dazu die Kopfzeile.
   assert.equal((markup.match(/<tr>/g) || []).length, 5);
@@ -144,62 +145,189 @@ test("Feiertage, Schulferien und das eigene Dienstwochenende sind vermerkt", asy
   assert.match(markup, /<h1>Januar 2026<\/h1>/);
 });
 
-test("Ein Monatsblatt füllt eine DIN-A4-Querseite und bricht sauber um", async (t) => {
+test("Ein grosses Team wird auf mehrere Blätter je Monat verteilt", async () => {
+  const app = await loadMonthPrintApp();
+  const blatt = (anzahl) =>
+    app
+      .blankVacationMonthSheets(Array.from({ length: anzahl }, (_, i) => ({ id: `e${i}` })))
+      .map((sheet) => sheet.length);
+
+  assert.equal(blatt(20).join("+"), "20", "Zwanzig füllen genau ein Blatt");
+  assert.equal(blatt(21).join("+"), "20+1", "Einer mehr beginnt ein zweites");
+  assert.equal(blatt(45).join("+"), "20+20+5");
+  // Ohne Mitarbeiter bleibt ein leeres Blatt statt gar keinem - gedruckt wird
+  // dieser Fall ohnehin nicht, die Aktion bricht vorher mit einer Meldung ab.
+  assert.equal(blatt(0).join("+"), "0");
+});
+
+test("Jedes Blatt eines Monats nennt Monat und Seite", async () => {
+  const app = await loadMonthPrintApp();
+  const employees = Array.from({ length: 45 }, (_, index) => ({
+    ...createEmployee(`e${index}`),
+    lastName: `Nachname${String(index).padStart(2, "0")}`,
+    firstName: "Vorname",
+  }));
+  const holidays = app.getNrwHolidays(2026);
+  const schoolVacations = app.getNrwSchoolVacations(2026);
+  const sheets = app.blankVacationMonthSheets(employees);
+  const blaetter = sheets.map((sheetEmployees, index) =>
+    app.renderBlankVacationMonthPrintDocument(7, sheetEmployees, holidays, schoolVacations, {
+      sheet: index + 1,
+      sheetCount: sheets.length,
+      totalEmployees: employees.length,
+    }),
+  );
+
+  assert.equal(blaetter.length, 3);
+  blaetter.forEach((markup, index) => {
+    // Der Monat steht auf jedem Blatt - sonst wüsste das zweite nicht, wohin
+    // es gehört.
+    assert.match(markup, /<h1>Juli 2026<\/h1>/, `Blatt ${index + 1} nennt den Monat`);
+    assert.match(
+      markup,
+      new RegExp(`Seite ${index + 1} von 3`),
+      `Blatt ${index + 1} nennt seine Seite`,
+    );
+    // Gezählt wird das ganze Team, nicht der Ausschnitt auf diesem Blatt.
+    assert.match(markup, /<strong>45<\/strong>/);
+  });
+});
+
+test("Ein einzelnes Blatt trägt keine Seitenangabe", async () => {
+  const app = await loadMonthPrintApp();
+  const markup = renderMonth(app, 1);
+
+  assert.match(markup, /<h1>Januar 2026<\/h1>/);
+  assert.doesNotMatch(
+    markup,
+    /Seite \d+ von/,
+    "Bei einem Blatt je Monat wäre „Seite 1 von 1“ nur Beiwerk",
+  );
+});
+
+test("Ein volles Blatt passt auf die Seite - auch mit langen Namen", async (t) => {
   const teo = await openTeO(t, { angemeldetAls: "admin" });
   if (!teo) return;
 
   const app = await loadMonthPrintApp();
-  const employees = app.vacationEmployeesForBlankYearPrint();
-  const viele = Array.from({ length: 40 }, (_, index) => ({
-    ...employees[index % employees.length],
-    id: `viele-${index}`,
-    lastName: `Nachname${String(index).padStart(2, "0")}`,
-  }));
   const holidays = app.getNrwHolidays(2026);
   const schoolVacations = app.getNrwSchoolVacations(2026);
-  const kleinesTeam = app.renderBlankVacationMonthPrintDocument(1, employees, holidays, schoolVacations);
-  const grossesTeam = app.renderBlankVacationMonthPrintDocument(1, viele, holidays, schoolVacations);
+  const bauen = (anzahl, lang) =>
+    app.renderBlankVacationMonthPrintDocument(
+      1,
+      Array.from({ length: anzahl }, (_, index) => ({
+        ...createEmployee(`e${index}`),
+        lastName: lang ? `Schmidt-Wagenknecht-Lüdenscheidt${index}` : `Name${index}`,
+        firstName: lang ? "Maximiliane-Charlotte" : "Vorname",
+        serviceWeekend: "weekend_a",
+      })),
+      holidays,
+      schoolVacations,
+      { sheet: 1, sheetCount: 2, totalEmployees: 40 },
+    );
 
-  // Inhaltsbreite einer A4-Querseite mit 8 mm Rand.
-  await teo.page.setViewportSize({ width: 1062, height: 800 });
+  await teo.page.setViewportSize({ width: 1062, height: 900 });
   await teo.page.emulateMedia({ media: "print" });
-
   const gemessen = await teo.evaluate(
-    ([klein, gross]) => {
+    ([voll, vollLang, einsZuViel]) => {
       const flaeche = document.querySelector("#vacationBlankMonthPrintSurface");
       document.body.classList.add("print-vacation-blank-month");
-      const mm = (px) => (px / 96) * 25.4;
       const messe = (markup) => {
         flaeche.innerHTML = markup;
         const blatt = document.querySelector(".vacation-blank-month-document");
         const rand = blatt.getBoundingClientRect();
-        const ueberstehend = [...blatt.querySelectorAll("*")].filter(
-          (element) => element.getBoundingClientRect().right > rand.right + 0.5,
-        ).length;
-        return { hoehe: Math.round(mm(rand.height)), ueberstehend };
+        return {
+          hoehe: Math.round((rand.height / 96) * 25.4 * 10) / 10,
+          ueberstehend: [...blatt.querySelectorAll("*")].filter(
+            (element) => element.getBoundingClientRect().right > rand.right + 0.5,
+          ).length,
+        };
       };
-      const ergebnis = { klein: messe(klein), gross: messe(gross) };
+      const ergebnis = {
+        voll: messe(voll),
+        vollLang: messe(vollLang),
+        einsZuViel: messe(einsZuViel),
+      };
       flaeche.innerHTML = "";
       document.body.classList.remove("print-vacation-blank-month");
       return ergebnis;
     },
-    [kleinesTeam, grossesTeam],
+    [bauen(20, false), bauen(20, true), bauen(22, false)],
   );
 
   // Nutzbare Höhe einer A4-Querseite mit 8 mm Rand: 194 mm.
   assert.ok(
-    gemessen.klein.hoehe <= 194,
-    `Ein Blatt mit vier Mitarbeitern misst ${gemessen.klein.hoehe} mm`,
+    gemessen.voll.hoehe <= 194,
+    `Ein volles Blatt misst ${gemessen.voll.hoehe} mm`,
   );
-  assert.equal(gemessen.klein.ueberstehend, 0, "Nichts steht über den Rand hinaus");
-  assert.equal(gemessen.gross.ueberstehend, 0);
+  assert.equal(gemessen.voll.ueberstehend, 0, "Nichts steht über den Rand hinaus");
 
-  // Ein grosses Team passt nicht auf ein Blatt. Dass der Tabellenkopf auf der
-  // Folgeseite wiederkehrt, besorgt der Browser von sich aus.
-  assert.ok(
-    gemessen.gross.hoehe > 194,
-    "Vierzig Mitarbeiter füllen mehr als eine Seite",
+  // Der entscheidende Punkt: Lange Namen dürfen die Zeile nicht wachsen
+  // lassen, sonst stimmt die versprochene Seitenzahl nicht mehr.
+  assert.equal(
+    gemessen.vollLang.hoehe,
+    gemessen.voll.hoehe,
+    "Die Blatthöhe hängt nicht an der Länge der Namen",
   );
+
+  // Und die Aufteilung ist nicht zu großzügig gewählt: Zwei Zeilen mehr
+  // passten nicht mehr auf die Seite.
+  assert.ok(
+    gemessen.einsZuViel.hoehe > 194,
+    `Zwei Zeilen mehr messen ${gemessen.einsZuViel.hoehe} mm und passten noch`,
+  );
+});
+
+test("Die versprochene Seitenzahl entspricht dem, was der Drucker ausgibt", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  const app = await loadMonthPrintApp();
+  const employees = Array.from({ length: 21 }, (_, index) => ({
+    ...createEmployee(`e${index}`),
+    // Gemischt: kurze und sehr lange Namen im selben Blatt.
+    lastName:
+      index % 3 === 0
+        ? `Schmidt-Wagenknecht-Lüdenscheidt${index}`
+        : `Name${String(index).padStart(2, "0")}`,
+    firstName: index % 3 === 0 ? "Maximiliane-Charlotte" : "Vorname",
+    serviceWeekend: ["weekend_a", "weekend_b", "none"][index % 3],
+  }));
+  const holidays = app.getNrwHolidays(2026);
+  const schoolVacations = app.getNrwSchoolVacations(2026);
+  const sheets = app.blankVacationMonthSheets(employees);
+  assert.equal(sheets.length, 2, "Einundzwanzig Mitarbeiter brauchen zwei Blätter");
+
+  const markup = sheets
+    .map((sheetEmployees, index) =>
+      app.renderBlankVacationMonthPrintDocument(7, sheetEmployees, holidays, schoolVacations, {
+        sheet: index + 1,
+        sheetCount: sheets.length,
+        totalEmployees: employees.length,
+      }),
+    )
+    .join("");
+
+  await teo.page.emulateMedia({ media: "print" });
+  await teo.evaluate((inhalt) => {
+    document.querySelector("#vacationBlankMonthPrintSurface").innerHTML = inhalt;
+    document.body.classList.add("print-vacation-blank-month");
+  }, markup);
+  const pdf = await teo.page.pdf({
+    landscape: true,
+    format: "A4",
+    printBackground: true,
+    margin: { top: "8mm", bottom: "8mm", left: "8mm", right: "8mm" },
+  });
+  await teo.evaluate(() => {
+    document.querySelector("#vacationBlankMonthPrintSurface").innerHTML = "";
+    document.body.classList.remove("print-vacation-blank-month");
+  });
+
+  // „Seite 1 von 2“ ist eine Zusage an den Leser. Sie stimmt nur, wenn der
+  // Drucker auch wirklich zwei Seiten ausgibt - gemessen am erzeugten PDF.
+  const seiten = (pdf.toString("latin1").match(/\/Type\s*\/Page[^s]/g) || []).length;
+  assert.equal(seiten, 2, `Versprochen sind zwei Seiten, gedruckt werden ${seiten}`);
 });
 
 test("Der Druck ist als eigene Seitenart eingerichtet", async () => {

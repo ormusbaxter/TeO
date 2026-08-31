@@ -1094,6 +1094,29 @@
   // Gedruckt wird das ganze Jahr. Wer nur einen Monat braucht, waehlt im
   // Druckdialog die Seite aus; zwoelf Blaetter neu aufzubauen ist billiger als
   // eine zweite Bedienung dafuer.
+  //
+  // Ein grosses Team fuellt mehr als ein Blatt. Aufgeteilt wird hier und nicht
+  // vom Seitenumbruch: Nur so weiss jedes Blatt, das wievielte es ist, und
+  // kann Monat und "Seite x von y" im Kopf tragen. Auf eine A4-Querseite
+  // passen bei 8 mm Rand 194 mm; Kopf, Legende, Tabellenkopf und Fuss nehmen
+  // davon rund 35 mm, jede Zeile 7,5 mm. Rechnerisch waeren 21 Zeilen
+  // moeglich (192,6 mm) - eine bleibt als Reserve frei, damit abweichende
+  // Schriftmetriken auf einem fremden Rechner die Aufteilung nicht kippen und
+  // aus "Seite 1 von 2" nicht stillschweigend drei Seiten werden.
+  const BLANK_MONTH_ROWS_PER_SHEET = 20;
+
+  function blankVacationMonthSheets(employees) {
+    const sheets = [];
+    for (
+      let position = 0;
+      position < employees.length;
+      position += BLANK_MONTH_ROWS_PER_SHEET
+    ) {
+      sheets.push(employees.slice(position, position + BLANK_MONTH_ROWS_PER_SHEET));
+    }
+    return sheets.length ? sheets : [[]];
+  }
+
   function printBlankVacationMonthPlans() {
     const employees = vacationEmployeesForBlankYearPrint();
     if (!employees.length) {
@@ -1108,15 +1131,25 @@
     // ermittelt genuegt.
     const holidays = getNrwHolidays(vacationYear);
     const schoolVacations = getNrwSchoolVacations(vacationYear);
+    const sheets = blankVacationMonthSheets(employees);
     elements.vacationBlankMonthPrintSurface.innerHTML = Array.from(
       { length: 12 },
       (_, index) =>
-        renderBlankVacationMonthPrintDocument(
-          index + 1,
-          employees,
-          holidays,
-          schoolVacations,
-        ),
+        sheets
+          .map((sheetEmployees, sheetIndex) =>
+            renderBlankVacationMonthPrintDocument(
+              index + 1,
+              sheetEmployees,
+              holidays,
+              schoolVacations,
+              {
+                sheet: sheetIndex + 1,
+                sheetCount: sheets.length,
+                totalEmployees: employees.length,
+              },
+            ),
+          )
+          .join(""),
     ).join("");
     document.body.classList.add("print-vacation-blank-month");
     window.print();
@@ -1131,6 +1164,7 @@
     employees,
     holidays,
     schoolVacations,
+    { sheet = 1, sheetCount = 1, totalEmployees = employees.length } = {},
   ) {
     const monthLabel = dateFormat({ month: "long", year: "numeric" }).format(
       new Date(vacationYear, month - 1, 1, 12),
@@ -1145,8 +1179,15 @@
             <h1>${escapeHtml(monthLabel)}</h1>
           </div>
           <div class="vacation-blank-month-meta">
-            <strong>${employees.length}</strong>
+            <strong>${totalEmployees}</strong>
             <span>Mitarbeiter</span>
+            ${
+              // Nur wenn der Monat wirklich mehrere Blaetter braucht - sonst
+              // stuende auf jedem Blatt eine Selbstverstaendlichkeit.
+              sheetCount > 1
+                ? `<span class="vacation-blank-month-sheet">Seite ${sheet} von ${sheetCount}</span>`
+                : ""
+            }
           </div>
         </header>
         <div class="vacation-blank-year-legend" aria-label="Legende">
@@ -1221,7 +1262,9 @@
     return `
       <tr>
         <th class="vacation-blank-month-name-column" scope="row">
-          <strong>${escapeHtml(fullName(employee))}</strong>
+          <strong>${escapeHtml(
+            [employee.lastName, employee.firstName].filter(Boolean).join(", "),
+          )}</strong>
           <small>${escapeHtml(
             [
               `${employee.employmentPercent} %`,

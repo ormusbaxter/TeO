@@ -11941,6 +11941,10 @@ body.is-dragging-appointment .appointment-calendar-entry {
     font-size: 14pt;
   }
 
+  .vacation-blank-month-sheet {
+    font-weight: 800;
+  }
+
   .vacation-blank-month-meta span,
   .vacation-blank-month-document .vacation-blank-year-legend,
   .vacation-blank-month-document footer {
@@ -11983,20 +11987,29 @@ body.is-dragging-appointment .appointment-calendar-entry {
   /* Die Namensspalte traegt zwei Zeilen: Name und darunter Umfang sowie
      Dienstwochenende. Sie ist die einzige linksbuendige Spalte. */
   .vacation-blank-month-name-column {
-    width: 42mm;
+    width: 46mm;
     padding-left: 1.5mm !important;
     text-align: left !important;
     background-color: #eef1f4;
   }
 
-  .vacation-blank-month-name-column strong {
+  /* Beide Zeilen bleiben einzeilig: Bricht ein langer Name um, waechst die
+     Zeile - und damit stimmte die Blattaufteilung nicht mehr, die "Seite x
+     von y" verspricht. Gekuerzt wird am Ende, also beim Vornamen; der
+     Nachname traegt die alphabetische Ordnung und bleibt stehen. */
+  .vacation-blank-month-name-column :is(strong, small) {
     display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .vacation-blank-month-name-column strong {
     font-size: 7pt;
     line-height: 1.15;
   }
 
   .vacation-blank-month-name-column small {
-    display: block;
     color: #596779;
     font-size: 5.5pt;
   }
