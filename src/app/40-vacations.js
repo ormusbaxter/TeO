@@ -1142,11 +1142,7 @@
               sheetEmployees,
               holidays,
               schoolVacations,
-              {
-                sheet: sheetIndex + 1,
-                sheetCount: sheets.length,
-                totalEmployees: employees.length,
-              },
+              { sheet: sheetIndex + 1, sheetCount: sheets.length },
             ),
           )
           .join(""),
@@ -1164,7 +1160,7 @@
     employees,
     holidays,
     schoolVacations,
-    { sheet = 1, sheetCount = 1, totalEmployees = employees.length } = {},
+    { sheet = 1, sheetCount = 1 } = {},
   ) {
     const monthLabel = dateFormat({ month: "long", year: "numeric" }).format(
       new Date(vacationYear, month - 1, 1, 12),
@@ -1174,21 +1170,14 @@
     return `
       <article class="vacation-blank-month-document">
         <header class="vacation-blank-month-header">
-          <div>
-            <p>Leere Monatsplanung</p>
-            <h1>${escapeHtml(monthLabel)}</h1>
-          </div>
-          <div class="vacation-blank-month-meta">
-            <strong>${totalEmployees}</strong>
-            <span>Mitarbeiter</span>
-            ${
-              // Nur wenn der Monat wirklich mehrere Blaetter braucht - sonst
-              // stuende auf jedem Blatt eine Selbstverstaendlichkeit.
-              sheetCount > 1
-                ? `<span class="vacation-blank-month-sheet">Seite ${sheet} von ${sheetCount}</span>`
-                : ""
-            }
-          </div>
+          <h1>${escapeHtml(monthLabel)}</h1>
+          ${
+            // Nur wenn der Monat wirklich mehrere Blaetter braucht - sonst
+            // stuende auf jedem Blatt eine Selbstverstaendlichkeit.
+            sheetCount > 1
+              ? `<span class="vacation-blank-month-sheet">Seite ${sheet} von ${sheetCount}</span>`
+              : ""
+          }
         </header>
         <div class="vacation-blank-year-legend" aria-label="Legende">
           <span><i class="vacation-blank-holiday-swatch"></i> Feiertag NRW</span>
@@ -1268,7 +1257,12 @@
           <small>${escapeHtml(
             [
               `${employee.employmentPercent} %`,
-              serviceWeekendLabel(employee.serviceWeekend),
+              // Beim Ausfuellen von Hand ist der Jahresanspruch die Zahl, die
+              // gebraucht wird - das Dienstwochenende steht ohnehin als
+              // Umrandung in den Tagesspalten.
+              `${formatVacationNumber(
+                getVacationEntitlement(employee, vacationYear).total,
+              )} Urlaubstage`,
             ].join(" · "),
           )}</small>
         </th>

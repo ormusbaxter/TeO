@@ -1,6 +1,6 @@
 ### 4.46.0 – Leere Monatsplanungen zum Ausfüllen
 
-- **Neu:** Die Urlaubsplanung druckt **leere Monatsplanungen**: je Monat des gewählten Jahres ein DIN-A4-Blatt quer, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch untereinander – nach Nachname, Vorname – und die Tage des Monats als Spalten. Feiertage, Schulferien und das eigene Dienstwochenende sind vermerkt, die Felder bleiben leer. Wer nur einen Monat braucht, wählt die Seiten im Druckdialog
+- **Neu:** Die Urlaubsplanung druckt **leere Monatsplanungen**: je Monat des gewählten Jahres ein DIN-A4-Blatt quer, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch untereinander – nach Nachname, Vorname – und die Tage des Monats als Spalten. Unter jedem Namen stehen Beschäftigungsumfang und Jahresurlaubsanspruch. Feiertage, Schulferien und das eigene Dienstwochenende sind vermerkt, die Felder bleiben leer. Wer nur einen Monat braucht, wählt die Seiten im Druckdialog
 - **Neu:** Braucht ein Monat mehr als ein Blatt – auf eines passen 20 Mitarbeiter –, trägt jedes Blatt den Monat im Kopf und daneben **Seite x von y** für diesen Monat. So lässt sich ein Stapel wieder sortieren
 - **Verbessert:** Das Handbuch beschreibt jetzt beide leeren Vordrucke – die Jahresübersicht je Mitarbeiter und die neue Monatsplanung
 

@@ -801,6 +801,9 @@ Mitarbeiter: zwölf Monatszeilen, 31 Tagesspalten.
 **Leere Monatsplanungen** druckt umgekehrt ein Blatt je Monat des gewählten
 Jahres, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch
 untereinander – nach Nachname, Vorname – und die Tage des Monats als Spalten.
+Unter jedem Namen stehen Beschäftigungsumfang und Jahresurlaubsanspruch
+einschließlich zusätzlicher Tage. Das Dienstwochenende ist an der Umrandung
+der betreffenden Tagesspalten abzulesen.
 
 Auf ein Blatt passen 20 Mitarbeiter. Ein größeres Team verteilt sich auf
 mehrere Blätter je Monat; jedes trägt dann den Monat im Kopf und daneben
