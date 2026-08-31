@@ -1183,12 +1183,20 @@ laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und
 administrative Passwort-Resets erhalten automatisch eine aktualisierte
 Schlüsselhülle.
 
+Der Schlüssel gehört zum Datenbestand, nicht zum Arbeitsplatz: Sein Verzeichnis
+mit den Schlüsselhüllen aller Konten steht in `teo-autosicherung.json` selbst –
+in der äußeren Hülle, die auch ohne Schlüssel lesbar ist. Jeder Arbeitsplatz
+entsperrt daraus mit dem gewohnten Login-Passwort denselben Schlüssel. Ein
+einmal geschützter Datenbestand braucht dafür kein neues Passwort, und ein an
+einem anderen Arbeitsplatz angelegtes Konto bekommt seine Hülle beim ersten
+Login selbst.
+
 Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss
 getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die
-Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Ein
-bereits vorhandenes Konto ohne Schlüsselhülle benötigt ihn einmalig beim ersten
-Login. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung
-beim Prüfen und Importieren automatisch entschlüsselt.
+Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Nach ihm
+fragt TeO erst, wenn auch das Schlüsselverzeichnis der gemeinsamen Datei keine
+passende Hülle kennt. Verschlüsselte Autosicherungen werden während einer
+entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.
 
 Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist
 nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über
@@ -1201,13 +1209,39 @@ unabhängig davon verfügbar.
 Beim Start in der lokalen Browser-Betriebsart sucht TeO nach der Anmeldung
 zuerst im zuletzt verknüpften Sicherungsordner nach `teo-autosicherung.json` und
 lädt sie ohne zusätzliche Auswahl. Nur wenn der Ordnerzugriff nicht mehr gilt,
-die Datei dort fehlt oder nicht gelesen werden kann, erscheint die Dateiauswahl.
-Die Bedienoberfläche bleibt bis zum erfolgreichen Abgleich gesperrt. Die Datei
-wird geprüft, gegebenenfalls mit dem beim Login entsperrten Schlüssel
-entschlüsselt und als aktueller Datenbestand übernommen. Eine Sicherung, die
-älter als der zuletzt lokal gesicherte Stand ist, wird abgewiesen. In der
-MariaDB-Betriebsart übernimmt stattdessen der Server den verbindlichen
-Startabgleich.
+die Datei dort fehlt oder nicht gelesen werden kann, erscheint der Startdialog.
+Dort lässt sich entweder die Datei einzeln wählen oder – besser – der
+Sicherungsordner freigeben; die Verknüpfung gilt dann auch für die nächste
+Sitzung. Die Bedienoberfläche bleibt bis zum erfolgreichen Abgleich gesperrt.
+Die Datei wird geprüft, gegebenenfalls mit dem beim Login entsperrten Schlüssel
+entschlüsselt und als aktueller Datenbestand übernommen – **einschließlich der
+Benutzerkonten**, denn die gemeinsame Datei ist der vollständige Datenbestand.
+Eine Sicherung, die älter als der zuletzt lokal gesicherte Stand ist, wird
+abgewiesen. In der MariaDB-Betriebsart übernimmt stattdessen der Server den
+verbindlichen Startabgleich.
+
+Hat ein anderer Arbeitsplatz die Datei zwischenzeitlich geschrieben, überschreibt
+TeO sie nicht. Stattdessen erscheint ein Hinweis; der sichere Weg ist abmelden,
+TeO neu laden und den Startabgleich wiederholen. Wer die Änderungen der
+laufenden Sitzung dennoch sichern muss, wählt **Jetzt automatisch sichern** und
+bestätigt das Überschreiben ausdrücklich.
+
+### Erster Start an einem weiteren Arbeitsplatz
+
+Liegt TeO in einem gemeinsamen Ordner und wird es an einem weiteren Arbeitsplatz
+zum ersten Mal geöffnet, fragt TeO zunächst, woher der Datenbestand kommt:
+
+- **Vorhandenen Datenbestand öffnen** – der Regelfall. TeO fragt nach dem
+  gemeinsamen Sicherungsordner, liest dort `teo-autosicherung.json` und öffnet
+  anschließend die Anmeldung. Dort gilt das Konto, das bereits am ersten
+  Arbeitsplatz angelegt wurde, mit seinem gewohnten Passwort. Ordnerverknüpfung,
+  Sicherungsschlüssel, Konten und Daten kommen damit in einem Schritt.
+- **Neuen Datenbestand einrichten** – nur für den allerersten Arbeitsplatz. Es
+  entsteht ein erstes Administratorkonto und ein leerer Datenbestand.
+
+Ein Konto muss also nur einmal angelegt werden. Neue Konten, Passwortänderungen
+und Passwort-Resets werden über die gemeinsame Datei an alle Arbeitsplätze
+weitergegeben, sobald dort die nächste automatische Sicherung geschrieben wurde.
 
 ### Sicherung prüfen
 
@@ -1247,7 +1281,10 @@ auf andere Browserspeicher zurück.
 Wichtig:
 
 - Ein Netzlaufwerk mit derselben `index.html` teilt nicht automatisch den
-  IndexedDB-Datenbestand zwischen Arbeitsplätzen.
+  IndexedDB-Datenbestand zwischen Arbeitsplätzen. Die gemeinsame
+  `teo-autosicherung.json` übernimmt diese Aufgabe: Beim ersten Start an einem
+  weiteren Arbeitsplatz führt **Vorhandenen Datenbestand öffnen** dorthin, und
+  jeder folgende Start gleicht über sie ab.
 - Jeder Browser und jedes Browserprofil besitzt seinen eigenen lokalen
   Speicher.
 - Browserbereinigung oder ein Profilwechsel kann lokale Daten entfernen.
@@ -1353,7 +1390,8 @@ Die Datenqualitätsprüfung sucht unter anderem nach:
 Im lokalen Browserbetrieb lädt TeO die gemeinsame Datei
 `teo-autosicherung.json` automatisch aus dem zuletzt verknüpften Sicherungsordner.
 Eine Auswahl ist nur erforderlich, wenn die gespeicherte Freigabe nicht mehr
-gilt, die Datei fehlt oder nicht gelesen werden kann. Erst nach erfolgreicher
+gilt, die Datei fehlt oder nicht gelesen werden kann. Wird dort statt der Datei
+der Sicherungsordner freigegeben, entfällt die Auswahl auch künftig. Erst nach erfolgreicher
 Prüfung und Übernahme wird die Anwendung freigegeben. Im MariaDB-Betrieb entfällt
 dieser Startabgleich, weil der Server bereits den verbindlichen Datenstand liefert.
 
@@ -1383,10 +1421,16 @@ ersatzweise eine beliebige umbenannte JSON-Datei.
 ### Muss ich für eine verschlüsselte Autosicherung ein zweites Passwort eingeben?
 
 Normalerweise nicht. Der gemeinsame Sicherungsschlüssel wird beim Login mit dem
-persönlichen Benutzerpasswort automatisch entsperrt. Nur wenn dem Konto noch
-keine passende Schlüsselhülle zugeordnet ist oder das Browserprofil vollständig
-verloren ging, wird einmalig der separat aufbewahrte Wiederherstellungsschlüssel
-benötigt. Dieser Schlüssel ist nicht das Login-Passwort.
+persönlichen Benutzerpasswort automatisch entsperrt – auch an einem
+Arbeitsplatz, an dem dieses Konto sich zum ersten Mal anmeldet: Die passende
+Schlüsselhülle steht im Verzeichnis der gemeinsamen Datei. Erst wenn auch dort
+keine Hülle zum Konto passt oder die Datei nicht erreichbar ist, wird einmalig
+der separat aufbewahrte Wiederherstellungsschlüssel benötigt. Dieser Schlüssel
+ist nicht das Login-Passwort.
+
+Ein neuer Arbeitsplatz erzeugt dabei **kein** neues Passwort und macht das alte
+nicht ungültig. Der Schlüssel bleibt derselbe, solange derselbe Datenbestand
+verwendet wird.
 
 ### Wann wird die gemeinsame Datei aktualisiert?
 
@@ -1400,10 +1444,12 @@ gewählten Ordner besitzt.
 
 Nein. Die gemeinsame JSON-Datei ist für eine nacheinander erfolgende Nutzung
 gedacht. Jede geöffnete Anwendung hält einen vollständigen Datenstand und würde
-beim Sichern die gesamte Datei überschreiben. Bei gleichzeitiger Bearbeitung
-kann dadurch die zuletzt geschriebene Version Änderungen einer anderen Person
-verdrängen. Für den parallelen Betrieb an mehreren Arbeitsplätzen muss MariaDB
-als gemeinsamer Datenbestand verwendet werden.
+beim Sichern die gesamte Datei überschreiben. TeO erkennt einen zwischenzeitlich
+erfolgten fremden Schreibvorgang an Größe und Änderungszeit der Datei und
+überschreibt sie dann nicht mehr stillschweigend, sondern meldet es – die
+Änderungen der eigenen Sitzung bleiben in diesem Fall aber ungesichert. Für den
+parallelen Betrieb an mehreren Arbeitsplätzen muss MariaDB als gemeinsamer
+Datenbestand verwendet werden.
 
 ### Warum sehe ich Änderungen eines anderen Arbeitsplatzes nicht sofort?
 

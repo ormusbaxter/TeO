@@ -57,6 +57,10 @@
   const BACKUP_VOLUME_WARNING_RATIO = 0.9;
   const AUTO_BACKUP_DELAY_MS = 2000;
   const AUTO_BACKUP_FILENAME = "teo-autosicherung.json";
+  const FOREIGN_BACKUP_NOTICE =
+    `Ein anderer Arbeitsplatz hat ${AUTO_BACKUP_FILENAME} zwischenzeitlich ` +
+    "geschrieben – es wurde nichts überschrieben. Abmelden, TeO neu laden und " +
+    "den Startabgleich wiederholen.";
   const DEFAULT_VACATION_BASE_DAYS = 30;
   const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
   const DEFAULT_WEEKDAY_ABSENCE_LIMIT = 8;
@@ -517,6 +521,16 @@
   let automaticBackupNotice = "";
   let startupBackupSynchronized = false;
   let startupBackupImportRunning = false;
+  // Das Login-Passwort der laufenden Anmeldung, nur bis zum Ende des
+  // Startabgleichs. Die Schluesselhuellen aus der gemeinsamen Datei sind erst
+  // nach dem Lesen der Datei bekannt - ohne das gemerkte Passwort muesste TeO
+  // dort nach dem Wiederherstellungsschluessel fragen, obwohl die passende
+  // Huelle gleich danach vorliegt.
+  let pendingLoginPassword = "";
+  // Groesse und Aenderungszeit der zuletzt gelesenen oder selbst geschriebenen
+  // teo-autosicherung.json. Weicht die Datei davon ab, hat inzwischen ein
+  // anderer Arbeitsplatz geschrieben.
+  let sharedBackupFileStamp = null;
   let browserPersistenceNotice = "";
   // Beim Laden verworfene Benutzerkonten, damit der Verlust nicht unbemerkt
   // bleibt. Wird nach dem Start einmalig gemeldet.
@@ -914,6 +928,13 @@
       "#selectStartupBackupFileButton",
     ),
     startupBackupStatus: document.querySelector("#startupBackupStatus"),
+    selectStartupBackupDirectoryButton: document.querySelector(
+      "#selectStartupBackupDirectoryButton",
+    ),
+    dataOriginDialog: document.querySelector("#dataOriginDialog"),
+    dataOriginStatus: document.querySelector("#dataOriginStatus"),
+    createDataSetButton: document.querySelector("#createDataSetButton"),
+    openSharedDataSetButton: document.querySelector("#openSharedDataSetButton"),
     setupDialog: document.querySelector("#setupDialog"),
     setupForm: document.querySelector("#setupForm"),
     setupError: document.querySelector("#setupError"),

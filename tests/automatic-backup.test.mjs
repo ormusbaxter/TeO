@@ -35,6 +35,10 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
   );
   assert.match(html, /id="startupBackupFile"/);
   assert.match(html, /teo-autosicherung\.json auswählen/);
+  assert.match(html, /id="selectStartupBackupDirectoryButton"/);
+  assert.match(html, /id="dataOriginDialog"/);
+  assert.match(html, /id="openSharedDataSetButton"/);
+  assert.match(html, /id="createDataSetButton"/);
   assert.match(appSource, /window\.showDirectoryPicker/);
   assert.match(appSource, /AUTO_BACKUP_DIRECTORY_KEY/);
   assert.match(appSource, /AUTO_BACKUP_DELAY_MS\s*=\s*2000/);
@@ -42,12 +46,17 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
     appSource,
     /AUTO_BACKUP_FILENAME\s*=\s*"teo-autosicherung\.json"/,
   );
+  // Die automatische Sicherung schreibt das Schlüsselverzeichnis mit: Ohne es
+  // erzeugt jeder weitere Arbeitsplatz einen eigenen Schlüssel.
   assert.match(
     appSource,
-    /encryptBackup\(fileContent, automaticBackupPassword\)/,
+    /encryptBackup\(\s*fileContent,\s*automaticBackupPassword,\s*automaticBackupKeyDirectory\(\),\s*\)/,
   );
   assert.match(appSource, /scheduleAutomaticBackup\(\)/);
-  assert.match(appSource, /unlockAutomaticBackupForLogin\(user, password\)/);
+  assert.match(
+    appSource,
+    /unlockAutomaticBackupForLogin\(user, password, \{\s*promptRecovery: false,\s*\}\)/,
+  );
   assert.match(
     appSource,
     /registerAutomaticBackupUserKey\(currentUser\.id, password\)/,
@@ -75,6 +84,7 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
     appSource,
     /!isMariaDbMode\(\) && !startupBackupSynchronized/,
   );
+  assert.match(styles, /\.data-origin-choice\s*\{/);
   assert.match(styles, /\.automatic-backup-panel\s*\{/);
   assert.match(styles, /\.backup-reminder-settings-form\s*\{/);
   assert.match(styles, /\.backup-volume-meter\.is-warning\s*\{/);

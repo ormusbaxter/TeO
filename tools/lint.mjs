@@ -48,9 +48,29 @@ const generatedMaps = {
   "app.js": await buildLineMap("src/app", 1),
 };
 
+// ESLint wird unmittelbar gestartet, nicht über npx: Node verweigert ab 20.12
+// das Starten einer .cmd-Datei ohne Shell (EINVAL), und der Umweg über eine
+// Shell brächte nur Anführungszeichenregeln mit sich. Die CLI liegt ohnehin im
+// Projekt, und derselbe Node führt sie aus.
+const eslintCli = path.join(
+  projectRoot,
+  "node_modules",
+  "eslint",
+  "bin",
+  "eslint.js",
+);
+try {
+  await fs.access(eslintCli);
+} catch {
+  process.stderr.write(
+    "ESLint ist nicht installiert. Einmalig „npm ci“ ausführen.\n",
+  );
+  process.exit(1);
+}
+
 const eslint = spawn(
-  process.platform === "win32" ? "npx.cmd" : "npx",
-  ["eslint", ".", "--format", "json", ...process.argv.slice(2)],
+  process.execPath,
+  [eslintCli, ".", "--format", "json", ...process.argv.slice(2)],
   { cwd: projectRoot },
 );
 

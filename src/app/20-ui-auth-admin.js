@@ -305,7 +305,7 @@
     );
     elements.runAutomaticBackupButton.addEventListener(
       "click",
-      () => void runAutomaticBackup({ force: true, requestPermission: true }),
+      () => void runAutomaticBackupOnDemand(),
     );
     elements.removeAutomaticBackupDirectoryButton.addEventListener(
       "click",
@@ -336,6 +336,10 @@
     elements.selectStartupBackupFileButton.addEventListener(
       "click",
       () => elements.startupBackupFile.click(),
+    );
+    elements.selectStartupBackupDirectoryButton.addEventListener(
+      "click",
+      () => void selectStartupBackupDirectory(),
     );
     elements.startupBackupFile.addEventListener(
       "change",
@@ -1077,6 +1081,11 @@
   }
 
   function bindAuthentication() {
+    elements.createDataSetButton.addEventListener("click", showSetupDialog);
+    elements.openSharedDataSetButton.addEventListener(
+      "click",
+      () => void openSharedDataSet(),
+    );
     elements.setupForm.addEventListener("submit", handleSetupSubmit);
     elements.loginForm.addEventListener("submit", handleLoginSubmit);
     elements.changePasswordForm.addEventListener("submit", handlePasswordChangeSubmit);
@@ -1413,7 +1422,7 @@
 
   function restoreAuthenticationSession() {
     if (!isMariaDbMode() && state.users.length === 0) {
-      showSetupDialog();
+      showDataOriginDialog();
       return;
     }
     const sessionUserId = sessionStorage.getItem(SESSION_USER_KEY);
@@ -1433,6 +1442,34 @@
       return;
     }
     completeLogin(user);
+  }
+
+  // Ohne eigene Konten stehen zwei Wege offen: ein neuer Datenbestand oder der
+  // bereits vorhandene aus dem gemeinsamen Ordner. Frueher fuehrte nur der
+  // erste Weg weiter - und legte ein Konto an, das anschliessend die Konten aus
+  // der gemeinsamen Datei verdraengte.
+  function showDataOriginDialog() {
+    currentUser = null;
+    sessionStorage.removeItem(SESSION_USER_KEY);
+    document.body.classList.add("is-auth-locked");
+    document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
+    elements.dataOriginStatus.textContent = "";
+    const sharedDataSetAvailable =
+      typeof window.showDirectoryPicker === "function";
+    elements.openSharedDataSetButton.disabled = !sharedDataSetAvailable;
+    if (!sharedDataSetAvailable) {
+      elements.dataOriginStatus.textContent =
+        "Einen vorhandenen Datenbestand können nur Chrome und Edge über HTTPS beziehungsweise localhost öffnen.";
+    }
+    if (!elements.dataOriginDialog.open) elements.dataOriginDialog.showModal();
+    window.setTimeout(
+      () =>
+        (sharedDataSetAvailable
+          ? elements.openSharedDataSetButton
+          : elements.createDataSetButton
+        ).focus(),
+      0,
+    );
   }
 
   function showSetupDialog() {
@@ -1538,6 +1575,17 @@
       (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
     );
 
+    // Erste Anmeldung an einem weiteren Arbeitsplatz: Die Konten liegen noch in
+    // der gemeinsamen Datei, nicht in diesem Browserprofil.
+    if (!user && state.users.length === 0 && automaticBackupDirectoryHandle) {
+      const message = await loginFromSharedDataSet(username, password);
+      if (message) {
+        elements.loginError.textContent = message;
+        document.querySelector("#loginPassword").value = "";
+      }
+      return;
+    }
+
     let passwordMatches;
     try {
       passwordMatches = user ? await verifyPassword(password, user) : false;
@@ -1554,8 +1602,15 @@
       return;
     }
 
+    // Bis zum Ende des Startabgleichs gemerkt: Fehlt die Schluesselhuelle
+    // dieses Kontos hier noch, bringt sie das Verzeichnis der gemeinsamen Datei
+    // mit - danach genuegt dasselbe Passwort. Erst wenn auch das fehlschlaegt,
+    // wird nach dem Wiederherstellungsschluessel gefragt.
+    pendingLoginPassword = password;
     try {
-      await unlockAutomaticBackupForLogin(user, password);
+      await unlockAutomaticBackupForLogin(user, password, {
+        promptRecovery: false,
+      });
     } catch (error) {
       console.warn("Der automatische Sicherungsschlüssel konnte nicht entsperrt werden.", error);
       automaticBackupNotice =
@@ -1607,6 +1662,7 @@
     applyTheme(activeThemeKey());
     clearAutomaticBackupTimer();
     automaticBackupPassword = "";
+    pendingLoginPassword = "";
     startupBackupSynchronized = false;
     startupBackupImportRunning = false;
     backupReminderShown = false;
@@ -1682,6 +1738,8 @@
       );
     }
     currentUser = state.users.find((user) => user.id === currentUser.id);
+    // Der Startabgleich steht noch aus; er braucht das jetzt gueltige Passwort.
+    if (pendingLoginPassword) pendingLoginPassword = password;
     elements.changePasswordDialog.close();
     if (!isMariaDbMode() && !startupBackupSynchronized) {
       void synchronizeStartupBackupFromSavedDirectory({ requestPermission: true });

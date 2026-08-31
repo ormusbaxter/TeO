@@ -58,6 +58,10 @@
   const BACKUP_VOLUME_WARNING_RATIO = 0.9;
   const AUTO_BACKUP_DELAY_MS = 2000;
   const AUTO_BACKUP_FILENAME = "teo-autosicherung.json";
+  const FOREIGN_BACKUP_NOTICE =
+    `Ein anderer Arbeitsplatz hat ${AUTO_BACKUP_FILENAME} zwischenzeitlich ` +
+    "geschrieben – es wurde nichts überschrieben. Abmelden, TeO neu laden und " +
+    "den Startabgleich wiederholen.";
   const DEFAULT_VACATION_BASE_DAYS = 30;
   const DEFAULT_WEEKEND_A_REFERENCE_SATURDAY = "2026-01-03";
   const DEFAULT_WEEKDAY_ABSENCE_LIMIT = 8;
@@ -518,6 +522,16 @@
   let automaticBackupNotice = "";
   let startupBackupSynchronized = false;
   let startupBackupImportRunning = false;
+  // Das Login-Passwort der laufenden Anmeldung, nur bis zum Ende des
+  // Startabgleichs. Die Schluesselhuellen aus der gemeinsamen Datei sind erst
+  // nach dem Lesen der Datei bekannt - ohne das gemerkte Passwort muesste TeO
+  // dort nach dem Wiederherstellungsschluessel fragen, obwohl die passende
+  // Huelle gleich danach vorliegt.
+  let pendingLoginPassword = "";
+  // Groesse und Aenderungszeit der zuletzt gelesenen oder selbst geschriebenen
+  // teo-autosicherung.json. Weicht die Datei davon ab, hat inzwischen ein
+  // anderer Arbeitsplatz geschrieben.
+  let sharedBackupFileStamp = null;
   let browserPersistenceNotice = "";
   // Beim Laden verworfene Benutzerkonten, damit der Verlust nicht unbemerkt
   // bleibt. Wird nach dem Start einmalig gemeldet.
@@ -915,6 +929,13 @@
       "#selectStartupBackupFileButton",
     ),
     startupBackupStatus: document.querySelector("#startupBackupStatus"),
+    selectStartupBackupDirectoryButton: document.querySelector(
+      "#selectStartupBackupDirectoryButton",
+    ),
+    dataOriginDialog: document.querySelector("#dataOriginDialog"),
+    dataOriginStatus: document.querySelector("#dataOriginStatus"),
+    createDataSetButton: document.querySelector("#createDataSetButton"),
+    openSharedDataSetButton: document.querySelector("#openSharedDataSetButton"),
     setupDialog: document.querySelector("#setupDialog"),
     setupForm: document.querySelector("#setupForm"),
     setupError: document.querySelector("#setupError"),
@@ -2901,7 +2922,7 @@
     );
     elements.runAutomaticBackupButton.addEventListener(
       "click",
-      () => void runAutomaticBackup({ force: true, requestPermission: true }),
+      () => void runAutomaticBackupOnDemand(),
     );
     elements.removeAutomaticBackupDirectoryButton.addEventListener(
       "click",
@@ -2932,6 +2953,10 @@
     elements.selectStartupBackupFileButton.addEventListener(
       "click",
       () => elements.startupBackupFile.click(),
+    );
+    elements.selectStartupBackupDirectoryButton.addEventListener(
+      "click",
+      () => void selectStartupBackupDirectory(),
     );
     elements.startupBackupFile.addEventListener(
       "change",
@@ -3673,6 +3698,11 @@
   }
 
   function bindAuthentication() {
+    elements.createDataSetButton.addEventListener("click", showSetupDialog);
+    elements.openSharedDataSetButton.addEventListener(
+      "click",
+      () => void openSharedDataSet(),
+    );
     elements.setupForm.addEventListener("submit", handleSetupSubmit);
     elements.loginForm.addEventListener("submit", handleLoginSubmit);
     elements.changePasswordForm.addEventListener("submit", handlePasswordChangeSubmit);
@@ -4009,7 +4039,7 @@
 
   function restoreAuthenticationSession() {
     if (!isMariaDbMode() && state.users.length === 0) {
-      showSetupDialog();
+      showDataOriginDialog();
       return;
     }
     const sessionUserId = sessionStorage.getItem(SESSION_USER_KEY);
@@ -4029,6 +4059,34 @@
       return;
     }
     completeLogin(user);
+  }
+
+  // Ohne eigene Konten stehen zwei Wege offen: ein neuer Datenbestand oder der
+  // bereits vorhandene aus dem gemeinsamen Ordner. Frueher fuehrte nur der
+  // erste Weg weiter - und legte ein Konto an, das anschliessend die Konten aus
+  // der gemeinsamen Datei verdraengte.
+  function showDataOriginDialog() {
+    currentUser = null;
+    sessionStorage.removeItem(SESSION_USER_KEY);
+    document.body.classList.add("is-auth-locked");
+    document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
+    elements.dataOriginStatus.textContent = "";
+    const sharedDataSetAvailable =
+      typeof window.showDirectoryPicker === "function";
+    elements.openSharedDataSetButton.disabled = !sharedDataSetAvailable;
+    if (!sharedDataSetAvailable) {
+      elements.dataOriginStatus.textContent =
+        "Einen vorhandenen Datenbestand können nur Chrome und Edge über HTTPS beziehungsweise localhost öffnen.";
+    }
+    if (!elements.dataOriginDialog.open) elements.dataOriginDialog.showModal();
+    window.setTimeout(
+      () =>
+        (sharedDataSetAvailable
+          ? elements.openSharedDataSetButton
+          : elements.createDataSetButton
+        ).focus(),
+      0,
+    );
   }
 
   function showSetupDialog() {
@@ -4134,6 +4192,17 @@
       (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
     );
 
+    // Erste Anmeldung an einem weiteren Arbeitsplatz: Die Konten liegen noch in
+    // der gemeinsamen Datei, nicht in diesem Browserprofil.
+    if (!user && state.users.length === 0 && automaticBackupDirectoryHandle) {
+      const message = await loginFromSharedDataSet(username, password);
+      if (message) {
+        elements.loginError.textContent = message;
+        document.querySelector("#loginPassword").value = "";
+      }
+      return;
+    }
+
     let passwordMatches;
     try {
       passwordMatches = user ? await verifyPassword(password, user) : false;
@@ -4150,8 +4219,15 @@
       return;
     }
 
+    // Bis zum Ende des Startabgleichs gemerkt: Fehlt die Schluesselhuelle
+    // dieses Kontos hier noch, bringt sie das Verzeichnis der gemeinsamen Datei
+    // mit - danach genuegt dasselbe Passwort. Erst wenn auch das fehlschlaegt,
+    // wird nach dem Wiederherstellungsschluessel gefragt.
+    pendingLoginPassword = password;
     try {
-      await unlockAutomaticBackupForLogin(user, password);
+      await unlockAutomaticBackupForLogin(user, password, {
+        promptRecovery: false,
+      });
     } catch (error) {
       console.warn("Der automatische Sicherungsschlüssel konnte nicht entsperrt werden.", error);
       automaticBackupNotice =
@@ -4203,6 +4279,7 @@
     applyTheme(activeThemeKey());
     clearAutomaticBackupTimer();
     automaticBackupPassword = "";
+    pendingLoginPassword = "";
     startupBackupSynchronized = false;
     startupBackupImportRunning = false;
     backupReminderShown = false;
@@ -4278,6 +4355,8 @@
       );
     }
     currentUser = state.users.find((user) => user.id === currentUser.id);
+    // Der Startabgleich steht noch aus; er braucht das jetzt gueltige Passwort.
+    if (pendingLoginPassword) pendingLoginPassword = password;
     elements.changePasswordDialog.close();
     if (!isMariaDbMode() && !startupBackupSynchronized) {
       void synchronizeStartupBackupFromSavedDirectory({ requestPermission: true });
@@ -17221,17 +17300,15 @@
         id: "teo-automatic-backup",
         mode: "readwrite",
       });
-      await dataStore.setItem(AUTO_BACKUP_DIRECTORY_KEY, handle);
-      automaticBackupDirectoryHandle = handle;
-      automaticBackupSettings = normalizeAutomaticBackupSettings({
-        ...automaticBackupSettings,
-        enabled: true,
-        directoryName: handle.name,
-      });
-      automaticBackupNotice = "";
-      await persistAutomaticBackupConfiguration();
+      await linkAutomaticBackupDirectory(handle);
       renderAutomaticBackupStatus();
-      await runAutomaticBackup({ force: true, requestPermission: true });
+      // Einen Ordner zu waehlen ist die ausdrueckliche Entscheidung, dorthin zu
+      // sichern - die Wache gegen fremde Schreibvorgaenge stuende hier im Weg.
+      await runAutomaticBackup({
+        force: true,
+        requestPermission: true,
+        overwriteForeignChanges: true,
+      });
     } catch (error) {
       if (error?.name === "AbortError") return;
       console.error("Der Sicherungsordner konnte nicht gespeichert werden.", error);
@@ -17240,6 +17317,42 @@
       renderAutomaticBackupStatus();
       showToast(automaticBackupNotice, "error");
     }
+  }
+
+  // „Jetzt automatisch sichern“ ist der Ausweg aus einer erkannten
+  // Fremdschreibung: Ohne ihn blieben die Aenderungen dieser Sitzung ungesichert
+  // liegen. Ueberschrieben wird nur nach ausdruecklicher Bestaetigung.
+  async function runAutomaticBackupOnDemand() {
+    if (await sharedBackupFileChangedElsewhere()) {
+      requestConfirmation({
+        title: `${AUTO_BACKUP_FILENAME} überschreiben?`,
+        message:
+          `Ein anderer Arbeitsplatz hat ${AUTO_BACKUP_FILENAME} zwischenzeitlich geschrieben. ` +
+          "Beim Überschreiben gehen die dort gesicherten Änderungen verloren. " +
+          "Sicherer ist: abmelden, TeO neu laden und den Startabgleich wiederholen.",
+        acceptLabel: "Trotzdem überschreiben",
+        callback: () =>
+          void runAutomaticBackup({
+            force: true,
+            requestPermission: true,
+            overwriteForeignChanges: true,
+          }),
+      });
+      return;
+    }
+    await runAutomaticBackup({ force: true, requestPermission: true });
+  }
+
+  async function linkAutomaticBackupDirectory(handle) {
+    await dataStore.setItem(AUTO_BACKUP_DIRECTORY_KEY, handle);
+    automaticBackupDirectoryHandle = handle;
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      enabled: true,
+      directoryName: handle.name,
+    });
+    automaticBackupNotice = "";
+    await persistAutomaticBackupConfiguration();
   }
 
   async function removeAutomaticBackupDirectory() {
@@ -17391,6 +17504,99 @@
     return bytesToBase64(new Uint8Array(digest));
   }
 
+  // Das Schluesselverzeichnis reist in der aeusseren, unverschluesselten Huelle
+  // der gemeinsamen Datei mit. Im Datenbestand selbst waere es unerreichbar:
+  // Wer die Datei an einem weiteren Arbeitsplatz zum ersten Mal oeffnet, muss
+  // die Huelle seines Kontos finden, bevor er entschluesseln kann.
+  function automaticBackupKeyDirectory() {
+    if (
+      !automaticBackupSettings?.encrypted ||
+      !automaticBackupSettings.keyFingerprint
+    ) {
+      return null;
+    }
+    return {
+      keyFingerprint: automaticBackupSettings.keyFingerprint,
+      keyEnvelopes: { ...automaticBackupSettings.keyEnvelopes },
+    };
+  }
+
+  function readAutomaticBackupKeyDirectory(envelope) {
+    const normalized = normalizeAutomaticBackupSettings({
+      encrypted: true,
+      keyFingerprint: envelope?.keyFingerprint,
+      keyEnvelopes: envelope?.keyEnvelopes,
+    });
+    return normalized.keyFingerprint
+      ? {
+          keyFingerprint: normalized.keyFingerprint,
+          keyEnvelopes: normalized.keyEnvelopes,
+        }
+      : null;
+  }
+
+  // Die Datei ist massgeblich: Bei abweichendem Fingerabdruck gilt ihr
+  // Schluessel, der bisher gehaltene ist fuer sie wertlos. Stimmt er ueberein,
+  // werden die Huellen vereinigt - eine hier angelegte Huelle, die es noch
+  // nicht in die Datei geschafft hat, bleibt so erhalten.
+  async function adoptAutomaticBackupKeyDirectory(directory) {
+    if (!directory) return false;
+    const sameKey =
+      automaticBackupSettings?.keyFingerprint === directory.keyFingerprint;
+    const known =
+      sameKey &&
+      automaticBackupSettings.encrypted &&
+      Object.keys(directory.keyEnvelopes).every((userId) =>
+        Object.hasOwn(automaticBackupSettings.keyEnvelopes, userId),
+      );
+    if (known) return false;
+    if (!sameKey) automaticBackupPassword = "";
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      encrypted: true,
+      keyFingerprint: directory.keyFingerprint,
+      keyEnvelopes: sameKey
+        ? { ...automaticBackupSettings.keyEnvelopes, ...directory.keyEnvelopes }
+        : directory.keyEnvelopes,
+    });
+    try {
+      await persistAutomaticBackupConfiguration();
+    } catch (error) {
+      console.warn(
+        "Das Schlüsselverzeichnis der gemeinsamen Datei konnte nicht gespeichert werden.",
+        error,
+      );
+    }
+    return true;
+  }
+
+  // Sucht die passende Schluesselhuelle. Die eigene zuerst, danach alle
+  // uebrigen: Beim ersten Login an einem weiteren Arbeitsplatz ist die eigene
+  // Konto-ID noch unbekannt, sie steht im verschluesselten Teil der Datei. Das
+  // kostet je Konto eine Schluesselableitung und faellt genau einmal an.
+  async function unlockAutomaticBackupKeyWithPassword(loginPassword, userId = "") {
+    if (!loginPassword || !automaticBackupSettings?.keyFingerprint) return "";
+    const envelopes = automaticBackupSettings.keyEnvelopes || {};
+    const order = [
+      ...(envelopes[userId] ? [userId] : []),
+      ...Object.keys(envelopes).filter((id) => id !== userId),
+    ];
+    for (const id of order) {
+      try {
+        const key = await decryptBackup(envelopes[id], loginPassword);
+        if (
+          (await automaticBackupKeyFingerprint(key)) ===
+          automaticBackupSettings.keyFingerprint
+        ) {
+          return key;
+        }
+      } catch {
+        // Naechste Huelle: Diese gehoert zu einem anderen Konto.
+      }
+    }
+    return "";
+  }
+
   async function registerAutomaticBackupUserKey(userId, loginPassword) {
     if (
       !automaticBackupSettings?.encrypted ||
@@ -17427,25 +17633,30 @@
     return true;
   }
 
-  async function unlockAutomaticBackupForLogin(user, loginPassword) {
+  async function unlockAutomaticBackupForLogin(
+    user,
+    loginPassword,
+    { promptRecovery = true } = {},
+  ) {
     if (!automaticBackupSettings?.encrypted) return true;
-    const envelope = automaticBackupSettings.keyEnvelopes?.[user.id];
-    if (envelope) {
-      try {
-        const key = await decryptBackup(envelope, loginPassword);
-        if (
-          (await automaticBackupKeyFingerprint(key)) ===
-          automaticBackupSettings.keyFingerprint
-        ) {
-          automaticBackupPassword = key;
-          automaticBackupNotice = "";
-          return true;
-        }
-      } catch {
-        // Ein altes Passwort oder eine fehlende Hülle wird über den
-        // Wiederherstellungsschlüssel repariert.
+    const key = await unlockAutomaticBackupKeyWithPassword(
+      loginPassword,
+      user.id,
+    );
+    if (key) {
+      automaticBackupPassword = key;
+      automaticBackupNotice = "";
+      // Ein Konto, das der Schluessel ueber eine fremde Huelle erreicht hat,
+      // bekommt seine eigene - damit die naechste Anmeldung ohne Suche gelingt.
+      if (!automaticBackupSettings.keyEnvelopes?.[user.id]) {
+        await registerAutomaticBackupUserKey(user.id, loginPassword);
       }
+      return true;
     }
+    // Ohne passende Huelle bleibt der Wiederherstellungsschluessel. Beim
+    // Startabgleich wird zuerst die gemeinsame Datei gelesen: Ihr
+    // Schluesselverzeichnis kennt die Huelle womoeglich schon.
+    if (!promptRecovery) return false;
     const recoveryKey = await requestAutomaticBackupRecoveryKey();
     if (!recoveryKey) return false;
     automaticBackupPassword = recoveryKey;
@@ -17601,9 +17812,10 @@
   async function runAutomaticBackup({
     force = false,
     requestPermission = false,
+    overwriteForeignChanges = false,
   } = {}) {
     const execute = () =>
-      performAutomaticBackup({ force, requestPermission });
+      performAutomaticBackup({ force, requestPermission, overwriteForeignChanges });
     if (typeof navigator.locks?.request === "function") {
       return navigator.locks.request("teo-automatic-backup", execute);
     }
@@ -17613,6 +17825,7 @@
   async function performAutomaticBackup({
     force = false,
     requestPermission = false,
+    overwriteForeignChanges = false,
   } = {}) {
     if (automaticBackupRunning) return false;
     if (!automaticBackupDirectoryHandle) {
@@ -17667,6 +17880,15 @@
       return false;
     }
 
+    if (!overwriteForeignChanges && (await sharedBackupFileChangedElsewhere())) {
+      automaticBackupRetryAt = Date.now() + 60 * 60 * 1000;
+      automaticBackupNotice = FOREIGN_BACKUP_NOTICE;
+      renderAutomaticBackupStatus();
+      showToast(automaticBackupNotice, "warning");
+      scheduleAutomaticBackup();
+      return false;
+    }
+
     automaticBackupRunning = true;
     automaticBackupNotice = "";
     renderAutomaticBackupStatus();
@@ -17684,7 +17906,11 @@
       let fileContent = JSON.stringify(backup, null, 2);
       if (automaticBackupSettings.encrypted) {
         fileContent = JSON.stringify(
-          await encryptBackup(fileContent, automaticBackupPassword),
+          await encryptBackup(
+            fileContent,
+            automaticBackupPassword,
+            automaticBackupKeyDirectory(),
+          ),
           null,
           2,
         );
@@ -17700,6 +17926,10 @@
         AUTO_BACKUP_FILENAME,
         fileContent,
       );
+      // Sofort nach dem Schreiben: Der Stempel beschreibt die Datei, nicht den
+      // Ausgang der folgenden Schritte. Bliebe er stehen, hielte der naechste
+      // Lauf die eigene Sicherung fuer einen fremden Schreibvorgang.
+      await rememberSharedBackupFileStamp();
 
       // Die Datei liegt geschrieben vor, der Zeitstempel muss aber auch in den
       // Datenbestand. Scheitert das, darf der lokale Stand nicht so tun, als
@@ -17759,6 +17989,52 @@
       renderAutomaticBackupStatus();
       scheduleAutomaticBackup();
     }
+  }
+
+  // Erkennt einen fremden Schreibvorgang, ohne die Datei zu lesen: Groesse und
+  // Aenderungszeit stehen im File-Objekt. Nur wenn beides dem entspricht, was
+  // TeO zuletzt selbst geschrieben oder eingelesen hat, gehoert die Datei noch
+  // zu dieser Sitzung.
+  async function readSharedBackupFileStamp(
+    directoryHandle = automaticBackupDirectoryHandle,
+  ) {
+    if (!directoryHandle) return null;
+    try {
+      const fileHandle = await directoryHandle.getFileHandle(
+        AUTO_BACKUP_FILENAME,
+        { create: false },
+      );
+      return sharedBackupFileStampOf(await fileHandle.getFile());
+    } catch (error) {
+      if (error?.name === "NotFoundError") return null;
+      console.warn(
+        "Der Stand der gemeinsamen Sicherungsdatei konnte nicht geprüft werden.",
+        error,
+      );
+      return null;
+    }
+  }
+
+  function sharedBackupFileStampOf(file) {
+    return file
+      ? { lastModified: Number(file.lastModified) || 0, size: Number(file.size) || 0 }
+      : null;
+  }
+
+  async function rememberSharedBackupFileStamp(file = null) {
+    sharedBackupFileStamp = file
+      ? sharedBackupFileStampOf(file)
+      : await readSharedBackupFileStamp();
+  }
+
+  async function sharedBackupFileChangedElsewhere() {
+    if (!sharedBackupFileStamp) return false;
+    const stamp = await readSharedBackupFileStamp();
+    if (!stamp) return false;
+    return (
+      stamp.lastModified !== sharedBackupFileStamp.lastModified ||
+      stamp.size !== sharedBackupFileStamp.size
+    );
   }
 
   async function writeAutomaticBackupFile(directoryHandle, filename, content) {
@@ -18080,7 +18356,7 @@
       .slice(0, 19);
   }
 
-  async function encryptBackup(plainText, password) {
+  async function encryptBackup(plainText, password, keyDirectory = null) {
     const salt = window.crypto.getRandomValues(new Uint8Array(16));
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
     const keyMaterial = await window.crypto.subtle.importKey(
@@ -18104,13 +18380,21 @@
     );
     return {
       format: `${BACKUP_FORMAT}-verschluesselt`,
-      formatVersion: 1,
+      // Fassung 2 fuehrt das Schluesselverzeichnis. Aeltere TeO-Fassungen lesen
+      // solche Dateien unveraendert weiter - sie ignorieren die Zusatzfelder.
+      formatVersion: keyDirectory ? 2 : 1,
       algorithm: "AES-GCM",
       keyDerivation: "PBKDF2-SHA-256",
       iterations: 250000,
       salt: bytesToBase64(salt),
       iv: bytesToBase64(iv),
       ciphertext: bytesToBase64(new Uint8Array(ciphertext)),
+      ...(keyDirectory
+        ? {
+            keyFingerprint: keyDirectory.keyFingerprint,
+            keyEnvelopes: keyDirectory.keyEnvelopes,
+          }
+        : {}),
     };
   }
 
@@ -18150,7 +18434,7 @@
     }
   }
 
-  async function readBackupFile(file) {
+  async function readBackupFile(file, { adoptKeyDirectory = false } = {}) {
     const fileContent = await file.text();
     let envelope;
     try {
@@ -18159,6 +18443,15 @@
       throw new Error("Die ausgewählte Datei enthält kein gültiges JSON.");
     }
     if (envelope?.format === `${BACKUP_FORMAT}-verschluesselt`) {
+      // Nur die gemeinsame Datei darf das Verzeichnis stellen. Ein von Hand
+      // gewaehlter Import kann aus einem fremden Datenbestand stammen und
+      // wuerde den Schluessel dieses Bestands verdraengen.
+      if (adoptKeyDirectory) {
+        await adoptAutomaticBackupKeyDirectory(
+          readAutomaticBackupKeyDirectory(envelope),
+        );
+        await unlockAutomaticBackupWithPendingLogin();
+      }
       if (automaticBackupPassword) {
         try {
           return parseBackup(
@@ -18188,6 +18481,23 @@
       }
     }
     return parseBackup(fileContent);
+  }
+
+  // Nach dem Lesen der gemeinsamen Datei: Ihr Schluesselverzeichnis kennt die
+  // Huelle des angemeldeten Kontos womoeglich, obwohl dieser Arbeitsplatz sie
+  // beim Login noch nicht hatte.
+  async function unlockAutomaticBackupWithPendingLogin() {
+    if (
+      automaticBackupPassword ||
+      !automaticBackupSettings?.encrypted ||
+      !pendingLoginPassword ||
+      !currentUser
+    ) {
+      return false;
+    }
+    // Jetzt ist das Verzeichnis der Datei bekannt. Bleibt die Huelle auch damit
+    // aus, ist der getrennt verwahrte Schluessel der letzte Weg.
+    return unlockAutomaticBackupForLogin(currentUser, pendingLoginPassword);
   }
 
   async function handleBackupFileSelection(event) {
@@ -18346,6 +18656,218 @@
     return synchronized;
   }
 
+  // Fragt den gemeinsamen Sicherungsordner ab. Meldungen gehen in das
+  // uebergebene Feld, damit Start- und Auswahldialog denselben Weg nutzen.
+  async function requestSharedBackupDirectory(statusElement) {
+    if (typeof window.showDirectoryPicker !== "function") {
+      statusElement.textContent =
+        "Dieser Browser unterstützt keine direkte Ordnerfreigabe. Verwenden Sie Chrome oder Edge über HTTPS beziehungsweise localhost.";
+      return null;
+    }
+    try {
+      return await window.showDirectoryPicker({
+        id: "teo-automatic-backup",
+        mode: "readwrite",
+      });
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        console.error(
+          "Der gemeinsame Sicherungsordner konnte nicht geöffnet werden.",
+          error,
+        );
+        statusElement.textContent = "Der Ordner konnte nicht geöffnet werden.";
+      }
+      return null;
+    }
+  }
+
+  function sharedBackupDirectoryMessage(status) {
+    return status === "file-missing"
+      ? `In diesem Ordner liegt keine ${AUTO_BACKUP_FILENAME}. Wählen Sie den Ordner mit der gemeinsamen Datensicherung.`
+      : startupBackupFallbackMessage(status) ||
+          "Der Ordner konnte nicht gelesen werden.";
+  }
+
+  // Zweite Tuer beim Erststart: Der Datenbestand liegt bereits im gemeinsamen
+  // Ordner. Ordnerverknuepfung, Schluesselverzeichnis und Anmeldung entstehen
+  // hier in einem Zug - der Weg ueber die Ersteinrichtung legt ein Konto an,
+  // das den Konten aus der Datei gleich wieder im Weg staende.
+  async function openSharedDataSet() {
+    // Ein bereits verknuepfter Ordner genuegt; erst wenn er nichts hergibt,
+    // wird ausgewaehlt. Nach einer misslungenen Anmeldung entfaellt so der
+    // zweite Gang durch die Ordnerauswahl.
+    let located = automaticBackupDirectoryHandle
+      ? await findStartupBackupFileInSavedDirectory(
+          automaticBackupDirectoryHandle,
+          true,
+        )
+      : { status: "directory-missing" };
+
+    if (located.status !== "found") {
+      const handle = await requestSharedBackupDirectory(
+        elements.dataOriginStatus,
+      );
+      if (!handle) return false;
+      located = await findStartupBackupFileInSavedDirectory(handle, true);
+      if (located.status !== "found") {
+        elements.dataOriginStatus.textContent = sharedBackupDirectoryMessage(
+          located.status,
+        );
+        return false;
+      }
+      try {
+        await linkAutomaticBackupDirectory(handle);
+      } catch (error) {
+        console.error("Die Ordnerverknüpfung konnte nicht gespeichert werden.", error);
+        elements.dataOriginStatus.textContent =
+          "Die Ordnerverknüpfung konnte nicht gespeichert werden.";
+        return false;
+      }
+    }
+
+    await adoptSharedKeyDirectoryFromFile(located.file);
+    elements.dataOriginDialog.close();
+    showLoginDialog();
+    elements.loginError.textContent =
+      "Melden Sie sich mit Ihrem vorhandenen TeO-Konto an. Der gemeinsame Datenbestand wird dabei geladen.";
+    return true;
+  }
+
+  async function adoptSharedKeyDirectoryFromFile(file) {
+    try {
+      const envelope = JSON.parse(await file.text());
+      if (envelope?.format !== `${BACKUP_FORMAT}-verschluesselt`) return false;
+      return await adoptAutomaticBackupKeyDirectory(
+        readAutomaticBackupKeyDirectory(envelope),
+      );
+    } catch (error) {
+      console.warn(
+        "Das Schlüsselverzeichnis der gemeinsamen Datei konnte nicht gelesen werden.",
+        error,
+      );
+      return false;
+    }
+  }
+
+  // Erste Anmeldung an einem Arbeitsplatz ohne eigene Konten: Die Konten stehen
+  // im verschluesselten Teil der gemeinsamen Datei. Erst der Schluessel aus dem
+  // Verzeichnis oeffnet sie, danach wird das Passwort wie sonst geprueft.
+  // Rueckgabe ist die Meldung fuer den Anmeldedialog, leer bei Erfolg.
+  async function loginFromSharedDataSet(username, password) {
+    const located = await findStartupBackupFileInSavedDirectory(
+      automaticBackupDirectoryHandle,
+      true,
+    );
+    if (located.status !== "found") {
+      return (
+        startupBackupFallbackMessage(located.status) ||
+        `Im verknüpften Ordner wurde ${AUTO_BACKUP_FILENAME} nicht gefunden.`
+      );
+    }
+    const volume = backupVolumeAssessment(located.file.size);
+    if (volume.exceeded) return backupVolumeMessage(volume);
+
+    let fileContent = await located.file.text();
+    let envelope;
+    try {
+      envelope = JSON.parse(fileContent);
+    } catch {
+      return "Die gemeinsame Sicherungsdatei enthält kein gültiges JSON.";
+    }
+
+    if (envelope?.format === `${BACKUP_FORMAT}-verschluesselt`) {
+      await adoptAutomaticBackupKeyDirectory(
+        readAutomaticBackupKeyDirectory(envelope),
+      );
+      let key = await unlockAutomaticBackupKeyWithPassword(password);
+      if (!key) {
+        // Ohne passende Huelle bleibt der getrennt verwahrte Schluessel. Fehlt
+        // auch das Verzeichnis, stammt die Datei aus einer aelteren Fassung und
+        // traegt ein frei gewaehltes Passwort.
+        key = automaticBackupSettings.keyFingerprint
+          ? await requestAutomaticBackupRecoveryKey()
+          : ((await requestBackupPassword({ mode: "import" })) || "").trim();
+        if (!key) return "Benutzername oder Passwort ist nicht korrekt.";
+      }
+      try {
+        fileContent = await decryptBackup(envelope, key);
+      } catch (error) {
+        return error.message;
+      }
+      automaticBackupPassword = key;
+    }
+
+    let importedState;
+    try {
+      importedState = parseBackup(fileContent);
+    } catch (error) {
+      return error.message;
+    }
+
+    const user = importedState.users.find(
+      (item) =>
+        item.username.toLocaleLowerCase("de-DE") ===
+        username.toLocaleLowerCase("de-DE"),
+    );
+    if (!user || !(await verifyPassword(password, user))) {
+      automaticBackupPassword = "";
+      return "Benutzername oder Passwort ist nicht korrekt.";
+    }
+
+    if (
+      !(await importDatabase(importedState, {
+        adoptUsers: true,
+        resumeSession: false,
+      }))
+    ) {
+      automaticBackupPassword = "";
+      return "Der Datenbestand konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.";
+    }
+
+    currentUser = user;
+    startupBackupSynchronized = true;
+    pendingLoginPassword = "";
+    await rememberSharedBackupFileStamp(located.file);
+    await rememberBackupVolume(volume.sizeBytes);
+    if (
+      automaticBackupPassword &&
+      !automaticBackupSettings.keyEnvelopes?.[user.id]
+    ) {
+      await registerAutomaticBackupUserKey(user.id, password);
+    }
+    completeLogin(user);
+    showToast(
+      volume.warning
+        ? backupVolumeMessage(volume)
+        : `Der gemeinsame Datenbestand wurde aus ${AUTO_BACKUP_FILENAME} geladen.`,
+      volume.warning ? "warning" : undefined,
+    );
+    return "";
+  }
+
+  // Im Startdialog: Statt der einzelnen Datei den Ordner freigeben. Damit gilt
+  // die Verknuepfung auch fuer die naechste Sitzung, und die Dateiauswahl
+  // entfaellt kuenftig.
+  async function selectStartupBackupDirectory() {
+    const handle = await requestSharedBackupDirectory(
+      elements.startupBackupStatus,
+    );
+    if (!handle) return false;
+    const located = await findStartupBackupFileInSavedDirectory(handle, true);
+    if (located.status !== "found") {
+      elements.startupBackupStatus.textContent = sharedBackupDirectoryMessage(
+        located.status,
+      );
+      return false;
+    }
+    try {
+      await linkAutomaticBackupDirectory(handle);
+    } catch (error) {
+      console.error("Die Ordnerverknüpfung konnte nicht gespeichert werden.", error);
+    }
+    return synchronizeStartupBackupFile(located.file);
+  }
+
   async function handleStartupBackupFileSelection(event) {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -18370,7 +18892,9 @@
     elements.selectStartupBackupFileButton.disabled = true;
     elements.startupBackupStatus.textContent = "Sicherungsdatei wird geprüft …";
     try {
-      const importedState = await readBackupFile(file);
+      const importedState = await readBackupFile(file, {
+        adoptKeyDirectory: true,
+      });
       if (!importedState) {
         elements.startupBackupStatus.textContent =
           "Der Startabgleich wurde nicht abgeschlossen.";
@@ -18382,13 +18906,18 @@
         return false;
       }
       elements.startupBackupStatus.textContent = "Datenbestand wird übernommen …";
-      if (!(await importDatabase(importedState))) {
+      // Der Startabgleich laedt den gemeinsamen Datenbestand, keinen Teilimport:
+      // Die Konten gehoeren dazu, sonst kennt jeder Arbeitsplatz nur die dort
+      // angelegten und ueberschreibt beim naechsten Sichern die uebrigen.
+      if (!(await importDatabase(importedState, { adoptUsers: true }))) {
         elements.startupBackupStatus.textContent =
           "Der Datenbestand konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.";
         return false;
       }
 
       startupBackupSynchronized = true;
+      pendingLoginPassword = "";
+      await rememberSharedBackupFileStamp(file);
       await rememberBackupVolume(volume.sizeBytes);
       renderBackupVolumeMeter();
       if (elements.startupBackupDialog.open) elements.startupBackupDialog.close();
@@ -19169,16 +19698,21 @@
     return normalizedState;
   }
 
-  async function importDatabase(importedState) {
+  async function importDatabase(
+    importedState,
+    { adoptUsers = false, resumeSession = true } = {},
+  ) {
     const previousState = state;
-    // Benutzerkonten sind bewusst nicht Teil des Imports: Der Import ersetzt den
-    // fachlichen Datenbestand, die Anmeldung bleibt davon unberührt. Nur auf einem
-    // System ohne jedes Konto werden die Konten aus der Sicherung übernommen,
-    // damit eine Wiederherstellung von Grund auf möglich bleibt.
+    // Beim Import von Hand sind Benutzerkonten bewusst nicht Teil des Vorgangs:
+    // Er ersetzt den fachlichen Datenbestand, die Anmeldung bleibt davon
+    // unberührt. Nur auf einem System ohne jedes Konto werden die Konten aus der
+    // Sicherung übernommen, damit eine Wiederherstellung von Grund auf möglich
+    // bleibt. Der Startabgleich verlangt dagegen ausdrücklich die Konten aus der
+    // Datei: Dort ist die gemeinsame Datei der Datenbestand, nicht ein Teil davon.
     const preservedUsers = Array.isArray(previousState?.users)
       ? previousState.users
       : [];
-    const usersFromBackup = preservedUsers.length === 0;
+    const usersFromBackup = adoptUsers || preservedUsers.length === 0;
     if (!usersFromBackup) {
       importedState.users = preservedUsers;
     }
@@ -19195,20 +19729,27 @@
     selectedCompletionEmployeeIds.clear();
     selectedEmployeeIds.clear();
     attendanceDraft.clear();
+    if (!resumeSession) return true;
     currentUser = state.users.find((user) => user.id === currentUser?.id) || null;
     if (!currentUser) {
       showLoginDialog();
+      elements.loginError.textContent =
+        "Ihr Konto ist im gemeinsamen Datenbestand nicht enthalten. Bitte melden Sie sich mit einem dort geführten Konto an.";
       return false;
     }
     // Nach dem Auffrischen des Kontos, damit das Farbthema aus der Sicherung
     // greift.
     applyTheme(activeThemeKey());
     renderAll();
-    showToast(
-      usersFromBackup
-        ? "Die Datensicherung wurde einschließlich der Benutzerkonten importiert."
-        : "Die Datensicherung wurde importiert. Die Benutzerkonten sind unverändert.",
-    );
+    // Der Startabgleich meldet sich selbst; eine zweite Meldung ueber dieselbe
+    // Uebernahme waere nur Rauschen.
+    if (!adoptUsers) {
+      showToast(
+        usersFromBackup
+          ? "Die Datensicherung wurde einschließlich der Benutzerkonten importiert."
+          : "Die Datensicherung wurde importiert. Die Benutzerkonten sind unverändert.",
+      );
+    }
     return true;
   }
 

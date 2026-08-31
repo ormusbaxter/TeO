@@ -1,5 +1,52 @@
     <dialog
       class="modal auth-dialog"
+      id="dataOriginDialog"
+      aria-labelledby="dataOriginDialogTitle"
+      data-persistent-dialog
+    >
+      <div class="modal-header auth-dialog-header">
+        <span class="brand-mark">
+          <svg><use href="#icon-logo"></use></svg>
+        </span>
+        <div>
+          <p class="eyebrow">Erster Start an diesem Arbeitsplatz</p>
+          <h2 id="dataOriginDialogTitle">Datenbestand wählen</h2>
+          <p class="modal-subtitle">
+            Wird hier ein neuer Datenbestand angelegt, oder liegt er bereits im
+            gemeinsamen Sicherungsordner?
+          </p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="data-origin-choices">
+          <button class="data-origin-choice" id="openSharedDataSetButton" type="button">
+            <svg><use href="#icon-upload"></use></svg>
+            <span>
+              <strong>Vorhandenen Datenbestand öffnen</strong>
+              <small>
+                Sicherungsordner freigeben und mit dem bereits vorhandenen Konto
+                anmelden. Konten, Daten und Sicherungsschlüssel kommen aus
+                <strong>teo-autosicherung.json</strong>.
+              </small>
+            </span>
+          </button>
+          <button class="data-origin-choice" id="createDataSetButton" type="button">
+            <svg><use href="#icon-plus"></use></svg>
+            <span>
+              <strong>Neuen Datenbestand einrichten</strong>
+              <small>
+                Erstes Administratorkonto anlegen. Nur für den allerersten
+                Arbeitsplatz gedacht.
+              </small>
+            </span>
+          </button>
+        </div>
+        <p class="form-error auth-error" id="dataOriginStatus" role="alert"></p>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
       id="setupDialog"
       aria-labelledby="setupDialogTitle"
       data-persistent-dialog
@@ -144,7 +191,7 @@
           <svg><use href="#icon-upload"></use></svg>
           <div>
             <strong>Gemeinsame Sicherungsdatei erforderlich</strong>
-            <span>Die Datei wird geprüft, bei Bedarf automatisch entschlüsselt und anschließend als aktueller Datenstand übernommen.</span>
+            <span>Die Datei wird geprüft, bei Bedarf automatisch entschlüsselt und anschließend als aktueller Datenstand übernommen. Über den freigegebenen Ordner findet TeO sie künftig ohne Auswahl.</span>
           </div>
         </div>
         <input
@@ -158,9 +205,13 @@
       </div>
       <div class="modal-footer">
         <button class="button button-ghost" type="button" data-logout>Abmelden</button>
-        <button class="button button-primary" id="selectStartupBackupFileButton" type="button">
+        <button class="button button-ghost" id="selectStartupBackupFileButton" type="button">
           <svg><use href="#icon-upload"></use></svg>
           teo-autosicherung.json auswählen
+        </button>
+        <button class="button button-primary" id="selectStartupBackupDirectoryButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          Sicherungsordner freigeben
         </button>
       </div>
     </dialog>

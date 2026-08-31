@@ -62,8 +62,19 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
     return;
   }
 
+  // Erst der Browser, dann der Server - ein gescheiterter Browserstart ließe
+  // sonst einen lauschenden Server zurück und der Testlauf endete nie.
+  let browser;
+  try {
+    browser = await playwright.chromium.launch();
+  } catch (error) {
+    t.skip(
+      "Playwright findet keinen Browser - „npx playwright install chromium“ " +
+        `holt ihn nach (${String(error.message).split("\n")[0]})`,
+    );
+    return;
+  }
   const { server, port } = await startServer();
-  const browser = await playwright.chromium.launch();
   const page = await browser.newPage();
   const problems = [];
   page.on("pageerror", (error) => problems.push(`Skriptfehler: ${error.message}`));
@@ -76,12 +87,13 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
     await page.waitForFunction(() => Boolean(window.TeOProjectMeta), null, { timeout: 10000 });
 
     const loginInformation = await page.evaluate(() => ({
-      // Beim allerersten Start gibt es noch kein Konto; dann führt TeO durch
-      // die Einrichtung statt durch die Anmeldung. Verlangt ist beides Mal
-      // dasselbe: Die Oberfläche bleibt gesperrt, bis jemand angemeldet ist.
-      offenerAuthDialog: [...document.querySelectorAll("dialog[open]")]
-        .map((dialog) => dialog.id)
-        .find((id) => ["setupDialog", "loginDialog"].includes(id)),
+      // Ein frisches Browserprofil kennt noch keinen Datenbestand. Dann fragt
+      // TeO zuerst, woher er kommt; Einrichtung oder Anmeldung folgen erst
+      // danach. Verlangt ist in jedem Fall dasselbe: Die Oberfläche bleibt
+      // gesperrt, bis jemand angemeldet ist.
+      offeneDialoge: [...document.querySelectorAll("dialog[open]")].map(
+        (dialog) => dialog.id,
+      ),
       gesperrt: document.body.classList.contains("is-auth-locked"),
       version: document.querySelector("#loginProjectVersion").textContent.trim(),
       copyright: document.querySelector("#loginCopyright").textContent.trim(),
@@ -91,9 +103,10 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
         window.TeOProjectMeta.version.patch,
       ].join("."),
     }));
-    assert.ok(
-      loginInformation.offenerAuthDialog,
-      "Vor der Anmeldung steht Einrichtung oder Anmeldung offen",
+    assert.equal(
+      loginInformation.offeneDialoge.join(","),
+      "dataOriginDialog",
+      "Ohne Konten fragt TeO zuerst nach der Herkunft des Datenbestands",
     );
     assert.equal(loginInformation.gesperrt, true, "Die Oberfläche bleibt gesperrt");
     // Und die Anmeldemaske trägt Fassung und Copyright, ohne dass sich jemand

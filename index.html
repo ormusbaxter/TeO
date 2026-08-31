@@ -2483,9 +2483,15 @@
 <p>Administratoren können unter <strong>Einstellungen → Sicherungserinnerung</strong> die maximale Größe einer Sicherungsdatei zwischen 1 und 100 MB festlegen. Der Standardwert beträgt 20 MB. Die Grenze gilt beim Erstellen, Prüfen, Startabgleich und Import. Ab 90 % des eingestellten Volumens zeigt TeO eine Warnung mit aktueller Dateigröße und Grenzwert an. Wird die Grenze überschritten, muss sie vor der nächsten Sicherung oder dem Import erhöht werden.</p>
 <p>Ein farbiger Balken in den Einstellungen zeigt die zuletzt gemessene Sicherungsgröße als „xx von yy MB“. Solange noch keine Sicherung in diesem Browser erstellt oder eingelesen wurde, verwendet TeO eine Schätzung des aktuellen unverschlüsselten Datenbestands. Der Balken ist unter 90 % grün, ab 90 % gelb und bei überschrittenem Grenzwert rot.</p>
 <p>Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
-<p>Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Ein bereits vorhandenes Konto ohne Schlüsselhülle benötigt ihn einmalig beim ersten Login. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.</p>
+<p>Der Schlüssel gehört zum Datenbestand, nicht zum Arbeitsplatz: Sein Verzeichnis mit den Schlüsselhüllen aller Konten steht in <code>teo-autosicherung.json</code> selbst – in der äußeren Hülle, die auch ohne Schlüssel lesbar ist. Jeder Arbeitsplatz entsperrt daraus mit dem gewohnten Login-Passwort denselben Schlüssel. Ein einmal geschützter Datenbestand braucht dafür kein neues Passwort, und ein an einem anderen Arbeitsplatz angelegtes Konto bekommt seine Hülle beim ersten Login selbst.</p>
+<p>Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Nach ihm fragt TeO erst, wenn auch das Schlüsselverzeichnis der gemeinsamen Datei keine passende Hülle kennt. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.</p>
 <p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
-<p>Beim Start in der lokalen Browser-Betriebsart sucht TeO nach der Anmeldung zuerst im zuletzt verknüpften Sicherungsordner nach <code>teo-autosicherung.json</code> und lädt sie ohne zusätzliche Auswahl. Nur wenn der Ordnerzugriff nicht mehr gilt, die Datei dort fehlt oder nicht gelesen werden kann, erscheint die Dateiauswahl. Die Bedienoberfläche bleibt bis zum erfolgreichen Abgleich gesperrt. Die Datei wird geprüft, gegebenenfalls mit dem beim Login entsperrten Schlüssel entschlüsselt und als aktueller Datenbestand übernommen. Eine Sicherung, die älter als der zuletzt lokal gesicherte Stand ist, wird abgewiesen. In der MariaDB-Betriebsart übernimmt stattdessen der Server den verbindlichen Startabgleich.</p>
+<p>Beim Start in der lokalen Browser-Betriebsart sucht TeO nach der Anmeldung zuerst im zuletzt verknüpften Sicherungsordner nach <code>teo-autosicherung.json</code> und lädt sie ohne zusätzliche Auswahl. Nur wenn der Ordnerzugriff nicht mehr gilt, die Datei dort fehlt oder nicht gelesen werden kann, erscheint der Startdialog. Dort lässt sich entweder die Datei einzeln wählen oder – besser – der Sicherungsordner freigeben; die Verknüpfung gilt dann auch für die nächste Sitzung. Die Bedienoberfläche bleibt bis zum erfolgreichen Abgleich gesperrt. Die Datei wird geprüft, gegebenenfalls mit dem beim Login entsperrten Schlüssel entschlüsselt und als aktueller Datenbestand übernommen – <strong>einschließlich der Benutzerkonten</strong>, denn die gemeinsame Datei ist der vollständige Datenbestand. Eine Sicherung, die älter als der zuletzt lokal gesicherte Stand ist, wird abgewiesen. In der MariaDB-Betriebsart übernimmt stattdessen der Server den verbindlichen Startabgleich.</p>
+<p>Hat ein anderer Arbeitsplatz die Datei zwischenzeitlich geschrieben, überschreibt TeO sie nicht. Stattdessen erscheint ein Hinweis; der sichere Weg ist abmelden, TeO neu laden und den Startabgleich wiederholen. Wer die Änderungen der laufenden Sitzung dennoch sichern muss, wählt <strong>Jetzt automatisch sichern</strong> und bestätigt das Überschreiben ausdrücklich.</p>
+<h3 id="hilfe-erster-start-an-einem-weiteren-arbeitsplatz">Erster Start an einem weiteren Arbeitsplatz</h3>
+<p>Liegt TeO in einem gemeinsamen Ordner und wird es an einem weiteren Arbeitsplatz zum ersten Mal geöffnet, fragt TeO zunächst, woher der Datenbestand kommt:</p>
+<ul><li><strong>Vorhandenen Datenbestand öffnen</strong> – der Regelfall. TeO fragt nach dem gemeinsamen Sicherungsordner, liest dort <code>teo-autosicherung.json</code> und öffnet anschließend die Anmeldung. Dort gilt das Konto, das bereits am ersten Arbeitsplatz angelegt wurde, mit seinem gewohnten Passwort. Ordnerverknüpfung, Sicherungsschlüssel, Konten und Daten kommen damit in einem Schritt.</li><li><strong>Neuen Datenbestand einrichten</strong> – nur für den allerersten Arbeitsplatz. Es entsteht ein erstes Administratorkonto und ein leerer Datenbestand.</li></ul>
+<p>Ein Konto muss also nur einmal angelegt werden. Neue Konten, Passwortänderungen und Passwort-Resets werden über die gemeinsame Datei an alle Arbeitsplätze weitergegeben, sobald dort die nächste automatische Sicherung geschrieben wurde.</p>
 <h3 id="hilfe-sicherung-prufen">Sicherung prüfen</h3>
 <p>Über <strong>Sicherung prüfen</strong> wird eine Datei validiert, ohne den aktuellen Datenbestand zu verändern.</p>
 <h3 id="hilfe-sicherung-importieren">Sicherung importieren</h3>
@@ -2501,7 +2507,7 @@
 <h3 id="hilfe-lokaler-modus">Lokaler Modus</h3>
 <p>Im lokalen Modus liegen die Daten im Browserprofil des verwendeten Arbeitsplatzes. localForage verwendet bevorzugt IndexedDB und fällt bei Bedarf auf andere Browserspeicher zurück.</p>
 <p>Wichtig:</p>
-<ul><li>Ein Netzlaufwerk mit derselben <code>index.html</code> teilt nicht automatisch den IndexedDB-Datenbestand zwischen Arbeitsplätzen.</li><li>Jeder Browser und jedes Browserprofil besitzt seinen eigenen lokalen Speicher.</li><li>Browserbereinigung oder ein Profilwechsel kann lokale Daten entfernen.</li><li>Regelmäßige JSON-Sicherungen bleiben erforderlich.</li></ul>
+<ul><li>Ein Netzlaufwerk mit derselben <code>index.html</code> teilt nicht automatisch den IndexedDB-Datenbestand zwischen Arbeitsplätzen. Die gemeinsame <code>teo-autosicherung.json</code> übernimmt diese Aufgabe: Beim ersten Start an einem weiteren Arbeitsplatz führt <strong>Vorhandenen Datenbestand öffnen</strong> dorthin, und jeder folgende Start gleicht über sie ab.</li><li>Jeder Browser und jedes Browserprofil besitzt seinen eigenen lokalen Speicher.</li><li>Browserbereinigung oder ein Profilwechsel kann lokale Daten entfernen.</li><li>Regelmäßige JSON-Sicherungen bleiben erforderlich.</li></ul>
 <p>Unter <strong>Einstellungen</strong> zeigt TeO den belegten und geschätzten verfügbaren Browserspeicher an. Dauerhafter Speicher kann beim Browser angefordert werden.</p>
 <p>Der Browser entscheidet selbst, ob er die Anforderung für dauerhaften Browserspeicher freigibt. Chrome und Edge treffen diese Entscheidung normalerweise automatisch und zeigen keinen Berechtigungsdialog. Eine Ablehnung löscht keine vorhandenen Daten; sie verbleiben als Best-Effort-Speicher und könnten nur bei erheblichem Speicherdruck oder durch das bewusste Löschen der Websitedaten entfernt werden. TeO sollte über HTTPS oder <code>localhost</code> aufgerufen werden. Unabhängige Sicherungsexporte bleiben auch bei freigegebenem dauerhaftem Speicher erforderlich.</p>
 <h3 id="hilfe-mariadb-modus">MariaDB-Modus</h3>
@@ -2527,7 +2533,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-haufig-gestellte-fragen">
 <h2 id="hilfe-haufig-gestellte-fragen">Häufig gestellte Fragen</h2>
 <h3 id="hilfe-welche-datei-muss-ich-nach-der-anmeldung-auswahlen">Welche Datei muss ich nach der Anmeldung auswählen?</h3>
-<p>Im lokalen Browserbetrieb lädt TeO die gemeinsame Datei <code>teo-autosicherung.json</code> automatisch aus dem zuletzt verknüpften Sicherungsordner. Eine Auswahl ist nur erforderlich, wenn die gespeicherte Freigabe nicht mehr gilt, die Datei fehlt oder nicht gelesen werden kann. Erst nach erfolgreicher Prüfung und Übernahme wird die Anwendung freigegeben. Im MariaDB-Betrieb entfällt dieser Startabgleich, weil der Server bereits den verbindlichen Datenstand liefert.</p>
+<p>Im lokalen Browserbetrieb lädt TeO die gemeinsame Datei <code>teo-autosicherung.json</code> automatisch aus dem zuletzt verknüpften Sicherungsordner. Eine Auswahl ist nur erforderlich, wenn die gespeicherte Freigabe nicht mehr gilt, die Datei fehlt oder nicht gelesen werden kann. Wird dort statt der Datei der Sicherungsordner freigegeben, entfällt die Auswahl auch künftig. Erst nach erfolgreicher Prüfung und Übernahme wird die Anwendung freigegeben. Im MariaDB-Betrieb entfällt dieser Startabgleich, weil der Server bereits den verbindlichen Datenstand liefert.</p>
 <h3 id="hilfe-warum-lasst-sich-der-startabgleich-nicht-uberspringen">Warum lässt sich der Startabgleich nicht überspringen?</h3>
 <p>Der verpflichtende Abgleich verhindert, dass versehentlich mit einem veralteten Browserstand weitergearbeitet wird. Ohne gültige Sicherungsdatei kann die lokale Anwendung deshalb nur abgemeldet, aber nicht geöffnet werden. Falls die Datei nicht erreichbar ist, prüfen Sie die Netzwerkverbindung, den freigegebenen Ordner und Ihre Zugriffsrechte.</p>
 <h3 id="hilfe-warum-wird-teo-autosicherung-json-beim-start-abgelehnt">Warum wird <code>teo-autosicherung.json</code> beim Start abgelehnt?</h3>
@@ -2535,11 +2541,12 @@
 <ul><li>anders heißt oder das unter <strong>Einstellungen → Sicherungserinnerung</strong> festgelegte Maximalvolumen überschreitet</li><li>kein vollständiges und gültiges TeO-Sicherungsformat enthält</li><li>beschädigt oder manuell unvollständig bearbeitet wurde</li><li>aus einer neueren, nicht kompatiblen TeO-Version stammt</li><li>älter als die zuletzt in diesem Browser erfolgreich erstellte Autosicherung ist</li><li>verschlüsselt ist und nicht entschlüsselt werden kann</li></ul>
 <p>Die Meldung im Startdialog nennt den erkannten Grund. Verwenden Sie nicht ersatzweise eine beliebige umbenannte JSON-Datei.</p>
 <h3 id="hilfe-muss-ich-fur-eine-verschlusselte-autosicherung-ein-zweites-passwort-eingeben">Muss ich für eine verschlüsselte Autosicherung ein zweites Passwort eingeben?</h3>
-<p>Normalerweise nicht. Der gemeinsame Sicherungsschlüssel wird beim Login mit dem persönlichen Benutzerpasswort automatisch entsperrt. Nur wenn dem Konto noch keine passende Schlüsselhülle zugeordnet ist oder das Browserprofil vollständig verloren ging, wird einmalig der separat aufbewahrte Wiederherstellungsschlüssel benötigt. Dieser Schlüssel ist nicht das Login-Passwort.</p>
+<p>Normalerweise nicht. Der gemeinsame Sicherungsschlüssel wird beim Login mit dem persönlichen Benutzerpasswort automatisch entsperrt – auch an einem Arbeitsplatz, an dem dieses Konto sich zum ersten Mal anmeldet: Die passende Schlüsselhülle steht im Verzeichnis der gemeinsamen Datei. Erst wenn auch dort keine Hülle zum Konto passt oder die Datei nicht erreichbar ist, wird einmalig der separat aufbewahrte Wiederherstellungsschlüssel benötigt. Dieser Schlüssel ist nicht das Login-Passwort.</p>
+<p>Ein neuer Arbeitsplatz erzeugt dabei <strong>kein</strong> neues Passwort und macht das alte nicht ungültig. Der Schlüssel bleibt derselbe, solange derselbe Datenbestand verwendet wird.</p>
 <h3 id="hilfe-wann-wird-die-gemeinsame-datei-aktualisiert">Wann wird die gemeinsame Datei aktualisiert?</h3>
 <p>Nach einer fachlichen Änderung wartet TeO zwei Sekunden. Weitere Änderungen in diesem Zeitraum starten die Frist neu. Anschließend wird <code>teo-autosicherung.json</code> vollständig überschrieben. Die Sicherung funktioniert nur, solange TeO geöffnet ist und der Browser weiterhin Schreibzugriff auf den gewählten Ordner besitzt.</p>
 <h3 id="hilfe-konnen-mehrere-personen-gleichzeitig-mit-derselben-json-datei-arbeiten">Können mehrere Personen gleichzeitig mit derselben JSON-Datei arbeiten?</h3>
-<p>Nein. Die gemeinsame JSON-Datei ist für eine nacheinander erfolgende Nutzung gedacht. Jede geöffnete Anwendung hält einen vollständigen Datenstand und würde beim Sichern die gesamte Datei überschreiben. Bei gleichzeitiger Bearbeitung kann dadurch die zuletzt geschriebene Version Änderungen einer anderen Person verdrängen. Für den parallelen Betrieb an mehreren Arbeitsplätzen muss MariaDB als gemeinsamer Datenbestand verwendet werden.</p>
+<p>Nein. Die gemeinsame JSON-Datei ist für eine nacheinander erfolgende Nutzung gedacht. Jede geöffnete Anwendung hält einen vollständigen Datenstand und würde beim Sichern die gesamte Datei überschreiben. TeO erkennt einen zwischenzeitlich erfolgten fremden Schreibvorgang an Größe und Änderungszeit der Datei und überschreibt sie dann nicht mehr stillschweigend, sondern meldet es – die Änderungen der eigenen Sitzung bleiben in diesem Fall aber ungesichert. Für den parallelen Betrieb an mehreren Arbeitsplätzen muss MariaDB als gemeinsamer Datenbestand verwendet werden.</p>
 <h3 id="hilfe-warum-sehe-ich-anderungen-eines-anderen-arbeitsplatzes-nicht-sofort">Warum sehe ich Änderungen eines anderen Arbeitsplatzes nicht sofort?</h3>
 <p>Im lokalen Betrieb wird die gemeinsame Datei nur beim verpflichtenden Startabgleich eingelesen. Während einer bereits laufenden Sitzung werden fremde Dateiänderungen nicht automatisch zusammengeführt. Melden Sie sich ab, laden Sie TeO neu und wählen Sie anschließend erneut <code>teo-autosicherung.json</code>. Im MariaDB-Betrieb prüft TeO regelmäßig, ob eine neuere Serverrevision vorliegt.</p>
 <h3 id="hilfe-warum-fragt-der-browser-erneut-nach-dem-sicherungsordner">Warum fragt der Browser erneut nach dem Sicherungsordner?</h3>
@@ -2576,6 +2583,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-47-0-ein-konto-und-ein-schlussel-fur-alle-arbeitsplatze">4.47.0 – Ein Konto und ein Schlüssel für alle Arbeitsplätze</h3>
+<ul><li><strong>Behoben:</strong> Ein Konto galt bisher nur an dem Arbeitsplatz, an dem es angelegt wurde. Der Startabgleich lud zwar den gemeinsamen Datenbestand, behielt aber die örtlichen Konten und verwarf die aus der Datei – beim nächsten Sichern verschwanden sie auch dort. Der Startabgleich übernimmt die Konten jetzt aus <code>teo-autosicherung.json</code>; ein einmal angelegtes Konto arbeitet damit an jedem Arbeitsplatz mit seinem Passwort. Der Import von Hand lässt die vorhandenen Konten unverändert wie bisher</li><li><strong>Behoben:</strong> Ein zweiter Arbeitsplatz erzeugte für dieselbe Datei einen neuen Sicherungsschlüssel und machte den bisherigen damit wertlos. Der Schlüssel gehört jetzt zum Datenbestand: Sein Verzeichnis mit den Schlüsselhüllen aller Konten reist in der gemeinsamen Datei mit. Jeder Arbeitsplatz entsperrt ihn mit dem gewohnten Login-Passwort – ein einmal geschützter Datenbestand bleibt ohne neues Passwort bearbeitbar</li><li><strong>Neu:</strong> Beim ersten Start an einem weiteren Arbeitsplatz fragt TeO, ob ein neuer Datenbestand entstehen oder der vorhandene geöffnet werden soll. <strong>Vorhandenen Datenbestand öffnen</strong> gibt den Sicherungsordner frei und meldet mit dem bereits vorhandenen Konto an; Ordnerverknüpfung, Schlüssel und Daten kommen in einem Schritt. Die frühere Pflicht-Ersteinrichtung entfällt damit</li><li><strong>Neu:</strong> Der Startdialog gibt wahlweise den Sicherungsordner frei, statt nur die einzelne Datei zu wählen. Die Verknüpfung gilt dann auch für die nächste Sitzung, und die Dateiauswahl entfällt künftig</li><li><strong>Neu:</strong> Hat ein anderer Arbeitsplatz <code>teo-autosicherung.json</code> zwischenzeitlich geschrieben, überschreibt TeO sie nicht mehr stillschweigend, sondern meldet es. Über <strong>Jetzt automatisch sichern</strong> lässt sich nach ausdrücklicher Bestätigung dennoch überschreiben</li><li><strong>Verbessert:</strong> Ein an einem anderen Arbeitsplatz angelegtes Konto bekommt seine Schlüsselhülle beim ersten Login selbst. Nach dem Wiederherstellungsschlüssel fragt TeO erst, wenn auch das Verzeichnis der gemeinsamen Datei keine passende Hülle kennt</li></ul>
 <h3 id="hilfe-4-46-0-leere-monatsplanungen-zum-ausfullen">4.46.0 – Leere Monatsplanungen zum Ausfüllen</h3>
 <ul><li><strong>Neu:</strong> Die Urlaubsplanung druckt <strong>leere Monatsplanungen</strong>: je Monat des gewählten Jahres ein DIN-A4-Blatt quer, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch untereinander – nach Nachname, Vorname – und die Tage des Monats als Spalten. Feiertage, Schulferien und das eigene Dienstwochenende sind vermerkt, die Felder bleiben leer. Wer nur einen Monat braucht, wählt die Seiten im Druckdialog</li><li><strong>Neu:</strong> Braucht ein Monat mehr als ein Blatt – auf eines passen 20 Mitarbeiter –, trägt jedes Blatt den Monat im Kopf und daneben <strong>Seite x von y</strong> für diesen Monat. So lässt sich ein Stapel wieder sortieren</li><li><strong>Verbessert:</strong> Das Handbuch beschreibt jetzt beide leeren Vordrucke – die Jahresübersicht je Mitarbeiter und die neue Monatsplanung</li></ul>
 <h3 id="hilfe-4-45-0-neue-farbthemen-und-schlankerer-start">4.45.0 – Neue Farbthemen und schlankerer Start</h3>
@@ -2832,6 +2841,53 @@ npm run verify</code></pre>
 
     <dialog
       class="modal auth-dialog"
+      id="dataOriginDialog"
+      aria-labelledby="dataOriginDialogTitle"
+      data-persistent-dialog
+    >
+      <div class="modal-header auth-dialog-header">
+        <span class="brand-mark">
+          <svg><use href="#icon-logo"></use></svg>
+        </span>
+        <div>
+          <p class="eyebrow">Erster Start an diesem Arbeitsplatz</p>
+          <h2 id="dataOriginDialogTitle">Datenbestand wählen</h2>
+          <p class="modal-subtitle">
+            Wird hier ein neuer Datenbestand angelegt, oder liegt er bereits im
+            gemeinsamen Sicherungsordner?
+          </p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="data-origin-choices">
+          <button class="data-origin-choice" id="openSharedDataSetButton" type="button">
+            <svg><use href="#icon-upload"></use></svg>
+            <span>
+              <strong>Vorhandenen Datenbestand öffnen</strong>
+              <small>
+                Sicherungsordner freigeben und mit dem bereits vorhandenen Konto
+                anmelden. Konten, Daten und Sicherungsschlüssel kommen aus
+                <strong>teo-autosicherung.json</strong>.
+              </small>
+            </span>
+          </button>
+          <button class="data-origin-choice" id="createDataSetButton" type="button">
+            <svg><use href="#icon-plus"></use></svg>
+            <span>
+              <strong>Neuen Datenbestand einrichten</strong>
+              <small>
+                Erstes Administratorkonto anlegen. Nur für den allerersten
+                Arbeitsplatz gedacht.
+              </small>
+            </span>
+          </button>
+        </div>
+        <p class="form-error auth-error" id="dataOriginStatus" role="alert"></p>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
       id="setupDialog"
       aria-labelledby="setupDialogTitle"
       data-persistent-dialog
@@ -2976,7 +3032,7 @@ npm run verify</code></pre>
           <svg><use href="#icon-upload"></use></svg>
           <div>
             <strong>Gemeinsame Sicherungsdatei erforderlich</strong>
-            <span>Die Datei wird geprüft, bei Bedarf automatisch entschlüsselt und anschließend als aktueller Datenstand übernommen.</span>
+            <span>Die Datei wird geprüft, bei Bedarf automatisch entschlüsselt und anschließend als aktueller Datenstand übernommen. Über den freigegebenen Ordner findet TeO sie künftig ohne Auswahl.</span>
           </div>
         </div>
         <input
@@ -2990,9 +3046,13 @@ npm run verify</code></pre>
       </div>
       <div class="modal-footer">
         <button class="button button-ghost" type="button" data-logout>Abmelden</button>
-        <button class="button button-primary" id="selectStartupBackupFileButton" type="button">
+        <button class="button button-ghost" id="selectStartupBackupFileButton" type="button">
           <svg><use href="#icon-upload"></use></svg>
           teo-autosicherung.json auswählen
+        </button>
+        <button class="button button-primary" id="selectStartupBackupDirectoryButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          Sicherungsordner freigeben
         </button>
       </div>
     </dialog>
