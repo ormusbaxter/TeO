@@ -11664,8 +11664,14 @@ body.is-dragging-appointment .appointment-calendar-entry {
   margin: 8mm;
 }
 
+@page vacation-blank-month {
+  size: A4 landscape;
+  margin: 8mm;
+}
+
 .appointment-print-surface,
-.vacation-blank-year-print-surface {
+.vacation-blank-year-print-surface,
+.vacation-blank-month-print-surface {
   display: none;
 }
 
@@ -11871,6 +11877,142 @@ body.is-dragging-appointment .appointment-calendar-entry {
     color: #596779;
   }
 
+  body.print-vacation-blank-month > * {
+    display: none !important;
+  }
+
+  body.print-vacation-blank-month > #vacationBlankMonthPrintSurface {
+    page: vacation-blank-month;
+    display: block !important;
+    width: 100%;
+    color: #182230;
+    background: white;
+  }
+
+  /* Anders als die Jahresuebersicht steht hier keine feste Zeilenzahl fest:
+     Ein grosses Team fuellt mehr als ein Blatt. Der Monat beginnt deshalb auf
+     einer neuen Seite und laeuft bei Bedarf weiter. Den Tabellenkopf
+     wiederholt der Browser dabei von selbst - thead ist ohnehin eine
+     Kopfgruppe, und nichts stellt das hier um. */
+  .vacation-blank-month-document + .vacation-blank-month-document {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .vacation-blank-month-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .vacation-blank-month-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 3mm;
+    border-bottom: 0.35mm solid #9ba6b2;
+  }
+
+  .vacation-blank-month-header :is(h1, p),
+  .vacation-blank-month-document footer {
+    margin: 0;
+  }
+
+  .vacation-blank-month-header p {
+    margin-bottom: 1mm;
+    color: #596779;
+    font-size: 7pt;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .vacation-blank-month-header h1 {
+    font-size: 15pt;
+    line-height: 1.1;
+  }
+
+  .vacation-blank-month-meta {
+    display: grid;
+    gap: 1mm;
+    text-align: right;
+  }
+
+  .vacation-blank-month-meta strong {
+    font-size: 14pt;
+  }
+
+  .vacation-blank-month-meta span,
+  .vacation-blank-month-document .vacation-blank-year-legend,
+  .vacation-blank-month-document footer {
+    font-size: 6.5pt;
+  }
+
+  .vacation-blank-month-table {
+    width: 100%;
+    margin-top: 2.5mm;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  .vacation-blank-month-table :is(th, td) {
+    height: 7.5mm;
+    padding: 0.5mm;
+    color: #182230;
+    text-align: center;
+    border: 0.25mm solid #b8c1cb;
+    background-color: white;
+    font-size: 6pt;
+  }
+
+  .vacation-blank-month-table thead th {
+    background-color: #eef1f4;
+  }
+
+  .vacation-blank-month-day {
+    display: block;
+    font-size: 7pt;
+    font-weight: 800;
+  }
+
+  .vacation-blank-month-weekday {
+    display: block;
+    color: #596779;
+    font-size: 5.5pt;
+  }
+
+  /* Die Namensspalte traegt zwei Zeilen: Name und darunter Umfang sowie
+     Dienstwochenende. Sie ist die einzige linksbuendige Spalte. */
+  .vacation-blank-month-name-column {
+    width: 42mm;
+    padding-left: 1.5mm !important;
+    text-align: left !important;
+    background-color: #eef1f4;
+  }
+
+  .vacation-blank-month-name-column strong {
+    display: block;
+    font-size: 7pt;
+    line-height: 1.15;
+  }
+
+  .vacation-blank-month-name-column small {
+    display: block;
+    color: #596779;
+    font-size: 5.5pt;
+  }
+
+  .vacation-blank-month-table td.is-own-weekend {
+    box-shadow: inset 0 0 0 0.45mm rgb(24 102 186 / 72%);
+  }
+
+  .vacation-blank-month-document footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2mm;
+    color: #596779;
+    font-size: 6.5pt;
+  }
+
   .appointment-print-document,
   .appointment-print-document * {
     box-sizing: border-box;
@@ -12069,6 +12211,10 @@ body.is-dragging-appointment .appointment-calendar-entry {
   body.print-weekend-overview > #trainingMatrixDialog,
   body.print-vacation-overview > #trainingMatrixDialog,
   body.print-vacation-blank-year > #trainingMatrixDialog {
+    display: none !important;
+  }
+
+  body.print-vacation-blank-month > #trainingMatrixDialog {
     display: none !important;
   }
 

@@ -788,6 +788,24 @@ Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix:
 **Jahr drucken** gibt die Matrix aus. Da sie 31 Tagesspalten hat, ist das
 Querformat voreingestellt.
 
+### Leere Vordrucke zum Ausfüllen von Hand
+
+Zwei Schaltflächen im Kopf der Urlaubsplanung geben leere Vordrucke aus –
+gedacht für Aushang und Handeintrag, bevor die Planung in TeO übertragen wird.
+Beide zeigen Feiertage, Schulferien und Dienstwochenenden, aber keine bereits
+erfassten Einträge.
+
+**Leere Jahresübersichten** druckt ein Blatt je aktivem oder einzuarbeitendem
+Mitarbeiter: zwölf Monatszeilen, 31 Tagesspalten.
+
+**Leere Monatsplanungen** druckt umgekehrt ein Blatt je Monat des gewählten
+Jahres, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch
+untereinander und die Tage des Monats als Spalten. Ein großes Team läuft auf
+ein zweites Blatt weiter. Wer nur einen einzelnen Monat braucht, wählt die
+Seite im Druckdialog aus.
+
+Beide Vordrucke sind auf DIN A4 quer ausgelegt.
+
 ### Feiertage und Schulferien
 
 Gesetzliche Feiertage in Nordrhein-Westfalen werden für jedes Jahr automatisch

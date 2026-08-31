@@ -763,6 +763,12 @@
     vacationBlankYearPrintSurface: document.querySelector(
       "#vacationBlankYearPrintSurface",
     ),
+    printBlankVacationMonthPlansButton: document.querySelector(
+      "#printBlankVacationMonthPlansButton",
+    ),
+    vacationBlankMonthPrintSurface: document.querySelector(
+      "#vacationBlankMonthPrintSurface",
+    ),
     vacationSummary: document.querySelector("#vacationSummary"),
     vacationPlannerWidget: document.querySelector("#vacationPlannerWidget"),
     vacationPlanner: document.querySelector("#vacationPlanner"),
