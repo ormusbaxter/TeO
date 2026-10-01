@@ -392,12 +392,6 @@
       "click",
       toggleVacationPlannerMaximized,
     );
-    elements.previousVacationMonthButton.addEventListener("click", () =>
-      shiftVacationMonth(-1),
-    );
-    elements.nextVacationMonthButton.addEventListener("click", () =>
-      shiftVacationMonth(1),
-    );
     document.addEventListener("keydown", handleVacationPlannerMaximizeKeydown);
     elements.vacationConflictContent.addEventListener("click", (event) => {
       const dateButton = event.target.closest("[data-vacation-conflict-date]");

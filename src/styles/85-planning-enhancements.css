@@ -123,10 +123,6 @@
   min-width: 190px;
 }
 
-.vacation-summary {
-  margin-bottom: 20px;
-}
-
 body.is-vacation-view .main-content {
   max-width: none;
   padding-right: clamp(18px, 2vw, 36px);
@@ -160,6 +156,28 @@ body.is-vacation-view .main-content {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.vacation-month-heading {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vacation-month-heading .icon-button {
+  flex: none;
+  width: 26px;
+  height: 26px;
+}
+
+.vacation-month-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .vacation-month-navigation svg {

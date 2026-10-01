@@ -783,7 +783,6 @@
     vacationBlankMonthPrintSurface: document.querySelector(
       "#vacationBlankMonthPrintSurface",
     ),
-    vacationSummary: document.querySelector("#vacationSummary"),
     vacationPlannerWidget: document.querySelector("#vacationPlannerWidget"),
     vacationPlanner: document.querySelector("#vacationPlanner"),
     toggleVacationPlannerMaximizeButton: document.querySelector(
@@ -795,10 +794,6 @@
     vacationPlannerMaximizeLabel: document.querySelector(
       "#vacationPlannerMaximizeLabel",
     ),
-    previousVacationMonthButton: document.querySelector(
-      "#previousVacationMonthButton",
-    ),
-    nextVacationMonthButton: document.querySelector("#nextVacationMonthButton"),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),

@@ -670,9 +670,11 @@ Eintrag erscheint als **×** im selben Grün wie der Urlaub.
    den Planungseintrag.
 
 Der zuletzt gewählte Monat und das Planungsjahr werden im Browser gespeichert.
-In der maximierten Planung blättern die Pfeilschaltflächen über der Tabelle
-durch die Monate; dort bleibt oberhalb der Tabelle nur die kompakte, mit den
-farbigen Tabellensymbolen dargestellte Tastaturbelegung sichtbar.
+Die beiden Pfeile in der ersten Zelle der Tabelle – neben Monat und Jahr –
+blättern zum vorherigen beziehungsweise nächsten Monat, auch über den
+Jahreswechsel hinweg. In der maximierten Planung bleibt oberhalb der Tabelle
+nur die kompakte, mit den farbigen Tabellensymbolen dargestellte
+Tastaturbelegung sichtbar.
 
 Die Kopfzeile bleibt beim vertikalen Scrollen sichtbar. Wochenenden,
 Feiertage, Schulferien und die beiden Dienstwochenenden werden farblich
@@ -732,8 +734,7 @@ zurücknehmbar. Ein einzelner Klick setzt weiterhin genau ein Feld.
 
 Das Suchfeld **Mitarbeiter** blendet alle Zeilen aus, die nicht zum Suchbegriff
 passen; gesucht wird in Vor- und Nachname sowie im Benutzernamen. Die
-Kennzahlen über der Tabelle und sämtliche Tagesgrenzen beziehen sich weiterhin
-auf das gesamte Team, damit ein Filter die Auslastung nicht verfälscht. Ist ein
+Tagesgrenzen beziehen sich weiterhin auf das gesamte Team, damit ein Filter die Auslastung nicht verfälscht. Ist ein
 Filter aktiv, weist ein Hinweis über der Tabelle darauf hin.
 
 ### Abwesenheitsgrenzen
