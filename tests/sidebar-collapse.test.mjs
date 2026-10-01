@@ -72,7 +72,7 @@ test("Der eingeklappte Zustand überlebt den nächsten Start", async (t) => {
 
   // Neu geladen gilt sie weiter - der Zustand ist eine persönliche
   // Einstellung des Arbeitsplatzes, keine des Datenbestands.
-  const nachNeustart = await openTeO(t, { angemeldetAls: "admin" });
+  const nachNeustart = await openTeO(t, { angemeldetAls: "admin", neustart: true });
   const zustand = await leseZustand(nachNeustart);
   assert.equal(zustand.eingeklappt, true);
   assert.equal(zustand.breite, "76px");

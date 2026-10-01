@@ -107,7 +107,7 @@ test("Eine gemerkte Ansicht überlebt den Neustart", async (t) => {
 
   // Neu geladen steht der Filter wieder da - und zwar im Bedienelement,
   // nicht nur als Chip.
-  const nachNeustart = await openTeO(t, { angemeldetAls: "admin" });
+  const nachNeustart = await openTeO(t, { angemeldetAls: "admin", neustart: true });
   await nachNeustart.zeigeAnsicht("employees");
   const wiederhergestellt = await nachNeustart.page.waitForFunction(
     () => document.querySelector("#employeeSearch").value || null,
