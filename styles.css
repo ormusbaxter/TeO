@@ -4103,7 +4103,7 @@ body.is-sidebar-collapsed
   border: 1px solid var(--slate-200);
   border-radius: 8px;
   outline: 0;
-  background: white;
+  background: var(--white);
 }
 
 .compact-field input:focus,
@@ -4396,7 +4396,7 @@ legend {
   border: 1px solid var(--slate-200);
   border-radius: 8px;
   outline: 0;
-  background: white;
+  background: var(--white);
   transition:
     border-color 140ms ease,
     box-shadow 140ms ease;
@@ -6817,7 +6817,7 @@ body.is-device-matrix-maximized {
   font: inherit;
   border: 1px solid var(--slate-200);
   border-radius: 8px;
-  background: white;
+  background: var(--white);
 }
 
 .device-filter-bar > .device-search-field {

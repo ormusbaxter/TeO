@@ -32,7 +32,7 @@
 - **Neu:** In der Urlaubsplanung trägt die erste Zelle der Tabelle neben Monat und Jahr zwei Pfeile. Sie blättern zum vorherigen beziehungsweise nächsten Monat, auch über den Jahreswechsel hinweg. Die bisherigen Pfeile in der Kopfleiste der Planungstabelle entfallen dafür
 - **Verbessert:** Zwischen Steuerleiste und Planungstabelle stehen keine Kennzahlen-Kacheln mehr; die Tabelle rückt damit nach oben
 - **Verbessert:** Die Planungstabelle nennt die Mitarbeiter als **Nachname, Vorname**; die Namenssuche findet sie auch in dieser Schreibweise
-- **Neu:** Die Auswahl **Sortierung** ordnet die Planungstabelle alphabetisch nach Nachname oder nach Qualifikation – Stationsleitung, Stellv. Stationsleitung, Fachweiterbildung, Pflegefachkraft, aktuell in Einarbeitung, ITA (Intensivtransportassistent/in), Pflegefachassistenz, MFA, Stationsassistenz, innerhalb der Gruppe nach Nachname. Die Sortierart merkt sich der Browser
+- **Neu:** Die Auswahl **Sortierung** ordnet die Planungstabelle alphabetisch nach Nachname oder nach Qualifikation – Stationsleitung, Stellv. Stationsleitung, Fachweiterbildung, Pflegefachkraft, aktuell in Einarbeitung, ITA (Intensivtechnische/r Assistent/in), Pflegefachassistenz, MFA, Stationsassistenz, innerhalb der Gruppe nach Nachname. Die Sortierart merkt sich der Browser
 - **Neu:** Die Reihenfolge dieser Gruppen lässt sich unter **Einstellungen → Planung** umstellen und wieder auf die Vorgabe zurücksetzen
 
 ### 4.47.0 – Mehrplatzbetrieb und leere Monatsplanungen
