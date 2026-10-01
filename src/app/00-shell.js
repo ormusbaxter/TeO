@@ -202,6 +202,7 @@
     "gruvbox-dark": "Gruvbox Dark",
     "tokyo-night": "Tokyo Night",
     "catppuccin-latte": "Catppuccin Latte",
+    github: "GitHub",
     "windows-95": "Windows 95",
     cellitinnen: "Cellitinnen",
     "cellitinnen-red": "Cellitinnen Rot",

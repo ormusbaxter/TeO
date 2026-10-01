@@ -1,3 +1,7 @@
+### 4.49.0 – Farbthema GitHub
+
+- **Neu:** Das Farbthema **GitHub** übernimmt die helle Palette von GitHub: weiße Karten mit feinem grauen Rand auf hellgrauem Grund, Links und Fokusrahmen im GitHub-Blau, die Hauptaktion im Grün der GitHub-Schaltflächen und eine dunkelgraue Seitenleiste wie die klassische GitHub-Kopfzeile. Zu finden unter **Einstellungen → Allgemein → Aktives Farbthema**
+
 ### 4.48.0 – Monatswechsel und Sortierung in der Planungstabelle
 
 - **Neu:** In der Urlaubsplanung trägt die erste Zelle der Tabelle neben Monat und Jahr zwei Pfeile. Sie blättern zum vorherigen beziehungsweise nächsten Monat, auch über den Jahreswechsel hinweg. Die bisherigen Pfeile in der Kopfleiste der Planungstabelle entfallen dafür

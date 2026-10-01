@@ -47,6 +47,7 @@ const THEMEN = [
   "gruvbox-dark",
   "tokyo-night",
   "catppuccin-latte",
+  "github",
   "cellitinnen",
   "cellitinnen-red",
   "windows-95",

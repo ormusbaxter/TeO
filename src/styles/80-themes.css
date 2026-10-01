@@ -893,6 +893,112 @@ html[data-theme="catppuccin-latte"] :is(
   box-shadow: 0 0 0 3px rgb(136 57 239 / 14%);
 }
 
+/* GitHub (hell): Primer-Palette, https://primer.style/foundations/color.
+   Die Seitenleiste nimmt das Dunkelgrau der klassischen GitHub-Kopfzeile auf,
+   die Hauptaktion das Gruen der GitHub-Schaltflaechen. */
+html[data-theme="github"] {
+  --navy-950: #1f2328;
+  --navy-900: #24292f;
+  --navy-800: #32383f;
+  --blue-700: #0969da;
+  --blue-600: #0969da;
+  --blue-100: #ddf4ff;
+  --blue-50: #f0f8ff;
+  --teal-700: #1b7c83;
+  --teal-100: #d8f3f1;
+  --orange-700: #9a6700;
+  --orange-100: #fff8c5;
+  --red-700: #cf222e;
+  --red-100: #ffebe9;
+  --green-700: #1a7f37;
+  --green-100: #dafbe1;
+  --slate-900: #1f2328;
+  --slate-800: #32383f;
+  --slate-700: #424a53;
+  --slate-600: #59636e;
+  --slate-500: #6e7781;
+  --slate-400: #8c959f;
+  --slate-300: #afb8c1;
+  --slate-200: #d0d7de;
+  --slate-100: #eaeef2;
+  --slate-50: #f6f8fa;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 0 rgb(31 35 40 / 4%);
+  --shadow-md: 0 3px 6px rgb(140 149 159 / 15%);
+  --shadow-lg: 0 8px 24px rgb(140 149 159 / 20%);
+  --toast-surface: #24292f;
+  --toast-text: #f6f8fa;
+  --toast-border: rgb(240 246 252 / 14%);
+  --toast-success-icon: #4ac26b;
+  --toast-success-tint: rgb(74 194 107 / 14%);
+  --toast-error-icon: #ff8182;
+  --toast-error-tint: rgb(255 129 130 / 12%);
+  --toast-warning-icon: #d4a72c;
+  --toast-warning-tint: rgb(212 167 44 / 14%);
+}
+
+html[data-theme="github"] body {
+  background: #f6f8fa;
+}
+
+html[data-theme="github"] .sidebar {
+  background: #24292f;
+}
+
+html[data-theme="github"] .brand-mark {
+  background: #1f2328;
+  box-shadow: inset 0 0 0 1px rgb(240 246 252 / 18%);
+}
+
+html[data-theme="github"] .nav-item.is-active {
+  background: rgb(240 246 252 / 10%);
+  box-shadow: inset 3px 0 #fd8c73;
+}
+
+html[data-theme="github"] :is(.panel, .page-header) {
+  border-color: #d0d7de;
+  box-shadow: none;
+}
+
+html[data-theme="github"] .page-header {
+  background: #ffffff;
+}
+
+html[data-theme="github"] .button-primary {
+  border-color: rgb(31 35 40 / 15%);
+  background: #1f883d;
+  box-shadow: 0 1px 0 rgb(31 35 40 / 10%);
+}
+
+html[data-theme="github"] .button-primary:hover {
+  background: #1c8139;
+  box-shadow: 0 1px 0 rgb(31 35 40 / 10%);
+}
+
+html[data-theme="github"] .button-secondary {
+  border-color: #d0d7de;
+  background: #f6f8fa;
+  box-shadow: 0 1px 0 rgb(31 35 40 / 4%);
+}
+
+html[data-theme="github"] .button-secondary:hover {
+  border-color: #d0d7de;
+  background: #eaeef2;
+}
+
+html[data-theme="github"] :is(
+    .search-field:focus-within,
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus,
+    .compact-field select:focus,
+    .bulk-attendance-bar select:focus,
+    .attendance-status-field select:focus
+  ) {
+  border-color: #0969da;
+  box-shadow: inset 0 0 0 1px #0969da;
+}
+
 html[data-theme="windows-95"] {
   --navy-950: #000000;
   --navy-900: #000080;
