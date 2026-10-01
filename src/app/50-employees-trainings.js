@@ -207,7 +207,11 @@
               <div class="audit-row">
                 <span>${formatDateTime(entry.timestamp)}</span>
                 <strong>${escapeHtml(entry.username)}</strong>
-                <span>${escapeHtml(entry.action)}</span>
+                <span>${escapeHtml(entry.action)}${
+                  entry.subjects?.length
+                    ? `<small class="audit-subjects">${escapeHtml(auditSubjectNames(entry))}</small>`
+                    : ""
+                }</span>
               </div>
             `,
           )
@@ -220,6 +224,17 @@
     elements.auditLogDialog.showModal();
   }
 
+  // Geloeschte Mitarbeiter stehen nicht mehr im Bestand; sie erscheinen als
+  // „gelöschter Mitarbeiter“, damit der Eintrag lesbar bleibt.
+  function auditSubjectNames(entry, limit = 3) {
+    const names = (entry.subjects || []).map((subject) => {
+      const employee = getEmployee(subject.employeeId);
+      return employee ? fullName(employee) : "gelöschter Mitarbeiter";
+    });
+    if (names.length <= limit) return names.join(" · ");
+    return `${names.slice(0, limit).join(" · ")} und ${names.length - limit} weitere`;
+  }
+
   function exportAuditLogCsv() {
     if (!requireAdmin() || state.auditLog.length === 0) {
       showToast("Das Änderungsprotokoll enthält noch keine Einträge.", "error");
@@ -227,11 +242,12 @@
     }
     downloadCsv(
       `teo-aenderungsprotokoll_${todayIso()}.csv`,
-      ["Zeitpunkt", "Benutzer", "Änderung"],
+      ["Zeitpunkt", "Benutzer", "Änderung", "Betroffene Mitarbeiter"],
       state.auditLog.map((entry) => [
         formatDateTime(entry.timestamp),
         entry.username,
         entry.action,
+        auditSubjectNames(entry, Infinity),
       ]),
     );
   }

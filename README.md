@@ -543,7 +543,16 @@ Ein Klick auf einen Mitarbeiter öffnet die Gesamtakte mit:
 - Qualifikationen und Ablaufdaten
 - Pflichtfortbildungsstatus
 - Teamsitzungsteilnahmen
+- Änderungsverlauf (nur für Administratoren)
 - Druckansicht
+
+Der **Änderungsverlauf** zeigt die letzten 25 Änderungen an diesem Mitarbeiter:
+wann, durch wen und was – etwa „Stammdaten: Beruf, Stellenumfang“,
+„Abwesenheitsplanung: 3 Einträge“, „Fortbildungsnachweis“ oder
+„Geräteeinweisung“. Erfasst sind Änderungen ab Version 4.51.0; was davor
+geschah, steht nur im allgemeinen Änderungsprotokoll ohne Bezug zum
+Mitarbeiter. Ältere Einträge fallen heraus, sobald das Protokoll seine
+Höchstzahl von 1000 Einträgen erreicht.
 
 ### E-Mail-Adressen exportieren
 
@@ -1322,8 +1331,11 @@ einem System ohne jedes Konto werden die Konten aus der Sicherung übernommen.
 ### Änderungsprotokoll
 
 Administrative und fachliche Änderungen werden mit Zeitpunkt, Benutzer und
-Beschreibung protokolliert. Das Protokoll kann als CSV exportiert werden. Die
-Einsicht ist Administratoren vorbehalten.
+Beschreibung protokolliert. Betrifft eine Änderung Mitarbeiter, nennt der
+Eintrag sie mit Namen; daraus entsteht auch der Änderungsverlauf in der
+Mitarbeiter-Akte. Das Protokoll kann als CSV exportiert werden, mit einer
+Spalte für die betroffenen Mitarbeiter. Die Einsicht ist Administratoren
+vorbehalten.
 
 ## Datenspeicherung und MariaDB
 

@@ -1208,7 +1208,20 @@
         const username = String(entry?.username || "").trim().slice(0, 40);
         const action = String(entry?.action || "").trim().slice(0, 240);
         if (!id || !timestamp || !username || !action) return null;
-        return { id, timestamp, username, action };
+        const subjects = (Array.isArray(entry.subjects) ? entry.subjects : [])
+          .map((subject) => ({
+            employeeId: normalizeId(subject?.employeeId),
+            change: String(subject?.change || "").trim().slice(0, 240),
+          }))
+          .filter((subject) => subject.employeeId && subject.change)
+          .slice(0, MAX_AUDIT_SUBJECTS);
+        return {
+          id,
+          timestamp,
+          username,
+          action,
+          ...(subjects.length ? { subjects } : {}),
+        };
       })
       .filter(Boolean)
       .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
@@ -1317,6 +1330,7 @@
       auditAction === undefined
         ? describeMutation(previousState, state)
         : auditAction,
+      describeEmployeeChanges(previousState, state),
     );
 
     if (await persistState()) {
@@ -1388,7 +1402,9 @@
 
   // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn
   // gezielt wieder entfernen kann, wenn das Speichern anschliessend scheitert.
-  function appendAuditEntry(action) {
+  // subjects nennt die betroffenen Mitarbeiter samt Art der Aenderung; daraus
+  // entsteht der Aenderungsverlauf in der Mitarbeiter-Akte.
+  function appendAuditEntry(action, subjects = []) {
     if (!action) return "";
     const id = createId();
     state.auditLog.unshift({
@@ -1396,9 +1412,76 @@
       timestamp: new Date().toISOString(),
       username: currentUser?.username || "System",
       action,
+      ...(subjects.length ? { subjects } : {}),
     });
     state.auditLog = state.auditLog.slice(0, MAX_AUDIT_LOG_ENTRIES);
     return id;
+  }
+
+  // Welche Mitarbeiter eine Aenderung betrifft und wie. Verglichen werden nur
+  // Sammlungen, die sich ueberhaupt geaendert haben - der Normalfall ist ein
+  // einziger Eintrag, und der kurze Vergleich bricht beim ersten Unterschied ab.
+  function describeEmployeeChanges(before, after) {
+    const changes = new Map();
+    const note = (employeeId, label, count = 1) => {
+      if (!employeeId) return;
+      if (!changes.has(employeeId)) changes.set(employeeId, new Map());
+      const labels = changes.get(employeeId);
+      labels.set(label, (labels.get(label) || 0) + count);
+    };
+
+    if (!sameStoredValue(before.employees, after.employees)) {
+      const previous = new Map(before.employees.map((employee) => [employee.id, employee]));
+      const current = new Map(after.employees.map((employee) => [employee.id, employee]));
+      current.forEach((employee, id) => {
+        const old = previous.get(id);
+        if (!old) {
+          note(id, "angelegt");
+          return;
+        }
+        const fields = Object.entries(EMPLOYEE_FIELD_LABELS)
+          .filter(([field]) => !sameStoredValue(old[field], employee[field]))
+          .map(([, label]) => label);
+        if (fields.length) note(id, `Stammdaten: ${fields.join(", ")}`);
+      });
+      previous.forEach((_, id) => {
+        if (!current.has(id)) note(id, "gelöscht");
+      });
+    }
+
+    EMPLOYEE_RELATED_COLLECTIONS.forEach(({ key, label, recordKey, employeeIdsOf }) => {
+      if (!sameStoredValue(before[key], after[key])) {
+        const previous = new Map(before[key].map((record) => [recordKey(record), record]));
+        const current = new Map(after[key].map((record) => [recordKey(record), record]));
+        const touched = (record) =>
+          employeeIdsOf(record).forEach((employeeId) => note(employeeId, label));
+        current.forEach((record, id) => {
+          const old = previous.get(id);
+          if (!old) touched(record);
+          else if (!sameStoredValue(old, record)) {
+            // Wechselt ein Eintrag den Mitarbeiter, betrifft er beide.
+            new Set([...employeeIdsOf(old), ...employeeIdsOf(record)]).forEach(
+              (employeeId) => note(employeeId, label),
+            );
+          }
+        });
+        previous.forEach((record, id) => {
+          if (!current.has(id)) touched(record);
+        });
+      }
+    });
+
+    return [...changes]
+      .slice(0, MAX_AUDIT_SUBJECTS)
+      .map(([employeeId, labels]) => ({
+        employeeId,
+        change: [...labels]
+          .map(([label, count]) =>
+            count > 1 ? `${label}: ${count} Einträge` : label,
+          )
+          .join("; ")
+          .slice(0, 240),
+      }));
   }
 
   function describeMutation(before, after) {

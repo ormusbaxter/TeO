@@ -515,8 +515,44 @@
             .join("") || '<p class="field-hint">Keine erwarteten Teamsitzungen.</p>'}
         </div>
       </section>
+      ${isAdmin() ? renderEmployeeChangeHistory(employee.id) : ""}
     `;
     elements.employeeDossierDialog.showModal();
+  }
+
+  // Wie das Aenderungsprotokoll selbst nur fuer Administratoren: Es nennt,
+  // wer wann an einem Mitarbeiter gearbeitet hat.
+  function employeeChangeHistory(employeeId) {
+    return state.auditLog.flatMap((entry) => {
+      const subject = entry.subjects?.find((item) => item.employeeId === employeeId);
+      return subject ? [{ ...entry, change: subject.change }] : [];
+    });
+  }
+
+  function renderEmployeeChangeHistory(employeeId) {
+    const history = employeeChangeHistory(employeeId);
+    const shown = history.slice(0, EMPLOYEE_HISTORY_VISIBLE_ENTRIES);
+    return `
+      <section class="dossier-section employee-change-history">
+        <h3>Änderungsverlauf</h3>
+        ${
+          shown.length
+            ? `<div class="dossier-list">${shown
+                .map(
+                  (entry) => `<div class="dossier-list-row">
+                    <strong>${escapeHtml(entry.change)}</strong>
+                    <span>${formatDateTime(entry.timestamp)} · ${escapeHtml(entry.username)}</span>
+                  </div>`,
+                )
+                .join("")}</div>${
+                history.length > shown.length
+                  ? `<p class="field-hint">${history.length - shown.length} ältere Änderungen stehen im Änderungsprotokoll.</p>`
+                  : ""
+              }`
+            : '<p class="field-hint">Seit Einführung des Änderungsverlaufs wurde an diesem Mitarbeiter nichts geändert.</p>'
+        }
+      </section>
+    `;
   }
 
   function renderDossierItem(label, value) {
