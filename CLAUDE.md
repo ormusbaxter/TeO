@@ -95,10 +95,32 @@ await teo.farbeAn("#teoProbeToast");          // Bildpunkt, für „liegt obenau
 await teo.evaluate(() => …);                  // Rumpf läuft in der Seite
 ```
 
-`after(closeTeO)` nicht vergessen. Jeder Aufruf von `openTeO` lädt die Seite
-neu, damit Tests sich nicht gegenseitig den Zustand verstellen; Übergänge und
-Animationen sind abgeschaltet, sonst misst man den Startwert statt des
-Ergebnisses.
+`after(closeTeO)` nicht vergessen. Jeder Aufruf von `openTeO` öffnet einen
+eigenen Browserkontext mit leerem Speicher, damit Tests sich nicht gegenseitig
+den Zustand verstellen; Übergänge und Animationen sind abgeschaltet, sonst misst
+man den Startwert statt des Ergebnisses.
+
+Für echte Ansichten statt nachgebauter Ausschnitte lädt `mitDemodaten` die
+Demodatenbank (`demo/`, 60 Mitarbeiter). Als Funktion übergeben, bekommt sie
+eine Kopie des Bestands zum Anpassen, bevor TeO startet. `urlaubsansicht`
+setzt den gemerkten Zeitraum der Urlaubsplanung:
+
+```js
+const teo = await openTeO(t, {
+  angemeldetAls: "admin",
+  urlaubsansicht: { year: 2026, month: 7, sort: "qualification" },
+  mitDemodaten(bestand) {
+    bestand.vacationDays.push({ … });
+  },
+});
+```
+
+Die Demodatenbank enthält keine Urlaubseinträge; wer welche braucht, ergänzt
+sie so.
+
+Soll etwas den nächsten Start überleben, öffnet der zweite Aufruf mit
+`neustart: true`: Er lädt TeO im Kontext des vorigen Aufrufs neu, mit dessen
+Speicher.
 
 Zwei Fallstricke: `elementFromPoint` beantwortet **nicht**, ob etwas obenauf
 liegt – eine Meldungsschicht ist durchlässig für Klicks und taucht in der

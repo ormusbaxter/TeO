@@ -82,7 +82,48 @@ function startServer() {
 //
 // Jeder Aufruf lädt die Seite neu: Die Tests sollen sich nicht gegenseitig
 // den Zustand verstellen.
-export async function openTeO(t, { angemeldetAls = "" } = {}) {
+// Die Demodatenbank: 60 Mitarbeiter mit Qualifikationen, Fortbildungen,
+// Sitzungen und Geräteeinweisungen. Sie wird einmal gelesen und je Aufruf
+// kopiert, damit ein Test die Vorlage nicht für den nächsten verändert.
+let demoState = null;
+
+function loadDemoState() {
+  if (!demoState) {
+    const backup = JSON.parse(
+      fs.readFileSync(
+        path.join(projectRoot, "demo", "teo-demo-datenbank-60-ma-2025-2026.json"),
+        "utf8",
+      ),
+    );
+    demoState = backup.state || backup.data || backup;
+  }
+  return structuredClone(demoState);
+}
+
+// Öffnet TeO und liefert eine Handhabe darauf - oder null, wenn Playwright
+// fehlt; dann ist der Test bereits als übersprungen vermerkt.
+//
+// Jeder Aufruf bekommt einen eigenen Browserkontext und damit einen leeren
+// Speicher: Die Tests sollen sich nicht gegenseitig den Zustand verstellen,
+// und ein Datenbestand aus einem Test darf im nächsten nicht auftauchen.
+//
+// Optionen:
+// - angemeldetAls: Rolle, mit der die Anmeldesperre gelöst wird
+// - mitDemodaten: lädt die Demodatenbank; `true` oder eine Funktion, die den
+//   Bestand vor dem Laden anpasst (etwa Urlaubseinträge ergänzt)
+// - urlaubsansicht: gemerkter Zeitraum der Urlaubsplanung, z. B.
+//   { year: 2026, month: 7, sort: "qualification" }
+// - neustart: startet TeO im Kontext des vorigen Aufrufs neu, mit dessen
+//   Speicher - für die Frage, ob etwas den nächsten Start überlebt
+export async function openTeO(
+  t,
+  {
+    angemeldetAls = "",
+    mitDemodaten = false,
+    urlaubsansicht = null,
+    neustart = false,
+  } = {},
+) {
   const playwright = await loadPlaywright();
   if (!playwright) {
     t.skip("Playwright ist nicht installiert - „npm ci“ holt es nach");
@@ -98,24 +139,55 @@ export async function openTeO(t, { angemeldetAls = "" } = {}) {
     const browser = await startBrowser(playwright, t);
     if (!browser) return null;
     const { server, port } = await startServer();
-    try {
-      const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-      shared = { server, port, browser, page, problems: [] };
-      page.on("pageerror", (error) => shared.problems.push(`Skriptfehler: ${error.message}`));
-      page.on("console", (message) => {
-        if (message.type() === "error") shared.problems.push(`Konsole: ${message.text()}`);
-      });
-    } catch (error) {
-      server.close();
-      await browser.close();
-      throw error;
-    }
+    shared = { server, port, browser, context: null, page: null, problems: [] };
   }
 
-  const { page, port } = shared;
+  if (neustart && shared.context) {
+    await shared.page?.close().catch(() => {});
+  } else {
+    await shared.context?.close().catch(() => {});
+    shared.context = await shared.browser.newContext({
+      viewport: { width: 1440, height: 900 },
+    });
+  }
+  const page = await shared.context.newPage();
+  shared.page = page;
   shared.problems.length = 0;
+  page.on("pageerror", (error) => shared.problems.push(`Skriptfehler: ${error.message}`));
+  page.on("console", (message) => {
+    if (message.type() === "error") shared.problems.push(`Konsole: ${message.text()}`);
+  });
+
+  const { port } = shared;
+  if (mitDemodaten || urlaubsansicht) {
+    // Vor dem ersten Laden ablegen: TeO übernimmt einen Bestand unter dem
+    // früheren localStorage-Schlüssel beim Start in seinen Speicher - der
+    // Weg, auf dem auch ältere Installationen ihre Daten mitbringen.
+    const bestand = mitDemodaten ? loadDemoState() : null;
+    if (typeof mitDemodaten === "function") mitDemodaten(bestand);
+    await page.addInitScript(
+      ([daten, ansicht]) => {
+        if (sessionStorage.getItem("teo-test-seeded")) return;
+        sessionStorage.setItem("teo-test-seeded", "1");
+        if (daten) {
+          localStorage.setItem("intensivteam-personalverwaltung-v1", JSON.stringify(daten));
+        }
+        if (ansicht) {
+          localStorage.setItem("intensivteam-vacation-view-v1", JSON.stringify(ansicht));
+        }
+      },
+      [bestand, urlaubsansicht],
+    );
+  }
   await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
   await page.waitForFunction(() => Boolean(window.TeOProjectMeta), null, { timeout: 15000 });
+  if (mitDemodaten) {
+    await page.waitForFunction(
+      () => Number(document.querySelector("#navEmployeeCount")?.textContent) > 0,
+      null,
+      { timeout: 15000 },
+    );
+  }
 
   // Ohne dies misst ein Test unmittelbar nach einer Änderung den Startwert
   // eines laufenden Übergangs statt des Ergebnisses - beim Farbschema etwa

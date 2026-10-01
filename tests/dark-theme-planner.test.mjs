@@ -14,22 +14,29 @@ function helligkeit(wert) {
 // Leere Tagesfelder und das Suchfeld der Urlaubsplanung trugen feste helle
 // Flaechen und standen in den dunklen Schemata als graue Kacheln da.
 test("Leere Tagesfelder und Suchfeld bleiben in dunklen Schemata dunkel", async (t) => {
-  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  const teo = await openTeO(t, {
+    angemeldetAls: "admin",
+    mitDemodaten: true,
+    urlaubsansicht: { year: 2026, month: 7, sort: "name" },
+  });
   if (!teo) return;
+  await teo.zeigeAnsicht("vacations");
 
   const gemessen = await teo.evaluate((themen) => {
-    // Ein leeres Tagesfeld so, wie renderVacationEmployeeRow es aufbaut -
-    // ohne Datenbestand gibt es sonst keine Tabellenzeile.
-    const planer = document.querySelector("#vacationPlanner");
-    planer.innerHTML =
-      '<table class="vacation-table"><tbody><tr><td class="vacation-day-cell"><button type="button" data-probe="tag"></button></td></tr></tbody></table>';
     const auswahl = document.querySelector("[data-theme-select]");
     const ergebnis = {};
     for (const thema of themen) {
       auswahl.value = thema;
       auswahl.dispatchEvent(new Event("change", { bubbles: true }));
+      // Ein leeres Feld an einem Werktag - ohne Eintrag, ohne Wochenendtönung.
+      const tag = [...document.querySelectorAll(".vacation-day-cell")].find(
+        (zelle) =>
+          !zelle.className.includes("vacation-weekend") &&
+          !zelle.className.includes("vacation-holiday") &&
+          !zelle.querySelector("button[class*='planner-entry-']"),
+      );
       ergebnis[thema] = {
-        tag: getComputedStyle(planer.querySelector('[data-probe="tag"]')).backgroundColor,
+        tag: getComputedStyle(tag.querySelector("button")).backgroundColor,
         suche: getComputedStyle(document.querySelector("#vacationEmployeeSearch")).backgroundColor,
         monat: getComputedStyle(document.querySelector("#vacationMonth")).backgroundColor,
       };
