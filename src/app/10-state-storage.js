@@ -119,6 +119,7 @@
         vacationWeekdayAbsenceLimit: DEFAULT_WEEKDAY_ABSENCE_LIMIT,
         vacationWeekendAbsenceLimit: DEFAULT_WEEKEND_ABSENCE_LIMIT,
         vacationSortGroupOrder: [...DEFAULT_VACATION_SORT_GROUP_ORDER],
+        vacationCarryOverExpiry: DEFAULT_VACATION_CARRY_OVER_EXPIRY,
         serviceWeekends: {
           weekend_a: {
             name: SERVICE_WEEKENDS.weekend_a,
@@ -510,6 +511,9 @@
         vacationSortGroupOrder: normalizeVacationSortGroupOrder(
           parsed.settings?.vacationSortGroupOrder,
         ),
+        vacationCarryOverExpiry: normalizeCarryOverExpiry(
+          parsed.settings?.vacationCarryOverExpiry,
+        ),
         serviceWeekends,
         deadlineKinds: normalizeDeadlineKinds(parsed.settings?.deadlineKinds),
         deadlineHideOverdue: Boolean(parsed.settings?.deadlineHideOverdue),
@@ -714,6 +718,20 @@
       ...kept,
       ...DEFAULT_VACATION_SORT_GROUP_ORDER.filter((key) => !kept.includes(key)),
     ];
+  }
+
+  // Stichtag im Format MM-TT, gueltig in jedem Jahr - der 29. Februar
+  // faellt deshalb heraus.
+  function normalizeCarryOverExpiry(value) {
+    const text = String(value || "");
+    const match = /^(\d{2})-(\d{2})$/.exec(text);
+    if (!match) return DEFAULT_VACATION_CARRY_OVER_EXPIRY;
+    const month = Number(match[1]);
+    const day = Number(match[2]);
+    const probe = new Date(2001, month - 1, day, 12);
+    return probe.getMonth() === month - 1 && probe.getDate() === day
+      ? text
+      : DEFAULT_VACATION_CARRY_OVER_EXPIRY;
   }
 
   function normalizeProfession(value) {
@@ -1101,6 +1119,8 @@
       year,
       additionalDays:
         Math.round(clampNumber(entitlement.additionalDays, 0, 30, 0) * 2) / 2,
+      carryOverDays:
+        Math.round(clampNumber(entitlement.carryOverDays, 0, 60, 0) * 2) / 2,
     };
   }
 

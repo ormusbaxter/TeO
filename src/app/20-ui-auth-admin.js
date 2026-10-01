@@ -372,6 +372,10 @@
         ? elements.vacationEntryType.value
         : "vacation";
     });
+    elements.carryOverVacationButton.addEventListener(
+      "click",
+      requestVacationCarryOver,
+    );
     elements.vacationSortMode.addEventListener("change", () => {
       vacationSortMode = Object.hasOwn(
         VACATION_SORT_MODES,

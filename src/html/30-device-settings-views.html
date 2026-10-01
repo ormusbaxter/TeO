@@ -415,6 +415,18 @@
                   <input id="vacationWeekendAbsenceLimit" type="number" min="1" max="100" step="1" />
                 </label>
                 <label class="settings-field">
+                  <span>Resturlaub verfällt am</span>
+                  <input
+                    id="vacationCarryOverExpiry"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="31.03."
+                    maxlength="6"
+                    aria-describedby="vacationCarryOverExpiryHint"
+                  />
+                  <small id="vacationCarryOverExpiryHint">Tag und Monat, z. B. 31.03.</small>
+                </label>
+                <label class="settings-field">
                   <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
                   <input id="vacationWeekendAReferenceSaturday" type="date" />
                 </label>

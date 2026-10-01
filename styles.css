@@ -10689,7 +10689,24 @@ body.is-vacation-planner-maximized {
 
 .vacation-table tr > .vacation-total-column:nth-last-child(5) {
   right: calc(var(--vacation-total-width) * 4);
+}
+
+.vacation-table tr > .vacation-total-column:nth-last-child(6) {
+  right: calc(var(--vacation-total-width) * 5);
   box-shadow: -8px 0 12px -12px rgb(16 34 54 / 65%);
+}
+
+.vacation-table td.vacation-carry-over-expiring {
+  background: var(--orange-100) !important;
+}
+
+.vacation-table td.vacation-carry-over-expiring input {
+  border-color: var(--orange-700);
+}
+
+.vacation-table td.vacation-carry-over-expired input {
+  color: var(--slate-500);
+  text-decoration: line-through;
 }
 
 .vacation-additional-input {
@@ -11968,6 +11985,11 @@ body.is-dragging-appointment .appointment-calendar-entry {
   outline: 2px dashed var(--blue-600);
   outline-offset: -2px;
   background: var(--blue-50);
+}
+
+.settings-field small {
+  color: var(--slate-500);
+  font-size: 0.7rem;
 }
 
 @page phone-list {
