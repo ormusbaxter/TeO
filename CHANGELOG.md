@@ -1,3 +1,8 @@
+### 4.48.0 – Monatswechsel direkt in der Planungstabelle
+
+- **Neu:** In der Urlaubsplanung trägt die erste Zelle der Tabelle neben Monat und Jahr zwei Pfeile. Sie blättern zum vorherigen beziehungsweise nächsten Monat, auch über den Jahreswechsel hinweg. Die bisherigen Pfeile in der Kopfleiste der Planungstabelle entfallen dafür
+- **Verbessert:** Zwischen Steuerleiste und Planungstabelle stehen keine Kennzahlen-Kacheln mehr; die Tabelle rückt damit nach oben
+
 ### 4.47.0 – Mehrplatzbetrieb und leere Monatsplanungen
 
 - **Behoben:** Ein Konto galt bisher nur an dem Arbeitsplatz, an dem es angelegt wurde. Der Startabgleich lud zwar den gemeinsamen Datenbestand, behielt aber die örtlichen Konten und verwarf die aus der Datei – beim nächsten Sichern verschwanden sie auch dort. Der Startabgleich übernimmt die Konten jetzt aus `teo-autosicherung.json`; ein einmal angelegtes Konto arbeitet damit an jedem Arbeitsplatz mit seinem Passwort. Der Import von Hand lässt die vorhandenen Konten unverändert wie bisher

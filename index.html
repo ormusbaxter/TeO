@@ -867,7 +867,6 @@
             </div>
           </section>
 
-          <div class="training-summary vacation-summary" id="vacationSummary"></div>
           <section
             class="panel vacation-planner-panel"
             id="vacationPlannerWidget"
@@ -879,24 +878,6 @@
                 <h2 id="vacationPlannerWidgetTitle">Planungstabelle</h2>
               </div>
               <div class="vacation-planner-widget-actions">
-                <button
-                  class="icon-button vacation-month-navigation vacation-month-previous"
-                  id="previousVacationMonthButton"
-                  type="button"
-                  aria-label="Vorheriger Monat"
-                  title="Vorheriger Monat"
-                >
-                  <svg><use href="#icon-chevron"></use></svg>
-                </button>
-                <button
-                  class="icon-button vacation-month-navigation"
-                  id="nextVacationMonthButton"
-                  type="button"
-                  aria-label="Nächster Monat"
-                  title="Nächster Monat"
-                >
-                  <svg><use href="#icon-chevron"></use></svg>
-                </button>
                 <button
                   class="button button-secondary button-compact"
                   id="toggleVacationPlannerMaximizeButton"
@@ -2333,7 +2314,7 @@
 <p><strong>Nachtdienst</strong> ist keine Abwesenheit und verbraucht keinen Urlaubstag.</p>
 <h3 id="hilfe-monatsplanung">Monatsplanung</h3>
 <ol><li>Jahr und Monat auswählen.</li><li>Gewünschte Eintragsart festlegen.</li><li>In der Zeile des Mitarbeiters auf den entsprechenden Tag klicken.</li><li>Ein erneuter Klick beziehungsweise die Auswahl „Kein Eintrag“ entfernt den Planungseintrag.</li></ol>
-<p>Der zuletzt gewählte Monat und das Planungsjahr werden im Browser gespeichert. In der maximierten Planung blättern die Pfeilschaltflächen über der Tabelle durch die Monate; dort bleibt oberhalb der Tabelle nur die kompakte, mit den farbigen Tabellensymbolen dargestellte Tastaturbelegung sichtbar.</p>
+<p>Der zuletzt gewählte Monat und das Planungsjahr werden im Browser gespeichert. Die beiden Pfeile in der ersten Zelle der Tabelle – neben Monat und Jahr – blättern zum vorherigen beziehungsweise nächsten Monat, auch über den Jahreswechsel hinweg. In der maximierten Planung bleibt oberhalb der Tabelle nur die kompakte, mit den farbigen Tabellensymbolen dargestellte Tastaturbelegung sichtbar.</p>
 <p>Die Kopfzeile bleibt beim vertikalen Scrollen sichtbar. Wochenenden, Feiertage, Schulferien und die beiden Dienstwochenenden werden farblich unterschieden.</p>
 <p>Unter dem Namen des Mitarbeiters stehen das feste <strong>Dienstwochenende</strong> und der Beschäftigungsgrad. Der Beschäftigungsstatus bleibt im Tooltip der Zeile sichtbar.</p>
 <p>Ein <strong>Geburtstag</strong> ist an der goldenen Schraffur des Tagesfeldes erkennbar; der Tooltip nennt das erreichte Lebensjahr. Fällt der Geburtstag auf den</p>
@@ -2347,7 +2328,7 @@
 <h3 id="hilfe-mit-der-maus-uber-mehrere-tage-ziehen">Mit der Maus über mehrere Tage ziehen</h3>
 <p>Im Monatsraster lässt sich mit gedrückter Maustaste über mehrere Felder ziehen – auch über mehrere Zeilen hinweg. Beim Loslassen erhalten alle überstrichenen Felder die in der Leiste gewählte Eintragsart. Das entspricht der Bereichsauswahl über <strong>Umschalt + Pfeiltaste</strong> und ist wie jede andere Änderung zurücknehmbar. Ein einzelner Klick setzt weiterhin genau ein Feld.</p>
 <h3 id="hilfe-nach-mitarbeitern-filtern">Nach Mitarbeitern filtern</h3>
-<p>Das Suchfeld <strong>Mitarbeiter</strong> blendet alle Zeilen aus, die nicht zum Suchbegriff passen; gesucht wird in Vor- und Nachname sowie im Benutzernamen. Die Kennzahlen über der Tabelle und sämtliche Tagesgrenzen beziehen sich weiterhin auf das gesamte Team, damit ein Filter die Auslastung nicht verfälscht. Ist ein Filter aktiv, weist ein Hinweis über der Tabelle darauf hin.</p>
+<p>Das Suchfeld <strong>Mitarbeiter</strong> blendet alle Zeilen aus, die nicht zum Suchbegriff passen; gesucht wird in Vor- und Nachname sowie im Benutzernamen. Die Tagesgrenzen beziehen sich weiterhin auf das gesamte Team, damit ein Filter die Auslastung nicht verfälscht. Ist ein Filter aktiv, weist ein Hinweis über der Tabelle darauf hin.</p>
 <h3 id="hilfe-abwesenheitsgrenzen">Abwesenheitsgrenzen</h3>
 <p>Standardmäßig gelten:</p>
 <ul><li>Werktage: höchstens 8 gleichzeitig abwesende Mitarbeiter</li><li>Wochenenden und Feiertage: höchstens 5 gleichzeitig abwesende Mitarbeiter</li></ul>
@@ -2583,6 +2564,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-48-0-monatswechsel-direkt-in-der-planungstabelle">4.48.0 – Monatswechsel direkt in der Planungstabelle</h3>
+<ul><li><strong>Neu:</strong> In der Urlaubsplanung trägt die erste Zelle der Tabelle neben Monat und Jahr zwei Pfeile. Sie blättern zum vorherigen beziehungsweise nächsten Monat, auch über den Jahreswechsel hinweg. Die bisherigen Pfeile in der Kopfleiste der Planungstabelle entfallen dafür</li><li><strong>Verbessert:</strong> Zwischen Steuerleiste und Planungstabelle stehen keine Kennzahlen-Kacheln mehr; die Tabelle rückt damit nach oben</li></ul>
 <h3 id="hilfe-4-47-0-mehrplatzbetrieb-und-leere-monatsplanungen">4.47.0 – Mehrplatzbetrieb und leere Monatsplanungen</h3>
 <ul><li><strong>Behoben:</strong> Ein Konto galt bisher nur an dem Arbeitsplatz, an dem es angelegt wurde. Der Startabgleich lud zwar den gemeinsamen Datenbestand, behielt aber die örtlichen Konten und verwarf die aus der Datei – beim nächsten Sichern verschwanden sie auch dort. Der Startabgleich übernimmt die Konten jetzt aus <code>teo-autosicherung.json</code>; ein einmal angelegtes Konto arbeitet damit an jedem Arbeitsplatz mit seinem Passwort. Der Import von Hand lässt die vorhandenen Konten unverändert wie bisher</li><li><strong>Behoben:</strong> Ein zweiter Arbeitsplatz erzeugte für dieselbe Datei einen neuen Sicherungsschlüssel und machte den bisherigen damit wertlos. Der Schlüssel gehört jetzt zum Datenbestand: Sein Verzeichnis mit den Schlüsselhüllen aller Konten reist in der gemeinsamen Datei mit. Jeder Arbeitsplatz entsperrt ihn mit dem gewohnten Login-Passwort – ein einmal geschützter Datenbestand bleibt ohne neues Passwort bearbeitbar</li><li><strong>Neu:</strong> Beim ersten Start an einem weiteren Arbeitsplatz fragt TeO, ob ein neuer Datenbestand entstehen oder der vorhandene geöffnet werden soll. <strong>Vorhandenen Datenbestand öffnen</strong> gibt den Sicherungsordner frei und meldet mit dem bereits vorhandenen Konto an; Ordnerverknüpfung, Schlüssel und Daten kommen in einem Schritt. Die frühere Pflicht-Ersteinrichtung entfällt damit</li><li><strong>Neu:</strong> Der Startdialog gibt wahlweise den Sicherungsordner frei, statt nur die einzelne Datei zu wählen. Die Verknüpfung gilt dann auch für die nächste Sitzung, und die Dateiauswahl entfällt künftig</li><li><strong>Neu:</strong> Hat ein anderer Arbeitsplatz <code>teo-autosicherung.json</code> zwischenzeitlich geschrieben, überschreibt TeO sie nicht mehr stillschweigend, sondern meldet es. Über <strong>Jetzt automatisch sichern</strong> lässt sich nach ausdrücklicher Bestätigung dennoch überschreiben</li><li><strong>Verbessert:</strong> Ein an einem anderen Arbeitsplatz angelegtes Konto bekommt seine Schlüsselhülle beim ersten Login selbst. Nach dem Wiederherstellungsschlüssel fragt TeO erst, wenn auch das Verzeichnis der gemeinsamen Datei keine passende Hülle kennt</li><li><strong>Neu:</strong> Die Urlaubsplanung druckt <strong>leere Monatsplanungen</strong>: je Monat des gewählten Jahres ein DIN-A4-Blatt quer, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch untereinander – nach Nachname, Vorname – und die Tage des Monats als Spalten. Unter jedem Namen stehen Beschäftigungsumfang und Jahresurlaubsanspruch. Feiertage, Schulferien und das eigene Dienstwochenende sind vermerkt, die Felder bleiben leer. Wer nur einen Monat braucht, wählt die Seiten im Druckdialog</li><li><strong>Neu:</strong> Braucht ein Monat mehr als ein Blatt – auf eines passen 20 Mitarbeiter –, trägt jedes Blatt den Monat im Kopf und daneben <strong>Seite x von y</strong> für diesen Monat. So lässt sich ein Stapel wieder sortieren</li><li><strong>Verbessert:</strong> Das Handbuch beschreibt jetzt beide leeren Vordrucke – die Jahresübersicht je Mitarbeiter und die neue Monatsplanung</li></ul>
 <h3 id="hilfe-4-45-0-neue-farbthemen-und-schlankerer-start">4.45.0 – Neue Farbthemen und schlankerer Start</h3>

@@ -784,7 +784,6 @@
     vacationBlankMonthPrintSurface: document.querySelector(
       "#vacationBlankMonthPrintSurface",
     ),
-    vacationSummary: document.querySelector("#vacationSummary"),
     vacationPlannerWidget: document.querySelector("#vacationPlannerWidget"),
     vacationPlanner: document.querySelector("#vacationPlanner"),
     toggleVacationPlannerMaximizeButton: document.querySelector(
@@ -796,10 +795,6 @@
     vacationPlannerMaximizeLabel: document.querySelector(
       "#vacationPlannerMaximizeLabel",
     ),
-    previousVacationMonthButton: document.querySelector(
-      "#previousVacationMonthButton",
-    ),
-    nextVacationMonthButton: document.querySelector("#nextVacationMonthButton"),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),
@@ -3008,12 +3003,6 @@
     elements.toggleVacationPlannerMaximizeButton.addEventListener(
       "click",
       toggleVacationPlannerMaximized,
-    );
-    elements.previousVacationMonthButton.addEventListener("click", () =>
-      shiftVacationMonth(-1),
-    );
-    elements.nextVacationMonthButton.addEventListener("click", () =>
-      shiftVacationMonth(1),
     );
     document.addEventListener("keydown", handleVacationPlannerMaximizeKeydown);
     elements.vacationConflictContent.addEventListener("click", (event) => {
@@ -9243,47 +9232,6 @@
     const schoolVacationCoverageNote = schoolVacations.size
       ? "Hinterlegte Schulferien sind berücksichtigt; bewegliche Ferientage sind nicht enthalten."
       : "Für dieses Jahr sind keine Schulferien hinterlegt. Sie lassen sich unter Einstellungen → Schulferien ergänzen.";
-    const monthEntries = state.vacationDays.filter(
-      (vacationDay) =>
-        getEmployee(vacationDay.employeeId)?.active &&
-        vacationDay.date.startsWith(
-          `${vacationYear}-${String(vacationMonth).padStart(2, "0")}-`,
-        ),
-    );
-    const monthAbsenceCount = monthEntries.filter(
-      (entry) => PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
-    ).length;
-    const monthDutyCount = monthEntries.filter(
-      (entry) => entry.type === "mandatoryDuty",
-    ).length;
-    const capacityDays = dates.filter((date) => {
-      const stats = getPlannerDayStats(date, holidays);
-      return stats.absenceCount >= stats.limit;
-    }).length;
-    // Die Kennzahlen beschreiben immer das gesamte Team. Ein Namensfilter
-    // schraenkt nur die sichtbaren Zeilen ein, nicht die Auslastung des Monats.
-    const totalEntitlement = allEmployees.reduce(
-      (sum, employee) => sum + getVacationEntitlement(employee, vacationYear).total,
-      0,
-    );
-    const totalPlanned = allEmployees.reduce(
-      (sum, employee) => sum + getPlannedVacationDays(employee.id, vacationYear),
-      0,
-    );
-
-    elements.vacationSummary.innerHTML = `
-      ${renderSummaryChip("calendar", formatVacationNumber(totalEntitlement), "Urlaubsanspruch gesamt")}
-      ${renderSummaryChip("check", totalPlanned, "Urlaubstage im Jahr geplant", "teal")}
-      ${renderSummaryChip("calendar", monthAbsenceCount, "Abwesenheiten im Monat", "orange")}
-      ${renderSummaryChip("users", monthDutyCount, "Dienstzusagen im Monat", "blue")}
-      ${renderSummaryChip(
-        "alert",
-        capacityDays,
-        "Tage an oder über Grenze",
-        capacityDays ? "orange" : "blue",
-      )}
-    `;
-
     if (allEmployees.length === 0) {
       elements.vacationPlanner.innerHTML = renderEmptyState({
         title: "Keine aktiven Mitarbeiter",
@@ -9331,9 +9279,29 @@
         <table class="vacation-table">
           <thead>
             <tr>
-              <th class="vacation-employee-column" scope="col">${escapeHtml(
-                selectedMonthLabel,
-              )}</th>
+              <th class="vacation-employee-column" scope="col">
+                <div class="vacation-month-heading">
+                  <button
+                    class="icon-button vacation-month-navigation vacation-month-previous"
+                    type="button"
+                    data-vacation-month-shift="-1"
+                    aria-label="Vorheriger Monat"
+                    title="Vorheriger Monat (Bild ↑)"
+                  >
+                    <svg><use href="#icon-chevron"></use></svg>
+                  </button>
+                  <span class="vacation-month-label">${escapeHtml(selectedMonthLabel)}</span>
+                  <button
+                    class="icon-button vacation-month-navigation"
+                    type="button"
+                    data-vacation-month-shift="1"
+                    aria-label="Nächster Monat"
+                    title="Nächster Monat (Bild ↓)"
+                  >
+                    <svg><use href="#icon-chevron"></use></svg>
+                  </button>
+                </div>
+              </th>
               ${dates
                 .map((date) =>
                   renderVacationDayHeader(date, holidays, schoolVacations),
@@ -10679,6 +10647,12 @@
   }
 
   async function handleVacationPlannerClick(event) {
+    const monthShiftButton = event.target.closest("[data-vacation-month-shift]");
+    if (monthShiftButton) {
+      shiftVacationMonth(Number(monthShiftButton.dataset.vacationMonthShift));
+      return;
+    }
+
     const employeeOverviewButton = event.target.closest(
       "[data-vacation-employee-overview]",
     );
