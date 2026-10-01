@@ -1,3 +1,8 @@
+### 4.49.1 – Urlaubsplanung in dunklen Farbthemen
+
+- **Behoben:** In den dunklen Farbthemen – Dark Mode, Nord, Dracula, Gruvbox Dark, Tokyo Night und GitHub Dark – standen die leeren Tagesfelder der Urlaubsplanung als hellgraue Kacheln da. Sie übernehmen jetzt die Kartenfarbe des Schemas
+- **Behoben:** Das Suchfeld **Mitarbeiter** der Urlaubsplanung trug den Standardstil des Browsers – in dunklen Themen grau, in hellen mit schwarzem Rahmen. Es sieht jetzt aus wie die Auswahlfelder daneben
+
 ### 4.49.0 – Nachname, Vorname und Farbthemen GitHub
 
 - **Verbessert:** Mitarbeiter heißen jetzt überall **Nachname, Vorname** – in Listen, Akten, Schnellansicht, Befehlspalette, Auswahlfeldern, Meldungen, Telefonliste und CSV-Export. Die Suchfelder finden einen Namen weiterhin auch in der Reihenfolge „Vorname Nachname“

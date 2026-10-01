@@ -4091,6 +4091,7 @@ body.is-sidebar-collapsed
   font-weight: 750;
 }
 
+.compact-field input,
 .compact-field select,
 .bulk-attendance-bar select,
 .attendance-status-field select {
@@ -4105,6 +4106,7 @@ body.is-sidebar-collapsed
   background: white;
 }
 
+.compact-field input:focus,
 .compact-field select:focus,
 .bulk-attendance-bar select:focus,
 .attendance-status-field select:focus {
@@ -8267,6 +8269,7 @@ html[data-theme="cellitinnen"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -8337,6 +8340,7 @@ html[data-theme="cellitinnen-red"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -8457,6 +8461,7 @@ html[data-theme="dark"] :is(
     .button-ghost,
     .segmented-control button.is-active,
     .icon-button:hover,
+    .compact-field input,
     .compact-field select,
     .bulk-attendance-bar select,
     .attendance-status-field select,
@@ -8829,6 +8834,7 @@ html[data-theme="tokyo-night"] {
     .button-ghost,
     .segmented-control button.is-active,
     .icon-button:hover,
+    .compact-field input,
     .compact-field select,
     .bulk-attendance-bar select,
     .attendance-status-field select,
@@ -9078,6 +9084,7 @@ html[data-theme="solarized-light"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -9172,6 +9179,7 @@ html[data-theme="catppuccin-latte"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -9278,6 +9286,7 @@ html[data-theme="github"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -10553,7 +10562,9 @@ body.is-vacation-planner-maximized {
   font-weight: 900;
   border: 1px solid transparent;
   border-radius: 7px;
-  background: rgb(255 255 255 / 48%);
+  /* Aus der Flaechenmarke statt festem Weiss: In den dunklen Schemata ist
+     --white die dunkle Kartenflaeche, das leere Feld bleibt also dunkel. */
+  background: color-mix(in srgb, var(--white) 48%, transparent);
 }
 
 /* Der globale Fokusrahmen liegt 2 px ausserhalb und wuerde in der dichten

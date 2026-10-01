@@ -54,6 +54,7 @@ html[data-theme="cellitinnen"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -124,6 +125,7 @@ html[data-theme="cellitinnen-red"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -244,6 +246,7 @@ html[data-theme="dark"] :is(
     .button-ghost,
     .segmented-control button.is-active,
     .icon-button:hover,
+    .compact-field input,
     .compact-field select,
     .bulk-attendance-bar select,
     .attendance-status-field select,
@@ -616,6 +619,7 @@ html[data-theme="tokyo-night"] {
     .button-ghost,
     .segmented-control button.is-active,
     .icon-button:hover,
+    .compact-field input,
     .compact-field select,
     .bulk-attendance-bar select,
     .attendance-status-field select,
@@ -865,6 +869,7 @@ html[data-theme="solarized-light"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -959,6 +964,7 @@ html[data-theme="catppuccin-latte"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
@@ -1065,6 +1071,7 @@ html[data-theme="github"] :is(
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus,
+    .compact-field input:focus,
     .compact-field select:focus,
     .bulk-attendance-bar select:focus,
     .attendance-status-field select:focus
