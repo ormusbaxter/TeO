@@ -85,20 +85,25 @@ function startServer() {
 // Die Demodatenbank: 60 Mitarbeiter mit Qualifikationen, Fortbildungen,
 // Sitzungen und Geräteeinweisungen. Sie wird einmal gelesen und je Aufruf
 // kopiert, damit ein Test die Vorlage nicht für den nächsten verändert.
-let demoState = null;
+let demoBackup = null;
 
-function loadDemoState() {
-  if (!demoState) {
-    const backup = JSON.parse(
+function loadDemoBackup() {
+  if (!demoBackup) {
+    demoBackup = JSON.parse(
       fs.readFileSync(
         path.join(projectRoot, "demo", "teo-demo-datenbank-60-ma-2025-2026.json"),
         "utf8",
       ),
     );
-    demoState = backup.state || backup.data || backup;
   }
-  return structuredClone(demoState);
+  return structuredClone(demoBackup);
 }
+
+// Die Konten der Demodatenbank (siehe demo/README.md).
+const DEMO_KONTEN = {
+  admin: { username: "DemoAdmin", password: "DemoStart2026!" },
+  user: { username: "DemoUser1", password: "DemoUser2026!" },
+};
 
 // Öffnet TeO und liefert eine Handhabe darauf - oder null, wenn Playwright
 // fehlt; dann ist der Test bereits als übersprungen vermerkt.
@@ -115,6 +120,11 @@ function loadDemoState() {
 //   { year: 2026, month: 7, sort: "qualification" }
 // - neustart: startet TeO im Kontext des vorigen Aufrufs neu, mit dessen
 //   Speicher - für die Frage, ob etwas den nächsten Start überlebt
+// - anmeldenAls: "admin" oder "user" - meldet sich wirklich an, mit einem
+//   Konto der Demodatenbank, und durchläuft den Startabgleich mit derselben
+//   Datei. Anders als angemeldetAls, das nur die Sperre löst und die Rolle an
+//   der Oberfläche setzt, ist danach intern jemand angemeldet: Was Rechte
+//   prüft, verhält sich wie im Betrieb. Lädt die Demodaten von selbst.
 export async function openTeO(
   t,
   {
@@ -122,8 +132,12 @@ export async function openTeO(
     mitDemodaten = false,
     urlaubsansicht = null,
     neustart = false,
+    anmeldenAls = "",
   } = {},
 ) {
+  if (anmeldenAls && !DEMO_KONTEN[anmeldenAls]) {
+    throw new Error(`Unbekannte Rolle für anmeldenAls: ${anmeldenAls}`);
+  }
   const playwright = await loadPlaywright();
   if (!playwright) {
     t.skip("Playwright ist nicht installiert - „npm ci“ holt es nach");
@@ -159,12 +173,20 @@ export async function openTeO(
   });
 
   const { port } = shared;
-  if (mitDemodaten || urlaubsansicht) {
+  const sicherung = mitDemodaten || anmeldenAls ? loadDemoBackup() : null;
+  const bestand = sicherung ? sicherung.data : null;
+  if (bestand) {
+    if (typeof mitDemodaten === "function") mitDemodaten(bestand);
+    // Die Benutzerkonten der Demo verlangen beim ersten Anmelden ein neues
+    // Passwort. Für den Test ist das bereits geschehen.
+    bestand.users.forEach((user) => {
+      user.mustChangePassword = false;
+    });
+  }
+  if (bestand || urlaubsansicht) {
     // Vor dem ersten Laden ablegen: TeO übernimmt einen Bestand unter dem
     // früheren localStorage-Schlüssel beim Start in seinen Speicher - der
     // Weg, auf dem auch ältere Installationen ihre Daten mitbringen.
-    const bestand = mitDemodaten ? loadDemoState() : null;
-    if (typeof mitDemodaten === "function") mitDemodaten(bestand);
     await page.addInitScript(
       ([daten, ansicht]) => {
         if (sessionStorage.getItem("teo-test-seeded")) return;
@@ -181,9 +203,32 @@ export async function openTeO(
   }
   await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
   await page.waitForFunction(() => Boolean(window.TeOProjectMeta), null, { timeout: 15000 });
-  if (mitDemodaten) {
+  if (bestand) {
     await page.waitForFunction(
       () => Number(document.querySelector("#navEmployeeCount")?.textContent) > 0,
+      null,
+      { timeout: 15000 },
+    );
+  }
+  if (anmeldenAls) {
+    const konto = DEMO_KONTEN[anmeldenAls];
+    await page.waitForSelector("#loginDialog[open]");
+    await page.fill("#loginUsername", konto.username);
+    await page.fill("#loginPassword", konto.password);
+    await page.evaluate(() => document.querySelector("#loginForm").requestSubmit());
+    // Der Startabgleich verlangt die gemeinsame Sicherungsdatei. Es ist
+    // dieselbe Sicherung, mit der TeO gestartet wurde - auch ein angepasster
+    // Bestand bleibt dabei erhalten.
+    await page.waitForSelector("#startupBackupDialog[open]");
+    await page.setInputFiles("#startupBackupFile", {
+      name: "teo-autosicherung.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(sicherung)),
+    });
+    await page.waitForFunction(
+      () =>
+        !document.body.classList.contains("is-auth-locked") &&
+        !document.querySelector("dialog[open]"),
       null,
       { timeout: 15000 },
     );

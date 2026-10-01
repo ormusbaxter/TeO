@@ -10,6 +10,9 @@ Enthalten sind:
 - Pflichtfortbildungen und plausible Abschlüsse für 2025 und 2026
 - der unveränderte Gerätekatalog der Anwendung
 - plausible Geräteeinweisungen für 2025 und Januar bis Juli 2026
+- eine Urlaubs- und Abwesenheitsplanung für 2025 und 2026 mit Zusatzurlaub,
+  Resturlaub-Übertrag nach 2026 sowie einzelnen Schul-, Nachtdienst- und
+  Dienstzusage-Einträgen
 
 Die Datei kann unter **Einstellungen → Gesamten Datenbestand sichern →
 Sicherung importieren** geladen werden. Der Import ersetzt den gesamten

@@ -1,3 +1,10 @@
+### 4.52.0 – Gruppen in der Planungstabelle und Demo mit Urlaubsplanung
+
+- **Neu:** Bei der Sortierung nach Qualifikation beginnt jede Gruppe der Planungstabelle mit einer Zwischenzeile, die ihren Namen und die Zahl ihrer Mitarbeiter nennt. Wer in keine Gruppe passt, steht unter „Ohne Gruppe“
+- **Neu:** Die Demodatenbank enthält eine Urlaubs- und Abwesenheitsplanung für 2025 und 2026 – mit Zusatzurlaub, Resturlaub-Übertrag nach 2026 und einzelnen Schul-, Nachtdienst- und Dienstzusage-Einträgen
+- **Behoben:** Auswahl- und Eingabefelder trugen festes Weiß statt der Flächenfarbe des Farbthemas. In getönten hellen Themen wie Solarized Light passen sie sich jetzt an
+- **Behoben:** Der Eintrag zu 4.48.0 nannte ITA noch „Intensivtransportassistent/in“; gemeint ist Intensivtechnische/r Assistent/in
+
 ### 4.51.0 – Änderungsverlauf je Mitarbeiter
 
 - **Neu:** Die Mitarbeiter-Akte zeigt Administratoren einen **Änderungsverlauf**: wann, durch wen und was an diesem Mitarbeiter geändert wurde – Stammdaten mit den betroffenen Feldern, Abwesenheiten, Urlaubsanspruch, Fortbildungsnachweise, Sitzungsteilnahmen und Geräteeinweisungen. Auch ein zurückgenommener Schritt erscheint dort
