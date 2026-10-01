@@ -273,6 +273,7 @@
     pflegefachkraft: "Pflegefachkraft",
     onboarding: "Aktuell in Einarbeitung",
     ita: "ITA",
+    pflegefachassistenz: "Pflegefachassistenz",
     mfa: "MFA",
     stationsassistenz: "Stationsassistenz",
   });
