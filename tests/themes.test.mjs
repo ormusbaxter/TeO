@@ -13,6 +13,7 @@ const THEMEN = [
   ["gruvbox-dark", "Gruvbox Dark"],
   ["tokyo-night", "Tokyo Night"],
   ["catppuccin-latte", "Catppuccin Latte"],
+  ["github", "GitHub"],
   ["windows-95", "Windows 95"],
 ];
 
@@ -126,6 +127,7 @@ test("Text und Flächen jedes Schemas sind lesbar", async (t) => {
     );
   }
   assert.doesNotMatch(gemessen["catppuccin-latte"].farbschema, /^dark$/);
+  assert.doesNotMatch(gemessen.github.farbschema, /^dark$/);
 });
 
 test("Ein gewähltes Schema gilt sofort und bleibt erhalten", async (t) => {
