@@ -14,10 +14,11 @@ const THEMEN = [
   ["tokyo-night", "Tokyo Night"],
   ["catppuccin-latte", "Catppuccin Latte"],
   ["github", "GitHub"],
+  ["github-dark", "GitHub Dark"],
   ["windows-95", "Windows 95"],
 ];
 
-const DUNKLE_THEMEN = ["dark", "nord", "dracula", "gruvbox-dark", "tokyo-night"];
+const DUNKLE_THEMEN = ["dark", "nord", "dracula", "gruvbox-dark", "tokyo-night", "github-dark"];
 
 function relativeHelligkeit([r, g, b]) {
   const kanal = (wert) => {

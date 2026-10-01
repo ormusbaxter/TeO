@@ -1142,7 +1142,8 @@ body.is-vacation-planner-maximized {
     html[data-theme="nord"],
     html[data-theme="dracula"],
     html[data-theme="gruvbox-dark"],
-    html[data-theme="tokyo-night"]
+    html[data-theme="tokyo-night"],
+    html[data-theme="github-dark"]
   ) :is(
     .legend-weekend-weekend_a,
     .vacation-weekend-weekend_a,
@@ -1156,7 +1157,8 @@ body.is-vacation-planner-maximized {
     html[data-theme="nord"],
     html[data-theme="dracula"],
     html[data-theme="gruvbox-dark"],
-    html[data-theme="tokyo-night"]
+    html[data-theme="tokyo-night"],
+    html[data-theme="github-dark"]
   ) :is(
     .legend-weekend-weekend_b,
     .vacation-weekend-weekend_b,

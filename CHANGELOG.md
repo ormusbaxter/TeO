@@ -1,6 +1,7 @@
-### 4.49.0 – Farbthema GitHub
+### 4.49.0 – Farbthemen GitHub und GitHub Dark
 
 - **Neu:** Das Farbthema **GitHub** übernimmt die helle Palette von GitHub: weiße Karten mit feinem grauen Rand auf hellgrauem Grund, Links und Fokusrahmen im GitHub-Blau, die Hauptaktion im Grün der GitHub-Schaltflächen und eine dunkelgraue Seitenleiste wie die klassische GitHub-Kopfzeile. Zu finden unter **Einstellungen → Allgemein → Aktives Farbthema**
+- **Neu:** **GitHub Dark** ist das dunkle Gegenstück nach der Primer-Palette „dark default“: fast schwarzer Grund, dunkelgraue Karten mit feinem Rand, helle Schrift, Akzente im hellen GitHub-Blau, die Hauptaktion grün. Formularfelder, Bildlaufleisten und der Datumswähler erscheinen dabei ebenfalls dunkel
 
 ### 4.48.0 – Monatswechsel und Sortierung in der Planungstabelle
 

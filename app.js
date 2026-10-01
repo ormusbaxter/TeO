@@ -204,6 +204,7 @@
     "tokyo-night": "Tokyo Night",
     "catppuccin-latte": "Catppuccin Latte",
     github: "GitHub",
+    "github-dark": "GitHub Dark",
     "windows-95": "Windows 95",
     cellitinnen: "Cellitinnen",
     "cellitinnen-red": "Cellitinnen Rot",
@@ -214,6 +215,7 @@
     "dracula",
     "gruvbox-dark",
     "tokyo-night",
+    "github-dark",
   ]);
 
   const PASSWORD_ITERATIONS = 210000;

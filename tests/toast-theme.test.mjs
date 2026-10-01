@@ -48,6 +48,7 @@ const THEMEN = [
   "tokyo-night",
   "catppuccin-latte",
   "github",
+  "github-dark",
   "cellitinnen",
   "cellitinnen-red",
   "windows-95",
