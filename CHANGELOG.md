@@ -1,3 +1,9 @@
+### 4.50.0 – Resturlaub aus dem Vorjahr
+
+- **Neu:** Die Urlaubsplanung kennt den **Resturlaub aus dem Vorjahr**. Die neue Spalte **Übertrag** steht zwischen Zusatz und Anspruch und lässt sich je Mitarbeiter eintragen
+- **Neu:** **Resturlaub übernehmen** über der Planungstabelle trägt für alle Mitarbeiter den Rest des Vorjahres als Übertrag ein. Wer im Vorjahr keinen Planungseintrag hat, bleibt unverändert; die Übernahme lässt sich zurücknehmen
+- **Neu:** Übertragener Resturlaub verfällt, soweit er nicht bis zum **31.03.** geplant ist. Vorher hebt TeO die betroffenen Mitarbeiter orange hervor und nennt sie über der Tabelle; danach zählt der verfallene Teil nicht mehr zum Anspruch. Der Stichtag lässt sich unter **Einstellungen → Planung** ändern
+
 ### 4.49.2 – ITA heißt Intensivtechnische/r Assistent/in
 
 - **Behoben:** Die Gruppe **ITA** der Sortierung nach Qualifikation steht für Intensivtechnische/r Assistent/in, nicht für Intensivtransportassistent/in. Dazu zählt jetzt der Beruf „ITA“ oder „Intensivtechnische/r Assistent/in“

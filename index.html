@@ -887,6 +887,15 @@
               <div class="vacation-planner-widget-actions">
                 <button
                   class="button button-secondary button-compact"
+                  id="carryOverVacationButton"
+                  type="button"
+                  title="Den Rest des Vorjahres als Übertrag für das gewählte Planungsjahr eintragen"
+                >
+                  <svg><use href="#icon-calendar"></use></svg>
+                  <span>Resturlaub übernehmen</span>
+                </button>
+                <button
+                  class="button button-secondary button-compact"
                   id="toggleVacationPlannerMaximizeButton"
                   type="button"
                   aria-controls="vacationPlanner"
@@ -1622,6 +1631,18 @@
                   <input id="vacationWeekendAbsenceLimit" type="number" min="1" max="100" step="1" />
                 </label>
                 <label class="settings-field">
+                  <span>Resturlaub verfällt am</span>
+                  <input
+                    id="vacationCarryOverExpiry"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="31.03."
+                    maxlength="6"
+                    aria-describedby="vacationCarryOverExpiryHint"
+                  />
+                  <small id="vacationCarryOverExpiryHint">Tag und Monat, z. B. 31.03.</small>
+                </label>
+                <label class="settings-field">
                   <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
                   <input id="vacationWeekendAReferenceSaturday" type="date" />
                 </label>
@@ -2328,9 +2349,14 @@
 <h2 id="hilfe-urlaubs-und-abwesenheitsplanung">Urlaubs- und Abwesenheitsplanung</h2>
 <h3 id="hilfe-urlaubsanspruch">Urlaubsanspruch</h3>
 <p>Der Jahresanspruch setzt sich zusammen aus:</p>
-<ul><li>konfigurierbarem Grundurlaub einer Vollzeitkraft</li><li>Stellenanteil des Mitarbeiters</li><li>individuell erarbeitetem Zusatzurlaub durch Schichtdienst</li></ul>
-<p>Grundurlaub, Abwesenheitsgrenzen und Referenzsamstag werden unter <strong>Einstellungen → Urlaub</strong> gepflegt.</p>
-<p>Die fünf Summenspalten <strong>Basis</strong>, <strong>Zusatz</strong>, <strong>Anspruch</strong>, <strong>Geplant</strong> und <strong>Rest</strong> bleiben beim horizontalen Scrollen fixiert.</p>
+<ul><li>konfigurierbarem Grundurlaub einer Vollzeitkraft</li><li>Stellenanteil des Mitarbeiters</li><li>individuell erarbeitetem Zusatzurlaub durch Schichtdienst</li><li>übertragenem Resturlaub aus dem Vorjahr</li></ul>
+<p>Grundurlaub, Abwesenheitsgrenzen, Referenzsamstag und der Verfallstag des Resturlaubs werden unter <strong>Einstellungen → Planung</strong> gepflegt.</p>
+<p>Die sechs Summenspalten <strong>Basis</strong>, <strong>Zusatz</strong>, <strong>Übertrag</strong>, <strong>Anspruch</strong>, <strong>Geplant</strong> und <strong>Rest</strong> bleiben beim horizontalen Scrollen fixiert.</p>
+<h3 id="hilfe-resturlaub-aus-dem-vorjahr">Resturlaub aus dem Vorjahr</h3>
+<p>Die Spalte <strong>Übertrag</strong> nimmt den Resturlaub aus dem Vorjahr auf. Er lässt sich je Mitarbeiter von Hand eintragen oder für alle auf einmal übernehmen: <strong>Resturlaub übernehmen</strong> über der Planungstabelle trägt für das gewählte Planungsjahr den Rest des Vorjahres ein – also Anspruch minus geplante Urlaubstage. Mitarbeiter ohne einen einzigen Planungseintrag im Vorjahr bleiben dabei unverändert, weil für sie offensichtlich keine Daten vorliegen. Bereits eingetragene Überträge werden ersetzt; die Übernahme lässt sich zurücknehmen.</p>
+<p>Urlaub, der bis zum Verfallstag – vorgegeben ist der <strong>31.03.</strong> – geplant ist, zehrt zuerst den Übertrag auf. Was danach noch übrig ist,</p>
+<ul><li>wird <strong>vor</strong> dem Verfallstag orange hervorgehoben; ein Hinweis über der Tabelle nennt die betroffenen Mitarbeiter,</li><li>ist <strong>nach</strong> dem Verfallstag verfallen: Der Wert erscheint durchgestrichen und zählt nicht mehr zum Anspruch.</li></ul>
+<p>Der Tooltip der Übertrag-Zelle nennt jeweils die Anzahl der Tage.</p>
 <h3 id="hilfe-planungseintrage">Planungseinträge</h3>
 <p>Folgende Eintragsarten stehen zur Verfügung:</p>
 <ul><li>Urlaub</li><li>Urlaub Einarbeitung</li><li>Schule, Weiterbildung oder Universität</li><li>unbezahlter Urlaub</li><li>Nachtdienst</li><li>externer Einsatz</li><li>frei geplant</li><li>verpflichtende Dienstzusage</li></ul>
@@ -2595,6 +2621,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-50-0-resturlaub-aus-dem-vorjahr">4.50.0 – Resturlaub aus dem Vorjahr</h3>
+<ul><li><strong>Neu:</strong> Die Urlaubsplanung kennt den <strong>Resturlaub aus dem Vorjahr</strong>. Die neue Spalte <strong>Übertrag</strong> steht zwischen Zusatz und Anspruch und lässt sich je Mitarbeiter eintragen</li><li><strong>Neu:</strong> <strong>Resturlaub übernehmen</strong> über der Planungstabelle trägt für alle Mitarbeiter den Rest des Vorjahres als Übertrag ein. Wer im Vorjahr keinen Planungseintrag hat, bleibt unverändert; die Übernahme lässt sich zurücknehmen</li><li><strong>Neu:</strong> Übertragener Resturlaub verfällt, soweit er nicht bis zum <strong>31.03.</strong> geplant ist. Vorher hebt TeO die betroffenen Mitarbeiter orange hervor und nennt sie über der Tabelle; danach zählt der verfallene Teil nicht mehr zum Anspruch. Der Stichtag lässt sich unter <strong>Einstellungen → Planung</strong> ändern</li></ul>
 <h3 id="hilfe-4-49-2-ita-hei-t-intensivtechnische-r-assistent-in">4.49.2 – ITA heißt Intensivtechnische/r Assistent/in</h3>
 <ul><li><strong>Behoben:</strong> Die Gruppe <strong>ITA</strong> der Sortierung nach Qualifikation steht für Intensivtechnische/r Assistent/in, nicht für Intensivtransportassistent/in. Dazu zählt jetzt der Beruf „ITA“ oder „Intensivtechnische/r Assistent/in“</li><li><strong>Verbessert:</strong> Die vorgegebene Berufsliste eines neuen Datenbestands enthält <strong>Intensivtechnische/r Assistent/in</strong> statt Arzt/Ärztin. Ein vorhandener Datenbestand behält seine Berufsliste; dort lässt sich der Beruf unter <strong>Einstellungen → Stammdaten &amp; Zugriffe</strong> ergänzen</li><li><strong>Verbessert:</strong> Die Demodatenbank enthält keine Ärzte mehr, dafür Intensivtechnische Assistentinnen und Assistenten</li></ul>
 <h3 id="hilfe-4-49-1-urlaubsplanung-in-dunklen-farbthemen">4.49.1 – Urlaubsplanung in dunklen Farbthemen</h3>

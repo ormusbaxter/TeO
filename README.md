@@ -637,12 +637,33 @@ Der Jahresanspruch setzt sich zusammen aus:
 - konfigurierbarem Grundurlaub einer Vollzeitkraft
 - Stellenanteil des Mitarbeiters
 - individuell erarbeitetem Zusatzurlaub durch Schichtdienst
+- übertragenem Resturlaub aus dem Vorjahr
 
-Grundurlaub, Abwesenheitsgrenzen und Referenzsamstag werden unter
-**Einstellungen → Urlaub** gepflegt.
+Grundurlaub, Abwesenheitsgrenzen, Referenzsamstag und der Verfallstag des
+Resturlaubs werden unter **Einstellungen → Planung** gepflegt.
 
-Die fünf Summenspalten **Basis**, **Zusatz**, **Anspruch**, **Geplant** und
-**Rest** bleiben beim horizontalen Scrollen fixiert.
+Die sechs Summenspalten **Basis**, **Zusatz**, **Übertrag**, **Anspruch**,
+**Geplant** und **Rest** bleiben beim horizontalen Scrollen fixiert.
+
+### Resturlaub aus dem Vorjahr
+
+Die Spalte **Übertrag** nimmt den Resturlaub aus dem Vorjahr auf. Er lässt sich
+je Mitarbeiter von Hand eintragen oder für alle auf einmal übernehmen:
+**Resturlaub übernehmen** über der Planungstabelle trägt für das gewählte
+Planungsjahr den Rest des Vorjahres ein – also Anspruch minus geplante
+Urlaubstage. Mitarbeiter ohne einen einzigen Planungseintrag im Vorjahr bleiben
+dabei unverändert, weil für sie offensichtlich keine Daten vorliegen. Bereits
+eingetragene Überträge werden ersetzt; die Übernahme lässt sich zurücknehmen.
+
+Urlaub, der bis zum Verfallstag – vorgegeben ist der **31.03.** – geplant ist,
+zehrt zuerst den Übertrag auf. Was danach noch übrig ist,
+
+- wird **vor** dem Verfallstag orange hervorgehoben; ein Hinweis über der
+  Tabelle nennt die betroffenen Mitarbeiter,
+- ist **nach** dem Verfallstag verfallen: Der Wert erscheint durchgestrichen
+  und zählt nicht mehr zum Anspruch.
+
+Der Tooltip der Übertrag-Zelle nennt jeweils die Anzahl der Tage.
 
 ### Planungseinträge
 

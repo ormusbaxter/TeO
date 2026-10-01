@@ -113,6 +113,7 @@
           bleiben sichtbar, zählen aber nicht gegen die Tagesgrenze.
         </span>
         ${renderPlannerKeyboardHint()}
+        ${renderCarryOverWarning(allEmployees)}
         <span class="vacation-note-detail ${
           schoolVacations.size ? "" : "is-warning"
         }">${schoolVacationCoverageNote}</span>
@@ -156,6 +157,11 @@
                 .join("")}
               <th class="vacation-total-column" scope="col">Basis</th>
               <th class="vacation-total-column" scope="col">Zusatz</th>
+              <th
+                class="vacation-total-column"
+                scope="col"
+                title="Resturlaub aus ${vacationYear - 1}; verfällt, soweit er nicht bis zum ${formatCarryOverExpiry()}${vacationYear} geplant ist"
+              >Übertrag</th>
               <th class="vacation-total-column" scope="col">Anspruch</th>
               <th class="vacation-total-column" scope="col">Geplant</th>
               <th class="vacation-total-column" scope="col">Rest</th>
@@ -277,6 +283,7 @@
     );
     elements.vacationWeekendAReferenceSaturday.value =
       state.settings.vacationWeekendAReferenceSaturday;
+    elements.vacationCarryOverExpiry.value = formatCarryOverExpiry();
     elements.vacationWeekendAReferenceLabel.textContent =
       `Referenzsamstag ${serviceWeekendLabel("weekend_a")}`;
     renderVacationSortOrderSettings();
@@ -486,6 +493,7 @@
   function renderVacationEmployeeRow(employee, dates, holidays, schoolVacations) {
     const entitlement = getVacationEntitlement(employee, vacationYear);
     const planned = getPlannedVacationDays(employee.id, vacationYear);
+    const carryOverNote = vacationCarryOverNote(entitlement);
     const remaining = entitlement.total - planned;
     const plannedEntries = new Map(
       state.vacationDays
@@ -589,6 +597,23 @@
             value="${entitlement.additional}"
             data-vacation-additional-employee="${employee.id}"
             aria-label="Zusatzurlaub ${escapeHtml(fullName(employee))}"
+          />
+        </td>
+        <td
+          class="vacation-total-column ${
+            entitlement.expiring ? "vacation-carry-over-expiring" : ""
+          } ${entitlement.expired ? "vacation-carry-over-expired" : ""}"
+          ${carryOverNote ? `title="${escapeHtml(carryOverNote)}"` : ""}
+        >
+          <input
+            class="vacation-additional-input"
+            type="number"
+            min="0"
+            max="60"
+            step="0.5"
+            value="${entitlement.carryOver}"
+            data-vacation-carry-over-employee="${employee.id}"
+            aria-label="Resturlaub aus ${vacationYear - 1} für ${escapeHtml(fullName(employee))}"
           />
         </td>
         <td class="vacation-total-column"><strong>${formatVacationNumber(entitlement.total)}</strong></td>
@@ -1515,7 +1540,150 @@
       (entry) => entry.employeeId === employee.id && entry.year === year,
     );
     const additional = stored?.additionalDays || 0;
-    return { base, additional, total: base + additional };
+    const carryOver = stored?.carryOverDays || 0;
+    const expiryDate = `${year}-${state.settings.vacationCarryOverExpiry}`;
+    // Urlaub bis zum Stichtag zehrt zuerst den Uebertrag auf. Was davon
+    // uebrig bleibt, verfaellt am Stichtag; bis dahin wird nur gewarnt.
+    const usedUntilExpiry = carryOver
+      ? vacationDaysOf(employee.id).filter(
+          (vacationDay) =>
+            vacationDay.date.startsWith(`${year}-`) &&
+            vacationDay.date <= expiryDate &&
+            PLANNER_ENTRY_TYPES[vacationDay.type]?.countsVacationEntitlement,
+        ).length
+      : 0;
+    const unused = Math.max(0, carryOver - usedUntilExpiry);
+    const expired = todayIso() > expiryDate ? unused : 0;
+    return {
+      base,
+      additional,
+      carryOver,
+      expiryDate,
+      expiring: unused - expired,
+      expired,
+      total: base + additional + carryOver - expired,
+    };
+  }
+
+  function renderCarryOverWarning(employees) {
+    const expiring = employees
+      .map((employee) => ({
+        employee,
+        entitlement: getVacationEntitlement(employee, vacationYear),
+      }))
+      .filter((item) => item.entitlement.expiring);
+    if (!expiring.length) return "";
+    const days = expiring.reduce((sum, item) => sum + item.entitlement.expiring, 0);
+    return `<span class="vacation-note-detail is-warning">Resturlaub: ${formatVacationNumber(days)} Tage von ${expiring.length} Mitarbeiter${
+      expiring.length === 1 ? "" : "n"
+    } verfallen am ${formatDate(expiring[0].entitlement.expiryDate)}, wenn sie nicht bis dahin geplant werden – betroffen: ${escapeHtml(
+      formatList(expiring.map((item) => fullName(item.employee))),
+    )}.</span>`;
+  }
+
+  function vacationCarryOverNote(entitlement) {
+    if (entitlement.expired) {
+      return `${formatVacationNumber(entitlement.expired)} Tage Resturlaub sind am ${formatDate(entitlement.expiryDate)} verfallen.`;
+    }
+    if (entitlement.expiring) {
+      return `${formatVacationNumber(entitlement.expiring)} Tage Resturlaub verfallen am ${formatDate(entitlement.expiryDate)}, wenn sie nicht bis dahin geplant werden.`;
+    }
+    return "";
+  }
+
+  // „31.03.“, „31.3“ oder „31.03“ ergeben „03-31“; Ungueltiges liefert "".
+  function parseCarryOverExpiry(text) {
+    const match = /^\s*(\d{1,2})\.(\d{1,2})\.?\s*$/.exec(String(text || ""));
+    if (!match) return "";
+    const value = `${match[2].padStart(2, "0")}-${match[1].padStart(2, "0")}`;
+    return normalizeCarryOverExpiry(value) === value ? value : "";
+  }
+
+  function formatCarryOverExpiry(value = state.settings.vacationCarryOverExpiry) {
+    const [month, day] = value.split("-");
+    return `${day}.${month}.`;
+  }
+
+  // Rest des Vorjahres als Uebertrag des gewaehlten Jahres. Wer im Vorjahr
+  // keinen einzigen Planungseintrag hat, bleibt aussen vor: Dort fehlen
+  // vermutlich die Daten, und der volle Anspruch waere ein falscher Rest.
+  function proposedCarryOvers(year) {
+    const previousYear = year - 1;
+    return activeEmployeeList()
+      .filter((employee) =>
+        vacationDaysOf(employee.id).some((entry) =>
+          entry.date.startsWith(`${previousYear}-`),
+        ),
+      )
+      .map((employee) => {
+        const rest =
+          getVacationEntitlement(employee, previousYear).total -
+          getPlannedVacationDays(employee.id, previousYear);
+        return {
+          employeeId: employee.id,
+          days: Math.min(60, Math.max(0, Math.round(rest * 2) / 2)),
+        };
+      });
+  }
+
+  function setVacationEntitlementValue(employeeId, year, field, value) {
+    const existing = state.vacationEntitlements.find(
+      (entry) => entry.employeeId === employeeId && entry.year === year,
+    );
+    if (existing) {
+      existing[field] = value;
+      return;
+    }
+    state.vacationEntitlements.push({
+      employeeId,
+      year,
+      additionalDays: 0,
+      carryOverDays: 0,
+      [field]: value,
+    });
+  }
+
+  function requestVacationCarryOver() {
+    const year = vacationYear;
+    const proposals = proposedCarryOvers(year);
+    const skipped = activeEmployeeList().length - proposals.length;
+    if (!proposals.length) {
+      showToast(
+        `Für ${year - 1} gibt es keine Planungseinträge – es lässt sich kein Resturlaub übernehmen.`,
+        "warning",
+      );
+      return;
+    }
+    const totalDays = proposals.reduce((sum, item) => sum + item.days, 0);
+    requestConfirmation({
+      title: `Resturlaub aus ${year - 1} übernehmen?`,
+      message: [
+        `${proposals.length} Mitarbeiter erhalten ihren Rest aus ${year - 1} als Übertrag für ${year} – zusammen ${formatVacationNumber(totalDays)} Tage. Bereits eingetragene Überträge für ${year} werden dabei ersetzt.`,
+        skipped
+          ? `${skipped} Mitarbeiter ohne Planungseinträge in ${year - 1} bleiben unverändert.`
+          : "",
+        `Nicht bis zum ${formatCarryOverExpiry()}${year} geplanter Resturlaub verfällt.`,
+      ]
+        .filter(Boolean)
+        .join(" "),
+      acceptLabel: "Resturlaub übernehmen",
+      tone: "primary",
+      callback: async () => {
+        const committed = await commitStateMutation(
+          () => {
+            proposals.forEach((item) =>
+              setVacationEntitlementValue(item.employeeId, year, "carryOverDays", item.days),
+            );
+          },
+          { undo: `Resturlaub ${year - 1} übernommen` },
+        );
+        if (committed) {
+          showUndoToast(
+            `Resturlaub aus ${year - 1} für ${proposals.length} Mitarbeiter übernommen.`,
+          );
+        }
+      },
+    });
   }
 
   function getPlannedVacationDays(employeeId, year) {
@@ -1669,25 +1837,19 @@
   }
 
   async function handleVacationPlannerChange(event) {
-    const input = event.target.closest("[data-vacation-additional-employee]");
+    const additionalInput = event.target.closest("[data-vacation-additional-employee]");
+    const carryOverInput = event.target.closest("[data-vacation-carry-over-employee]");
+    const input = additionalInput || carryOverInput;
     if (!input) return;
     const scrollPosition = captureVacationScrollPosition();
-    const employeeId = input.dataset.vacationAdditionalEmployee;
-    const additionalDays =
-      Math.round(clampNumber(input.value, 0, 30, 0) * 2) / 2;
-    const existing = state.vacationEntitlements.find(
-      (entry) => entry.employeeId === employeeId && entry.year === vacationYear,
-    );
+    const employeeId = additionalInput
+      ? input.dataset.vacationAdditionalEmployee
+      : input.dataset.vacationCarryOverEmployee;
+    const field = additionalInput ? "additionalDays" : "carryOverDays";
+    const value =
+      Math.round(clampNumber(input.value, 0, additionalInput ? 30 : 60, 0) * 2) / 2;
     await commitStateMutation(() => {
-      if (existing) {
-        existing.additionalDays = additionalDays;
-      } else {
-        state.vacationEntitlements.push({
-          employeeId,
-          year: vacationYear,
-          additionalDays,
-        });
-      }
+      setVacationEntitlementValue(employeeId, vacationYear, field, value);
     });
     restoreVacationScrollPosition(scrollPosition);
   }
@@ -1877,6 +2039,17 @@
         DEFAULT_WEEKEND_ABSENCE_LIMIT,
       ),
     );
+    const carryOverExpiry = parseCarryOverExpiry(
+      elements.vacationCarryOverExpiry.value,
+    );
+    if (!carryOverExpiry) {
+      showToast(
+        "Den Verfall des Resturlaubs bitte als Tag und Monat angeben, etwa 31.03.",
+        "error",
+      );
+      elements.vacationCarryOverExpiry.focus();
+      return;
+    }
     const referenceDate = elements.vacationWeekendAReferenceSaturday.value;
     const parsedReference = parseLocalDate(referenceDate);
     if (!parsedReference || parsedReference.getDay() !== 6) {
@@ -1892,6 +2065,7 @@
       state.settings.vacationWeekendAReferenceSaturday = referenceDate;
       state.settings.vacationWeekdayAbsenceLimit = weekdayAbsenceLimit;
       state.settings.vacationWeekendAbsenceLimit = weekendAbsenceLimit;
+      state.settings.vacationCarryOverExpiry = carryOverExpiry;
     });
     if (committed) showToast("Planungseinstellungen wurden gespeichert.");
   }

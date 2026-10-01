@@ -283,6 +283,8 @@
   const DEFAULT_VACATION_SORT_GROUP_ORDER = Object.freeze(
     Object.keys(VACATION_SORT_GROUPS),
   );
+  // Bis zu diesem Tag (MM-TT) muss uebertragener Resturlaub genommen sein.
+  const DEFAULT_VACATION_CARRY_OVER_EXPIRY = "03-31";
   const VACATION_SORT_MODES = Object.freeze({
     name: "Nachname (alphabetisch)",
     qualification: "Qualifikation",
@@ -778,6 +780,8 @@
     vacationEmployeeSearch: document.querySelector("#vacationEmployeeSearch"),
     vacationBaseDays: document.querySelector("#vacationBaseDays"),
     vacationSortMode: document.querySelector("#vacationSortMode"),
+    vacationCarryOverExpiry: document.querySelector("#vacationCarryOverExpiry"),
+    carryOverVacationButton: document.querySelector("#carryOverVacationButton"),
     vacationSortOrderList: document.querySelector("#vacationSortOrderList"),
     resetVacationSortOrderButton: document.querySelector(
       "#resetVacationSortOrderButton",
