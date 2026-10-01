@@ -110,7 +110,7 @@ export default [
 
   // Der Browserteil wird am erzeugten app.js geprüft, nicht an den Dateien in
   // src/app/. Zwei Gründe: Die Bruchstücke sind einzeln kein gültiges
-  // Programm - 00-shell.js öffnet die IIFE, 90-domain-utils.js schließt sie -,
+  // Programm - 00-shell.js öffnet die IIFE, 90c-ui-helpers.js schließt sie -,
   // und erst zusammengesetzt stimmt der Gültigkeitsbereich. Eine ungenutzte
   // Funktion oder ein unbekannter Bezeichner fällt nur dort auf.
   //

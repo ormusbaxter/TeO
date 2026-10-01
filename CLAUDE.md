@@ -59,7 +59,7 @@ holt sie einmalig mit `npm ci`; in der CI laufen sie nach `npm run verify`.
 
 - **ESLint** über `npm run lint`. Geprüft wird der Browserteil am erzeugten
   `app.js`, nicht an den Dateien in `src/app/`: Die sind einzeln kein gültiges
-  Programm – `00-shell.js` öffnet die IIFE, `90-domain-utils.js` schließt sie –,
+  Programm – `00-shell.js` öffnet die IIFE, `90c-ui-helpers.js` schließt sie –,
   und erst zusammengesetzt stimmt der Gültigkeitsbereich. Nur dort fällt eine
   ungenutzte Funktion oder ein unbekannter Bezeichner auf. `tools/lint.mjs`
   rechnet die Fundstelle anschließend auf die Quelldatei zurück, meldet also
