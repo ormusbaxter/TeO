@@ -714,7 +714,9 @@ body.is-vacation-planner-maximized {
   font-weight: 900;
   border: 1px solid transparent;
   border-radius: 7px;
-  background: rgb(255 255 255 / 48%);
+  /* Aus der Flaechenmarke statt festem Weiss: In den dunklen Schemata ist
+     --white die dunkle Kartenflaeche, das leere Feld bleibt also dunkel. */
+  background: color-mix(in srgb, var(--white) 48%, transparent);
 }
 
 /* Der globale Fokusrahmen liegt 2 px ausserhalb und wuerde in der dichten

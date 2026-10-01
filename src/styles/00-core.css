@@ -4090,6 +4090,7 @@ body.is-sidebar-collapsed
   font-weight: 750;
 }
 
+.compact-field input,
 .compact-field select,
 .bulk-attendance-bar select,
 .attendance-status-field select {
@@ -4104,6 +4105,7 @@ body.is-sidebar-collapsed
   background: white;
 }
 
+.compact-field input:focus,
 .compact-field select:focus,
 .bulk-attendance-bar select:focus,
 .attendance-status-field select:focus {
