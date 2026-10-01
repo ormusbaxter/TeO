@@ -3649,7 +3649,6 @@
     elements.helpNoResults.hidden = visibleCount > 0;
   }
 
-
   function bindDelegatedActions() {
     elements.employeeTable.addEventListener("click", handleEmployeeTableAction);
     elements.employeeTable.addEventListener("change", handleEmployeeTableSelection);

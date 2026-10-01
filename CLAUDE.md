@@ -16,9 +16,14 @@
 Änderungen gehören nach `src/`:
 
 - `src/html/*.html` – zu `index.html` zusammengesetzt
-- `src/app/*.js` – in dieser Reihenfolge zu `app.js` verkettet; alle Dateien
-  teilen sich **einen** IIFE-Gültigkeitsbereich, Funktionen sind also
-  dateiübergreifend aufrufbar
+- `src/app/*.js` – in alphabetischer Reihenfolge zu `app.js` verkettet; alle
+  Dateien teilen sich **einen** IIFE-Gültigkeitsbereich, Funktionen sind also
+  dateiübergreifend aufrufbar. Die Nummer gibt den Bereich an, ein Buchstabe
+  die Teile eines Bereichs (`40-vacations-planner.js`, `40a-…`, `40b-…`; `-`
+  sortiert vor jedem Buchstaben). Wächst eine Datei über rund 1000 Zeilen,
+  wird sie an Funktionsgrenzen in aufeinanderfolgende Teile geschnitten – dann
+  bleibt `app.js` bis auf Leerzeilen gleich, und genau das lässt sich prüfen:
+  `diff <(grep -v '^\s*$' alt.js) <(grep -v '^\s*$' app.js)`
 - `src/styles/*.css` – zu `styles.css` zusammengesetzt
 - `src/shared/`, `src/meta/` – gemeinsame Bausteine für Browser und Tests
 
@@ -58,7 +63,7 @@ holt sie einmalig mit `npm ci`; in der CI laufen sie nach `npm run verify`.
   und erst zusammengesetzt stimmt der Gültigkeitsbereich. Nur dort fällt eine
   ungenutzte Funktion oder ein unbekannter Bezeichner auf. `tools/lint.mjs`
   rechnet die Fundstelle anschließend auf die Quelldatei zurück, meldet also
-  `src/app/40-vacations.js:1660` statt `app.js:10727`.
+  `src/app/40e-vacations-actions-settings.js:120` statt `app.js:10727`.
 - **Playwright** für die Tests, die TeO wirklich starten. Sie beantworten die
   Frage, ob eine Regel im Stylesheet auch *wirkt* – der DOM-Ersatz kann das
   nicht, und eine abgeschriebene Regel bestätigt nur, dass dort steht, was dort

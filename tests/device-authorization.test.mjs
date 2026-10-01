@@ -9,7 +9,7 @@ import {
 
 const indexUrl = new URL("../index.html", import.meta.url);
 const deviceSourceUrl = new URL(
-  "../src/app/60-appointments-devices.js",
+  "../app.js",
   import.meta.url,
 );
 

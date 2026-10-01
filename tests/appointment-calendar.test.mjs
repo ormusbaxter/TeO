@@ -11,7 +11,7 @@ const appointmentsHtml = fs.readFileSync(
   "utf8",
 );
 const appointmentSource = fs.readFileSync(
-  path.join(projectRoot, "src/app/60-appointments-devices.js"),
+  path.join(projectRoot, "app.js"),
   "utf8",
 );
 const calendarStyles = fs.readFileSync(

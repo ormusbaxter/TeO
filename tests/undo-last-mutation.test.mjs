@@ -157,24 +157,14 @@ test("Die Beschreibung benennt die geänderte Sammlung", async () => {
 });
 
 test("Jede zurücknehmbare Änderung meldet sich auch als solche", async () => {
-  const sources = await Promise.all(
-    [
-      "50-employees-trainings",
-      "55-memos",
-      "60-appointments-devices",
-      "70-meetings-editor-actions",
-      "20-ui-auth-admin",
-      "41-drag-and-drop",
-    ].map((name) =>
-      fs.readFile(path.join(projectRoot, "src", "app", `${name}.js`), "utf8"),
-    ),
-  );
-  const combined = sources.join("\n");
+  // Der ganze Bestand, nicht eine Liste einzelner Dateien: Eine neue Datei
+  // mit „Rückgängig“ fiele sonst stillschweigend aus der Prüfung.
+  const combined = await fs.readFile(path.join(projectRoot, "app.js"), "utf8");
 
   // Diese Prüfung bleibt bewusst am Quelltext: Sie fragt nicht, wie eine
   // einzelne Aktion sich verhält, sondern ob im ganzen Bestand an Aktionen
   // eine vergessen wurde. Das lässt sich nicht an einem Beispiel zeigen.
-  const angeboten = [...combined.matchAll(/showUndoToast\(/g)].length;
+  const angeboten = [...combined.matchAll(/(?<!function )showUndoToast\(/g)].length;
   const gemerkt = [...combined.matchAll(/\{ undo: /g)].length;
   assert.equal(
     angeboten,
