@@ -85,6 +85,12 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
   try {
     await page.goto(`http://localhost:${port}/index.html`, { waitUntil: "load" });
     await page.waitForFunction(() => Boolean(window.TeOProjectMeta), null, { timeout: 10000 });
+    // Der Startdialog öffnet sich erst nach der asynchronen Initialisierung
+    // des Speichers. Unter Last - im vollen Testlauf - war er beim bloßen
+    // Laden der Skripte manchmal noch nicht offen.
+    await page.waitForFunction(() => document.querySelector("dialog[open]"), null, {
+      timeout: 10000,
+    });
 
     const loginInformation = await page.evaluate(() => ({
       // Ein frisches Browserprofil kennt noch keinen Datenbestand. Dann fragt

@@ -6,7 +6,7 @@ import { loadAppFunctions } from "./helpers/load-app.mjs";
 test("Geräteverwaltung bietet einen Excel-Export mit Tabellen-Icon an", async () => {
   const [indexHtml, uiSource] = await Promise.all([
     readFile(new URL("../index.html", import.meta.url), "utf8"),
-    readFile(new URL("../src/app/20-ui-auth-admin.js", import.meta.url), "utf8"),
+    readFile(new URL("../app.js", import.meta.url), "utf8"),
   ]);
 
   assert.match(indexHtml, /id="icon-spreadsheet"/);

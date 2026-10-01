@@ -15,7 +15,7 @@ const settingsHtml = fs.readFileSync(
   "utf8",
 );
 const uiSource = fs.readFileSync(
-  path.join(projectRoot, "src/app/20-ui-auth-admin.js"),
+  path.join(projectRoot, "app.js"),
   "utf8",
 );
 
