@@ -2150,3 +2150,29 @@ body.is-dragging-appointment .appointment-calendar-entry {
   color: var(--slate-500);
   font-size: 0.72rem;
 }
+
+.vacation-table .vacation-group-row > * {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-top: 2px solid var(--slate-200);
+  background: var(--slate-100);
+}
+
+.vacation-table .vacation-group-row > .vacation-employee-column {
+  overflow: hidden;
+  color: var(--slate-700);
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-shadow: none;
+}
+
+.vacation-group-count {
+  margin-left: 6px;
+  padding: 1px 6px;
+  color: var(--slate-600);
+  font-weight: 700;
+  border-radius: 999px;
+  background: var(--slate-200);
+}

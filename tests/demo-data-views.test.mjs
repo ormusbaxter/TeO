@@ -22,7 +22,37 @@ test("Die Urlaubsplanung sortiert echte Daten nach Qualifikation", async (t) => 
   assert.ok(zeilen.length > 40, `nur ${zeilen.length} Zeilen`);
   // Jede Zeile heißt „Nachname, Vorname“.
   assert.ok(zeilen.every((name) => /^[^,]+, [^,]+$/.test(name)), zeilen.join(" | "));
+
+  // Jede Gruppe beginnt mit einer Zwischenzeile, in der Reihenfolge der
+  // Einstellungen; die Zahl darin stimmt mit den folgenden Zeilen überein.
+  const gruppen = await teo.evaluate(() =>
+    [...document.querySelectorAll(".vacation-group-row")].map((zeile) => {
+      let anzahl = 0;
+      for (let folgende = zeile.nextElementSibling; folgende && !folgende.matches(".vacation-group-row"); folgende = folgende.nextElementSibling) {
+        anzahl += 1;
+      }
+      return {
+        titel: zeile.querySelector("th").firstChild.textContent.trim(),
+        genannt: Number(zeile.querySelector(".vacation-group-count").textContent),
+        anzahl,
+      };
+    }),
+  );
+  assert.equal(gruppen[0].titel, "Stationsleitung");
+  assert.ok(gruppen.length >= 5, gruppen.map((gruppe) => gruppe.titel).join(" | "));
+  gruppen.forEach((gruppe) => assert.equal(gruppe.genannt, gruppe.anzahl, gruppe.titel));
   assert.deepEqual(teo.problems, []);
+});
+
+test("Alphabetisch sortiert kommt die Tabelle ohne Zwischenzeilen aus", async (t) => {
+  const teo = await openTeO(t, {
+    angemeldetAls: "admin",
+    mitDemodaten: true,
+    urlaubsansicht: { year: 2026, month: 7, sort: "name" },
+  });
+  if (!teo) return;
+  await teo.zeigeAnsicht("vacations");
+  assert.equal(await teo.evaluate(() => document.querySelectorAll(".vacation-group-row").length), 0);
 });
 
 test("Resturlaub wird übernommen, angezeigt und lässt sich zurücknehmen", async (t) => {

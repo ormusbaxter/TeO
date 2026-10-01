@@ -169,13 +169,15 @@
           </thead>
           <tbody>
             ${employees
-              .map((employee) =>
-                renderVacationEmployeeRow(
-                  employee,
-                  dates,
-                  holidays,
-                  schoolVacations,
-                ),
+              .map(
+                (employee, index) =>
+                  renderVacationGroupRow(employees, index, dates.length) +
+                  renderVacationEmployeeRow(
+                    employee,
+                    dates,
+                    holidays,
+                    schoolVacations,
+                  ),
               )
               .join("")}
           </tbody>
@@ -184,6 +186,25 @@
     `;
     applyAccessControl();
     restoreVacationFocus();
+  }
+
+  // Bei der Sortierung nach Qualifikation beginnt jede Gruppe mit einer
+  // Zwischenzeile. Sie traegt keine Tagesfelder; die Tastaturnavigation
+  // arbeitet mit Mitarbeiter und Datum und ueberspringt sie damit von selbst.
+  function renderVacationGroupRow(employees, index, dayCount) {
+    if (vacationSortMode !== "qualification") return "";
+    const group = vacationSortGroupOf(employees[index]);
+    if (index > 0 && vacationSortGroupOf(employees[index - 1]) === group) return "";
+    const count = employees.filter((employee) => vacationSortGroupOf(employee) === group).length;
+    return `
+      <tr class="vacation-group-row">
+        <th class="vacation-employee-column" scope="rowgroup">
+          ${escapeHtml(VACATION_SORT_GROUPS[group] || "Ohne Gruppe")}
+          <span class="vacation-group-count">${count}</span>
+        </th>
+        <td colspan="${dayCount + 6}" aria-hidden="true"></td>
+      </tr>
+    `;
   }
 
   function renderPlannerKeyboardHint() {
