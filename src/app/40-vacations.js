@@ -54,7 +54,11 @@
 
   function renderVacationPlanner() {
     renderVacationControls();
-    const allEmployees = activeEmployeeList().sort(sortEmployees);
+    const allEmployees = activeEmployeeList().sort(
+      vacationSortMode === "qualification"
+        ? compareEmployeesByVacationSortGroup
+        : sortEmployees,
+    );
     const employees = filterVacationEmployees(allEmployees);
     const daysInMonth = new Date(vacationYear, vacationMonth, 0).getDate();
     const dates = Array.from({ length: daysInMonth }, (_, index) =>
@@ -198,6 +202,7 @@
     const fallback = {
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
+      sort: "name",
     };
     try {
       const raw = window.localStorage?.getItem?.(VACATION_VIEW_KEY);
@@ -208,6 +213,7 @@
       return {
         year: Number.isInteger(year) && year >= 2000 && year <= 2100 ? year : fallback.year,
         month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : fallback.month,
+        sort: Object.hasOwn(VACATION_SORT_MODES, value?.sort) ? value.sort : fallback.sort,
       };
     } catch {
       return fallback;
@@ -218,7 +224,11 @@
     try {
       window.localStorage?.setItem?.(
         VACATION_VIEW_KEY,
-        JSON.stringify({ year: vacationYear, month: vacationMonth }),
+        JSON.stringify({
+          year: vacationYear,
+          month: vacationMonth,
+          sort: vacationSortMode,
+        }),
       );
     } catch {
       // Die Planung bleibt auch ohne verfügbaren Browserspeicher bedienbar.
@@ -249,6 +259,7 @@
     elements.vacationYear.value = String(vacationYear);
     elements.vacationMonth.value = String(vacationMonth);
     elements.vacationEntryType.value = vacationEntryType;
+    elements.vacationSortMode.value = vacationSortMode;
     renderVacationSettingsControls();
     elements.vacationWeekendALegend.textContent =
       serviceWeekendLabel("weekend_a");
@@ -268,6 +279,7 @@
       state.settings.vacationWeekendAReferenceSaturday;
     elements.vacationWeekendAReferenceLabel.textContent =
       `Referenzsamstag ${serviceWeekendLabel("weekend_a")}`;
+    renderVacationSortOrderSettings();
   }
 
   function renderVacationDayHeader(date, holidays, schoolVacations) {
@@ -331,6 +343,115 @@
     `;
   }
 
+  // Die Rangfolge ist fest und unabhaengig von der eingestellten Reihenfolge:
+  // Leitungsfunktionen vor der Einarbeitung, die Einarbeitung vor
+  // Weiterbildung und Beruf. Wer in keine Gruppe faellt - etwa Aerzte -, steht
+  // hinter allen Gruppen.
+  function vacationSortGroupOf(employee) {
+    const qualifications = employee.qualifications || {};
+    if (qualifications.stationsleitung) return "stationsleitung";
+    if (qualifications.stellvertretendeStationsleitung) {
+      return "stellvertretendeStationsleitung";
+    }
+    if (employee.employmentStatus === "onboarding") return "onboarding";
+    if (qualifications.fachweiterbildungIA) return "fachweiterbildung";
+    const signature = professionSignature(employee.profession);
+    if (
+      signature === "ita" ||
+      signature.includes("pflegefachassisten") ||
+      (signature.includes("intensiv") && signature.includes("assisten"))
+    ) {
+      return "ita";
+    }
+    if (signature === "mfa" || signature.includes("fachangestellt")) return "mfa";
+    if (signature.includes("stationsassisten")) return "stationsassistenz";
+    if (signature.includes("pflegefach") || signature.includes("krankenpfleg")) {
+      return "pflegefachkraft";
+    }
+    return "";
+  }
+
+  function vacationSortGroupRank(employee) {
+    const position = state.settings.vacationSortGroupOrder.indexOf(
+      vacationSortGroupOf(employee),
+    );
+    return position < 0 ? state.settings.vacationSortGroupOrder.length : position;
+  }
+
+  function compareEmployeesByVacationSortGroup(a, b) {
+    return vacationSortGroupRank(a) - vacationSortGroupRank(b) || sortEmployees(a, b);
+  }
+
+  function vacationEmployeeName(employee) {
+    return [employee.lastName, employee.firstName].filter(Boolean).join(", ");
+  }
+
+  function renderVacationSortOrderSettings() {
+    const order = state.settings.vacationSortGroupOrder;
+    elements.vacationSortOrderList.innerHTML = order
+      .map(
+        (key, index) => `
+          <li class="vacation-sort-order-row">
+            <span><span class="vacation-sort-order-position">${index + 1}.</span> ${escapeHtml(
+              VACATION_SORT_GROUPS[key],
+            )}</span>
+            <span class="vacation-sort-order-actions">
+              <button
+                class="icon-button vacation-sort-order-up"
+                type="button"
+                data-vacation-sort-move="${key}"
+                data-direction="up"
+                aria-label="${escapeHtml(VACATION_SORT_GROUPS[key])} nach oben"
+                title="Nach oben"
+                ${index === 0 ? "disabled" : ""}
+              ><svg><use href="#icon-chevron"></use></svg></button>
+              <button
+                class="icon-button vacation-sort-order-down"
+                type="button"
+                data-vacation-sort-move="${key}"
+                data-direction="down"
+                aria-label="${escapeHtml(VACATION_SORT_GROUPS[key])} nach unten"
+                title="Nach unten"
+                ${index === order.length - 1 ? "disabled" : ""}
+              ><svg><use href="#icon-chevron"></use></svg></button>
+            </span>
+          </li>`,
+      )
+      .join("");
+    elements.resetVacationSortOrderButton.disabled =
+      order.join("|") === DEFAULT_VACATION_SORT_GROUP_ORDER.join("|");
+  }
+
+  async function handleVacationSortOrderClick(event) {
+    const button = event.target.closest("[data-vacation-sort-move]");
+    if (!button) return;
+    const order = [...state.settings.vacationSortGroupOrder];
+    const index = order.indexOf(button.dataset.vacationSortMove);
+    const target = index + (button.dataset.direction === "up" ? -1 : 1);
+    if (index < 0 || target < 0 || target >= order.length) return;
+    [order[index], order[target]] = [order[target], order[index]];
+    const committed = await commitStateMutation(() => {
+      state.settings.vacationSortGroupOrder = order;
+    });
+    // Nach dem Neuaufbau der Liste steht der Fokus sonst im Leeren; er folgt
+    // der verschobenen Gruppe, damit sich mehrfach hintereinander schieben
+    // laesst.
+    if (committed) {
+      elements.vacationSortOrderList
+        .querySelector(
+          `[data-vacation-sort-move="${button.dataset.vacationSortMove}"][data-direction="${button.dataset.direction}"]:not([disabled])`,
+        )
+        ?.focus();
+    }
+  }
+
+  async function resetVacationSortOrder() {
+    const committed = await commitStateMutation(() => {
+      state.settings.vacationSortGroupOrder = [...DEFAULT_VACATION_SORT_GROUP_ORDER];
+    });
+    if (committed) showToast("Die Sortierreihenfolge steht wieder auf der Vorgabe.");
+  }
+
   function filterVacationEmployees(employees) {
     const searchTerm = searchKey(vacationEmployeeSearchTerm);
     if (!searchTerm) return employees;
@@ -338,6 +459,7 @@
       searchKey(
         [
           fullName(employee),
+          vacationEmployeeName(employee),
           employee.lastName,
           employee.firstName,
           employee.username,
@@ -397,7 +519,7 @@
                 type="button"
                 data-vacation-employee-overview="${employee.id}"
                 aria-label="Jahresabwesenheiten von ${escapeHtml(fullName(employee))} öffnen"
-              >${escapeHtml(fullName(employee))}</button>
+              >${escapeHtml(vacationEmployeeName(employee))}</button>
               <small>${escapeHtml(
                 vacationServiceWeekendLabel(employee),
               )} · ${employee.employmentPercent} %</small>
@@ -1231,7 +1353,7 @@
       <tr>
         <th class="vacation-blank-month-name-column" scope="row">
           <strong>${escapeHtml(
-            [employee.lastName, employee.firstName].filter(Boolean).join(", "),
+            vacationEmployeeName(employee),
           )}</strong>
           <small>${escapeHtml(
             [

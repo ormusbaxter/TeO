@@ -837,6 +837,13 @@
                 </select>
               </label>
               <label class="compact-field">
+                <span>Sortierung</span>
+                <select id="vacationSortMode">
+                  <option value="name">Nachname (alphabetisch)</option>
+                  <option value="qualification">Qualifikation</option>
+                </select>
+              </label>
+              <label class="compact-field">
                 <span>Eintragsart</span>
                 <select id="vacationEntryType">
                   <option value="vacation">Urlaub</option>
@@ -1622,6 +1629,21 @@
                   Urlaubseinstellungen speichern
                 </button>
               </div>
+              <div class="vacation-sort-order-settings">
+                <h3>Sortierung nach Qualifikation</h3>
+                <p class="settings-description">
+                  In dieser Reihenfolge stehen die Gruppen in der Planungstabelle,
+                  wenn dort „Sortierung: Qualifikation“ gewählt ist; innerhalb
+                  einer Gruppe alphabetisch nach Nachname. Wer in keine Gruppe
+                  fällt, steht am Ende. Jede Verschiebung gilt sofort.
+                </p>
+                <ol class="vacation-sort-order-list" id="vacationSortOrderList"></ol>
+                <div class="settings-actions">
+                  <button class="button button-secondary" id="resetVacationSortOrderButton" type="button">
+                    Vorgabe wiederherstellen
+                  </button>
+                </div>
+              </div>
             </section>
 
             <section
@@ -2316,6 +2338,12 @@
 <ol><li>Jahr und Monat auswählen.</li><li>Gewünschte Eintragsart festlegen.</li><li>In der Zeile des Mitarbeiters auf den entsprechenden Tag klicken.</li><li>Ein erneuter Klick beziehungsweise die Auswahl „Kein Eintrag“ entfernt den Planungseintrag.</li></ol>
 <p>Der zuletzt gewählte Monat und das Planungsjahr werden im Browser gespeichert. Die beiden Pfeile in der ersten Zelle der Tabelle – neben Monat und Jahr – blättern zum vorherigen beziehungsweise nächsten Monat, auch über den Jahreswechsel hinweg. In der maximierten Planung bleibt oberhalb der Tabelle nur die kompakte, mit den farbigen Tabellensymbolen dargestellte Tastaturbelegung sichtbar.</p>
 <p>Die Kopfzeile bleibt beim vertikalen Scrollen sichtbar. Wochenenden, Feiertage, Schulferien und die beiden Dienstwochenenden werden farblich unterschieden.</p>
+<h3 id="hilfe-sortierung-der-planungstabelle">Sortierung der Planungstabelle</h3>
+<p>Die Namen stehen als <strong>Nachname, Vorname</strong>. Die Auswahl <strong>Sortierung</strong> in der Steuerleiste ordnet die Zeilen wahlweise</p>
+<ul><li><strong>Nachname (alphabetisch)</strong> – alle Mitarbeiter nach Nachname, dann Vorname,</li><li><strong>Qualifikation</strong> – nach Gruppen und innerhalb einer Gruppe alphabetisch nach Nachname. Vorgegeben ist: Stationsleitung, Stellv. Stationsleitung, Fachweiterbildung, Pflegefachkraft, aktuell in Einarbeitung, ITA, MFA, Stationsassistenz. Wer in keine dieser Gruppen fällt – etwa Ärztinnen und Ärzte –, steht am Ende.</li></ul>
+<p>Die Gruppe ergibt sich aus den Stammdaten, und zwar in dieser Rangfolge: Qualifikation *Stationsleitung*, dann *Stellvertretende Stationsleitung*, dann der Status *In Einarbeitung*, dann die Qualifikation *Fachweiterbildung I/A*, zuletzt der Beruf (Pflegefachassistenz zählt zu ITA, Medizinische/r Fachangestellte/r zu MFA). Eine Stationsleitung in Einarbeitung steht also bei der Stationsleitung.</p>
+<p>Die Reihenfolge der Gruppen lässt sich unter <strong>Einstellungen → Planung → Sortierung nach Qualifikation</strong> mit den Pfeilen umstellen; jede Verschiebung gilt sofort für alle Arbeitsplätze, <strong>Vorgabe wiederherstellen</strong> setzt sie zurück. Die gewählte Sortierart merkt sich dagegen jeder Browser selbst.</p>
+<h3 id="hilfe-darstellung-der-mitarbeiterzeilen">Darstellung der Mitarbeiterzeilen</h3>
 <p>Unter dem Namen des Mitarbeiters stehen das feste <strong>Dienstwochenende</strong> und der Beschäftigungsgrad. Der Beschäftigungsstatus bleibt im Tooltip der Zeile sichtbar.</p>
 <p>Ein <strong>Geburtstag</strong> ist an der goldenen Schraffur des Tagesfeldes erkennbar; der Tooltip nennt das erreichte Lebensjahr. Fällt der Geburtstag auf den</p>
 <ol><li>Februar, wird er in Nicht-Schaltjahren am 28. Februar angezeigt.</li></ol>
@@ -2564,8 +2592,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
-<h3 id="hilfe-4-48-0-monatswechsel-direkt-in-der-planungstabelle">4.48.0 – Monatswechsel direkt in der Planungstabelle</h3>
-<ul><li><strong>Neu:</strong> In der Urlaubsplanung trägt die erste Zelle der Tabelle neben Monat und Jahr zwei Pfeile. Sie blättern zum vorherigen beziehungsweise nächsten Monat, auch über den Jahreswechsel hinweg. Die bisherigen Pfeile in der Kopfleiste der Planungstabelle entfallen dafür</li><li><strong>Verbessert:</strong> Zwischen Steuerleiste und Planungstabelle stehen keine Kennzahlen-Kacheln mehr; die Tabelle rückt damit nach oben</li></ul>
+<h3 id="hilfe-4-48-0-monatswechsel-und-sortierung-in-der-planungstabelle">4.48.0 – Monatswechsel und Sortierung in der Planungstabelle</h3>
+<ul><li><strong>Neu:</strong> In der Urlaubsplanung trägt die erste Zelle der Tabelle neben Monat und Jahr zwei Pfeile. Sie blättern zum vorherigen beziehungsweise nächsten Monat, auch über den Jahreswechsel hinweg. Die bisherigen Pfeile in der Kopfleiste der Planungstabelle entfallen dafür</li><li><strong>Verbessert:</strong> Zwischen Steuerleiste und Planungstabelle stehen keine Kennzahlen-Kacheln mehr; die Tabelle rückt damit nach oben</li><li><strong>Verbessert:</strong> Die Planungstabelle nennt die Mitarbeiter als <strong>Nachname, Vorname</strong>; die Namenssuche findet sie auch in dieser Schreibweise</li><li><strong>Neu:</strong> Die Auswahl <strong>Sortierung</strong> ordnet die Planungstabelle alphabetisch nach Nachname oder nach Qualifikation – Stationsleitung, Stellv. Stationsleitung, Fachweiterbildung, Pflegefachkraft, aktuell in Einarbeitung, ITA, MFA, Stationsassistenz, innerhalb der Gruppe nach Nachname. Die Sortierart merkt sich der Browser</li><li><strong>Neu:</strong> Die Reihenfolge dieser Gruppen lässt sich unter <strong>Einstellungen → Planung</strong> umstellen und wieder auf die Vorgabe zurücksetzen</li></ul>
 <h3 id="hilfe-4-47-0-mehrplatzbetrieb-und-leere-monatsplanungen">4.47.0 – Mehrplatzbetrieb und leere Monatsplanungen</h3>
 <ul><li><strong>Behoben:</strong> Ein Konto galt bisher nur an dem Arbeitsplatz, an dem es angelegt wurde. Der Startabgleich lud zwar den gemeinsamen Datenbestand, behielt aber die örtlichen Konten und verwarf die aus der Datei – beim nächsten Sichern verschwanden sie auch dort. Der Startabgleich übernimmt die Konten jetzt aus <code>teo-autosicherung.json</code>; ein einmal angelegtes Konto arbeitet damit an jedem Arbeitsplatz mit seinem Passwort. Der Import von Hand lässt die vorhandenen Konten unverändert wie bisher</li><li><strong>Behoben:</strong> Ein zweiter Arbeitsplatz erzeugte für dieselbe Datei einen neuen Sicherungsschlüssel und machte den bisherigen damit wertlos. Der Schlüssel gehört jetzt zum Datenbestand: Sein Verzeichnis mit den Schlüsselhüllen aller Konten reist in der gemeinsamen Datei mit. Jeder Arbeitsplatz entsperrt ihn mit dem gewohnten Login-Passwort – ein einmal geschützter Datenbestand bleibt ohne neues Passwort bearbeitbar</li><li><strong>Neu:</strong> Beim ersten Start an einem weiteren Arbeitsplatz fragt TeO, ob ein neuer Datenbestand entstehen oder der vorhandene geöffnet werden soll. <strong>Vorhandenen Datenbestand öffnen</strong> gibt den Sicherungsordner frei und meldet mit dem bereits vorhandenen Konto an; Ordnerverknüpfung, Schlüssel und Daten kommen in einem Schritt. Die frühere Pflicht-Ersteinrichtung entfällt damit</li><li><strong>Neu:</strong> Der Startdialog gibt wahlweise den Sicherungsordner frei, statt nur die einzelne Datei zu wählen. Die Verknüpfung gilt dann auch für die nächste Sitzung, und die Dateiauswahl entfällt künftig</li><li><strong>Neu:</strong> Hat ein anderer Arbeitsplatz <code>teo-autosicherung.json</code> zwischenzeitlich geschrieben, überschreibt TeO sie nicht mehr stillschweigend, sondern meldet es. Über <strong>Jetzt automatisch sichern</strong> lässt sich nach ausdrücklicher Bestätigung dennoch überschreiben</li><li><strong>Verbessert:</strong> Ein an einem anderen Arbeitsplatz angelegtes Konto bekommt seine Schlüsselhülle beim ersten Login selbst. Nach dem Wiederherstellungsschlüssel fragt TeO erst, wenn auch das Verzeichnis der gemeinsamen Datei keine passende Hülle kennt</li><li><strong>Neu:</strong> Die Urlaubsplanung druckt <strong>leere Monatsplanungen</strong>: je Monat des gewählten Jahres ein DIN-A4-Blatt quer, darauf alle aktiven und einzuarbeitenden Mitarbeiter alphabetisch untereinander – nach Nachname, Vorname – und die Tage des Monats als Spalten. Unter jedem Namen stehen Beschäftigungsumfang und Jahresurlaubsanspruch. Feiertage, Schulferien und das eigene Dienstwochenende sind vermerkt, die Felder bleiben leer. Wer nur einen Monat braucht, wählt die Seiten im Druckdialog</li><li><strong>Neu:</strong> Braucht ein Monat mehr als ein Blatt – auf eines passen 20 Mitarbeiter –, trägt jedes Blatt den Monat im Kopf und daneben <strong>Seite x von y</strong> für diesen Monat. So lässt sich ein Stapel wieder sortieren</li><li><strong>Verbessert:</strong> Das Handbuch beschreibt jetzt beide leeren Vordrucke – die Jahresübersicht je Mitarbeiter und die neue Monatsplanung</li></ul>
 <h3 id="hilfe-4-45-0-neue-farbthemen-und-schlankerer-start">4.45.0 – Neue Farbthemen und schlankerer Start</h3>

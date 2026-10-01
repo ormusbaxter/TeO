@@ -372,6 +372,19 @@
         ? elements.vacationEntryType.value
         : "vacation";
     });
+    elements.vacationSortMode.addEventListener("change", () => {
+      vacationSortMode = Object.hasOwn(
+        VACATION_SORT_MODES,
+        elements.vacationSortMode.value,
+      )
+        ? elements.vacationSortMode.value
+        : "name";
+      saveVacationViewPreference();
+      // Die Zeilen tauschen die Plaetze; ein gemerktes Feld zeigte sonst
+      // auf einen anderen Mitarbeiter.
+      vacationSelectionAnchor = null;
+      renderVacationPlanner();
+    });
     elements.vacationEmployeeSearch.addEventListener("input", () => {
       vacationEmployeeSearchTerm = elements.vacationEmployeeSearch.value;
       renderVacationPlanner();
@@ -410,6 +423,14 @@
     elements.saveVacationSettingsButton.addEventListener(
       "click",
       saveVacationSettings,
+    );
+    elements.vacationSortOrderList.addEventListener(
+      "click",
+      handleVacationSortOrderClick,
+    );
+    elements.resetVacationSortOrderButton.addEventListener(
+      "click",
+      resetVacationSortOrder,
     );
     elements.printWeekendOverviewButton.addEventListener("click", printWeekendOverview);
     elements.openDataQualityButton.addEventListener("click", openDataQualityDialog);
