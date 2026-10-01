@@ -11992,6 +11992,13 @@ body.is-dragging-appointment .appointment-calendar-entry {
   font-size: 0.7rem;
 }
 
+.audit-subjects {
+  display: block;
+  margin-top: 2px;
+  color: var(--slate-500);
+  font-size: 0.72rem;
+}
+
 @page phone-list {
   size: A4 portrait;
   margin: 0;

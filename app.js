@@ -20,6 +20,62 @@
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
+  // Mehr Betroffene merkt sich ein Protokolleintrag nicht; eine Sammelaktion
+  // ueber das ganze Team bleibt so klein.
+  const MAX_AUDIT_SUBJECTS = 100;
+  const EMPLOYEE_HISTORY_VISIBLE_ENTRIES = 25;
+  // Felder eines Mitarbeiters, deren Aenderung der Verlauf beim Namen nennt.
+  // Zeitstempel fehlen bewusst: Sie aendern sich bei jedem Speichern mit.
+  const EMPLOYEE_FIELD_LABELS = Object.freeze({
+    firstName: "Vorname",
+    lastName: "Nachname",
+    username: "Benutzername",
+    birthDate: "Geburtsdatum",
+    phone: "Telefon",
+    email: "E-Mail",
+    profession: "Beruf",
+    employmentPercent: "Stellenumfang",
+    employmentStatus: "Status",
+    serviceWeekend: "Dienstwochenende",
+    qualifications: "Qualifikationen",
+    qualificationExpiries: "Ablaufdaten",
+  });
+  // Sammlungen, deren Eintraege einem Mitarbeiter zugeordnet sind.
+  const EMPLOYEE_RELATED_COLLECTIONS = Object.freeze([
+    {
+      key: "completions",
+      label: "Fortbildungsnachweis",
+      recordKey: (record) => record.id,
+      employeeIdsOf: (record) => [record.employeeId],
+    },
+    {
+      key: "meetingAttendances",
+      label: "Sitzungsteilnahme",
+      recordKey: (record) => record.id,
+      employeeIdsOf: (record) => [record.employeeId],
+    },
+    {
+      key: "vacationDays",
+      label: "Abwesenheitsplanung",
+      recordKey: (record) => `${record.employeeId}:${record.date}`,
+      employeeIdsOf: (record) => [record.employeeId],
+    },
+    {
+      key: "vacationEntitlements",
+      label: "Urlaubsanspruch",
+      recordKey: (record) => `${record.employeeId}:${record.year}`,
+      employeeIdsOf: (record) => [record.employeeId],
+    },
+    {
+      key: "deviceInstructions",
+      label: "Geräteeinweisung",
+      recordKey: (record) => record.id,
+      employeeIdsOf: (record) => [
+        ...(record.participants || []).map((participant) => participant.employeeId),
+        ...(record.instructorEmployeeId ? [record.instructorEmployeeId] : []),
+      ],
+    },
+  ]);
   // Alle fachlichen Sammlungen des Datenbestands mit ihrer Bezeichnung im
   // Aenderungsprotokoll. Aus dieser Liste leiten sich der Protokolltext einer
   // Mutation und die Pruefung ab, ob seit der letzten Sicherung etwas geaendert
@@ -2432,7 +2488,20 @@
         const username = String(entry?.username || "").trim().slice(0, 40);
         const action = String(entry?.action || "").trim().slice(0, 240);
         if (!id || !timestamp || !username || !action) return null;
-        return { id, timestamp, username, action };
+        const subjects = (Array.isArray(entry.subjects) ? entry.subjects : [])
+          .map((subject) => ({
+            employeeId: normalizeId(subject?.employeeId),
+            change: String(subject?.change || "").trim().slice(0, 240),
+          }))
+          .filter((subject) => subject.employeeId && subject.change)
+          .slice(0, MAX_AUDIT_SUBJECTS);
+        return {
+          id,
+          timestamp,
+          username,
+          action,
+          ...(subjects.length ? { subjects } : {}),
+        };
       })
       .filter(Boolean)
       .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
@@ -2541,6 +2610,7 @@
       auditAction === undefined
         ? describeMutation(previousState, state)
         : auditAction,
+      describeEmployeeChanges(previousState, state),
     );
 
     if (await persistState()) {
@@ -2612,7 +2682,9 @@
 
   // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn
   // gezielt wieder entfernen kann, wenn das Speichern anschliessend scheitert.
-  function appendAuditEntry(action) {
+  // subjects nennt die betroffenen Mitarbeiter samt Art der Aenderung; daraus
+  // entsteht der Aenderungsverlauf in der Mitarbeiter-Akte.
+  function appendAuditEntry(action, subjects = []) {
     if (!action) return "";
     const id = createId();
     state.auditLog.unshift({
@@ -2620,9 +2692,76 @@
       timestamp: new Date().toISOString(),
       username: currentUser?.username || "System",
       action,
+      ...(subjects.length ? { subjects } : {}),
     });
     state.auditLog = state.auditLog.slice(0, MAX_AUDIT_LOG_ENTRIES);
     return id;
+  }
+
+  // Welche Mitarbeiter eine Aenderung betrifft und wie. Verglichen werden nur
+  // Sammlungen, die sich ueberhaupt geaendert haben - der Normalfall ist ein
+  // einziger Eintrag, und der kurze Vergleich bricht beim ersten Unterschied ab.
+  function describeEmployeeChanges(before, after) {
+    const changes = new Map();
+    const note = (employeeId, label, count = 1) => {
+      if (!employeeId) return;
+      if (!changes.has(employeeId)) changes.set(employeeId, new Map());
+      const labels = changes.get(employeeId);
+      labels.set(label, (labels.get(label) || 0) + count);
+    };
+
+    if (!sameStoredValue(before.employees, after.employees)) {
+      const previous = new Map(before.employees.map((employee) => [employee.id, employee]));
+      const current = new Map(after.employees.map((employee) => [employee.id, employee]));
+      current.forEach((employee, id) => {
+        const old = previous.get(id);
+        if (!old) {
+          note(id, "angelegt");
+          return;
+        }
+        const fields = Object.entries(EMPLOYEE_FIELD_LABELS)
+          .filter(([field]) => !sameStoredValue(old[field], employee[field]))
+          .map(([, label]) => label);
+        if (fields.length) note(id, `Stammdaten: ${fields.join(", ")}`);
+      });
+      previous.forEach((_, id) => {
+        if (!current.has(id)) note(id, "gelöscht");
+      });
+    }
+
+    EMPLOYEE_RELATED_COLLECTIONS.forEach(({ key, label, recordKey, employeeIdsOf }) => {
+      if (!sameStoredValue(before[key], after[key])) {
+        const previous = new Map(before[key].map((record) => [recordKey(record), record]));
+        const current = new Map(after[key].map((record) => [recordKey(record), record]));
+        const touched = (record) =>
+          employeeIdsOf(record).forEach((employeeId) => note(employeeId, label));
+        current.forEach((record, id) => {
+          const old = previous.get(id);
+          if (!old) touched(record);
+          else if (!sameStoredValue(old, record)) {
+            // Wechselt ein Eintrag den Mitarbeiter, betrifft er beide.
+            new Set([...employeeIdsOf(old), ...employeeIdsOf(record)]).forEach(
+              (employeeId) => note(employeeId, label),
+            );
+          }
+        });
+        previous.forEach((record, id) => {
+          if (!current.has(id)) touched(record);
+        });
+      }
+    });
+
+    return [...changes]
+      .slice(0, MAX_AUDIT_SUBJECTS)
+      .map(([employeeId, labels]) => ({
+        employeeId,
+        change: [...labels]
+          .map(([label, count]) =>
+            count > 1 ? `${label}: ${count} Einträge` : label,
+          )
+          .join("; ")
+          .slice(0, 240),
+      }));
   }
 
   function describeMutation(before, after) {
@@ -8354,8 +8493,44 @@
             .join("") || '<p class="field-hint">Keine erwarteten Teamsitzungen.</p>'}
         </div>
       </section>
+      ${isAdmin() ? renderEmployeeChangeHistory(employee.id) : ""}
     `;
     elements.employeeDossierDialog.showModal();
+  }
+
+  // Wie das Aenderungsprotokoll selbst nur fuer Administratoren: Es nennt,
+  // wer wann an einem Mitarbeiter gearbeitet hat.
+  function employeeChangeHistory(employeeId) {
+    return state.auditLog.flatMap((entry) => {
+      const subject = entry.subjects?.find((item) => item.employeeId === employeeId);
+      return subject ? [{ ...entry, change: subject.change }] : [];
+    });
+  }
+
+  function renderEmployeeChangeHistory(employeeId) {
+    const history = employeeChangeHistory(employeeId);
+    const shown = history.slice(0, EMPLOYEE_HISTORY_VISIBLE_ENTRIES);
+    return `
+      <section class="dossier-section employee-change-history">
+        <h3>Änderungsverlauf</h3>
+        ${
+          shown.length
+            ? `<div class="dossier-list">${shown
+                .map(
+                  (entry) => `<div class="dossier-list-row">
+                    <strong>${escapeHtml(entry.change)}</strong>
+                    <span>${formatDateTime(entry.timestamp)} · ${escapeHtml(entry.username)}</span>
+                  </div>`,
+                )
+                .join("")}</div>${
+                history.length > shown.length
+                  ? `<p class="field-hint">${history.length - shown.length} ältere Änderungen stehen im Änderungsprotokoll.</p>`
+                  : ""
+              }`
+            : '<p class="field-hint">Seit Einführung des Änderungsverlaufs wurde an diesem Mitarbeiter nichts geändert.</p>'
+        }
+      </section>
+    `;
   }
 
   function renderDossierItem(label, value) {
@@ -11814,7 +11989,11 @@
               <div class="audit-row">
                 <span>${formatDateTime(entry.timestamp)}</span>
                 <strong>${escapeHtml(entry.username)}</strong>
-                <span>${escapeHtml(entry.action)}</span>
+                <span>${escapeHtml(entry.action)}${
+                  entry.subjects?.length
+                    ? `<small class="audit-subjects">${escapeHtml(auditSubjectNames(entry))}</small>`
+                    : ""
+                }</span>
               </div>
             `,
           )
@@ -11827,6 +12006,17 @@
     elements.auditLogDialog.showModal();
   }
 
+  // Geloeschte Mitarbeiter stehen nicht mehr im Bestand; sie erscheinen als
+  // „gelöschter Mitarbeiter“, damit der Eintrag lesbar bleibt.
+  function auditSubjectNames(entry, limit = 3) {
+    const names = (entry.subjects || []).map((subject) => {
+      const employee = getEmployee(subject.employeeId);
+      return employee ? fullName(employee) : "gelöschter Mitarbeiter";
+    });
+    if (names.length <= limit) return names.join(" · ");
+    return `${names.slice(0, limit).join(" · ")} und ${names.length - limit} weitere`;
+  }
+
   function exportAuditLogCsv() {
     if (!requireAdmin() || state.auditLog.length === 0) {
       showToast("Das Änderungsprotokoll enthält noch keine Einträge.", "error");
@@ -11834,11 +12024,12 @@
     }
     downloadCsv(
       `teo-aenderungsprotokoll_${todayIso()}.csv`,
-      ["Zeitpunkt", "Benutzer", "Änderung"],
+      ["Zeitpunkt", "Benutzer", "Änderung", "Betroffene Mitarbeiter"],
       state.auditLog.map((entry) => [
         formatDateTime(entry.timestamp),
         entry.username,
         entry.action,
+        auditSubjectNames(entry, Infinity),
       ]),
     );
   }

@@ -2319,7 +2319,8 @@
 <p>Verantwortliche Personen eines Dienstwochenendes können nicht durch eine Sammelaktion in ein anderes Wochenende verschoben werden.</p>
 <h3 id="hilfe-mitarbeiter-gesamtakte">Mitarbeiter-Gesamtakte</h3>
 <p>Ein Klick auf einen Mitarbeiter öffnet die Gesamtakte mit:</p>
-<ul><li>Stammdaten und Kontaktdaten</li><li>Beschäftigungsstatus und Stellenanteil</li><li>Qualifikationen und Ablaufdaten</li><li>Pflichtfortbildungsstatus</li><li>Teamsitzungsteilnahmen</li><li>Druckansicht</li></ul>
+<ul><li>Stammdaten und Kontaktdaten</li><li>Beschäftigungsstatus und Stellenanteil</li><li>Qualifikationen und Ablaufdaten</li><li>Pflichtfortbildungsstatus</li><li>Teamsitzungsteilnahmen</li><li>Änderungsverlauf (nur für Administratoren)</li><li>Druckansicht</li></ul>
+<p>Der <strong>Änderungsverlauf</strong> zeigt die letzten 25 Änderungen an diesem Mitarbeiter: wann, durch wen und was – etwa „Stammdaten: Beruf, Stellenumfang“, „Abwesenheitsplanung: 3 Einträge“, „Fortbildungsnachweis“ oder „Geräteeinweisung“. Erfasst sind Änderungen ab Version 4.51.0; was davor geschah, steht nur im allgemeinen Änderungsprotokoll ohne Bezug zum Mitarbeiter. Ältere Einträge fallen heraus, sobald das Protokoll seine Höchstzahl von 1000 Einträgen erreicht.</p>
 <h3 id="hilfe-e-mail-adressen-exportieren">E-Mail-Adressen exportieren</h3>
 <p><strong>E-Mails kopieren</strong> erzeugt aus den sichtbaren, aktiven Mitarbeitern einen einzelnen String. Die Adressen werden durch Semikolon getrennt und direkt in die Zwischenablage kopiert.</p>
 <h3 id="hilfe-benutzernamen-exportieren">Benutzernamen exportieren</h3>
@@ -2538,7 +2539,7 @@
 <p>TeO lädt vor dem Ersetzen zusätzlich eine Wiederherstellungssicherung herunter.</p>
 <p>Die Benutzerkonten werden dabei nicht ersetzt. Wer angemeldet ist, bleibt angemeldet; bestehende Konten und Passwörter gelten unverändert weiter. Nur auf einem System ohne jedes Konto werden die Konten aus der Sicherung übernommen.</p>
 <h3 id="hilfe-anderungsprotokoll">Änderungsprotokoll</h3>
-<p>Administrative und fachliche Änderungen werden mit Zeitpunkt, Benutzer und Beschreibung protokolliert. Das Protokoll kann als CSV exportiert werden. Die Einsicht ist Administratoren vorbehalten.</p>
+<p>Administrative und fachliche Änderungen werden mit Zeitpunkt, Benutzer und Beschreibung protokolliert. Betrifft eine Änderung Mitarbeiter, nennt der Eintrag sie mit Namen; daraus entsteht auch der Änderungsverlauf in der Mitarbeiter-Akte. Das Protokoll kann als CSV exportiert werden, mit einer Spalte für die betroffenen Mitarbeiter. Die Einsicht ist Administratoren vorbehalten.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-datenspeicherung-und-mariadb">
 <h2 id="hilfe-datenspeicherung-und-mariadb">Datenspeicherung und MariaDB</h2>
@@ -2621,6 +2622,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-51-0-anderungsverlauf-je-mitarbeiter">4.51.0 – Änderungsverlauf je Mitarbeiter</h3>
+<ul><li><strong>Neu:</strong> Die Mitarbeiter-Akte zeigt Administratoren einen <strong>Änderungsverlauf</strong>: wann, durch wen und was an diesem Mitarbeiter geändert wurde – Stammdaten mit den betroffenen Feldern, Abwesenheiten, Urlaubsanspruch, Fortbildungsnachweise, Sitzungsteilnahmen und Geräteeinweisungen. Auch ein zurückgenommener Schritt erscheint dort</li><li><strong>Verbessert:</strong> Das Änderungsprotokoll nennt bei jeder Änderung die betroffenen Mitarbeiter; der CSV-Export führt sie in einer eigenen Spalte</li><li><strong>Hinweis:</strong> Erfasst wird ab dieser Version. Frühere Protokolleinträge bleiben ohne Bezug zu einzelnen Mitarbeitern</li></ul>
 <h3 id="hilfe-4-50-0-resturlaub-aus-dem-vorjahr">4.50.0 – Resturlaub aus dem Vorjahr</h3>
 <ul><li><strong>Neu:</strong> Die Urlaubsplanung kennt den <strong>Resturlaub aus dem Vorjahr</strong>. Die neue Spalte <strong>Übertrag</strong> steht zwischen Zusatz und Anspruch und lässt sich je Mitarbeiter eintragen</li><li><strong>Neu:</strong> <strong>Resturlaub übernehmen</strong> über der Planungstabelle trägt für alle Mitarbeiter den Rest des Vorjahres als Übertrag ein. Wer im Vorjahr keinen Planungseintrag hat, bleibt unverändert; die Übernahme lässt sich zurücknehmen</li><li><strong>Neu:</strong> Übertragener Resturlaub verfällt, soweit er nicht bis zum <strong>31.03.</strong> geplant ist. Vorher hebt TeO die betroffenen Mitarbeiter orange hervor und nennt sie über der Tabelle; danach zählt der verfallene Teil nicht mehr zum Anspruch. Der Stichtag lässt sich unter <strong>Einstellungen → Planung</strong> ändern</li></ul>
 <h3 id="hilfe-4-49-2-ita-hei-t-intensivtechnische-r-assistent-in">4.49.2 – ITA heißt Intensivtechnische/r Assistent/in</h3>

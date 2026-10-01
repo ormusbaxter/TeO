@@ -19,6 +19,62 @@
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
+  // Mehr Betroffene merkt sich ein Protokolleintrag nicht; eine Sammelaktion
+  // ueber das ganze Team bleibt so klein.
+  const MAX_AUDIT_SUBJECTS = 100;
+  const EMPLOYEE_HISTORY_VISIBLE_ENTRIES = 25;
+  // Felder eines Mitarbeiters, deren Aenderung der Verlauf beim Namen nennt.
+  // Zeitstempel fehlen bewusst: Sie aendern sich bei jedem Speichern mit.
+  const EMPLOYEE_FIELD_LABELS = Object.freeze({
+    firstName: "Vorname",
+    lastName: "Nachname",
+    username: "Benutzername",
+    birthDate: "Geburtsdatum",
+    phone: "Telefon",
+    email: "E-Mail",
+    profession: "Beruf",
+    employmentPercent: "Stellenumfang",
+    employmentStatus: "Status",
+    serviceWeekend: "Dienstwochenende",
+    qualifications: "Qualifikationen",
+    qualificationExpiries: "Ablaufdaten",
+  });
+  // Sammlungen, deren Eintraege einem Mitarbeiter zugeordnet sind.
+  const EMPLOYEE_RELATED_COLLECTIONS = Object.freeze([
+    {
+      key: "completions",
+      label: "Fortbildungsnachweis",
+      recordKey: (record) => record.id,
+      employeeIdsOf: (record) => [record.employeeId],
+    },
+    {
+      key: "meetingAttendances",
+      label: "Sitzungsteilnahme",
+      recordKey: (record) => record.id,
+      employeeIdsOf: (record) => [record.employeeId],
+    },
+    {
+      key: "vacationDays",
+      label: "Abwesenheitsplanung",
+      recordKey: (record) => `${record.employeeId}:${record.date}`,
+      employeeIdsOf: (record) => [record.employeeId],
+    },
+    {
+      key: "vacationEntitlements",
+      label: "Urlaubsanspruch",
+      recordKey: (record) => `${record.employeeId}:${record.year}`,
+      employeeIdsOf: (record) => [record.employeeId],
+    },
+    {
+      key: "deviceInstructions",
+      label: "Geräteeinweisung",
+      recordKey: (record) => record.id,
+      employeeIdsOf: (record) => [
+        ...(record.participants || []).map((participant) => participant.employeeId),
+        ...(record.instructorEmployeeId ? [record.instructorEmployeeId] : []),
+      ],
+    },
+  ]);
   // Alle fachlichen Sammlungen des Datenbestands mit ihrer Bezeichnung im
   // Aenderungsprotokoll. Aus dieser Liste leiten sich der Protokolltext einer
   // Mutation und die Pruefung ab, ob seit der letzten Sicherung etwas geaendert

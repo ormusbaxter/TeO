@@ -1,3 +1,9 @@
+### 4.51.0 – Änderungsverlauf je Mitarbeiter
+
+- **Neu:** Die Mitarbeiter-Akte zeigt Administratoren einen **Änderungsverlauf**: wann, durch wen und was an diesem Mitarbeiter geändert wurde – Stammdaten mit den betroffenen Feldern, Abwesenheiten, Urlaubsanspruch, Fortbildungsnachweise, Sitzungsteilnahmen und Geräteeinweisungen. Auch ein zurückgenommener Schritt erscheint dort
+- **Verbessert:** Das Änderungsprotokoll nennt bei jeder Änderung die betroffenen Mitarbeiter; der CSV-Export führt sie in einer eigenen Spalte
+- **Hinweis:** Erfasst wird ab dieser Version. Frühere Protokolleinträge bleiben ohne Bezug zu einzelnen Mitarbeitern
+
 ### 4.50.0 – Resturlaub aus dem Vorjahr
 
 - **Neu:** Die Urlaubsplanung kennt den **Resturlaub aus dem Vorjahr**. Die neue Spalte **Übertrag** steht zwischen Zusatz und Anspruch und lässt sich je Mitarbeiter eintragen
