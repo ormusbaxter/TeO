@@ -680,6 +680,32 @@ Die Kopfzeile bleibt beim vertikalen Scrollen sichtbar. Wochenenden,
 Feiertage, Schulferien und die beiden Dienstwochenenden werden farblich
 unterschieden.
 
+### Sortierung der Planungstabelle
+
+Die Namen stehen als **Nachname, Vorname**. Die Auswahl **Sortierung** in der
+Steuerleiste ordnet die Zeilen wahlweise
+
+- **Nachname (alphabetisch)** – alle Mitarbeiter nach Nachname, dann Vorname,
+- **Qualifikation** – nach Gruppen und innerhalb einer Gruppe alphabetisch nach
+  Nachname. Vorgegeben ist: Stationsleitung, Stellv. Stationsleitung,
+  Fachweiterbildung, Pflegefachkraft, aktuell in Einarbeitung, ITA, MFA,
+  Stationsassistenz. Wer in keine dieser Gruppen fällt – etwa Ärztinnen und
+  Ärzte –, steht am Ende.
+
+Die Gruppe ergibt sich aus den Stammdaten, und zwar in dieser Rangfolge:
+Qualifikation *Stationsleitung*, dann *Stellvertretende Stationsleitung*, dann
+der Status *In Einarbeitung*, dann die Qualifikation *Fachweiterbildung I/A*,
+zuletzt der Beruf (Pflegefachassistenz zählt zu ITA, Medizinische/r
+Fachangestellte/r zu MFA). Eine Stationsleitung in Einarbeitung steht also bei
+der Stationsleitung.
+
+Die Reihenfolge der Gruppen lässt sich unter **Einstellungen → Planung →
+Sortierung nach Qualifikation** mit den Pfeilen umstellen; jede Verschiebung
+gilt sofort für alle Arbeitsplätze, **Vorgabe wiederherstellen** setzt sie
+zurück. Die gewählte Sortierart merkt sich dagegen jeder Browser selbst.
+
+### Darstellung der Mitarbeiterzeilen
+
 Unter dem Namen des Mitarbeiters stehen das feste **Dienstwochenende** und der
 Beschäftigungsgrad. Der Beschäftigungsstatus bleibt im Tooltip der Zeile
 sichtbar.

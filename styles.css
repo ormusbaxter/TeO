@@ -9817,6 +9817,71 @@ body.is-vacation-view .main-content {
   align-items: center;
 }
 
+.vacation-sort-order-settings {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--slate-200);
+}
+
+.vacation-sort-order-settings h3 {
+  margin: 0 0 6px;
+  color: var(--slate-900);
+  font-size: 0.95rem;
+}
+
+.vacation-sort-order-list {
+  display: grid;
+  gap: 6px;
+  max-width: 460px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vacation-sort-order-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 4px 12px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+}
+
+.vacation-sort-order-position {
+  display: inline-block;
+  min-width: 1.6em;
+  color: var(--slate-500);
+}
+
+.vacation-sort-order-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.vacation-sort-order-actions .icon-button {
+  width: 30px;
+  height: 30px;
+}
+
+.vacation-sort-order-actions .icon-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.vacation-sort-order-actions svg {
+  width: 16px;
+  height: 16px;
+}
+
+.vacation-sort-order-up svg {
+  transform: rotate(-90deg);
+}
+
+.vacation-sort-order-down svg {
+  transform: rotate(90deg);
+}
+
 .vacation-month-heading {
   display: flex;
   gap: 4px;

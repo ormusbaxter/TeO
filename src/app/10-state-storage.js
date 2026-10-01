@@ -118,6 +118,7 @@
           DEFAULT_WEEKEND_A_REFERENCE_SATURDAY,
         vacationWeekdayAbsenceLimit: DEFAULT_WEEKDAY_ABSENCE_LIMIT,
         vacationWeekendAbsenceLimit: DEFAULT_WEEKEND_ABSENCE_LIMIT,
+        vacationSortGroupOrder: [...DEFAULT_VACATION_SORT_GROUP_ORDER],
         serviceWeekends: {
           weekend_a: {
             name: SERVICE_WEEKENDS.weekend_a,
@@ -506,6 +507,9 @@
             DEFAULT_WEEKEND_ABSENCE_LIMIT,
           ),
         ),
+        vacationSortGroupOrder: normalizeVacationSortGroupOrder(
+          parsed.settings?.vacationSortGroupOrder,
+        ),
         serviceWeekends,
         deadlineKinds: normalizeDeadlineKinds(parsed.settings?.deadlineKinds),
         deadlineHideOverdue: Boolean(parsed.settings?.deadlineHideOverdue),
@@ -693,6 +697,23 @@
     return Object.hasOwn(SERVICE_WEEKENDS, migratedValue)
       ? migratedValue
       : "none";
+  }
+
+  // Bekannte Gruppen behalten ihre gespeicherte Position, unbekannte und
+  // doppelte entfallen, fehlende haengen sich in der Vorgabereihenfolge an -
+  // so bringt eine spaetere Fassung neue Gruppen mit, ohne die eigene
+  // Reihenfolge zu verwerfen.
+  function normalizeVacationSortGroupOrder(value) {
+    const kept = [];
+    (Array.isArray(value) ? value : []).forEach((key) => {
+      if (Object.hasOwn(VACATION_SORT_GROUPS, key) && !kept.includes(key)) {
+        kept.push(key);
+      }
+    });
+    return [
+      ...kept,
+      ...DEFAULT_VACATION_SORT_GROUP_ORDER.filter((key) => !kept.includes(key)),
+    ];
   }
 
   function normalizeProfession(value) {

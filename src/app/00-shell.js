@@ -261,6 +261,29 @@
   ]);
 
 
+  // Gruppen der Sortierung „nach Qualifikation“ in der Urlaubsplanung. Die
+  // Reihenfolge hier ist die Vorgabe; in den Einstellungen laesst sie sich
+  // umstellen. Welche Gruppe ein Mitarbeiter traegt, entscheidet dagegen
+  // eine feste Rangfolge (siehe vacationSortGroupOf), damit ein Umsortieren
+  // niemanden in eine andere Gruppe verschiebt.
+  const VACATION_SORT_GROUPS = Object.freeze({
+    stationsleitung: "Stationsleitung",
+    stellvertretendeStationsleitung: "Stellv. Stationsleitung",
+    fachweiterbildung: "Fachweiterbildung",
+    pflegefachkraft: "Pflegefachkraft",
+    onboarding: "Aktuell in Einarbeitung",
+    ita: "ITA",
+    mfa: "MFA",
+    stationsassistenz: "Stationsassistenz",
+  });
+  const DEFAULT_VACATION_SORT_GROUP_ORDER = Object.freeze(
+    Object.keys(VACATION_SORT_GROUPS),
+  );
+  const VACATION_SORT_MODES = Object.freeze({
+    name: "Nachname (alphabetisch)",
+    qualification: "Qualifikation",
+  });
+
   const SERVICE_WEEKENDS = {
     none: "Kein festes Dienstwochenende",
     weekend_a: "Wochenende A",
@@ -540,6 +563,7 @@
   let vacationYear = savedVacationView.year;
   let vacationMonth = savedVacationView.month;
   let vacationEntryType = "vacation";
+  let vacationSortMode = savedVacationView.sort;
   let vacationEmployeeSearchTerm = "";
   // Tastaturbedienung der Planungstabelle: zuletzt angesteuertes Feld als
   // Zeilen-/Spaltenindex sowie der Ankerpunkt einer mit Umschalt aufgezogenen
@@ -749,6 +773,11 @@
     vacationEntryType: document.querySelector("#vacationEntryType"),
     vacationEmployeeSearch: document.querySelector("#vacationEmployeeSearch"),
     vacationBaseDays: document.querySelector("#vacationBaseDays"),
+    vacationSortMode: document.querySelector("#vacationSortMode"),
+    vacationSortOrderList: document.querySelector("#vacationSortOrderList"),
+    resetVacationSortOrderButton: document.querySelector(
+      "#resetVacationSortOrderButton",
+    ),
     vacationWeekdayAbsenceLimit: document.querySelector(
       "#vacationWeekdayAbsenceLimit",
     ),
