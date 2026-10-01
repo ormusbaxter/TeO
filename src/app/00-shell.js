@@ -242,10 +242,10 @@
 
   const DEFAULT_PROFESSIONS = [
     "Pflegefachkraft",
+    "Intensivtechnische/r Assistent/in",
     "Pflegefachassistenz",
     "Medizinische/r Fachangestellte/r",
     "Stationsassistenz",
-    "Arzt/Ärztin",
   ];
   const CARE_PROFESSION_ALIASES = new Set([
     "gesundheits- und krankenpfleger/in",

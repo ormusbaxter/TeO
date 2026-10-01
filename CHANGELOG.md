@@ -1,3 +1,9 @@
+### 4.49.2 – ITA heißt Intensivtechnische/r Assistent/in
+
+- **Behoben:** Die Gruppe **ITA** der Sortierung nach Qualifikation steht für Intensivtechnische/r Assistent/in, nicht für Intensivtransportassistent/in. Dazu zählt jetzt der Beruf „ITA“ oder „Intensivtechnische/r Assistent/in“
+- **Verbessert:** Die vorgegebene Berufsliste eines neuen Datenbestands enthält **Intensivtechnische/r Assistent/in** statt Arzt/Ärztin. Ein vorhandener Datenbestand behält seine Berufsliste; dort lässt sich der Beruf unter **Einstellungen → Stammdaten & Zugriffe** ergänzen
+- **Verbessert:** Die Demodatenbank enthält keine Ärzte mehr, dafür Intensivtechnische Assistentinnen und Assistenten
+
 ### 4.49.1 – Urlaubsplanung in dunklen Farbthemen
 
 - **Behoben:** In den dunklen Farbthemen – Dark Mode, Nord, Dracula, Gruvbox Dark, Tokyo Night und GitHub Dark – standen die leeren Tagesfelder der Urlaubsplanung als hellgraue Kacheln da. Sie übernehmen jetzt die Kartenfarbe des Schemas

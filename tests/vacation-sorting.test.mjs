@@ -16,7 +16,7 @@ const TEAM = [
   person("sa", "Adler", "Sina", { profession: "Stationsassistenz" }),
   person("mfa", "Becker", "Mia", { profession: "Medizinische/r Fachangestellte/r" }),
   person("pfa", "Clausen", "Ida", { profession: "Pflegefachassistenz" }),
-  person("ita", "Ismer", "Tom", { profession: "Intensivtransportassistent/in" }),
+  person("ita", "Ismer", "Tom", { profession: "Intensivtechnische/r Assistent/in" }),
   person("ita2", "Albrecht", "Jan", { profession: "ITA" }),
   person("ein", "Dorn", "Eva", { employmentStatus: "onboarding" }),
   person("pfk2", "Zander", "Paul"),

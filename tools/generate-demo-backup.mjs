@@ -27,10 +27,10 @@ const QUALIFICATIONS = [
 ];
 const PROFESSIONS = [
   "Pflegefachkraft",
+  "Intensivtechnische/r Assistent/in",
   "Pflegefachassistenz",
   "Medizinische/r Fachangestellte/r",
   "Stationsassistenz",
-  "Arzt/Ärztin",
 ];
 const FIRST_NAMES = [
   "Ada", "Amira", "Anika", "Benedikt", "Cem", "Clara", "Daria", "Deniz",
@@ -179,10 +179,10 @@ function createEmployees() {
       ["Pflegefachassistenz", 7],
       ["Medizinische/r Fachangestellte/r", 5],
       ["Stationsassistenz", 5],
-      ["Arzt/Ärztin", 5],
+      ["Intensivtechnische/r Assistent/in", 5],
     ]);
     const serviceWeekend =
-      profession === "Stationsassistenz" || profession === "Arzt/Ärztin"
+      profession === "Stationsassistenz"
         ? "none"
         : weightedPick([["weekend_a", 45], ["weekend_b", 45], ["none", 10]]);
     const qualifications = Object.fromEntries(

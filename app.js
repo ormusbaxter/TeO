@@ -243,10 +243,10 @@
 
   const DEFAULT_PROFESSIONS = [
     "Pflegefachkraft",
+    "Intensivtechnische/r Assistent/in",
     "Pflegefachassistenz",
     "Medizinische/r Fachangestellte/r",
     "Stationsassistenz",
-    "Arzt/Ärztin",
   ];
   const CARE_PROFESSION_ALIASES = new Set([
     "gesundheits- und krankenpfleger/in",
@@ -9577,7 +9577,8 @@
 
   // Die Rangfolge ist fest und unabhaengig von der eingestellten Reihenfolge:
   // Leitungsfunktionen vor der Einarbeitung, die Einarbeitung vor
-  // Weiterbildung und Beruf. ITA steht fuer Intensivtransportassistent/in.
+  // Weiterbildung und Beruf. ITA steht fuer Intensivtechnische/r
+  // Assistent/in.
   // Wer in keine Gruppe faellt, steht hinter allen Gruppen.
   function vacationSortGroupOf(employee) {
     const qualifications = employee.qualifications || {};
@@ -9588,7 +9589,12 @@
     if (employee.employmentStatus === "onboarding") return "onboarding";
     if (qualifications.fachweiterbildungIA) return "fachweiterbildung";
     const signature = professionSignature(employee.profession);
-    if (signature === "ita" || signature.includes("intensivtransport")) return "ita";
+    if (
+      signature === "ita" ||
+      (signature.includes("intensivtechn") && signature.includes("assist"))
+    ) {
+      return "ita";
+    }
     if (signature.includes("pflegefachassisten")) return "pflegefachassistenz";
     if (signature === "mfa" || signature.includes("fachangestellt")) return "mfa";
     if (signature.includes("stationsassisten")) return "stationsassistenz";
