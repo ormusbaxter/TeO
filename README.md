@@ -495,6 +495,10 @@ Anmeldung und Rollen zusätzlich serverseitig geprüft.
    hinterlegen.
 7. Speichern.
 
+TeO nennt Mitarbeiter überall in der Form **Nachname, Vorname** – in Listen,
+Akten, Auswahlfeldern, Meldungen, Ausdrucken und Exporten. Die Suchfelder
+finden einen Namen in beiden Reihenfolgen, also auch als „Vorname Nachname“.
+
 ### Mitarbeiterstatus
 
 TeO unterscheidet:

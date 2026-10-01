@@ -1452,7 +1452,7 @@
         }
         if (!attendanceSearchTerm) return true;
         return searchKey(
-          [employee.firstName, employee.lastName, employee.profession].join(" "),
+          [employeeSearchText(employee), employee.profession].join(" "),
         ).includes(attendanceSearchTerm);
       })
       .sort(sortEmployees);
@@ -1671,7 +1671,7 @@
       .filter((employee) => {
         if (!completionSearchTerm) return true;
         return searchKey(
-          [employee.firstName, employee.lastName, employee.profession].join(" "),
+          [employeeSearchText(employee), employee.profession].join(" "),
         ).includes(completionSearchTerm);
       })
       .sort(sortEmployees);

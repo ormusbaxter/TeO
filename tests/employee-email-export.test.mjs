@@ -193,9 +193,9 @@ test("Die Telefonliste zeigt aktive und einzuarbeitende Mitarbeiter unabhängig 
   );
 
   const erwartet = [
-    ["Zora Abel", ""],
-    ["Cara Neu", "0221 555555"],
-    ["Anna Ziegler", "+49 221 123456"],
+    ["Abel, Zora", ""],
+    ["Neu, Cara", "0221 555555"],
+    ["Ziegler, Anna", "+49 221 123456"],
   ];
 
   // Ohne Filter: aktive und einzuarbeitende Mitarbeiter, keine inaktiven

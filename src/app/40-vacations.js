@@ -377,10 +377,6 @@
     return vacationSortGroupRank(a) - vacationSortGroupRank(b) || sortEmployees(a, b);
   }
 
-  function vacationEmployeeName(employee) {
-    return [employee.lastName, employee.firstName].filter(Boolean).join(", ");
-  }
-
   function renderVacationSortOrderSettings() {
     const order = state.settings.vacationSortGroupOrder;
     elements.vacationSortOrderList.innerHTML = order
@@ -453,10 +449,7 @@
     return employees.filter((employee) =>
       searchKey(
         [
-          fullName(employee),
-          vacationEmployeeName(employee),
-          employee.lastName,
-          employee.firstName,
+          employeeSearchText(employee),
           employee.username,
         ].join(" "),
       ).includes(searchTerm),
@@ -514,7 +507,7 @@
                 type="button"
                 data-vacation-employee-overview="${employee.id}"
                 aria-label="Jahresabwesenheiten von ${escapeHtml(fullName(employee))} öffnen"
-              >${escapeHtml(vacationEmployeeName(employee))}</button>
+              >${escapeHtml(fullName(employee))}</button>
               <small>${escapeHtml(
                 vacationServiceWeekendLabel(employee),
               )} · ${employee.employmentPercent} %</small>
@@ -1348,7 +1341,7 @@
       <tr>
         <th class="vacation-blank-month-name-column" scope="row">
           <strong>${escapeHtml(
-            vacationEmployeeName(employee),
+            fullName(employee),
           )}</strong>
           <small>${escapeHtml(
             [

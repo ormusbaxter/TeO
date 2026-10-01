@@ -147,7 +147,7 @@ test("Einweisungsberechtigung folgt der Herstellereinweisung und dem damaligen S
 
 test("Mitarbeiter der Geräteeinweisung sind nach Nachname und Vorname sortiert", async () => {
   const app = await loadAppFunctions([
-    "deviceInstructionEmployeeOptionLabel",
+    "fullName",
     "filteredDeviceParticipants",
   ]);
   const employees = [
@@ -166,7 +166,7 @@ test("Mitarbeiter der Geräteeinweisung sind nach Nachname und Vorname sortiert"
     ["adler-anna", "adler-zoe", "zimmer"],
   );
   assert.equal(
-    app.deviceInstructionEmployeeOptionLabel(employees[0]),
+    app.fullName(employees[0]),
     "Zimmer, Berta",
     "Der sichtbare Optionswert muss mit dem Nachnamen beginnen, damit die native Tastatursuche danach springt.",
   );

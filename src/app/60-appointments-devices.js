@@ -1133,7 +1133,7 @@
         }
         return (
           !deviceEmployeeSearchTerm ||
-          searchKey(fullName(employee)).includes(deviceEmployeeSearchTerm)
+          searchKey(employeeSearchText(employee)).includes(deviceEmployeeSearchTerm)
         );
       })
       .sort(sortEmployees);
@@ -1775,7 +1775,7 @@
         .map(
           (employee) => `
             <option value="${employee.id}">
-              ${escapeHtml(deviceInstructionEmployeeOptionLabel(employee))}${
+              ${escapeHtml(fullName(employee))}${
                 employee.qualifications.medizinproduktebeauftragter
                   ? " · aktuell Medizinproduktebeauftragte/r"
                   : ""
@@ -1949,7 +1949,7 @@
       .filter(
         (employee) =>
           !deviceParticipantSearchTerm ||
-          searchKey(fullName(employee)).includes(deviceParticipantSearchTerm),
+          searchKey(employeeSearchText(employee)).includes(deviceParticipantSearchTerm),
       )
       .sort(compareDeviceInstructionEmployees);
   }
@@ -1960,10 +1960,6 @@
       a.firstName.localeCompare(b.firstName, "de", { sensitivity: "base" }) ||
       a.id.localeCompare(b.id)
     );
-  }
-
-  function deviceInstructionEmployeeOptionLabel(employee) {
-    return [employee.lastName, employee.firstName].filter(Boolean).join(", ");
   }
 
   function renderDeviceParticipantList() {
@@ -2259,7 +2255,7 @@
       return (
         !normalizedSearch ||
         searchKey(
-          [fullName(employee), employee.profession].filter(Boolean).join(" "),
+          [employeeSearchText(employee), employee.profession].filter(Boolean).join(" "),
         ).includes(normalizedSearch)
       );
     });
