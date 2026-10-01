@@ -345,8 +345,8 @@
 
   // Die Rangfolge ist fest und unabhaengig von der eingestellten Reihenfolge:
   // Leitungsfunktionen vor der Einarbeitung, die Einarbeitung vor
-  // Weiterbildung und Beruf. Wer in keine Gruppe faellt - etwa Aerzte -, steht
-  // hinter allen Gruppen.
+  // Weiterbildung und Beruf. ITA steht fuer Intensivtransportassistent/in.
+  // Wer in keine Gruppe faellt, steht hinter allen Gruppen.
   function vacationSortGroupOf(employee) {
     const qualifications = employee.qualifications || {};
     if (qualifications.stationsleitung) return "stationsleitung";
@@ -356,13 +356,8 @@
     if (employee.employmentStatus === "onboarding") return "onboarding";
     if (qualifications.fachweiterbildungIA) return "fachweiterbildung";
     const signature = professionSignature(employee.profession);
-    if (
-      signature === "ita" ||
-      signature.includes("pflegefachassisten") ||
-      (signature.includes("intensiv") && signature.includes("assisten"))
-    ) {
-      return "ita";
-    }
+    if (signature === "ita" || signature.includes("intensivtransport")) return "ita";
+    if (signature.includes("pflegefachassisten")) return "pflegefachassistenz";
     if (signature === "mfa" || signature.includes("fachangestellt")) return "mfa";
     if (signature.includes("stationsassisten")) return "stationsassistenz";
     if (signature.includes("pflegefach") || signature.includes("krankenpfleg")) {

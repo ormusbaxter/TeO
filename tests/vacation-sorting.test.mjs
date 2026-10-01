@@ -15,7 +15,9 @@ function person(id, lastName, firstName, overrides = {}) {
 const TEAM = [
   person("sa", "Adler", "Sina", { profession: "Stationsassistenz" }),
   person("mfa", "Becker", "Mia", { profession: "Medizinische/r Fachangestellte/r" }),
-  person("ita", "Clausen", "Ida", { profession: "Pflegefachassistenz" }),
+  person("pfa", "Clausen", "Ida", { profession: "Pflegefachassistenz" }),
+  person("ita", "Ismer", "Tom", { profession: "Intensivtransportassistent/in" }),
+  person("ita2", "Albrecht", "Jan", { profession: "ITA" }),
   person("ein", "Dorn", "Eva", { employmentStatus: "onboarding" }),
   person("pfk2", "Zander", "Paul"),
   person("pfk1", "Engel", "Pia"),
@@ -24,7 +26,7 @@ const TEAM = [
     qualifications: { stellvertretendeStationsleitung: true },
   }),
   person("sl", "Huber", "Lea", { qualifications: { stationsleitung: true } }),
-  person("arzt", "Albers", "Anton", { profession: "Arzt/Ärztin" }),
+  person("ohne", "Albers", "Anton", { profession: "Praktikant/in" }),
 ];
 
 async function planung(order) {
@@ -48,7 +50,7 @@ function reihenfolge(app) {
 
 test("Nach Qualifikation: Gruppen in der Vorgabe, darin nach Nachname", async () => {
   const app = await planung();
-  assert.equal(reihenfolge(app), "sl,stv,fwb,pfk1,pfk2,ein,ita,mfa,sa,arzt");
+  assert.equal(reihenfolge(app), "sl,stv,fwb,pfk1,pfk2,ein,ita2,ita,pfa,mfa,sa,ohne");
 });
 
 test("Eine umgestellte Reihenfolge aus den Einstellungen wirkt", async () => {
@@ -56,15 +58,15 @@ test("Eine umgestellte Reihenfolge aus den Einstellungen wirkt", async () => {
   // Fehlende Gruppen haengen sich in der Vorgabereihenfolge an.
   assert.equal(
     app.getState().settings.vacationSortGroupOrder.join(","),
-    "mfa,stationsleitung,stellvertretendeStationsleitung,fachweiterbildung,pflegefachkraft,onboarding,ita,stationsassistenz",
+    "mfa,stationsleitung,stellvertretendeStationsleitung,fachweiterbildung,pflegefachkraft,onboarding,ita,pflegefachassistenz,stationsassistenz",
   );
-  assert.equal(reihenfolge(app), "mfa,sl,stv,fwb,pfk1,pfk2,ein,ita,sa,arzt");
+  assert.equal(reihenfolge(app), "mfa,sl,stv,fwb,pfk1,pfk2,ein,ita2,ita,pfa,sa,ohne");
 });
 
 test("Unbekannte und doppelte Gruppen werden verworfen", async () => {
   const app = await planung(["ita", "gibtsnicht", "ita", 7]);
   assert.equal(app.getState().settings.vacationSortGroupOrder[0], "ita");
-  assert.equal(app.getState().settings.vacationSortGroupOrder.length, 8);
+  assert.equal(app.getState().settings.vacationSortGroupOrder.length, 9);
 });
 
 test("Die Planungstabelle zeigt Nachname, Vorname", async () => {

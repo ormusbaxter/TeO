@@ -688,16 +688,16 @@ Steuerleiste ordnet die Zeilen wahlweise
 - **Nachname (alphabetisch)** – alle Mitarbeiter nach Nachname, dann Vorname,
 - **Qualifikation** – nach Gruppen und innerhalb einer Gruppe alphabetisch nach
   Nachname. Vorgegeben ist: Stationsleitung, Stellv. Stationsleitung,
-  Fachweiterbildung, Pflegefachkraft, aktuell in Einarbeitung, ITA, MFA,
-  Stationsassistenz. Wer in keine dieser Gruppen fällt – etwa Ärztinnen und
-  Ärzte –, steht am Ende.
+  Fachweiterbildung, Pflegefachkraft, aktuell in Einarbeitung, ITA
+  (Intensivtransportassistent/in), Pflegefachassistenz, MFA,
+  Stationsassistenz. Wer in keine dieser Gruppen fällt, steht am Ende.
 
 Die Gruppe ergibt sich aus den Stammdaten, und zwar in dieser Rangfolge:
 Qualifikation *Stationsleitung*, dann *Stellvertretende Stationsleitung*, dann
 der Status *In Einarbeitung*, dann die Qualifikation *Fachweiterbildung I/A*,
-zuletzt der Beruf (Pflegefachassistenz zählt zu ITA, Medizinische/r
-Fachangestellte/r zu MFA). Eine Stationsleitung in Einarbeitung steht also bei
-der Stationsleitung.
+zuletzt der Beruf: Zu ITA zählt ein Beruf namens „ITA“ oder
+„Intensivtransportassistent/in“, zu MFA „Medizinische/r Fachangestellte/r“.
+Eine Stationsleitung in Einarbeitung steht also bei der Stationsleitung.
 
 Die Reihenfolge der Gruppen lässt sich unter **Einstellungen → Planung →
 Sortierung nach Qualifikation** mit den Pfeilen umstellen; jede Verschiebung
