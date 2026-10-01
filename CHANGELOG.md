@@ -1,5 +1,6 @@
-### 4.49.0 – Farbthemen GitHub und GitHub Dark
+### 4.49.0 – Nachname, Vorname und Farbthemen GitHub
 
+- **Verbessert:** Mitarbeiter heißen jetzt überall **Nachname, Vorname** – in Listen, Akten, Schnellansicht, Befehlspalette, Auswahlfeldern, Meldungen, Telefonliste und CSV-Export. Die Suchfelder finden einen Namen weiterhin auch in der Reihenfolge „Vorname Nachname“
 - **Neu:** Das Farbthema **GitHub** übernimmt die helle Palette von GitHub: weiße Karten mit feinem grauen Rand auf hellgrauem Grund, Links und Fokusrahmen im GitHub-Blau, die Hauptaktion im Grün der GitHub-Schaltflächen und eine dunkelgraue Seitenleiste wie die klassische GitHub-Kopfzeile. Zu finden unter **Einstellungen → Allgemein → Aktives Farbthema**
 - **Neu:** **GitHub Dark** ist das dunkle Gegenstück nach der Primer-Palette „dark default“: fast schwarzer Grund, dunkelgraue Karten mit feinem Rand, helle Schrift, Akzente im hellen GitHub-Blau, die Hauptaktion grün. Formularfelder, Bildlaufleisten und der Datumswähler erscheinen dabei ebenfalls dunkel
 

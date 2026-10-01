@@ -375,7 +375,7 @@
         if (!employeeSearchTerm) return true;
 
         const haystack = searchKey(
-          [employee.firstName, employee.lastName].join(" "),
+          employeeSearchText(employee),
         );
         return haystack.includes(employeeSearchTerm);
       })

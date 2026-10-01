@@ -911,7 +911,16 @@
   }
 
   function fullName(employee) {
-    return `${employee.firstName} ${employee.lastName}`.trim();
+    return [employee.lastName, employee.firstName]
+      .map((part) => String(part || "").trim())
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  // Angezeigt wird „Nachname, Vorname“; gesucht werden soll trotzdem auch in
+  // der gesprochenen Reihenfolge „Vorname Nachname“.
+  function employeeSearchText(employee) {
+    return `${employee.firstName} ${employee.lastName} ${fullName(employee)}`;
   }
 
   function initials(employee) {
