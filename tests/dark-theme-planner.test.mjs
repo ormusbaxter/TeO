@@ -52,3 +52,31 @@ test("Leere Tagesfelder und Suchfeld bleiben in dunklen Schemata dunkel", async 
     assert.equal(werte.suche, werte.monat, `${thema}: Suchfeld weicht vom Monatsfeld ab`);
   }
 });
+
+// Auswahl- und Eingabefelder trugen festes Weiß statt der Flächenmarke des
+// Schemas. In getönten hellen Schemata wie Solarized Light wichen sie dadurch
+// vom Farbton des Schemas ab.
+test("Eingabefelder übernehmen in getönten Schemata die Flächenmarke", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+  await teo.zeigeAnsicht("vacations");
+  const gemessen = await teo.evaluate(() => {
+    const auswahl = document.querySelector("[data-theme-select]");
+    auswahl.value = "solarized-light";
+    auswahl.dispatchEvent(new Event("change", { bubbles: true }));
+    const farbe = (selektor) => getComputedStyle(document.querySelector(selektor)).backgroundColor;
+    const probe = document.createElement("div");
+    probe.id = "teoFlaechenProbe";
+    document.body.append(probe);
+    probe.style.background = "var(--white)";
+    return {
+      marke: farbe("#teoFlaechenProbe"),
+      monat: farbe("#vacationMonth"),
+      suche: farbe("#vacationEmployeeSearch"),
+      formular: farbe("#firstName"),
+    };
+  });
+  assert.equal(gemessen.monat, gemessen.marke);
+  assert.equal(gemessen.suche, gemessen.marke);
+  assert.equal(gemessen.formular, gemessen.marke);
+});

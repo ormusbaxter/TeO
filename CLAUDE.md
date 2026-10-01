@@ -59,7 +59,7 @@ holt sie einmalig mit `npm ci`; in der CI laufen sie nach `npm run verify`.
 
 - **ESLint** über `npm run lint`. Geprüft wird der Browserteil am erzeugten
   `app.js`, nicht an den Dateien in `src/app/`: Die sind einzeln kein gültiges
-  Programm – `00-shell.js` öffnet die IIFE, `90-domain-utils.js` schließt sie –,
+  Programm – `00-shell.js` öffnet die IIFE, `90c-ui-helpers.js` schließt sie –,
   und erst zusammengesetzt stimmt der Gültigkeitsbereich. Nur dort fällt eine
   ungenutzte Funktion oder ein unbekannter Bezeichner auf. `tools/lint.mjs`
   rechnet die Fundstelle anschließend auf die Quelldatei zurück, meldet also
@@ -120,8 +120,16 @@ const teo = await openTeO(t, {
 });
 ```
 
-Die Demodatenbank enthält keine Urlaubseinträge; wer welche braucht, ergänzt
-sie so.
+Die Demodatenbank bringt eine Urlaubsplanung für 2025 und 2026 mit, samt
+Überträgen nach 2026. Ein Test, der eine leere oder ganz bestimmte Planung
+braucht, setzt `bestand.vacationDays` selbst.
+
+`angemeldetAls` löst nur die Sperre und setzt die Rolle an der Oberfläche –
+intern ist dann niemand angemeldet, und was Rechte prüft (`isAdmin()`), sagt
+nein. Für solche Fälle meldet `anmeldenAls: "admin"` bzw. `"user"` sich
+wirklich an, mit den Konten der Demodatenbank, und durchläuft den
+Startabgleich mit derselben Datei. Das lädt die Demodaten von selbst und
+dauert etwas länger.
 
 Soll etwas den nächsten Start überleben, öffnet der zweite Aufruf mit
 `neustart: true`: Er lädt TeO im Kontext des vorigen Aufrufs neu, mit dessen

@@ -460,6 +460,136 @@ function createDeviceInstructions(devices, employees) {
   return deviceInstructions;
 }
 
+// Urlaubsplanung 2025 und 2026: Jahresurlaub in Blöcken von einem Tag bis zwei
+// Wochen, dazu einige Schul-, Nachtdienst- und Dienstzusage-Einträge. 2025 ist
+// fast ausgeschöpft; der Rest wird als Übertrag nach 2026 mitgenommen. Je Tag
+// bleibt die Zahl der Abwesenden unter der Tagesgrenze, damit die Demo nicht
+// voller roter Tage steht. Wochenenden bleiben frei - Urlaub zählt nur an
+// Werktagen.
+const DEMO_DAY_CAP = { weekday: 6, weekend: 3 };
+
+function isoDate(year, monthIndex, day) {
+  return dateToIso(new Date(Date.UTC(year, monthIndex, day)));
+}
+
+function workdaysFrom(startIso, count) {
+  const days = [];
+  const cursor = new Date(`${startIso}T12:00:00Z`);
+  const year = cursor.getUTCFullYear();
+  while (days.length < count && cursor.getUTCFullYear() === year) {
+    const weekday = cursor.getUTCDay();
+    if (weekday !== 0 && weekday !== 6) days.push(dateToIso(cursor));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return days;
+}
+
+function createVacationPlan(employees) {
+  const vacationDays = [];
+  const vacationEntitlements = [];
+  const perDay = new Map();
+  const taken = new Set();
+  let counter = 0;
+
+  const fits = (employeeId, days) =>
+    days.every((date) => {
+      const weekday = new Date(`${date}T12:00:00Z`).getUTCDay();
+      const cap = weekday === 0 || weekday === 6 ? DEMO_DAY_CAP.weekend : DEMO_DAY_CAP.weekday;
+      return !taken.has(`${employeeId}:${date}`) && (perDay.get(date) || 0) < cap;
+    });
+  const add = (employeeId, days, type) => {
+    days.forEach((date) => {
+      counter += 1;
+      taken.add(`${employeeId}:${date}`);
+      perDay.set(date, (perDay.get(date) || 0) + 1);
+      vacationDays.push({
+        id: `vacation-demo-${pad(counter, 5)}`,
+        employeeId,
+        date,
+        type,
+        createdAt: EXPORTED_AT,
+        updatedAt: EXPORTED_AT,
+      });
+    });
+  };
+  // Legt bis zu `target` Tage in Blöcken an und gibt die tatsächliche Zahl zurück.
+  const planBlocks = (employee, year, target, type, firstMonth = 0, lastMonth = 11) => {
+    let planned = 0;
+    for (let attempt = 0; attempt < 80 && planned < target; attempt += 1) {
+      const length = Math.min(
+        target - planned,
+        weightedPick([[10, 3], [5, 5], [3, 3], [2, 2], [1, 2]]),
+      );
+      const month = firstMonth + Math.floor(random() * (lastMonth - firstMonth + 1));
+      const start = isoDate(year, month, 1 + Math.floor(random() * 28));
+      const days = workdaysFrom(start, length);
+      if (days.length === length && fits(employee.id, days)) {
+        add(employee.id, days, type);
+        planned += length;
+      }
+    }
+    return planned;
+  };
+
+  employees
+    .filter((employee) => employee.employmentStatus !== "inactive")
+    .forEach((employee) => {
+      const base = Math.round(30 * (employee.employmentPercent / 100) * 2) / 2;
+      const vacationType =
+        employee.employmentStatus === "onboarding" ? "onboardingVacation" : "vacation";
+
+      // 2025: fast ausgeschöpft, ein kleiner Rest bleibt für den Übertrag.
+      const additional2025 = pick([0, 0, 1, 2, 3, 4]);
+      const rest2025 = pick([0, 0, 0, 1, 2, 3, 5]);
+      const planned2025 = planBlocks(
+        employee,
+        2025,
+        Math.max(0, Math.floor(base + additional2025 - rest2025)),
+        vacationType,
+      );
+      const carryOver = Math.max(0, Math.round((base + additional2025 - planned2025) * 2) / 2);
+      vacationEntitlements.push({
+        employeeId: employee.id,
+        year: 2025,
+        additionalDays: additional2025,
+        carryOverDays: 0,
+      });
+
+      // 2026: Der Übertrag wird teils bis Ende März genommen, der Rest des
+      // Jahres ist zu großen Teilen verplant.
+      const additional2026 = pick([0, 0, 1, 2, 3, 4]);
+      vacationEntitlements.push({
+        employeeId: employee.id,
+        year: 2026,
+        additionalDays: additional2026,
+        carryOverDays: Math.min(60, carryOver),
+      });
+      const earlyDays = planBlocks(employee, 2026, Math.ceil(carryOver * random()), vacationType, 0, 2);
+      const share = 0.7 + random() * 0.25;
+      planBlocks(
+        employee,
+        2026,
+        Math.max(0, Math.floor((base + additional2026) * share) - earlyDays),
+        vacationType,
+      );
+
+      // Weitere Eintragsarten - nicht bei jedem, damit die Tabelle lesbar bleibt.
+      if (random() < 0.15) planBlocks(employee, pick([2025, 2026]), 5, "school");
+      if (random() < 0.25) planBlocks(employee, pick([2025, 2026]), 5, "nightDuty");
+      if (random() < 0.1) planBlocks(employee, 2026, 2, "plannedOff");
+      if (employee.serviceWeekend !== "none" && random() < 0.3) {
+        const saturday = workdaysFrom(isoDate(2026, Math.floor(random() * 12), 1), 1)[0];
+        const date = new Date(`${saturday}T12:00:00Z`);
+        date.setUTCDate(date.getUTCDate() + ((6 - date.getUTCDay() + 7) % 7));
+        const weekend = [dateToIso(date)];
+        if (fits(employee.id, weekend)) add(employee.id, weekend, "mandatoryDuty");
+      }
+    });
+
+  vacationDays.sort((a, b) => a.date.localeCompare(b.date) || a.employeeId.localeCompare(b.employeeId));
+  return { vacationDays, vacationEntitlements };
+}
+
 function initialUsers() {
   return [
     {
@@ -573,6 +703,15 @@ function validateBackup(backup) {
   ) {
     errors.push("Eine Geräteeinweisung liegt nach dem Exportdatum.");
   }
+  if (
+    data.vacationDays.some(
+      (entry) => !employeeIds.has(entry.employeeId) || !/^202[56]-\d{2}-\d{2}$/.test(entry.date),
+    ) ||
+    new Set(data.vacationDays.map((entry) => `${entry.employeeId}:${entry.date}`)).size !==
+      data.vacationDays.length
+  ) {
+    errors.push("Die Urlaubsplanung enthält ungültige oder doppelte Einträge.");
+  }
   if (errors.length) throw new Error(errors.join("\n"));
 
   const meetingRates = data.meetings.map((meeting) => {
@@ -605,6 +744,10 @@ function validateBackup(backup) {
     deviceInstructions2026: data.deviceInstructions.filter((entry) =>
       entry.date.startsWith("2026-"),
     ).length,
+    vacationDays2025: data.vacationDays.filter((entry) => entry.date.startsWith("2025-"))
+      .length,
+    vacationDays2026: data.vacationDays.filter((entry) => entry.date.startsWith("2026-"))
+      .length,
     deviceInstructionParticipants: data.deviceInstructions.reduce(
       (sum, entry) => sum + entry.participants.length,
       0,
@@ -635,6 +778,9 @@ export async function generateDemoBackup(outputPath = DEFAULT_OUTPUT) {
   const { meetings, meetingAttendances } = createMeetings(employees);
   const { trainings, completions } = createTrainings(employees);
   const deviceInstructions = createDeviceInstructions(devices, employees);
+  // Zuletzt erzeugt: So bleiben alle übrigen Daten bei gleichem Startwert
+  // unverändert.
+  const { vacationDays, vacationEntitlements } = createVacationPlan(employees);
   const backup = {
     format: BACKUP_FORMAT,
     formatVersion: 1,
@@ -657,8 +803,8 @@ export async function generateDemoBackup(outputPath = DEFAULT_OUTPUT) {
       memos: [],
       devices,
       deviceInstructions,
-      vacationEntitlements: [],
-      vacationDays: [],
+      vacationEntitlements,
+      vacationDays,
       settings: {
         theme: "standard",
         lastBackupAt: EXPORTED_AT,

@@ -724,7 +724,9 @@ Steuerleiste ordnet die Zeilen wahlweise
   Nachname. Vorgegeben ist: Stationsleitung, Stellv. Stationsleitung,
   Fachweiterbildung, Pflegefachkraft, aktuell in Einarbeitung, ITA
   (Intensivtechnische/r Assistent/in), Pflegefachassistenz, MFA,
-  Stationsassistenz. Wer in keine dieser Gruppen fällt, steht am Ende.
+  Stationsassistenz. Wer in keine dieser Gruppen fällt, steht am Ende unter
+  „Ohne Gruppe“. Jede Gruppe beginnt mit einer Zwischenzeile, die ihren Namen
+  und die Zahl ihrer Mitarbeiter nennt.
 
 Die Gruppe ergibt sich aus den Stammdaten, und zwar in dieser Rangfolge:
 Qualifikation *Stationsleitung*, dann *Stellvertretende Stationsleitung*, dann

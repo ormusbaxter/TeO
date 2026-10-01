@@ -83,7 +83,7 @@ test("Nicht zutreffende Sitzungsstatus werden aus der Anwesenheitsstatistik ausg
 
 test("Die Startseite zeigt Fortbildungsfortschritt als Prozentwert", async () => {
   const source = await fs.readFile(
-    path.join(projectRoot, "src/app/30-dashboard-weekends.js"),
+    path.join(projectRoot, "app.js"),
     "utf8",
   );
   assert.match(source, /progress-value">\$\{stats\.percent\}&thinsp;%/);
@@ -92,7 +92,7 @@ test("Die Startseite zeigt Fortbildungsfortschritt als Prozentwert", async () =>
 
 test("Die Startseite enthält kein Widget für aktive Mitarbeiter", async () => {
   const [source, html] = await Promise.all([
-    fs.readFile(path.join(projectRoot, "src/app/30-dashboard-weekends.js"), "utf8"),
+    fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
     fs.readFile(path.join(projectRoot, "src/html/00-shell-dashboard.html"), "utf8"),
   ]);
 
