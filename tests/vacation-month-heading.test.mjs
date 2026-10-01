@@ -29,7 +29,10 @@ function pfeil(app, richtung) {
 // Den gewaehlten Zeitraum merkt sich die Planung im Browserspeicher; dort
 // laesst er sich ohne Bedienelemente ablesen.
 function gemerkterZeitraum(app) {
-  return app.dom.window.localStorage.getItem("intensivteam-vacation-view-v1");
+  const { year, month } = JSON.parse(
+    app.dom.window.localStorage.getItem("intensivteam-vacation-view-v1"),
+  );
+  return `${year}-${month}`;
 }
 
 test("Die erste Tabellenzelle trägt Monat, Jahr und zwei Blätterpfeile", async () => {
@@ -47,8 +50,8 @@ test("Die erste Tabellenzelle trägt Monat, Jahr und zwei Blätterpfeile", async
 test("Die Pfeile blättern über den Jahreswechsel", async () => {
   const app = await planungMitEinemMitarbeiter();
   await app.handleVacationPlannerClick(pfeil(app, 1));
-  assert.equal(gemerkterZeitraum(app), '{"year":2027,"month":1}');
+  assert.equal(gemerkterZeitraum(app), '2027-1');
   await app.handleVacationPlannerClick(pfeil(app, -1));
   await app.handleVacationPlannerClick(pfeil(app, -1));
-  assert.equal(gemerkterZeitraum(app), '{"year":2026,"month":11}');
+  assert.equal(gemerkterZeitraum(app), '2026-11');
 });
