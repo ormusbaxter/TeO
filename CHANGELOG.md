@@ -1,4 +1,6 @@
-### 4.52.1 – Korrekturen in der Urlaubsplanung
+### 4.53.0 – Fadenkreuz und Korrekturen in der Urlaubsplanung
+
+- **Neu:** Ein **Fadenkreuz** hebt in der Planungstabelle Zeile und Spalte des Tagesfelds unter dem Mauszeiger hervor – mit der Tastatur folgt es dem ausgewählten Feld. Die Tönung liegt über der Zelle; Wochenende, Feiertag, Ferien und Überplanung bleiben darunter erkennbar
 
 - **Behoben:** Ein überplanter Tag färbte Spaltenkopf und Tagesfelder rot ein. Dadurch war nicht mehr zu erkennen, ob der Tag ein Wochenende, ein Feiertag oder ein Ferientag ist. Die Spalte ist jetzt rot eingerahmt, die Belegung im Kopf steht weiter auf rotem Grund, und die Kennzeichnung des Tages bleibt sichtbar
 - **Behoben:** Die Meldung „Automatische Datensicherung … wurde aktualisiert“ ließ die Seite springen, wenn weiter unten in einer Tabelle gearbeitet wurde. Die Sicherung baute dafür die ganze Ansicht neu auf; sie aktualisiert jetzt nur noch die Statusanzeigen

@@ -12053,6 +12053,41 @@ body.is-dragging-appointment .appointment-calendar-entry {
   background: var(--slate-50);
 }
 
+/* Fadenkreuz der Planungstabelle. Die Tönung liegt als eigene,
+   durchscheinende Schicht über der Zelle, statt deren Hintergrund zu
+   ersetzen: Wochenende, Feiertagsschraffur, Ferien und eine Überplanung
+   bleiben darunter erkennbar. Klicks gehen durch die Schicht hindurch. */
+.vacation-table tr.is-crosshair-row > td,
+.vacation-table td.is-crosshair-column {
+  position: relative;
+}
+
+.vacation-table tr.is-crosshair-row > :is(th, td)::after,
+.vacation-table .is-crosshair-column::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: color-mix(in srgb, var(--blue-600) 11%, transparent);
+}
+
+.vacation-table tr.is-crosshair-row > .vacation-day-cell.is-crosshair-column::after {
+  background: color-mix(in srgb, var(--blue-600) 22%, transparent);
+}
+
+.vacation-table tr.is-crosshair-row > .vacation-employee-column {
+  box-shadow:
+    inset 4px 0 var(--blue-600),
+    7px 0 12px -12px rgb(16 34 54 / 55%);
+}
+
+/* Die Einträge selbst bleiben ungetönt über der Schicht. */
+.vacation-table tr.is-crosshair-row > td > button,
+.vacation-table td.is-crosshair-column > button {
+  position: relative;
+  z-index: 1;
+}
+
 @page phone-list {
   size: A4 portrait;
   margin: 0;

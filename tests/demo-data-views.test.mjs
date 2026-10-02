@@ -251,3 +251,55 @@ test("Jahresabwesenheiten: Summen je Monat, keine Kopfzahlen, nur eigenes Dienst
   assert.equal(ansicht.legende.join(","), "vacation-year-weekend-swatch is-own-weekend");
   assert.deepEqual(teo.problems, []);
 });
+
+test("Das Fadenkreuz hebt Zeile und Spalte des Feldes unter Zeiger oder Fokus hervor", async (t) => {
+  const teo = await openTeO(t, {
+    angemeldetAls: "admin",
+    mitDemodaten: true,
+    urlaubsansicht: { year: 2026, month: 6, sort: "name" },
+  });
+  if (!teo) return;
+  await teo.zeigeAnsicht("vacations");
+
+  const zustand = () =>
+    teo.evaluate(() => ({
+      zeilen: [...document.querySelectorAll("tr.is-crosshair-row")].map(
+        (zeile) => zeile.querySelector("[data-vacation-employee]")?.dataset.vacationEmployee,
+      ),
+      kopf: [...document.querySelectorAll("thead .is-crosshair-column")].map(
+        (zelle) => zelle.dataset.vacationColumnDate,
+      ),
+      spaltenfelder: document.querySelectorAll("tbody td.is-crosshair-column").length,
+      zeilen_gesamt: document.querySelectorAll("tbody tr:not(.vacation-group-row)").length,
+    }));
+
+  const felder = await teo.page.$$('[data-vacation-date="2026-06-10"]');
+  await felder[2].scrollIntoViewIfNeeded();
+  await felder[2].hover();
+  const gezeigt = await zustand();
+  const zweiter = await felder[2].evaluate((feld) => feld.dataset.vacationEmployee);
+  assert.equal(gezeigt.zeilen.join(","), zweiter);
+  assert.equal(gezeigt.kopf.join(","), "2026-06-10");
+  assert.equal(gezeigt.spaltenfelder, gezeigt.zeilen_gesamt);
+
+  // Die Tönung liegt über der Zelle, ohne deren Färbung zu ersetzen.
+  const schicht = await felder[2].evaluate((feld) => {
+    const zelle = feld.closest("td");
+    return getComputedStyle(zelle, "::after").backgroundColor;
+  });
+  assert.match(schicht, /color\(srgb|rgba/);
+
+  // Tastatur: Der Fokus nimmt das Kreuz mit.
+  await felder[2].focus();
+  await teo.page.keyboard.press("ArrowRight");
+  const nachTaste = await zustand();
+  assert.equal(nachTaste.kopf.join(","), "2026-06-11");
+
+  // Verlässt der Zeiger die Tabelle, verschwindet das Kreuz.
+  await teo.evaluate(() =>
+    document.querySelector("#vacationPlanner").dispatchEvent(new Event("pointerleave")),
+  );
+  const danach = await zustand();
+  assert.equal(danach.kopf.length + danach.zeilen.length + danach.spaltenfelder, 0);
+  assert.deepEqual(teo.problems, []);
+});
