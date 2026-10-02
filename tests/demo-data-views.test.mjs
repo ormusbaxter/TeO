@@ -289,6 +289,24 @@ test("Das Fadenkreuz hebt Zeile und Spalte des Feldes unter Zeiger oder Fokus he
   });
   assert.match(schicht, /color\(srgb|rgba/);
 
+  // Die Summenspalten der markierten Zeile kleben weiter am rechten Rand -
+  // und stehen damit genau unter ihren Spaltenköpfen.
+  const summen = await felder[2].evaluate((feld) => {
+    const zeile = feld.closest("tr");
+    const scroll = document.querySelector(".vacation-table-scroll");
+    scroll.scrollLeft = scroll.scrollWidth;
+    const kopf = [...document.querySelectorAll("thead .vacation-total-column")];
+    return [...zeile.querySelectorAll(".vacation-total-column")].map((zelle, index) => ({
+      position: getComputedStyle(zelle).position,
+      versatz: Math.round(zelle.getBoundingClientRect().left - kopf[index].getBoundingClientRect().left),
+    }));
+  });
+  assert.ok(summen.length >= 6);
+  summen.forEach((summe) => {
+    assert.equal(summe.position, "sticky");
+    assert.equal(summe.versatz, 0);
+  });
+
   // Tastatur: Der Fokus nimmt das Kreuz mit.
   await felder[2].focus();
   await teo.page.keyboard.press("ArrowRight");
