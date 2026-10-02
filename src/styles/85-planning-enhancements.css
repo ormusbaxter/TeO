@@ -587,24 +587,32 @@ body.is-vacation-planner-maximized {
   background: var(--red-700);
 }
 
+/* Eine Überschreitung rahmt die Spalte rot ein, statt sie einzufärben: Die
+   Füllung verdeckte sonst, ob der Tag ein Wochenende, ein Feiertag oder ein
+   Ferientag ist. Die Kennzeichnung des Tages bleibt so darunter sichtbar. */
 .vacation-day-column.is-over-limit {
-  color: var(--white);
-  background: var(--red-700) !important;
+  color: var(--red-700);
+  box-shadow: inset 0 0 0 3px var(--red-700);
 }
 
-.vacation-day-column.is-over-limit :is(
-    small,
-    .vacation-duty-count,
-    .vacation-offset-count
-  ) {
-  color: var(--white);
+.vacation-day-column.is-over-limit.vacation-school-vacation {
+  box-shadow:
+    inset 0 0 0 3px var(--red-700),
+    inset 0 7px #e7b900;
 }
 
 .vacation-day-cell.is-over-limit {
-  background-color: var(--red-100) !important;
   box-shadow:
-    inset 2px 0 rgb(180 35 47 / 38%),
-    inset -2px 0 rgb(180 35 47 / 38%);
+    inset 3px 0 var(--red-700),
+    inset -3px 0 var(--red-700);
+}
+
+.vacation-day-cell.is-over-limit.is-selected {
+  box-shadow:
+    inset 3px 0 var(--red-700),
+    inset -3px 0 var(--red-700),
+    inset 0 2px var(--blue-700),
+    inset 0 -2px var(--blue-700);
 }
 
 .vacation-duty-count {
@@ -979,6 +987,18 @@ body.is-vacation-planner-maximized {
 .vacation-conflict-participants li.is-exempt {
   opacity: 0.7;
   border-style: dashed;
+}
+
+/* Schule / Weiterbildung: ausgegraut, weil sich diese Termine meist nicht
+   verschieben lassen und für eine Lösung kaum in Frage kommen. */
+.vacation-conflict-participants li.is-school {
+  color: var(--slate-500);
+  background: var(--slate-100);
+}
+
+.vacation-conflict-participants li.is-school strong {
+  color: var(--slate-500);
+  font-weight: 700;
 }
 
 .vacation-conflict-participants strong {

@@ -40,6 +40,22 @@
     renderSidebarSystemStatus();
   }
 
+  // Die automatische Sicherung laeuft im Hintergrund, oft waehrend jemand
+  // weiter unten in einer Tabelle arbeitet. Sie aendert nur Sicherungszeitpunkt
+  // und Protokoll - nichts, was die offene Ansicht zeigt. Ein vollstaendiger
+  // Neuaufbau wie in renderAll() setzte dort Bildlauf und Fokus zurueck und
+  // liess die Seite springen. Deshalb nur die Statusanzeigen; die uebrigen
+  // Ansichten werden beim naechsten Wechsel ohnehin neu aufgebaut.
+  function renderAfterAutomaticBackup() {
+    for (const view of Object.keys(VIEW_RENDERERS)) {
+      if (view !== activeView) staleViews.add(view);
+    }
+    if (activeView === "settings") renderView(activeView);
+    renderBackupStatus();
+    renderDatabaseSaveWarning();
+    renderSidebarSystemStatus();
+  }
+
   // Das Farbthema gehoert zum Benutzerkonto, nicht zum Datenbestand: Wer sich
   // anmeldet, bringt seine eigene Auswahl mit. state.settings.theme bleibt die
   // gemeinsame Vorgabe - sie gilt vor der Anmeldung und fuer Konten, die noch

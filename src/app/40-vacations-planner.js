@@ -104,7 +104,7 @@
           Urlaub Einarbeitung und Dienstzusagen zählen nicht gegen die Tagesgrenze
           (${state.settings.vacationWeekdayAbsenceLimit} werktags,
           ${state.settings.vacationWeekendAbsenceLimit} an Wochenenden und Feiertagen).
-          Eine Überschreitung bleibt möglich und färbt den Tag rot. Auf einem
+          Eine Überschreitung bleibt möglich und rahmt den Tag rot ein. Auf einem
           Dienstwochenende gleicht die Zusage eines Mitarbeiters vom jeweils anderen
           festen Wochenende einen Urlaub auf dem eigenen Wochenende aus.
         </span>

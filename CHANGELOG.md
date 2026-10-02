@@ -1,3 +1,9 @@
+### 4.52.1 – Korrekturen in der Urlaubsplanung
+
+- **Behoben:** Ein überplanter Tag färbte Spaltenkopf und Tagesfelder rot ein. Dadurch war nicht mehr zu erkennen, ob der Tag ein Wochenende, ein Feiertag oder ein Ferientag ist. Die Spalte ist jetzt rot eingerahmt, die Belegung im Kopf steht weiter auf rotem Grund, und die Kennzeichnung des Tages bleibt sichtbar
+- **Behoben:** Die Meldung „Automatische Datensicherung … wurde aktualisiert“ ließ die Seite springen, wenn weiter unten in einer Tabelle gearbeitet wurde. Die Sicherung baute dafür die ganze Ansicht neu auf; sie aktualisiert jetzt nur noch die Statusanzeigen
+- **Verbessert:** **Überschneidungen prüfen** zeigt Einträge „Schule / Weiterbildung / Uni“ je Tag ausgegraut vor den übrigen Abwesenheiten. Sie zählen weiter mit, lassen sich aber meist nicht verschieben
+
 ### 4.52.0 – Gruppen in der Planungstabelle und Demo mit Urlaubsplanung
 
 - **Neu:** Bei der Sortierung nach Qualifikation beginnt jede Gruppe der Planungstabelle mit einer Zwischenzeile, die ihren Namen und die Zahl ihrer Mitarbeiter nennt. Wer in keine Gruppe passt, steht unter „Ohne Gruppe“

@@ -124,3 +124,68 @@ test("Ein Test ohne Demodaten sieht keinen Bestand eines früheren Tests", async
   );
   assert.equal(anzahl, 0);
 });
+
+// Eine Überschreitung färbte Kopf und Felder rot ein und verdeckte damit, ob
+// der Tag ein Wochenende oder ein Feiertag ist. Jetzt rahmt sie nur ein.
+test("Überplante Tage behalten ihre Wochenend- und Feiertagskennzeichnung", async (t) => {
+  const teo = await openTeO(t, {
+    angemeldetAls: "admin",
+    urlaubsansicht: { year: 2026, month: 6, sort: "name" },
+    mitDemodaten(bestand) {
+      bestand.vacationDays = [];
+      const pflege = bestand.employees.filter(
+        (employee) => employee.active && employee.profession === "Pflegefachkraft",
+      );
+      // Fronleichnam (Do, 4.6.) und Samstag, 6.6.: je sieben Abwesende bei
+      // einer Grenze von fünf an Wochenenden und Feiertagen.
+      for (const date of ["2026-06-04", "2026-06-06"]) {
+        pflege.slice(0, 7).forEach((employee) => {
+          bestand.vacationDays.push({
+            id: `test-${employee.id}-${date}`,
+            employeeId: employee.id,
+            date,
+            type: "vacation",
+            createdAt: "2026-01-01T00:00:00.000Z",
+            updatedAt: "2026-01-01T00:00:00.000Z",
+          });
+        });
+      }
+    },
+  });
+  if (!teo) return;
+  await teo.zeigeAnsicht("vacations");
+
+  const kopf = await teo.evaluate(() => {
+    const kopfzellen = [...document.querySelectorAll(".vacation-table thead .vacation-day-column")];
+    const tag = (nummer) => {
+      const zelle = kopfzellen[nummer - 1];
+      const stil = getComputedStyle(zelle);
+      return {
+        ueberplant: zelle.classList.contains("is-over-limit"),
+        hintergrund: stil.backgroundColor,
+        bild: stil.backgroundImage,
+        rahmen: stil.boxShadow,
+      };
+    };
+    return { feiertag: tag(4), samstag: tag(6), vergleichsSamstag: tag(20), werktag: tag(3) };
+  });
+
+  assert.ok(kopf.feiertag.ueberplant && kopf.samstag.ueberplant);
+  // Wochenende: dieselbe Färbung wie zwei Wochen später, am selben Dienstwochenende.
+  assert.equal(kopf.samstag.hintergrund, kopf.vergleichsSamstag.hintergrund);
+  assert.notEqual(kopf.samstag.hintergrund, kopf.werktag.hintergrund);
+  // Feiertag: Die Schraffur in der Ecke bleibt.
+  assert.match(kopf.feiertag.bild, /linear-gradient/);
+  // Die Überschreitung zeigt sich als roter Rahmen.
+  assert.match(kopf.samstag.rahmen, /inset/);
+  assert.equal(kopf.vergleichsSamstag.rahmen, "none");
+
+  // Auch die Tagesfelder behalten die Wochenendfärbung.
+  const felder = await teo.evaluate(() => {
+    const zeile = document.querySelector(".vacation-table tbody tr:not(.vacation-group-row)");
+    const zellen = zeile.querySelectorAll(".vacation-day-cell");
+    return [getComputedStyle(zellen[5]).backgroundColor, getComputedStyle(zellen[19]).backgroundColor];
+  });
+  assert.equal(felder[0], felder[1]);
+  assert.deepEqual(teo.problems, []);
+});

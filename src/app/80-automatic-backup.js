@@ -755,7 +755,7 @@
       automaticBackupRetryAt = 0;
       automaticBackupNotice = "";
       databaseSaveReminderArmed = stateMutationSequence !== mutationSequence;
-      renderAll();
+      renderAfterAutomaticBackup();
       showToast(
         volume.warning
           ? backupVolumeMessage(volume)
