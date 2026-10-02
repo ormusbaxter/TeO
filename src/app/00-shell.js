@@ -341,6 +341,9 @@
   );
   // Bis zu diesem Tag (MM-TT) muss uebertragener Resturlaub genommen sein.
   const DEFAULT_VACATION_CARRY_OVER_EXPIRY = "03-31";
+  // Abwesenheiten, die sich in der Regel nicht verschieben lassen. Die
+  // Übersicht der Überschneidungen zeigt sie ausgegraut vorn.
+  const FIXED_ABSENCE_TYPES = Object.freeze(["school", "external"]);
   const VACATION_SORT_MODES = Object.freeze({
     name: "Nachname (alphabetisch)",
     qualification: "Qualifikation",

@@ -832,9 +832,9 @@ erscheinen:
 - Feiertag, Schulferien und Dienstwochenende des Tages
 - alle beteiligten Mitarbeiter mit Eintragsart, Beruf und Dienstwochenende
 
-Einträge **Schule / Weiterbildung / Uni** stehen je Tag vorn und sind
-ausgegraut: Sie zählen als Abwesenheit, lassen sich aber meist nicht
-verschieben. Die übrigen Abwesenheiten folgen darunter. Nicht angerechnete
+Einträge **Schule / Weiterbildung / Uni** und **Externer Einsatz** stehen je
+Tag vorn und sind ausgegraut: Sie zählen als Abwesenheit, lassen sich aber
+meist nicht verschieben. Die übrigen Abwesenheiten folgen darunter. Nicht angerechnete
 Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das Datum springt in
 den zugehörigen Monat der Planungstabelle.
 
@@ -850,8 +850,10 @@ Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix:
 
 - Monate in der ersten Spalte
 - Kalendertage in der Kopfzeile
-- Wochenenden und Dienstwochenenden farblich markiert
+- das eigene Dienstwochenende blau umrahmt, Feiertage und Schulferien markiert
 - alle Abwesenheiten und Dienstzusagen tageweise sichtbar
+- rechts je Monat die genommenen Urlaubstage und – falls vorhanden – die Tage
+  „Schule / Weiterbildung / Uni“
 
 **Jahr drucken** gibt die Matrix aus. Da sie 31 Tagesspalten hat, ist das
 Querformat voreingestellt.

@@ -623,7 +623,6 @@
     height: auto;
   }
 
-  body.print-vacation-overview .vacation-overview-summary > div,
   body.print-vacation-overview .vacation-year-matrix-scroll {
     color: #182230;
     border-color: #cdd5dd;

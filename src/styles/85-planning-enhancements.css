@@ -885,10 +885,6 @@ body.is-vacation-planner-maximized {
   background: var(--red-100) !important;
 }
 
-.vacation-overview-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
 .vacation-overview-dialog {
   width: min(96vw, 1500px);
   max-width: 1500px;
@@ -989,14 +985,15 @@ body.is-vacation-planner-maximized {
   border-style: dashed;
 }
 
-/* Schule / Weiterbildung: ausgegraut, weil sich diese Termine meist nicht
-   verschieben lassen und für eine Lösung kaum in Frage kommen. */
-.vacation-conflict-participants li.is-school {
+/* Schule / Weiterbildung und externe Einsätze: ausgegraut, weil sich diese
+   Termine meist nicht verschieben lassen und für eine Lösung kaum in Frage
+   kommen. */
+.vacation-conflict-participants li.is-fixed {
   color: var(--slate-500);
   background: var(--slate-100);
 }
 
-.vacation-conflict-participants li.is-school strong {
+.vacation-conflict-participants li.is-fixed strong {
   color: var(--slate-500);
   font-weight: 700;
 }
@@ -1251,10 +1248,6 @@ body.is-vacation-planner-maximized {
 
   .vacation-employee .avatar {
     display: none;
-  }
-
-  .vacation-overview-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .mobile-nav {
@@ -2195,4 +2188,19 @@ body.is-dragging-appointment .appointment-calendar-entry {
   font-weight: 700;
   border-radius: 999px;
   background: var(--slate-200);
+}
+
+.vacation-year-weekend-swatch.is-own-weekend {
+  background: var(--white);
+  border: 0;
+  box-shadow: inset 0 0 0 2px rgb(24 102 186 / 72%);
+}
+
+.vacation-year-matrix .vacation-year-total-column {
+  width: 54px;
+  min-width: 54px;
+  color: var(--slate-800);
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: var(--slate-50);
 }

@@ -102,17 +102,22 @@
             ({ entry, employee }) =>
               employee?.active && PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
           )
-          // Schule und Weiterbildung zuerst: Diese Termine stehen in der Regel
-          // fest und lassen sich nicht verschieben. Wer nach Ausweichmöglichkeiten
-          // sucht, findet die verschiebbaren Urlaube so gesammelt darunter.
+          // Schule, Weiterbildung und externe Einsätze zuerst: Diese Termine
+          // stehen in der Regel fest und lassen sich nicht verschieben. Wer nach
+          // Ausweichmöglichkeiten sucht, findet die verschiebbaren Urlaube so
+          // gesammelt darunter.
           .sort(
             (a, b) =>
-              (a.entry.type === "school" ? 0 : 1) - (b.entry.type === "school" ? 0 : 1) ||
+              (isFixedAbsence(a.entry) ? 0 : 1) - (isFixedAbsence(b.entry) ? 0 : 1) ||
               sortEmployees(a.employee, b.employee),
           );
         return { date, stats, participants };
       })
       .filter(Boolean);
+  }
+
+  function isFixedAbsence(entry) {
+    return FIXED_ABSENCE_TYPES.includes(entry.type);
   }
 
   function openVacationConflictOverview() {
@@ -183,7 +188,7 @@
               ({ entry, employee }) => `
                 <li class="${[
                   countsTowardsAbsenceLimit(employee) ? "" : "is-exempt",
-                  entry.type === "school" ? "is-school" : "",
+                  isFixedAbsence(entry) ? "is-fixed" : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}">
@@ -217,29 +222,12 @@
           Number(entry.date.slice(0, 4)) === vacationYear,
       )
       .sort((a, b) => a.date.localeCompare(b.date));
-    const plannedVacationCount = entries.filter(
-      (entry) =>
-        PLANNER_ENTRY_TYPES[entry.type]?.countsVacationEntitlement,
-    ).length;
-    const countedAbsenceCount = entries.filter(
-      (entry) => PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
-    ).length;
-    const dutyCount = entries.filter(
-      (entry) => entry.type === "mandatoryDuty",
-    ).length;
-
     elements.vacationEmployeeOverviewTitle.textContent =
       `${fullName(employee)} · ${vacationYear}`;
     elements.vacationEmployeeOverviewSubtitle.textContent =
       `${employeeStatusLabel(employee)} · ${employee.employmentPercent} % · ${serviceWeekendLabel(employee.serviceWeekend)}`;
 
     elements.vacationEmployeeOverviewContent.innerHTML = `
-      <div class="dossier-summary-grid vacation-overview-summary">
-        ${renderDossierItem("Planungseinträge", entries.length)}
-        ${renderDossierItem("Urlaubstage", plannedVacationCount)}
-        ${renderDossierItem("Zählende Abwesenheiten", countedAbsenceCount)}
-        ${renderDossierItem("Dienstzusagen", dutyCount)}
-      </div>
       <div class="vacation-year-legend" aria-label="Legende der Jahresübersicht">
         ${Object.entries(PLANNER_ENTRY_TYPES)
           .map(
@@ -251,10 +239,13 @@
             `,
           )
           .join("")}
-        <span><i class="vacation-year-weekend-swatch is-weekend_a"></i> ${escapeHtml(serviceWeekendLabel("weekend_a"))}</span>
-        <span><i class="vacation-year-weekend-swatch is-weekend_b"></i> ${escapeHtml(serviceWeekendLabel("weekend_b"))}</span>
+        ${
+          employee.serviceWeekend === "weekend_a" || employee.serviceWeekend === "weekend_b"
+            ? `<span><i class="vacation-year-weekend-swatch is-own-weekend"></i> Eigenes Dienstwochenende ${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</span>`
+            : ""
+        }
       </div>
-      ${renderVacationYearMatrix(entries, employee)}
+      ${renderVacationYearMatrix(entries, employee, { personal: true })}
     `;
     elements.vacationEmployeeOverviewDialog.showModal();
   }

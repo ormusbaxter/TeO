@@ -342,6 +342,9 @@
   );
   // Bis zu diesem Tag (MM-TT) muss uebertragener Resturlaub genommen sein.
   const DEFAULT_VACATION_CARRY_OVER_EXPIRY = "03-31";
+  // Abwesenheiten, die sich in der Regel nicht verschieben lassen. Die
+  // Übersicht der Überschneidungen zeigt sie ausgegraut vorn.
+  const FIXED_ABSENCE_TYPES = Object.freeze(["school", "external"]);
   const VACATION_SORT_MODES = Object.freeze({
     name: "Nachname (alphabetisch)",
     qualification: "Qualifikation",
@@ -10454,17 +10457,22 @@
             ({ entry, employee }) =>
               employee?.active && PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
           )
-          // Schule und Weiterbildung zuerst: Diese Termine stehen in der Regel
-          // fest und lassen sich nicht verschieben. Wer nach Ausweichmöglichkeiten
-          // sucht, findet die verschiebbaren Urlaube so gesammelt darunter.
+          // Schule, Weiterbildung und externe Einsätze zuerst: Diese Termine
+          // stehen in der Regel fest und lassen sich nicht verschieben. Wer nach
+          // Ausweichmöglichkeiten sucht, findet die verschiebbaren Urlaube so
+          // gesammelt darunter.
           .sort(
             (a, b) =>
-              (a.entry.type === "school" ? 0 : 1) - (b.entry.type === "school" ? 0 : 1) ||
+              (isFixedAbsence(a.entry) ? 0 : 1) - (isFixedAbsence(b.entry) ? 0 : 1) ||
               sortEmployees(a.employee, b.employee),
           );
         return { date, stats, participants };
       })
       .filter(Boolean);
+  }
+
+  function isFixedAbsence(entry) {
+    return FIXED_ABSENCE_TYPES.includes(entry.type);
   }
 
   function openVacationConflictOverview() {
@@ -10535,7 +10543,7 @@
               ({ entry, employee }) => `
                 <li class="${[
                   countsTowardsAbsenceLimit(employee) ? "" : "is-exempt",
-                  entry.type === "school" ? "is-school" : "",
+                  isFixedAbsence(entry) ? "is-fixed" : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}">
@@ -10569,29 +10577,12 @@
           Number(entry.date.slice(0, 4)) === vacationYear,
       )
       .sort((a, b) => a.date.localeCompare(b.date));
-    const plannedVacationCount = entries.filter(
-      (entry) =>
-        PLANNER_ENTRY_TYPES[entry.type]?.countsVacationEntitlement,
-    ).length;
-    const countedAbsenceCount = entries.filter(
-      (entry) => PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
-    ).length;
-    const dutyCount = entries.filter(
-      (entry) => entry.type === "mandatoryDuty",
-    ).length;
-
     elements.vacationEmployeeOverviewTitle.textContent =
       `${fullName(employee)} · ${vacationYear}`;
     elements.vacationEmployeeOverviewSubtitle.textContent =
       `${employeeStatusLabel(employee)} · ${employee.employmentPercent} % · ${serviceWeekendLabel(employee.serviceWeekend)}`;
 
     elements.vacationEmployeeOverviewContent.innerHTML = `
-      <div class="dossier-summary-grid vacation-overview-summary">
-        ${renderDossierItem("Planungseinträge", entries.length)}
-        ${renderDossierItem("Urlaubstage", plannedVacationCount)}
-        ${renderDossierItem("Zählende Abwesenheiten", countedAbsenceCount)}
-        ${renderDossierItem("Dienstzusagen", dutyCount)}
-      </div>
       <div class="vacation-year-legend" aria-label="Legende der Jahresübersicht">
         ${Object.entries(PLANNER_ENTRY_TYPES)
           .map(
@@ -10603,10 +10594,13 @@
             `,
           )
           .join("")}
-        <span><i class="vacation-year-weekend-swatch is-weekend_a"></i> ${escapeHtml(serviceWeekendLabel("weekend_a"))}</span>
-        <span><i class="vacation-year-weekend-swatch is-weekend_b"></i> ${escapeHtml(serviceWeekendLabel("weekend_b"))}</span>
+        ${
+          employee.serviceWeekend === "weekend_a" || employee.serviceWeekend === "weekend_b"
+            ? `<span><i class="vacation-year-weekend-swatch is-own-weekend"></i> Eigenes Dienstwochenende ${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</span>`
+            : ""
+        }
       </div>
-      ${renderVacationYearMatrix(entries, employee)}
+      ${renderVacationYearMatrix(entries, employee, { personal: true })}
     `;
     elements.vacationEmployeeOverviewDialog.showModal();
   }
@@ -10896,11 +10890,16 @@
     ].join("-");
   }
 
-  function renderVacationYearMatrix(entries, employee) {
+  // personal: die Ansicht „Jahresabwesenheiten“ eines Mitarbeiters. Sie zeigt
+  // je Monat die genommenen Urlaubs- und Schultage und markiert nur das eigene
+  // Dienstwochenende; die Tönung beider Dienstwochenenden fällt weg. Der leere
+  // Vordruck zum Ausfüllen von Hand bleibt, wie er ist.
+  function renderVacationYearMatrix(entries, employee, { personal = false } = {}) {
     const entriesByDate = new Map(
       entries.map((entry) => [entry.date, entry]),
     );
     const days = Array.from({ length: 31 }, (_, index) => index + 1);
+    const showSchool = personal && entries.some((entry) => entry.type === "school");
     return `
       <div class="vacation-year-matrix-scroll">
         <table class="vacation-year-matrix">
@@ -10908,6 +10907,15 @@
             <tr>
               <th class="vacation-year-month-column" scope="col">Monat</th>
               ${days.map((day) => `<th scope="col">${day}</th>`).join("")}
+              ${
+                personal
+                  ? `<th class="vacation-year-total-column" scope="col" title="Genommene Urlaubstage im Monat">Urlaub</th>${
+                      showSchool
+                        ? '<th class="vacation-year-total-column" scope="col" title="Schule / Weiterbildung / Uni im Monat">Schule</th>'
+                        : ""
+                    }`
+                  : ""
+              }
             </tr>
           </thead>
           <tbody>
@@ -10917,6 +10925,7 @@
                 days,
                 entriesByDate,
                 employee,
+                { personal, showSchool },
               ),
             ).join("")}
           </tbody>
@@ -10925,11 +10934,25 @@
     `;
   }
 
-  function renderVacationYearMonthRow(month, days, entriesByDate, employee) {
+  function renderVacationYearMonthRow(
+    month,
+    days,
+    entriesByDate,
+    employee,
+    { personal = false, showSchool = false } = {},
+  ) {
     const monthLabel = dateFormat({ month: "long" }).format(
       new Date(vacationYear, month - 1, 1, 12),
     );
     const daysInMonth = new Date(vacationYear, month, 0).getDate();
+    const monthPrefix = `${vacationYear}-${String(month).padStart(2, "0")}-`;
+    const monthEntries = personal
+      ? [...entriesByDate.values()].filter((entry) => entry.date.startsWith(monthPrefix))
+      : [];
+    const vacationCount = monthEntries.filter(
+      (entry) => PLANNER_ENTRY_TYPES[entry.type]?.countsVacationEntitlement,
+    ).length;
+    const schoolCount = monthEntries.filter((entry) => entry.type === "school").length;
     return `
       <tr>
         <th class="vacation-year-month-column" scope="row">${escapeHtml(monthLabel)}</th>
@@ -10941,9 +10964,17 @@
               daysInMonth,
               entriesByDate,
               employee,
+              personal,
             ),
           )
           .join("")}
+        ${
+          personal
+            ? `<td class="vacation-year-total-column">${vacationCount || ""}</td>${
+                showSchool ? `<td class="vacation-year-total-column">${schoolCount || ""}</td>` : ""
+              }`
+            : ""
+        }
       </tr>
     `;
   }
@@ -10954,6 +10985,7 @@
     daysInMonth,
     entriesByDate,
     employee,
+    personal = false,
   ) {
     if (day > daysInMonth) {
       return '<td class="is-unavailable" aria-label="Dieser Kalendertag existiert nicht"></td>';
@@ -10982,7 +11014,11 @@
     ].filter(Boolean);
     return `
       <td
-        class="${metadata.className} ${
+        class="${
+          personal
+            ? metadata.className.replace(/\bvacation-weekend-weekend_[ab]\b/g, "")
+            : metadata.className
+        } ${
           metadata.weekendGroup === employee.serviceWeekend
             ? "is-own-weekend"
             : ""

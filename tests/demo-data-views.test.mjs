@@ -189,3 +189,65 @@ test("Überplante Tage behalten ihre Wochenend- und Feiertagskennzeichnung", asy
   assert.equal(felder[0], felder[1]);
   assert.deepEqual(teo.problems, []);
 });
+
+test("Jahresabwesenheiten: Summen je Monat, keine Kopfzahlen, nur eigenes Dienstwochenende", async (t) => {
+  let mitarbeiter;
+  const teo = await openTeO(t, {
+    angemeldetAls: "admin",
+    urlaubsansicht: { year: 2026, month: 3, sort: "name" },
+    mitDemodaten(bestand) {
+      mitarbeiter = bestand.employees.find(
+        (employee) => employee.active && employee.serviceWeekend === "weekend_a",
+      );
+      bestand.vacationDays = bestand.vacationDays.filter(
+        (entry) => entry.employeeId !== mitarbeiter.id,
+      );
+      const neu = (date, type) =>
+        bestand.vacationDays.push({
+          id: `test-${date}`,
+          employeeId: mitarbeiter.id,
+          date,
+          type,
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        });
+      ["2026-03-02", "2026-03-03", "2026-03-04"].forEach((date) => neu(date, "vacation"));
+      ["2026-03-10", "2026-03-11"].forEach((date) => neu(date, "school"));
+      neu("2026-05-05", "vacation");
+    },
+  });
+  if (!teo) return;
+  await teo.zeigeAnsicht("vacations");
+  await teo.evaluate((id) => {
+    document.querySelector(`[data-vacation-employee-overview="${id}"]`).click();
+  }, mitarbeiter.id);
+  await teo.page.waitForSelector("#vacationEmployeeOverviewDialog[open]");
+
+  const ansicht = await teo.evaluate(() => {
+    const inhalt = document.querySelector("#vacationEmployeeOverviewContent");
+    const kopf = [...inhalt.querySelectorAll(".vacation-year-matrix thead th")].map((th) => th.textContent.trim());
+    const zeile = (monat) => {
+      const zellen = inhalt.querySelectorAll(".vacation-year-matrix tbody tr")[monat - 1].querySelectorAll(".vacation-year-total-column");
+      return [...zellen].map((zelle) => zelle.textContent.trim()).join("/");
+    };
+    return {
+      kopfzahlen: Boolean(inhalt.querySelector(".dossier-summary-grid")),
+      kopf: kopf.slice(-2).join("|"),
+      maerz: zeile(3),
+      mai: zeile(5),
+      april: zeile(4),
+      fremdeTönung: inhalt.querySelectorAll(".vacation-year-matrix td[class*='vacation-weekend-']").length,
+      eigeneWochenenden: inhalt.querySelectorAll(".vacation-year-matrix td.is-own-weekend").length,
+      legende: [...inhalt.querySelectorAll(".vacation-year-weekend-swatch")].map((swatch) => swatch.className),
+    };
+  });
+  assert.equal(ansicht.kopfzahlen, false);
+  assert.equal(ansicht.kopf, "Urlaub|Schule");
+  assert.equal(ansicht.maerz, "3/2");
+  assert.equal(ansicht.mai, "1/");
+  assert.equal(ansicht.april, "/");
+  assert.equal(ansicht.fremdeTönung, 0);
+  assert.ok(ansicht.eigeneWochenenden > 40, `${ansicht.eigeneWochenenden} eigene Wochenendtage`);
+  assert.equal(ansicht.legende.join(","), "vacation-year-weekend-swatch is-own-weekend");
+  assert.deepEqual(teo.problems, []);
+});
