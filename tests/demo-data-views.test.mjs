@@ -252,11 +252,42 @@ test("Jahresabwesenheiten: Summen je Monat, keine Kopfzahlen, nur eigenes Dienst
   assert.deepEqual(teo.problems, []);
 });
 
-test("Das Fadenkreuz hebt Zeile und Spalte des Feldes unter Zeiger oder Fokus hervor", async (t) => {
+test("Das Fadenkreuz ist eine Option und standardmäßig aus", async (t) => {
   const teo = await openTeO(t, {
     angemeldetAls: "admin",
     mitDemodaten: true,
     urlaubsansicht: { year: 2026, month: 6, sort: "name" },
+  });
+  if (!teo) return;
+  await teo.zeigeAnsicht("vacations");
+  const markiert = () => teo.evaluate(() => document.querySelectorAll(".is-crosshair-row, .is-crosshair-column").length);
+
+  assert.equal(await teo.evaluate(() => document.querySelector("#vacationCrosshairToggle").checked), false);
+  const feld = (await teo.page.$$('[data-vacation-date="2026-06-10"]'))[2];
+  await feld.scrollIntoViewIfNeeded();
+  await feld.hover();
+  assert.equal(await markiert(), 0);
+
+  // Eingeschaltet wirkt es sofort und wird gemerkt.
+  await teo.page.check("#vacationCrosshairToggle");
+  await feld.hover({ position: { x: 3, y: 3 } });
+  await (await teo.page.$$('[data-vacation-date="2026-06-11"]'))[2].hover();
+  assert.ok((await markiert()) > 0);
+  assert.match(
+    await teo.evaluate(() => localStorage.getItem("intensivteam-vacation-view-v1")),
+    /"crosshair":true/,
+  );
+
+  // Ausgeschaltet verschwindet es sofort.
+  await teo.page.uncheck("#vacationCrosshairToggle");
+  assert.equal(await markiert(), 0);
+});
+
+test("Das Fadenkreuz hebt Zeile und Spalte des Feldes unter Zeiger oder Fokus hervor", async (t) => {
+  const teo = await openTeO(t, {
+    angemeldetAls: "admin",
+    mitDemodaten: true,
+    urlaubsansicht: { year: 2026, month: 6, sort: "name", crosshair: true },
   });
   if (!teo) return;
   await teo.zeigeAnsicht("vacations");
@@ -275,7 +306,17 @@ test("Das Fadenkreuz hebt Zeile und Spalte des Feldes unter Zeiger oder Fokus he
 
   const felder = await teo.page.$$('[data-vacation-date="2026-06-10"]');
   await felder[2].scrollIntoViewIfNeeded();
-  await felder[2].hover();
+  // Ausgelöst wird über die ganze Zelle, auch über ihrem Rand neben dem Feld.
+  const zelle = await felder[2].evaluateHandle((feld) => feld.closest("td"));
+  await zelle.hover({ position: { x: 1, y: 1 } });
+  // Der Punkt liegt neben dem Feld - unter dem Zeiger ist die Zelle selbst.
+  assert.equal(
+    await zelle.evaluate((td) => {
+      const rechteck = td.getBoundingClientRect();
+      return document.elementFromPoint(rechteck.left + 1, rechteck.top + 1) === td;
+    }),
+    true,
+  );
   const gezeigt = await zustand();
   const zweiter = await felder[2].evaluate((feld) => feld.dataset.vacationEmployee);
   assert.equal(gezeigt.zeilen.join(","), zweiter);

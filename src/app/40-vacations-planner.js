@@ -230,6 +230,7 @@
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       sort: "name",
+      crosshair: false,
     };
     try {
       const raw = window.localStorage?.getItem?.(VACATION_VIEW_KEY);
@@ -241,6 +242,7 @@
         year: Number.isInteger(year) && year >= 2000 && year <= 2100 ? year : fallback.year,
         month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : fallback.month,
         sort: Object.hasOwn(VACATION_SORT_MODES, value?.sort) ? value.sort : fallback.sort,
+        crosshair: value?.crosshair === true,
       };
     } catch {
       return fallback;
@@ -255,6 +257,7 @@
           year: vacationYear,
           month: vacationMonth,
           sort: vacationSortMode,
+          crosshair: vacationCrosshairEnabled,
         }),
       );
     } catch {
@@ -287,6 +290,7 @@
     elements.vacationMonth.value = String(vacationMonth);
     elements.vacationEntryType.value = vacationEntryType;
     elements.vacationSortMode.value = vacationSortMode;
+    elements.vacationCrosshairToggle.checked = vacationCrosshairEnabled;
     renderVacationSettingsControls();
     elements.vacationWeekendALegend.textContent =
       serviceWeekendLabel("weekend_a");

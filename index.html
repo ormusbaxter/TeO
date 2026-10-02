@@ -856,6 +856,13 @@
                   <option value="mandatoryDuty">Verpflichtende Dienstzusage</option>
                 </select>
               </label>
+              <label
+                class="checkbox-field vacation-crosshair-toggle"
+                title="Zeile und Spalte des Tages unter dem Mauszeiger hervorheben"
+              >
+                <input id="vacationCrosshairToggle" type="checkbox" />
+                <span>Fadenkreuz</span>
+              </label>
             </div>
             <div class="vacation-legend" aria-label="Legende">
               <span><i class="legend-vacation"></i> Urlaub</span>
@@ -2378,7 +2385,9 @@
 <p>Ein <strong>Geburtstag</strong> ist an der goldenen Schraffur des Tagesfeldes erkennbar; der Tooltip nennt das erreichte Lebensjahr. Fällt der Geburtstag auf den</p>
 <ol><li>Februar, wird er in Nicht-Schaltjahren am 28. Februar angezeigt.</li></ol>
 <h3 id="hilfe-fadenkreuz">Fadenkreuz</h3>
-<p>Fährt der Mauszeiger über ein Tagesfeld, heben sich dessen Zeile – samt Name und Summen – und Spalte – samt Tageskopf – leicht blau ab; das Feld selbst etwas kräftiger. Bei der Tastaturbedienung folgt das Fadenkreuz dem ausgewählten Feld. Die Tönung liegt über den Zellen, Wochenend-, Feiertags-, Ferien- und Überplanungskennzeichnung bleiben also sichtbar.</p>
+<p>Das Häkchen <strong>Fadenkreuz</strong> in der Steuerleiste schaltet eine Lesehilfe ein. Vorgegeben ist „aus“; jeder Browser merkt sich die Wahl.</p>
+<p>Eingeschaltet heben sich beim Überfahren einer Tageszelle deren Zeile und Spalte leicht blau ab – die Zeile samt Name und Summen, die Spalte samt Tageskopf. Die Zelle im Schnittpunkt ist etwas kräftiger getönt. Es genügt, irgendwo in die Zelle zu zeigen, nicht nur auf das Feld darin. Bei der Tastaturbedienung folgt das Fadenkreuz dem ausgewählten Feld.</p>
+<p>Die Tönung liegt über den Zellen. Wochenend-, Feiertags-, Ferien- und Überplanungskennzeichnung bleiben also sichtbar.</p>
 <h3 id="hilfe-tastaturbedienung-der-planungstabelle">Tastaturbedienung der Planungstabelle</h3>
 <p>Ein Klick auf ein Tagesfeld setzt den Ausgangspunkt; danach lässt sich die Tabelle vollständig über die Tastatur ausfüllen.</p>
 <p>| Taste | Wirkung | | --- | --- | | <code>U</code> | Urlaub | | <code>A</code> | Urlaub Einarbeitung | | <code>S</code> | Schule / Weiterbildung / Uni | | <code>B</code> | Unbezahlter Urlaub | | <code>N</code> | Nachtdienst | | <code>E</code> | Externer Einsatz | | <code>F</code> | Frei geplant | | <code>D</code> | Verpflichtende Dienstzusage | | <code>Entf</code> oder <code>Rücktaste</code> | Eintrag entfernen | | Pfeiltasten | Feld wechseln | | <code>Pos 1</code> / <code>Ende</code> | an den Monatsanfang oder das Monatsende springen | | <code>Bild auf</code> / <code>Bild ab</code> | Monat wechseln, Zeile und Tag bleiben erhalten | | <code>Umschalt</code> + Pfeil | Bereich über mehrere Tage und Zeilen markieren | | <code>Esc</code> | Bereichsmarkierung aufheben |</p>
@@ -2625,7 +2634,7 @@
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
 <h3 id="hilfe-4-53-0-fadenkreuz-und-korrekturen-in-der-urlaubsplanung">4.53.0 – Fadenkreuz und Korrekturen in der Urlaubsplanung</h3>
-<ul><li><strong>Neu:</strong> Ein <strong>Fadenkreuz</strong> hebt in der Planungstabelle Zeile und Spalte des Tagesfelds unter dem Mauszeiger hervor – mit der Tastatur folgt es dem ausgewählten Feld. Die Tönung liegt über der Zelle; Wochenende, Feiertag, Ferien und Überplanung bleiben darunter erkennbar</li></ul>
+<ul><li><strong>Neu:</strong> Ein <strong>Fadenkreuz</strong> hebt in der Planungstabelle Zeile und Spalte der Tageszelle unter dem Mauszeiger hervor – mit der Tastatur folgt es dem ausgewählten Feld. Es lässt sich über das Häkchen <strong>Fadenkreuz</strong> in der Steuerleiste einschalten; vorgegeben ist „aus“, der Browser merkt sich die Wahl. Die Tönung liegt über der Zelle; Wochenende, Feiertag, Ferien und Überplanung bleiben darunter erkennbar</li></ul>
 <ul><li><strong>Behoben:</strong> Ein überplanter Tag färbte Spaltenkopf und Tagesfelder rot ein. Dadurch war nicht mehr zu erkennen, ob der Tag ein Wochenende, ein Feiertag oder ein Ferientag ist. Die Spalte ist jetzt rot eingerahmt, die Belegung im Kopf steht weiter auf rotem Grund, und die Kennzeichnung des Tages bleibt sichtbar</li><li><strong>Behoben:</strong> Die Meldung „Automatische Datensicherung … wurde aktualisiert“ ließ die Seite springen, wenn weiter unten in einer Tabelle gearbeitet wurde. Die Sicherung baute dafür die ganze Ansicht neu auf; sie aktualisiert jetzt nur noch die Statusanzeigen</li><li><strong>Verbessert:</strong> <strong>Überschneidungen prüfen</strong> zeigt Einträge „Schule / Weiterbildung / Uni“ und „Externer Einsatz“ je Tag ausgegraut vor den übrigen Abwesenheiten. Sie zählen weiter mit, lassen sich aber meist nicht verschieben</li><li><strong>Verbessert:</strong> Die <strong>Jahresabwesenheiten</strong> eines Mitarbeiters nennen rechts neben jedem Monat die genommenen Urlaubstage und, falls vorhanden, die Schultage. Die Kennzahlen über der Matrix entfallen</li><li><strong>Verbessert:</strong> In den Jahresabwesenheiten ist nur noch das eigene Dienstwochenende markiert; die Tönung beider Dienstwochenenden ist – auch in der Legende – entfallen</li></ul>
 <h3 id="hilfe-4-52-0-gruppen-in-der-planungstabelle-und-demo-mit-urlaubsplanung">4.52.0 – Gruppen in der Planungstabelle und Demo mit Urlaubsplanung</h3>
 <ul><li><strong>Neu:</strong> Bei der Sortierung nach Qualifikation beginnt jede Gruppe der Planungstabelle mit einer Zwischenzeile, die ihren Namen und die Zahl ihrer Mitarbeiter nennt. Wer in keine Gruppe passt, steht unter „Ohne Gruppe“</li><li><strong>Neu:</strong> Die Demodatenbank enthält eine Urlaubs- und Abwesenheitsplanung für 2025 und 2026 – mit Zusatzurlaub, Resturlaub-Übertrag nach 2026 und einzelnen Schul-, Nachtdienst- und Dienstzusage-Einträgen</li><li><strong>Behoben:</strong> Auswahl- und Eingabefelder trugen festes Weiß statt der Flächenfarbe des Farbthemas. In getönten hellen Themen wie Solarized Light passen sie sich jetzt an</li><li><strong>Behoben:</strong> Der Eintrag zu 4.48.0 nannte ITA noch „Intensivtransportassistent/in“; gemeint ist Intensivtechnische/r Assistent/in</li></ul>

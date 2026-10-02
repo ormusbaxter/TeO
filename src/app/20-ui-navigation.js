@@ -376,6 +376,11 @@
       "click",
       requestVacationCarryOver,
     );
+    elements.vacationCrosshairToggle.addEventListener("change", () => {
+      vacationCrosshairEnabled = elements.vacationCrosshairToggle.checked;
+      saveVacationViewPreference();
+      if (!vacationCrosshairEnabled) setVacationCrosshair(null);
+    });
     elements.vacationSortMode.addEventListener("change", () => {
       vacationSortMode = Object.hasOwn(
         VACATION_SORT_MODES,
