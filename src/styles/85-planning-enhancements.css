@@ -2209,7 +2209,10 @@ body.is-dragging-appointment .appointment-calendar-entry {
    durchscheinende Schicht über der Zelle, statt deren Hintergrund zu
    ersetzen: Wochenende, Feiertagsschraffur, Ferien und eine Überplanung
    bleiben darunter erkennbar. Klicks gehen durch die Schicht hindurch. */
-.vacation-table tr.is-crosshair-row > td,
+/* Nur Zellen ohne eigene Positionierung: Namens- und Summenspalten sind
+   sticky und tragen die Schicht ohnehin. Ein relative dort hob ihr Kleben am
+   Rand auf, und die Summen der markierten Zeile rutschten aus der Spalte. */
+.vacation-table tr.is-crosshair-row > td:not(.vacation-total-column),
 .vacation-table td.is-crosshair-column {
   position: relative;
 }
