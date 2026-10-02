@@ -2390,14 +2390,14 @@
 <h3 id="hilfe-abwesenheitsgrenzen">Abwesenheitsgrenzen</h3>
 <p>Standardmäßig gelten:</p>
 <ul><li>Werktage: höchstens 8 gleichzeitig abwesende Mitarbeiter</li><li>Wochenenden und Feiertage: höchstens 5 gleichzeitig abwesende Mitarbeiter</li></ul>
-<p>Beide Grenzwerte sind konfigurierbar. Eine Überplanung bleibt möglich, wird aber deutlich rot markiert.</p>
+<p>Beide Grenzwerte sind konfigurierbar. Eine Überplanung bleibt möglich, wird aber deutlich markiert: Die Spalte des Tages ist rot eingerahmt, und die Belegung im Spaltenkopf steht auf rotem Grund. Wochenend-, Feiertags- und Ferienkennzeichnung bleiben darunter sichtbar.</p>
 <p>Die Grenze beschreibt den Pflegepool, der sich gegenseitig vertritt. Nicht mitgezählt werden Abwesenheiten von</p>
 <ul><li>Medizinischen Fachangestellten</li><li>Pflegefachassistenz</li><li>Stationsassistenz</li></ul>
 <p>Diese Einträge bleiben in der Tabelle sichtbar und werden im Tooltip des Tages gesondert ausgewiesen, belegen aber keinen der gleichzeitig möglichen Urlaube – auch nicht beim Ausgleich am Dienstwochenende.</p>
 <h3 id="hilfe-uberschneidungen-prufen">Überschneidungen prüfen</h3>
 <p>Die Schaltfläche <strong>Überschneidungen prüfen</strong> öffnet eine Liste aller Tage des Planungsjahres, an denen die Tagesgrenze überschritten ist. Zu jedem Tag erscheinen:</p>
 <ul><li>wirksame Abwesenheiten und geltende Grenze</li><li>Feiertag, Schulferien und Dienstwochenende des Tages</li><li>alle beteiligten Mitarbeiter mit Eintragsart, Beruf und Dienstwochenende</li></ul>
-<p>Nicht angerechnete Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das Datum springt in den zugehörigen Monat der Planungstabelle.</p>
+<p>Einträge <strong>Schule / Weiterbildung / Uni</strong> stehen je Tag vorn und sind ausgegraut: Sie zählen als Abwesenheit, lassen sich aber meist nicht verschieben. Die übrigen Abwesenheiten folgen darunter. Nicht angerechnete Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das Datum springt in den zugehörigen Monat der Planungstabelle.</p>
 <h3 id="hilfe-dienstwochenenden-und-kompensation">Dienstwochenenden und Kompensation</h3>
 <p>Urlaub auf dem eigenen Dienstwochenende wirkt auf die Abwesenheitsberechnung. Eine verpflichtende Dienstzusage eines Mitarbeiters aus dem jeweils anderen Wochenende kann diesen Effekt kompensieren.</p>
 <h3 id="hilfe-jahresubersicht-je-mitarbeiter">Jahresübersicht je Mitarbeiter</h3>
@@ -2598,7 +2598,7 @@
 <p>Maßgeblich sind Einführungsjahr, Wiederholungsintervall, das Datum des neuesten Nachweises, die Zuordnung zur richtigen Fortbildungsreihe und das ausgewählte Auswertungsjahr. Prüfen Sie diese Angaben sowohl im Fortbildungskatalog als auch im Nachweis des Mitarbeiters.</p>
 <h3 id="hilfe-warum-kann-eine-leitungsrolle-nicht-entfernt-werden">Warum kann eine Leitungsrolle nicht entfernt werden?</h3>
 <p>Die Person ist noch als verantwortliche Leitung eines Dienstwochenendes eingetragen. Wählen Sie zuerst unter <strong>Einstellungen → Feste Dienstwochenenden</strong> eine andere Stationsleitung oder stellvertretende Stationsleitung aus.</p>
-<h3 id="hilfe-warum-ist-ein-tag-in-der-urlaubsplanung-rot">Warum ist ein Tag in der Urlaubsplanung rot?</h3>
+<h3 id="hilfe-warum-ist-ein-tag-in-der-urlaubsplanung-rot-eingerahmt">Warum ist ein Tag in der Urlaubsplanung rot eingerahmt?</h3>
 <p>Die konfigurierte Abwesenheitsgrenze wurde überschritten. Die Eintragung bleibt möglich, muss aber organisatorisch geprüft werden. <strong>Überschneidungen prüfen</strong> listet die betroffenen Tage und Personen auf. Abwesenheiten von Medizinischen Fachangestellten, Pflegefachassistenz und Stationsassistenz werden bei dieser Grenze nicht mitgezählt.</p>
 <h3 id="hilfe-wie-stelle-ich-den-datenbestand-nach-einem-browser-oder-gerateverlust-wieder-her">Wie stelle ich den Datenbestand nach einem Browser- oder Geräteverlust wieder her?</h3>
 <p>Öffnen Sie TeO in einem unterstützten Browser und importieren Sie die zuletzt erfolgreich erstellte Sicherung. Bei einer verschlüsselten Datei benötigen Sie den getrennt aufbewahrten Wiederherstellungsschlüssel. Bewahren Sie Datei und Schlüssel nicht ausschließlich auf demselben Gerät auf. Im MariaDB-Betrieb erfolgt die Wiederherstellung stattdessen über die geregelte Serversicherung.</p>
@@ -2622,6 +2622,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-52-1-korrekturen-in-der-urlaubsplanung">4.52.1 – Korrekturen in der Urlaubsplanung</h3>
+<ul><li><strong>Behoben:</strong> Ein überplanter Tag färbte Spaltenkopf und Tagesfelder rot ein. Dadurch war nicht mehr zu erkennen, ob der Tag ein Wochenende, ein Feiertag oder ein Ferientag ist. Die Spalte ist jetzt rot eingerahmt, die Belegung im Kopf steht weiter auf rotem Grund, und die Kennzeichnung des Tages bleibt sichtbar</li><li><strong>Behoben:</strong> Die Meldung „Automatische Datensicherung … wurde aktualisiert“ ließ die Seite springen, wenn weiter unten in einer Tabelle gearbeitet wurde. Die Sicherung baute dafür die ganze Ansicht neu auf; sie aktualisiert jetzt nur noch die Statusanzeigen</li><li><strong>Verbessert:</strong> <strong>Überschneidungen prüfen</strong> zeigt Einträge „Schule / Weiterbildung / Uni“ je Tag ausgegraut vor den übrigen Abwesenheiten. Sie zählen weiter mit, lassen sich aber meist nicht verschieben</li></ul>
 <h3 id="hilfe-4-52-0-gruppen-in-der-planungstabelle-und-demo-mit-urlaubsplanung">4.52.0 – Gruppen in der Planungstabelle und Demo mit Urlaubsplanung</h3>
 <ul><li><strong>Neu:</strong> Bei der Sortierung nach Qualifikation beginnt jede Gruppe der Planungstabelle mit einer Zwischenzeile, die ihren Namen und die Zahl ihrer Mitarbeiter nennt. Wer in keine Gruppe passt, steht unter „Ohne Gruppe“</li><li><strong>Neu:</strong> Die Demodatenbank enthält eine Urlaubs- und Abwesenheitsplanung für 2025 und 2026 – mit Zusatzurlaub, Resturlaub-Übertrag nach 2026 und einzelnen Schul-, Nachtdienst- und Dienstzusage-Einträgen</li><li><strong>Behoben:</strong> Auswahl- und Eingabefelder trugen festes Weiß statt der Flächenfarbe des Farbthemas. In getönten hellen Themen wie Solarized Light passen sie sich jetzt an</li><li><strong>Behoben:</strong> Der Eintrag zu 4.48.0 nannte ITA noch „Intensivtransportassistent/in“; gemeint ist Intensivtechnische/r Assistent/in</li></ul>
 <h3 id="hilfe-4-51-0-anderungsverlauf-je-mitarbeiter">4.51.0 – Änderungsverlauf je Mitarbeiter</h3>

@@ -807,7 +807,9 @@ Standardmäßig gelten:
 - Wochenenden und Feiertage: höchstens 5 gleichzeitig abwesende Mitarbeiter
 
 Beide Grenzwerte sind konfigurierbar. Eine Überplanung bleibt möglich, wird
-aber deutlich rot markiert.
+aber deutlich markiert: Die Spalte des Tages ist rot eingerahmt, und die
+Belegung im Spaltenkopf steht auf rotem Grund. Wochenend-, Feiertags- und
+Ferienkennzeichnung bleiben darunter sichtbar.
 
 Die Grenze beschreibt den Pflegepool, der sich gegenseitig vertritt. Nicht
 mitgezählt werden Abwesenheiten von
@@ -830,8 +832,11 @@ erscheinen:
 - Feiertag, Schulferien und Dienstwochenende des Tages
 - alle beteiligten Mitarbeiter mit Eintragsart, Beruf und Dienstwochenende
 
-Nicht angerechnete Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das
-Datum springt in den zugehörigen Monat der Planungstabelle.
+Einträge **Schule / Weiterbildung / Uni** stehen je Tag vorn und sind
+ausgegraut: Sie zählen als Abwesenheit, lassen sich aber meist nicht
+verschieben. Die übrigen Abwesenheiten folgen darunter. Nicht angerechnete
+Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das Datum springt in
+den zugehörigen Monat der Planungstabelle.
 
 ### Dienstwochenenden und Kompensation
 
@@ -1566,7 +1571,7 @@ eingetragen. Wählen Sie zuerst unter **Einstellungen → Feste
 Dienstwochenenden** eine andere Stationsleitung oder stellvertretende
 Stationsleitung aus.
 
-### Warum ist ein Tag in der Urlaubsplanung rot?
+### Warum ist ein Tag in der Urlaubsplanung rot eingerahmt?
 
 Die konfigurierte Abwesenheitsgrenze wurde überschritten. Die Eintragung bleibt
 möglich, muss aber organisatorisch geprüft werden. **Überschneidungen prüfen**

@@ -4206,6 +4206,22 @@
     renderSidebarSystemStatus();
   }
 
+  // Die automatische Sicherung laeuft im Hintergrund, oft waehrend jemand
+  // weiter unten in einer Tabelle arbeitet. Sie aendert nur Sicherungszeitpunkt
+  // und Protokoll - nichts, was die offene Ansicht zeigt. Ein vollstaendiger
+  // Neuaufbau wie in renderAll() setzte dort Bildlauf und Fokus zurueck und
+  // liess die Seite springen. Deshalb nur die Statusanzeigen; die uebrigen
+  // Ansichten werden beim naechsten Wechsel ohnehin neu aufgebaut.
+  function renderAfterAutomaticBackup() {
+    for (const view of Object.keys(VIEW_RENDERERS)) {
+      if (view !== activeView) staleViews.add(view);
+    }
+    if (activeView === "settings") renderView(activeView);
+    renderBackupStatus();
+    renderDatabaseSaveWarning();
+    renderSidebarSystemStatus();
+  }
+
   // Das Farbthema gehoert zum Benutzerkonto, nicht zum Datenbestand: Wer sich
   // anmeldet, bringt seine eigene Auswahl mit. state.settings.theme bleibt die
   // gemeinsame Vorgabe - sie gilt vor der Anmeldung und fuer Konten, die noch
@@ -9538,7 +9554,7 @@
           Urlaub Einarbeitung und Dienstzusagen zählen nicht gegen die Tagesgrenze
           (${state.settings.vacationWeekdayAbsenceLimit} werktags,
           ${state.settings.vacationWeekendAbsenceLimit} an Wochenenden und Feiertagen).
-          Eine Überschreitung bleibt möglich und färbt den Tag rot. Auf einem
+          Eine Überschreitung bleibt möglich und rahmt den Tag rot ein. Auf einem
           Dienstwochenende gleicht die Zusage eines Mitarbeiters vom jeweils anderen
           festen Wochenende einen Urlaub auf dem eigenen Wochenende aus.
         </span>
@@ -10438,7 +10454,14 @@
             ({ entry, employee }) =>
               employee?.active && PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
           )
-          .sort((a, b) => sortEmployees(a.employee, b.employee));
+          // Schule und Weiterbildung zuerst: Diese Termine stehen in der Regel
+          // fest und lassen sich nicht verschieben. Wer nach Ausweichmöglichkeiten
+          // sucht, findet die verschiebbaren Urlaube so gesammelt darunter.
+          .sort(
+            (a, b) =>
+              (a.entry.type === "school" ? 0 : 1) - (b.entry.type === "school" ? 0 : 1) ||
+              sortEmployees(a.employee, b.employee),
+          );
         return { date, stats, participants };
       })
       .filter(Boolean);
@@ -10510,9 +10533,12 @@
           ${participants
             .map(
               ({ entry, employee }) => `
-                <li class="${
-                  countsTowardsAbsenceLimit(employee) ? "" : "is-exempt"
-                }">
+                <li class="${[
+                  countsTowardsAbsenceLimit(employee) ? "" : "is-exempt",
+                  entry.type === "school" ? "is-school" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}">
                   <strong>${escapeHtml(fullName(employee))}</strong>
                   <span>${escapeHtml(
                     [
@@ -18533,7 +18559,7 @@
       automaticBackupRetryAt = 0;
       automaticBackupNotice = "";
       databaseSaveReminderArmed = stateMutationSequence !== mutationSequence;
-      renderAll();
+      renderAfterAutomaticBackup();
       showToast(
         volume.warning
           ? backupVolumeMessage(volume)

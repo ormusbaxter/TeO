@@ -102,7 +102,14 @@
             ({ entry, employee }) =>
               employee?.active && PLANNER_ENTRY_TYPES[entry.type]?.isAbsence,
           )
-          .sort((a, b) => sortEmployees(a.employee, b.employee));
+          // Schule und Weiterbildung zuerst: Diese Termine stehen in der Regel
+          // fest und lassen sich nicht verschieben. Wer nach Ausweichmöglichkeiten
+          // sucht, findet die verschiebbaren Urlaube so gesammelt darunter.
+          .sort(
+            (a, b) =>
+              (a.entry.type === "school" ? 0 : 1) - (b.entry.type === "school" ? 0 : 1) ||
+              sortEmployees(a.employee, b.employee),
+          );
         return { date, stats, participants };
       })
       .filter(Boolean);
@@ -174,9 +181,12 @@
           ${participants
             .map(
               ({ entry, employee }) => `
-                <li class="${
-                  countsTowardsAbsenceLimit(employee) ? "" : "is-exempt"
-                }">
+                <li class="${[
+                  countsTowardsAbsenceLimit(employee) ? "" : "is-exempt",
+                  entry.type === "school" ? "is-school" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}">
                   <strong>${escapeHtml(fullName(employee))}</strong>
                   <span>${escapeHtml(
                     [
