@@ -160,6 +160,7 @@
     vacationEmployeeSearch: document.querySelector("#vacationEmployeeSearch"),
     vacationBaseDays: document.querySelector("#vacationBaseDays"),
     vacationSortMode: document.querySelector("#vacationSortMode"),
+    vacationCrosshairToggle: document.querySelector("#vacationCrosshairToggle"),
     vacationCarryOverExpiry: document.querySelector("#vacationCarryOverExpiry"),
     carryOverVacationButton: document.querySelector("#carryOverVacationButton"),
     vacationSortOrderList: document.querySelector("#vacationSortOrderList"),

@@ -752,11 +752,17 @@ Tooltip nennt das erreichte Lebensjahr. Fällt der Geburtstag auf den
 
 ### Fadenkreuz
 
-Fährt der Mauszeiger über ein Tagesfeld, heben sich dessen Zeile – samt Name
-und Summen – und Spalte – samt Tageskopf – leicht blau ab; das Feld selbst
-etwas kräftiger. Bei der Tastaturbedienung folgt das Fadenkreuz dem
-ausgewählten Feld. Die Tönung liegt über den Zellen, Wochenend-, Feiertags-,
-Ferien- und Überplanungskennzeichnung bleiben also sichtbar.
+Das Häkchen **Fadenkreuz** in der Steuerleiste schaltet eine Lesehilfe ein.
+Vorgegeben ist „aus“; jeder Browser merkt sich die Wahl.
+
+Eingeschaltet heben sich beim Überfahren einer Tageszelle deren Zeile und
+Spalte leicht blau ab – die Zeile samt Name und Summen, die Spalte samt
+Tageskopf. Die Zelle im Schnittpunkt ist etwas kräftiger getönt. Es genügt,
+irgendwo in die Zelle zu zeigen, nicht nur auf das Feld darin. Bei der
+Tastaturbedienung folgt das Fadenkreuz dem ausgewählten Feld.
+
+Die Tönung liegt über den Zellen. Wochenend-, Feiertags-, Ferien- und
+Überplanungskennzeichnung bleiben also sichtbar.
 
 ### Tastaturbedienung der Planungstabelle
 

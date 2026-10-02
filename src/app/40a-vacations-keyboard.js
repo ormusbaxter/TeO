@@ -257,16 +257,21 @@
   // beim Ueberstreichen der Tabelle feuert pointerover fuer jedes Feld.
   let vacationCrosshair = { employeeId: "", date: "" };
 
+  // Ausloeser ist die ganze Tageszelle, nicht nur die Schaltflaeche darin -
+  // sonst sprang das Kreuz nur an, wenn der Zeiger genau den Eintrag traf.
   function handleVacationCrosshair(event) {
-    const cell = event.target.closest?.("[data-vacation-employee][data-vacation-date]");
-    if (!cell) {
+    if (!vacationCrosshairEnabled) return;
+    const button = event.target
+      .closest?.("td.vacation-day-cell")
+      ?.querySelector("[data-vacation-employee][data-vacation-date]");
+    if (!button) {
       // Ueber Kopf, Namen oder Summen bleibt das Kreuz stehen; erst das
       // Verlassen der Tabelle loest es.
       return;
     }
     setVacationCrosshair({
-      employeeId: cell.dataset.vacationEmployee,
-      date: cell.dataset.vacationDate,
+      employeeId: button.dataset.vacationEmployee,
+      date: button.dataset.vacationDate,
     });
   }
 

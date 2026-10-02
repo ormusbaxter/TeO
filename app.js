@@ -630,6 +630,7 @@
   let vacationMonth = savedVacationView.month;
   let vacationEntryType = "vacation";
   let vacationSortMode = savedVacationView.sort;
+  let vacationCrosshairEnabled = savedVacationView.crosshair;
   let vacationEmployeeSearchTerm = "";
   // Tastaturbedienung der Planungstabelle: zuletzt angesteuertes Feld als
   // Zeilen-/Spaltenindex sowie der Ankerpunkt einer mit Umschalt aufgezogenen
@@ -840,6 +841,7 @@
     vacationEmployeeSearch: document.querySelector("#vacationEmployeeSearch"),
     vacationBaseDays: document.querySelector("#vacationBaseDays"),
     vacationSortMode: document.querySelector("#vacationSortMode"),
+    vacationCrosshairToggle: document.querySelector("#vacationCrosshairToggle"),
     vacationCarryOverExpiry: document.querySelector("#vacationCarryOverExpiry"),
     carryOverVacationButton: document.querySelector("#carryOverVacationButton"),
     vacationSortOrderList: document.querySelector("#vacationSortOrderList"),
@@ -3208,6 +3210,11 @@
       "click",
       requestVacationCarryOver,
     );
+    elements.vacationCrosshairToggle.addEventListener("change", () => {
+      vacationCrosshairEnabled = elements.vacationCrosshairToggle.checked;
+      saveVacationViewPreference();
+      if (!vacationCrosshairEnabled) setVacationCrosshair(null);
+    });
     elements.vacationSortMode.addEventListener("change", () => {
       vacationSortMode = Object.hasOwn(
         VACATION_SORT_MODES,
@@ -9688,6 +9695,7 @@
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
       sort: "name",
+      crosshair: false,
     };
     try {
       const raw = window.localStorage?.getItem?.(VACATION_VIEW_KEY);
@@ -9699,6 +9707,7 @@
         year: Number.isInteger(year) && year >= 2000 && year <= 2100 ? year : fallback.year,
         month: Number.isInteger(month) && month >= 1 && month <= 12 ? month : fallback.month,
         sort: Object.hasOwn(VACATION_SORT_MODES, value?.sort) ? value.sort : fallback.sort,
+        crosshair: value?.crosshair === true,
       };
     } catch {
       return fallback;
@@ -9713,6 +9722,7 @@
           year: vacationYear,
           month: vacationMonth,
           sort: vacationSortMode,
+          crosshair: vacationCrosshairEnabled,
         }),
       );
     } catch {
@@ -9745,6 +9755,7 @@
     elements.vacationMonth.value = String(vacationMonth);
     elements.vacationEntryType.value = vacationEntryType;
     elements.vacationSortMode.value = vacationSortMode;
+    elements.vacationCrosshairToggle.checked = vacationCrosshairEnabled;
     renderVacationSettingsControls();
     elements.vacationWeekendALegend.textContent =
       serviceWeekendLabel("weekend_a");
@@ -10364,16 +10375,21 @@
   // beim Ueberstreichen der Tabelle feuert pointerover fuer jedes Feld.
   let vacationCrosshair = { employeeId: "", date: "" };
 
+  // Ausloeser ist die ganze Tageszelle, nicht nur die Schaltflaeche darin -
+  // sonst sprang das Kreuz nur an, wenn der Zeiger genau den Eintrag traf.
   function handleVacationCrosshair(event) {
-    const cell = event.target.closest?.("[data-vacation-employee][data-vacation-date]");
-    if (!cell) {
+    if (!vacationCrosshairEnabled) return;
+    const button = event.target
+      .closest?.("td.vacation-day-cell")
+      ?.querySelector("[data-vacation-employee][data-vacation-date]");
+    if (!button) {
       // Ueber Kopf, Namen oder Summen bleibt das Kreuz stehen; erst das
       // Verlassen der Tabelle loest es.
       return;
     }
     setVacationCrosshair({
-      employeeId: cell.dataset.vacationEmployee,
-      date: cell.dataset.vacationDate,
+      employeeId: button.dataset.vacationEmployee,
+      date: button.dataset.vacationDate,
     });
   }
 

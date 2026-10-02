@@ -94,6 +94,7 @@
   let vacationMonth = savedVacationView.month;
   let vacationEntryType = "vacation";
   let vacationSortMode = savedVacationView.sort;
+  let vacationCrosshairEnabled = savedVacationView.crosshair;
   let vacationEmployeeSearchTerm = "";
   // Tastaturbedienung der Planungstabelle: zuletzt angesteuertes Feld als
   // Zeilen-/Spaltenindex sowie der Ankerpunkt einer mit Umschalt aufgezogenen

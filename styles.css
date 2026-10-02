@@ -12091,6 +12091,15 @@ body.is-dragging-appointment .appointment-calendar-entry {
   z-index: 1;
 }
 
+.vacation-crosshair-toggle {
+  align-self: end;
+  min-height: 42px;
+  align-items: center;
+  color: var(--slate-700);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 @page phone-list {
   size: A4 portrait;
   margin: 0;
