@@ -750,6 +750,14 @@ Ein **Geburtstag** ist an der goldenen Schraffur des Tagesfeldes erkennbar; der
 Tooltip nennt das erreichte Lebensjahr. Fällt der Geburtstag auf den
 29. Februar, wird er in Nicht-Schaltjahren am 28. Februar angezeigt.
 
+### Fadenkreuz
+
+Fährt der Mauszeiger über ein Tagesfeld, heben sich dessen Zeile – samt Name
+und Summen – und Spalte – samt Tageskopf – leicht blau ab; das Feld selbst
+etwas kräftiger. Bei der Tastaturbedienung folgt das Fadenkreuz dem
+ausgewählten Feld. Die Tönung liegt über den Zellen, Wochenend-, Feiertags-,
+Ferien- und Überplanungskennzeichnung bleiben also sichtbar.
+
 ### Tastaturbedienung der Planungstabelle
 
 Ein Klick auf ein Tagesfeld setzt den Ausgangspunkt; danach lässt sich die

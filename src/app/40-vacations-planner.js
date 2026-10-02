@@ -344,6 +344,7 @@
       <th
         class="vacation-day-column ${metadata.className} ${capacityClass}"
         scope="col"
+        data-vacation-column-date="${date}"
         title="${escapeHtml(title)}"
       >
         <strong>${day.getDate()}</strong>

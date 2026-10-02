@@ -3800,6 +3800,11 @@
       "keydown",
       handleVacationPlannerKeydown,
     );
+    elements.vacationPlanner.addEventListener("pointerover", handleVacationCrosshair);
+    elements.vacationPlanner.addEventListener("focusin", handleVacationCrosshair);
+    elements.vacationPlanner.addEventListener("pointerleave", () =>
+      setVacationCrosshair(null),
+    );
     elements.recentEmployees.addEventListener("click", handleRecentEmployeeAction);
     elements.trainingList.addEventListener("click", handleTrainingAction);
     elements.meetingList.addEventListener("click", handleMeetingAction);
@@ -9797,6 +9802,7 @@
       <th
         class="vacation-day-column ${metadata.className} ${capacityClass}"
         scope="col"
+        data-vacation-column-date="${date}"
         title="${escapeHtml(title)}"
       >
         <strong>${day.getDate()}</strong>
@@ -10352,6 +10358,63 @@
   // Feld und Laenge unveraendert sind. Eintraege werden ausschliesslich per
   // push ergaenzt oder per filter entfernt, beides faellt dadurch auf.
   const vacationIndexes = new WeakMap();
+
+  // Fadenkreuz: Zeile und Spalte des Tagesfelds unter dem Zeiger oder mit dem
+  // Tastaturfokus werden hervorgehoben. Gesetzt wird nur, was sich aendert -
+  // beim Ueberstreichen der Tabelle feuert pointerover fuer jedes Feld.
+  let vacationCrosshair = { employeeId: "", date: "" };
+
+  function handleVacationCrosshair(event) {
+    const cell = event.target.closest?.("[data-vacation-employee][data-vacation-date]");
+    if (!cell) {
+      // Ueber Kopf, Namen oder Summen bleibt das Kreuz stehen; erst das
+      // Verlassen der Tabelle loest es.
+      return;
+    }
+    setVacationCrosshair({
+      employeeId: cell.dataset.vacationEmployee,
+      date: cell.dataset.vacationDate,
+    });
+  }
+
+  function setVacationCrosshair(target) {
+    const next = target || { employeeId: "", date: "" };
+    const planner = elements.vacationPlanner;
+    const rowChanged = next.employeeId !== vacationCrosshair.employeeId;
+    const columnChanged = next.date !== vacationCrosshair.date;
+    // Nach einem Neuaufbau der Tabelle sind die Markierungen weg, der
+    // gemerkte Stand aber nicht - dann alles neu setzen.
+    const stale = !planner.querySelector(".is-crosshair-row, .is-crosshair-column");
+    if (!rowChanged && !columnChanged && !stale) return;
+
+    if (rowChanged || stale) {
+      planner
+        .querySelectorAll(".is-crosshair-row")
+        .forEach((element) => element.classList.remove("is-crosshair-row"));
+      if (next.employeeId) {
+        planner
+          .querySelector(`[data-vacation-employee="${next.employeeId}"]`)
+          ?.closest("tr")
+          ?.classList.add("is-crosshair-row");
+      }
+    }
+    if (columnChanged || stale) {
+      planner
+        .querySelectorAll(".is-crosshair-column")
+        .forEach((element) => element.classList.remove("is-crosshair-column"));
+      if (next.date) {
+        planner
+          .querySelectorAll(
+            `[data-vacation-column-date="${next.date}"], [data-vacation-date="${next.date}"]`,
+          )
+          .forEach((element) =>
+            (element.closest("td") || element).classList.add("is-crosshair-column"),
+          );
+      }
+    }
+    vacationCrosshair = next;
+  }
+
 
   function vacationIndex() {
     const collection = state.vacationDays;
