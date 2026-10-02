@@ -2,7 +2,9 @@
 
 - **Behoben:** Ein überplanter Tag färbte Spaltenkopf und Tagesfelder rot ein. Dadurch war nicht mehr zu erkennen, ob der Tag ein Wochenende, ein Feiertag oder ein Ferientag ist. Die Spalte ist jetzt rot eingerahmt, die Belegung im Kopf steht weiter auf rotem Grund, und die Kennzeichnung des Tages bleibt sichtbar
 - **Behoben:** Die Meldung „Automatische Datensicherung … wurde aktualisiert“ ließ die Seite springen, wenn weiter unten in einer Tabelle gearbeitet wurde. Die Sicherung baute dafür die ganze Ansicht neu auf; sie aktualisiert jetzt nur noch die Statusanzeigen
-- **Verbessert:** **Überschneidungen prüfen** zeigt Einträge „Schule / Weiterbildung / Uni“ je Tag ausgegraut vor den übrigen Abwesenheiten. Sie zählen weiter mit, lassen sich aber meist nicht verschieben
+- **Verbessert:** **Überschneidungen prüfen** zeigt Einträge „Schule / Weiterbildung / Uni“ und „Externer Einsatz“ je Tag ausgegraut vor den übrigen Abwesenheiten. Sie zählen weiter mit, lassen sich aber meist nicht verschieben
+- **Verbessert:** Die **Jahresabwesenheiten** eines Mitarbeiters nennen rechts neben jedem Monat die genommenen Urlaubstage und, falls vorhanden, die Schultage. Die Kennzahlen über der Matrix entfallen
+- **Verbessert:** In den Jahresabwesenheiten ist nur noch das eigene Dienstwochenende markiert; die Tönung beider Dienstwochenenden ist – auch in der Legende – entfallen
 
 ### 4.52.0 – Gruppen in der Planungstabelle und Demo mit Urlaubsplanung
 

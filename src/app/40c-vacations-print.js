@@ -272,11 +272,16 @@
     ].join("-");
   }
 
-  function renderVacationYearMatrix(entries, employee) {
+  // personal: die Ansicht „Jahresabwesenheiten“ eines Mitarbeiters. Sie zeigt
+  // je Monat die genommenen Urlaubs- und Schultage und markiert nur das eigene
+  // Dienstwochenende; die Tönung beider Dienstwochenenden fällt weg. Der leere
+  // Vordruck zum Ausfüllen von Hand bleibt, wie er ist.
+  function renderVacationYearMatrix(entries, employee, { personal = false } = {}) {
     const entriesByDate = new Map(
       entries.map((entry) => [entry.date, entry]),
     );
     const days = Array.from({ length: 31 }, (_, index) => index + 1);
+    const showSchool = personal && entries.some((entry) => entry.type === "school");
     return `
       <div class="vacation-year-matrix-scroll">
         <table class="vacation-year-matrix">
@@ -284,6 +289,15 @@
             <tr>
               <th class="vacation-year-month-column" scope="col">Monat</th>
               ${days.map((day) => `<th scope="col">${day}</th>`).join("")}
+              ${
+                personal
+                  ? `<th class="vacation-year-total-column" scope="col" title="Genommene Urlaubstage im Monat">Urlaub</th>${
+                      showSchool
+                        ? '<th class="vacation-year-total-column" scope="col" title="Schule / Weiterbildung / Uni im Monat">Schule</th>'
+                        : ""
+                    }`
+                  : ""
+              }
             </tr>
           </thead>
           <tbody>
@@ -293,6 +307,7 @@
                 days,
                 entriesByDate,
                 employee,
+                { personal, showSchool },
               ),
             ).join("")}
           </tbody>
@@ -301,11 +316,25 @@
     `;
   }
 
-  function renderVacationYearMonthRow(month, days, entriesByDate, employee) {
+  function renderVacationYearMonthRow(
+    month,
+    days,
+    entriesByDate,
+    employee,
+    { personal = false, showSchool = false } = {},
+  ) {
     const monthLabel = dateFormat({ month: "long" }).format(
       new Date(vacationYear, month - 1, 1, 12),
     );
     const daysInMonth = new Date(vacationYear, month, 0).getDate();
+    const monthPrefix = `${vacationYear}-${String(month).padStart(2, "0")}-`;
+    const monthEntries = personal
+      ? [...entriesByDate.values()].filter((entry) => entry.date.startsWith(monthPrefix))
+      : [];
+    const vacationCount = monthEntries.filter(
+      (entry) => PLANNER_ENTRY_TYPES[entry.type]?.countsVacationEntitlement,
+    ).length;
+    const schoolCount = monthEntries.filter((entry) => entry.type === "school").length;
     return `
       <tr>
         <th class="vacation-year-month-column" scope="row">${escapeHtml(monthLabel)}</th>
@@ -317,9 +346,17 @@
               daysInMonth,
               entriesByDate,
               employee,
+              personal,
             ),
           )
           .join("")}
+        ${
+          personal
+            ? `<td class="vacation-year-total-column">${vacationCount || ""}</td>${
+                showSchool ? `<td class="vacation-year-total-column">${schoolCount || ""}</td>` : ""
+              }`
+            : ""
+        }
       </tr>
     `;
   }
@@ -330,6 +367,7 @@
     daysInMonth,
     entriesByDate,
     employee,
+    personal = false,
   ) {
     if (day > daysInMonth) {
       return '<td class="is-unavailable" aria-label="Dieser Kalendertag existiert nicht"></td>';
@@ -358,7 +396,11 @@
     ].filter(Boolean);
     return `
       <td
-        class="${metadata.className} ${
+        class="${
+          personal
+            ? metadata.className.replace(/\bvacation-weekend-weekend_[ab]\b/g, "")
+            : metadata.className
+        } ${
           metadata.weekendGroup === employee.serviceWeekend
             ? "is-own-weekend"
             : ""

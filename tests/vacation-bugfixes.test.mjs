@@ -20,7 +20,7 @@ function eintrag(employeeId, type) {
   };
 }
 
-test("Überschneidungen: Schule steht je Tag vorn und ist als solche gekennzeichnet", async () => {
+test("Überschneidungen: Schule und externe Einsätze stehen je Tag vorn, ausgegraut", async () => {
   const app = await loadAppFunctions([
     "collectVacationConflicts",
     "renderVacationConflictRow",
@@ -30,23 +30,29 @@ test("Überschneidungen: Schule steht je Tag vorn und ist als solche gekennzeich
     employees: [
       { ...createEmployee("a"), firstName: "Anna", lastName: "Adler" },
       { ...createEmployee("b"), firstName: "Ben", lastName: "Berg" },
+      { ...createEmployee("y"), firstName: "Yve", lastName: "Young" },
       { ...createEmployee("z"), firstName: "Zoe", lastName: "Zander" },
     ],
-    vacationDays: [eintrag("a", "vacation"), eintrag("b", "vacation"), eintrag("z", "school")],
+    vacationDays: [
+      eintrag("a", "vacation"),
+      eintrag("b", "vacation"),
+      eintrag("y", "external"),
+      eintrag("z", "school"),
+    ],
   });
   state.settings = { ...state.settings, vacationWeekdayAbsenceLimit: 2 };
   app.setState(app.normalizeState(state));
 
   const [tag] = app.collectVacationConflicts(2026);
   assert.equal(tag.date, WERKTAG);
-  // Alphabetisch stünde Zander zuletzt - als Schule steht sie vorn.
-  assert.equal(tag.participants.map((item) => item.employee.id).join(","), "z,a,b");
+  // Alphabetisch stünden Young und Zander zuletzt - als feste Termine vorn.
+  assert.equal(tag.participants.map((item) => item.employee.id).join(","), "y,z,a,b");
 
   const html = app.renderVacationConflictRow(tag);
   const klassen = [...html.matchAll(/<li class="([^"]*)">/g)].map((treffer) => treffer[1].trim());
-  assert.equal(klassen.join("|"), "is-school||");
-  // Schule zählt weiterhin als Abwesenheit.
-  assert.equal(tag.stats.absenceCount, 3);
+  assert.equal(klassen.join("|"), "is-fixed|is-fixed||");
+  // Beide zählen weiterhin als Abwesenheit.
+  assert.equal(tag.stats.absenceCount, 4);
 });
 
 test("Nach der automatischen Sicherung bleibt die offene Ansicht unangetastet", async () => {
