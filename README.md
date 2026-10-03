@@ -487,7 +487,8 @@ Anmeldung und Rollen zusätzlich serverseitig geprüft.
 
 1. **Mitarbeiter** öffnen.
 2. **Mitarbeiter anlegen** auswählen.
-3. Vorname, Nachname, Beruf und Stellenanteil erfassen.
+3. Vorname, Nachname, Beruf und Stellenumfang erfassen; bei Bedarf Ein- und
+   Austrittsdatum.
 4. Optional Geburtsdatum, Telefonnummer, E-Mail-Adresse und Benutzername
    ergänzen.
 5. Mitarbeiterstatus und festes Dienstwochenende auswählen.
@@ -498,6 +499,20 @@ Anmeldung und Rollen zusätzlich serverseitig geprüft.
 TeO nennt Mitarbeiter überall in der Form **Nachname, Vorname** – in Listen,
 Akten, Auswahlfeldern, Meldungen, Ausdrucken und Exporten. Die Suchfelder
 finden einen Namen in beiden Reihenfolgen, also auch als „Vorname Nachname“.
+
+### Eintritt, Austritt und Stellenumfang
+
+**Eintrittsdatum** und **Austrittsdatum** begrenzen die Beschäftigung. Davor
+und danach erscheint der Mitarbeiter nicht in der Urlaubsplanung; in Monaten
+mit Ein- oder Austritt sind die Tage außerhalb schraffiert und gesperrt. Ist
+das Austrittsdatum überschritten, der Mitarbeiter aber noch aktiv, meldet die
+Datenqualitätsprüfung das – den Status stellt TeO nicht selbst um.
+
+Ändert sich der Stellenumfang, trägt **Änderung hinzufügen** den neuen Wert
+mit dem Tag ein, ab dem er gilt. Das Feld **Stellenumfang** ist dann der
+Ausgangswert bis zur ersten Änderung. Überall angezeigt wird der heute
+gültige Wert; eine bevorstehende Änderung nennt die Mitarbeiterliste unter
+dem Wert („ab 01.01.2027: 75 %“), die Akte zeigt den Verlauf.
 
 ### Mitarbeiterstatus
 
@@ -644,9 +659,19 @@ ausgewählt und nochmals bestätigt werden.
 Der Jahresanspruch setzt sich zusammen aus:
 
 - konfigurierbarem Grundurlaub einer Vollzeitkraft
-- Stellenanteil des Mitarbeiters
+- Stellenumfang des Mitarbeiters, gegebenenfalls mit Änderungen im Jahr
+- Ein- und Austritt im Jahr
 - individuell erarbeitetem Zusatzurlaub durch Schichtdienst
 - übertragenem Resturlaub aus dem Vorjahr
+
+Ein- und Austritt sowie Änderungen des Stellenumfangs im Jahr werden
+gezwölftelt, wie es TVöD und AVR für Teiljahre vorsehen: Jeder **volle**
+Beschäftigungsmonat bringt ein Zwölftel des Grundurlaubs, bemessen am
+Stellenumfang zum Monatsersten. Angefangene Monate zählen nicht. Beispiel:
+Eintritt am 1. April bei 100 % ergibt 9/12 von 30 = 22,5 Tage; Wechsel von
+100 % auf 50 % zum 1. Juli ergibt 15 + 7,5 = 22,5 Tage. Ein anteiliger Wert
+in der Spalte **Basis** trägt ein Sternchen, der Tooltip nennt die Zahl der
+vollen Monate.
 
 Grundurlaub, Abwesenheitsgrenzen, Referenzsamstag und der Verfallstag des
 Resturlaubs werden unter **Einstellungen → Planung** gepflegt.

@@ -484,10 +484,56 @@ function workdaysFrom(startIso, count) {
   return days;
 }
 
+function fullMonthsIn(employee, year) {
+  let months = 0;
+  for (let month = 0; month < 12; month += 1) {
+    const first = isoDate(year, month, 1);
+    const last = isoDate(year, month + 1, 0);
+    if (
+      (!employee.entryDate || employee.entryDate <= first) &&
+      (!employee.exitDate || last <= employee.exitDate)
+    ) {
+      months += 1;
+    }
+  }
+  return months;
+}
+
+// Ein- und Austritte sowie Änderungen des Stellenumfangs. Erst nach allen
+// übrigen Daten erzeugt, damit diese bei gleichem Startwert unverändert
+// bleiben. Ausgetretene sind inaktiv, Einzuarbeitende 2026 eingetreten.
+function assignEmploymentPeriods(employees) {
+  employees.forEach((employee) => {
+    if (employee.employmentStatus === "onboarding") {
+      employee.entryDate = isoDate(2026, Math.floor(random() * 6), 1);
+    } else {
+      employee.entryDate = isoDate(2002 + Math.floor(random() * 23), Math.floor(random() * 12), 1);
+    }
+    if (employee.employmentStatus === "inactive") {
+      employee.exitDate = isoDate(2025, 3 + Math.floor(random() * 8), 0);
+      if (employee.exitDate <= employee.entryDate) employee.entryDate = "2015-01-01";
+    }
+    employee.employmentChanges = [];
+  });
+  const active = employees.filter((employee) => employee.employmentStatus === "active");
+  // Zwei angekündigte Austritte und einige Änderungen des Stellenumfangs.
+  active.slice(0, 2).forEach((employee, index) => {
+    employee.exitDate = index === 0 ? "2026-12-31" : "2027-03-31";
+  });
+  active.slice(2, 6).forEach((employee, index) => {
+    const before = employee.employmentPercent;
+    const after = before === 100 ? 75 : 100;
+    employee.employmentChanges = [
+      { from: index < 3 ? "2026-01-01" : "2027-01-01", percent: after },
+    ];
+  });
+}
+
 function createVacationPlan(employees) {
   const vacationDays = [];
   const vacationEntitlements = [];
   const perDay = new Map();
+  const employeeById = new Map(employees.map((employee) => [employee.id, employee]));
   const taken = new Set();
   let counter = 0;
 
@@ -495,7 +541,13 @@ function createVacationPlan(employees) {
     days.every((date) => {
       const weekday = new Date(`${date}T12:00:00Z`).getUTCDay();
       const cap = weekday === 0 || weekday === 6 ? DEMO_DAY_CAP.weekend : DEMO_DAY_CAP.weekday;
-      return !taken.has(`${employeeId}:${date}`) && (perDay.get(date) || 0) < cap;
+      const employee = employeeById.get(employeeId);
+      return (
+        !taken.has(`${employeeId}:${date}`) &&
+        (perDay.get(date) || 0) < cap &&
+        (!employee.entryDate || employee.entryDate <= date) &&
+        (!employee.exitDate || date <= employee.exitDate)
+      );
     });
   const add = (employeeId, days, type) => {
     days.forEach((date) => {
@@ -534,7 +586,9 @@ function createVacationPlan(employees) {
   employees
     .filter((employee) => employee.employmentStatus !== "inactive")
     .forEach((employee) => {
-      const base = Math.round(30 * (employee.employmentPercent / 100) * 2) / 2;
+      // Anteilig nach vollen Beschäftigungsmonaten - wie TeO selbst rechnet.
+      const fullYear = 30 * (employee.employmentPercent / 100);
+      const base = Math.round(fullYear * (fullMonthsIn(employee, 2025) / 12) * 2) / 2;
       const vacationType =
         employee.employmentStatus === "onboarding" ? "onboardingVacation" : "vacation";
 
@@ -569,7 +623,13 @@ function createVacationPlan(employees) {
       planBlocks(
         employee,
         2026,
-        Math.max(0, Math.floor((base + additional2026) * share) - earlyDays),
+        Math.max(
+          0,
+          Math.floor(
+            (fullYear * (fullMonthsIn(employee, 2026) / 12) + additional2026) *
+              share,
+          ) - earlyDays,
+        ),
         vacationType,
       );
 
@@ -780,6 +840,7 @@ export async function generateDemoBackup(outputPath = DEFAULT_OUTPUT) {
   const deviceInstructions = createDeviceInstructions(devices, employees);
   // Zuletzt erzeugt: So bleiben alle übrigen Daten bei gleichem Startwert
   // unverändert.
+  assignEmploymentPeriods(employees);
   const { vacationDays, vacationEntitlements } = createVacationPlan(employees);
   const backup = {
     format: BACKUP_FORMAT,

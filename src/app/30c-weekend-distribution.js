@@ -130,7 +130,7 @@
     return Object.fromEntries(
       Object.entries(groups).map(([key, employees]) => {
         const employmentPercent = employees.reduce(
-          (sum, employee) => sum + employee.employmentPercent,
+          (sum, employee) => sum + currentEmploymentPercent(employee),
           0,
         );
         return [
@@ -184,7 +184,7 @@
             }</small>
           </span>
         </span>
-        <strong class="weekend-employment-percent">${employee.employmentPercent} %</strong>
+        <strong class="weekend-employment-percent">${currentEmploymentPercent(employee)} %</strong>
         <span class="weekend-qualification-state ${fachweiterbildung.className}"
           title="Fachweiterbildung I/A: ${fachweiterbildung.title}">
           ${fachweiterbildung.symbol} FWB I/A

@@ -34,13 +34,36 @@
         ${renderDossierItem("Telefon", employee.phone || "–")}
         ${renderDossierItem("E-Mail", employee.email || "–")}
         ${renderDossierItem("Benutzername", employee.username || "–")}
-        ${renderDossierItem("Stellenumfang", `${employee.employmentPercent} %`)}
+        ${renderDossierItem("Stellenumfang", `${currentEmploymentPercent(employee)} %`)}
+        ${renderDossierItem("Eintritt", employee.entryDate ? formatDate(employee.entryDate) : "–")}
+        ${renderDossierItem("Austritt", employee.exitDate ? formatDate(employee.exitDate) : "–")}
         ${renderDossierItem("Dienstwochenende", serviceWeekendLabel(employee.serviceWeekend))}
         ${renderDossierItem(
           "Sitzungsteilnahme",
           `${percentage(participated, expectedMeetings)} % (${participated}/${expectedMeetings})`,
         )}
       </div>
+      ${
+        employee.employmentChanges?.length
+          ? `<section class="dossier-section">
+              <h3>Stellenumfang im Verlauf</h3>
+              <div class="dossier-list">
+                <div class="dossier-list-row">
+                  <strong>${employee.employmentPercent} %</strong>
+                  <span>${employee.entryDate ? `ab ${formatDate(employee.entryDate)}` : "Ausgangswert"}</span>
+                </div>
+                ${employee.employmentChanges
+                  .map(
+                    (change) => `<div class="dossier-list-row">
+                      <strong>${change.percent} %</strong>
+                      <span>ab ${formatDate(change.from)}${change.from > todayIso() ? " (geplant)" : ""}</span>
+                    </div>`,
+                  )
+                  .join("")}
+              </div>
+            </section>`
+          : ""
+      }
       <section class="dossier-section">
         <h3>Zusatzqualifikationen</h3>
         ${

@@ -12,6 +12,7 @@
     document.querySelector("#employeeId").value = "";
     document.querySelector("#employmentPercent").value = "100";
     document.querySelector("#employeeStatus").value = "active";
+    renderEmploymentChangeRows([]);
 
     const employee = employeeId ? getEmployee(employeeId) : null;
     if (employee) trackWorkspaceRecord("employee", employee.id);
@@ -31,6 +32,9 @@
       document.querySelector("#profession").value = employee.profession;
       document.querySelector("#serviceWeekend").value = employee.serviceWeekend;
       document.querySelector("#employmentPercent").value = String(employee.employmentPercent);
+      document.querySelector("#entryDate").value = employee.entryDate || "";
+      document.querySelector("#exitDate").value = employee.exitDate || "";
+      renderEmploymentChangeRows(employee.employmentChanges || []);
       document.querySelector("#employeeStatus").value = employee.employmentStatus;
 
       document.querySelectorAll('input[name="qualification"]').forEach((checkbox) => {
@@ -41,6 +45,71 @@
     elements.employeeDialog.showModal();
     captureCleanForm(elements.employeeForm);
     window.setTimeout(() => document.querySelector("#firstName").focus(), 0);
+  }
+
+  function renderEmploymentChangeRows(changes) {
+    elements.employmentChangeList.innerHTML = changes
+      .map((change) => employmentChangeRowMarkup(change))
+      .join("");
+  }
+
+  function employmentChangeRowMarkup({ from = "", percent = "" } = {}) {
+    return `
+      <div class="employment-change-row">
+        <label>
+          <span>ab</span>
+          <input type="date" data-employment-change-from value="${escapeHtml(from)}" required />
+        </label>
+        <label>
+          <span>Stellenumfang</span>
+          <span class="input-suffix">
+            <input
+              type="number"
+              min="1"
+              max="100"
+              step="1"
+              data-employment-change-percent
+              value="${escapeHtml(String(percent))}"
+              required
+            />
+            <span>%</span>
+          </span>
+        </label>
+        <button
+          class="icon-button danger"
+          type="button"
+          data-remove-employment-change
+          aria-label="Änderung entfernen"
+          title="Änderung entfernen"
+        ><svg><use href="#icon-trash"></use></svg></button>
+      </div>
+    `;
+  }
+
+  function handleEmploymentChangeAction(event) {
+    const remove = event.target.closest("[data-remove-employment-change]");
+    if (remove) remove.closest(".employment-change-row").remove();
+  }
+
+  function addEmploymentChangeRow() {
+    elements.employmentChangeList.insertAdjacentHTML(
+      "beforeend",
+      employmentChangeRowMarkup({
+        percent: document.querySelector("#employmentPercent").value || "100",
+      }),
+    );
+    elements.employmentChangeList
+      .querySelector(".employment-change-row:last-child [data-employment-change-from]")
+      ?.focus();
+  }
+
+  function readEmploymentChangeRows() {
+    return [...elements.employmentChangeList.querySelectorAll(".employment-change-row")]
+      .map((row) => ({
+        from: row.querySelector("[data-employment-change-from]").value,
+        percent: Number(row.querySelector("[data-employment-change-percent]").value),
+      }))
+      .filter((change) => change.from && Number.isFinite(change.percent));
   }
 
   function renderEmployeeCatalogFields(employee = null) {
@@ -177,6 +246,18 @@
       return;
     }
 
+    const entryDate = document.querySelector("#entryDate").value;
+    const exitDate = document.querySelector("#exitDate").value;
+    if (entryDate && exitDate && exitDate < entryDate) {
+      document.querySelector("#exitDate").setCustomValidity(
+        "Das Austrittsdatum liegt vor dem Eintrittsdatum.",
+      );
+      document.querySelector("#exitDate").reportValidity();
+      document.querySelector("#exitDate").setCustomValidity("");
+      return;
+    }
+    const employmentChanges = normalizeEmploymentChanges(readEmploymentChangeRows());
+
     const employee = {
       id: existingEmployee?.id || createId(),
       firstName: firstNameInput.value.trim(),
@@ -191,6 +272,9 @@
         100,
         100,
       ),
+      entryDate,
+      exitDate,
+      employmentChanges,
       profession: normalizeProfession(professionInput.value),
       serviceWeekend:
         ownerWeekend ||

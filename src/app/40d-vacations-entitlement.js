@@ -9,13 +9,32 @@
   // TeO systematisch zu wenig - dann muessen die Arbeitstage pro Woche am
   // Mitarbeitenden erfasst und hier statt employmentPercent verwendet werden.
   //
-  // Ebenfalls nicht abgebildet: die Zwoelftelung nach Paragraf 5 BUrlG bei Ein-
-  // oder Austritt im laufenden Jahr. Die Funktion kennt nur volle Kalenderjahre.
+  // Ein- und Austritt sowie Aenderungen des Stellenumfangs im Jahr werden
+  // monatsweise gezwoelftelt, wie es TVoeD und AVR fuer Teiljahre vorsehen:
+  // Jeder volle Beschaeftigungsmonat bringt ein Zwoelftel des Grundurlaubs,
+  // bemessen am Stellenumfang zum Monatsersten. Angefangene Monate zaehlen
+  // nicht. Ohne Ein-, Austritt und Aenderung im Jahr ergibt das genau den
+  // Jahreswert. Gerundet wird wie bisher auf halbe Tage.
+  function vacationBaseForYear(employee, year) {
+    let twelfths = 0;
+    let fullMonths = 0;
+    for (let month = 1; month <= 12; month += 1) {
+      const prefix = `${year}-${String(month).padStart(2, "0")}`;
+      const firstDay = `${prefix}-01`;
+      const lastDay = `${prefix}-${String(new Date(year, month, 0).getDate()).padStart(2, "0")}`;
+      if (isEmployedOn(employee, firstDay) && isEmployedOn(employee, lastDay)) {
+        fullMonths += 1;
+        twelfths += employmentPercentOn(employee, firstDay);
+      }
+    }
+    return {
+      base: Math.round(((state.settings.vacationBaseDays * twelfths) / 1200) * 2) / 2,
+      fullMonths,
+    };
+  }
+
   function getVacationEntitlement(employee, year) {
-    const base =
-      Math.round(
-        state.settings.vacationBaseDays * (employee.employmentPercent / 100) * 2,
-      ) / 2;
+    const { base, fullMonths } = vacationBaseForYear(employee, year);
     const stored = state.vacationEntitlements.find(
       (entry) => entry.employeeId === employee.id && entry.year === year,
     );
@@ -36,6 +55,7 @@
     const expired = todayIso() > expiryDate ? unused : 0;
     return {
       base,
+      fullMonths,
       additional,
       carryOver,
       expiryDate,

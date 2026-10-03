@@ -2311,8 +2311,11 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-mitarbeiterverwaltung">
 <h2 id="hilfe-mitarbeiterverwaltung">Mitarbeiterverwaltung</h2>
 <h3 id="hilfe-mitarbeiter-anlegen">Mitarbeiter anlegen</h3>
-<ol><li><strong>Mitarbeiter</strong> öffnen.</li><li><strong>Mitarbeiter anlegen</strong> auswählen.</li><li>Vorname, Nachname, Beruf und Stellenanteil erfassen.</li><li>Optional Geburtsdatum, Telefonnummer, E-Mail-Adresse und Benutzername ergänzen.</li><li>Mitarbeiterstatus und festes Dienstwochenende auswählen.</li><li>Zusatzqualifikationen kennzeichnen und gegebenenfalls ein Ablaufdatum hinterlegen.</li><li>Speichern.</li></ol>
+<ol><li><strong>Mitarbeiter</strong> öffnen.</li><li><strong>Mitarbeiter anlegen</strong> auswählen.</li><li>Vorname, Nachname, Beruf und Stellenumfang erfassen; bei Bedarf Ein- und Austrittsdatum.</li><li>Optional Geburtsdatum, Telefonnummer, E-Mail-Adresse und Benutzername ergänzen.</li><li>Mitarbeiterstatus und festes Dienstwochenende auswählen.</li><li>Zusatzqualifikationen kennzeichnen und gegebenenfalls ein Ablaufdatum hinterlegen.</li><li>Speichern.</li></ol>
 <p>TeO nennt Mitarbeiter überall in der Form <strong>Nachname, Vorname</strong> – in Listen, Akten, Auswahlfeldern, Meldungen, Ausdrucken und Exporten. Die Suchfelder finden einen Namen in beiden Reihenfolgen, also auch als „Vorname Nachname“.</p>
+<h3 id="hilfe-eintritt-austritt-und-stellenumfang">Eintritt, Austritt und Stellenumfang</h3>
+<p><strong>Eintrittsdatum</strong> und <strong>Austrittsdatum</strong> begrenzen die Beschäftigung. Davor und danach erscheint der Mitarbeiter nicht in der Urlaubsplanung; in Monaten mit Ein- oder Austritt sind die Tage außerhalb schraffiert und gesperrt. Ist das Austrittsdatum überschritten, der Mitarbeiter aber noch aktiv, meldet die Datenqualitätsprüfung das – den Status stellt TeO nicht selbst um.</p>
+<p>Ändert sich der Stellenumfang, trägt <strong>Änderung hinzufügen</strong> den neuen Wert mit dem Tag ein, ab dem er gilt. Das Feld <strong>Stellenumfang</strong> ist dann der Ausgangswert bis zur ersten Änderung. Überall angezeigt wird der heute gültige Wert; eine bevorstehende Änderung nennt die Mitarbeiterliste unter dem Wert („ab 01.01.2027: 75 %“), die Akte zeigt den Verlauf.</p>
 <h3 id="hilfe-mitarbeiterstatus">Mitarbeiterstatus</h3>
 <p>TeO unterscheidet:</p>
 <ul><li><strong>Aktiv:</strong> regulär beschäftigte Person</li><li><strong>In Einarbeitung:</strong> beschäftigte Person mit gesonderter Kennzeichnung</li><li><strong>Inaktiv:</strong> wird in aktuellen Planungen und Auswahlfeldern nicht regulär angeboten</li></ul>
@@ -2357,7 +2360,8 @@
 <h2 id="hilfe-urlaubs-und-abwesenheitsplanung">Urlaubs- und Abwesenheitsplanung</h2>
 <h3 id="hilfe-urlaubsanspruch">Urlaubsanspruch</h3>
 <p>Der Jahresanspruch setzt sich zusammen aus:</p>
-<ul><li>konfigurierbarem Grundurlaub einer Vollzeitkraft</li><li>Stellenanteil des Mitarbeiters</li><li>individuell erarbeitetem Zusatzurlaub durch Schichtdienst</li><li>übertragenem Resturlaub aus dem Vorjahr</li></ul>
+<ul><li>konfigurierbarem Grundurlaub einer Vollzeitkraft</li><li>Stellenumfang des Mitarbeiters, gegebenenfalls mit Änderungen im Jahr</li><li>Ein- und Austritt im Jahr</li><li>individuell erarbeitetem Zusatzurlaub durch Schichtdienst</li><li>übertragenem Resturlaub aus dem Vorjahr</li></ul>
+<p>Ein- und Austritt sowie Änderungen des Stellenumfangs im Jahr werden gezwölftelt, wie es TVöD und AVR für Teiljahre vorsehen: Jeder <strong>volle</strong> Beschäftigungsmonat bringt ein Zwölftel des Grundurlaubs, bemessen am Stellenumfang zum Monatsersten. Angefangene Monate zählen nicht. Beispiel: Eintritt am 1. April bei 100 % ergibt 9/12 von 30 = 22,5 Tage; Wechsel von 100 % auf 50 % zum 1. Juli ergibt 15 + 7,5 = 22,5 Tage. Ein anteiliger Wert in der Spalte <strong>Basis</strong> trägt ein Sternchen, der Tooltip nennt die Zahl der vollen Monate.</p>
 <p>Grundurlaub, Abwesenheitsgrenzen, Referenzsamstag und der Verfallstag des Resturlaubs werden unter <strong>Einstellungen → Planung</strong> gepflegt.</p>
 <p>Die sechs Summenspalten <strong>Basis</strong>, <strong>Zusatz</strong>, <strong>Übertrag</strong>, <strong>Anspruch</strong>, <strong>Geplant</strong> und <strong>Rest</strong> bleiben beim horizontalen Scrollen fixiert.</p>
 <h3 id="hilfe-resturlaub-aus-dem-vorjahr">Resturlaub aus dem Vorjahr</h3>
@@ -2633,6 +2637,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-54-0-ein-und-austritt-anderungen-des-stellenumfangs">4.54.0 – Ein- und Austritt, Änderungen des Stellenumfangs</h3>
+<ul><li><strong>Neu:</strong> Mitarbeiter haben ein <strong>Eintritts-</strong> und ein <strong>Austrittsdatum</strong>. Davor und danach erscheinen sie nicht in der Urlaubsplanung; in Monaten mit Ein- oder Austritt sind die Tage außerhalb der Beschäftigung schraffiert und gesperrt</li><li><strong>Neu:</strong> <strong>Änderungen des Stellenumfangs</strong> lassen sich mit dem Tag erfassen, ab dem sie gelten. Überall gilt der jeweils aktuelle Wert – in Listen, Akte, Wochenendverteilung und Urlaubsplanung; die Mitarbeiterliste nennt eine bevorstehende Änderung, die Akte den Verlauf</li><li><strong>Neu:</strong> Der Urlaubsanspruch wird bei Ein- oder Austritt im Jahr und bei Änderungen des Stellenumfangs gezwölftelt: je vollem Beschäftigungsmonat ein Zwölftel, bemessen am Stellenumfang zum Monatsersten. Anteilige Werte sind in der Spalte <strong>Basis</strong> mit einem Sternchen markiert</li><li><strong>Neu:</strong> Die Datenqualitätsprüfung meldet Mitarbeiter, deren Austrittsdatum überschritten ist, die aber noch aktiv sind</li><li><strong>Verbessert:</strong> Die Demodatenbank enthält Ein- und Austrittsdaten sowie einige Änderungen des Stellenumfangs</li></ul>
 <h3 id="hilfe-4-53-0-fadenkreuz-und-korrekturen-in-der-urlaubsplanung">4.53.0 – Fadenkreuz und Korrekturen in der Urlaubsplanung</h3>
 <ul><li><strong>Neu:</strong> Ein <strong>Fadenkreuz</strong> hebt in der Planungstabelle Zeile und Spalte der Tageszelle unter dem Mauszeiger hervor – mit der Tastatur folgt es dem ausgewählten Feld. Es lässt sich über das Häkchen <strong>Fadenkreuz</strong> in der Steuerleiste einschalten; vorgegeben ist „aus“, der Browser merkt sich die Wahl. Die Tönung liegt über der Zelle; Wochenende, Feiertag, Ferien und Überplanung bleiben darunter erkennbar</li><li><strong>Behoben:</strong> Ein überplanter Tag färbte Spaltenkopf und Tagesfelder rot ein. Dadurch war nicht mehr zu erkennen, ob der Tag ein Wochenende, ein Feiertag oder ein Ferientag ist. Die Spalte ist jetzt rot eingerahmt, die Belegung im Kopf steht weiter auf rotem Grund, und die Kennzeichnung des Tages bleibt sichtbar</li><li><strong>Behoben:</strong> Die Meldung „Automatische Datensicherung … wurde aktualisiert“ ließ die Seite springen, wenn weiter unten in einer Tabelle gearbeitet wurde. Die Sicherung baute dafür die ganze Ansicht neu auf; sie aktualisiert jetzt nur noch die Statusanzeigen</li><li><strong>Verbessert:</strong> <strong>Überschneidungen prüfen</strong> zeigt Einträge „Schule / Weiterbildung / Uni“ und „Externer Einsatz“ je Tag ausgegraut vor den übrigen Abwesenheiten. Sie zählen weiter mit, lassen sich aber meist nicht verschieben</li><li><strong>Verbessert:</strong> Die <strong>Jahresabwesenheiten</strong> eines Mitarbeiters nennen rechts neben jedem Monat die genommenen Urlaubstage und, falls vorhanden, die Schultage. Die Kennzahlen über der Matrix entfallen</li><li><strong>Verbessert:</strong> In den Jahresabwesenheiten ist nur noch das eigene Dienstwochenende markiert; die Tönung beider Dienstwochenenden ist – auch in der Legende – entfallen</li></ul>
 <h3 id="hilfe-4-52-0-gruppen-in-der-planungstabelle-und-demo-mit-urlaubsplanung">4.52.0 – Gruppen in der Planungstabelle und Demo mit Urlaubsplanung</h3>
@@ -3871,7 +3877,35 @@ npm run verify</code></pre>
                   />
                   <span>%</span>
                 </span>
+                <small class="field-hint" id="employmentPercentHint">
+                  Gilt bis zur ersten Änderung.
+                </small>
               </label>
+              <label class="form-field">
+                <span>Eintrittsdatum</span>
+                <input id="entryDate" name="entryDate" type="date" />
+              </label>
+              <label class="form-field">
+                <span>Austrittsdatum</span>
+                <input id="exitDate" name="exitDate" type="date" />
+              </label>
+              <div class="form-field form-field-wide employment-change-field">
+                <span>Änderungen des Stellenumfangs</span>
+                <div class="employment-change-list" id="employmentChangeList"></div>
+                <button
+                  class="button button-secondary button-compact"
+                  id="addEmploymentChangeButton"
+                  type="button"
+                >
+                  <svg><use href="#icon-plus"></use></svg>
+                  Änderung hinzufügen
+                </button>
+                <small class="field-hint">
+                  Ab dem eingetragenen Tag gilt der neue Stellenumfang –
+                  für den Urlaubsanspruch, die Wochenendverteilung und alle
+                  Anzeigen.
+                </small>
+              </div>
               <label class="form-field form-field-wide">
                 <span>Festes Dienstwochenende</span>
                 <select id="serviceWeekend" name="serviceWeekend">

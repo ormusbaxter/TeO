@@ -10,6 +10,8 @@ Enthalten sind:
 - Pflichtfortbildungen und plausible Abschlüsse für 2025 und 2026
 - der unveränderte Gerätekatalog der Anwendung
 - plausible Geräteeinweisungen für 2025 und Januar bis Juli 2026
+- Ein- und Austrittsdaten, zwei angekündigte Austritte und einige Änderungen
+  des Stellenumfangs
 - eine Urlaubs- und Abwesenheitsplanung für 2025 und 2026 mit Zusatzurlaub,
   Resturlaub-Übertrag nach 2026 sowie einzelnen Schul-, Nachtdienst- und
   Dienstzusage-Einträgen

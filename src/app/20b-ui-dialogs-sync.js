@@ -7,6 +7,8 @@
       "keydown",
       handleVacationPlannerKeydown,
     );
+    elements.employmentChangeList.addEventListener("click", handleEmploymentChangeAction);
+    elements.addEmploymentChangeButton.addEventListener("click", addEmploymentChangeRow);
     elements.vacationPlanner.addEventListener("pointerover", handleVacationCrosshair);
     elements.vacationPlanner.addEventListener("focusin", handleVacationCrosshair);
     elements.vacationPlanner.addEventListener("pointerleave", () =>
