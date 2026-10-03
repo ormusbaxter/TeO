@@ -348,7 +348,13 @@ test("Das Fadenkreuz hebt Zeile und Spalte des Feldes unter Zeiger oder Fokus he
     assert.equal(summe.versatz, 0);
   });
 
-  // Tastatur: Der Fokus nimmt das Kreuz mit.
+  // Tastatur: Der Fokus nimmt das Kreuz mit. Vorher die Maus aus der
+  // Tabelle nehmen und zurückscrollen - sonst liegt der stehende Zeiger nach
+  // dem Bildlauf über einer anderen Zelle, und das Kreuz folgt ihm.
+  await teo.page.mouse.move(0, 0);
+  await teo.evaluate(() => {
+    document.querySelector(".vacation-table-scroll").scrollLeft = 0;
+  });
   await felder[2].focus();
   await teo.page.keyboard.press("ArrowRight");
   const nachTaste = await zustand();
