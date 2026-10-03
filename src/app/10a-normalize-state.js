@@ -286,7 +286,11 @@
           parsed.settings?.vacationCarryOverExpiry,
         ),
         serviceWeekends,
-        deadlineKinds: normalizeDeadlineKinds(parsed.settings?.deadlineKinds),
+        deadlineKinds: normalizeDeadlineKinds(
+          parsed.settings?.deadlineKinds,
+          parsed.settings?.deadlineKindsSeen,
+        ),
+        deadlineKindsSeen: [...DEADLINE_KINDS],
         deadlineHideOverdue: Boolean(parsed.settings?.deadlineHideOverdue),
       },
       users,

@@ -44,7 +44,10 @@
       time: document.querySelector("#meetingTime").value,
       notes: document.querySelector("#meetingNotes").value.trim(),
       expectedEmployeeIds:
-        existingMeeting?.expectedEmployeeIds || activeEmployeeList().map((employee) => employee.id),
+        existingMeeting?.expectedEmployeeIds ||
+        employedActiveEmployees(document.querySelector("#meetingDate")?.value || todayIso()).map(
+          (employee) => employee.id,
+        ),
       createdAt: existingMeeting?.createdAt || now,
       updatedAt: now,
     };
@@ -104,13 +107,19 @@
     const existingRecords = state.meetingAttendances.filter(
       (attendance) => attendance.meetingId === meetingId,
     );
+    const documentedIds = new Set(existingRecords.map((record) => record.employeeId));
     const employeeIds = new Set(meeting.expectedEmployeeIds);
     existingRecords.forEach((record) => employeeIds.add(record.employeeId));
     if (existingRecords.length === 0) {
-      activeEmployeeList().forEach((employee) => employeeIds.add(employee.id));
+      employedActiveEmployees(meeting.date).forEach((employee) => employeeIds.add(employee.id));
     }
 
-    attendanceEmployeeIds = [...employeeIds].filter((employeeId) => getEmployee(employeeId));
+    // Wer am Sitzungstag nicht beschäftigt war, steht nicht zur Auswahl -
+    // es sei denn, für ihn ist schon etwas dokumentiert.
+    attendanceEmployeeIds = [...employeeIds].filter((employeeId) => {
+      const employee = getEmployee(employeeId);
+      return employee && (documentedIds.has(employeeId) || isEmployedOn(employee, meeting.date));
+    });
     if (attendanceEmployeeIds.length === 0) {
       showToast("Für diese Sitzung sind keine Mitarbeiter verfügbar.", "error");
       return;

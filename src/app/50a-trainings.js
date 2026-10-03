@@ -13,7 +13,7 @@
     const displayedTrainings = trainingObligations().filter(
       (training) => training.year <= trainingDisplayYear,
     );
-    const activeCount = activeEmployeeList().length;
+    const activeCount = employedActiveEmployees().length;
     const totalAssignments = activeCount * displayedTrainings.length;
     const currentAssignments = displayedTrainings.reduce(
       (sum, training) => sum + getTrainingStats(training).current,
@@ -427,7 +427,10 @@
     const trainings = trainingObligations()
       .filter((training) => training.year <= year)
       .sort((a, b) => a.title.localeCompare(b.title, "de"));
-    const employees = [...activeEmployeeList()].sort(sortEmployees);
+    // Erwartet wird, wer zum Stichtag des Jahres beschäftigt ist: Wer im
+    // Herbst eintritt, gilt für dieses Jahr schon als verpflichtet, wer im
+    // Frühjahr ausgetreten ist, nicht mehr.
+    const employees = employedActiveEmployees(trainingReferenceDate(year)).sort(sortEmployees);
     let completedAssignments = 0;
     const completedPerTraining = trainings.map(() => 0);
     const rows = employees.map((employee) => ({
@@ -513,7 +516,7 @@
 
   function renderTrainingCard(training) {
     const stats = getTrainingStats(training);
-    const activeCount = activeEmployeeList().length;
+    const activeCount = employedActiveEmployees().length;
     const history = state.completions
       .filter((completion) => completionMatchesTraining(completion, training))
       .sort(

@@ -131,6 +131,7 @@
           },
         },
         deadlineKinds: [...DEADLINE_KINDS],
+        deadlineKindsSeen: [...DEADLINE_KINDS],
         deadlineHideOverdue: false,
       },
       users: initialUsers(),

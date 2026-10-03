@@ -529,6 +529,41 @@ function assignEmploymentPeriods(employees) {
   });
 }
 
+// Wer erst 2026 eingetreten ist, kann 2025 weder an einer Sitzung noch an
+// einer Fortbildung teilgenommen haben. Die Sammlungen werden an Ort und
+// Stelle bereinigt, damit die Demo zur Ein- und Austrittslogik passt.
+function removeRecordsOutsideEmployment(employees, data) {
+  const byId = new Map(employees.map((employee) => [employee.id, employee]));
+  const employedOn = (employeeId, date) => {
+    const employee = byId.get(employeeId);
+    return (
+      employee &&
+      (!employee.entryDate || employee.entryDate <= date) &&
+      (!employee.exitDate || date <= employee.exitDate)
+    );
+  };
+  const keep = (list, predicate) => {
+    const kept = list.filter(predicate);
+    list.splice(0, list.length, ...kept);
+  };
+  keep(data.completions, (completion) => employedOn(completion.employeeId, completion.completedOn));
+  const meetingDate = new Map(data.meetings.map((meeting) => [meeting.id, meeting.date]));
+  data.meetings.forEach((meeting) => {
+    meeting.expectedEmployeeIds = meeting.expectedEmployeeIds.filter((employeeId) =>
+      employedOn(employeeId, meeting.date),
+    );
+  });
+  keep(data.meetingAttendances, (attendance) =>
+    employedOn(attendance.employeeId, meetingDate.get(attendance.meetingId)),
+  );
+  data.deviceInstructions.forEach((instruction) => {
+    instruction.participants = instruction.participants.filter((participant) =>
+      employedOn(participant.employeeId, instruction.date),
+    );
+  });
+  keep(data.deviceInstructions, (instruction) => instruction.participants.length > 0);
+}
+
 function createVacationPlan(employees) {
   const vacationDays = [];
   const vacationEntitlements = [];
@@ -841,6 +876,12 @@ export async function generateDemoBackup(outputPath = DEFAULT_OUTPUT) {
   // Zuletzt erzeugt: So bleiben alle übrigen Daten bei gleichem Startwert
   // unverändert.
   assignEmploymentPeriods(employees);
+  removeRecordsOutsideEmployment(employees, {
+    completions,
+    meetings,
+    meetingAttendances,
+    deviceInstructions,
+  });
   const { vacationDays, vacationEntitlements } = createVacationPlan(employees);
   const backup = {
     format: BACKUP_FORMAT,

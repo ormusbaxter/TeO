@@ -11,7 +11,7 @@
   function renderAll() {
     // Nur Mitarbeiter, die tatsaechlich im Dienst stehen. Ausgetretene sollen
     // die Zahl in der Seitenleiste nicht dauerhaft aufblaehen.
-    elements.navEmployeeCount.textContent = String(activeEmployeeList().length);
+    elements.navEmployeeCount.textContent = String(employedActiveEmployees().length);
     elements.navTrainingCount.textContent = String(state.trainings.length);
     elements.navMeetingCount.textContent = String(state.meetings.length);
     elements.navAppointmentCount.textContent = String(

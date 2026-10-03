@@ -1,5 +1,5 @@
   function getTrainingStats(training) {
-    const activeEmployees = activeEmployeeList();
+    const activeEmployees = employedActiveEmployees();
     const current = activeEmployees.filter((employee) =>
       isEmployeeCurrentForTraining(employee.id, training),
     ).length;
@@ -187,10 +187,14 @@
     ];
     const expectedEmployeeIds = new Set(meeting.expectedEmployeeIds);
     records.forEach((record) => expectedEmployeeIds.add(record.employeeId));
-    const validExpectedIds = [...expectedEmployeeIds].filter((employeeId) =>
-      getEmployee(employeeId),
-    );
     const documentedEmployeeIds = new Set(records.map((record) => record.employeeId));
+    const validExpectedIds = [...expectedEmployeeIds].filter((employeeId) => {
+      const employee = getEmployee(employeeId);
+      return (
+        employee &&
+        (documentedEmployeeIds.has(employeeId) || isEmployedOn(employee, meeting.date))
+      );
+    });
     const documented = validExpectedIds.filter((employeeId) =>
       documentedEmployeeIds.has(employeeId),
     ).length;
@@ -262,7 +266,16 @@
     const employeeRows = state.employees
       .map((employee) => {
         const expectedMeetingIds = meetings
-          .filter((meeting) => meeting.expectedEmployeeIds.includes(employee.id))
+          .filter((meeting) =>
+            isExpectedForMeeting(
+              employee,
+              meeting,
+              state.meetingAttendances.some(
+                (attendance) =>
+                  attendance.meetingId === meeting.id && attendance.employeeId === employee.id,
+              ),
+            ),
+          )
           .map((meeting) => meeting.id);
         const records = state.meetingAttendances.filter(
           (attendance) =>

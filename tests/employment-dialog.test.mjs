@@ -56,3 +56,32 @@ test("Eintritt, Austritt und Änderungen des Stellenumfangs lassen sich erfassen
   assert.equal(await teo.evaluate(() => document.querySelector("#employeeDialog").open), true);
   assert.deepEqual(teo.problems, []);
 });
+
+test("Die Sammelbearbeitung setzt Ein- und Austritt für mehrere Mitarbeiter", async (t) => {
+  const teo = await openTeO(t, { anmeldenAls: "admin" });
+  if (!teo) return;
+  await teo.zeigeAnsicht("employees");
+  const ids = await teo.evaluate(() =>
+    [...document.querySelectorAll("[data-select-employee]")].slice(0, 2).map((box) => box.dataset.selectEmployee),
+  );
+  for (const id of ids) await teo.page.check(`[data-select-employee="${id}"]`);
+  await teo.evaluate(() => document.querySelector("#openBulkEditButton").click());
+  await teo.page.waitForSelector("#bulkEditDialog[open]");
+  await teo.page.fill("#bulkExitDate", "2099-06-30");
+  await teo.evaluate(() => document.querySelector("#bulkEditForm").requestSubmit());
+  await teo.page.waitForFunction(() => !document.querySelector("#bulkEditDialog").open);
+
+  // In der Akte steht der neue Austritt bei beiden.
+  for (const id of ids) {
+    await teo.evaluate((mitarbeiter) => {
+      document.querySelector(`[data-action="view-employee"][data-id="${mitarbeiter}"]`).click();
+    }, id);
+    await teo.page.waitForSelector("#employeeDossierDialog[open]");
+    assert.match(
+      await teo.evaluate(() => document.querySelector("#employeeDossierContent").textContent),
+      /Austritt\s*30\.06\.2099/,
+    );
+    await teo.evaluate(() => document.querySelector("#employeeDossierDialog").close());
+  }
+  assert.deepEqual(teo.problems, []);
+});

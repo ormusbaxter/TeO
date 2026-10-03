@@ -534,6 +534,8 @@
     bulkEditForm: document.querySelector("#bulkEditForm"),
     bulkEditSubtitle: document.querySelector("#bulkEditSubtitle"),
     bulkActive: document.querySelector("#bulkActive"),
+    bulkEntryDate: document.querySelector("#bulkEntryDate"),
+    bulkExitDate: document.querySelector("#bulkExitDate"),
     bulkProfession: document.querySelector("#bulkProfession"),
     bulkServiceWeekend: document.querySelector("#bulkServiceWeekend"),
     bulkQualification: document.querySelector("#bulkQualification"),

@@ -2305,3 +2305,13 @@ body.is-dragging-appointment .appointment-calendar-entry {
   font-size: 0.66rem;
   font-weight: 700;
 }
+
+.quality-issue-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.quality-issue-row > .quality-issue {
+  flex: 1;
+}

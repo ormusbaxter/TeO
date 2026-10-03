@@ -138,7 +138,20 @@
     "birthday",
     "training",
     "qualification",
+    "employment",
   ]);
+  // Fristarten, die es vor „employment“ gab. Wer seine Auswahl schon einmal
+  // gespeichert hat, kannte nur diese; eine neu hinzugekommene Art soll dann
+  // eingeschaltet erscheinen, statt stillschweigend zu fehlen.
+  const LEGACY_DEADLINE_KINDS = Object.freeze([
+    "appointment",
+    "birthday",
+    "training",
+    "qualification",
+  ]);
+  // Dienstjubiläen, die der Fristenmonitor nennt.
+  const SERVICE_ANNIVERSARY_YEARS = Object.freeze([10, 20, 25, 30, 40]);
+  const PROBATION_MONTHS = 6;
   // So viele Fristen bleiben im Monitor sichtbar, weitere sind scrollbar.
   const VISIBLE_DEADLINE_ROWS = 6;
   const DEADLINE_KIND_LABELS = Object.freeze({
@@ -146,6 +159,7 @@
     birthday: "Geburtstage",
     training: "Fortbildungen",
     qualification: "Qualifikationen",
+    employment: "Personal",
   });
   const DEFAULT_DEVICE_CATALOG_TIMESTAMP = "2026-07-26T00:00:00.000Z";
   const DEFAULT_DEVICE_CATALOG = Object.freeze([
@@ -1218,6 +1232,8 @@
     bulkEditForm: document.querySelector("#bulkEditForm"),
     bulkEditSubtitle: document.querySelector("#bulkEditSubtitle"),
     bulkActive: document.querySelector("#bulkActive"),
+    bulkEntryDate: document.querySelector("#bulkEntryDate"),
+    bulkExitDate: document.querySelector("#bulkExitDate"),
     bulkProfession: document.querySelector("#bulkProfession"),
     bulkServiceWeekend: document.querySelector("#bulkServiceWeekend"),
     bulkQualification: document.querySelector("#bulkQualification"),
@@ -1421,6 +1437,7 @@
           },
         },
         deadlineKinds: [...DEADLINE_KINDS],
+        deadlineKindsSeen: [...DEADLINE_KINDS],
         deadlineHideOverdue: false,
       },
       users: initialUsers(),
@@ -1805,7 +1822,11 @@
           parsed.settings?.vacationCarryOverExpiry,
         ),
         serviceWeekends,
-        deadlineKinds: normalizeDeadlineKinds(parsed.settings?.deadlineKinds),
+        deadlineKinds: normalizeDeadlineKinds(
+          parsed.settings?.deadlineKinds,
+          parsed.settings?.deadlineKindsSeen,
+        ),
+        deadlineKindsSeen: [...DEADLINE_KINDS],
         deadlineHideOverdue: Boolean(parsed.settings?.deadlineHideOverdue),
       },
       users,
@@ -2512,9 +2533,10 @@
       : DEFAULT_WEEKEND_A_REFERENCE_SATURDAY;
   }
 
-  function normalizeDeadlineKinds(value) {
+  function normalizeDeadlineKinds(value, seenKinds) {
     if (!Array.isArray(value)) return [...DEADLINE_KINDS];
-    return DEADLINE_KINDS.filter((kind) => value.includes(kind));
+    const known = Array.isArray(seenKinds) ? seenKinds : LEGACY_DEADLINE_KINDS;
+    return DEADLINE_KINDS.filter((kind) => value.includes(kind) || !known.includes(kind));
   }
 
   function normalizeAuditLog(entries) {
@@ -4227,7 +4249,7 @@
   function renderAll() {
     // Nur Mitarbeiter, die tatsaechlich im Dienst stehen. Ausgetretene sollen
     // die Zahl in der Seitenleiste nicht dauerhaft aufblaehen.
-    elements.navEmployeeCount.textContent = String(activeEmployeeList().length);
+    elements.navEmployeeCount.textContent = String(employedActiveEmployees().length);
     elements.navTrainingCount.textContent = String(state.trainings.length);
     elements.navMeetingCount.textContent = String(state.meetings.length);
     elements.navAppointmentCount.textContent = String(
@@ -8349,7 +8371,7 @@
   function getDeadlineItems() {
     const today = parseLocalDate(todayIso());
     const items = [];
-    activeEmployeeList().forEach((employee) => {
+    employedActiveEmployees().forEach((employee) => {
       const birthday = getNextBirthday(employee.birthDate, today);
       if (birthday) {
         items.push({
@@ -8395,6 +8417,23 @@
         });
       });
     });
+    // Personalfristen auch für künftig Eintretende - gerade deren Probezeit
+    // will im Blick sein. Vergangenes bleibt draußen: Ein abgelaufenes
+    // Probezeitende ist erledigt, keine überfällige Aufgabe.
+    activeEmployeeList().forEach((employee) => {
+      employmentDeadlines(employee).forEach((deadline) => {
+        const daysUntil = daysBetween(today, parseLocalDate(deadline.dueDate));
+        if (daysUntil < 0) return;
+        items.push({
+          employeeId: employee.id,
+          employee,
+          type: "Personal",
+          kind: "employment",
+          daysUntil,
+          ...deadline,
+        });
+      });
+    });
     state.appointments.forEach((appointment) => {
       const daysUntil = daysBetween(today, parseLocalDate(appointment.date));
       if (daysUntil < 0 && !appointment.pinned) return;
@@ -8417,6 +8456,46 @@
         (a.employee && b.employee ? sortEmployees(a.employee, b.employee) : 0) ||
         a.title.localeCompare(b.title, "de"),
     );
+  }
+
+  function employmentDeadlines(employee, today = todayIso()) {
+    const deadlines = [];
+    if (employee.entryDate) {
+      // Die Probezeit endet mit dem Tag vor dem Monatsjahrestag.
+      const probationEnd = addDays(addMonths(employee.entryDate, PROBATION_MONTHS), -1);
+      deadlines.push({ title: "Ende der Probezeit", dueDate: probationEnd });
+      const entryYear = Number(employee.entryDate.slice(0, 4));
+      const monthDay = employee.entryDate.slice(5);
+      const thisYear = Number(today.slice(0, 4));
+      const candidateYear = `${thisYear}-${monthDay}` >= today ? thisYear : thisYear + 1;
+      const years = candidateYear - entryYear;
+      if (SERVICE_ANNIVERSARY_YEARS.includes(years)) {
+        deadlines.push({
+          title: `${years}-jähriges Dienstjubiläum`,
+          dueDate: monthDay === "02-29" ? `${candidateYear}-02-28` : `${candidateYear}-${monthDay}`,
+        });
+      }
+    }
+    if (employee.exitDate) {
+      deadlines.push({ title: "Austritt", dueDate: employee.exitDate });
+    }
+    (employee.employmentChanges || []).forEach((change) => {
+      deadlines.push({
+        title: `Stellenumfang ${change.percent} %`,
+        dueDate: change.from,
+      });
+    });
+    return deadlines;
+  }
+
+  function addDays(dateString, dayCount) {
+    const date = parseLocalDate(dateString);
+    date.setDate(date.getDate() + dayCount);
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-");
   }
 
   function getNextBirthday(birthDate, referenceDate = parseLocalDate(todayIso())) {
@@ -8476,7 +8555,9 @@
       (attendance) => attendance.status === "teilgenommen",
     ).length;
     const expectedMeetings = state.meetings.filter((meeting) => {
-      if (!meeting.expectedEmployeeIds.includes(employee.id)) return false;
+      if (!isExpectedForMeeting(employee, meeting, attendances.some((item) => item.meetingId === meeting.id))) {
+        return false;
+      }
       return !attendances.some(
         (attendance) =>
           attendance.meetingId === meeting.id &&
@@ -8566,7 +8647,13 @@
         <h3>Teamsitzungen</h3>
         <div class="dossier-list">
           ${state.meetings
-            .filter((meeting) => meeting.expectedEmployeeIds.includes(employee.id))
+            .filter((meeting) =>
+              isExpectedForMeeting(
+                employee,
+                meeting,
+                attendances.some((item) => item.meetingId === meeting.id),
+              ),
+            )
             .sort((a, b) => b.date.localeCompare(a.date))
             .map((meeting) => {
               const attendance = attendances.find(
@@ -11232,9 +11319,10 @@
   // Ein- und Austritt sowie Aenderungen des Stellenumfangs im Jahr werden
   // monatsweise gezwoelftelt, wie es TVoeD und AVR fuer Teiljahre vorsehen:
   // Jeder volle Beschaeftigungsmonat bringt ein Zwoelftel des Grundurlaubs,
-  // bemessen am Stellenumfang zum Monatsersten. Angefangene Monate zaehlen
-  // nicht. Ohne Ein-, Austritt und Aenderung im Jahr ergibt das genau den
-  // Jahreswert. Gerundet wird wie bisher auf halbe Tage.
+  // bemessen am Stellenumfang dieses Monats. Aendert er sich mitten im Monat,
+  // zaehlt jeder Tag mit seinem Wert. Angefangene Monate zaehlen nicht. Ohne
+  // Ein-, Austritt und Aenderung im Jahr ergibt das genau den Jahreswert.
+  // Gerundet wird wie bisher auf halbe Tage.
   function vacationBaseForYear(employee, year) {
     let twelfths = 0;
     let fullMonths = 0;
@@ -11244,13 +11332,31 @@
       const lastDay = `${prefix}-${String(new Date(year, month, 0).getDate()).padStart(2, "0")}`;
       if (isEmployedOn(employee, firstDay) && isEmployedOn(employee, lastDay)) {
         fullMonths += 1;
-        twelfths += employmentPercentOn(employee, firstDay);
+        twelfths += monthlyEmploymentPercent(employee, year, month, firstDay, lastDay);
       }
     }
     return {
       base: Math.round(((state.settings.vacationBaseDays * twelfths) / 1200) * 2) / 2,
       fullMonths,
     };
+  }
+
+  // Durchschnittlicher Stellenumfang eines Monats. Nur wenn eine Aenderung
+  // in den Monat faellt, wird tageweise gerechnet - sonst genuegt ein Wert.
+  function monthlyEmploymentPercent(employee, year, month, firstDay, lastDay) {
+    const changesInMonth = (employee.employmentChanges || []).some(
+      (change) => change.from > firstDay && change.from <= lastDay,
+    );
+    if (!changesInMonth) return employmentPercentOn(employee, firstDay);
+    const days = new Date(year, month, 0).getDate();
+    let sum = 0;
+    for (let day = 1; day <= days; day += 1) {
+      sum += employmentPercentOn(
+        employee,
+        `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+      );
+    }
+    return sum / days;
   }
 
   function getVacationEntitlement(employee, year) {
@@ -12099,7 +12205,16 @@
     const weekend = elements.bulkServiceWeekend.value;
     const qualificationId = elements.bulkQualification.value;
     const qualificationState = elements.bulkQualificationState.value;
-    if (!active && !profession && !weekend && !(qualificationId && qualificationState)) {
+    const entryDate = elements.bulkEntryDate.value;
+    const exitDate = elements.bulkExitDate.value;
+    if (
+      !active &&
+      !profession &&
+      !weekend &&
+      !(qualificationId && qualificationState) &&
+      !entryDate &&
+      !exitDate
+    ) {
       showToast("Bitte mindestens eine Änderung auswählen.", "error");
       return;
     }
@@ -12151,10 +12266,31 @@
         return;
       }
     }
+    if (entryDate || exitDate) {
+      // Geprüft wird das Ergebnis je Mitarbeiter: Ein gemeinsamer Austritt
+      // darf bei keinem vor dessen eigenem Eintritt liegen.
+      const conflicting = [...selectedEmployeeIds]
+        .map(getEmployee)
+        .filter((employee) => {
+          if (!employee) return false;
+          const entry = entryDate || employee.entryDate;
+          const exit = exitDate || employee.exitDate;
+          return entry && exit && exit < entry;
+        });
+      if (conflicting.length) {
+        showToast(
+          `Bei ${conflicting.map(fullName).join(", ")} läge der Austritt vor dem Eintritt.`,
+          "error",
+        );
+        return;
+      }
+    }
     const now = new Date().toISOString();
     const committed = await commitStateMutation(() => {
       state.employees.forEach((employee) => {
         if (!selectedEmployeeIds.has(employee.id)) return;
+        if (entryDate) employee.entryDate = entryDate;
+        if (exitDate) employee.exitDate = exitDate;
         if (active) {
           employee.employmentStatus = active;
           employee.active = active !== "inactive";
@@ -12184,19 +12320,31 @@
       ? `<div class="quality-issue-list">${issues
           .map(
             (issue) => `
-              <button
-                class="quality-issue ${issue.severity === "high" ? "is-high" : ""}"
-                type="button"
-                data-quality-employee="${issue.employeeId}"
-              >
-                <span class="status-badge ${issue.severity === "high" ? "expired" : "open"}">
-                  ${issue.severity === "high" ? "Prüfen" : "Hinweis"}
-                </span>
-                <span>
-                  <strong>${escapeHtml(issue.title)}</strong>
-                  <small>${escapeHtml(issue.detail)}</small>
-                </span>
-              </button>
+              <div class="quality-issue-row">
+                <button
+                  class="quality-issue ${issue.severity === "high" ? "is-high" : ""}"
+                  type="button"
+                  data-quality-employee="${issue.employeeId}"
+                >
+                  <span class="status-badge ${issue.severity === "high" ? "expired" : "open"}">
+                    ${issue.severity === "high" ? "Prüfen" : "Hinweis"}
+                  </span>
+                  <span>
+                    <strong>${escapeHtml(issue.title)}</strong>
+                    <small>${escapeHtml(issue.detail)}</small>
+                  </span>
+                </button>
+                ${
+                  issue.action
+                    ? `<button
+                        class="button button-secondary button-compact"
+                        type="button"
+                        data-quality-action="${issue.action.kind}"
+                        data-quality-action-employee="${issue.employeeId}"
+                      >${escapeHtml(issue.action.label)}</button>`
+                    : ""
+                }
+              </div>
             `,
           )
           .join("")}</div>`
@@ -12213,7 +12361,32 @@
           openEmployeeDialog(button.dataset.qualityEmployee);
         }),
       );
-    elements.dataQualityDialog.showModal();
+    elements.dataQualityContent
+      .querySelectorAll('[data-quality-action="deactivate"]')
+      .forEach((button) =>
+        button.addEventListener("click", () =>
+          deactivateExitedEmployee(button.dataset.qualityActionEmployee),
+        ),
+      );
+    if (!elements.dataQualityDialog.open) elements.dataQualityDialog.showModal();
+  }
+
+  // Ein Klick aus der Datenqualität heraus: Status auf „Inaktiv“, als ein
+  // Schritt, der sich zurücknehmen lässt. Die Liste baut sich danach neu auf.
+  async function deactivateExitedEmployee(employeeId) {
+    const employee = getEmployee(employeeId);
+    if (!employee) return;
+    const committed = await commitStateMutation(
+      () => {
+        employee.active = false;
+        employee.employmentStatus = "inactive";
+        employee.updatedAt = new Date().toISOString();
+      },
+      { undo: `${fullName(employee)} inaktiv gesetzt` },
+    );
+    if (!committed) return;
+    showUndoToast(`${fullName(employee)} ist jetzt inaktiv.`);
+    if (elements.dataQualityDialog.open) openDataQualityDialog();
   }
 
   function getDataQualityIssues() {
@@ -12253,6 +12426,7 @@
           severity: "high",
           title: `${fullName(employee)} ist ausgetreten, aber noch aktiv`,
           detail: `Austritt am ${formatDate(employee.exitDate)} – Status auf „Inaktiv“ setzen.`,
+          action: { kind: "deactivate", label: "Auf Inaktiv setzen" },
         });
       }
       state.employees.slice(index + 1).forEach((other) => {
@@ -12739,7 +12913,7 @@
     const displayedTrainings = trainingObligations().filter(
       (training) => training.year <= trainingDisplayYear,
     );
-    const activeCount = activeEmployeeList().length;
+    const activeCount = employedActiveEmployees().length;
     const totalAssignments = activeCount * displayedTrainings.length;
     const currentAssignments = displayedTrainings.reduce(
       (sum, training) => sum + getTrainingStats(training).current,
@@ -13153,7 +13327,10 @@
     const trainings = trainingObligations()
       .filter((training) => training.year <= year)
       .sort((a, b) => a.title.localeCompare(b.title, "de"));
-    const employees = [...activeEmployeeList()].sort(sortEmployees);
+    // Erwartet wird, wer zum Stichtag des Jahres beschäftigt ist: Wer im
+    // Herbst eintritt, gilt für dieses Jahr schon als verpflichtet, wer im
+    // Frühjahr ausgetreten ist, nicht mehr.
+    const employees = employedActiveEmployees(trainingReferenceDate(year)).sort(sortEmployees);
     let completedAssignments = 0;
     const completedPerTraining = trainings.map(() => 0);
     const rows = employees.map((employee) => ({
@@ -13239,7 +13416,7 @@
 
   function renderTrainingCard(training) {
     const stats = getTrainingStats(training);
-    const activeCount = activeEmployeeList().length;
+    const activeCount = employedActiveEmployees().length;
     const history = state.completions
       .filter((completion) => completionMatchesTraining(completion, training))
       .sort(
@@ -17693,7 +17870,10 @@
       time: document.querySelector("#meetingTime").value,
       notes: document.querySelector("#meetingNotes").value.trim(),
       expectedEmployeeIds:
-        existingMeeting?.expectedEmployeeIds || activeEmployeeList().map((employee) => employee.id),
+        existingMeeting?.expectedEmployeeIds ||
+        employedActiveEmployees(document.querySelector("#meetingDate")?.value || todayIso()).map(
+          (employee) => employee.id,
+        ),
       createdAt: existingMeeting?.createdAt || now,
       updatedAt: now,
     };
@@ -17753,13 +17933,19 @@
     const existingRecords = state.meetingAttendances.filter(
       (attendance) => attendance.meetingId === meetingId,
     );
+    const documentedIds = new Set(existingRecords.map((record) => record.employeeId));
     const employeeIds = new Set(meeting.expectedEmployeeIds);
     existingRecords.forEach((record) => employeeIds.add(record.employeeId));
     if (existingRecords.length === 0) {
-      activeEmployeeList().forEach((employee) => employeeIds.add(employee.id));
+      employedActiveEmployees(meeting.date).forEach((employee) => employeeIds.add(employee.id));
     }
 
-    attendanceEmployeeIds = [...employeeIds].filter((employeeId) => getEmployee(employeeId));
+    // Wer am Sitzungstag nicht beschäftigt war, steht nicht zur Auswahl -
+    // es sei denn, für ihn ist schon etwas dokumentiert.
+    attendanceEmployeeIds = [...employeeIds].filter((employeeId) => {
+      const employee = getEmployee(employeeId);
+      return employee && (documentedIds.has(employeeId) || isEmployedOn(employee, meeting.date));
+    });
     if (attendanceEmployeeIds.length === 0) {
       showToast("Für diese Sitzung sind keine Mitarbeiter verfügbar.", "error");
       return;
@@ -20686,7 +20872,7 @@
   }
 
   function getTrainingStats(training) {
-    const activeEmployees = activeEmployeeList();
+    const activeEmployees = employedActiveEmployees();
     const current = activeEmployees.filter((employee) =>
       isEmployeeCurrentForTraining(employee.id, training),
     ).length;
@@ -20874,10 +21060,14 @@
     ];
     const expectedEmployeeIds = new Set(meeting.expectedEmployeeIds);
     records.forEach((record) => expectedEmployeeIds.add(record.employeeId));
-    const validExpectedIds = [...expectedEmployeeIds].filter((employeeId) =>
-      getEmployee(employeeId),
-    );
     const documentedEmployeeIds = new Set(records.map((record) => record.employeeId));
+    const validExpectedIds = [...expectedEmployeeIds].filter((employeeId) => {
+      const employee = getEmployee(employeeId);
+      return (
+        employee &&
+        (documentedEmployeeIds.has(employeeId) || isEmployedOn(employee, meeting.date))
+      );
+    });
     const documented = validExpectedIds.filter((employeeId) =>
       documentedEmployeeIds.has(employeeId),
     ).length;
@@ -20949,7 +21139,16 @@
     const employeeRows = state.employees
       .map((employee) => {
         const expectedMeetingIds = meetings
-          .filter((meeting) => meeting.expectedEmployeeIds.includes(employee.id))
+          .filter((meeting) =>
+            isExpectedForMeeting(
+              employee,
+              meeting,
+              state.meetingAttendances.some(
+                (attendance) =>
+                  attendance.meetingId === meeting.id && attendance.employeeId === employee.id,
+              ),
+            ),
+          )
           .map((meeting) => meeting.id);
         const records = state.meetingAttendances.filter(
           (attendance) =>
@@ -21075,6 +21274,26 @@
       (!employee.entryDate || employee.entryDate <= lastDate) &&
       (!employee.exitDate || firstDate <= employee.exitDate)
     );
+  }
+
+  // Aktive Mitarbeiter, die an diesem Tag auch beschäftigt sind. Ein Status
+  // „Aktiv“ allein genügt nicht: Vor dem Eintritt und nach dem Austritt zählt
+  // niemand zu Quoten, Matrizen und erwarteten Teilnehmern.
+  function employedActiveEmployees(date = todayIso()) {
+    return activeEmployeeList().filter((employee) => isEmployedOn(employee, date));
+  }
+
+  // Stichtag einer Jahrespflicht: das Jahresende, im laufenden Jahr heute.
+  function trainingReferenceDate(year) {
+    const today = todayIso();
+    return Number(today.slice(0, 4)) === year ? today : `${year}-12-31`;
+  }
+
+  // Zu einer Sitzung erwartet ist, wer auf der Liste steht und am Sitzungstag
+  // beschäftigt war. Eine bereits dokumentierte Teilnahme zählt immer.
+  function isExpectedForMeeting(employee, meeting, documented = false) {
+    if (!employee || !meeting.expectedEmployeeIds.includes(employee.id)) return documented;
+    return documented || isEmployedOn(employee, meeting.date);
   }
 
   function activeEmployeeList() {

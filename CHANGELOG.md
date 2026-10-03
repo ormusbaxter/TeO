@@ -1,3 +1,13 @@
+### 4.55.0 – Beschäftigungszeiten in Fortbildungen, Sitzungen und Fristen
+
+- **Verbessert:** Pflichtfortbildungen beachten Ein- und Austritt. Quoten zählen nur, wer heute beschäftigt ist; die Jahresmatrix erwartet, wer zum Jahresende beschäftigt ist – im laufenden Jahr, wer heute beschäftigt ist
+- **Verbessert:** Teamsitzungen erwarten nur, wer am Sitzungstag beschäftigt war – in Statistik, Teilnahmeerfassung und Akte. Bereits dokumentierte Teilnahmen bleiben erhalten
+- **Neu:** Der Fristenmonitor hat die Kategorie **Personal**: Ende der Probezeit, bevorstehende Austritte und Änderungen des Stellenumfangs sowie Dienstjubiläen nach 10, 20, 25, 30 und 40 Jahren. Bei einer gespeicherten Filterauswahl ist die neue Kategorie eingeschaltet
+- **Neu:** Die Datenqualitätsprüfung bietet bei „ausgetreten, aber noch aktiv“ die Schaltfläche **Auf Inaktiv setzen** – mit Rückgängig
+- **Neu:** Die Sammelbearbeitung setzt Ein- und Austrittsdatum für mehrere Mitarbeiter auf einmal
+- **Verbessert:** Ändert sich der Stellenumfang mitten im Monat, zählt für den Urlaubsanspruch jeder Tag mit seinem Wert
+- **Verbessert:** Die Demodatenbank enthält keine Fortbildungen, Sitzungsteilnahmen und Geräteeinweisungen mehr außerhalb der Beschäftigungszeiten
+
 ### 4.54.0 – Ein- und Austritt, Änderungen des Stellenumfangs
 
 - **Neu:** Mitarbeiter haben ein **Eintritts-** und ein **Austrittsdatum**. Davor und danach erscheinen sie nicht in der Urlaubsplanung; in Monaten mit Ein- oder Austritt sind die Tage außerhalb der Beschäftigung schraffiert und gesperrt

@@ -34,6 +34,26 @@
     );
   }
 
+  // Aktive Mitarbeiter, die an diesem Tag auch beschäftigt sind. Ein Status
+  // „Aktiv“ allein genügt nicht: Vor dem Eintritt und nach dem Austritt zählt
+  // niemand zu Quoten, Matrizen und erwarteten Teilnehmern.
+  function employedActiveEmployees(date = todayIso()) {
+    return activeEmployeeList().filter((employee) => isEmployedOn(employee, date));
+  }
+
+  // Stichtag einer Jahrespflicht: das Jahresende, im laufenden Jahr heute.
+  function trainingReferenceDate(year) {
+    const today = todayIso();
+    return Number(today.slice(0, 4)) === year ? today : `${year}-12-31`;
+  }
+
+  // Zu einer Sitzung erwartet ist, wer auf der Liste steht und am Sitzungstag
+  // beschäftigt war. Eine bereits dokumentierte Teilnahme zählt immer.
+  function isExpectedForMeeting(employee, meeting, documented = false) {
+    if (!employee || !meeting.expectedEmployeeIds.includes(employee.id)) return documented;
+    return documented || isEmployedOn(employee, meeting.date);
+  }
+
   function activeEmployeeList() {
     return state.employees.filter((employee) => employee.active);
   }

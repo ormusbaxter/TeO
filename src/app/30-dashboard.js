@@ -305,7 +305,7 @@
   function getDeadlineItems() {
     const today = parseLocalDate(todayIso());
     const items = [];
-    activeEmployeeList().forEach((employee) => {
+    employedActiveEmployees().forEach((employee) => {
       const birthday = getNextBirthday(employee.birthDate, today);
       if (birthday) {
         items.push({
@@ -351,6 +351,23 @@
         });
       });
     });
+    // Personalfristen auch für künftig Eintretende - gerade deren Probezeit
+    // will im Blick sein. Vergangenes bleibt draußen: Ein abgelaufenes
+    // Probezeitende ist erledigt, keine überfällige Aufgabe.
+    activeEmployeeList().forEach((employee) => {
+      employmentDeadlines(employee).forEach((deadline) => {
+        const daysUntil = daysBetween(today, parseLocalDate(deadline.dueDate));
+        if (daysUntil < 0) return;
+        items.push({
+          employeeId: employee.id,
+          employee,
+          type: "Personal",
+          kind: "employment",
+          daysUntil,
+          ...deadline,
+        });
+      });
+    });
     state.appointments.forEach((appointment) => {
       const daysUntil = daysBetween(today, parseLocalDate(appointment.date));
       if (daysUntil < 0 && !appointment.pinned) return;
@@ -373,6 +390,46 @@
         (a.employee && b.employee ? sortEmployees(a.employee, b.employee) : 0) ||
         a.title.localeCompare(b.title, "de"),
     );
+  }
+
+  function employmentDeadlines(employee, today = todayIso()) {
+    const deadlines = [];
+    if (employee.entryDate) {
+      // Die Probezeit endet mit dem Tag vor dem Monatsjahrestag.
+      const probationEnd = addDays(addMonths(employee.entryDate, PROBATION_MONTHS), -1);
+      deadlines.push({ title: "Ende der Probezeit", dueDate: probationEnd });
+      const entryYear = Number(employee.entryDate.slice(0, 4));
+      const monthDay = employee.entryDate.slice(5);
+      const thisYear = Number(today.slice(0, 4));
+      const candidateYear = `${thisYear}-${monthDay}` >= today ? thisYear : thisYear + 1;
+      const years = candidateYear - entryYear;
+      if (SERVICE_ANNIVERSARY_YEARS.includes(years)) {
+        deadlines.push({
+          title: `${years}-jähriges Dienstjubiläum`,
+          dueDate: monthDay === "02-29" ? `${candidateYear}-02-28` : `${candidateYear}-${monthDay}`,
+        });
+      }
+    }
+    if (employee.exitDate) {
+      deadlines.push({ title: "Austritt", dueDate: employee.exitDate });
+    }
+    (employee.employmentChanges || []).forEach((change) => {
+      deadlines.push({
+        title: `Stellenumfang ${change.percent} %`,
+        dueDate: change.from,
+      });
+    });
+    return deadlines;
+  }
+
+  function addDays(dateString, dayCount) {
+    const date = parseLocalDate(dateString);
+    date.setDate(date.getDate() + dayCount);
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-");
   }
 
   function getNextBirthday(birthDate, referenceDate = parseLocalDate(todayIso())) {
