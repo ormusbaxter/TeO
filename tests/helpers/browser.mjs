@@ -246,7 +246,13 @@ export async function openTeO(
   // Die Anmeldemaske liegt über allem. Für die Frage, ob eine Regel wirkt,
   // genügt es, die Sperre zu lösen und die Rolle zu setzen - der Anmeldeweg
   // selbst ist anderswo geprüft.
-  if (angemeldetAls) {
+  if (angemeldetAls && !anmeldenAls) {
+    // Der Startdialog (Herkunft des Datenbestands oder Anmeldung) öffnet sich
+    // erst nach der asynchronen Initialisierung. Unter Last kam er sonst nach
+    // dem Schließen - und ein offener Dialog lässt etwa Esc ins Leere gehen.
+    await page
+      .waitForSelector("dialog[open]", { timeout: 10000 })
+      .catch(() => {});
     await page.evaluate((rolle) => {
       document.body.classList.remove("is-auth-locked");
       document.body.dataset.userRole = rolle;
