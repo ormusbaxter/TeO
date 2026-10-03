@@ -475,6 +475,10 @@
                     <input type="checkbox" value="qualification" data-deadline-filter checked />
                     <span>Qualifikationen</span>
                   </label>
+                  <label class="deadline-filter-chip" title="Probezeitende, Austritte, Änderungen des Stellenumfangs, Dienstjubiläen">
+                    <input type="checkbox" value="employment" data-deadline-filter checked />
+                    <span>Personal</span>
+                  </label>
                 </fieldset>
                 <label class="deadline-filter-chip deadline-overdue-filter">
                   <input id="deadlineHideOverdue" type="checkbox" />
@@ -2314,7 +2318,9 @@
 <ol><li><strong>Mitarbeiter</strong> öffnen.</li><li><strong>Mitarbeiter anlegen</strong> auswählen.</li><li>Vorname, Nachname, Beruf und Stellenumfang erfassen; bei Bedarf Ein- und Austrittsdatum.</li><li>Optional Geburtsdatum, Telefonnummer, E-Mail-Adresse und Benutzername ergänzen.</li><li>Mitarbeiterstatus und festes Dienstwochenende auswählen.</li><li>Zusatzqualifikationen kennzeichnen und gegebenenfalls ein Ablaufdatum hinterlegen.</li><li>Speichern.</li></ol>
 <p>TeO nennt Mitarbeiter überall in der Form <strong>Nachname, Vorname</strong> – in Listen, Akten, Auswahlfeldern, Meldungen, Ausdrucken und Exporten. Die Suchfelder finden einen Namen in beiden Reihenfolgen, also auch als „Vorname Nachname“.</p>
 <h3 id="hilfe-eintritt-austritt-und-stellenumfang">Eintritt, Austritt und Stellenumfang</h3>
-<p><strong>Eintrittsdatum</strong> und <strong>Austrittsdatum</strong> begrenzen die Beschäftigung. Davor und danach erscheint der Mitarbeiter nicht in der Urlaubsplanung; in Monaten mit Ein- oder Austritt sind die Tage außerhalb schraffiert und gesperrt. Ist das Austrittsdatum überschritten, der Mitarbeiter aber noch aktiv, meldet die Datenqualitätsprüfung das – den Status stellt TeO nicht selbst um.</p>
+<p><strong>Eintrittsdatum</strong> und <strong>Austrittsdatum</strong> begrenzen die Beschäftigung. Davor und danach erscheint der Mitarbeiter nicht in der Urlaubsplanung; in Monaten mit Ein- oder Austritt sind die Tage außerhalb schraffiert und gesperrt. Ist das Austrittsdatum überschritten, der Mitarbeiter aber noch aktiv, meldet die Datenqualitätsprüfung das. Den Status stellt TeO nicht selbst um; die Schaltfläche <strong>Auf Inaktiv setzen</strong> in der Meldung erledigt es mit einem Klick, und „Rückgängig“ nimmt es wieder zurück.</p>
+<p>Auch Pflichtfortbildungen und Teamsitzungen beachten die Beschäftigung:</p>
+<ul><li>Zu einer Pflichtfortbildung eines Jahres zählt, wer zum Jahresende beschäftigt ist – im laufenden Jahr, wer heute beschäftigt ist. Wer im Herbst eintritt, ist für das Jahr also schon verpflichtet; wer im Frühjahr ausgetreten ist, nicht mehr.</li><li>Zu einer Teamsitzung erwartet wird, wer am Sitzungstag beschäftigt war. Bereits dokumentierte Teilnahmen bleiben in jedem Fall erhalten.</li></ul>
 <p>Ändert sich der Stellenumfang, trägt <strong>Änderung hinzufügen</strong> den neuen Wert mit dem Tag ein, ab dem er gilt. Das Feld <strong>Stellenumfang</strong> ist dann der Ausgangswert bis zur ersten Änderung. Überall angezeigt wird der heute gültige Wert; eine bevorstehende Änderung nennt die Mitarbeiterliste unter dem Wert („ab 01.01.2027: 75 %“), die Akte zeigt den Verlauf.</p>
 <h3 id="hilfe-mitarbeiterstatus">Mitarbeiterstatus</h3>
 <p>TeO unterscheidet:</p>
@@ -2325,7 +2331,7 @@
 <p>Die Qualifikationen <strong>Stationsleitung</strong> und <strong>Stellvertretende Stationsleitung</strong> sind feste Systemrollen. Sie werden für die Dienstwochenendzuweisung benötigt und können nicht gelöscht oder umbenannt werden.</p>
 <h3 id="hilfe-filtern-sortieren-und-sammelbearbeitung">Filtern, Sortieren und Sammelbearbeitung</h3>
 <p>Die Mitarbeiterliste kann nach Status, Beruf, Qualifikation, Dienstwochenende und Suchtext eingeschränkt werden.</p>
-<p>Über die Auswahlkästchen können mehrere Mitarbeiter gleichzeitig bearbeitet werden. Möglich sind Änderungen an Status, Beruf, Dienstwochenende und Zusatzqualifikationen.</p>
+<p>Über die Auswahlkästchen können mehrere Mitarbeiter gleichzeitig bearbeitet werden. Möglich sind Änderungen an Status, Beruf, Dienstwochenende, Zusatzqualifikationen sowie Ein- und Austrittsdatum. Ein gemeinsamer Austritt wird abgewiesen, wenn er bei einem der Ausgewählten vor dessen Eintritt läge.</p>
 <p>Verantwortliche Personen eines Dienstwochenendes können nicht durch eine Sammelaktion in ein anderes Wochenende verschoben werden.</p>
 <h3 id="hilfe-mitarbeiter-gesamtakte">Mitarbeiter-Gesamtakte</h3>
 <p>Ein Klick auf einen Mitarbeiter öffnet die Gesamtakte mit:</p>
@@ -2361,7 +2367,7 @@
 <h3 id="hilfe-urlaubsanspruch">Urlaubsanspruch</h3>
 <p>Der Jahresanspruch setzt sich zusammen aus:</p>
 <ul><li>konfigurierbarem Grundurlaub einer Vollzeitkraft</li><li>Stellenumfang des Mitarbeiters, gegebenenfalls mit Änderungen im Jahr</li><li>Ein- und Austritt im Jahr</li><li>individuell erarbeitetem Zusatzurlaub durch Schichtdienst</li><li>übertragenem Resturlaub aus dem Vorjahr</li></ul>
-<p>Ein- und Austritt sowie Änderungen des Stellenumfangs im Jahr werden gezwölftelt, wie es TVöD und AVR für Teiljahre vorsehen: Jeder <strong>volle</strong> Beschäftigungsmonat bringt ein Zwölftel des Grundurlaubs, bemessen am Stellenumfang zum Monatsersten. Angefangene Monate zählen nicht. Beispiel: Eintritt am 1. April bei 100 % ergibt 9/12 von 30 = 22,5 Tage; Wechsel von 100 % auf 50 % zum 1. Juli ergibt 15 + 7,5 = 22,5 Tage. Ein anteiliger Wert in der Spalte <strong>Basis</strong> trägt ein Sternchen, der Tooltip nennt die Zahl der vollen Monate.</p>
+<p>Ein- und Austritt sowie Änderungen des Stellenumfangs im Jahr werden gezwölftelt, wie es TVöD und AVR für Teiljahre vorsehen: Jeder <strong>volle</strong> Beschäftigungsmonat bringt ein Zwölftel des Grundurlaubs, bemessen am Stellenumfang dieses Monats; ändert er sich mitten im Monat, zählt jeder Tag mit seinem Wert. Angefangene Monate zählen nicht. Beispiel: Eintritt am 1. April bei 100 % ergibt 9/12 von 30 = 22,5 Tage; Wechsel von 100 % auf 50 % zum 1. Juli ergibt 15 + 7,5 = 22,5 Tage. Ein anteiliger Wert in der Spalte <strong>Basis</strong> trägt ein Sternchen, der Tooltip nennt die Zahl der vollen Monate.</p>
 <p>Grundurlaub, Abwesenheitsgrenzen, Referenzsamstag und der Verfallstag des Resturlaubs werden unter <strong>Einstellungen → Planung</strong> gepflegt.</p>
 <p>Die sechs Summenspalten <strong>Basis</strong>, <strong>Zusatz</strong>, <strong>Übertrag</strong>, <strong>Anspruch</strong>, <strong>Geplant</strong> und <strong>Rest</strong> bleiben beim horizontalen Scrollen fixiert.</p>
 <h3 id="hilfe-resturlaub-aus-dem-vorjahr">Resturlaub aus dem Vorjahr</h3>
@@ -2455,7 +2461,7 @@
 <h3 id="hilfe-fristenmonitor">Fristenmonitor</h3>
 <p>Der Fristenmonitor steht auf der Übersichtsseite direkt unter den Kennzahlen. Sechs Einträge bleiben sichtbar, weitere sind innerhalb des Bereichs scrollbar.</p>
 <p>Er zeigt:</p>
-<ul><li>anstehende Termine; Schulungen und Geräteeinweisungen aus dem Terminkalender werden dabei dem Filter <strong>Fortbildungen</strong> zugeordnet</li><li>Geburtstage</li><li>fällige und überfällige Pflichtfortbildungen</li><li>ablaufende Zusatzqualifikationen</li></ul>
+<ul><li>anstehende Termine; Schulungen und Geräteeinweisungen aus dem Terminkalender werden dabei dem Filter <strong>Fortbildungen</strong> zugeordnet</li><li>Geburtstage</li><li>fällige und überfällige Pflichtfortbildungen</li><li>ablaufende Zusatzqualifikationen</li><li>unter <strong>Personal</strong>: Ende der Probezeit (sechs Monate nach Eintritt), bevorstehende Austritte und Änderungen des Stellenumfangs sowie Dienstjubiläen nach 10, 20, 25, 30 und 40 Jahren. Bereits vergangene Personalfristen erscheinen nicht – ein abgelaufenes Probezeitende ist erledigt, keine offene Aufgabe.</li></ul>
 <p>Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien lassen sich einzeln ein- oder ausblenden. Der zusätzliche Filter <strong>Überfällige ausblenden</strong> zeigt nur aktuell anstehende Einträge und wird gemeinsam mit den Kategorie-Filtern gespeichert.</p>
 <p>Geburtstage erscheinen mit Name, erreichtem Lebensjahr und vollständigem Geburtsdatum.</p>
 </section>
@@ -2637,6 +2643,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-55-0-beschaftigungszeiten-in-fortbildungen-sitzungen-und-fristen">4.55.0 – Beschäftigungszeiten in Fortbildungen, Sitzungen und Fristen</h3>
+<ul><li><strong>Verbessert:</strong> Pflichtfortbildungen beachten Ein- und Austritt. Quoten zählen nur, wer heute beschäftigt ist; die Jahresmatrix erwartet, wer zum Jahresende beschäftigt ist – im laufenden Jahr, wer heute beschäftigt ist</li><li><strong>Verbessert:</strong> Teamsitzungen erwarten nur, wer am Sitzungstag beschäftigt war – in Statistik, Teilnahmeerfassung und Akte. Bereits dokumentierte Teilnahmen bleiben erhalten</li><li><strong>Neu:</strong> Der Fristenmonitor hat die Kategorie <strong>Personal</strong>: Ende der Probezeit, bevorstehende Austritte und Änderungen des Stellenumfangs sowie Dienstjubiläen nach 10, 20, 25, 30 und 40 Jahren. Bei einer gespeicherten Filterauswahl ist die neue Kategorie eingeschaltet</li><li><strong>Neu:</strong> Die Datenqualitätsprüfung bietet bei „ausgetreten, aber noch aktiv“ die Schaltfläche <strong>Auf Inaktiv setzen</strong> – mit Rückgängig</li><li><strong>Neu:</strong> Die Sammelbearbeitung setzt Ein- und Austrittsdatum für mehrere Mitarbeiter auf einmal</li><li><strong>Verbessert:</strong> Ändert sich der Stellenumfang mitten im Monat, zählt für den Urlaubsanspruch jeder Tag mit seinem Wert</li><li><strong>Verbessert:</strong> Die Demodatenbank enthält keine Fortbildungen, Sitzungsteilnahmen und Geräteeinweisungen mehr außerhalb der Beschäftigungszeiten</li></ul>
 <h3 id="hilfe-4-54-0-ein-und-austritt-anderungen-des-stellenumfangs">4.54.0 – Ein- und Austritt, Änderungen des Stellenumfangs</h3>
 <ul><li><strong>Neu:</strong> Mitarbeiter haben ein <strong>Eintritts-</strong> und ein <strong>Austrittsdatum</strong>. Davor und danach erscheinen sie nicht in der Urlaubsplanung; in Monaten mit Ein- oder Austritt sind die Tage außerhalb der Beschäftigung schraffiert und gesperrt</li><li><strong>Neu:</strong> <strong>Änderungen des Stellenumfangs</strong> lassen sich mit dem Tag erfassen, ab dem sie gelten. Überall gilt der jeweils aktuelle Wert – in Listen, Akte, Wochenendverteilung und Urlaubsplanung; die Mitarbeiterliste nennt eine bevorstehende Änderung, die Akte den Verlauf</li><li><strong>Neu:</strong> Der Urlaubsanspruch wird bei Ein- oder Austritt im Jahr und bei Änderungen des Stellenumfangs gezwölftelt: je vollem Beschäftigungsmonat ein Zwölftel, bemessen am Stellenumfang zum Monatsersten. Anteilige Werte sind in der Spalte <strong>Basis</strong> mit einem Sternchen markiert</li><li><strong>Neu:</strong> Die Datenqualitätsprüfung meldet Mitarbeiter, deren Austrittsdatum überschritten ist, die aber noch aktiv sind</li><li><strong>Verbessert:</strong> Die Demodatenbank enthält Ein- und Austrittsdaten sowie einige Änderungen des Stellenumfangs</li></ul>
 <h3 id="hilfe-4-53-0-fadenkreuz-und-korrekturen-in-der-urlaubsplanung">4.53.0 – Fadenkreuz und Korrekturen in der Urlaubsplanung</h3>
@@ -3454,6 +3462,14 @@ npm run verify</code></pre>
                 <option value="add">Zuweisen</option>
                 <option value="remove">Entfernen</option>
               </select>
+            </label>
+            <label class="form-field">
+              <span>Eintrittsdatum</span>
+              <input id="bulkEntryDate" type="date" />
+            </label>
+            <label class="form-field">
+              <span>Austrittsdatum</span>
+              <input id="bulkExitDate" type="date" />
             </label>
           </div>
         </div>

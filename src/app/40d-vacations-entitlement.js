@@ -12,9 +12,10 @@
   // Ein- und Austritt sowie Aenderungen des Stellenumfangs im Jahr werden
   // monatsweise gezwoelftelt, wie es TVoeD und AVR fuer Teiljahre vorsehen:
   // Jeder volle Beschaeftigungsmonat bringt ein Zwoelftel des Grundurlaubs,
-  // bemessen am Stellenumfang zum Monatsersten. Angefangene Monate zaehlen
-  // nicht. Ohne Ein-, Austritt und Aenderung im Jahr ergibt das genau den
-  // Jahreswert. Gerundet wird wie bisher auf halbe Tage.
+  // bemessen am Stellenumfang dieses Monats. Aendert er sich mitten im Monat,
+  // zaehlt jeder Tag mit seinem Wert. Angefangene Monate zaehlen nicht. Ohne
+  // Ein-, Austritt und Aenderung im Jahr ergibt das genau den Jahreswert.
+  // Gerundet wird wie bisher auf halbe Tage.
   function vacationBaseForYear(employee, year) {
     let twelfths = 0;
     let fullMonths = 0;
@@ -24,13 +25,31 @@
       const lastDay = `${prefix}-${String(new Date(year, month, 0).getDate()).padStart(2, "0")}`;
       if (isEmployedOn(employee, firstDay) && isEmployedOn(employee, lastDay)) {
         fullMonths += 1;
-        twelfths += employmentPercentOn(employee, firstDay);
+        twelfths += monthlyEmploymentPercent(employee, year, month, firstDay, lastDay);
       }
     }
     return {
       base: Math.round(((state.settings.vacationBaseDays * twelfths) / 1200) * 2) / 2,
       fullMonths,
     };
+  }
+
+  // Durchschnittlicher Stellenumfang eines Monats. Nur wenn eine Aenderung
+  // in den Monat faellt, wird tageweise gerechnet - sonst genuegt ein Wert.
+  function monthlyEmploymentPercent(employee, year, month, firstDay, lastDay) {
+    const changesInMonth = (employee.employmentChanges || []).some(
+      (change) => change.from > firstDay && change.from <= lastDay,
+    );
+    if (!changesInMonth) return employmentPercentOn(employee, firstDay);
+    const days = new Date(year, month, 0).getDate();
+    let sum = 0;
+    for (let day = 1; day <= days; day += 1) {
+      sum += employmentPercentOn(
+        employee,
+        `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+      );
+    }
+    return sum / days;
   }
 
   function getVacationEntitlement(employee, year) {

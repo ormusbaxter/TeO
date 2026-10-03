@@ -137,7 +137,20 @@
     "birthday",
     "training",
     "qualification",
+    "employment",
   ]);
+  // Fristarten, die es vor „employment“ gab. Wer seine Auswahl schon einmal
+  // gespeichert hat, kannte nur diese; eine neu hinzugekommene Art soll dann
+  // eingeschaltet erscheinen, statt stillschweigend zu fehlen.
+  const LEGACY_DEADLINE_KINDS = Object.freeze([
+    "appointment",
+    "birthday",
+    "training",
+    "qualification",
+  ]);
+  // Dienstjubiläen, die der Fristenmonitor nennt.
+  const SERVICE_ANNIVERSARY_YEARS = Object.freeze([10, 20, 25, 30, 40]);
+  const PROBATION_MONTHS = 6;
   // So viele Fristen bleiben im Monitor sichtbar, weitere sind scrollbar.
   const VISIBLE_DEADLINE_ROWS = 6;
   const DEADLINE_KIND_LABELS = Object.freeze({
@@ -145,6 +158,7 @@
     birthday: "Geburtstage",
     training: "Fortbildungen",
     qualification: "Qualifikationen",
+    employment: "Personal",
   });
   const DEFAULT_DEVICE_CATALOG_TIMESTAMP = "2026-07-26T00:00:00.000Z";
   const DEFAULT_DEVICE_CATALOG = Object.freeze([

@@ -506,7 +506,18 @@ finden einen Namen in beiden Reihenfolgen, also auch als „Vorname Nachname“.
 und danach erscheint der Mitarbeiter nicht in der Urlaubsplanung; in Monaten
 mit Ein- oder Austritt sind die Tage außerhalb schraffiert und gesperrt. Ist
 das Austrittsdatum überschritten, der Mitarbeiter aber noch aktiv, meldet die
-Datenqualitätsprüfung das – den Status stellt TeO nicht selbst um.
+Datenqualitätsprüfung das. Den Status stellt TeO nicht selbst um; die
+Schaltfläche **Auf Inaktiv setzen** in der Meldung erledigt es mit einem Klick,
+und „Rückgängig“ nimmt es wieder zurück.
+
+Auch Pflichtfortbildungen und Teamsitzungen beachten die Beschäftigung:
+
+- Zu einer Pflichtfortbildung eines Jahres zählt, wer zum Jahresende
+  beschäftigt ist – im laufenden Jahr, wer heute beschäftigt ist. Wer im Herbst
+  eintritt, ist für das Jahr also schon verpflichtet; wer im Frühjahr
+  ausgetreten ist, nicht mehr.
+- Zu einer Teamsitzung erwartet wird, wer am Sitzungstag beschäftigt war.
+  Bereits dokumentierte Teilnahmen bleiben in jedem Fall erhalten.
 
 Ändert sich der Stellenumfang, trägt **Änderung hinzufügen** den neuen Wert
 mit dem Tag ein, ab dem er gilt. Das Feld **Stellenumfang** ist dann der
@@ -543,8 +554,9 @@ Die Mitarbeiterliste kann nach Status, Beruf, Qualifikation,
 Dienstwochenende und Suchtext eingeschränkt werden.
 
 Über die Auswahlkästchen können mehrere Mitarbeiter gleichzeitig bearbeitet
-werden. Möglich sind Änderungen an Status, Beruf, Dienstwochenende und
-Zusatzqualifikationen.
+werden. Möglich sind Änderungen an Status, Beruf, Dienstwochenende,
+Zusatzqualifikationen sowie Ein- und Austrittsdatum. Ein gemeinsamer Austritt
+wird abgewiesen, wenn er bei einem der Ausgewählten vor dessen Eintritt läge.
 
 Verantwortliche Personen eines Dienstwochenendes können nicht durch eine
 Sammelaktion in ein anderes Wochenende verschoben werden.
@@ -667,7 +679,8 @@ Der Jahresanspruch setzt sich zusammen aus:
 Ein- und Austritt sowie Änderungen des Stellenumfangs im Jahr werden
 gezwölftelt, wie es TVöD und AVR für Teiljahre vorsehen: Jeder **volle**
 Beschäftigungsmonat bringt ein Zwölftel des Grundurlaubs, bemessen am
-Stellenumfang zum Monatsersten. Angefangene Monate zählen nicht. Beispiel:
+Stellenumfang dieses Monats; ändert er sich mitten im Monat, zählt jeder Tag mit
+seinem Wert. Angefangene Monate zählen nicht. Beispiel:
 Eintritt am 1. April bei 100 % ergibt 9/12 von 30 = 22,5 Tage; Wechsel von
 100 % auf 50 % zum 1. Juli ergibt 15 + 7,5 = 22,5 Tage. Ein anteiliger Wert
 in der Spalte **Basis** trägt ein Sternchen, der Tooltip nennt die Zahl der
@@ -1023,6 +1036,11 @@ Er zeigt:
 - Geburtstage
 - fällige und überfällige Pflichtfortbildungen
 - ablaufende Zusatzqualifikationen
+- unter **Personal**: Ende der Probezeit (sechs Monate nach Eintritt),
+  bevorstehende Austritte und Änderungen des Stellenumfangs sowie
+  Dienstjubiläen nach 10, 20, 25, 30 und 40 Jahren. Bereits vergangene
+  Personalfristen erscheinen nicht – ein abgelaufenes Probezeitende ist
+  erledigt, keine offene Aufgabe.
 
 Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien
 lassen sich einzeln ein- oder ausblenden.

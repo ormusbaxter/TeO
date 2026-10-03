@@ -1992,14 +1992,6 @@
     ],
     "completions": [
       {
-        "id": "completion-training-demo-2025-01-001",
-        "employeeId": "employee-demo-001",
-        "trainingId": "training-demo-2025-01",
-        "completedOn": "2025-07-25",
-        "note": "",
-        "createdAt": "2025-07-25T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-01-060",
         "employeeId": "employee-demo-060",
         "trainingId": "training-demo-2025-01",
@@ -2144,14 +2136,6 @@
         "createdAt": "2025-05-27T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-01-002",
-        "employeeId": "employee-demo-002",
-        "trainingId": "training-demo-2025-01",
-        "completedOn": "2025-11-13",
-        "note": "",
-        "createdAt": "2025-11-13T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-01-042",
         "employeeId": "employee-demo-042",
         "trainingId": "training-demo-2025-01",
@@ -2184,28 +2168,12 @@
         "createdAt": "2025-08-16T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-01-036",
-        "employeeId": "employee-demo-036",
-        "trainingId": "training-demo-2025-01",
-        "completedOn": "2025-11-22",
-        "note": "",
-        "createdAt": "2025-11-22T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-01-008",
         "employeeId": "employee-demo-008",
         "trainingId": "training-demo-2025-01",
         "completedOn": "2025-05-27",
         "note": "",
         "createdAt": "2025-05-27T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-01-033",
-        "employeeId": "employee-demo-033",
-        "trainingId": "training-demo-2025-01",
-        "completedOn": "2025-06-11",
-        "note": "",
-        "createdAt": "2025-06-11T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-01-050",
@@ -2232,14 +2200,6 @@
         "createdAt": "2025-09-04T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-01-054",
-        "employeeId": "employee-demo-054",
-        "trainingId": "training-demo-2025-01",
-        "completedOn": "2025-09-25",
-        "note": "",
-        "createdAt": "2025-09-25T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-01-031",
         "employeeId": "employee-demo-031",
         "trainingId": "training-demo-2025-01",
@@ -2264,28 +2224,12 @@
         "createdAt": "2025-07-25T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-01-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2025-01",
-        "completedOn": "2025-11-15",
-        "note": "",
-        "createdAt": "2025-11-15T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-01-037",
         "employeeId": "employee-demo-037",
         "trainingId": "training-demo-2025-01",
         "completedOn": "2025-05-30",
         "note": "",
         "createdAt": "2025-05-30T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-01-025",
-        "employeeId": "employee-demo-025",
-        "trainingId": "training-demo-2025-01",
-        "completedOn": "2025-04-24",
-        "note": "",
-        "createdAt": "2025-04-24T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-01-020",
@@ -2464,14 +2408,6 @@
         "createdAt": "2025-06-04T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-02-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2025-02",
-        "completedOn": "2025-06-02",
-        "note": "",
-        "createdAt": "2025-06-02T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-02-052",
         "employeeId": "employee-demo-052",
         "trainingId": "training-demo-2025-02",
@@ -2542,14 +2478,6 @@
         "completedOn": "2025-10-15",
         "note": "",
         "createdAt": "2025-10-15T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-02-004",
-        "employeeId": "employee-demo-004",
-        "trainingId": "training-demo-2025-02",
-        "completedOn": "2025-10-29",
-        "note": "",
-        "createdAt": "2025-10-29T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-02-003",
@@ -2688,14 +2616,6 @@
         "createdAt": "2025-06-02T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-02-002",
-        "employeeId": "employee-demo-002",
-        "trainingId": "training-demo-2025-02",
-        "completedOn": "2025-08-31",
-        "note": "",
-        "createdAt": "2025-08-31T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-02-012",
         "employeeId": "employee-demo-012",
         "trainingId": "training-demo-2025-02",
@@ -2776,14 +2696,6 @@
         "createdAt": "2025-10-09T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-02-025",
-        "employeeId": "employee-demo-025",
-        "trainingId": "training-demo-2025-02",
-        "completedOn": "2025-03-14",
-        "note": "",
-        "createdAt": "2025-03-14T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-02-046",
         "employeeId": "employee-demo-046",
         "trainingId": "training-demo-2025-02",
@@ -2798,14 +2710,6 @@
         "completedOn": "2025-05-09",
         "note": "",
         "createdAt": "2025-05-09T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-02-001",
-        "employeeId": "employee-demo-001",
-        "trainingId": "training-demo-2025-02",
-        "completedOn": "2025-11-12",
-        "note": "",
-        "createdAt": "2025-11-12T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-02-040",
@@ -2976,22 +2880,6 @@
         "createdAt": "2025-10-16T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-03-001",
-        "employeeId": "employee-demo-001",
-        "trainingId": "training-demo-2025-03",
-        "completedOn": "2025-04-05",
-        "note": "",
-        "createdAt": "2025-04-05T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-03-033",
-        "employeeId": "employee-demo-033",
-        "trainingId": "training-demo-2025-03",
-        "completedOn": "2025-08-31",
-        "note": "",
-        "createdAt": "2025-08-31T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-03-034",
         "employeeId": "employee-demo-034",
         "trainingId": "training-demo-2025-03",
@@ -3030,14 +2918,6 @@
         "completedOn": "2025-11-28",
         "note": "",
         "createdAt": "2025-11-28T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-03-054",
-        "employeeId": "employee-demo-054",
-        "trainingId": "training-demo-2025-03",
-        "completedOn": "2025-06-10",
-        "note": "",
-        "createdAt": "2025-06-10T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-03-026",
@@ -3136,28 +3016,12 @@
         "createdAt": "2025-09-10T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-03-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2025-03",
-        "completedOn": "2025-02-19",
-        "note": "",
-        "createdAt": "2025-02-19T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-03-032",
         "employeeId": "employee-demo-032",
         "trainingId": "training-demo-2025-03",
         "completedOn": "2025-01-28",
         "note": "",
         "createdAt": "2025-01-28T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-03-002",
-        "employeeId": "employee-demo-002",
-        "trainingId": "training-demo-2025-03",
-        "completedOn": "2025-01-22",
-        "note": "",
-        "createdAt": "2025-01-22T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-03-059",
@@ -3296,14 +3160,6 @@
         "createdAt": "2025-10-26T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-03-025",
-        "employeeId": "employee-demo-025",
-        "trainingId": "training-demo-2025-03",
-        "completedOn": "2025-06-11",
-        "note": "",
-        "createdAt": "2025-06-11T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-04-046",
         "employeeId": "employee-demo-046",
         "trainingId": "training-demo-2025-04",
@@ -3342,22 +3198,6 @@
         "completedOn": "2025-08-19",
         "note": "",
         "createdAt": "2025-08-19T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-04-025",
-        "employeeId": "employee-demo-025",
-        "trainingId": "training-demo-2025-04",
-        "completedOn": "2025-11-23",
-        "note": "",
-        "createdAt": "2025-11-23T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-04-054",
-        "employeeId": "employee-demo-054",
-        "trainingId": "training-demo-2025-04",
-        "completedOn": "2025-11-22",
-        "note": "",
-        "createdAt": "2025-11-22T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-04-018",
@@ -3432,14 +3272,6 @@
         "createdAt": "2025-10-07T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-04-002",
-        "employeeId": "employee-demo-002",
-        "trainingId": "training-demo-2025-04",
-        "completedOn": "2025-08-28",
-        "note": "",
-        "createdAt": "2025-08-28T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-04-058",
         "employeeId": "employee-demo-058",
         "trainingId": "training-demo-2025-04",
@@ -3448,28 +3280,12 @@
         "createdAt": "2025-07-24T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-04-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2025-04",
-        "completedOn": "2025-12-14",
-        "note": "",
-        "createdAt": "2025-12-14T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-04-057",
         "employeeId": "employee-demo-057",
         "trainingId": "training-demo-2025-04",
         "completedOn": "2025-07-06",
         "note": "",
         "createdAt": "2025-07-06T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-04-036",
-        "employeeId": "employee-demo-036",
-        "trainingId": "training-demo-2025-04",
-        "completedOn": "2025-07-31",
-        "note": "",
-        "createdAt": "2025-07-31T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-04-003",
@@ -3608,22 +3424,6 @@
         "createdAt": "2025-04-01T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-04-001",
-        "employeeId": "employee-demo-001",
-        "trainingId": "training-demo-2025-04",
-        "completedOn": "2025-11-18",
-        "note": "",
-        "createdAt": "2025-11-18T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-04-033",
-        "employeeId": "employee-demo-033",
-        "trainingId": "training-demo-2025-04",
-        "completedOn": "2025-10-05",
-        "note": "",
-        "createdAt": "2025-10-05T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-04-053",
         "employeeId": "employee-demo-053",
         "trainingId": "training-demo-2025-04",
@@ -3736,14 +3536,6 @@
         "createdAt": "2025-03-12T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-05-001",
-        "employeeId": "employee-demo-001",
-        "trainingId": "training-demo-2025-05",
-        "completedOn": "2025-07-12",
-        "note": "",
-        "createdAt": "2025-07-12T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-05-006",
         "employeeId": "employee-demo-006",
         "trainingId": "training-demo-2025-05",
@@ -3766,22 +3558,6 @@
         "completedOn": "2025-06-19",
         "note": "",
         "createdAt": "2025-06-19T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-05-002",
-        "employeeId": "employee-demo-002",
-        "trainingId": "training-demo-2025-05",
-        "completedOn": "2025-01-23",
-        "note": "",
-        "createdAt": "2025-01-23T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-05-004",
-        "employeeId": "employee-demo-004",
-        "trainingId": "training-demo-2025-05",
-        "completedOn": "2025-12-12",
-        "note": "",
-        "createdAt": "2025-12-12T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-05-009",
@@ -3976,14 +3752,6 @@
         "createdAt": "2025-10-12T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-05-033",
-        "employeeId": "employee-demo-033",
-        "trainingId": "training-demo-2025-05",
-        "completedOn": "2025-09-29",
-        "note": "",
-        "createdAt": "2025-09-29T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-05-020",
         "employeeId": "employee-demo-020",
         "trainingId": "training-demo-2025-05",
@@ -4030,14 +3798,6 @@
         "completedOn": "2025-12-14",
         "note": "",
         "createdAt": "2025-12-14T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-05-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2025-05",
-        "completedOn": "2025-03-17",
-        "note": "",
-        "createdAt": "2025-03-17T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-05-027",
@@ -4118,14 +3878,6 @@
         "completedOn": "2025-04-26",
         "note": "",
         "createdAt": "2025-04-26T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-05-054",
-        "employeeId": "employee-demo-054",
-        "trainingId": "training-demo-2025-05",
-        "completedOn": "2025-07-11",
-        "note": "",
-        "createdAt": "2025-07-11T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-05-034",
@@ -4400,14 +4152,6 @@
         "createdAt": "2025-03-02T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-06-025",
-        "employeeId": "employee-demo-025",
-        "trainingId": "training-demo-2025-06",
-        "completedOn": "2025-12-07",
-        "note": "",
-        "createdAt": "2025-12-07T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-06-012",
         "employeeId": "employee-demo-012",
         "trainingId": "training-demo-2025-06",
@@ -4440,22 +4184,6 @@
         "createdAt": "2025-01-28T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-06-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2025-06",
-        "completedOn": "2025-05-10",
-        "note": "",
-        "createdAt": "2025-05-10T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-06-002",
-        "employeeId": "employee-demo-002",
-        "trainingId": "training-demo-2025-06",
-        "completedOn": "2025-06-13",
-        "note": "",
-        "createdAt": "2025-06-13T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-06-029",
         "employeeId": "employee-demo-029",
         "trainingId": "training-demo-2025-06",
@@ -4478,14 +4206,6 @@
         "completedOn": "2025-11-22",
         "note": "",
         "createdAt": "2025-11-22T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-06-054",
-        "employeeId": "employee-demo-054",
-        "trainingId": "training-demo-2025-06",
-        "completedOn": "2025-10-06",
-        "note": "",
-        "createdAt": "2025-10-06T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-06-028",
@@ -4534,14 +4254,6 @@
         "completedOn": "2025-05-18",
         "note": "",
         "createdAt": "2025-05-18T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-06-033",
-        "employeeId": "employee-demo-033",
-        "trainingId": "training-demo-2025-06",
-        "completedOn": "2025-11-16",
-        "note": "",
-        "createdAt": "2025-11-16T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2026-01-019",
@@ -4654,14 +4366,6 @@
         "completedOn": "2026-07-08",
         "note": "",
         "createdAt": "2026-07-08T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2026-01-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2026-01",
-        "completedOn": "2026-02-25",
-        "note": "",
-        "createdAt": "2026-02-25T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2026-01-009",
@@ -4824,14 +4528,6 @@
         "createdAt": "2026-05-18T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2026-01-033",
-        "employeeId": "employee-demo-033",
-        "trainingId": "training-demo-2026-01",
-        "completedOn": "2026-02-07",
-        "note": "",
-        "createdAt": "2026-02-07T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2026-01-043",
         "employeeId": "employee-demo-043",
         "trainingId": "training-demo-2026-01",
@@ -4886,14 +4582,6 @@
         "completedOn": "2026-01-16",
         "note": "",
         "createdAt": "2026-01-16T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2026-02-002",
-        "employeeId": "employee-demo-002",
-        "trainingId": "training-demo-2026-02",
-        "completedOn": "2026-03-27",
-        "note": "",
-        "createdAt": "2026-03-27T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2026-02-059",
@@ -5128,14 +4816,6 @@
         "createdAt": "2026-03-02T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2026-02-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2026-02",
-        "completedOn": "2026-01-18",
-        "note": "",
-        "createdAt": "2026-01-18T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2026-02-015",
         "employeeId": "employee-demo-015",
         "trainingId": "training-demo-2026-02",
@@ -5358,14 +5038,6 @@
         "completedOn": "2026-06-21",
         "note": "",
         "createdAt": "2026-06-21T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2026-03-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2026-03",
-        "completedOn": "2026-02-11",
-        "note": "",
-        "createdAt": "2026-02-11T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2026-03-019",
@@ -5632,14 +5304,6 @@
         "createdAt": "2026-02-23T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2026-04-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2026-04",
-        "completedOn": "2026-05-06",
-        "note": "",
-        "createdAt": "2026-05-06T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2026-04-035",
         "employeeId": "employee-demo-035",
         "trainingId": "training-demo-2026-04",
@@ -5662,14 +5326,6 @@
         "completedOn": "2026-06-08",
         "note": "",
         "createdAt": "2026-06-08T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2026-04-002",
-        "employeeId": "employee-demo-002",
-        "trainingId": "training-demo-2026-04",
-        "completedOn": "2026-02-23",
-        "note": "",
-        "createdAt": "2026-02-23T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2026-04-032",
@@ -5966,14 +5622,6 @@
         "completedOn": "2026-02-20",
         "note": "",
         "createdAt": "2026-02-20T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2026-05-001",
-        "employeeId": "employee-demo-001",
-        "trainingId": "training-demo-2026-05",
-        "completedOn": "2026-01-30",
-        "note": "",
-        "createdAt": "2026-01-30T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2026-05-029",
@@ -6344,14 +5992,6 @@
         "createdAt": "2025-05-04T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-07-033",
-        "employeeId": "employee-demo-033",
-        "trainingId": "training-demo-2025-07",
-        "completedOn": "2025-05-29",
-        "note": "",
-        "createdAt": "2025-05-29T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-07-043",
         "employeeId": "employee-demo-043",
         "trainingId": "training-demo-2025-07",
@@ -6472,28 +6112,12 @@
         "createdAt": "2025-07-23T15:00:00.000Z"
       },
       {
-        "id": "completion-training-demo-2025-07-001",
-        "employeeId": "employee-demo-001",
-        "trainingId": "training-demo-2025-07",
-        "completedOn": "2025-08-01",
-        "note": "",
-        "createdAt": "2025-08-01T15:00:00.000Z"
-      },
-      {
         "id": "completion-training-demo-2025-07-050",
         "employeeId": "employee-demo-050",
         "trainingId": "training-demo-2025-07",
         "completedOn": "2025-03-13",
         "note": "",
         "createdAt": "2025-03-13T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-07-054",
-        "employeeId": "employee-demo-054",
-        "trainingId": "training-demo-2025-07",
-        "completedOn": "2025-07-02",
-        "note": "",
-        "createdAt": "2025-07-02T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-07-020",
@@ -6542,14 +6166,6 @@
         "completedOn": "2025-03-09",
         "note": "",
         "createdAt": "2025-03-09T15:00:00.000Z"
-      },
-      {
-        "id": "completion-training-demo-2025-07-022",
-        "employeeId": "employee-demo-022",
-        "trainingId": "training-demo-2025-07",
-        "completedOn": "2025-03-02",
-        "note": "",
-        "createdAt": "2025-03-02T15:00:00.000Z"
       },
       {
         "id": "completion-training-demo-2025-07-052",
@@ -6704,8 +6320,6 @@
         "time": "13:30",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -6724,10 +6338,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -6735,7 +6347,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -6772,8 +6383,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -6792,10 +6401,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -6803,7 +6410,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -6840,8 +6446,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -6860,10 +6464,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -6871,7 +6473,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -6908,8 +6509,6 @@
         "time": "13:30",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -6928,10 +6527,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -6939,7 +6536,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -6976,8 +6572,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -6996,10 +6590,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7007,7 +6599,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7044,8 +6635,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7064,10 +6653,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7075,7 +6662,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7112,8 +6698,6 @@
         "time": "13:30",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7132,10 +6716,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7143,7 +6725,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7180,8 +6761,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7200,10 +6779,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7211,7 +6788,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7248,8 +6824,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7268,10 +6842,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7279,7 +6851,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7316,8 +6887,6 @@
         "time": "13:30",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7336,10 +6905,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7347,7 +6914,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7384,8 +6950,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7404,10 +6968,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7415,7 +6977,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7452,8 +7013,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7472,10 +7031,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7483,7 +7040,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7520,8 +7076,6 @@
         "time": "13:30",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7540,10 +7094,8 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
-          "employee-demo-025",
           "employee-demo-026",
           "employee-demo-027",
           "employee-demo-028",
@@ -7551,7 +7103,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7588,8 +7139,6 @@
         "time": "14:00",
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
-          "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7608,7 +7157,6 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
           "employee-demo-025",
@@ -7619,7 +7167,6 @@
           "employee-demo-030",
           "employee-demo-031",
           "employee-demo-032",
-          "employee-demo-033",
           "employee-demo-034",
           "employee-demo-035",
           "employee-demo-037",
@@ -7657,7 +7204,6 @@
         "notes": "Reguläre monatliche Teamsitzung (synthetischer Demo-Datensatz).",
         "expectedEmployeeIds": [
           "employee-demo-001",
-          "employee-demo-002",
           "employee-demo-003",
           "employee-demo-005",
           "employee-demo-006",
@@ -7676,7 +7222,6 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
           "employee-demo-025",
@@ -7744,7 +7289,6 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
           "employee-demo-025",
@@ -7812,7 +7356,6 @@
           "employee-demo-019",
           "employee-demo-020",
           "employee-demo-021",
-          "employee-demo-022",
           "employee-demo-023",
           "employee-demo-024",
           "employee-demo-025",
@@ -7992,14 +7535,6 @@
     ],
     "meetingAttendances": [
       {
-        "id": "attendance-2025-01-002",
-        "meetingId": "meeting-demo-2025-01",
-        "employeeId": "employee-demo-002",
-        "status": "teilgenommen",
-        "createdAt": "2025-01-14T16:30:00.000Z",
-        "updatedAt": "2025-01-14T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-01-030",
         "meetingId": "meeting-demo-2025-01",
         "employeeId": "employee-demo-030",
@@ -8104,14 +7639,6 @@
         "updatedAt": "2025-01-14T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-01-022",
-        "meetingId": "meeting-demo-2025-01",
-        "employeeId": "employee-demo-022",
-        "status": "teilgenommen",
-        "createdAt": "2025-01-14T16:30:00.000Z",
-        "updatedAt": "2025-01-14T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-01-055",
         "meetingId": "meeting-demo-2025-01",
         "employeeId": "employee-demo-055",
@@ -8200,14 +7727,6 @@
         "updatedAt": "2025-01-14T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-01-025",
-        "meetingId": "meeting-demo-2025-01",
-        "employeeId": "employee-demo-025",
-        "status": "teilgenommen",
-        "createdAt": "2025-01-14T16:30:00.000Z",
-        "updatedAt": "2025-01-14T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-01-037",
         "meetingId": "meeting-demo-2025-01",
         "employeeId": "employee-demo-037",
@@ -8243,14 +7762,6 @@
         "id": "attendance-2025-01-046",
         "meetingId": "meeting-demo-2025-01",
         "employeeId": "employee-demo-046",
-        "status": "teilgenommen",
-        "createdAt": "2025-01-14T16:30:00.000Z",
-        "updatedAt": "2025-01-14T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-01-001",
-        "meetingId": "meeting-demo-2025-01",
-        "employeeId": "employee-demo-001",
         "status": "teilgenommen",
         "createdAt": "2025-01-14T16:30:00.000Z",
         "updatedAt": "2025-01-14T16:30:00.000Z"
@@ -8400,14 +7911,6 @@
         "updatedAt": "2025-01-14T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-01-033",
-        "meetingId": "meeting-demo-2025-01",
-        "employeeId": "employee-demo-033",
-        "status": "entschuldigt",
-        "createdAt": "2025-01-14T16:30:00.000Z",
-        "updatedAt": "2025-01-14T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-01-032",
         "meetingId": "meeting-demo-2025-01",
         "employeeId": "employee-demo-032",
@@ -8446,14 +7949,6 @@
         "status": "dienst",
         "createdAt": "2025-01-14T16:30:00.000Z",
         "updatedAt": "2025-01-14T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-02-022",
-        "meetingId": "meeting-demo-2025-02",
-        "employeeId": "employee-demo-022",
-        "status": "teilgenommen",
-        "createdAt": "2025-02-11T16:30:00.000Z",
-        "updatedAt": "2025-02-11T16:30:00.000Z"
       },
       {
         "id": "attendance-2025-02-027",
@@ -8507,14 +8002,6 @@
         "id": "attendance-2025-02-051",
         "meetingId": "meeting-demo-2025-02",
         "employeeId": "employee-demo-051",
-        "status": "teilgenommen",
-        "createdAt": "2025-02-11T16:30:00.000Z",
-        "updatedAt": "2025-02-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-02-033",
-        "meetingId": "meeting-demo-2025-02",
-        "employeeId": "employee-demo-033",
         "status": "teilgenommen",
         "createdAt": "2025-02-11T16:30:00.000Z",
         "updatedAt": "2025-02-11T16:30:00.000Z"
@@ -8616,33 +8103,9 @@
         "updatedAt": "2025-02-11T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-02-001",
-        "meetingId": "meeting-demo-2025-02",
-        "employeeId": "employee-demo-001",
-        "status": "teilgenommen",
-        "createdAt": "2025-02-11T16:30:00.000Z",
-        "updatedAt": "2025-02-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-02-025",
-        "meetingId": "meeting-demo-2025-02",
-        "employeeId": "employee-demo-025",
-        "status": "teilgenommen",
-        "createdAt": "2025-02-11T16:30:00.000Z",
-        "updatedAt": "2025-02-11T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-02-013",
         "meetingId": "meeting-demo-2025-02",
         "employeeId": "employee-demo-013",
-        "status": "teilgenommen",
-        "createdAt": "2025-02-11T16:30:00.000Z",
-        "updatedAt": "2025-02-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-02-002",
-        "meetingId": "meeting-demo-2025-02",
-        "employeeId": "employee-demo-002",
         "status": "teilgenommen",
         "createdAt": "2025-02-11T16:30:00.000Z",
         "updatedAt": "2025-02-11T16:30:00.000Z"
@@ -9008,14 +8471,6 @@
         "updatedAt": "2025-03-11T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-03-033",
-        "meetingId": "meeting-demo-2025-03",
-        "employeeId": "employee-demo-033",
-        "status": "teilgenommen",
-        "createdAt": "2025-03-11T16:30:00.000Z",
-        "updatedAt": "2025-03-11T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-03-005",
         "meetingId": "meeting-demo-2025-03",
         "employeeId": "employee-demo-005",
@@ -9051,14 +8506,6 @@
         "id": "attendance-2025-03-060",
         "meetingId": "meeting-demo-2025-03",
         "employeeId": "employee-demo-060",
-        "status": "teilgenommen",
-        "createdAt": "2025-03-11T16:30:00.000Z",
-        "updatedAt": "2025-03-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-03-001",
-        "meetingId": "meeting-demo-2025-03",
-        "employeeId": "employee-demo-001",
         "status": "teilgenommen",
         "createdAt": "2025-03-11T16:30:00.000Z",
         "updatedAt": "2025-03-11T16:30:00.000Z"
@@ -9144,25 +8591,9 @@
         "updatedAt": "2025-03-11T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-03-025",
-        "meetingId": "meeting-demo-2025-03",
-        "employeeId": "employee-demo-025",
-        "status": "teilgenommen",
-        "createdAt": "2025-03-11T16:30:00.000Z",
-        "updatedAt": "2025-03-11T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-03-044",
         "meetingId": "meeting-demo-2025-03",
         "employeeId": "employee-demo-044",
-        "status": "teilgenommen",
-        "createdAt": "2025-03-11T16:30:00.000Z",
-        "updatedAt": "2025-03-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-03-002",
-        "meetingId": "meeting-demo-2025-03",
-        "employeeId": "employee-demo-002",
         "status": "teilgenommen",
         "createdAt": "2025-03-11T16:30:00.000Z",
         "updatedAt": "2025-03-11T16:30:00.000Z"
@@ -9227,14 +8658,6 @@
         "id": "attendance-2025-03-049",
         "meetingId": "meeting-demo-2025-03",
         "employeeId": "employee-demo-049",
-        "status": "teilgenommen",
-        "createdAt": "2025-03-11T16:30:00.000Z",
-        "updatedAt": "2025-03-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-03-022",
-        "meetingId": "meeting-demo-2025-03",
-        "employeeId": "employee-demo-022",
         "status": "teilgenommen",
         "createdAt": "2025-03-11T16:30:00.000Z",
         "updatedAt": "2025-03-11T16:30:00.000Z"
@@ -9360,14 +8783,6 @@
         "updatedAt": "2025-03-11T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-04-002",
-        "meetingId": "meeting-demo-2025-04",
-        "employeeId": "employee-demo-002",
-        "status": "teilgenommen",
-        "createdAt": "2025-04-08T16:30:00.000Z",
-        "updatedAt": "2025-04-08T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-04-060",
         "meetingId": "meeting-demo-2025-04",
         "employeeId": "employee-demo-060",
@@ -9387,14 +8802,6 @@
         "id": "attendance-2025-04-045",
         "meetingId": "meeting-demo-2025-04",
         "employeeId": "employee-demo-045",
-        "status": "teilgenommen",
-        "createdAt": "2025-04-08T16:30:00.000Z",
-        "updatedAt": "2025-04-08T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-04-001",
-        "meetingId": "meeting-demo-2025-04",
-        "employeeId": "employee-demo-001",
         "status": "teilgenommen",
         "createdAt": "2025-04-08T16:30:00.000Z",
         "updatedAt": "2025-04-08T16:30:00.000Z"
@@ -9499,14 +8906,6 @@
         "id": "attendance-2025-04-023",
         "meetingId": "meeting-demo-2025-04",
         "employeeId": "employee-demo-023",
-        "status": "teilgenommen",
-        "createdAt": "2025-04-08T16:30:00.000Z",
-        "updatedAt": "2025-04-08T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-04-025",
-        "meetingId": "meeting-demo-2025-04",
-        "employeeId": "employee-demo-025",
         "status": "teilgenommen",
         "createdAt": "2025-04-08T16:30:00.000Z",
         "updatedAt": "2025-04-08T16:30:00.000Z"
@@ -9664,14 +9063,6 @@
         "updatedAt": "2025-04-08T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-04-033",
-        "meetingId": "meeting-demo-2025-04",
-        "employeeId": "employee-demo-033",
-        "status": "teilgenommen",
-        "createdAt": "2025-04-08T16:30:00.000Z",
-        "updatedAt": "2025-04-08T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-04-015",
         "meetingId": "meeting-demo-2025-04",
         "employeeId": "employee-demo-015",
@@ -9768,14 +9159,6 @@
         "updatedAt": "2025-04-08T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-04-022",
-        "meetingId": "meeting-demo-2025-04",
-        "employeeId": "employee-demo-022",
-        "status": "krankheit",
-        "createdAt": "2025-04-08T16:30:00.000Z",
-        "updatedAt": "2025-04-08T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-04-050",
         "meetingId": "meeting-demo-2025-04",
         "employeeId": "employee-demo-050",
@@ -9843,14 +9226,6 @@
         "id": "attendance-2025-05-027",
         "meetingId": "meeting-demo-2025-05",
         "employeeId": "employee-demo-027",
-        "status": "teilgenommen",
-        "createdAt": "2025-05-13T16:30:00.000Z",
-        "updatedAt": "2025-05-13T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-05-025",
-        "meetingId": "meeting-demo-2025-05",
-        "employeeId": "employee-demo-025",
         "status": "teilgenommen",
         "createdAt": "2025-05-13T16:30:00.000Z",
         "updatedAt": "2025-05-13T16:30:00.000Z"
@@ -9984,14 +9359,6 @@
         "updatedAt": "2025-05-13T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-05-002",
-        "meetingId": "meeting-demo-2025-05",
-        "employeeId": "employee-demo-002",
-        "status": "teilgenommen",
-        "createdAt": "2025-05-13T16:30:00.000Z",
-        "updatedAt": "2025-05-13T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-05-052",
         "meetingId": "meeting-demo-2025-05",
         "employeeId": "employee-demo-052",
@@ -10051,14 +9418,6 @@
         "id": "attendance-2025-05-039",
         "meetingId": "meeting-demo-2025-05",
         "employeeId": "employee-demo-039",
-        "status": "teilgenommen",
-        "createdAt": "2025-05-13T16:30:00.000Z",
-        "updatedAt": "2025-05-13T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-05-001",
-        "meetingId": "meeting-demo-2025-05",
-        "employeeId": "employee-demo-001",
         "status": "teilgenommen",
         "createdAt": "2025-05-13T16:30:00.000Z",
         "updatedAt": "2025-05-13T16:30:00.000Z"
@@ -10176,14 +9535,6 @@
         "updatedAt": "2025-05-13T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-05-022",
-        "meetingId": "meeting-demo-2025-05",
-        "employeeId": "employee-demo-022",
-        "status": "teilgenommen",
-        "createdAt": "2025-05-13T16:30:00.000Z",
-        "updatedAt": "2025-05-13T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-05-043",
         "meetingId": "meeting-demo-2025-05",
         "employeeId": "employee-demo-043",
@@ -10264,14 +9615,6 @@
         "updatedAt": "2025-05-13T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-05-033",
-        "meetingId": "meeting-demo-2025-05",
-        "employeeId": "employee-demo-033",
-        "status": "schule",
-        "createdAt": "2025-05-13T16:30:00.000Z",
-        "updatedAt": "2025-05-13T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-06-045",
         "meetingId": "meeting-demo-2025-06",
         "employeeId": "employee-demo-045",
@@ -10347,14 +9690,6 @@
         "id": "attendance-2025-06-038",
         "meetingId": "meeting-demo-2025-06",
         "employeeId": "employee-demo-038",
-        "status": "teilgenommen",
-        "createdAt": "2025-06-10T16:30:00.000Z",
-        "updatedAt": "2025-06-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-06-002",
-        "meetingId": "meeting-demo-2025-06",
-        "employeeId": "employee-demo-002",
         "status": "teilgenommen",
         "createdAt": "2025-06-10T16:30:00.000Z",
         "updatedAt": "2025-06-10T16:30:00.000Z"
@@ -10459,14 +9794,6 @@
         "id": "attendance-2025-06-023",
         "meetingId": "meeting-demo-2025-06",
         "employeeId": "employee-demo-023",
-        "status": "teilgenommen",
-        "createdAt": "2025-06-10T16:30:00.000Z",
-        "updatedAt": "2025-06-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-06-033",
-        "meetingId": "meeting-demo-2025-06",
-        "employeeId": "employee-demo-033",
         "status": "teilgenommen",
         "createdAt": "2025-06-10T16:30:00.000Z",
         "updatedAt": "2025-06-10T16:30:00.000Z"
@@ -10616,25 +9943,9 @@
         "updatedAt": "2025-06-10T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-06-025",
-        "meetingId": "meeting-demo-2025-06",
-        "employeeId": "employee-demo-025",
-        "status": "krankheit",
-        "createdAt": "2025-06-10T16:30:00.000Z",
-        "updatedAt": "2025-06-10T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-06-046",
         "meetingId": "meeting-demo-2025-06",
         "employeeId": "employee-demo-046",
-        "status": "dienst",
-        "createdAt": "2025-06-10T16:30:00.000Z",
-        "updatedAt": "2025-06-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-06-022",
-        "meetingId": "meeting-demo-2025-06",
-        "employeeId": "employee-demo-022",
         "status": "dienst",
         "createdAt": "2025-06-10T16:30:00.000Z",
         "updatedAt": "2025-06-10T16:30:00.000Z"
@@ -10652,14 +9963,6 @@
         "meetingId": "meeting-demo-2025-06",
         "employeeId": "employee-demo-056",
         "status": "unentschuldigt",
-        "createdAt": "2025-06-10T16:30:00.000Z",
-        "updatedAt": "2025-06-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-06-001",
-        "meetingId": "meeting-demo-2025-06",
-        "employeeId": "employee-demo-001",
-        "status": "krankheit",
         "createdAt": "2025-06-10T16:30:00.000Z",
         "updatedAt": "2025-06-10T16:30:00.000Z"
       },
@@ -10726,14 +10029,6 @@
         "status": "schule",
         "createdAt": "2025-06-10T16:30:00.000Z",
         "updatedAt": "2025-06-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-07-001",
-        "meetingId": "meeting-demo-2025-07",
-        "employeeId": "employee-demo-001",
-        "status": "teilgenommen",
-        "createdAt": "2025-07-08T16:30:00.000Z",
-        "updatedAt": "2025-07-08T16:30:00.000Z"
       },
       {
         "id": "attendance-2025-07-042",
@@ -10952,14 +10247,6 @@
         "updatedAt": "2025-07-08T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-07-033",
-        "meetingId": "meeting-demo-2025-07",
-        "employeeId": "employee-demo-033",
-        "status": "teilgenommen",
-        "createdAt": "2025-07-08T16:30:00.000Z",
-        "updatedAt": "2025-07-08T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-07-005",
         "meetingId": "meeting-demo-2025-07",
         "employeeId": "employee-demo-005",
@@ -11016,14 +10303,6 @@
         "updatedAt": "2025-07-08T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-07-002",
-        "meetingId": "meeting-demo-2025-07",
-        "employeeId": "employee-demo-002",
-        "status": "teilgenommen",
-        "createdAt": "2025-07-08T16:30:00.000Z",
-        "updatedAt": "2025-07-08T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-07-035",
         "meetingId": "meeting-demo-2025-07",
         "employeeId": "employee-demo-035",
@@ -11064,14 +10343,6 @@
         "updatedAt": "2025-07-08T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-07-025",
-        "meetingId": "meeting-demo-2025-07",
-        "employeeId": "employee-demo-025",
-        "status": "krankheit",
-        "createdAt": "2025-07-08T16:30:00.000Z",
-        "updatedAt": "2025-07-08T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-07-059",
         "meetingId": "meeting-demo-2025-07",
         "employeeId": "employee-demo-059",
@@ -11084,14 +10355,6 @@
         "meetingId": "meeting-demo-2025-07",
         "employeeId": "employee-demo-056",
         "status": "unentschuldigt",
-        "createdAt": "2025-07-08T16:30:00.000Z",
-        "updatedAt": "2025-07-08T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-07-022",
-        "meetingId": "meeting-demo-2025-07",
-        "employeeId": "employee-demo-022",
-        "status": "urlaub",
         "createdAt": "2025-07-08T16:30:00.000Z",
         "updatedAt": "2025-07-08T16:30:00.000Z"
       },
@@ -11216,25 +10479,9 @@
         "updatedAt": "2025-08-12T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-08-033",
-        "meetingId": "meeting-demo-2025-08",
-        "employeeId": "employee-demo-033",
-        "status": "teilgenommen",
-        "createdAt": "2025-08-12T16:30:00.000Z",
-        "updatedAt": "2025-08-12T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-08-048",
         "meetingId": "meeting-demo-2025-08",
         "employeeId": "employee-demo-048",
-        "status": "teilgenommen",
-        "createdAt": "2025-08-12T16:30:00.000Z",
-        "updatedAt": "2025-08-12T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-08-025",
-        "meetingId": "meeting-demo-2025-08",
-        "employeeId": "employee-demo-025",
         "status": "teilgenommen",
         "createdAt": "2025-08-12T16:30:00.000Z",
         "updatedAt": "2025-08-12T16:30:00.000Z"
@@ -11275,14 +10522,6 @@
         "id": "attendance-2025-08-013",
         "meetingId": "meeting-demo-2025-08",
         "employeeId": "employee-demo-013",
-        "status": "teilgenommen",
-        "createdAt": "2025-08-12T16:30:00.000Z",
-        "updatedAt": "2025-08-12T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-08-001",
-        "meetingId": "meeting-demo-2025-08",
-        "employeeId": "employee-demo-001",
         "status": "teilgenommen",
         "createdAt": "2025-08-12T16:30:00.000Z",
         "updatedAt": "2025-08-12T16:30:00.000Z"
@@ -11464,14 +10703,6 @@
         "updatedAt": "2025-08-12T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-08-022",
-        "meetingId": "meeting-demo-2025-08",
-        "employeeId": "employee-demo-022",
-        "status": "teilgenommen",
-        "createdAt": "2025-08-12T16:30:00.000Z",
-        "updatedAt": "2025-08-12T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-08-049",
         "meetingId": "meeting-demo-2025-08",
         "employeeId": "employee-demo-049",
@@ -11507,14 +10738,6 @@
         "id": "attendance-2025-08-044",
         "meetingId": "meeting-demo-2025-08",
         "employeeId": "employee-demo-044",
-        "status": "teilgenommen",
-        "createdAt": "2025-08-12T16:30:00.000Z",
-        "updatedAt": "2025-08-12T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-08-002",
-        "meetingId": "meeting-demo-2025-08",
-        "employeeId": "employee-demo-002",
         "status": "teilgenommen",
         "createdAt": "2025-08-12T16:30:00.000Z",
         "updatedAt": "2025-08-12T16:30:00.000Z"
@@ -11720,14 +10943,6 @@
         "updatedAt": "2025-09-09T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-09-001",
-        "meetingId": "meeting-demo-2025-09",
-        "employeeId": "employee-demo-001",
-        "status": "teilgenommen",
-        "createdAt": "2025-09-09T16:30:00.000Z",
-        "updatedAt": "2025-09-09T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-09-029",
         "meetingId": "meeting-demo-2025-09",
         "employeeId": "employee-demo-029",
@@ -11779,14 +10994,6 @@
         "id": "attendance-2025-09-058",
         "meetingId": "meeting-demo-2025-09",
         "employeeId": "employee-demo-058",
-        "status": "teilgenommen",
-        "createdAt": "2025-09-09T16:30:00.000Z",
-        "updatedAt": "2025-09-09T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-09-025",
-        "meetingId": "meeting-demo-2025-09",
-        "employeeId": "employee-demo-025",
         "status": "teilgenommen",
         "createdAt": "2025-09-09T16:30:00.000Z",
         "updatedAt": "2025-09-09T16:30:00.000Z"
@@ -11888,14 +11095,6 @@
         "updatedAt": "2025-09-09T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-09-002",
-        "meetingId": "meeting-demo-2025-09",
-        "employeeId": "employee-demo-002",
-        "status": "teilgenommen",
-        "createdAt": "2025-09-09T16:30:00.000Z",
-        "updatedAt": "2025-09-09T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-09-034",
         "meetingId": "meeting-demo-2025-09",
         "employeeId": "employee-demo-034",
@@ -11964,14 +11163,6 @@
         "meetingId": "meeting-demo-2025-09",
         "employeeId": "employee-demo-042",
         "status": "teilgenommen",
-        "createdAt": "2025-09-09T16:30:00.000Z",
-        "updatedAt": "2025-09-09T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-09-022",
-        "meetingId": "meeting-demo-2025-09",
-        "employeeId": "employee-demo-022",
-        "status": "urlaub",
         "createdAt": "2025-09-09T16:30:00.000Z",
         "updatedAt": "2025-09-09T16:30:00.000Z"
       },
@@ -12088,25 +11279,9 @@
         "updatedAt": "2025-09-09T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-09-033",
-        "meetingId": "meeting-demo-2025-09",
-        "employeeId": "employee-demo-033",
-        "status": "urlaub",
-        "createdAt": "2025-09-09T16:30:00.000Z",
-        "updatedAt": "2025-09-09T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-10-003",
         "meetingId": "meeting-demo-2025-10",
         "employeeId": "employee-demo-003",
-        "status": "teilgenommen",
-        "createdAt": "2025-10-14T16:30:00.000Z",
-        "updatedAt": "2025-10-14T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-10-033",
-        "meetingId": "meeting-demo-2025-10",
-        "employeeId": "employee-demo-033",
         "status": "teilgenommen",
         "createdAt": "2025-10-14T16:30:00.000Z",
         "updatedAt": "2025-10-14T16:30:00.000Z"
@@ -12187,14 +11362,6 @@
         "id": "attendance-2025-10-026",
         "meetingId": "meeting-demo-2025-10",
         "employeeId": "employee-demo-026",
-        "status": "teilgenommen",
-        "createdAt": "2025-10-14T16:30:00.000Z",
-        "updatedAt": "2025-10-14T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-10-002",
-        "meetingId": "meeting-demo-2025-10",
-        "employeeId": "employee-demo-002",
         "status": "teilgenommen",
         "createdAt": "2025-10-14T16:30:00.000Z",
         "updatedAt": "2025-10-14T16:30:00.000Z"
@@ -12304,25 +11471,9 @@
         "updatedAt": "2025-10-14T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-10-001",
-        "meetingId": "meeting-demo-2025-10",
-        "employeeId": "employee-demo-001",
-        "status": "teilgenommen",
-        "createdAt": "2025-10-14T16:30:00.000Z",
-        "updatedAt": "2025-10-14T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-10-048",
         "meetingId": "meeting-demo-2025-10",
         "employeeId": "employee-demo-048",
-        "status": "teilgenommen",
-        "createdAt": "2025-10-14T16:30:00.000Z",
-        "updatedAt": "2025-10-14T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-10-025",
-        "meetingId": "meeting-demo-2025-10",
-        "employeeId": "employee-demo-025",
         "status": "teilgenommen",
         "createdAt": "2025-10-14T16:30:00.000Z",
         "updatedAt": "2025-10-14T16:30:00.000Z"
@@ -12395,14 +11546,6 @@
         "id": "attendance-2025-10-058",
         "meetingId": "meeting-demo-2025-10",
         "employeeId": "employee-demo-058",
-        "status": "teilgenommen",
-        "createdAt": "2025-10-14T16:30:00.000Z",
-        "updatedAt": "2025-10-14T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-10-022",
-        "meetingId": "meeting-demo-2025-10",
-        "employeeId": "employee-demo-022",
         "status": "teilgenommen",
         "createdAt": "2025-10-14T16:30:00.000Z",
         "updatedAt": "2025-10-14T16:30:00.000Z"
@@ -12560,14 +11703,6 @@
         "updatedAt": "2025-11-11T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-11-033",
-        "meetingId": "meeting-demo-2025-11",
-        "employeeId": "employee-demo-033",
-        "status": "teilgenommen",
-        "createdAt": "2025-11-11T16:30:00.000Z",
-        "updatedAt": "2025-11-11T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-11-057",
         "meetingId": "meeting-demo-2025-11",
         "employeeId": "employee-demo-057",
@@ -12619,14 +11754,6 @@
         "id": "attendance-2025-11-056",
         "meetingId": "meeting-demo-2025-11",
         "employeeId": "employee-demo-056",
-        "status": "teilgenommen",
-        "createdAt": "2025-11-11T16:30:00.000Z",
-        "updatedAt": "2025-11-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-11-001",
-        "meetingId": "meeting-demo-2025-11",
-        "employeeId": "employee-demo-001",
         "status": "teilgenommen",
         "createdAt": "2025-11-11T16:30:00.000Z",
         "updatedAt": "2025-11-11T16:30:00.000Z"
@@ -12704,14 +11831,6 @@
         "updatedAt": "2025-11-11T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-11-022",
-        "meetingId": "meeting-demo-2025-11",
-        "employeeId": "employee-demo-022",
-        "status": "teilgenommen",
-        "createdAt": "2025-11-11T16:30:00.000Z",
-        "updatedAt": "2025-11-11T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-11-037",
         "meetingId": "meeting-demo-2025-11",
         "employeeId": "employee-demo-037",
@@ -12731,14 +11850,6 @@
         "id": "attendance-2025-11-016",
         "meetingId": "meeting-demo-2025-11",
         "employeeId": "employee-demo-016",
-        "status": "teilgenommen",
-        "createdAt": "2025-11-11T16:30:00.000Z",
-        "updatedAt": "2025-11-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-11-002",
-        "meetingId": "meeting-demo-2025-11",
-        "employeeId": "employee-demo-002",
         "status": "teilgenommen",
         "createdAt": "2025-11-11T16:30:00.000Z",
         "updatedAt": "2025-11-11T16:30:00.000Z"
@@ -12924,14 +12035,6 @@
         "meetingId": "meeting-demo-2025-11",
         "employeeId": "employee-demo-024",
         "status": "teilgenommen",
-        "createdAt": "2025-11-11T16:30:00.000Z",
-        "updatedAt": "2025-11-11T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-11-025",
-        "meetingId": "meeting-demo-2025-11",
-        "employeeId": "employee-demo-025",
-        "status": "urlaub",
         "createdAt": "2025-11-11T16:30:00.000Z",
         "updatedAt": "2025-11-11T16:30:00.000Z"
       },
@@ -13312,14 +12415,6 @@
         "updatedAt": "2025-12-09T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-12-033",
-        "meetingId": "meeting-demo-2025-12",
-        "employeeId": "employee-demo-033",
-        "status": "teilgenommen",
-        "createdAt": "2025-12-09T16:30:00.000Z",
-        "updatedAt": "2025-12-09T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-12-013",
         "meetingId": "meeting-demo-2025-12",
         "employeeId": "employee-demo-013",
@@ -13360,26 +12455,10 @@
         "updatedAt": "2025-12-09T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-12-025",
-        "meetingId": "meeting-demo-2025-12",
-        "employeeId": "employee-demo-025",
-        "status": "teilgenommen",
-        "createdAt": "2025-12-09T16:30:00.000Z",
-        "updatedAt": "2025-12-09T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-12-026",
         "meetingId": "meeting-demo-2025-12",
         "employeeId": "employee-demo-026",
         "status": "dienst",
-        "createdAt": "2025-12-09T16:30:00.000Z",
-        "updatedAt": "2025-12-09T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-12-002",
-        "meetingId": "meeting-demo-2025-12",
-        "employeeId": "employee-demo-002",
-        "status": "krankheit",
         "createdAt": "2025-12-09T16:30:00.000Z",
         "updatedAt": "2025-12-09T16:30:00.000Z"
       },
@@ -13416,22 +12495,6 @@
         "updatedAt": "2025-12-09T16:30:00.000Z"
       },
       {
-        "id": "attendance-2025-12-022",
-        "meetingId": "meeting-demo-2025-12",
-        "employeeId": "employee-demo-022",
-        "status": "dienst",
-        "createdAt": "2025-12-09T16:30:00.000Z",
-        "updatedAt": "2025-12-09T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2025-12-001",
-        "meetingId": "meeting-demo-2025-12",
-        "employeeId": "employee-demo-001",
-        "status": "dienst",
-        "createdAt": "2025-12-09T16:30:00.000Z",
-        "updatedAt": "2025-12-09T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2025-12-051",
         "meetingId": "meeting-demo-2025-12",
         "employeeId": "employee-demo-051",
@@ -13462,14 +12525,6 @@
         "status": "entschuldigt",
         "createdAt": "2025-12-09T16:30:00.000Z",
         "updatedAt": "2025-12-09T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2026-01-002",
-        "meetingId": "meeting-demo-2026-01",
-        "employeeId": "employee-demo-002",
-        "status": "teilgenommen",
-        "createdAt": "2026-01-13T16:30:00.000Z",
-        "updatedAt": "2026-01-13T16:30:00.000Z"
       },
       {
         "id": "attendance-2026-01-019",
@@ -13576,14 +12631,6 @@
         "updatedAt": "2026-01-13T16:30:00.000Z"
       },
       {
-        "id": "attendance-2026-01-033",
-        "meetingId": "meeting-demo-2026-01",
-        "employeeId": "employee-demo-033",
-        "status": "teilgenommen",
-        "createdAt": "2026-01-13T16:30:00.000Z",
-        "updatedAt": "2026-01-13T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2026-01-008",
         "meetingId": "meeting-demo-2026-01",
         "employeeId": "employee-demo-008",
@@ -13667,14 +12714,6 @@
         "id": "attendance-2026-01-006",
         "meetingId": "meeting-demo-2026-01",
         "employeeId": "employee-demo-006",
-        "status": "teilgenommen",
-        "createdAt": "2026-01-13T16:30:00.000Z",
-        "updatedAt": "2026-01-13T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2026-01-025",
-        "meetingId": "meeting-demo-2026-01",
-        "employeeId": "employee-demo-025",
         "status": "teilgenommen",
         "createdAt": "2026-01-13T16:30:00.000Z",
         "updatedAt": "2026-01-13T16:30:00.000Z"
@@ -13784,14 +12823,6 @@
         "updatedAt": "2026-01-13T16:30:00.000Z"
       },
       {
-        "id": "attendance-2026-01-022",
-        "meetingId": "meeting-demo-2026-01",
-        "employeeId": "employee-demo-022",
-        "status": "teilgenommen",
-        "createdAt": "2026-01-13T16:30:00.000Z",
-        "updatedAt": "2026-01-13T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2026-01-038",
         "meetingId": "meeting-demo-2026-01",
         "employeeId": "employee-demo-038",
@@ -13892,14 +12923,6 @@
         "meetingId": "meeting-demo-2026-01",
         "employeeId": "employee-demo-007",
         "status": "krankheit",
-        "createdAt": "2026-01-13T16:30:00.000Z",
-        "updatedAt": "2026-01-13T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2026-01-001",
-        "meetingId": "meeting-demo-2026-01",
-        "employeeId": "employee-demo-001",
-        "status": "urlaub",
         "createdAt": "2026-01-13T16:30:00.000Z",
         "updatedAt": "2026-01-13T16:30:00.000Z"
       },
@@ -14048,25 +13071,9 @@
         "updatedAt": "2026-02-10T16:30:00.000Z"
       },
       {
-        "id": "attendance-2026-02-001",
-        "meetingId": "meeting-demo-2026-02",
-        "employeeId": "employee-demo-001",
-        "status": "teilgenommen",
-        "createdAt": "2026-02-10T16:30:00.000Z",
-        "updatedAt": "2026-02-10T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2026-02-045",
         "meetingId": "meeting-demo-2026-02",
         "employeeId": "employee-demo-045",
-        "status": "teilgenommen",
-        "createdAt": "2026-02-10T16:30:00.000Z",
-        "updatedAt": "2026-02-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2026-02-033",
-        "meetingId": "meeting-demo-2026-02",
-        "employeeId": "employee-demo-033",
         "status": "teilgenommen",
         "createdAt": "2026-02-10T16:30:00.000Z",
         "updatedAt": "2026-02-10T16:30:00.000Z"
@@ -14107,14 +13114,6 @@
         "id": "attendance-2026-02-021",
         "meetingId": "meeting-demo-2026-02",
         "employeeId": "employee-demo-021",
-        "status": "teilgenommen",
-        "createdAt": "2026-02-10T16:30:00.000Z",
-        "updatedAt": "2026-02-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2026-02-022",
-        "meetingId": "meeting-demo-2026-02",
-        "employeeId": "employee-demo-022",
         "status": "teilgenommen",
         "createdAt": "2026-02-10T16:30:00.000Z",
         "updatedAt": "2026-02-10T16:30:00.000Z"
@@ -14328,14 +13327,6 @@
         "updatedAt": "2026-02-10T16:30:00.000Z"
       },
       {
-        "id": "attendance-2026-02-002",
-        "meetingId": "meeting-demo-2026-02",
-        "employeeId": "employee-demo-002",
-        "status": "dienst",
-        "createdAt": "2026-02-10T16:30:00.000Z",
-        "updatedAt": "2026-02-10T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2026-02-058",
         "meetingId": "meeting-demo-2026-02",
         "employeeId": "employee-demo-058",
@@ -14395,14 +13386,6 @@
         "id": "attendance-2026-03-018",
         "meetingId": "meeting-demo-2026-03",
         "employeeId": "employee-demo-018",
-        "status": "teilgenommen",
-        "createdAt": "2026-03-10T16:30:00.000Z",
-        "updatedAt": "2026-03-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2026-03-002",
-        "meetingId": "meeting-demo-2026-03",
-        "employeeId": "employee-demo-002",
         "status": "teilgenommen",
         "createdAt": "2026-03-10T16:30:00.000Z",
         "updatedAt": "2026-03-10T16:30:00.000Z"
@@ -14651,14 +13634,6 @@
         "id": "attendance-2026-03-048",
         "meetingId": "meeting-demo-2026-03",
         "employeeId": "employee-demo-048",
-        "status": "teilgenommen",
-        "createdAt": "2026-03-10T16:30:00.000Z",
-        "updatedAt": "2026-03-10T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2026-03-022",
-        "meetingId": "meeting-demo-2026-03",
-        "employeeId": "employee-demo-022",
         "status": "teilgenommen",
         "createdAt": "2026-03-10T16:30:00.000Z",
         "updatedAt": "2026-03-10T16:30:00.000Z"
@@ -15176,14 +14151,6 @@
         "updatedAt": "2026-04-14T16:30:00.000Z"
       },
       {
-        "id": "attendance-2026-04-022",
-        "meetingId": "meeting-demo-2026-04",
-        "employeeId": "employee-demo-022",
-        "status": "urlaub",
-        "createdAt": "2026-04-14T16:30:00.000Z",
-        "updatedAt": "2026-04-14T16:30:00.000Z"
-      },
-      {
         "id": "attendance-2026-04-048",
         "meetingId": "meeting-demo-2026-04",
         "employeeId": "employee-demo-048",
@@ -15363,14 +14330,6 @@
         "id": "attendance-2026-05-031",
         "meetingId": "meeting-demo-2026-05",
         "employeeId": "employee-demo-031",
-        "status": "teilgenommen",
-        "createdAt": "2026-05-12T16:30:00.000Z",
-        "updatedAt": "2026-05-12T16:30:00.000Z"
-      },
-      {
-        "id": "attendance-2026-05-022",
-        "meetingId": "meeting-demo-2026-05",
-        "employeeId": "employee-demo-022",
         "status": "teilgenommen",
         "createdAt": "2026-05-12T16:30:00.000Z",
         "updatedAt": "2026-05-12T16:30:00.000Z"
@@ -17275,10 +16234,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-019",
             "wasMedicalProductsOfficer": false
           },
@@ -17451,10 +16406,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-032",
             "wasMedicalProductsOfficer": false
           },
@@ -17475,10 +16426,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-041",
             "wasMedicalProductsOfficer": false
           },
@@ -17489,10 +16436,6 @@
           {
             "employeeId": "employee-demo-043",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           }
         ],
         "createdAt": "2025-07-15T15:00:00.000Z"
@@ -17515,10 +16458,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-059",
             "wasMedicalProductsOfficer": false
           },
@@ -17536,10 +16475,6 @@
           },
           {
             "employeeId": "employee-demo-044",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -17631,10 +16566,6 @@
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-051",
             "wasMedicalProductsOfficer": false
           },
@@ -17664,10 +16595,6 @@
           },
           {
             "employeeId": "employee-demo-037",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -17703,14 +16630,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-029",
             "wasMedicalProductsOfficer": false
           },
@@ -17737,10 +16656,6 @@
           {
             "employeeId": "employee-demo-008",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-08-14T15:00:00.000Z"
@@ -17817,10 +16732,6 @@
           {
             "employeeId": "employee-demo-034",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-003",
@@ -17923,20 +16834,12 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-013",
             "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-024",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-027",
@@ -17968,10 +16871,6 @@
           },
           {
             "employeeId": "employee-demo-049",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -18013,10 +16912,6 @@
           {
             "employeeId": "employee-demo-014",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-043",
@@ -18067,10 +16962,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-035",
             "wasMedicalProductsOfficer": false
           },
@@ -18116,10 +17007,6 @@
           },
           {
             "employeeId": "employee-demo-037",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -18196,10 +17083,6 @@
           },
           {
             "employeeId": "employee-demo-029",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -18285,10 +17168,6 @@
           {
             "employeeId": "employee-demo-045",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           }
         ],
         "createdAt": "2025-10-21T15:00:00.000Z"
@@ -18316,10 +17195,6 @@
           },
           {
             "employeeId": "employee-demo-003",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -18383,10 +17258,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-016",
             "wasMedicalProductsOfficer": true
           },
@@ -18437,10 +17308,6 @@
           {
             "employeeId": "employee-demo-018",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-06-03T15:00:00.000Z"
@@ -18459,10 +17326,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-010",
             "wasMedicalProductsOfficer": false
           },
@@ -18472,10 +17335,6 @@
           },
           {
             "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -18611,10 +17470,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-041",
             "wasMedicalProductsOfficer": false
           },
@@ -18628,10 +17483,6 @@
           },
           {
             "employeeId": "employee-demo-037",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -18799,14 +17650,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-009",
             "wasMedicalProductsOfficer": false
           },
@@ -18848,10 +17691,6 @@
           },
           {
             "employeeId": "employee-demo-024",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -18991,10 +17830,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-004",
             "wasMedicalProductsOfficer": false
           },
@@ -19023,10 +17858,6 @@
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-050",
             "wasMedicalProductsOfficer": false
           },
@@ -19044,10 +17875,6 @@
           },
           {
             "employeeId": "employee-demo-040",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -19167,10 +17994,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-059",
             "wasMedicalProductsOfficer": false
           }
@@ -19201,10 +18024,6 @@
           {
             "employeeId": "employee-demo-057",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-07-27T15:00:00.000Z"
@@ -19228,10 +18047,6 @@
           },
           {
             "employeeId": "employee-demo-041",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -19299,19 +18114,11 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-004",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-005",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -19333,10 +18140,6 @@
           {
             "employeeId": "employee-demo-006",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-045",
@@ -19376,10 +18179,6 @@
           },
           {
             "employeeId": "employee-demo-018",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -19595,10 +18394,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
@@ -19691,10 +18486,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-055",
             "wasMedicalProductsOfficer": false
           },
@@ -19723,10 +18514,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-018",
             "wasMedicalProductsOfficer": false
           }
@@ -19747,10 +18534,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-029",
             "wasMedicalProductsOfficer": false
           },
@@ -19760,14 +18543,6 @@
           },
           {
             "employeeId": "employee-demo-011",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -19811,19 +18586,11 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-024",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-041",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -19923,10 +18690,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-037",
             "wasMedicalProductsOfficer": false
           },
@@ -19957,10 +18720,6 @@
           {
             "employeeId": "employee-demo-014",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-11-26T15:00:00.000Z"
@@ -19983,10 +18742,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-018",
             "wasMedicalProductsOfficer": false
           },
@@ -19997,10 +18752,6 @@
           {
             "employeeId": "employee-demo-060",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-021",
@@ -20127,10 +18878,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-034",
             "wasMedicalProductsOfficer": true
           },
@@ -20148,10 +18895,6 @@
           },
           {
             "employeeId": "employee-demo-037",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -20227,10 +18970,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-045",
             "wasMedicalProductsOfficer": false
           },
@@ -20251,10 +18990,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-019",
             "wasMedicalProductsOfficer": false
           }
@@ -20270,14 +19005,6 @@
         "instructorName": "Schulungsservice Customed",
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
           {
             "employeeId": "employee-demo-050",
             "wasMedicalProductsOfficer": false
@@ -20405,10 +19132,6 @@
           {
             "employeeId": "employee-demo-052",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-044",
@@ -20591,10 +19314,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-004",
             "wasMedicalProductsOfficer": false
           },
@@ -20614,10 +19333,6 @@
         "instructorName": "Schulungsservice Dahlhausen / TIM",
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-058",
             "wasMedicalProductsOfficer": false
@@ -20671,10 +19386,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-010",
             "wasMedicalProductsOfficer": false
           },
@@ -20713,10 +19424,6 @@
           {
             "employeeId": "employee-demo-013",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-020",
@@ -20799,10 +19506,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-005",
             "wasMedicalProductsOfficer": false
           },
@@ -20855,10 +19558,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-053",
             "wasMedicalProductsOfficer": false
           },
@@ -20899,10 +19598,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-017",
             "wasMedicalProductsOfficer": false
           },
@@ -20931,10 +19626,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-017",
             "wasMedicalProductsOfficer": false
           },
@@ -20949,10 +19640,6 @@
           {
             "employeeId": "employee-demo-023",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           }
         ],
         "createdAt": "2025-03-22T15:00:00.000Z"
@@ -20976,10 +19663,6 @@
           },
           {
             "employeeId": "employee-demo-010",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -21027,10 +19710,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-039",
             "wasMedicalProductsOfficer": true
           },
@@ -21044,10 +19723,6 @@
           },
           {
             "employeeId": "employee-demo-058",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -21083,10 +19758,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-029",
             "wasMedicalProductsOfficer": false
           },
@@ -21096,10 +19767,6 @@
           },
           {
             "employeeId": "employee-demo-046",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -21227,14 +19894,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-051",
             "wasMedicalProductsOfficer": false
           },
@@ -21279,10 +19938,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-024",
             "wasMedicalProductsOfficer": false
           },
@@ -21303,14 +19958,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-055",
             "wasMedicalProductsOfficer": false
           },
@@ -21320,10 +19967,6 @@
           },
           {
             "employeeId": "employee-demo-038",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -21353,10 +19996,6 @@
           {
             "employeeId": "employee-demo-027",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-028",
@@ -21475,10 +20114,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-047",
             "wasMedicalProductsOfficer": false
           },
@@ -21488,10 +20123,6 @@
           },
           {
             "employeeId": "employee-demo-059",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -21571,10 +20202,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-018",
             "wasMedicalProductsOfficer": false
           },
@@ -21636,10 +20263,6 @@
           },
           {
             "employeeId": "employee-demo-020",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -21779,10 +20402,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-051",
             "wasMedicalProductsOfficer": false
           },
@@ -21804,14 +20423,6 @@
           },
           {
             "employeeId": "employee-demo-043",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -21843,10 +20454,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-049",
             "wasMedicalProductsOfficer": false
           },
@@ -21869,14 +20476,6 @@
           {
             "employeeId": "employee-demo-039",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-10-21T15:00:00.000Z"
@@ -21892,10 +20491,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-003",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -21967,10 +20562,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-039",
             "wasMedicalProductsOfficer": true
           },
@@ -21979,15 +20570,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-057",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -21996,10 +20579,6 @@
           },
           {
             "employeeId": "employee-demo-020",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -22163,14 +20742,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-034",
             "wasMedicalProductsOfficer": true
           },
@@ -22190,10 +20761,6 @@
         "instructorName": "Nora Vogel",
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-016",
             "wasMedicalProductsOfficer": true
@@ -22269,10 +20836,6 @@
           {
             "employeeId": "employee-demo-059",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-02-03T15:00:00.000Z"
@@ -22295,10 +20858,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-017",
             "wasMedicalProductsOfficer": false
           },
@@ -22316,10 +20875,6 @@
           },
           {
             "employeeId": "employee-demo-043",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -22355,10 +20910,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-049",
             "wasMedicalProductsOfficer": false
           },
@@ -22385,10 +20936,6 @@
           {
             "employeeId": "employee-demo-030",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           }
         ],
         "createdAt": "2025-07-20T15:00:00.000Z"
@@ -22503,20 +21050,12 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-055",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-032",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-020",
@@ -22539,10 +21078,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-030",
             "wasMedicalProductsOfficer": false
           },
@@ -22552,10 +21087,6 @@
           },
           {
             "employeeId": "employee-demo-029",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -22598,10 +21129,6 @@
         "instructorName": "Schulungsservice Dräger",
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-050",
             "wasMedicalProductsOfficer": false
@@ -22795,16 +21322,8 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-008",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-027",
@@ -22821,10 +21340,6 @@
           {
             "employeeId": "employee-demo-047",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-059",
@@ -22883,10 +21398,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-034",
             "wasMedicalProductsOfficer": true
           },
@@ -22908,10 +21419,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-021",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -23015,10 +21522,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-050",
             "wasMedicalProductsOfficer": false
           }
@@ -23060,10 +21563,6 @@
           },
           {
             "employeeId": "employee-demo-047",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -23179,10 +21678,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-030",
             "wasMedicalProductsOfficer": false
           },
@@ -23287,10 +21782,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-047",
             "wasMedicalProductsOfficer": false
           },
@@ -23347,20 +21838,12 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-003",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-008",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-019",
@@ -23391,10 +21874,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-013",
             "wasMedicalProductsOfficer": true
           },
@@ -23415,10 +21894,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-010",
             "wasMedicalProductsOfficer": false
           }
@@ -23435,10 +21910,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-006",
             "wasMedicalProductsOfficer": false
           },
@@ -23452,10 +21923,6 @@
           },
           {
             "employeeId": "employee-demo-055",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -23551,10 +22018,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-046",
             "wasMedicalProductsOfficer": false
           }
@@ -23635,10 +22098,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-027",
             "wasMedicalProductsOfficer": true
           },
@@ -23684,10 +22143,6 @@
           },
           {
             "employeeId": "employee-demo-003",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -23739,24 +22194,12 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-032",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-045",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-030",
@@ -23807,15 +22250,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-026",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -23825,14 +22260,6 @@
           {
             "employeeId": "employee-demo-031",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-06-05T15:00:00.000Z"
@@ -23900,10 +22327,6 @@
           },
           {
             "employeeId": "employee-demo-035",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -23999,10 +22422,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-052",
             "wasMedicalProductsOfficer": true
           },
@@ -24067,10 +22486,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-034",
             "wasMedicalProductsOfficer": true
           },
@@ -24084,10 +22499,6 @@
           },
           {
             "employeeId": "employee-demo-047",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -24148,10 +22559,6 @@
           },
           {
             "employeeId": "employee-demo-003",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -24235,10 +22642,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-007",
             "wasMedicalProductsOfficer": false
           },
@@ -24284,10 +22687,6 @@
           },
           {
             "employeeId": "employee-demo-059",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -24379,14 +22778,6 @@
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-013",
             "wasMedicalProductsOfficer": true
           },
@@ -24405,10 +22796,6 @@
           {
             "employeeId": "employee-demo-027",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-030",
@@ -24443,10 +22830,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-034",
             "wasMedicalProductsOfficer": true
           },
@@ -24460,10 +22843,6 @@
           },
           {
             "employeeId": "employee-demo-018",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -24535,10 +22914,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-048",
             "wasMedicalProductsOfficer": false
           },
@@ -24589,10 +22964,6 @@
           {
             "employeeId": "employee-demo-044",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           }
         ],
         "createdAt": "2025-01-16T15:00:00.000Z"
@@ -24628,10 +22999,6 @@
           },
           {
             "employeeId": "employee-demo-023",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -24711,10 +23078,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-051",
             "wasMedicalProductsOfficer": false
           },
@@ -24745,10 +23108,6 @@
           {
             "employeeId": "employee-demo-058",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-03-28T15:00:00.000Z"
@@ -24767,10 +23126,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-040",
             "wasMedicalProductsOfficer": false
           },
@@ -24780,10 +23135,6 @@
           },
           {
             "employeeId": "employee-demo-041",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -24798,10 +23149,6 @@
         "instructorName": "Karla Naumann",
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-029",
             "wasMedicalProductsOfficer": false
@@ -24859,15 +23206,7 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-042",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -24977,10 +23316,6 @@
           {
             "employeeId": "employee-demo-053",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-05-11T15:00:00.000Z"
@@ -25015,10 +23350,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-046",
             "wasMedicalProductsOfficer": false
           },
@@ -25044,10 +23375,6 @@
           },
           {
             "employeeId": "employee-demo-049",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -25106,10 +23433,6 @@
         "instructorName": "Oskar Hagedorn",
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
           {
             "employeeId": "employee-demo-017",
             "wasMedicalProductsOfficer": false
@@ -25189,10 +23512,6 @@
           {
             "employeeId": "employee-demo-034",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-11-19T15:00:00.000Z"
@@ -25251,10 +23570,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-003",
             "wasMedicalProductsOfficer": false
           },
@@ -25299,19 +23614,11 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-046",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-005",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -25365,10 +23672,6 @@
           {
             "employeeId": "employee-demo-039",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-10-11T15:00:00.000Z"
@@ -25475,16 +23778,8 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-009",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-021",
@@ -25500,10 +23795,6 @@
           },
           {
             "employeeId": "employee-demo-038",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -25591,15 +23882,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-058",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -25655,10 +23938,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-037",
             "wasMedicalProductsOfficer": false
           }
@@ -25688,10 +23967,6 @@
           },
           {
             "employeeId": "employee-demo-008",
-            "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-002",
             "wasMedicalProductsOfficer": true
           },
           {
@@ -25823,10 +24098,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-024",
             "wasMedicalProductsOfficer": false
           },
@@ -25887,10 +24158,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-006",
             "wasMedicalProductsOfficer": false
           },
@@ -25905,10 +24172,6 @@
           {
             "employeeId": "employee-demo-005",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-041",
@@ -25947,10 +24210,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-038",
             "wasMedicalProductsOfficer": false
           },
@@ -25960,10 +24219,6 @@
           },
           {
             "employeeId": "employee-demo-021",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -26183,10 +24438,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-035",
             "wasMedicalProductsOfficer": false
           },
@@ -26201,10 +24452,6 @@
           {
             "employeeId": "employee-demo-017",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-024",
@@ -26231,10 +24478,6 @@
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-027",
             "wasMedicalProductsOfficer": true
           },
@@ -26260,10 +24503,6 @@
           },
           {
             "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -26415,10 +24654,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-042",
             "wasMedicalProductsOfficer": false
           },
@@ -26428,10 +24663,6 @@
           },
           {
             "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -26485,10 +24716,6 @@
           {
             "employeeId": "employee-demo-035",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-03-08T15:00:00.000Z"
@@ -26504,10 +24731,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-020",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -26553,10 +24776,6 @@
           {
             "employeeId": "employee-demo-038",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-027",
@@ -26695,10 +24914,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-046",
             "wasMedicalProductsOfficer": false
           },
@@ -26713,10 +24928,6 @@
           {
             "employeeId": "employee-demo-010",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           }
         ],
         "createdAt": "2025-10-28T15:00:00.000Z"
@@ -26747,10 +24958,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-038",
             "wasMedicalProductsOfficer": false
           },
@@ -26764,10 +24971,6 @@
           },
           {
             "employeeId": "employee-demo-023",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -26811,10 +25014,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-058",
             "wasMedicalProductsOfficer": false
           },
@@ -26825,10 +25024,6 @@
           {
             "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-008",
@@ -26860,10 +25055,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-026",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -26979,10 +25170,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-018",
             "wasMedicalProductsOfficer": false
           }
@@ -27095,10 +25282,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-027",
             "wasMedicalProductsOfficer": true
           },
@@ -27108,10 +25291,6 @@
           },
           {
             "employeeId": "employee-demo-032",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -27235,19 +25414,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-059",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -27413,10 +25580,6 @@
           {
             "employeeId": "employee-demo-037",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2025-04-26T15:00:00.000Z"
@@ -27432,10 +25595,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-007",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -27477,10 +25636,6 @@
           {
             "employeeId": "employee-demo-021",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-032",
@@ -27607,10 +25762,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-023",
             "wasMedicalProductsOfficer": false
           },
@@ -27620,10 +25771,6 @@
           },
           {
             "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -27659,15 +25806,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-043",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -27681,10 +25820,6 @@
           {
             "employeeId": "employee-demo-015",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           }
         ],
         "createdAt": "2025-07-26T15:00:00.000Z"
@@ -27704,10 +25839,6 @@
           },
           {
             "employeeId": "employee-demo-045",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -27764,10 +25895,6 @@
           },
           {
             "employeeId": "employee-demo-003",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -27839,10 +25966,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
@@ -27868,10 +25991,6 @@
           },
           {
             "employeeId": "employee-demo-023",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -27963,19 +26082,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-010",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -28018,10 +26125,6 @@
         "instructorName": "Nora Ortmann",
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-023",
             "wasMedicalProductsOfficer": false
@@ -28072,14 +26175,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-020",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -28247,10 +26342,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-005",
             "wasMedicalProductsOfficer": false
           },
@@ -28260,10 +26351,6 @@
           },
           {
             "employeeId": "employee-demo-038",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -28419,10 +26506,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-028",
             "wasMedicalProductsOfficer": false
           },
@@ -28464,10 +26547,6 @@
           },
           {
             "employeeId": "employee-demo-012",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -28526,10 +26605,6 @@
         "instructorName": "Schulungsservice Physiocontrol / Stryker",
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
-          {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-003",
             "wasMedicalProductsOfficer": false
@@ -28599,10 +26674,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-038",
             "wasMedicalProductsOfficer": false
           },
@@ -28624,10 +26695,6 @@
           },
           {
             "employeeId": "employee-demo-028",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -28691,10 +26758,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-023",
             "wasMedicalProductsOfficer": false
           },
@@ -28735,15 +26798,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-006",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -28779,10 +26834,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-045",
             "wasMedicalProductsOfficer": false
           },
@@ -28815,19 +26866,11 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-055",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-026",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -28856,10 +26899,6 @@
           },
           {
             "employeeId": "employee-demo-010",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -28918,10 +26957,6 @@
         "instructorName": "Yara Seidel",
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
-          {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-048",
             "wasMedicalProductsOfficer": false
@@ -28987,10 +27022,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-029",
             "wasMedicalProductsOfficer": false
           }
@@ -29036,10 +27067,6 @@
           },
           {
             "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -29207,10 +27234,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-051",
             "wasMedicalProductsOfficer": false
           },
@@ -29363,10 +27386,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-049",
             "wasMedicalProductsOfficer": false
           },
@@ -29431,10 +27450,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-041",
             "wasMedicalProductsOfficer": false
           }
@@ -29475,10 +27490,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-023",
             "wasMedicalProductsOfficer": false
           }
@@ -29508,10 +27519,6 @@
           },
           {
             "employeeId": "employee-demo-030",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -29627,20 +27634,12 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-012",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-035",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-031",
@@ -29715,10 +27714,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-056",
             "wasMedicalProductsOfficer": false
           }
@@ -29740,14 +27735,6 @@
           },
           {
             "employeeId": "employee-demo-019",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -29789,10 +27776,6 @@
           {
             "employeeId": "employee-demo-031",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-030",
@@ -29843,10 +27826,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-026",
             "wasMedicalProductsOfficer": false
           },
@@ -29892,10 +27871,6 @@
           },
           {
             "employeeId": "employee-demo-057",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -29999,10 +27974,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-036",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-060",
             "wasMedicalProductsOfficer": false
           },
@@ -30064,10 +28035,6 @@
           },
           {
             "employeeId": "employee-demo-021",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -30135,10 +28102,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-045",
             "wasMedicalProductsOfficer": false
           },
@@ -30184,10 +28147,6 @@
           },
           {
             "employeeId": "employee-demo-019",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -30307,10 +28266,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-020",
             "wasMedicalProductsOfficer": false
           }
@@ -30403,15 +28358,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-054",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-031",
-            "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-002",
             "wasMedicalProductsOfficer": true
           }
         ],
@@ -30429,10 +28376,6 @@
           {
             "employeeId": "employee-demo-039",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-014",
@@ -30456,10 +28399,6 @@
           },
           {
             "employeeId": "employee-demo-030",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -30492,10 +28431,6 @@
           },
           {
             "employeeId": "employee-demo-058",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -30547,10 +28482,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-034",
             "wasMedicalProductsOfficer": true
           },
@@ -30559,15 +28490,7 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-004",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-046",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -30582,10 +28505,6 @@
         "instructorName": "Schulungsservice TriMedika",
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-012",
             "wasMedicalProductsOfficer": false
@@ -30624,10 +28543,6 @@
           },
           {
             "employeeId": "employee-demo-030",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -30687,10 +28602,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-044",
             "wasMedicalProductsOfficer": false
           },
@@ -30713,10 +28624,6 @@
           {
             "employeeId": "employee-demo-041",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-009",
@@ -30815,10 +28722,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
@@ -30828,10 +28731,6 @@
           },
           {
             "employeeId": "employee-demo-046",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -30891,20 +28790,12 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-031",
             "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-015",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           }
         ],
         "createdAt": "2025-02-02T15:00:00.000Z"
@@ -30918,10 +28809,6 @@
         "instructorName": "Karla Naumann",
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
-          {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-028",
             "wasMedicalProductsOfficer": false
@@ -30976,10 +28863,6 @@
           },
           {
             "employeeId": "employee-demo-019",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-054",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -31079,10 +28962,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-031",
             "wasMedicalProductsOfficer": true
           },
@@ -31151,10 +29030,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-008",
             "wasMedicalProductsOfficer": true
           },
@@ -31203,19 +29078,11 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-009",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-050",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-036",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -31423,10 +29290,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-008",
             "wasMedicalProductsOfficer": true
           },
@@ -31458,10 +29321,6 @@
         "instructorName": "Kerem Sander",
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
           {
             "employeeId": "employee-demo-052",
             "wasMedicalProductsOfficer": true
@@ -31505,10 +29364,6 @@
           {
             "employeeId": "employee-demo-041",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-027",
@@ -31661,10 +29516,6 @@
           {
             "employeeId": "employee-demo-014",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2026-01-28T15:00:00.000Z"
@@ -31771,19 +29622,11 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
             "employeeId": "employee-demo-058",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-041",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -31935,10 +29778,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-048",
             "wasMedicalProductsOfficer": false
           }
@@ -31973,10 +29812,6 @@
           {
             "employeeId": "employee-demo-015",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-023",
@@ -32104,10 +29939,6 @@
           },
           {
             "employeeId": "employee-demo-051",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -32317,10 +30148,6 @@
           {
             "employeeId": "employee-demo-014",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-002",
@@ -32575,16 +30402,8 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-031",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-059",
@@ -32608,10 +30427,6 @@
           },
           {
             "employeeId": "employee-demo-003",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -32739,10 +30554,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-013",
             "wasMedicalProductsOfficer": true
           },
@@ -32803,15 +30614,7 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-017",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -32944,10 +30747,6 @@
           },
           {
             "employeeId": "employee-demo-012",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -33463,10 +31262,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-053",
             "wasMedicalProductsOfficer": false
           },
@@ -33644,14 +31439,6 @@
           },
           {
             "employeeId": "employee-demo-042",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -33963,10 +31750,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-039",
             "wasMedicalProductsOfficer": true
           },
@@ -34201,10 +31984,6 @@
           {
             "employeeId": "employee-demo-012",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
           }
         ],
         "createdAt": "2026-02-14T15:00:00.000Z"
@@ -34220,10 +31999,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-020",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -34463,10 +32238,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-007",
             "wasMedicalProductsOfficer": false
           },
@@ -34635,20 +32406,12 @@
         "instructorWasMedicalProductsOfficer": false,
         "participants": [
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-041",
             "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-048",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-009",
@@ -34816,10 +32579,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-057",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -35059,10 +32818,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-051",
             "wasMedicalProductsOfficer": false
           },
@@ -35259,10 +33014,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-025",
             "wasMedicalProductsOfficer": false
           },
@@ -35363,10 +33114,6 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-043",
             "wasMedicalProductsOfficer": false
           },
@@ -35408,10 +33155,6 @@
           },
           {
             "employeeId": "employee-demo-053",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -35495,16 +33238,8 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-039",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-057",
@@ -35624,10 +33359,6 @@
         "participants": [
           {
             "employeeId": "employee-demo-018",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -35911,20 +33642,12 @@
             "wasMedicalProductsOfficer": true
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-052",
             "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-038",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-010",
@@ -36234,10 +33957,6 @@
         "instructorName": "Anika Klose",
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
-          },
           {
             "employeeId": "employee-demo-023",
             "wasMedicalProductsOfficer": false
@@ -36807,10 +34526,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-006",
             "wasMedicalProductsOfficer": false
           },
@@ -37092,10 +34807,6 @@
           },
           {
             "employeeId": "employee-demo-049",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -37399,10 +35110,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-007",
             "wasMedicalProductsOfficer": false
           },
@@ -37436,10 +35143,6 @@
           },
           {
             "employeeId": "employee-demo-059",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -37859,10 +35562,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-052",
             "wasMedicalProductsOfficer": true
           },
@@ -37956,10 +35655,6 @@
           },
           {
             "employeeId": "employee-demo-051",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -38172,10 +35867,6 @@
           },
           {
             "employeeId": "employee-demo-055",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -38432,10 +36123,6 @@
           },
           {
             "employeeId": "employee-demo-006",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -39095,10 +36782,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-051",
             "wasMedicalProductsOfficer": false
           }
@@ -39231,10 +36914,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-044",
             "wasMedicalProductsOfficer": false
           }
@@ -39316,10 +36995,6 @@
           },
           {
             "employeeId": "employee-demo-026",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -39567,10 +37242,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-045",
             "wasMedicalProductsOfficer": false
           }
@@ -39635,10 +37306,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-039",
             "wasMedicalProductsOfficer": true
           },
@@ -39652,10 +37319,6 @@
           },
           {
             "employeeId": "employee-demo-059",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -39952,14 +37615,6 @@
           },
           {
             "employeeId": "employee-demo-023",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-022",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -40511,16 +38166,8 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-033",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-014",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-008",
@@ -40563,10 +38210,6 @@
         "instructorWasMedicalProductsOfficer": true,
         "participants": [
           {
-            "employeeId": "employee-demo-022",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-026",
             "wasMedicalProductsOfficer": false
           },
@@ -40592,10 +38235,6 @@
           },
           {
             "employeeId": "employee-demo-018",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-033",
             "wasMedicalProductsOfficer": false
           },
           {
@@ -40643,10 +38282,6 @@
             "wasMedicalProductsOfficer": false
           },
           {
-            "employeeId": "employee-demo-025",
-            "wasMedicalProductsOfficer": false
-          },
-          {
             "employeeId": "employee-demo-016",
             "wasMedicalProductsOfficer": true
           },
@@ -40672,10 +38307,6 @@
           },
           {
             "employeeId": "employee-demo-007",
-            "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-001",
             "wasMedicalProductsOfficer": false
           }
         ],
@@ -40889,10 +38520,6 @@
           {
             "employeeId": "employee-demo-031",
             "wasMedicalProductsOfficer": true
-          },
-          {
-            "employeeId": "employee-demo-001",
-            "wasMedicalProductsOfficer": false
           },
           {
             "employeeId": "employee-demo-024",
@@ -41117,10 +38744,6 @@
           {
             "employeeId": "employee-demo-017",
             "wasMedicalProductsOfficer": false
-          },
-          {
-            "employeeId": "employee-demo-002",
-            "wasMedicalProductsOfficer": true
           },
           {
             "employeeId": "employee-demo-014",

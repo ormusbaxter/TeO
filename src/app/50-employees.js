@@ -31,7 +31,16 @@
     const weekend = elements.bulkServiceWeekend.value;
     const qualificationId = elements.bulkQualification.value;
     const qualificationState = elements.bulkQualificationState.value;
-    if (!active && !profession && !weekend && !(qualificationId && qualificationState)) {
+    const entryDate = elements.bulkEntryDate.value;
+    const exitDate = elements.bulkExitDate.value;
+    if (
+      !active &&
+      !profession &&
+      !weekend &&
+      !(qualificationId && qualificationState) &&
+      !entryDate &&
+      !exitDate
+    ) {
       showToast("Bitte mindestens eine Änderung auswählen.", "error");
       return;
     }
@@ -83,10 +92,31 @@
         return;
       }
     }
+    if (entryDate || exitDate) {
+      // Geprüft wird das Ergebnis je Mitarbeiter: Ein gemeinsamer Austritt
+      // darf bei keinem vor dessen eigenem Eintritt liegen.
+      const conflicting = [...selectedEmployeeIds]
+        .map(getEmployee)
+        .filter((employee) => {
+          if (!employee) return false;
+          const entry = entryDate || employee.entryDate;
+          const exit = exitDate || employee.exitDate;
+          return entry && exit && exit < entry;
+        });
+      if (conflicting.length) {
+        showToast(
+          `Bei ${conflicting.map(fullName).join(", ")} läge der Austritt vor dem Eintritt.`,
+          "error",
+        );
+        return;
+      }
+    }
     const now = new Date().toISOString();
     const committed = await commitStateMutation(() => {
       state.employees.forEach((employee) => {
         if (!selectedEmployeeIds.has(employee.id)) return;
+        if (entryDate) employee.entryDate = entryDate;
+        if (exitDate) employee.exitDate = exitDate;
         if (active) {
           employee.employmentStatus = active;
           employee.active = active !== "inactive";
@@ -116,19 +146,31 @@
       ? `<div class="quality-issue-list">${issues
           .map(
             (issue) => `
-              <button
-                class="quality-issue ${issue.severity === "high" ? "is-high" : ""}"
-                type="button"
-                data-quality-employee="${issue.employeeId}"
-              >
-                <span class="status-badge ${issue.severity === "high" ? "expired" : "open"}">
-                  ${issue.severity === "high" ? "Prüfen" : "Hinweis"}
-                </span>
-                <span>
-                  <strong>${escapeHtml(issue.title)}</strong>
-                  <small>${escapeHtml(issue.detail)}</small>
-                </span>
-              </button>
+              <div class="quality-issue-row">
+                <button
+                  class="quality-issue ${issue.severity === "high" ? "is-high" : ""}"
+                  type="button"
+                  data-quality-employee="${issue.employeeId}"
+                >
+                  <span class="status-badge ${issue.severity === "high" ? "expired" : "open"}">
+                    ${issue.severity === "high" ? "Prüfen" : "Hinweis"}
+                  </span>
+                  <span>
+                    <strong>${escapeHtml(issue.title)}</strong>
+                    <small>${escapeHtml(issue.detail)}</small>
+                  </span>
+                </button>
+                ${
+                  issue.action
+                    ? `<button
+                        class="button button-secondary button-compact"
+                        type="button"
+                        data-quality-action="${issue.action.kind}"
+                        data-quality-action-employee="${issue.employeeId}"
+                      >${escapeHtml(issue.action.label)}</button>`
+                    : ""
+                }
+              </div>
             `,
           )
           .join("")}</div>`
@@ -145,7 +187,32 @@
           openEmployeeDialog(button.dataset.qualityEmployee);
         }),
       );
-    elements.dataQualityDialog.showModal();
+    elements.dataQualityContent
+      .querySelectorAll('[data-quality-action="deactivate"]')
+      .forEach((button) =>
+        button.addEventListener("click", () =>
+          deactivateExitedEmployee(button.dataset.qualityActionEmployee),
+        ),
+      );
+    if (!elements.dataQualityDialog.open) elements.dataQualityDialog.showModal();
+  }
+
+  // Ein Klick aus der Datenqualität heraus: Status auf „Inaktiv“, als ein
+  // Schritt, der sich zurücknehmen lässt. Die Liste baut sich danach neu auf.
+  async function deactivateExitedEmployee(employeeId) {
+    const employee = getEmployee(employeeId);
+    if (!employee) return;
+    const committed = await commitStateMutation(
+      () => {
+        employee.active = false;
+        employee.employmentStatus = "inactive";
+        employee.updatedAt = new Date().toISOString();
+      },
+      { undo: `${fullName(employee)} inaktiv gesetzt` },
+    );
+    if (!committed) return;
+    showUndoToast(`${fullName(employee)} ist jetzt inaktiv.`);
+    if (elements.dataQualityDialog.open) openDataQualityDialog();
   }
 
   function getDataQualityIssues() {
@@ -185,6 +252,7 @@
           severity: "high",
           title: `${fullName(employee)} ist ausgetreten, aber noch aktiv`,
           detail: `Austritt am ${formatDate(employee.exitDate)} – Status auf „Inaktiv“ setzen.`,
+          action: { kind: "deactivate", label: "Auf Inaktiv setzen" },
         });
       }
       state.employees.slice(index + 1).forEach((other) => {

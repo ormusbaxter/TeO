@@ -696,9 +696,10 @@
       : DEFAULT_WEEKEND_A_REFERENCE_SATURDAY;
   }
 
-  function normalizeDeadlineKinds(value) {
+  function normalizeDeadlineKinds(value, seenKinds) {
     if (!Array.isArray(value)) return [...DEADLINE_KINDS];
-    return DEADLINE_KINDS.filter((kind) => value.includes(kind));
+    const known = Array.isArray(seenKinds) ? seenKinds : LEGACY_DEADLINE_KINDS;
+    return DEADLINE_KINDS.filter((kind) => value.includes(kind) || !known.includes(kind));
   }
 
   function normalizeAuditLog(entries) {
