@@ -1,3 +1,39 @@
+  // Stellenumfang an einem Tag: die letzte Änderung bis zu diesem Tag, sonst
+  // der Ausgangswert. employmentPercent ist damit der Wert vor der ersten
+  // Änderung, nicht zwingend der heutige.
+  function employmentPercentOn(employee, date) {
+    let percent = employee.employmentPercent;
+    for (const change of employee.employmentChanges || []) {
+      if (change.from > date) break;
+      percent = change.percent;
+    }
+    return percent;
+  }
+
+  function currentEmploymentPercent(employee) {
+    return employmentPercentOn(employee, todayIso());
+  }
+
+  function upcomingEmploymentChange(employee) {
+    const today = todayIso();
+    return (employee.employmentChanges || []).find((change) => change.from > today) || null;
+  }
+
+  function isEmployedOn(employee, date) {
+    return (
+      (!employee.entryDate || employee.entryDate <= date) &&
+      (!employee.exitDate || date <= employee.exitDate)
+    );
+  }
+
+  // Beschäftigt an mindestens einem Tag des Zeitraums.
+  function isEmployedBetween(employee, firstDate, lastDate) {
+    return (
+      (!employee.entryDate || employee.entryDate <= lastDate) &&
+      (!employee.exitDate || firstDate <= employee.exitDate)
+    );
+  }
+
   function activeEmployeeList() {
     return state.employees.filter((employee) => employee.active);
   }

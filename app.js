@@ -35,6 +35,9 @@
     email: "E-Mail",
     profession: "Beruf",
     employmentPercent: "Stellenumfang",
+    entryDate: "Eintrittsdatum",
+    exitDate: "Austrittsdatum",
+    employmentChanges: "Änderungen des Stellenumfangs",
     employmentStatus: "Status",
     serviceWeekend: "Dienstwochenende",
     qualifications: "Qualifikationen",
@@ -841,6 +844,8 @@
     vacationEmployeeSearch: document.querySelector("#vacationEmployeeSearch"),
     vacationBaseDays: document.querySelector("#vacationBaseDays"),
     vacationSortMode: document.querySelector("#vacationSortMode"),
+    employmentChangeList: document.querySelector("#employmentChangeList"),
+    addEmploymentChangeButton: document.querySelector("#addEmploymentChangeButton"),
     vacationCrosshairToggle: document.querySelector("#vacationCrosshairToggle"),
     vacationCarryOverExpiry: document.querySelector("#vacationCarryOverExpiry"),
     carryOverVacationButton: document.querySelector("#carryOverVacationButton"),
@@ -2066,6 +2071,8 @@
       phone: String(employee.phone || ""),
       email: String(employee.email || ""),
       employmentPercent: clampNumber(employee.employmentPercent, 1, 100, 100),
+      ...normalizeEmploymentPeriod(employee),
+      employmentChanges: normalizeEmploymentChanges(employee.employmentChanges),
       profession: normalizeProfession(employee.profession),
       serviceWeekend: normalizeServiceWeekend(employee.serviceWeekend),
       active: employmentStatus !== "inactive",
@@ -2075,6 +2082,32 @@
       createdAt: validTimestamp(employee.createdAt),
       updatedAt: validTimestamp(employee.updatedAt || employee.createdAt),
     };
+  }
+
+  // Ein Austritt vor dem Eintritt ist ein Tippfehler; dann gilt nur der
+  // Eintritt, statt den Mitarbeiter aus jedem Zeitraum zu verbannen.
+  function normalizeEmploymentPeriod(employee) {
+    const entryDate = normalizeOptionalDate(employee.entryDate);
+    const exitDate = normalizeOptionalDate(employee.exitDate);
+    return {
+      entryDate,
+      exitDate: entryDate && exitDate && exitDate < entryDate ? "" : exitDate,
+    };
+  }
+
+  // Je Stichtag höchstens eine Änderung, aufsteigend sortiert.
+  function normalizeEmploymentChanges(changes) {
+    const byDate = new Map();
+    (Array.isArray(changes) ? changes : []).forEach((change) => {
+      const from = normalizeOptionalDate(change?.from);
+      const percent = Number(change?.percent);
+      if (from && Number.isFinite(percent)) {
+        byDate.set(from, { from, percent: clampNumber(Math.round(percent), 1, 100, 100) });
+      }
+    });
+    return [...byDate.values()]
+      .sort((a, b) => a.from.localeCompare(b.from))
+      .slice(0, 50);
   }
 
   function normalizeTraining(training) {
@@ -3807,6 +3840,8 @@
       "keydown",
       handleVacationPlannerKeydown,
     );
+    elements.employmentChangeList.addEventListener("click", handleEmploymentChangeAction);
+    elements.addEmploymentChangeButton.addEventListener("click", addEmploymentChangeRow);
     elements.vacationPlanner.addEventListener("pointerover", handleVacationCrosshair);
     elements.vacationPlanner.addEventListener("focusin", handleVacationCrosshair);
     elements.vacationPlanner.addEventListener("pointerleave", () =>
@@ -6413,7 +6448,7 @@
       </div>
       <dl class="record-inspector-facts">
         <div><dt>Status</dt><dd>${escapeHtml(employeeStatusLabel(employee))}</dd></div>
-        <div><dt>Stellenumfang</dt><dd>${employee.employmentPercent}&thinsp;%</dd></div>
+        <div><dt>Stellenumfang</dt><dd>${currentEmploymentPercent(employee)}&thinsp;%</dd></div>
         <div><dt>Dienstwochenende</dt><dd>${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</dd></div>
         <div><dt>Fortbildungen</dt><dd>${training.current}/${training.total} aktuell</dd></div>
         <div><dt>Telefon</dt><dd>${escapeHtml(employee.phone || "–")}</dd></div>
@@ -8460,13 +8495,36 @@
         ${renderDossierItem("Telefon", employee.phone || "–")}
         ${renderDossierItem("E-Mail", employee.email || "–")}
         ${renderDossierItem("Benutzername", employee.username || "–")}
-        ${renderDossierItem("Stellenumfang", `${employee.employmentPercent} %`)}
+        ${renderDossierItem("Stellenumfang", `${currentEmploymentPercent(employee)} %`)}
+        ${renderDossierItem("Eintritt", employee.entryDate ? formatDate(employee.entryDate) : "–")}
+        ${renderDossierItem("Austritt", employee.exitDate ? formatDate(employee.exitDate) : "–")}
         ${renderDossierItem("Dienstwochenende", serviceWeekendLabel(employee.serviceWeekend))}
         ${renderDossierItem(
           "Sitzungsteilnahme",
           `${percentage(participated, expectedMeetings)} % (${participated}/${expectedMeetings})`,
         )}
       </div>
+      ${
+        employee.employmentChanges?.length
+          ? `<section class="dossier-section">
+              <h3>Stellenumfang im Verlauf</h3>
+              <div class="dossier-list">
+                <div class="dossier-list-row">
+                  <strong>${employee.employmentPercent} %</strong>
+                  <span>${employee.entryDate ? `ab ${formatDate(employee.entryDate)}` : "Ausgangswert"}</span>
+                </div>
+                ${employee.employmentChanges
+                  .map(
+                    (change) => `<div class="dossier-list-row">
+                      <strong>${change.percent} %</strong>
+                      <span>ab ${formatDate(change.from)}${change.from > todayIso() ? " (geplant)" : ""}</span>
+                    </div>`,
+                  )
+                  .join("")}
+              </div>
+            </section>`
+          : ""
+      }
       <section class="dossier-section">
         <h3>Zusatzqualifikationen</h3>
         ${
@@ -9010,7 +9068,7 @@
 
   function weekendSimulationMetrics(employees) {
     const employmentPercent = employees.reduce(
-      (sum, employee) => sum + employee.employmentPercent,
+      (sum, employee) => sum + currentEmploymentPercent(employee),
       0,
     );
     return {
@@ -9057,7 +9115,7 @@
           ${renderAvatar(employee, true)}
           <span>
             <strong>${escapeHtml(fullName(employee))}</strong>
-            <small>${employee.employmentPercent} % · ${escapeHtml(
+            <small>${currentEmploymentPercent(employee)} % · ${escapeHtml(
               employeeStatusLabel(employee),
             )}</small>
           </span>
@@ -9203,7 +9261,7 @@
     return Object.fromEntries(
       Object.entries(groups).map(([key, employees]) => {
         const employmentPercent = employees.reduce(
-          (sum, employee) => sum + employee.employmentPercent,
+          (sum, employee) => sum + currentEmploymentPercent(employee),
           0,
         );
         return [
@@ -9257,7 +9315,7 @@
             }</small>
           </span>
         </span>
-        <strong class="weekend-employment-percent">${employee.employmentPercent} %</strong>
+        <strong class="weekend-employment-percent">${currentEmploymentPercent(employee)} %</strong>
         <span class="weekend-qualification-state ${fachweiterbildung.className}"
           title="Fachweiterbildung I/A: ${fachweiterbildung.title}">
           ${fachweiterbildung.symbol} FWB I/A
@@ -9519,13 +9577,24 @@
 
   function renderVacationPlanner() {
     renderVacationControls();
-    const allEmployees = activeEmployeeList().sort(
-      vacationSortMode === "qualification"
-        ? compareEmployeesByVacationSortGroup
-        : sortEmployees,
-    );
-    const employees = filterVacationEmployees(allEmployees);
     const daysInMonth = new Date(vacationYear, vacationMonth, 0).getDate();
+    const monthPrefix = `${vacationYear}-${String(vacationMonth).padStart(2, "0")}`;
+    // Nur wer in diesem Monat wenigstens einen Tag beschäftigt ist: vor dem
+    // Eintritt und nach dem Austritt gibt es nichts zu planen.
+    const allEmployees = activeEmployeeList()
+      .filter((employee) =>
+        isEmployedBetween(
+          employee,
+          `${monthPrefix}-01`,
+          `${monthPrefix}-${String(daysInMonth).padStart(2, "0")}`,
+        ),
+      )
+      .sort(
+        vacationSortMode === "qualification"
+          ? compareEmployeesByVacationSortGroup
+          : sortEmployees,
+      );
+    const employees = filterVacationEmployees(allEmployees);
     const dates = Array.from({ length: daysInMonth }, (_, index) =>
       [
         vacationYear,
@@ -9991,6 +10060,7 @@
         .filter((vacationDay) => vacationDay.employeeId === employee.id)
         .map((vacationDay) => [vacationDay.date, vacationDay]),
     );
+    const monthPercent = employmentPercentOn(employee, dates[0]);
     return `
       <tr class="${employee.active ? "" : "is-inactive"}">
         <th
@@ -10000,8 +10070,12 @@
             [
               serviceWeekendLabel(employee.serviceWeekend),
               employeeStatusLabel(employee),
-              `${employee.employmentPercent} %`,
-            ].join(" · "),
+              `${monthPercent} %`,
+              employee.entryDate ? `Eintritt ${formatDate(employee.entryDate)}` : "",
+              employee.exitDate ? `Austritt ${formatDate(employee.exitDate)}` : "",
+            ]
+              .filter(Boolean)
+              .join(" · "),
           )}"
         >
           <span class="vacation-employee">
@@ -10015,7 +10089,7 @@
               >${escapeHtml(fullName(employee))}</button>
               <small>${escapeHtml(
                 vacationServiceWeekendLabel(employee),
-              )} · ${employee.employmentPercent} %</small>
+              )} · ${monthPercent} %</small>
             </span>
           </span>
         </th>
@@ -10038,6 +10112,23 @@
             const birthdayNote = birthday
               ? `${birthday.age}. Geburtstag`
               : "";
+            if (!isEmployedOn(employee, date)) {
+              const note =
+                employee.entryDate && date < employee.entryDate
+                  ? `Vor dem Eintritt am ${formatDate(employee.entryDate)}`
+                  : `Nach dem Austritt am ${formatDate(employee.exitDate)}`;
+              return `
+                <td class="vacation-day-cell is-outside-employment ${metadata.className}" title="${escapeHtml(note)}">
+                  <button
+                    type="button"
+                    disabled
+                    data-vacation-employee="${employee.id}"
+                    data-vacation-date="${date}"
+                    aria-label="${escapeHtml(`${fullName(employee)}: ${note}`)}"
+                  ></button>
+                </td>
+              `;
+            }
             return `
               <td class="vacation-day-cell ${metadata.className} ${
                 dayStats.isOverLimit ? "is-over-limit" : ""
@@ -10077,7 +10168,14 @@
             `;
           })
           .join("")}
-        <td class="vacation-total-column">${formatVacationNumber(entitlement.base)}</td>
+        <td
+          class="vacation-total-column"
+          ${
+            entitlement.fullMonths < 12
+              ? `title="Anteilig: ${entitlement.fullMonths} volle Beschäftigungsmonate in ${vacationYear}"`
+              : ""
+          }
+        >${formatVacationNumber(entitlement.base)}${entitlement.fullMonths < 12 ? "<sup>*</sup>" : ""}</td>
         <td class="vacation-total-column">
           <input
             class="vacation-additional-input"
@@ -10308,7 +10406,13 @@
   async function applyVacationEntryToSelection(entryType) {
     const cells = currentPlannerSelection()
       .map(plannerCoordinates)
-      .filter((cell) => cell.employeeId && cell.date);
+      .filter((cell) => cell.employeeId && cell.date)
+      // Tage vor dem Eintritt oder nach dem Austritt bleiben leer, auch wenn
+      // eine Bereichsauswahl über sie hinwegreicht.
+      .filter((cell) => {
+        const employee = getEmployee(cell.employeeId);
+        return employee && isEmployedOn(employee, cell.date);
+      });
     if (!cells.length) return;
 
     // Die Eintragsart der Steuerleiste zieht mit, damit Klick und Taste
@@ -10659,7 +10763,7 @@
     elements.vacationEmployeeOverviewTitle.textContent =
       `${fullName(employee)} · ${vacationYear}`;
     elements.vacationEmployeeOverviewSubtitle.textContent =
-      `${employeeStatusLabel(employee)} · ${employee.employmentPercent} % · ${serviceWeekendLabel(employee.serviceWeekend)}`;
+      `${employeeStatusLabel(employee)} · ${currentEmploymentPercent(employee)} % · ${serviceWeekendLabel(employee.serviceWeekend)}`;
 
     elements.vacationEmployeeOverviewContent.innerHTML = `
       <div class="vacation-year-legend" aria-label="Legende der Jahresübersicht">
@@ -10737,7 +10841,7 @@
             <span>${escapeHtml(
               [
                 employeeStatusLabel(employee),
-                `${employee.employmentPercent} %`,
+                `${currentEmploymentPercent(employee)} %`,
                 serviceWeekendLabel(employee.serviceWeekend),
               ].join(" · "),
             )}</span>
@@ -10930,7 +11034,7 @@
           )}</strong>
           <small>${escapeHtml(
             [
-              `${employee.employmentPercent} %`,
+              `${employmentPercentOn(employee, blankVacationMonthDate(month, 1))} %`,
               // Beim Ausfuellen von Hand ist der Jahresanspruch die Zahl, die
               // gebraucht wird - das Dienstwochenende steht ohnehin als
               // Umrandung in den Tagesspalten.
@@ -11125,13 +11229,32 @@
   // TeO systematisch zu wenig - dann muessen die Arbeitstage pro Woche am
   // Mitarbeitenden erfasst und hier statt employmentPercent verwendet werden.
   //
-  // Ebenfalls nicht abgebildet: die Zwoelftelung nach Paragraf 5 BUrlG bei Ein-
-  // oder Austritt im laufenden Jahr. Die Funktion kennt nur volle Kalenderjahre.
+  // Ein- und Austritt sowie Aenderungen des Stellenumfangs im Jahr werden
+  // monatsweise gezwoelftelt, wie es TVoeD und AVR fuer Teiljahre vorsehen:
+  // Jeder volle Beschaeftigungsmonat bringt ein Zwoelftel des Grundurlaubs,
+  // bemessen am Stellenumfang zum Monatsersten. Angefangene Monate zaehlen
+  // nicht. Ohne Ein-, Austritt und Aenderung im Jahr ergibt das genau den
+  // Jahreswert. Gerundet wird wie bisher auf halbe Tage.
+  function vacationBaseForYear(employee, year) {
+    let twelfths = 0;
+    let fullMonths = 0;
+    for (let month = 1; month <= 12; month += 1) {
+      const prefix = `${year}-${String(month).padStart(2, "0")}`;
+      const firstDay = `${prefix}-01`;
+      const lastDay = `${prefix}-${String(new Date(year, month, 0).getDate()).padStart(2, "0")}`;
+      if (isEmployedOn(employee, firstDay) && isEmployedOn(employee, lastDay)) {
+        fullMonths += 1;
+        twelfths += employmentPercentOn(employee, firstDay);
+      }
+    }
+    return {
+      base: Math.round(((state.settings.vacationBaseDays * twelfths) / 1200) * 2) / 2,
+      fullMonths,
+    };
+  }
+
   function getVacationEntitlement(employee, year) {
-    const base =
-      Math.round(
-        state.settings.vacationBaseDays * (employee.employmentPercent / 100) * 2,
-      ) / 2;
+    const { base, fullMonths } = vacationBaseForYear(employee, year);
     const stored = state.vacationEntitlements.find(
       (entry) => entry.employeeId === employee.id && entry.year === year,
     );
@@ -11152,6 +11275,7 @@
     const expired = todayIso() > expiryDate ? unused : 0;
     return {
       base,
+      fullMonths,
       additional,
       carryOver,
       expiryDate,
@@ -12120,6 +12244,17 @@
           detail: employee.phone,
         });
       }
+      // Der Status wird nicht von selbst umgestellt: Ein Austritt kann sich
+      // verschieben, und ein stiller Statuswechsel nähme den Mitarbeiter aus
+      // Fortbildungen und Sitzungen, ohne dass es jemand bemerkt.
+      if (employee.active && employee.exitDate && employee.exitDate < todayIso()) {
+        issues.push({
+          employeeId: employee.id,
+          severity: "high",
+          title: `${fullName(employee)} ist ausgetreten, aber noch aktiv`,
+          detail: `Austritt am ${formatDate(employee.exitDate)} – Status auf „Inaktiv“ setzen.`,
+        });
+      }
       state.employees.slice(index + 1).forEach((other) => {
         const sameName =
           fullName(employee).toLocaleLowerCase("de-DE") ===
@@ -12447,7 +12582,11 @@
         </td>
       `,
       employment: `
-        <td data-column="employment" class="${pinnedEmployeeColumn === "employment" ? "is-pinned-column" : ""}"${employeeColumnStyle("employment")}><strong>${employee.employmentPercent}&thinsp;%</strong></td>
+        <td data-column="employment" class="${pinnedEmployeeColumn === "employment" ? "is-pinned-column" : ""}"${employeeColumnStyle("employment")}><strong>${currentEmploymentPercent(employee)}&thinsp;%</strong>${
+          upcomingEmploymentChange(employee)
+            ? `<small class="employment-change-note">ab ${formatDate(upcomingEmploymentChange(employee).from)}: ${upcomingEmploymentChange(employee).percent}&thinsp;%</small>`
+            : ""
+        }</td>
       `,
       qualifications: `
         <td data-column="qualifications" class="${pinnedEmployeeColumn === "qualifications" ? "is-pinned-column" : ""}"${employeeColumnStyle("qualifications")}>
@@ -12522,7 +12661,7 @@
     const values = {
       name: () => sortEmployees(a, b),
       profession: () => a.profession.localeCompare(b.profession, "de"),
-      employment: () => a.employmentPercent - b.employmentPercent,
+      employment: () => currentEmploymentPercent(a) - currentEmploymentPercent(b),
       qualifications: () =>
         selectedQualificationCount(a) - selectedQualificationCount(b),
       trainings: () =>
@@ -16805,6 +16944,7 @@
     document.querySelector("#employeeId").value = "";
     document.querySelector("#employmentPercent").value = "100";
     document.querySelector("#employeeStatus").value = "active";
+    renderEmploymentChangeRows([]);
 
     const employee = employeeId ? getEmployee(employeeId) : null;
     if (employee) trackWorkspaceRecord("employee", employee.id);
@@ -16824,6 +16964,9 @@
       document.querySelector("#profession").value = employee.profession;
       document.querySelector("#serviceWeekend").value = employee.serviceWeekend;
       document.querySelector("#employmentPercent").value = String(employee.employmentPercent);
+      document.querySelector("#entryDate").value = employee.entryDate || "";
+      document.querySelector("#exitDate").value = employee.exitDate || "";
+      renderEmploymentChangeRows(employee.employmentChanges || []);
       document.querySelector("#employeeStatus").value = employee.employmentStatus;
 
       document.querySelectorAll('input[name="qualification"]').forEach((checkbox) => {
@@ -16834,6 +16977,71 @@
     elements.employeeDialog.showModal();
     captureCleanForm(elements.employeeForm);
     window.setTimeout(() => document.querySelector("#firstName").focus(), 0);
+  }
+
+  function renderEmploymentChangeRows(changes) {
+    elements.employmentChangeList.innerHTML = changes
+      .map((change) => employmentChangeRowMarkup(change))
+      .join("");
+  }
+
+  function employmentChangeRowMarkup({ from = "", percent = "" } = {}) {
+    return `
+      <div class="employment-change-row">
+        <label>
+          <span>ab</span>
+          <input type="date" data-employment-change-from value="${escapeHtml(from)}" required />
+        </label>
+        <label>
+          <span>Stellenumfang</span>
+          <span class="input-suffix">
+            <input
+              type="number"
+              min="1"
+              max="100"
+              step="1"
+              data-employment-change-percent
+              value="${escapeHtml(String(percent))}"
+              required
+            />
+            <span>%</span>
+          </span>
+        </label>
+        <button
+          class="icon-button danger"
+          type="button"
+          data-remove-employment-change
+          aria-label="Änderung entfernen"
+          title="Änderung entfernen"
+        ><svg><use href="#icon-trash"></use></svg></button>
+      </div>
+    `;
+  }
+
+  function handleEmploymentChangeAction(event) {
+    const remove = event.target.closest("[data-remove-employment-change]");
+    if (remove) remove.closest(".employment-change-row").remove();
+  }
+
+  function addEmploymentChangeRow() {
+    elements.employmentChangeList.insertAdjacentHTML(
+      "beforeend",
+      employmentChangeRowMarkup({
+        percent: document.querySelector("#employmentPercent").value || "100",
+      }),
+    );
+    elements.employmentChangeList
+      .querySelector(".employment-change-row:last-child [data-employment-change-from]")
+      ?.focus();
+  }
+
+  function readEmploymentChangeRows() {
+    return [...elements.employmentChangeList.querySelectorAll(".employment-change-row")]
+      .map((row) => ({
+        from: row.querySelector("[data-employment-change-from]").value,
+        percent: Number(row.querySelector("[data-employment-change-percent]").value),
+      }))
+      .filter((change) => change.from && Number.isFinite(change.percent));
   }
 
   function renderEmployeeCatalogFields(employee = null) {
@@ -16970,6 +17178,18 @@
       return;
     }
 
+    const entryDate = document.querySelector("#entryDate").value;
+    const exitDate = document.querySelector("#exitDate").value;
+    if (entryDate && exitDate && exitDate < entryDate) {
+      document.querySelector("#exitDate").setCustomValidity(
+        "Das Austrittsdatum liegt vor dem Eintrittsdatum.",
+      );
+      document.querySelector("#exitDate").reportValidity();
+      document.querySelector("#exitDate").setCustomValidity("");
+      return;
+    }
+    const employmentChanges = normalizeEmploymentChanges(readEmploymentChangeRows());
+
     const employee = {
       id: existingEmployee?.id || createId(),
       firstName: firstNameInput.value.trim(),
@@ -16984,6 +17204,9 @@
         100,
         100,
       ),
+      entryDate,
+      exitDate,
+      employmentChanges,
       profession: normalizeProfession(professionInput.value),
       serviceWeekend:
         ownerWeekend ||
@@ -20818,6 +21041,42 @@
     }).format(value);
   }
 
+  // Stellenumfang an einem Tag: die letzte Änderung bis zu diesem Tag, sonst
+  // der Ausgangswert. employmentPercent ist damit der Wert vor der ersten
+  // Änderung, nicht zwingend der heutige.
+  function employmentPercentOn(employee, date) {
+    let percent = employee.employmentPercent;
+    for (const change of employee.employmentChanges || []) {
+      if (change.from > date) break;
+      percent = change.percent;
+    }
+    return percent;
+  }
+
+  function currentEmploymentPercent(employee) {
+    return employmentPercentOn(employee, todayIso());
+  }
+
+  function upcomingEmploymentChange(employee) {
+    const today = todayIso();
+    return (employee.employmentChanges || []).find((change) => change.from > today) || null;
+  }
+
+  function isEmployedOn(employee, date) {
+    return (
+      (!employee.entryDate || employee.entryDate <= date) &&
+      (!employee.exitDate || date <= employee.exitDate)
+    );
+  }
+
+  // Beschäftigt an mindestens einem Tag des Zeitraums.
+  function isEmployedBetween(employee, firstDate, lastDate) {
+    return (
+      (!employee.entryDate || employee.entryDate <= lastDate) &&
+      (!employee.exitDate || firstDate <= employee.exitDate)
+    );
+  }
+
   function activeEmployeeList() {
     return state.employees.filter((employee) => employee.active);
   }
@@ -21360,7 +21619,7 @@
         : "active";
     const employmentPercent = Math.min(
       100,
-      Math.max(0, Number(employee.employmentPercent) || 0),
+      Math.max(0, Number(currentEmploymentPercent(employee)) || 0),
     );
     return `
       <span

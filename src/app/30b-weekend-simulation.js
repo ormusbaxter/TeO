@@ -434,7 +434,7 @@
 
   function weekendSimulationMetrics(employees) {
     const employmentPercent = employees.reduce(
-      (sum, employee) => sum + employee.employmentPercent,
+      (sum, employee) => sum + currentEmploymentPercent(employee),
       0,
     );
     return {
@@ -481,7 +481,7 @@
           ${renderAvatar(employee, true)}
           <span>
             <strong>${escapeHtml(fullName(employee))}</strong>
-            <small>${employee.employmentPercent} % · ${escapeHtml(
+            <small>${currentEmploymentPercent(employee)} % · ${escapeHtml(
               employeeStatusLabel(employee),
             )}</small>
           </span>

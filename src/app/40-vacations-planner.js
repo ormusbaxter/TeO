@@ -54,13 +54,24 @@
 
   function renderVacationPlanner() {
     renderVacationControls();
-    const allEmployees = activeEmployeeList().sort(
-      vacationSortMode === "qualification"
-        ? compareEmployeesByVacationSortGroup
-        : sortEmployees,
-    );
-    const employees = filterVacationEmployees(allEmployees);
     const daysInMonth = new Date(vacationYear, vacationMonth, 0).getDate();
+    const monthPrefix = `${vacationYear}-${String(vacationMonth).padStart(2, "0")}`;
+    // Nur wer in diesem Monat wenigstens einen Tag beschäftigt ist: vor dem
+    // Eintritt und nach dem Austritt gibt es nichts zu planen.
+    const allEmployees = activeEmployeeList()
+      .filter((employee) =>
+        isEmployedBetween(
+          employee,
+          `${monthPrefix}-01`,
+          `${monthPrefix}-${String(daysInMonth).padStart(2, "0")}`,
+        ),
+      )
+      .sort(
+        vacationSortMode === "qualification"
+          ? compareEmployeesByVacationSortGroup
+          : sortEmployees,
+      );
+    const employees = filterVacationEmployees(allEmployees);
     const dates = Array.from({ length: daysInMonth }, (_, index) =>
       [
         vacationYear,
@@ -526,6 +537,7 @@
         .filter((vacationDay) => vacationDay.employeeId === employee.id)
         .map((vacationDay) => [vacationDay.date, vacationDay]),
     );
+    const monthPercent = employmentPercentOn(employee, dates[0]);
     return `
       <tr class="${employee.active ? "" : "is-inactive"}">
         <th
@@ -535,8 +547,12 @@
             [
               serviceWeekendLabel(employee.serviceWeekend),
               employeeStatusLabel(employee),
-              `${employee.employmentPercent} %`,
-            ].join(" · "),
+              `${monthPercent} %`,
+              employee.entryDate ? `Eintritt ${formatDate(employee.entryDate)}` : "",
+              employee.exitDate ? `Austritt ${formatDate(employee.exitDate)}` : "",
+            ]
+              .filter(Boolean)
+              .join(" · "),
           )}"
         >
           <span class="vacation-employee">
@@ -550,7 +566,7 @@
               >${escapeHtml(fullName(employee))}</button>
               <small>${escapeHtml(
                 vacationServiceWeekendLabel(employee),
-              )} · ${employee.employmentPercent} %</small>
+              )} · ${monthPercent} %</small>
             </span>
           </span>
         </th>
@@ -573,6 +589,23 @@
             const birthdayNote = birthday
               ? `${birthday.age}. Geburtstag`
               : "";
+            if (!isEmployedOn(employee, date)) {
+              const note =
+                employee.entryDate && date < employee.entryDate
+                  ? `Vor dem Eintritt am ${formatDate(employee.entryDate)}`
+                  : `Nach dem Austritt am ${formatDate(employee.exitDate)}`;
+              return `
+                <td class="vacation-day-cell is-outside-employment ${metadata.className}" title="${escapeHtml(note)}">
+                  <button
+                    type="button"
+                    disabled
+                    data-vacation-employee="${employee.id}"
+                    data-vacation-date="${date}"
+                    aria-label="${escapeHtml(`${fullName(employee)}: ${note}`)}"
+                  ></button>
+                </td>
+              `;
+            }
             return `
               <td class="vacation-day-cell ${metadata.className} ${
                 dayStats.isOverLimit ? "is-over-limit" : ""
@@ -612,7 +645,14 @@
             `;
           })
           .join("")}
-        <td class="vacation-total-column">${formatVacationNumber(entitlement.base)}</td>
+        <td
+          class="vacation-total-column"
+          ${
+            entitlement.fullMonths < 12
+              ? `title="Anteilig: ${entitlement.fullMonths} volle Beschäftigungsmonate in ${vacationYear}"`
+              : ""
+          }
+        >${formatVacationNumber(entitlement.base)}${entitlement.fullMonths < 12 ? "<sup>*</sup>" : ""}</td>
         <td class="vacation-total-column">
           <input
             class="vacation-additional-input"

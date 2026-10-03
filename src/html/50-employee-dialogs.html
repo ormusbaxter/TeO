@@ -94,7 +94,35 @@
                   />
                   <span>%</span>
                 </span>
+                <small class="field-hint" id="employmentPercentHint">
+                  Gilt bis zur ersten Änderung.
+                </small>
               </label>
+              <label class="form-field">
+                <span>Eintrittsdatum</span>
+                <input id="entryDate" name="entryDate" type="date" />
+              </label>
+              <label class="form-field">
+                <span>Austrittsdatum</span>
+                <input id="exitDate" name="exitDate" type="date" />
+              </label>
+              <div class="form-field form-field-wide employment-change-field">
+                <span>Änderungen des Stellenumfangs</span>
+                <div class="employment-change-list" id="employmentChangeList"></div>
+                <button
+                  class="button button-secondary button-compact"
+                  id="addEmploymentChangeButton"
+                  type="button"
+                >
+                  <svg><use href="#icon-plus"></use></svg>
+                  Änderung hinzufügen
+                </button>
+                <small class="field-hint">
+                  Ab dem eingetragenen Tag gilt der neue Stellenumfang –
+                  für den Urlaubsanspruch, die Wochenendverteilung und alle
+                  Anzeigen.
+                </small>
+              </div>
               <label class="form-field form-field-wide">
                 <span>Festes Dienstwochenende</span>
                 <select id="serviceWeekend" name="serviceWeekend">

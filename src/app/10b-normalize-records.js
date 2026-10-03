@@ -255,6 +255,8 @@
       phone: String(employee.phone || ""),
       email: String(employee.email || ""),
       employmentPercent: clampNumber(employee.employmentPercent, 1, 100, 100),
+      ...normalizeEmploymentPeriod(employee),
+      employmentChanges: normalizeEmploymentChanges(employee.employmentChanges),
       profession: normalizeProfession(employee.profession),
       serviceWeekend: normalizeServiceWeekend(employee.serviceWeekend),
       active: employmentStatus !== "inactive",
@@ -264,6 +266,32 @@
       createdAt: validTimestamp(employee.createdAt),
       updatedAt: validTimestamp(employee.updatedAt || employee.createdAt),
     };
+  }
+
+  // Ein Austritt vor dem Eintritt ist ein Tippfehler; dann gilt nur der
+  // Eintritt, statt den Mitarbeiter aus jedem Zeitraum zu verbannen.
+  function normalizeEmploymentPeriod(employee) {
+    const entryDate = normalizeOptionalDate(employee.entryDate);
+    const exitDate = normalizeOptionalDate(employee.exitDate);
+    return {
+      entryDate,
+      exitDate: entryDate && exitDate && exitDate < entryDate ? "" : exitDate,
+    };
+  }
+
+  // Je Stichtag höchstens eine Änderung, aufsteigend sortiert.
+  function normalizeEmploymentChanges(changes) {
+    const byDate = new Map();
+    (Array.isArray(changes) ? changes : []).forEach((change) => {
+      const from = normalizeOptionalDate(change?.from);
+      const percent = Number(change?.percent);
+      if (from && Number.isFinite(percent)) {
+        byDate.set(from, { from, percent: clampNumber(Math.round(percent), 1, 100, 100) });
+      }
+    });
+    return [...byDate.values()]
+      .sort((a, b) => a.from.localeCompare(b.from))
+      .slice(0, 50);
   }
 
   function normalizeTraining(training) {

@@ -190,7 +190,13 @@
   async function applyVacationEntryToSelection(entryType) {
     const cells = currentPlannerSelection()
       .map(plannerCoordinates)
-      .filter((cell) => cell.employeeId && cell.date);
+      .filter((cell) => cell.employeeId && cell.date)
+      // Tage vor dem Eintritt oder nach dem Austritt bleiben leer, auch wenn
+      // eine Bereichsauswahl über sie hinwegreicht.
+      .filter((cell) => {
+        const employee = getEmployee(cell.employeeId);
+        return employee && isEmployedOn(employee, cell.date);
+      });
     if (!cells.length) return;
 
     // Die Eintragsart der Steuerleiste zieht mit, damit Klick und Taste

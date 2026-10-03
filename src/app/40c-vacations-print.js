@@ -40,7 +40,7 @@
             <span>${escapeHtml(
               [
                 employeeStatusLabel(employee),
-                `${employee.employmentPercent} %`,
+                `${currentEmploymentPercent(employee)} %`,
                 serviceWeekendLabel(employee.serviceWeekend),
               ].join(" · "),
             )}</span>
@@ -233,7 +233,7 @@
           )}</strong>
           <small>${escapeHtml(
             [
-              `${employee.employmentPercent} %`,
+              `${employmentPercentOn(employee, blankVacationMonthDate(month, 1))} %`,
               // Beim Ausfuellen von Hand ist der Jahresanspruch die Zahl, die
               // gebraucht wird - das Dienstwochenende steht ohnehin als
               // Umrandung in den Tagesspalten.

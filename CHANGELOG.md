@@ -1,3 +1,11 @@
+### 4.54.0 – Ein- und Austritt, Änderungen des Stellenumfangs
+
+- **Neu:** Mitarbeiter haben ein **Eintritts-** und ein **Austrittsdatum**. Davor und danach erscheinen sie nicht in der Urlaubsplanung; in Monaten mit Ein- oder Austritt sind die Tage außerhalb der Beschäftigung schraffiert und gesperrt
+- **Neu:** **Änderungen des Stellenumfangs** lassen sich mit dem Tag erfassen, ab dem sie gelten. Überall gilt der jeweils aktuelle Wert – in Listen, Akte, Wochenendverteilung und Urlaubsplanung; die Mitarbeiterliste nennt eine bevorstehende Änderung, die Akte den Verlauf
+- **Neu:** Der Urlaubsanspruch wird bei Ein- oder Austritt im Jahr und bei Änderungen des Stellenumfangs gezwölftelt: je vollem Beschäftigungsmonat ein Zwölftel, bemessen am Stellenumfang zum Monatsersten. Anteilige Werte sind in der Spalte **Basis** mit einem Sternchen markiert
+- **Neu:** Die Datenqualitätsprüfung meldet Mitarbeiter, deren Austrittsdatum überschritten ist, die aber noch aktiv sind
+- **Verbessert:** Die Demodatenbank enthält Ein- und Austrittsdaten sowie einige Änderungen des Stellenumfangs
+
 ### 4.53.0 – Fadenkreuz und Korrekturen in der Urlaubsplanung
 
 - **Neu:** Ein **Fadenkreuz** hebt in der Planungstabelle Zeile und Spalte der Tageszelle unter dem Mauszeiger hervor – mit der Tastatur folgt es dem ausgewählten Feld. Es lässt sich über das Häkchen **Fadenkreuz** in der Steuerleiste einschalten; vorgegeben ist „aus“, der Browser merkt sich die Wahl. Die Tönung liegt über der Zelle; Wochenende, Feiertag, Ferien und Überplanung bleiben darunter erkennbar

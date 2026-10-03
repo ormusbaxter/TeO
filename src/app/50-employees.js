@@ -176,6 +176,17 @@
           detail: employee.phone,
         });
       }
+      // Der Status wird nicht von selbst umgestellt: Ein Austritt kann sich
+      // verschieben, und ein stiller Statuswechsel nähme den Mitarbeiter aus
+      // Fortbildungen und Sitzungen, ohne dass es jemand bemerkt.
+      if (employee.active && employee.exitDate && employee.exitDate < todayIso()) {
+        issues.push({
+          employeeId: employee.id,
+          severity: "high",
+          title: `${fullName(employee)} ist ausgetreten, aber noch aktiv`,
+          detail: `Austritt am ${formatDate(employee.exitDate)} – Status auf „Inaktiv“ setzen.`,
+        });
+      }
       state.employees.slice(index + 1).forEach((other) => {
         const sameName =
           fullName(employee).toLocaleLowerCase("de-DE") ===
@@ -503,7 +514,11 @@
         </td>
       `,
       employment: `
-        <td data-column="employment" class="${pinnedEmployeeColumn === "employment" ? "is-pinned-column" : ""}"${employeeColumnStyle("employment")}><strong>${employee.employmentPercent}&thinsp;%</strong></td>
+        <td data-column="employment" class="${pinnedEmployeeColumn === "employment" ? "is-pinned-column" : ""}"${employeeColumnStyle("employment")}><strong>${currentEmploymentPercent(employee)}&thinsp;%</strong>${
+          upcomingEmploymentChange(employee)
+            ? `<small class="employment-change-note">ab ${formatDate(upcomingEmploymentChange(employee).from)}: ${upcomingEmploymentChange(employee).percent}&thinsp;%</small>`
+            : ""
+        }</td>
       `,
       qualifications: `
         <td data-column="qualifications" class="${pinnedEmployeeColumn === "qualifications" ? "is-pinned-column" : ""}"${employeeColumnStyle("qualifications")}>
@@ -578,7 +593,7 @@
     const values = {
       name: () => sortEmployees(a, b),
       profession: () => a.profession.localeCompare(b.profession, "de"),
-      employment: () => a.employmentPercent - b.employmentPercent,
+      employment: () => currentEmploymentPercent(a) - currentEmploymentPercent(b),
       qualifications: () =>
         selectedQualificationCount(a) - selectedQualificationCount(b),
       trainings: () =>

@@ -12100,6 +12100,60 @@ body.is-dragging-appointment .appointment-calendar-entry {
   font-weight: 700;
 }
 
+.employment-change-field {
+  display: grid;
+  gap: 8px;
+}
+
+.employment-change-list {
+  display: grid;
+  gap: 8px;
+}
+
+.employment-change-list:empty {
+  display: none;
+}
+
+.employment-change-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.employment-change-row label {
+  display: grid;
+  gap: 4px;
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.employment-change-field > .button {
+  justify-self: start;
+}
+
+/* Tage vor dem Eintritt und nach dem Austritt: schraffiert, nicht wählbar. */
+.vacation-table td.is-outside-employment {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--slate-100) 0 4px,
+    transparent 4px 8px
+  ) !important;
+}
+
+.vacation-table td.is-outside-employment button {
+  cursor: not-allowed;
+  opacity: 0;
+}
+
+.employment-change-note {
+  display: block;
+  color: var(--slate-500);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
 @page phone-list {
   size: A4 portrait;
   margin: 0;

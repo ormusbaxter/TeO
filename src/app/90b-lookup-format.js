@@ -69,7 +69,7 @@
         : "active";
     const employmentPercent = Math.min(
       100,
-      Math.max(0, Number(employee.employmentPercent) || 0),
+      Math.max(0, Number(currentEmploymentPercent(employee)) || 0),
     );
     return `
       <span

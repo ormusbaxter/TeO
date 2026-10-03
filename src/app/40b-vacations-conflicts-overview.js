@@ -225,7 +225,7 @@
     elements.vacationEmployeeOverviewTitle.textContent =
       `${fullName(employee)} · ${vacationYear}`;
     elements.vacationEmployeeOverviewSubtitle.textContent =
-      `${employeeStatusLabel(employee)} · ${employee.employmentPercent} % · ${serviceWeekendLabel(employee.serviceWeekend)}`;
+      `${employeeStatusLabel(employee)} · ${currentEmploymentPercent(employee)} % · ${serviceWeekendLabel(employee.serviceWeekend)}`;
 
     elements.vacationEmployeeOverviewContent.innerHTML = `
       <div class="vacation-year-legend" aria-label="Legende der Jahresübersicht">
