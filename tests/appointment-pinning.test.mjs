@@ -44,7 +44,7 @@ test("Pin-Status, Bedienung und Wichtig-Markierung sind verdrahtet", async () =>
   const [dialogHtml, appSource, coreCss] = await Promise.all([
     fs.readFile(path.join(projectRoot, "src/html/60-training-meeting-dialogs.html"), "utf8"),
     fs.readFile(path.join(projectRoot, "app.js"), "utf8"),
-    fs.readFile(path.join(projectRoot, "src/styles/00-core.css"), "utf8"),
+    fs.readFile(path.join(projectRoot, "styles.css"), "utf8"),
   ]);
 
   assert.match(dialogHtml, /id="appointmentPinned"/);

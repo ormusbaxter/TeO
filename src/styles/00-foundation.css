@@ -1,0 +1,213 @@
+/* Grundlagen: Farbmarken und Maße, Rücksetzen der Browservorgaben, Elementregeln
+   (Formularelemente, Fokusrahmen, Symbole) und die Sperre für Administratorbereiche. */
+
+:root {
+  --navy-950: #102236;
+  --navy-900: #17304a;
+  --navy-800: #21415f;
+  --blue-700: #2166d1;
+  --blue-600: #2878e3;
+  --blue-100: #e8f1ff;
+  --blue-50: #f3f7ff;
+  --teal-700: #087b78;
+  --teal-100: #dff5f3;
+  --orange-700: #a55a0a;
+  --orange-100: #fff0da;
+  --red-700: #b4232f;
+  --red-100: #ffe9eb;
+  --green-700: #197149;
+  --green-100: #e2f5eb;
+  --slate-900: #182230;
+  --slate-800: #29384a;
+  --slate-700: #425466;
+  --slate-600: #5e6d7c;
+  --slate-500: #637384;
+  --slate-400: #9ba6b2;
+  --slate-300: #cdd5dd;
+  --slate-200: #e1e6eb;
+  --slate-100: #eef1f4;
+  --slate-50: #f7f8fa;
+  --white: #ffffff;
+  --sidebar-width: 260px;
+  --shadow-sm: 0 1px 2px rgb(16 34 54 / 5%);
+  --shadow-md: 0 12px 32px rgb(16 34 54 / 11%);
+  --shadow-lg: 0 24px 70px rgb(16 34 54 / 18%);
+  --toast-surface: var(--navy-900);
+  --toast-text: #ffffff;
+  --toast-border: rgb(255 255 255 / 12%);
+  --toast-success-icon: #8ce0b9;
+  --toast-success-tint: rgb(98 208 157 / 14%);
+  --toast-error-icon: #ffabb2;
+  --toast-error-tint: rgb(230 88 101 / 15%);
+  --toast-warning-icon: #f4c86d;
+  --toast-warning-tint: rgb(230 170 66 / 15%);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  font-family:
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  color: var(--slate-900);
+  background: #f5f7fa;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+/* Der Browser haelt beim Wachsen und Schrumpfen von Inhalt die Blickposition
+   fest (scroll anchoring). Klappt der Seitenkopf ein, zoege er die Seite genau
+   um den Hoehensprung zurueck - der Kopf stuende sofort wieder aufgeklappt da
+   und das Spiel begaenne bei jedem Rad-Tick von vorn. */
+html {
+  overflow-anchor: none;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 78% -20%, rgb(40 120 227 / 7%), transparent 33rem),
+    #f5f7fa;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--blue-700);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Die Sperre haengt allein an der Rolle am body. Umgekehrt formuliert, damit
+   sie auch vor der ersten Anmeldung und bei einer unbekannten Rolle greift:
+   Sichtbar wird ein Verwaltungselement nur fuer „admin“. */
+body:not([data-user-role="admin"]) [data-admin-only] {
+  display: none !important;
+}
+
+svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.icon-library {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+fieldset + fieldset {
+  margin-top: 27px;
+  padding-top: 24px;
+  border-top: 1px solid var(--slate-100);
+}
+
+legend {
+  width: 100%;
+  margin-bottom: 14px;
+  color: var(--slate-800);
+  font-size: 0.77rem;
+  font-weight: 800;
+}
+
+.noscript-message {
+  position: fixed;
+  z-index: 200;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
+  padding: 14px;
+  color: white;
+  font-size: 0.8rem;
+  text-align: center;
+  border-radius: 10px;
+  background: var(--red-700);
+}
+
+@media (max-width: 900px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    padding-bottom: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,231 @@
+/* Hilfe und „Was ist neu?“. */
+
+.help-layout {
+  display: grid;
+  grid-template-columns: minmax(190px, 235px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.help-search-panel {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: 14px;
+}
+
+#helpSearchStatus {
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.help-no-results {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: 18px;
+  color: var(--slate-600);
+}
+
+.help-no-results > svg {
+  width: 22px;
+  height: 22px;
+  color: var(--blue-700);
+}
+
+.help-no-results strong,
+.help-no-results span {
+  display: block;
+}
+
+.help-no-results strong {
+  margin-bottom: 3px;
+  color: var(--slate-800);
+}
+
+.help-toc {
+  position: sticky;
+  top: 22px;
+  display: grid;
+  gap: 4px;
+  max-height: calc(100vh - 44px);
+  padding: 18px;
+  overflow-y: auto;
+}
+
+.help-toc .eyebrow {
+  margin-bottom: 7px;
+}
+
+.help-toc button {
+  width: 100%;
+  padding: 8px 9px;
+  cursor: pointer;
+  color: var(--slate-700);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+}
+
+.help-toc button:hover {
+  color: var(--blue-700);
+  background: var(--blue-50);
+}
+
+.help-article {
+  min-width: 0;
+  padding: clamp(24px, 4vw, 48px);
+  color: var(--slate-700);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.help-article > :first-child {
+  margin-top: 0;
+}
+
+.help-article h1,
+.help-article h2,
+.help-article h3 {
+  color: var(--navy-950);
+  line-height: 1.25;
+  scroll-margin-top: 24px;
+}
+
+.help-article h1 {
+  margin: 0 0 22px;
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+}
+
+.help-article h2 {
+  margin: 0 0 14px;
+  font-size: 1.2rem;
+}
+
+.help-article h3 {
+  margin: 26px 0 10px;
+  font-size: 1rem;
+}
+
+.help-article p {
+  margin: 0 0 16px;
+}
+
+.help-article ul {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 20px;
+  padding-left: 22px;
+}
+
+.help-article ol {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 20px;
+  padding-left: 24px;
+}
+
+.help-article li::marker {
+  color: var(--blue-700);
+}
+
+.help-section {
+  padding-top: 34px;
+  border-top: 1px solid var(--slate-200);
+}
+
+.help-section + .help-section {
+  margin-top: 34px;
+}
+
+.help-article a {
+  color: var(--blue-700);
+  font-weight: 700;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.help-article code {
+  padding: 2px 5px;
+  color: var(--navy-900);
+  font-size: 0.9em;
+  border-radius: 5px;
+  background: var(--slate-100);
+}
+
+.help-article pre {
+  max-width: 100%;
+  margin: 0 0 20px;
+  padding: 16px;
+  overflow-x: auto;
+  color: var(--slate-800);
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  background: var(--slate-50);
+}
+
+.help-article pre code {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* „Was ist neu“ zeigt den Abschnitt des Änderungsverzeichnisses, den die
+   Hilfe ohnehin trägt - hier nur mit mehr Luft zwischen den Punkten. */
+.whats-new-version {
+  margin: 0 0 12px;
+  color: var(--blue-700);
+  font-size: 0.9rem;
+}
+
+.whats-new-entries {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--slate-700);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.whats-new-entries strong {
+  color: var(--slate-800);
+}
+
+@media (max-width: 720px) {
+  .help-layout {
+    display: block;
+  }
+
+  .help-search-panel {
+    grid-template-columns: 1fr auto;
+  }
+
+  .help-search-field {
+    grid-column: 1 / -1;
+  }
+
+  .help-toc {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 16px;
+    max-height: none;
+  }
+
+  .help-toc .eyebrow {
+    grid-column: 1 / -1;
+  }
+
+  .help-article {
+    padding: 22px 18px;
+  }
+}

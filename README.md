@@ -123,7 +123,7 @@ und ist nicht Teil der Datensicherung. Ist ein gemerkter Wert später entfallen
 
 ### Tabellen anpassen
 
-- **Kompakte Tabellen** – in den Einstellungen unter **Darstellung**. Die
+- **Kompakte Tabellen** – unter **Einstellungen → Allgemein**. Die
   Zeilen rücken enger zusammen, Zweitzeilen wie Kontaktdaten treten zurück; im
   gleichen Bildausschnitt sind damit rund zwanzig statt zwölf Mitarbeiter
   sichtbar. Die Einstellung gilt nur an diesem Arbeitsplatz.
@@ -400,10 +400,9 @@ Server einem normalen Konto gar nicht erst aus, und es kann das Protokoll nur
 um eigene Einträge ergänzen – Benutzername und Zeitpunkt eines neuen Eintrags
 setzt der Server.
 
-Im lokalen Modus liegt der gesamte Datenbestand im Browserprofil des
-Arbeitsplatzes. Die Aufteilung ist dort eine Sperre der Oberfläche: Sie
-schützt nicht vor jemandem, der mit Entwicklerwerkzeugen unmittelbar auf den
-Browserspeicher zugreift.
+Im lokalen Modus ist die Aufteilung eine Sperre der Oberfläche, kein
+Zugriffsschutz – siehe „Was der lokale Modus leistet – und was nicht“ im
+Kapitel Datenschutz und IT-Sicherheit.
 
 ### Dialoge schließen
 
@@ -417,9 +416,10 @@ neben einen geöffneten Dialog auswirkt:
   Dialog.
 
 In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten
-Eingaben, fragt TeO vorher nach. Die drei Anmeldedialoge – Ersteinrichtung,
-Anmeldung und Passwortänderung – bleiben von der Einstellung unberührt und
-lassen sich weder per Klick daneben noch per Escape schließen.
+Eingaben, fragt TeO vorher nach. Die fünf Dialoge rund um Start und Anmeldung –
+Herkunft des Datenbestands, Ersteinrichtung, Anmeldung, Startabgleich und
+Passwortänderung – bleiben von der Einstellung unberührt und lassen sich weder
+per Klick daneben noch per Escape schließen.
 
 ### Schulferien pflegen
 
@@ -485,8 +485,9 @@ Wird das Passwort eines normalen Benutzers zurückgesetzt, erzeugt TeO ein
 temporäres Passwort. Beim nächsten Anmelden muss der Benutzer ein neues
 Passwort festlegen.
 
-Passwörter werden mit PBKDF2 gehasht gespeichert. Im lokalen Modus ist die
-Anmeldung ein Schutz innerhalb der Browser-Anwendung. Im MariaDB-Modus werden
+Passwörter werden mit PBKDF2 gehasht gespeichert. Im lokalen Modus steuert die
+Anmeldung die Bedienung der Oberfläche, schützt den Datenbestand aber nicht
+(siehe „Was der lokale Modus leistet – und was nicht“). Im MariaDB-Modus werden
 Anmeldung und Rollen zusätzlich serverseitig geprüft.
 
 ## Mitarbeiterverwaltung
@@ -571,7 +572,9 @@ Sammelaktion in ein anderes Wochenende verschoben werden.
 
 ### Mitarbeiter-Gesamtakte
 
-Ein Klick auf einen Mitarbeiter öffnet die Gesamtakte mit:
+Die Schaltfläche **Mitarbeiterakte** in der Zeile öffnet die Gesamtakte –
+ebenso **Gesamtakte** in der Schnellansicht, im Kontextmenü und in der
+Befehlspalette. Sie enthält:
 
 - Stammdaten und Kontaktdaten
 - Beschäftigungsstatus und Stellenanteil
@@ -699,6 +702,18 @@ Resturlaubs werden unter **Einstellungen → Planung** gepflegt.
 
 Die sechs Summenspalten **Basis**, **Zusatz**, **Übertrag**, **Anspruch**,
 **Geplant** und **Rest** bleiben beim horizontalen Scrollen fixiert.
+
+### Urlaubsanspruch bei Teilzeit
+
+TeO kürzt den Grundanspruch linear zum hinterlegten Stellenumfang: 30 Tage bei
+50 Prozent ergeben 15 Tage. Das Bundesurlaubsgesetz bemisst den Anspruch
+dagegen nach der Zahl der **Arbeitstage pro Woche**. Beide Rechnungen stimmen
+überein, solange Teilzeit auch weniger Arbeitstage bedeutet.
+
+Arbeitet jemand in Teilzeit bei unveränderter Fünftagewoche – also kürzere Tage
+statt weniger Tage –, steht dieser Person weiterhin der volle Anspruch zu; TeO
+weist dann zu wenig aus. Der Wert muss in diesem Fall über **Zusätzliche Tage**
+in der Urlaubsplanung ausgeglichen werden.
 
 ### Resturlaub aus dem Vorjahr
 
@@ -856,8 +871,9 @@ zurücknehmbar. Ein einzelner Klick setzt weiterhin genau ein Feld.
 
 Das Suchfeld **Mitarbeiter** blendet alle Zeilen aus, die nicht zum Suchbegriff
 passen; gesucht wird in Vor- und Nachname sowie im Benutzernamen. Die
-Tagesgrenzen beziehen sich weiterhin auf das gesamte Team, damit ein Filter die Auslastung nicht verfälscht. Ist ein
-Filter aktiv, weist ein Hinweis über der Tabelle darauf hin.
+Tagesgrenzen beziehen sich weiterhin auf das gesamte Team, damit ein Filter die
+Auslastung nicht verfälscht. Ist ein Filter aktiv, weist ein Hinweis über der
+Tabelle darauf hin.
 
 ### Abwesenheitsgrenzen
 
@@ -892,9 +908,9 @@ erscheinen:
 - Feiertag, Schulferien und Dienstwochenende des Tages
 - alle beteiligten Mitarbeiter mit Eintragsart, Beruf und Dienstwochenende
 
-Einträge **Schule / Weiterbildung / Uni** und **Externer Einsatz** stehen je
-Tag vorn und sind ausgegraut: Sie zählen als Abwesenheit, lassen sich aber
-meist nicht verschieben. Die übrigen Abwesenheiten folgen darunter. Nicht angerechnete
+Einträge **Schule / Weiterbildung / Uni** und **Externer Einsatz** stehen je Tag
+vorn und sind ausgegraut: Sie zählen als Abwesenheit, lassen sich aber meist
+nicht verschieben. Die übrigen Abwesenheiten folgen darunter. Nicht angerechnete
 Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das Datum springt in
 den zugehörigen Monat der Planungstabelle.
 
@@ -994,9 +1010,9 @@ hinterlegt werden.
 
 **Speichern & Drucken** legt den Termin an und öffnet eine mittig gesetzte
 DIN-A4-Druckansicht. Ist **Teilnehmerliste** aktiviert, enthält sie zusätzliche
-Leerzeilen zur handschriftlichen Eintragung. Angelegte Termine lassen sich in
-der Terminübersicht und im Fristenmonitor anklicken; beide Wege öffnen denselben
-Detaildialog zum Ansehen oder Bearbeiten.
+Leerzeilen zur handschriftlichen Eintragung. Ein Klick auf einen Termin im
+Fristenmonitor öffnet ihn zum Bearbeiten; in der Terminübersicht öffnet ein
+Klick auf die Karte die Schnellansicht, der Stift den Bearbeitungsdialog.
 
 Zur Auswahl stehen Geräteeinweisung, Teamsitzung, Meeting,
 Stationsleiterkonferenz, Begehung, Hospitation, Prüfung, Schulung und
@@ -1022,7 +1038,8 @@ Feiertags steht im Feld. Ab dem vierten Termin eines Tages klappt **+n
 weitere** den Rest auf.
 
 - Ein Klick auf ein Tagesfeld legt einen Termin für genau diesen Tag an.
-- Ein Klick auf einen Eintrag öffnet ihn zum Bearbeiten.
+- Ein Klick auf einen Eintrag öffnet seine Schnellansicht; ein Termin lässt
+  sich auch auf einen anderen Tag ziehen.
 - Die Pfeile wechseln den Monat, **Heute** springt zum laufenden Monat zurück.
 
 Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine
@@ -1257,7 +1274,7 @@ Filterbar sind unter anderem:
 Der Einweisungsstand je Gerät wird farblich angezeigt:
 
 - 0 bis 65 Prozent: rot
-- 66 bis 80 Prozent: gelb
+- 66 bis 80 Prozent: orange
 - 81 bis 100 Prozent: grün
 
 Bei Medizinproduktebeauftragten wird eine Herstellereinweisung gold
@@ -1487,37 +1504,26 @@ Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint
 unter **Einstellungen** in der Sidebar und zusätzlich als Abschnittsnavigation
 oben auf der Einstellungsseite:
 
-- **Allgemein:** Farbthema, Symbolsatz und Verhalten beim Schließen von Dialogen; das
-  Farbthema gehört zum angemeldeten Benutzerkonto und begleitet es an jeden
-  Arbeitsplatz, während andere Konten ihr eigenes Farbthema behalten
+- **Allgemein:** Farbthema, Symbolsatz, kompakte Tabellen und Verhalten beim
+  Schließen von Dialogen; Farbthema und Symbolsatz gehören zum angemeldeten
+  Benutzerkonto und begleiten es an jeden Arbeitsplatz, während andere Konten
+  ihre eigene Wahl behalten
 - **Planung:** feste Dienstwochenenden, Urlaubsplanung und Schulferien
 - **Pflichtfortbildungen:** Soll-Zeiten
 - **Stammdaten & Zugriffe:** Benutzer, Berufe, Qualifikationen,
   Memo-/ToDo-Kategorien und Datenqualität
-- **Daten & Sicherung:** Datenbank-Backend, Sicherungserinnerung sowie manuelle
-  und automatische Datensicherungen
+- **Daten & Sicherung:** Datenbank-Backend, Sicherungserinnerung, manuelle und
+  automatische Datensicherungen, Sicherungsprüfung, Import und
+  Änderungsprotokoll
 
 Beim Wechsel eines Untermenüs werden nur die zugehörigen Einstellungskarten
 angezeigt. Administratorgeschützte Funktionen bleiben weiterhin ausschließlich
 für Administratoren sichtbar.
 
-Die Einstellungsseite bündelt:
-
-- Farbthema
-- Dienstwochenendverantwortliche
-- lokales oder MariaDB-Backend
-- Benutzerverwaltung
-- Berufe und Qualifikationen
-- Memo-/ToDo-Kategorien
-- Datenqualitätsprüfung
-- Sicherungserinnerung
-- Import, Export und Sicherungsprüfung
-- verschlüsselten Export
-- Änderungsprotokoll
-
 Verfügbare Farbthemen sind Standard, Dark Mode, Solarized Light, Nord, Dracula,
 Gruvbox Dark, Tokyo Night, Catppuccin Latte, GitHub, GitHub Dark, Windows 95,
-Cellitinnen und Cellitinnen Rot. Die Auswahl wird mit dem Datenbestand gespeichert.
+Cellitinnen und Cellitinnen Rot. Die Auswahl wird für das angemeldete
+Benutzerkonto gespeichert.
 
 Unabhängig vom Farbthema lässt sich ein **Symbolsatz** wählen: TeO (die
 eigenen Symbole, Standard), Lucide, Tabler, Heroicons und Phosphor. Der
@@ -1545,9 +1551,10 @@ Im lokalen Browserbetrieb lädt TeO die gemeinsame Datei
 `teo-autosicherung.json` automatisch aus dem zuletzt verknüpften Sicherungsordner.
 Eine Auswahl ist nur erforderlich, wenn die gespeicherte Freigabe nicht mehr
 gilt, die Datei fehlt oder nicht gelesen werden kann. Wird dort statt der Datei
-der Sicherungsordner freigegeben, entfällt die Auswahl auch künftig. Erst nach erfolgreicher
-Prüfung und Übernahme wird die Anwendung freigegeben. Im MariaDB-Betrieb entfällt
-dieser Startabgleich, weil der Server bereits den verbindlichen Datenstand liefert.
+der Sicherungsordner freigegeben, entfällt die Auswahl auch künftig. Erst nach
+erfolgreicher Prüfung und Übernahme wird die Anwendung freigegeben. Im
+MariaDB-Betrieb entfällt dieser Startabgleich, weil der Server bereits den
+verbindlichen Datenstand liefert.
 
 ### Warum lässt sich der Startabgleich nicht überspringen?
 
@@ -1711,22 +1718,6 @@ Daraus folgt für den Betrieb:
   prüft der Server jede Anmeldung und jede Änderung.
 - Der lokale Modus eignet sich außerdem für Erprobung, Schulung und Demodaten.
 
-### Urlaubsanspruch bei Teilzeit
-
-TeO kürzt den Grundanspruch linear zum hinterlegten Stellenumfang: 30 Tage bei
-50 Prozent ergeben 15 Tage. Das Bundesurlaubsgesetz bemisst den Anspruch
-dagegen nach der Zahl der **Arbeitstage pro Woche**. Beide Rechnungen stimmen
-überein, solange Teilzeit auch weniger Arbeitstage bedeutet.
-
-Arbeitet jemand in Teilzeit bei unveränderter Fünftagewoche – also kürzere Tage
-statt weniger Tage –, steht dieser Person weiterhin der volle Anspruch zu; TeO
-weist dann zu wenig aus. Der Wert muss in diesem Fall über **Zusätzliche Tage**
-in der Urlaubsplanung ausgeglichen werden.
-
-Ebenfalls nicht automatisch berücksichtigt: die anteilige Berechnung nach
-§ 5 BUrlG bei Ein- oder Austritt im laufenden Kalenderjahr. Auch hier ist die
-manuelle Korrektur über **Zusätzliche Tage** vorgesehen.
-
 ## Änderungshistorie
 
 Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und
@@ -1734,74 +1725,3 @@ Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst.
 Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.
 
 <!-- CHANGELOG_ENTRIES -->
-
-## Entwicklung und Projektstruktur
-
-Die aktuelle Projekt- und Datenformatversion wird zentral in
-[`src/meta/project-meta.mjs`](src/meta/project-meta.mjs) gepflegt.
-Sichtbare Neuerungen und Korrekturen werden pro Version kurz und auf Deutsch in
-[`CHANGELOG.md`](CHANGELOG.md) ergänzt; Merge-Commits gehören nicht in diese Liste.
-
-Die Buildnummer besteht aus einer dreistelligen Major- und Minor-Nummer.
-Strukturelle Änderungen erhöhen die Major-Nummer; Funktionen und Korrekturen
-erhöhen die Minor-Nummer.
-
-Direkt startbare Dateien wie `index.html`, `styles.css`, `app.js`,
-`project-meta.js` und `state-schema.js` werden aus den Quellen unter `src/`
-erzeugt. Änderungen deshalb nicht in den generierten Dateien vornehmen.
-
-```text
-src/app/       Fachmodule der Browser-Anwendung
-src/html/      Ansichten und Dialoge
-src/styles/    Basis-, Themen-, Planungs- und Druckstile
-src/shared/    gemeinsamer Datenvertrag für Browser und Server
-src/meta/      zentrale Projekt- und Datenformatversion
-server/src/    MariaDB-API und persistente Sitzungsverwaltung
-tests/         automatisierte Migrations- und Fachlogiktests
-tools/         Build, Strukturprüfung und Demo-Datengenerator
-```
-
-Mit Node.js 20 oder neuer:
-
-```text
-npm ci
-npm run verify
-```
-
-`npm run verify` erzeugt die verteilbaren Dateien neu, prüft die Struktur und
-führt alle automatisierten Tests aus.
-
-Ein geprüftes ZIP-Paket für den lokalen Einzelplatzbetrieb entsteht mit:
-
-```text
-npm run release:package
-```
-
-Der Befehl führt zuerst die vollständige Verifikation aus und schreibt danach
-`dist/TeO-<Version>-lokaler-Betrieb.zip`. Das Paket enthält ausschließlich die
-gebaute Anwendung und ihre unmittelbar benötigten Laufzeitdateien. Quellen,
-Tests, Entwicklungswerkzeuge, Serverkomponenten und Demo-Daten bleiben außen
-vor. `dist/` und lokale ZIP-Dateien werden von Git ignoriert.
-
-### Buildnummer
-
-Die Buildnummer folgt dem Muster `major.minor.patch` mit je drei Stellen und
-wird unten in der Seitenleiste angezeigt. Sie steht an genau einer Stelle:
-[`src/meta/project-meta.mjs`](src/meta/project-meta.mjs). Die Dateien
-`project-meta.js` und `app.js` entstehen daraus beim Build.
-
-Jede Auslieferung erhöht die Nummer:
-
-| Anlass | Befehl | Wirkung |
-| --- | --- | --- |
-| Neue Funktion | `npm run version:feature` | `minor` + 1, `patch` auf 0 |
-| Fehlerbehebung | `npm run version:fix` | `patch` + 1 |
-| Umbruch | `npm run version:major` | `major` + 1, Rest auf 0 |
-
-Enthält eine Auslieferung sowohl neue Funktionen als auch Fehlerbehebungen,
-zählt sie als Funktion. Der Befehl passt zugleich die Version in `package.json`
-an; anschließend ist `npm run build` nötig. `npm run check` bricht ab, wenn
-beide Versionen auseinanderlaufen oder das Format nicht stimmt.
-
-Die mitgelieferte localForage-Version `1.10.0` befindet sich zusammen mit ihrer
-Lizenz im Ordner `vendor`.

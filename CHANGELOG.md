@@ -1,3 +1,10 @@
+### 4.56.2 – Handbuch durchgesehen
+
+- **Behoben:** Das Handbuch beschreibt jetzt richtig, was ein Klick öffnet: Die Gesamtakte erreicht man über **Mitarbeiterakte** in der Zeile sowie über Schnellansicht, Kontextmenü und Befehlspalette; im Terminkalender öffnet ein Klick auf eine Karte oder einen Eintrag im Monatsraster die Schnellansicht
+- **Behoben:** Das Handbuch nannte die anteilige Berechnung des Urlaubs bei Ein- oder Austritt als nicht berücksichtigt, obwohl TeO sie seit 4.54.0 vornimmt. Der Abschnitt zur Teilzeit steht jetzt im Kapitel zur Urlaubsplanung
+- **Behoben:** Weitere Angaben im Handbuch berichtigt: Fünf statt drei Dialoge rund um Start und Anmeldung lassen sich nicht schließen, die Einweisungsmatrix markiert mittlere Quoten orange, das Farbthema gilt für das angemeldete Konto, und die Liste der Einstellungsbereiche ist vollständig
+- **Entfernt:** Das Kapitel „Entwicklung und Projektstruktur“ richtete sich an Entwickler und erscheint nicht mehr in der Hilfe
+
 ### 4.56.1 – Änderungsprotokoll im MariaDB-Modus geschützt
 
 - **Behoben:** Im MariaDB-Modus lieferte der Server das Änderungsprotokoll jedem angemeldeten Konto mit aus, und ein normales Konto konnte es über die Schnittstelle umschreiben oder leeren. Normale Konten erhalten das Protokoll jetzt nicht mehr und können es nur um eigene Einträge ergänzen; Benutzername und Zeitpunkt eines neuen Eintrags setzt der Server. Der lokale Modus ist davon nicht betroffen

@@ -1,0 +1,566 @@
+/* Mitarbeiter: Tabelle, Gesamtakte, Beschäftigungszeiten, Qualifikationen und
+   Telefonliste. */
+
+.employee-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 0 14px 18px;
+}
+
+.employee-mini {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px;
+  cursor: pointer;
+  text-align: left;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.employee-mini:hover {
+  background: var(--slate-50);
+}
+
+.employee-mini > span:last-child {
+  min-width: 0;
+}
+
+.employee-mini strong,
+.employee-mini small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.employee-mini strong {
+  color: var(--slate-800);
+  font-size: 0.72rem;
+}
+
+.employee-mini small {
+  margin-top: 3px;
+  color: var(--slate-500);
+  font-size: 0.62rem;
+}
+
+.employee-cell {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  min-width: 0;
+}
+
+.employee-cell > div {
+  min-width: 0;
+}
+
+.employee-cell strong {
+  display: block;
+  overflow: hidden;
+  color: var(--slate-800);
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.employee-cell small {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--slate-500);
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qualification-tags {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.profession-cell strong,
+.profession-cell small {
+  display: block;
+}
+
+.profession-cell strong {
+  color: var(--slate-800);
+}
+
+.profession-cell small {
+  margin-top: 4px;
+  color: var(--slate-500);
+  font-size: 0.62rem;
+  line-height: 1.3;
+}
+
+/* Spaltenbreiten der Mitarbeitertabelle. Angesprochen wird die Spalte selbst,
+   nicht ihre Position: Wer Spalten abwaehlt, verschiebt sonst alle Breiten. */
+.employee-table th[data-column="name"] { width: 23%; }
+
+.employee-table th[data-column="profession"] { width: 16%; }
+
+.employee-table th[data-column="employment"] { width: 10%; }
+
+.employee-table th[data-column="qualifications"] { width: 22%; }
+
+.employee-table th[data-column="trainings"] { width: 13%; }
+
+.employee-table th[data-column="status"] { width: 9%; }
+
+.employee-table th:last-child { width: 138px; }
+
+.phone-list-preview-dialog {
+  width: min(1120px, calc(100vw - 28px));
+  height: min(94vh, 980px);
+  max-height: min(94vh, 980px);
+}
+
+.phone-list-preview-dialog[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.phone-list-preview-dialog .modal-footer {
+  flex-wrap: wrap;
+}
+
+.phone-list-preview-hint {
+  margin-right: auto;
+  color: var(--slate-500);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.phone-list-preview-body {
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: #dfe5ec;
+}
+
+.phone-list-preview-canvas {
+  width: max-content;
+  min-width: 100%;
+  margin: 0 auto;
+  padding-bottom: 2px;
+}
+
+.phone-list-preview-canvas .phone-list-document {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 15mm;
+  box-shadow: 0 12px 34px rgb(20 36 59 / 18%);
+}
+
+.phone-list-document {
+  color: #111;
+  font: var(--phone-font-size, 10pt) / 1.15 Arial, sans-serif;
+  background: white;
+}
+
+.phone-list-document-header {
+  display: flex;
+  gap: 8mm;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4mm;
+  padding-bottom: 2mm;
+  border-bottom: 1.5pt solid #111;
+}
+
+.phone-list-document-header h1 {
+  margin: 0;
+  color: #000;
+  font-size: 18pt;
+}
+
+.phone-list-document-header span {
+  color: #444;
+  font-size: 9pt;
+  white-space: nowrap;
+}
+
+.phone-list-document-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--phone-columns, 1), minmax(0, 1fr));
+  gap: 4mm;
+  align-items: start;
+}
+
+.phone-list-document table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  break-inside: avoid;
+}
+
+.phone-list-document th,
+.phone-list-document td {
+  padding: var(--phone-cell-padding, 2mm) 1.6mm;
+  overflow-wrap: anywhere;
+  text-align: left;
+  vertical-align: middle;
+  border: 0.65pt solid #777;
+}
+
+.phone-list-document th {
+  color: #000;
+  font-size: 9pt;
+  font-weight: 700;
+  border-bottom: 1pt solid #111;
+  background: #e8e8e8;
+}
+
+.phone-list-document th:first-child,
+.phone-list-document td:first-child {
+  width: 58%;
+}
+
+.phone-list-document tbody tr:nth-child(even) {
+  background: #f6f6f6;
+}
+
+.phone-list-print-surface {
+  display: none;
+}
+
+.qualification-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.employee-selection {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-height: 250px;
+  margin-top: 10px;
+  padding: 2px;
+  overflow-y: auto;
+}
+
+@media (max-width: 1180px) {
+  .employee-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .employee-table :is(th, td)[data-column="profession"] {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .phone-list-preview-body {
+    padding: 10px;
+  }
+
+  .phone-list-preview-hint {
+    width: 100%;
+  }
+
+  .employee-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-mini:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+#employeeInstructorFields {
+  gap: 12px;
+}
+
+.employee-filter-bar {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--slate-200);
+  background: var(--slate-50);
+  flex-wrap: wrap;
+}
+
+.employee-filter-bar .compact-field {
+  min-width: 170px;
+}
+
+.employee-bulk-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 20px;
+  color: var(--blue-700);
+  border-bottom: 1px solid var(--blue-100);
+  background: var(--blue-50);
+}
+
+.employee-bulk-bar[hidden] {
+  display: none;
+}
+
+.employee-bulk-bar strong {
+  margin-right: auto;
+  font-size: 0.72rem;
+}
+
+.qualification-expiry-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 155px;
+  gap: 9px;
+  align-items: stretch;
+}
+
+.qualification-expiry-field {
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: var(--slate-50);
+}
+
+.qualification-expiry-field span {
+  color: var(--slate-500);
+  font-size: 0.57rem;
+  font-weight: 700;
+}
+
+.qualification-expiry-field input {
+  min-width: 0;
+  color: var(--slate-700);
+  font: inherit;
+  font-size: 0.66rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.dossier-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dossier-summary-grid > div {
+  padding: 13px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  background: var(--slate-50);
+}
+
+.dossier-summary-grid span,
+.dossier-summary-grid strong {
+  display: block;
+}
+
+.dossier-summary-grid span {
+  color: var(--slate-500);
+  font-size: 0.61rem;
+}
+
+.dossier-summary-grid strong {
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  color: var(--slate-800);
+  font-size: 0.72rem;
+}
+
+.dossier-section {
+  margin-top: 20px;
+}
+
+.dossier-section h3 {
+  margin: 0 0 9px;
+  color: var(--slate-800);
+  font-size: 0.82rem;
+}
+
+.dossier-list {
+  overflow: hidden;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+}
+
+.dossier-list-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  color: var(--slate-600);
+  font-size: 0.66rem;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.dossier-list-row:last-child {
+  border-bottom: 0;
+}
+
+.dossier-list-row strong {
+  color: var(--slate-800);
+}
+
+.dossier-list-row strong small {
+  color: var(--slate-500);
+  font-weight: 600;
+}
+
+.employee-status-field {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: 11px;
+  background: var(--slate-50);
+}
+
+.employee-status-field > small {
+  color: var(--slate-500);
+  font-size: 0.61rem;
+  line-height: 1.45;
+}
+
+.employee-meeting-stat-table tr.is-below-threshold {
+  background: var(--red-100);
+}
+
+@media (max-width: 470px) {
+  .employee-bulk-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .employee-bulk-bar strong {
+    margin-right: 0;
+  }
+
+  .qualification-expiry-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .employee-filter-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .employee-filter-bar .compact-field {
+    width: 100%;
+  }
+
+  .dossier-summary-grid,
+  .weekend-group-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.employee-table tr[data-employee-row] {
+  cursor: pointer;
+}
+
+.employee-table tr[data-employee-row]:focus-visible,
+.employee-table tr.is-inspected {
+  outline: 2px solid var(--blue-600);
+  outline-offset: -2px;
+  background: var(--blue-50);
+}
+
+.employee-table :is(th, td)[data-column] {
+  width: var(--employee-column-width);
+  min-width: 80px;
+}
+
+.employee-table th[data-column] {
+  position: relative;
+}
+
+.employee-table .selection-column {
+  position: sticky;
+  z-index: 5;
+  left: 0;
+  background: var(--white);
+}
+
+.employee-table th.selection-column {
+  background: var(--slate-50);
+}
+
+.employee-table :is(th, td)[data-column="name"] {
+  position: sticky;
+  z-index: 4;
+  left: 45px;
+  width: var(--employee-column-width, 250px);
+  min-width: var(--employee-column-width, 250px);
+  background: var(--white);
+  box-shadow: 1px 0 var(--slate-200);
+}
+
+.employee-table th[data-column="name"] {
+  z-index: 6;
+  background: var(--slate-50);
+}
+
+.employee-table .is-pinned-column {
+  position: sticky;
+  z-index: 3;
+  left: calc(45px + var(--employee-name-width, 250px));
+  background: var(--white);
+  box-shadow: 1px 0 var(--slate-200);
+}
+
+.employee-table th.is-pinned-column {
+  z-index: 5;
+  background: var(--slate-50);
+}
+
+.employment-change-field {
+  display: grid;
+  gap: 8px;
+}
+
+.employment-change-list {
+  display: grid;
+  gap: 8px;
+}
+
+.employment-change-list:empty {
+  display: none;
+}
+
+.employment-change-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.employment-change-row label {
+  display: grid;
+  gap: 4px;
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.employment-change-field > .button {
+  justify-self: start;
+}
+
+.employment-change-note {
+  display: block;
+  color: var(--slate-500);
+  font-size: 0.66rem;
+  font-weight: 700;
+}

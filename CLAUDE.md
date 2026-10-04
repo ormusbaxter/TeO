@@ -29,6 +29,34 @@
 
 Die erzeugten Dateien gehören mit in den Commit.
 
+```text
+src/app/       Fachmodule der Browser-Anwendung
+src/html/      Ansichten und Dialoge
+src/styles/    Stile nach Fachbereichen, dazu Farbthemen und Druck
+src/shared/    gemeinsamer Datenvertrag für Browser und Server
+src/meta/      zentrale Projekt- und Datenformatversion
+server/        MariaDB-API und Sitzungsverwaltung (eigenes server/README.md)
+tests/         automatisierte Tests, tests/helpers/ für vm-Kontext und Browser
+tools/         Build, Strukturprüfung, Release-Paket, Demodaten, Symbolsätze
+vendor/        localForage 1.10.0 samt Lizenz
+```
+
+### Stylesheets
+
+`src/styles/` ist nach den Bereichen der Anwendung geordnet, mit derselben
+Nummernlogik wie `src/app/`: `00-foundation` (Farbmarken, Rücksetzen,
+Elementregeln), `10-components` (Bausteine mehrerer Bereiche: Schaltflächen,
+Felder, Tabellen, Dialoge, Meldungen …), `20-shell` (Seitenleiste, Seitenkopf,
+Anmeldemaske), danach je Fachbereich eine Datei bis `78-settings`, dann
+`80-themes` und `90-print`.
+
+Die Reihenfolge ist Teil der Kaskade: Bausteine vor Rahmen, Rahmen vor den
+Fachbereichen, Themen und Druck zuletzt. Eine Regel, die einen Baustein für
+einen Bereich abwandelt, gehört deshalb in die Datei des Bereichs – dort steht
+sie hinter dem Baustein und gewinnt bei gleicher Spezifität. Eine neue Regel
+kommt in die Datei, deren Bereich sie betrifft, nicht ans Ende irgendeiner
+Datei.
+
 ## Reihenfolge bei CHANGELOG-Einträgen
 
 `README.md` ist das Handbuch und wird samt `CHANGELOG.md` in die Hilfe der
@@ -147,6 +175,21 @@ ein Browserdialog aufgeht, oder ob das Bauergebnis stimmt (`help-build`,
 `release-notes`, `web-app-manifest`). Auch Druckregeln bleiben dort: Sie wirken
 erst im Druckerzeugnis. Solche Prüfungen tragen ihre Begründung am Ort.
 
+## Fassungsnummer
+
+Die Fassung `major.minor.patch` steht an genau einer Stelle,
+`src/meta/project-meta.mjs`; `project-meta.js`, `app.js` und `package.json`
+folgen daraus. `npm run check` bricht ab, wenn sie auseinanderlaufen.
+
+| Anlass | Befehl | Wirkung |
+| --- | --- | --- |
+| Neue Funktion | `npm run version:feature` | `minor` + 1, `patch` auf 0 |
+| Fehlerbehebung | `npm run version:fix` | `patch` + 1 |
+| Umbruch | `npm run version:major` | `major` + 1, Rest auf 0 |
+
+Enthält eine Auslieferung Funktionen und Fehlerbehebungen, zählt sie als
+Funktion. Danach `npm run build`.
+
 ## Veröffentlichen
 
 Der Workflow `Release` legt Paket und GitHub-Release an. Der Weg dorthin:
@@ -156,6 +199,11 @@ Der Workflow `Release` legt Paket und GitHub-Release an. Der Weg dorthin:
 2. Den Workflow `Release` auf `main` starten – ohne Eingaben. Er baut das
    Paket, lässt `npm run verify` laufen und **setzt den Tag erst danach**
    selbst; die Fassung liest er aus `package.json`.
+
+Das Paket baut `tools/New-ReleasePackage.ps1` (lokal: `npm run
+release:package`, Windows mit PowerShell). Es schreibt
+`dist/TeO-<Version>-lokaler-Betrieb.zip` mit der gebauten Anwendung und ihren
+Laufzeitdateien – ohne Quellen, Tests, Werkzeuge, Server und Demodaten.
 
 Ein Tag von Hand ist damit nicht mehr nötig, funktioniert aber weiter: Ein
 Push von `v*` startet denselben Workflow. Zeigt ein gleichnamiger Tag bereits
@@ -178,7 +226,7 @@ mit dem `GITHUB_TOKEN`.
   (sonst zeigt der Satz die TeO-Zeichnung). Die Pakete sind keine
   Abhängigkeit: `npm install --prefix <dir> lucide-static @tabler/icons
   heroicons @phosphor-icons/core`, dann `node tools/import-icon-sets.mjs <dir>`.
-- Farben kommen aus den Farbmarken in `src/styles/00-core.css`; die Themes in
+- Farben kommen aus den Farbmarken in `src/styles/00-foundation.css`; die Themes in
   `src/styles/80-themes.css` belegen dieselben Marken neu. Feste Farbwerte
   brechen die Schemata.
 - Die CSP des Servers verbietet `style`-Attribute im Markup.
