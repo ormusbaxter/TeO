@@ -291,6 +291,16 @@
     "github-dark",
   ]);
 
+  // Symbolstile. Sie veraendern nur, wie die Strichgrafiken der Sprite
+  // gezeichnet werden, und lassen sich mit jedem Farbthema kombinieren.
+  const ICON_THEMES = {
+    standard: "Standard",
+    fine: "Fein",
+    bold: "Kräftig",
+    sharp: "Kantig",
+    duotone: "Zweifarbig",
+  };
+
   const PASSWORD_ITERATIONS = 210000;
   const USER_FIRST_NAME_FALLBACKS = {
     becke003: "Oliver",
@@ -1988,6 +1998,7 @@
       passwordHash,
       mustChangePassword: Boolean(user.mustChangePassword),
       theme: normalizeUserTheme(user.theme),
+      iconTheme: normalizeUserIconTheme(user.iconTheme),
     };
   }
 
@@ -2000,6 +2011,15 @@
   // gemeinsame Vorgabe aus den Einstellungen.
   function normalizeUserTheme(theme) {
     return Object.hasOwn(THEMES, theme) ? theme : "";
+  }
+
+  function normalizeIconTheme(iconTheme) {
+    return Object.hasOwn(ICON_THEMES, iconTheme) ? iconTheme : "standard";
+  }
+
+  // Wie beim Farbthema: leer heisst "noch keine eigene Wahl getroffen".
+  function normalizeUserIconTheme(iconTheme) {
+    return Object.hasOwn(ICON_THEMES, iconTheme) ? iconTheme : "";
   }
 
   function normalizeServiceWeekendName(value, fallback) {
@@ -3068,6 +3088,9 @@
 
     document.querySelectorAll("[data-theme-select]").forEach((select) => {
       select.addEventListener("change", () => changeTheme(select.value));
+    });
+    document.querySelectorAll("[data-icon-theme-select]").forEach((select) => {
+      select.addEventListener("change", () => changeIconTheme(select.value));
     });
     elements.mobileThemeButton.addEventListener("click", () => {
       const themes = Object.keys(THEMES);
@@ -4353,6 +4376,58 @@
       `Farbthema wechseln. Aktuell: ${THEMES[activeTheme]}`,
     );
     elements.mobileThemeButton.title = `Farbthema: ${THEMES[activeTheme]}`;
+    // Wo das Farbthema neu gesetzt wird, hat sich das Konto geaendert - der
+    // Symbolstil zieht deshalb an derselben Stelle nach.
+    applyIconTheme(activeIconThemeKey());
+  }
+
+  // Der Symbolstil gehoert wie das Farbthema zum Benutzerkonto. Eine
+  // gemeinsame Vorgabe gibt es nicht: Ohne eigene Wahl gilt "Standard".
+  function activeIconThemeKey() {
+    return normalizeIconTheme(currentUser?.iconTheme);
+  }
+
+  async function changeIconTheme(iconTheme) {
+    const nextIconTheme = normalizeIconTheme(iconTheme);
+    if (!currentUser) {
+      applyIconTheme(nextIconTheme);
+      showToast(
+        "Der Symbolstil gilt vorerst nur für diese Sitzung. Nach der Anmeldung wird er für das Benutzerkonto gespeichert.",
+      );
+      return;
+    }
+    if (nextIconTheme === activeIconThemeKey()) {
+      applyIconTheme(nextIconTheme);
+      return;
+    }
+
+    const committed = await commitStateMutation(
+      () => {
+        const account = state.users.find((user) => user.id === currentUser.id);
+        if (account) account.iconTheme = nextIconTheme;
+        currentUser.iconTheme = nextIconTheme;
+      },
+      // Wie beim Farbthema: reine Anzeigeeinstellung, kein Protokolleintrag.
+      { auditAction: "" },
+    );
+    if (committed) {
+      currentUser =
+        state.users.find((user) => user.id === currentUser.id) || currentUser;
+    }
+    applyIconTheme(activeIconThemeKey());
+    if (committed) {
+      showToast(
+        `Symbolstil „${ICON_THEMES[nextIconTheme]}“ wurde für „${currentUser.username}“ gespeichert.`,
+      );
+    }
+  }
+
+  function applyIconTheme(iconTheme) {
+    const activeIconTheme = normalizeIconTheme(iconTheme);
+    document.documentElement.dataset.iconTheme = activeIconTheme;
+    document.querySelectorAll("[data-icon-theme-select]").forEach((select) => {
+      select.value = activeIconTheme;
+    });
   }
 
   function restoreAuthenticationSession() {
