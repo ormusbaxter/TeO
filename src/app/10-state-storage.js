@@ -669,6 +669,7 @@
       passwordHash,
       mustChangePassword: Boolean(user.mustChangePassword),
       theme: normalizeUserTheme(user.theme),
+      iconTheme: normalizeUserIconTheme(user.iconTheme),
     };
   }
 
@@ -681,6 +682,15 @@
   // gemeinsame Vorgabe aus den Einstellungen.
   function normalizeUserTheme(theme) {
     return Object.hasOwn(THEMES, theme) ? theme : "";
+  }
+
+  function normalizeIconTheme(iconTheme) {
+    return Object.hasOwn(ICON_THEMES, iconTheme) ? iconTheme : "standard";
+  }
+
+  // Wie beim Farbthema: leer heisst "noch keine eigene Wahl getroffen".
+  function normalizeUserIconTheme(iconTheme) {
+    return Object.hasOwn(ICON_THEMES, iconTheme) ? iconTheme : "";
   }
 
   function normalizeServiceWeekendName(value, fallback) {

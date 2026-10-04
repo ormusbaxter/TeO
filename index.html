@@ -1516,6 +1516,22 @@
                   <option value="cellitinnen-red">Cellitinnen Rot</option>
                 </select>
               </label>
+              <label class="settings-field">
+                <span>Symbolstil</span>
+                <select data-icon-theme-select aria-label="Symbolstil auswählen">
+                  <option value="standard">Standard</option>
+                  <option value="fine">Fein</option>
+                  <option value="bold">Kräftig</option>
+                  <option value="sharp">Kantig</option>
+                  <option value="duotone">Zweifarbig</option>
+                </select>
+              </label>
+              <p class="settings-description">
+                Der Symbolstil bestimmt, wie die Symbole gezeichnet werden –
+                feiner, kräftiger, kantig oder mit getönter Fläche. Er lässt
+                sich mit jedem Farbthema kombinieren und wird ebenfalls für das
+                angemeldete Benutzerkonto gespeichert.
+              </p>
             </section>
 
             <section class="panel settings-card" data-settings-section="planning">
@@ -2521,11 +2537,12 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-einstellungen-und-administration">
 <h2 id="hilfe-einstellungen-und-administration">Einstellungen und Administration</h2>
 <p>Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint unter <strong>Einstellungen</strong> in der Sidebar und zusätzlich als Abschnittsnavigation oben auf der Einstellungsseite:</p>
-<ul><li><strong>Allgemein:</strong> Farbthema und Verhalten beim Schließen von Dialogen; das Farbthema gehört zum angemeldeten Benutzerkonto und begleitet es an jeden Arbeitsplatz, während andere Konten ihr eigenes Farbthema behalten</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen, Memo-/ToDo-Kategorien und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung sowie manuelle und automatische Datensicherungen</li></ul>
+<ul><li><strong>Allgemein:</strong> Farbthema, Symbolstil und Verhalten beim Schließen von Dialogen; das Farbthema gehört zum angemeldeten Benutzerkonto und begleitet es an jeden Arbeitsplatz, während andere Konten ihr eigenes Farbthema behalten</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen, Memo-/ToDo-Kategorien und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung sowie manuelle und automatische Datensicherungen</li></ul>
 <p>Beim Wechsel eines Untermenüs werden nur die zugehörigen Einstellungskarten angezeigt. Administratorgeschützte Funktionen bleiben weiterhin ausschließlich für Administratoren sichtbar.</p>
 <p>Die Einstellungsseite bündelt:</p>
 <ul><li>Farbthema</li><li>Dienstwochenendverantwortliche</li><li>lokales oder MariaDB-Backend</li><li>Benutzerverwaltung</li><li>Berufe und Qualifikationen</li><li>Memo-/ToDo-Kategorien</li><li>Datenqualitätsprüfung</li><li>Sicherungserinnerung</li><li>Import, Export und Sicherungsprüfung</li><li>verschlüsselten Export</li><li>Änderungsprotokoll</li></ul>
 <p>Verfügbare Farbthemen sind Standard, Dark Mode, Solarized Light, Nord, Dracula, Gruvbox Dark, Tokyo Night, Catppuccin Latte, Windows 95, Cellitinnen und Cellitinnen Rot. Die Auswahl wird mit dem Datenbestand gespeichert.</p>
+<p>Unabhängig vom Farbthema lässt sich ein <strong>Symbolstil</strong> wählen: Standard, Fein (dünnere Striche), Kräftig (dickere Striche), Kantig (eckige Strichenden und spitze Ecken) und Zweifarbig (geschlossene Formen mit getönter Fläche). Jeder Symbolstil lässt sich mit jedem Farbthema kombinieren und wird wie dieses für das angemeldete Benutzerkonto gespeichert.</p>
 <p>Die Anmeldemaske nennt die aktuell eingesetzte Software-Version und den Copyright-Hinweis bereits vor der Anmeldung.</p>
 <p>Die Datenqualitätsprüfung sucht unter anderem nach:</p>
 <ul><li>möglichen Dubletten</li><li>ungültigen E-Mail-Adressen</li><li>auffälligen Telefonnummern</li><li>fehlenden Kontaktdaten</li></ul>
@@ -2583,6 +2600,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-48-0-symbolstile-neben-den-farbthemen">4.48.0 – Symbolstile neben den Farbthemen</h3>
+<ul><li><strong>Neu:</strong> Unter <strong>Einstellungen → Allgemein</strong> lässt sich neben dem Farbthema ein <strong>Symbolstil</strong> wählen: <strong>Standard</strong>, <strong>Fein</strong> mit dünneren Strichen, <strong>Kräftig</strong> mit dickeren, <strong>Kantig</strong> mit eckigen Strichenden und spitzen Ecken sowie <strong>Zweifarbig</strong>, das geschlossene Formen leicht tönt. Jeder Symbolstil lässt sich mit jedem Farbthema kombinieren</li><li><strong>Neu:</strong> Der Symbolstil wird wie das Farbthema für das angemeldete Benutzerkonto gespeichert und gilt an jedem Arbeitsplatz, an dem sich dieses Konto anmeldet. Ein Wechsel erscheint nicht im Änderungsprotokoll</li></ul>
 <h3 id="hilfe-4-47-0-ein-konto-und-ein-schlussel-fur-alle-arbeitsplatze">4.47.0 – Ein Konto und ein Schlüssel für alle Arbeitsplätze</h3>
 <ul><li><strong>Behoben:</strong> Ein Konto galt bisher nur an dem Arbeitsplatz, an dem es angelegt wurde. Der Startabgleich lud zwar den gemeinsamen Datenbestand, behielt aber die örtlichen Konten und verwarf die aus der Datei – beim nächsten Sichern verschwanden sie auch dort. Der Startabgleich übernimmt die Konten jetzt aus <code>teo-autosicherung.json</code>; ein einmal angelegtes Konto arbeitet damit an jedem Arbeitsplatz mit seinem Passwort. Der Import von Hand lässt die vorhandenen Konten unverändert wie bisher</li><li><strong>Behoben:</strong> Ein zweiter Arbeitsplatz erzeugte für dieselbe Datei einen neuen Sicherungsschlüssel und machte den bisherigen damit wertlos. Der Schlüssel gehört jetzt zum Datenbestand: Sein Verzeichnis mit den Schlüsselhüllen aller Konten reist in der gemeinsamen Datei mit. Jeder Arbeitsplatz entsperrt ihn mit dem gewohnten Login-Passwort – ein einmal geschützter Datenbestand bleibt ohne neues Passwort bearbeitbar</li><li><strong>Neu:</strong> Beim ersten Start an einem weiteren Arbeitsplatz fragt TeO, ob ein neuer Datenbestand entstehen oder der vorhandene geöffnet werden soll. <strong>Vorhandenen Datenbestand öffnen</strong> gibt den Sicherungsordner frei und meldet mit dem bereits vorhandenen Konto an; Ordnerverknüpfung, Schlüssel und Daten kommen in einem Schritt. Die frühere Pflicht-Ersteinrichtung entfällt damit</li><li><strong>Neu:</strong> Der Startdialog gibt wahlweise den Sicherungsordner frei, statt nur die einzelne Datei zu wählen. Die Verknüpfung gilt dann auch für die nächste Sitzung, und die Dateiauswahl entfällt künftig</li><li><strong>Neu:</strong> Hat ein anderer Arbeitsplatz <code>teo-autosicherung.json</code> zwischenzeitlich geschrieben, überschreibt TeO sie nicht mehr stillschweigend, sondern meldet es. Über <strong>Jetzt automatisch sichern</strong> lässt sich nach ausdrücklicher Bestätigung dennoch überschreiben</li><li><strong>Verbessert:</strong> Ein an einem anderen Arbeitsplatz angelegtes Konto bekommt seine Schlüsselhülle beim ersten Login selbst. Nach dem Wiederherstellungsschlüssel fragt TeO erst, wenn auch das Verzeichnis der gemeinsamen Datei keine passende Hülle kennt</li></ul>
 <h3 id="hilfe-4-46-0-leere-monatsplanungen-zum-ausfullen">4.46.0 – Leere Monatsplanungen zum Ausfüllen</h3>

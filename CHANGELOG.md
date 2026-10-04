@@ -1,3 +1,8 @@
+### 4.48.0 – Symbolstile neben den Farbthemen
+
+- **Neu:** Unter **Einstellungen → Allgemein** lässt sich neben dem Farbthema ein **Symbolstil** wählen: **Standard**, **Fein** mit dünneren Strichen, **Kräftig** mit dickeren, **Kantig** mit eckigen Strichenden und spitzen Ecken sowie **Zweifarbig**, das geschlossene Formen leicht tönt. Jeder Symbolstil lässt sich mit jedem Farbthema kombinieren
+- **Neu:** Der Symbolstil wird wie das Farbthema für das angemeldete Benutzerkonto gespeichert und gilt an jedem Arbeitsplatz, an dem sich dieses Konto anmeldet. Ein Wechsel erscheint nicht im Änderungsprotokoll
+
 ### 4.47.0 – Ein Konto und ein Schlüssel für alle Arbeitsplätze
 
 - **Behoben:** Ein Konto galt bisher nur an dem Arbeitsplatz, an dem es angelegt wurde. Der Startabgleich lud zwar den gemeinsamen Datenbestand, behielt aber die örtlichen Konten und verwarf die aus der Datei – beim nächsten Sichern verschwanden sie auch dort. Der Startabgleich übernimmt die Konten jetzt aus `teo-autosicherung.json`; ein einmal angelegtes Konto arbeitet damit an jedem Arbeitsplatz mit seinem Passwort. Der Import von Hand lässt die vorhandenen Konten unverändert wie bisher

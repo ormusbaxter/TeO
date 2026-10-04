@@ -91,6 +91,44 @@ test("die Themenwahl schreibt in das eigene Konto und nicht in die Einstellungen
   assert.match(changeTheme, /auditAction: ""/);
 });
 
+test("der Symbolstil wird am Benutzerkonto gespeichert", async () => {
+  const { normalizeState } = await loadAppFunctions(["normalizeState"]);
+  const normalized = normalizeState(
+    createMinimalState({
+      users: [
+        createUser({ id: "user-1", username: "Demo1234", iconTheme: "duotone" }),
+        createUser({ id: "user-2", username: "Demo5678", role: "user" }),
+        createUser({ id: "user-3", username: "Demo9012", iconTheme: "comic" }),
+      ],
+    }),
+  );
+
+  assert.equal(normalized.users[0].iconTheme, "duotone");
+  assert.equal(normalized.users[1].iconTheme, "");
+  // Ein unbekannter Stil wird verworfen wie ein unbekanntes Farbthema.
+  assert.equal(normalized.users[2].iconTheme, "");
+});
+
+test("der Symbolstil folgt dem angemeldeten Konto und ist sonst Standard", async () => {
+  const { activeIconThemeKey, setState, setCurrentUser } = await loadAppFunctions([
+    "activeIconThemeKey",
+    "normalizeState",
+  ]);
+  const state = createMinimalState({
+    users: [createUser({ iconTheme: "sharp" })],
+  });
+  setState(state);
+
+  setCurrentUser(null);
+  assert.equal(activeIconThemeKey(), "standard");
+
+  setCurrentUser(state.users[0]);
+  assert.equal(activeIconThemeKey(), "sharp");
+
+  setCurrentUser({ ...state.users[0], iconTheme: "" });
+  assert.equal(activeIconThemeKey(), "standard");
+});
+
 test("die Einstellungsseite benennt das Farbthema als Kontoeinstellung", () => {
   assert.match(settingsHtml, /für das angemeldete\s+Benutzerkonto gespeichert/);
 });

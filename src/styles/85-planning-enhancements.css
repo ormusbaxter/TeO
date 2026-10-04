@@ -1176,7 +1176,7 @@ body.is-vacation-planner-maximized {
 .appointment-view-control svg {
   width: 15px;
   height: 15px;
-  stroke-width: 2;
+  stroke-width: calc(2px * var(--icon-weight, 1));
 }
 
 .appointment-calendar {
@@ -1362,7 +1362,7 @@ body.is-vacation-planner-maximized {
   display: block;
   width: 13px;
   height: 13px;
-  stroke-width: 2;
+  stroke-width: calc(2px * var(--icon-weight, 1));
 }
 
 .appointment-calendar-entry-time {
