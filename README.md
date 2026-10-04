@@ -1474,7 +1474,7 @@ Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint
 unter **Einstellungen** in der Sidebar und zusätzlich als Abschnittsnavigation
 oben auf der Einstellungsseite:
 
-- **Allgemein:** Farbthema und Verhalten beim Schließen von Dialogen; das
+- **Allgemein:** Farbthema, Symbolstil und Verhalten beim Schließen von Dialogen; das
   Farbthema gehört zum angemeldeten Benutzerkonto und begleitet es an jeden
   Arbeitsplatz, während andere Konten ihr eigenes Farbthema behalten
 - **Planung:** feste Dienstwochenenden, Urlaubsplanung und Schulferien
@@ -1505,6 +1505,12 @@ Die Einstellungsseite bündelt:
 Verfügbare Farbthemen sind Standard, Dark Mode, Solarized Light, Nord, Dracula,
 Gruvbox Dark, Tokyo Night, Catppuccin Latte, GitHub, GitHub Dark, Windows 95,
 Cellitinnen und Cellitinnen Rot. Die Auswahl wird mit dem Datenbestand gespeichert.
+
+Unabhängig vom Farbthema lässt sich ein **Symbolstil** wählen: Standard, Fein
+(dünnere Striche), Kräftig (dickere Striche), Kantig (eckige Strichenden und
+spitze Ecken) und Zweifarbig (geschlossene Formen mit getönter Fläche). Jeder
+Symbolstil lässt sich mit jedem Farbthema kombinieren und wird wie dieses für
+das angemeldete Benutzerkonto gespeichert.
 
 Die Anmeldemaske nennt die aktuell eingesetzte Software-Version und den
 Copyright-Hinweis bereits vor der Anmeldung.

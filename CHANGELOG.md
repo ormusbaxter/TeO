@@ -1,3 +1,8 @@
+### 4.56.0 – Symbolstile neben den Farbthemen
+
+- **Neu:** Unter **Einstellungen → Allgemein** lässt sich neben dem Farbthema ein **Symbolstil** wählen: Standard, Fein (dünnere Striche), Kräftig (dickere Striche), Kantig (eckige Strichenden und spitze Ecken) und Zweifarbig (geschlossene Formen mit getönter Fläche)
+- **Neu:** Jeder Symbolstil lässt sich mit jedem Farbthema kombinieren und wird wie dieses für das angemeldete Benutzerkonto gespeichert
+
 ### 4.55.0 – Beschäftigungszeiten in Fortbildungen, Sitzungen und Fristen
 
 - **Verbessert:** Pflichtfortbildungen beachten Ein- und Austritt. Quoten zählen nur, wer heute beschäftigt ist; die Jahresmatrix erwartet, wer zum Jahresende beschäftigt ist – im laufenden Jahr, wer heute beschäftigt ist

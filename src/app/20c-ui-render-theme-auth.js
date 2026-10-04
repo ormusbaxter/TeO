@@ -115,6 +115,58 @@
       `Farbthema wechseln. Aktuell: ${THEMES[activeTheme]}`,
     );
     elements.mobileThemeButton.title = `Farbthema: ${THEMES[activeTheme]}`;
+    // Wo das Farbthema neu gesetzt wird, hat sich das Konto geaendert - der
+    // Symbolstil zieht deshalb an derselben Stelle nach.
+    applyIconTheme(activeIconThemeKey());
+  }
+
+  // Der Symbolstil gehoert wie das Farbthema zum Benutzerkonto. Eine
+  // gemeinsame Vorgabe gibt es nicht: Ohne eigene Wahl gilt "Standard".
+  function activeIconThemeKey() {
+    return normalizeIconTheme(currentUser?.iconTheme);
+  }
+
+  async function changeIconTheme(iconTheme) {
+    const nextIconTheme = normalizeIconTheme(iconTheme);
+    if (!currentUser) {
+      applyIconTheme(nextIconTheme);
+      showToast(
+        "Der Symbolstil gilt vorerst nur für diese Sitzung. Nach der Anmeldung wird er für das Benutzerkonto gespeichert.",
+      );
+      return;
+    }
+    if (nextIconTheme === activeIconThemeKey()) {
+      applyIconTheme(nextIconTheme);
+      return;
+    }
+
+    const committed = await commitStateMutation(
+      () => {
+        const account = state.users.find((user) => user.id === currentUser.id);
+        if (account) account.iconTheme = nextIconTheme;
+        currentUser.iconTheme = nextIconTheme;
+      },
+      // Wie beim Farbthema: reine Anzeigeeinstellung, kein Protokolleintrag.
+      { auditAction: "" },
+    );
+    if (committed) {
+      currentUser =
+        state.users.find((user) => user.id === currentUser.id) || currentUser;
+    }
+    applyIconTheme(activeIconThemeKey());
+    if (committed) {
+      showToast(
+        `Symbolstil „${ICON_THEMES[nextIconTheme]}“ wurde für „${currentUser.username}“ gespeichert.`,
+      );
+    }
+  }
+
+  function applyIconTheme(iconTheme) {
+    const activeIconTheme = normalizeIconTheme(iconTheme);
+    document.documentElement.dataset.iconTheme = activeIconTheme;
+    document.querySelectorAll("[data-icon-theme-select]").forEach((select) => {
+      select.value = activeIconTheme;
+    });
   }
 
   function restoreAuthenticationSession() {

@@ -156,3 +156,157 @@ test("Ein gewähltes Schema gilt sofort und bleibt erhalten", async (t) => {
     auswahl.dispatchEvent(new Event("change", { bubbles: true }));
   });
 });
+
+const SYMBOLSTILE = [
+  ["standard", "Standard"],
+  ["fine", "Fein"],
+  ["bold", "Kräftig"],
+  ["sharp", "Kantig"],
+  ["duotone", "Zweifarbig"],
+];
+
+function waehleSymbolstil(teo, key) {
+  return teo.evaluate((stil) => {
+    const auswahl = document.querySelector("[data-icon-theme-select]");
+    auswahl.value = stil;
+    auswahl.dispatchEvent(new Event("change", { bubbles: true }));
+  }, key);
+}
+
+test("Jeder Symbolstil zeichnet die Symbole sichtbar anders", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  // Ein Kalendersymbol in zwölffacher Größe auf weißem Grund, darüber ein
+  // Messpunkt an einer freien Stelle in seinem Inneren. Gemessen wird das
+  // Bild: Der errechnete Stil der Vorlage in der Sprite sagt nichts -
+  // sichtbar ist die Kopie unter <use>, und eine Regel kann die Vorlage
+  // treffen, ohne dort anzukommen.
+  await teo.evaluate(() => {
+    const buehne = document.createElement("div");
+    buehne.id = "teoProbeSymbol";
+    Object.assign(buehne.style, {
+      position: "fixed",
+      left: "0",
+      top: "0",
+      width: "240px",
+      height: "240px",
+      zIndex: "2147483647",
+      background: "rgb(255, 255, 255)",
+      color: "rgb(0, 0, 0)",
+    });
+    buehne.innerHTML = '<svg><use href="#icon-calendar"></use></svg>';
+    Object.assign(buehne.firstElementChild.style, { width: "240px", height: "240px" });
+    const punkt = document.createElement("div");
+    punkt.id = "teoProbeFlaeche";
+    Object.assign(punkt.style, {
+      position: "absolute",
+      left: "119px",
+      top: "159px",
+      width: "2px",
+      height: "2px",
+    });
+    buehne.append(punkt);
+    document.body.append(buehne);
+  });
+
+  const gemessen = {};
+  for (const [key, label] of SYMBOLSTILE) {
+    const angeboten = await teo.evaluate(
+      ([wert, text]) =>
+        [...document.querySelector("[data-icon-theme-select]").options].some(
+          (option) => option.value === wert && option.textContent.trim() === text,
+        ),
+      [key, label],
+    );
+    assert.ok(angeboten, `„${label}“ steht nicht zur Auswahl`);
+    await waehleSymbolstil(teo, key);
+    const stand = await teo.evaluate(() => {
+      const strich = getComputedStyle(document.querySelector("#teoProbeSymbol svg"));
+      return {
+        attribut: document.documentElement.dataset.iconTheme,
+        breite: parseFloat(strich.strokeWidth),
+        knopfBreite: parseFloat(
+          getComputedStyle(document.querySelector(".button svg")).strokeWidth,
+        ),
+        ende: strich.strokeLinecap,
+        ecke: strich.strokeLinejoin,
+      };
+    });
+    assert.equal(stand.attribut, key, `„${label}“ greift ohne Neuladen`);
+    gemessen[key] = { ...stand, flaeche: await teo.farbeAn("#teoProbeFlaeche") };
+  }
+
+  await waehleSymbolstil(teo, "standard");
+  await teo.evaluate(() => document.querySelector("#teoProbeSymbol").remove());
+
+  const { standard, fine, bold, sharp, duotone } = gemessen;
+  const WEISS = "255,255,255";
+
+  assert.equal(standard.breite, 1.8);
+  assert.equal(standard.ende, "round");
+  assert.ok(fine.breite < standard.breite, "Fein zeichnet dünner");
+  assert.ok(bold.breite > standard.breite, "Kräftig zeichnet dicker");
+  // Schaltflächen zeichnen ihre Symbole von Haus aus kräftiger; der Abstand
+  // zum übrigen Bestand bleibt in jedem Stil erhalten.
+  for (const stil of [standard, fine, bold]) {
+    assert.ok(stil.knopfBreite > stil.breite);
+  }
+
+  assert.equal(sharp.ende, "square");
+  assert.equal(sharp.ecke, "miter");
+
+  assert.equal(standard.flaeche.join(","), WEISS, "Standard lässt das Innere frei");
+  assert.equal(sharp.flaeche.join(","), WEISS);
+  assert.notEqual(duotone.flaeche.join(","), WEISS, "Zweifarbig tönt geschlossene Formen");
+  assert.ok(duotone.flaeche[0] > 150, "Die Tönung bleibt deutlich heller als der Strich");
+});
+
+test("Der Symbolstil lässt das Farbthema unberührt und bleibt am Konto", async (t) => {
+  const teo = await openTeO(t, { anmeldenAls: "admin" });
+  if (!teo) return;
+
+  await teo.evaluate(() => {
+    const farbe = document.querySelector("[data-theme-select]");
+    farbe.value = "nord";
+    farbe.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await waehleSymbolstil(teo, "bold");
+  const meldung = await teo.page.waitForFunction(
+    () =>
+      [...document.querySelectorAll(".toast")]
+        .map((toast) => toast.textContent)
+        .find((text) => text.includes("Symbolstil")) || null,
+    null,
+    { timeout: 5000 },
+  );
+  assert.match(await meldung.jsonValue(), /„Kräftig“ wurde für „DemoAdmin“ gespeichert/);
+
+  // Ein späterer Wechsel des Farbthemas setzt den Symbolstil nicht zurück.
+  await teo.evaluate(() => {
+    const farbe = document.querySelector("[data-theme-select]");
+    farbe.value = "dracula";
+    farbe.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await teo.page.waitForFunction(() => document.documentElement.dataset.theme === "dracula");
+  const stand = await teo.evaluate(() => ({ ...document.documentElement.dataset }));
+  assert.equal(stand.theme, "dracula");
+  assert.equal(stand.iconTheme, "bold");
+});
+
+test("Bei der Anmeldung gilt der Symbolstil des Kontos", async (t) => {
+  const teo = await openTeO(t, {
+    anmeldenAls: "admin",
+    mitDemodaten(bestand) {
+      bestand.users.find((user) => user.username === "DemoAdmin").iconTheme = "duotone";
+    },
+  });
+  if (!teo) return;
+
+  const stand = await teo.evaluate(() => ({
+    attribut: document.documentElement.dataset.iconTheme,
+    auswahl: document.querySelector("[data-icon-theme-select]").value,
+  }));
+  assert.equal(stand.attribut, "duotone");
+  assert.equal(stand.auswahl, "duotone");
+});

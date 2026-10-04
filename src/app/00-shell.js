@@ -290,6 +290,16 @@
     "github-dark",
   ]);
 
+  // Symbolstile. Sie veraendern nur, wie die Strichgrafiken der Sprite
+  // gezeichnet werden, und lassen sich mit jedem Farbthema kombinieren.
+  const ICON_THEMES = {
+    standard: "Standard",
+    fine: "Fein",
+    bold: "Kräftig",
+    sharp: "Kantig",
+    duotone: "Zweifarbig",
+  };
+
   const PASSWORD_ITERATIONS = 210000;
   const USER_FIRST_NAME_FALLBACKS = {
     becke003: "Oliver",

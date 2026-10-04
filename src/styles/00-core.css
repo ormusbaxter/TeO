@@ -183,9 +183,9 @@ svg {
   height: 20px;
   fill: none;
   stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
+  stroke-linecap: var(--icon-linecap, round);
+  stroke-linejoin: var(--icon-linejoin, round);
+  stroke-width: calc(1.8px * var(--icon-weight, 1));
 }
 
 .icon-library {
@@ -392,7 +392,7 @@ body.is-sidebar-collapsed .sidebar-toggle svg {
 .brand-mark svg {
   width: 25px;
   height: 25px;
-  stroke-width: 2.1;
+  stroke-width: calc(2.1px * var(--icon-weight, 1));
 }
 
 .brand strong {
@@ -1197,7 +1197,7 @@ body.is-sidebar-collapsed
 .page-header .eyebrow-icon {
   width: 15px;
   height: 15px;
-  stroke-width: 2;
+  stroke-width: calc(2px * var(--icon-weight, 1));
 }
 
 .button {
@@ -1231,7 +1231,7 @@ body.is-sidebar-collapsed
 .button svg {
   width: 17px;
   height: 17px;
-  stroke-width: 2;
+  stroke-width: calc(2px * var(--icon-weight, 1));
 }
 
 .button-primary {
@@ -3885,7 +3885,7 @@ body.is-sidebar-collapsed
   color: var(--blue-700);
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: calc(1.8px * var(--icon-weight, 1));
 }
 
 .backup-password-notice p {
@@ -4051,7 +4051,7 @@ body.is-sidebar-collapsed
 .efficiency-hint-icon svg {
   width: 14px;
   height: 14px;
-  stroke-width: 2.4;
+  stroke-width: calc(2.4px * var(--icon-weight, 1));
 }
 
 .efficiency-hint p {
@@ -4566,7 +4566,7 @@ legend {
 .check-box svg {
   width: 12px;
   height: 12px;
-  stroke-width: 2.5;
+  stroke-width: calc(2.5px * var(--icon-weight, 1));
 }
 
 .check-card:has(input:checked) {
@@ -4903,7 +4903,7 @@ body.is-compact-tables .icon-button {
 .filter-chip svg {
   width: 12px;
   height: 12px;
-  stroke-width: 2.6;
+  stroke-width: calc(2.6px * var(--icon-weight, 1));
 }
 
 .filter-chip:hover {
@@ -5228,7 +5228,7 @@ body.is-sidebar-collapsed .sidebar-search {
 .toast-icon svg {
   width: 13px;
   height: 13px;
-  stroke-width: 2.5;
+  stroke-width: calc(2.5px * var(--icon-weight, 1));
 }
 
 @keyframes toast-in {
