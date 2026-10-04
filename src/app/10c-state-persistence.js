@@ -15,6 +15,12 @@
           remoteRevision,
         );
         remoteRevision = Number(result.revision) || remoteRevision + 1;
+        // Ein normales Konto fuehrt das Aenderungsprotokoll nicht selbst: Der
+        // Server hat die neuen Eintraege uebernommen und liefert das Protokoll
+        // nur Administratoren aus. Was hier liegen bliebe, kaeme mit jeder
+        // weiteren Speicherung erneut an - und faellt es dort irgendwann aus
+        // den gefuehrten Eintraegen, als vermeintlich neuer Eintrag.
+        if (currentUser && !isAdmin()) state.auditLog = [];
         markBackendConnected({ synchronized: true });
         pendingRemoteConflictState = null;
       } catch (error) {

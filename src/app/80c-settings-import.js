@@ -769,6 +769,13 @@
     if (!usersFromBackup) {
       importedState.users = preservedUsers;
     }
+    // Im MariaDB-Modus fuehrt der Server das Aenderungsprotokoll, und ein
+    // normales Konto kann es nur ergaenzen. Die Eintraege einer Sicherung kaemen
+    // dort als neue an, unter dem Namen des importierenden Kontos - sie bleiben
+    // deshalb draussen, wie die Benutzerkonten.
+    if (isMariaDbMode() && currentUser && !isAdmin()) {
+      importedState.auditLog = previousState.auditLog;
+    }
     state = importedState;
     if (!(await persistState())) {
       state = previousState;

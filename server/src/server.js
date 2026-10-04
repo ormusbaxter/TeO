@@ -19,6 +19,13 @@ const PASSWORD_ITERATIONS = 210000;
 const MAX_STATE_BYTES = 20 * 1024 * 1024;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_ATTEMPTS_PER_WINDOW = 8;
+// Wie im Browser (MAX_AUDIT_LOG_ENTRIES, MAX_AUDIT_SUBJECTS).
+const MAX_AUDIT_LOG_ENTRIES = 1000;
+const MAX_AUDIT_SUBJECTS = 100;
+// Eine Aenderung erzeugt einen Protokolleintrag; scheitert eine Speicherung,
+// kann ein zweiter dazukommen. Weit mehr ist kein Bedienvorgang mehr, sondern
+// der Versuch, fremde Eintraege als neue einzuschleusen.
+const MAX_NEW_AUDIT_ENTRIES_PER_SAVE = 20;
 const bootstrapToken = String(process.env.TEO_BOOTSTRAP_TOKEN || "").trim();
 const httpsOnly = booleanEnv("TEO_HTTPS_ONLY", false);
 if (bootstrapToken && bootstrapToken.length < 32) {
@@ -357,10 +364,19 @@ app.put("/api/state", requireSession, asyncHandler(async (request, response) => 
       });
     }
 
-    const hydratedNextState = mergeProtectedCredentials(
+    const hydratedNextState = protectAuditLog(
       currentState,
-      nextState,
+      mergeProtectedCredentials(currentState, nextState),
+      currentUser,
     );
+    if (!hydratedNextState) {
+      await connection.rollback();
+      return response.status(403).json({
+        code: "audit_log_protected",
+        message:
+          "Das Änderungsprotokoll kann nur ein Administrator ersetzen; andere Konten ergänzen es nur um eigene Einträge.",
+      });
+    }
     validateStateShape(hydratedNextState, { requireCredentials: true });
     if (
       currentUser.mustChangePassword &&
@@ -514,7 +530,7 @@ function validateStateShape(state, { requireCredentials = false } = {}) {
   const validation = validateSharedState(state, {
     maxBytes: MAX_STATE_BYTES,
     requireAdmin: true,
-    maxAuditEntries: 1000,
+    maxAuditEntries: MAX_AUDIT_LOG_ENTRIES,
   });
   if (validation.valid && requireCredentials) {
     const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
@@ -587,11 +603,17 @@ function publicUser(user) {
   };
 }
 
-function stateForClient(state, _currentUserId) {
+// Das fachliche Aenderungsprotokoll ist Administratoren vorbehalten: Es macht
+// nachvollziehbar, wer wann woran gearbeitet hat. Normale Konten bekommen es
+// deshalb gar nicht erst ausgeliefert - eine Sperre nur in der Oberflaeche
+// liesse es in jeder Antwort des Servers mitlesen.
+function stateForClient(state, currentUserId) {
   const clientState = structuredClone(state);
   clientState.users = clientState.users.map((user) =>
     ({ ...user, passwordSalt: "", passwordHash: "" }),
   );
+  const currentUser = state.users?.find((user) => user.id === currentUserId);
+  if (currentUser?.role !== "admin") clientState.auditLog = [];
   return clientState;
 }
 
@@ -729,6 +751,59 @@ function constantTimeStringEqual(left, right) {
 }
 
 // Normale Benutzerkonten dürfen den gesamten fachlichen Datenbestand pflegen.
+// Ein normales Konto kann das Aenderungsprotokoll nur ergaenzen. Es kennt
+// den Bestand des Servers nicht (stateForClient) und schickt deshalb nur die
+// Eintraege mit, die es selbst angelegt hat. Was der Server schon fuehrt,
+// bleibt, wie es ist - gleich, ob der Browser es mitschickt, veraendert oder
+// weglaesst. Liefert null, wenn mehr neue Eintraege kommen, als eine
+// Speicherung erzeugen kann; Administratoren bleiben unberuehrt.
+function protectAuditLog(currentState, nextState, actor, now = new Date()) {
+  if (actor.role === "admin") return nextState;
+  const auditLog = appendOnlyAuditLog(
+    currentState.auditLog,
+    nextState.auditLog,
+    actor,
+    now,
+  );
+  return auditLog ? { ...nextState, auditLog } : null;
+}
+
+// Neu ist ein Eintrag, dessen Kennung der Server nicht kennt. Name und
+// Zeitpunkt setzt der Server selbst: Niemand traegt unter fremdem Namen oder
+// rueckdatiert ein.
+function appendOnlyAuditLog(currentLog, nextLog, actor, now) {
+  const known = new Set((currentLog || []).map((entry) => entry?.id));
+  const additions = [];
+  for (const entry of Array.isArray(nextLog) ? nextLog : []) {
+    const id = typeof entry?.id === "string" ? entry.id.trim() : "";
+    if (!id || id.length > 100 || known.has(id)) continue;
+    known.add(id);
+    additions.push(entry);
+  }
+  if (additions.length > MAX_NEW_AUDIT_ENTRIES_PER_SAVE) return null;
+
+  const timestamp = now.toISOString();
+  const accepted = additions.flatMap((entry) => {
+    const action = String(entry.action || "").trim().slice(0, 240);
+    if (!action) return [];
+    const subjects = (Array.isArray(entry.subjects) ? entry.subjects : [])
+      .map((subject) => ({
+        employeeId: String(subject?.employeeId || "").trim().slice(0, 100),
+        change: String(subject?.change || "").trim().slice(0, 240),
+      }))
+      .filter((subject) => subject.employeeId && subject.change)
+      .slice(0, MAX_AUDIT_SUBJECTS);
+    return [{
+      id: entry.id.trim(),
+      timestamp,
+      username: actor.username,
+      action,
+      ...(subjects.length ? { subjects } : {}),
+    }];
+  });
+  return [...accepted, ...(currentLog || [])].slice(0, MAX_AUDIT_LOG_ENTRIES);
+}
+
 // Administratoren vorbehalten sind ausschließlich die Benutzerverwaltung, die
 // Sicherungserinnerung, Sicherungsvolumen und das Schließverhalten der Dialoge;
 // der Speicherort ist reine Clientkonfiguration und gar nicht Teil des Datenbestands.
