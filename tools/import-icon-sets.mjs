@@ -102,7 +102,7 @@ for (const [index, [satz, { paket, datei }]] of Object.entries(SAETZE).entries()
   const wurzel = path.join(modules, paket);
   const meta = JSON.parse(fs.readFileSync(path.join(wurzel, "package.json"), "utf8"));
   lizenzen.push(
-    `${paket} ${meta.version} (${meta.license})\n\n${fs.readFileSync(path.join(wurzel, "LICENSE"), "utf8").trim()}`,
+    `${paket} ${meta.version} (${meta.license})\n\n${fs.readFileSync(path.join(wurzel, "LICENSE"), "utf8").replace(/\r\n?/g, "\n").trim()}`,
   );
   ergebnis[satz] = {};
   for (const [symbol, namen] of Object.entries(ZUORDNUNG)) {
