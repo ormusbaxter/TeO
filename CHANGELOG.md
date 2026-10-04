@@ -1,3 +1,8 @@
+### 4.56.1 – Änderungsprotokoll im MariaDB-Modus geschützt
+
+- **Behoben:** Im MariaDB-Modus lieferte der Server das Änderungsprotokoll jedem angemeldeten Konto mit aus, und ein normales Konto konnte es über die Schnittstelle umschreiben oder leeren. Normale Konten erhalten das Protokoll jetzt nicht mehr und können es nur um eigene Einträge ergänzen; Benutzername und Zeitpunkt eines neuen Eintrags setzt der Server. Der lokale Modus ist davon nicht betroffen
+- **Behoben:** Das Handbuch nennt die Einstellungen, die Administratoren vorbehalten sind, jetzt mit der richtigen Anzahl und beschreibt, was die Rollentrennung im lokalen Modus leistet
+
 ### 4.56.0 – Symbolsätze neben den Farbthemen
 
 - **Neu:** Unter **Einstellungen → Allgemein** lässt sich neben dem Farbthema ein **Symbolsatz** wählen: die eigenen Symbole von TeO oder die der freien Sätze **Lucide**, **Tabler**, **Heroicons** und **Phosphor**. Der Wechsel gilt sofort in der ganzen Anwendung; das Logo bleibt in jedem Satz dasselbe

@@ -381,7 +381,7 @@ Normale Benutzer dürfen alles, was zur regulären Bedienung gehört:
 
 ### Administratoren
 
-Administratoren dürfen zusätzlich drei Einstellungen ändern:
+Administratoren dürfen zusätzlich fünf Einstellungen ändern:
 
 - **Speicherort** – zwischen lokalem Browserspeicher und MariaDB wechseln
 - **Benutzer verwalten** – siehe unten
@@ -395,7 +395,15 @@ die Tätigkeit der übrigen Konten nachvollziehbar macht.
 Diese Aufteilung gilt im lokalen Modus und im MariaDB-Modus gleichermaßen. Im
 MariaDB-Modus setzt der Server sie unabhängig vom Browser durch: Ein normales
 Konto kann Benutzerkonten und die Sicherungserinnerung auch dann nicht
-verändern, wenn der Client umgangen wird.
+verändern, wenn der Client umgangen wird. Das Änderungsprotokoll liefert der
+Server einem normalen Konto gar nicht erst aus, und es kann das Protokoll nur
+um eigene Einträge ergänzen – Benutzername und Zeitpunkt eines neuen Eintrags
+setzt der Server.
+
+Im lokalen Modus liegt der gesamte Datenbestand im Browserprofil des
+Arbeitsplatzes. Die Aufteilung ist dort eine Sperre der Oberfläche: Sie
+schützt nicht vor jemandem, der mit Entwicklerwerkzeugen unmittelbar auf den
+Browserspeicher zugreift.
 
 ### Dialoge schließen
 
@@ -1402,6 +1410,11 @@ Eintrag sie mit Namen; daraus entsteht auch der Änderungsverlauf in der
 Mitarbeiter-Akte. Das Protokoll kann als CSV exportiert werden, mit einer
 Spalte für die betroffenen Mitarbeiter. Die Einsicht ist Administratoren
 vorbehalten.
+
+Im MariaDB-Modus führt der Server das Protokoll. Normale Konten erhalten es
+nicht; eine Datensicherung, die ein normales Konto exportiert, enthält es
+deshalb nicht, und ein Import durch ein normales Konto lässt das Protokoll
+unverändert.
 
 ## Datenspeicherung und MariaDB
 

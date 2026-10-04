@@ -2903,6 +2903,12 @@
           remoteRevision,
         );
         remoteRevision = Number(result.revision) || remoteRevision + 1;
+        // Ein normales Konto fuehrt das Aenderungsprotokoll nicht selbst: Der
+        // Server hat die neuen Eintraege uebernommen und liefert das Protokoll
+        // nur Administratoren aus. Was hier liegen bliebe, kaeme mit jeder
+        // weiteren Speicherung erneut an - und faellt es dort irgendwann aus
+        // den gefuehrten Eintraegen, als vermeintlich neuer Eintrag.
+        if (currentUser && !isAdmin()) state.auditLog = [];
         markBackendConnected({ synchronized: true });
         pendingRemoteConflictState = null;
       } catch (error) {
@@ -21226,6 +21232,13 @@
     const usersFromBackup = adoptUsers || preservedUsers.length === 0;
     if (!usersFromBackup) {
       importedState.users = preservedUsers;
+    }
+    // Im MariaDB-Modus fuehrt der Server das Aenderungsprotokoll, und ein
+    // normales Konto kann es nur ergaenzen. Die Eintraege einer Sicherung kaemen
+    // dort als neue an, unter dem Namen des importierenden Kontos - sie bleiben
+    // deshalb draussen, wie die Benutzerkonten.
+    if (isMariaDbMode() && currentUser && !isAdmin()) {
+      importedState.auditLog = previousState.auditLog;
     }
     state = importedState;
     if (!(await persistState())) {

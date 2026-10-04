@@ -43,6 +43,9 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       setSharedBackupFileStamp(value) { sharedBackupFileStamp = value; },
       getSharedBackupFileStamp() { return sharedBackupFileStamp; },
       setActiveView(value) { activeView = value; },
+      // "local" oder "mariadb". Im MariaDB-Modus spricht persistState mit
+      // window.TeOBackend - ein Test legt dafuer einen Ersatz an dom.window.
+      setBackendMode(value) { backendMode = value; },
       getActiveView() { return activeView; },
       setAppointmentFilters(value = {}) {
         appointmentSearchTerm = searchKey(value.search || "");
