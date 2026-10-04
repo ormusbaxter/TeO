@@ -171,6 +171,13 @@ mit dem `GITHUB_TOKEN`.
 - Symbole sind Strichgrafiken in der Inline-Sprite in
   `src/html/00-shell-dashboard.html` (`fill: none`, `stroke: currentColor`).
   Keine externen Symbolschriften einbinden.
+- Die Symbolsätze Lucide, Tabler, Heroicons und Phosphor liegen als Daten in
+  `src/app/00c-icon-sets.js` – erzeugt von `tools/import-icon-sets.mjs`, nicht
+  von Hand bearbeiten. Die Zuordnung zu den TeO-Symbolen steht im Werkzeug;
+  ein neues Symbol in der Sprite bekommt dort seine Entsprechung je Satz
+  (sonst zeigt der Satz die TeO-Zeichnung). Die Pakete sind keine
+  Abhängigkeit: `npm install --prefix <dir> lucide-static @tabler/icons
+  heroicons @phosphor-icons/core`, dann `node tools/import-icon-sets.mjs <dir>`.
 - Farben kommen aus den Farbmarken in `src/styles/00-core.css`; die Themes in
   `src/styles/80-themes.css` belegen dieselben Marken neu. Feste Farbwerte
   brechen die Schemata.

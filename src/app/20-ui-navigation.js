@@ -180,8 +180,8 @@
     document.querySelectorAll("[data-theme-select]").forEach((select) => {
       select.addEventListener("change", () => changeTheme(select.value));
     });
-    document.querySelectorAll("[data-icon-theme-select]").forEach((select) => {
-      select.addEventListener("change", () => changeIconTheme(select.value));
+    document.querySelectorAll("[data-icon-set-select]").forEach((select) => {
+      select.addEventListener("change", () => changeIconSet(select.value));
     });
     elements.mobileThemeButton.addEventListener("click", () => {
       const themes = Object.keys(THEMES);

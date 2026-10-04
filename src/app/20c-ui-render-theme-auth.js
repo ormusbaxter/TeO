@@ -116,35 +116,35 @@
     );
     elements.mobileThemeButton.title = `Farbthema: ${THEMES[activeTheme]}`;
     // Wo das Farbthema neu gesetzt wird, hat sich das Konto geaendert - der
-    // Symbolstil zieht deshalb an derselben Stelle nach.
-    applyIconTheme(activeIconThemeKey());
+    // Symbolsatz zieht deshalb an derselben Stelle nach.
+    applyIconSet(activeIconSetKey());
   }
 
-  // Der Symbolstil gehoert wie das Farbthema zum Benutzerkonto. Eine
+  // Der Symbolsatz gehoert wie das Farbthema zum Benutzerkonto. Eine
   // gemeinsame Vorgabe gibt es nicht: Ohne eigene Wahl gilt "Standard".
-  function activeIconThemeKey() {
-    return normalizeIconTheme(currentUser?.iconTheme);
+  function activeIconSetKey() {
+    return normalizeIconSet(currentUser?.iconSet);
   }
 
-  async function changeIconTheme(iconTheme) {
-    const nextIconTheme = normalizeIconTheme(iconTheme);
+  async function changeIconSet(iconSet) {
+    const nextIconSet = normalizeIconSet(iconSet);
     if (!currentUser) {
-      applyIconTheme(nextIconTheme);
+      applyIconSet(nextIconSet);
       showToast(
-        "Der Symbolstil gilt vorerst nur für diese Sitzung. Nach der Anmeldung wird er für das Benutzerkonto gespeichert.",
+        "Der Symbolsatz gilt vorerst nur für diese Sitzung. Nach der Anmeldung wird er für das Benutzerkonto gespeichert.",
       );
       return;
     }
-    if (nextIconTheme === activeIconThemeKey()) {
-      applyIconTheme(nextIconTheme);
+    if (nextIconSet === activeIconSetKey()) {
+      applyIconSet(nextIconSet);
       return;
     }
 
     const committed = await commitStateMutation(
       () => {
         const account = state.users.find((user) => user.id === currentUser.id);
-        if (account) account.iconTheme = nextIconTheme;
-        currentUser.iconTheme = nextIconTheme;
+        if (account) account.iconSet = nextIconSet;
+        currentUser.iconSet = nextIconSet;
       },
       // Wie beim Farbthema: reine Anzeigeeinstellung, kein Protokolleintrag.
       { auditAction: "" },
@@ -153,19 +153,45 @@
       currentUser =
         state.users.find((user) => user.id === currentUser.id) || currentUser;
     }
-    applyIconTheme(activeIconThemeKey());
+    applyIconSet(activeIconSetKey());
     if (committed) {
       showToast(
-        `Symbolstil „${ICON_THEMES[nextIconTheme]}“ wurde für „${currentUser.username}“ gespeichert.`,
+        `Symbolsatz „${ICON_SETS[nextIconSet]}“ wurde für „${currentUser.username}“ gespeichert.`,
       );
     }
   }
 
-  function applyIconTheme(iconTheme) {
-    const activeIconTheme = normalizeIconTheme(iconTheme);
-    document.documentElement.dataset.iconTheme = activeIconTheme;
-    document.querySelectorAll("[data-icon-theme-select]").forEach((select) => {
-      select.value = activeIconTheme;
+  // Die eigenen Zeichnungen der Sprite, beim ersten Aufruf gemerkt, damit
+  // "Standard" sie nach einem anderen Satz zurueckholen kann.
+  let teoIconSymbols = null;
+
+  // Ein Satz tauscht den Inhalt der <symbol> in der Sprite aus. Jedes <use>
+  // zeigt die neue Zeichnung sofort, ohne dass das Markup der Ansichten
+  // davon wissen muss. Was ein Satz nicht kennt - das Logo etwa -, behaelt
+  // die TeO-Zeichnung.
+  function applyIconSet(iconSet) {
+    const activeIconSet = normalizeIconSet(iconSet);
+    if (document.documentElement.dataset.iconSet !== activeIconSet) {
+      const symbols = document.querySelectorAll(".icon-library symbol[id^='icon-']");
+      teoIconSymbols ??= new Map(
+        [...symbols].map((symbol) => [
+          symbol.id,
+          [symbol.getAttribute("viewBox"), symbol.innerHTML],
+        ]),
+      );
+      const drawings = ICON_SET_SYMBOLS[activeIconSet] || {};
+      symbols.forEach((symbol) => {
+        const drawing =
+          drawings[symbol.id.slice("icon-".length)] ?? teoIconSymbols.get(symbol.id);
+        if (!drawing) return;
+        const [viewBox, markup] = Array.isArray(drawing) ? drawing : ["0 0 24 24", drawing];
+        symbol.setAttribute("viewBox", viewBox);
+        symbol.innerHTML = markup;
+      });
+    }
+    document.documentElement.dataset.iconSet = activeIconSet;
+    document.querySelectorAll("[data-icon-set-select]").forEach((select) => {
+      select.value = activeIconSet;
     });
   }
 

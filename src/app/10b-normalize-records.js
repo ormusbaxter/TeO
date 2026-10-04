@@ -151,7 +151,7 @@
       passwordHash,
       mustChangePassword: Boolean(user.mustChangePassword),
       theme: normalizeUserTheme(user.theme),
-      iconTheme: normalizeUserIconTheme(user.iconTheme),
+      iconSet: normalizeUserIconSet(user.iconSet),
     };
   }
 
@@ -166,13 +166,13 @@
     return Object.hasOwn(THEMES, theme) ? theme : "";
   }
 
-  function normalizeIconTheme(iconTheme) {
-    return Object.hasOwn(ICON_THEMES, iconTheme) ? iconTheme : "standard";
+  function normalizeIconSet(iconSet) {
+    return Object.hasOwn(ICON_SETS, iconSet) ? iconSet : "standard";
   }
 
   // Wie beim Farbthema: leer heisst "noch keine eigene Wahl getroffen".
-  function normalizeUserIconTheme(iconTheme) {
-    return Object.hasOwn(ICON_THEMES, iconTheme) ? iconTheme : "";
+  function normalizeUserIconSet(iconSet) {
+    return Object.hasOwn(ICON_SETS, iconSet) ? iconSet : "";
   }
 
   function normalizeServiceWeekendName(value, fallback) {

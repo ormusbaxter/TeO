@@ -290,14 +290,15 @@
     "github-dark",
   ]);
 
-  // Symbolstile. Sie veraendern nur, wie die Strichgrafiken der Sprite
-  // gezeichnet werden, und lassen sich mit jedem Farbthema kombinieren.
-  const ICON_THEMES = {
-    standard: "Standard",
-    fine: "Fein",
-    bold: "Kräftig",
-    sharp: "Kantig",
-    duotone: "Zweifarbig",
+  // Symbolsaetze. "Standard" sind die eigenen Zeichnungen der Sprite, die
+  // uebrigen stammen aus freien Symbolsaetzen (ICON_SET_SYMBOLS). Jeder Satz
+  // laesst sich mit jedem Farbthema kombinieren.
+  const ICON_SETS = {
+    standard: "TeO (Standard)",
+    lucide: "Lucide",
+    tabler: "Tabler",
+    heroicons: "Heroicons",
+    phosphor: "Phosphor",
   };
 
   const PASSWORD_ITERATIONS = 210000;
