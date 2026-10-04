@@ -157,112 +157,106 @@ test("Ein gewähltes Schema gilt sofort und bleibt erhalten", async (t) => {
   });
 });
 
-const SYMBOLSTILE = [
-  ["standard", "Standard"],
-  ["fine", "Fein"],
-  ["bold", "Kräftig"],
-  ["sharp", "Kantig"],
-  ["duotone", "Zweifarbig"],
+const SYMBOLSAETZE = [
+  ["standard", "TeO (Standard)"],
+  ["lucide", "Lucide"],
+  ["tabler", "Tabler"],
+  ["heroicons", "Heroicons"],
+  ["phosphor", "Phosphor"],
 ];
 
-function waehleSymbolstil(teo, key) {
-  return teo.evaluate((stil) => {
-    const auswahl = document.querySelector("[data-icon-theme-select]");
-    auswahl.value = stil;
+function waehleSymbolsatz(teo, key) {
+  return teo.evaluate((satz) => {
+    const auswahl = document.querySelector("[data-icon-set-select]");
+    auswahl.value = satz;
     auswahl.dispatchEvent(new Event("change", { bubbles: true }));
   }, key);
 }
 
-test("Jeder Symbolstil zeichnet die Symbole sichtbar anders", async (t) => {
-  const teo = await openTeO(t, { angemeldetAls: "admin" });
-  if (!teo) return;
-
-  // Ein Kalendersymbol in zwölffacher Größe auf weißem Grund, darüber ein
-  // Messpunkt an einer freien Stelle in seinem Inneren. Gemessen wird das
-  // Bild: Der errechnete Stil der Vorlage in der Sprite sagt nichts -
-  // sichtbar ist die Kopie unter <use>, und eine Regel kann die Vorlage
-  // treffen, ohne dort anzukommen.
-  await teo.evaluate(() => {
+// Ein Symbol in zehnfacher Größe auf weißem Grund, oben links über allem.
+// Gemessen wird das Bild: Was in der Sprite steht, sagt nur, was dort steht -
+// sichtbar ist die Kopie unter <use>.
+function zeigeProbesymbol(teo, symbol) {
+  return teo.evaluate((id) => {
+    document.querySelector("#teoProbeSymbol")?.remove();
     const buehne = document.createElement("div");
     buehne.id = "teoProbeSymbol";
     Object.assign(buehne.style, {
       position: "fixed",
       left: "0",
       top: "0",
-      width: "240px",
-      height: "240px",
+      width: "200px",
+      height: "200px",
       zIndex: "2147483647",
       background: "rgb(255, 255, 255)",
       color: "rgb(0, 0, 0)",
     });
-    buehne.innerHTML = '<svg><use href="#icon-calendar"></use></svg>';
-    Object.assign(buehne.firstElementChild.style, { width: "240px", height: "240px" });
-    const punkt = document.createElement("div");
-    punkt.id = "teoProbeFlaeche";
-    Object.assign(punkt.style, {
-      position: "absolute",
-      left: "119px",
-      top: "159px",
-      width: "2px",
-      height: "2px",
-    });
-    buehne.append(punkt);
+    buehne.innerHTML = `<svg><use href="#icon-${id}"></use></svg>`;
+    Object.assign(buehne.firstElementChild.style, { width: "200px", height: "200px" });
     document.body.append(buehne);
+  }, symbol);
+}
+
+async function bildDesProbesymbols(teo) {
+  const bild = await teo.page.screenshot({ clip: { x: 0, y: 0, width: 200, height: 200 } });
+  return bild.toString("base64");
+}
+
+test("Jeder Symbolsatz zeigt eigene Zeichnungen", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  await zeigeProbesymbol(teo, "calendar");
+  const leer = await teo.evaluate(() => {
+    document.querySelector("#teoProbeSymbol svg").style.visibility = "hidden";
+  }).then(() => bildDesProbesymbols(teo));
+  await teo.evaluate(() => {
+    document.querySelector("#teoProbeSymbol svg").style.visibility = "";
   });
 
-  const gemessen = {};
-  for (const [key, label] of SYMBOLSTILE) {
+  const kalender = {};
+  const logo = {};
+  for (const [key, label] of SYMBOLSAETZE) {
     const angeboten = await teo.evaluate(
       ([wert, text]) =>
-        [...document.querySelector("[data-icon-theme-select]").options].some(
+        [...document.querySelector("[data-icon-set-select]").options].some(
           (option) => option.value === wert && option.textContent.trim() === text,
         ),
       [key, label],
     );
     assert.ok(angeboten, `„${label}“ steht nicht zur Auswahl`);
-    await waehleSymbolstil(teo, key);
-    const stand = await teo.evaluate(() => {
-      const strich = getComputedStyle(document.querySelector("#teoProbeSymbol svg"));
-      return {
-        attribut: document.documentElement.dataset.iconTheme,
-        breite: parseFloat(strich.strokeWidth),
-        knopfBreite: parseFloat(
-          getComputedStyle(document.querySelector(".button svg")).strokeWidth,
-        ),
-        ende: strich.strokeLinecap,
-        ecke: strich.strokeLinejoin,
-      };
-    });
-    assert.equal(stand.attribut, key, `„${label}“ greift ohne Neuladen`);
-    gemessen[key] = { ...stand, flaeche: await teo.farbeAn("#teoProbeFlaeche") };
+    await waehleSymbolsatz(teo, key);
+    assert.equal(
+      await teo.evaluate(() => document.documentElement.dataset.iconSet),
+      key,
+      `„${label}“ greift ohne Neuladen`,
+    );
+    await zeigeProbesymbol(teo, "calendar");
+    kalender[key] = await bildDesProbesymbols(teo);
+    await zeigeProbesymbol(teo, "logo");
+    logo[key] = await bildDesProbesymbols(teo);
   }
 
-  await waehleSymbolstil(teo, "standard");
+  // Zurück auf Standard steht wieder die ursprüngliche Zeichnung da.
+  await waehleSymbolsatz(teo, "standard");
+  await zeigeProbesymbol(teo, "calendar");
+  const zurueck = await bildDesProbesymbols(teo);
   await teo.evaluate(() => document.querySelector("#teoProbeSymbol").remove());
 
-  const { standard, fine, bold, sharp, duotone } = gemessen;
-  const WEISS = "255,255,255";
-
-  assert.equal(standard.breite, 1.8);
-  assert.equal(standard.ende, "round");
-  assert.ok(fine.breite < standard.breite, "Fein zeichnet dünner");
-  assert.ok(bold.breite > standard.breite, "Kräftig zeichnet dicker");
-  // Schaltflächen zeichnen ihre Symbole von Haus aus kräftiger; der Abstand
-  // zum übrigen Bestand bleibt in jedem Stil erhalten.
-  for (const stil of [standard, fine, bold]) {
-    assert.ok(stil.knopfBreite > stil.breite);
+  for (const [key, label] of SYMBOLSAETZE) {
+    assert.notEqual(kalender[key], leer, `„${label}“ zeichnet überhaupt etwas`);
+    for (const [anderer, andererLabel] of SYMBOLSAETZE) {
+      if (anderer <= key) continue;
+      assert.notEqual(kalender[key], kalender[anderer], `„${label}“ gleicht „${andererLabel}“`);
+    }
+    // Das Logo ist die Marke und bleibt in jedem Satz dasselbe.
+    assert.equal(logo[key], logo.standard, `„${label}“ verändert das Logo`);
   }
-
-  assert.equal(sharp.ende, "square");
-  assert.equal(sharp.ecke, "miter");
-
-  assert.equal(standard.flaeche.join(","), WEISS, "Standard lässt das Innere frei");
-  assert.equal(sharp.flaeche.join(","), WEISS);
-  assert.notEqual(duotone.flaeche.join(","), WEISS, "Zweifarbig tönt geschlossene Formen");
-  assert.ok(duotone.flaeche[0] > 150, "Die Tönung bleibt deutlich heller als der Strich");
+  assert.equal(zurueck, kalender.standard);
+  assert.deepEqual(teo.problems, []);
 });
 
-test("Der Symbolstil lässt das Farbthema unberührt und bleibt am Konto", async (t) => {
+test("Der Symbolsatz lässt das Farbthema unberührt und bleibt am Konto", async (t) => {
   const teo = await openTeO(t, { anmeldenAls: "admin" });
   if (!teo) return;
 
@@ -271,18 +265,18 @@ test("Der Symbolstil lässt das Farbthema unberührt und bleibt am Konto", async
     farbe.value = "nord";
     farbe.dispatchEvent(new Event("change", { bubbles: true }));
   });
-  await waehleSymbolstil(teo, "bold");
+  await waehleSymbolsatz(teo, "tabler");
   const meldung = await teo.page.waitForFunction(
     () =>
       [...document.querySelectorAll(".toast")]
         .map((toast) => toast.textContent)
-        .find((text) => text.includes("Symbolstil")) || null,
+        .find((text) => text.includes("Symbolsatz")) || null,
     null,
     { timeout: 5000 },
   );
-  assert.match(await meldung.jsonValue(), /„Kräftig“ wurde für „DemoAdmin“ gespeichert/);
+  assert.match(await meldung.jsonValue(), /„Tabler“ wurde für „DemoAdmin“ gespeichert/);
 
-  // Ein späterer Wechsel des Farbthemas setzt den Symbolstil nicht zurück.
+  // Ein späterer Wechsel des Farbthemas setzt den Symbolsatz nicht zurück.
   await teo.evaluate(() => {
     const farbe = document.querySelector("[data-theme-select]");
     farbe.value = "dracula";
@@ -291,22 +285,24 @@ test("Der Symbolstil lässt das Farbthema unberührt und bleibt am Konto", async
   await teo.page.waitForFunction(() => document.documentElement.dataset.theme === "dracula");
   const stand = await teo.evaluate(() => ({ ...document.documentElement.dataset }));
   assert.equal(stand.theme, "dracula");
-  assert.equal(stand.iconTheme, "bold");
+  assert.equal(stand.iconSet, "tabler");
 });
 
-test("Bei der Anmeldung gilt der Symbolstil des Kontos", async (t) => {
+test("Bei der Anmeldung gilt der Symbolsatz des Kontos", async (t) => {
   const teo = await openTeO(t, {
     anmeldenAls: "admin",
     mitDemodaten(bestand) {
-      bestand.users.find((user) => user.username === "DemoAdmin").iconTheme = "duotone";
+      bestand.users.find((user) => user.username === "DemoAdmin").iconSet = "phosphor";
     },
   });
   if (!teo) return;
 
   const stand = await teo.evaluate(() => ({
-    attribut: document.documentElement.dataset.iconTheme,
-    auswahl: document.querySelector("[data-icon-theme-select]").value,
+    attribut: document.documentElement.dataset.iconSet,
+    auswahl: document.querySelector("[data-icon-set-select]").value,
+    zeichenflaeche: document.querySelector("#icon-calendar").getAttribute("viewBox"),
   }));
-  assert.equal(stand.attribut, "duotone");
-  assert.equal(stand.auswahl, "duotone");
+  assert.equal(stand.attribut, "phosphor");
+  assert.equal(stand.auswahl, "phosphor");
+  assert.equal(stand.zeichenflaeche, "0 0 256 256");
 });

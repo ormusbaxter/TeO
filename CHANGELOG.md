@@ -1,7 +1,7 @@
-### 4.56.0 – Symbolstile neben den Farbthemen
+### 4.56.0 – Symbolsätze neben den Farbthemen
 
-- **Neu:** Unter **Einstellungen → Allgemein** lässt sich neben dem Farbthema ein **Symbolstil** wählen: Standard, Fein (dünnere Striche), Kräftig (dickere Striche), Kantig (eckige Strichenden und spitze Ecken) und Zweifarbig (geschlossene Formen mit getönter Fläche)
-- **Neu:** Jeder Symbolstil lässt sich mit jedem Farbthema kombinieren und wird wie dieses für das angemeldete Benutzerkonto gespeichert
+- **Neu:** Unter **Einstellungen → Allgemein** lässt sich neben dem Farbthema ein **Symbolsatz** wählen: die eigenen Symbole von TeO oder die der freien Sätze **Lucide**, **Tabler**, **Heroicons** und **Phosphor**. Der Wechsel gilt sofort in der ganzen Anwendung; das Logo bleibt in jedem Satz dasselbe
+- **Neu:** Jeder Symbolsatz lässt sich mit jedem Farbthema kombinieren und wird wie dieses für das angemeldete Benutzerkonto gespeichert
 
 ### 4.55.0 – Beschäftigungszeiten in Fortbildungen, Sitzungen und Fristen
 
