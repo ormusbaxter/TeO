@@ -1,0 +1,560 @@
+/* Übersicht: Kennzahlen, Arbeitsliste, Schnellaktionen und Fristenmonitor. */
+
+.dashboard-grid {
+  display: grid;
+  /* Wie .deadline-panel und .recent-panel bringt der Block seinen eigenen
+     Abstand nach oben mit. Zuvor stand das Raster direkt unter der
+     Kennzahlenreihe und lebte von deren margin-bottom; seit der
+     Fristenmonitor davor liegt, fehlte der Abstand. */
+  margin-top: 22px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.75fr);
+  gap: 22px;
+}
+
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px 12px;
+}
+
+.quick-action {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 18px;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 14px 12px;
+  cursor: pointer;
+  text-align: left;
+  border: 0;
+  border-top: 1px solid var(--slate-100);
+  border-radius: 10px;
+  background: transparent;
+  transition: background 140ms ease;
+}
+
+.quick-action:first-child {
+  border-top-color: transparent;
+}
+
+.quick-action:hover {
+  background: var(--slate-50);
+}
+
+.quick-action-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--blue-700);
+  border-radius: 10px;
+  background: var(--blue-100);
+}
+
+.quick-action-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.quick-action-icon-teal {
+  color: var(--teal-700);
+  background: var(--teal-100);
+}
+
+.quick-action-icon-orange {
+  color: var(--orange-700);
+  background: var(--orange-100);
+}
+
+.quick-action-icon-purple {
+  color: #7650a6;
+  background: #f0e9fa;
+}
+
+.quick-action strong {
+  display: block;
+  color: var(--slate-800);
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+
+.quick-action small {
+  display: block;
+  margin-top: 2px;
+  color: var(--slate-500);
+  font-size: 0.66rem;
+  line-height: 1.4;
+}
+
+.quick-action-chevron {
+  width: 15px;
+  height: 15px;
+  color: var(--slate-400);
+}
+
+.recent-panel {
+  margin-top: 22px;
+}
+
+.deadline-pin-badge .important-notification-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.deadline-pin-badge {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  margin-right: 8px;
+  padding: 3px 7px;
+  color: var(--orange-700);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  vertical-align: 2px;
+  text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, var(--orange-700) 38%, transparent);
+  border-radius: 999px;
+  background: var(--orange-100);
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0 18px 18px;
+  }
+
+  .quick-action {
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: flex-start;
+    border: 1px solid var(--slate-100);
+  }
+
+  .quick-action:first-child {
+    border-top-color: var(--slate-100);
+  }
+
+  .quick-action-chevron {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-action {
+    align-items: center;
+  }
+}
+
+.deadline-panel {
+  margin-top: 22px;
+}
+
+.dashboard-priority-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.dashboard-priority-grid.has-memos {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dashboard-priority-grid .deadline-panel {
+  margin-top: 0;
+}
+
+.dashboard-memo-list {
+  display: grid;
+  border-top: 1px solid var(--slate-100);
+}
+
+.dashboard-memo-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 13px 20px;
+  color: inherit;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid var(--slate-100);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dashboard-memo-row:hover,
+.dashboard-memo-row:focus-visible {
+  background: var(--slate-50);
+}
+
+.dashboard-memo-row.is-pinned {
+  background: color-mix(in srgb, var(--orange-100) 35%, var(--white));
+}
+
+.dashboard-memo-row > span:last-child {
+  text-align: right;
+}
+
+.dashboard-memo-row strong,
+.dashboard-memo-row small {
+  display: block;
+}
+
+.dashboard-memo-row strong {
+  font-size: 0.7rem;
+}
+
+.dashboard-memo-row small {
+  margin-top: 3px;
+  color: var(--slate-500);
+  font-size: 0.6rem;
+}
+
+.memo-dashboard-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: #7650a6;
+  border-radius: 9px;
+  background: #f0e9fa;
+}
+
+.memo-dashboard-icon svg,
+.memo-dashboard-icon .important-notification-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.dashboard-memo-row.is-pinned .memo-dashboard-icon {
+  color: var(--orange-700);
+  background: var(--orange-100);
+}
+
+.dashboard-memo-more {
+  margin: 12px 20px 16px;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-priority-grid.has-memos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.deadline-panel-header {
+  align-items: flex-start;
+}
+
+.deadline-controls {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.deadline-filter-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.deadline-filter-group legend {
+  float: left;
+  margin: 0 3px 0 0;
+  color: var(--slate-500);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.deadline-filter-chip {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.deadline-filter-chip input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.deadline-filter-chip span {
+  padding: 7px 9px;
+  color: var(--slate-600);
+  font-size: 0.65rem;
+  font-weight: 750;
+  line-height: 1;
+  border: 1px solid var(--slate-200);
+  border-radius: 999px;
+  background: white;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.deadline-filter-chip input:checked + span {
+  color: var(--blue-700);
+  border-color: var(--blue-200);
+  background: var(--blue-50);
+}
+
+.deadline-filter-chip input:focus-visible + span {
+  outline: 3px solid var(--blue-100);
+  outline-offset: 1px;
+}
+
+@media (max-width: 900px) {
+  .deadline-panel-header {
+    flex-direction: column;
+  }
+
+  .deadline-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+.deadline-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 20px 16px;
+}
+
+.deadline-summary {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 180px));
+}
+
+.deadline-list {
+  display: grid;
+  border-top: 1px solid var(--slate-100);
+}
+
+/* Die Hoehe setzt renderDeadlineOverview auf sechs Zeilen. */
+.deadline-list.is-scrollable {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.deadline-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  width: 100%;
+  padding: 11px 20px;
+  cursor: pointer;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid var(--slate-100);
+  background: transparent;
+}
+
+.deadline-row:hover {
+  background: var(--slate-50);
+}
+
+.deadline-row.is-pinned {
+  border-bottom-color: color-mix(in srgb, var(--orange-700) 38%, transparent);
+  box-shadow: inset 4px 0 0 var(--orange-700);
+  background: color-mix(in srgb, var(--orange-100) 48%, var(--white));
+}
+
+.deadline-row.is-pinned:hover {
+  background: var(--orange-100);
+}
+
+.deadline-calendar-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: var(--blue-700);
+  border-radius: 9px;
+  background: var(--blue-100);
+}
+
+.deadline-calendar-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.deadline-row strong,
+.deadline-row small {
+  display: block;
+}
+
+.deadline-row strong {
+  color: var(--slate-800);
+  font-size: 0.72rem;
+}
+
+.deadline-row small {
+  margin-top: 3px;
+  color: var(--slate-500);
+  font-size: 0.62rem;
+}
+
+.deadline-row > span:nth-child(2) {
+  min-width: 0;
+}
+
+.deadline-row .deadline-description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--slate-700);
+  line-height: 1.4;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.deadline-row > :last-child {
+  text-align: right;
+}
+
+.deadline-row.is-overdue > :last-child strong,
+.deadline-row.is-overdue > :last-child small {
+  color: var(--red-700);
+}
+
+@media (max-width: 470px) {
+  .deadline-row {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .deadline-row > :last-child {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .deadline-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-layout-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-layout-row > span {
+  display: flex;
+  gap: 4px;
+}
+
+.dashboard-work-queue {
+  margin-bottom: 18px;
+}
+
+.dashboard-work-filter {
+  flex-shrink: 0;
+}
+
+.work-queue-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: var(--slate-200);
+}
+
+.work-queue-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  min-width: 0;
+  padding: 11px 13px;
+  border: 0;
+  background: var(--white);
+  text-align: left;
+  cursor: pointer;
+}
+
+.work-queue-row:hover {
+  background: var(--slate-50);
+}
+
+.work-queue-row strong,
+.work-queue-row small {
+  display: block;
+}
+
+.work-queue-row strong {
+  overflow: hidden;
+  color: var(--slate-800);
+  font-size: 0.73rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.work-queue-row small {
+  margin-top: 3px;
+  color: var(--slate-500);
+  font-size: 0.62rem;
+}
+
+.work-queue-row > span:last-child {
+  text-align: right;
+}
+
+.work-queue-row.is-overdue > span:last-child :is(strong, small) {
+  color: var(--red-700);
+}
+
+.work-queue-icon {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--blue-50);
+  color: var(--blue-700);
+}
+
+.work-queue-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.dashboard-layout-list {
+  display: grid;
+  gap: 8px;
+}
+
+@media (max-width: 1199px) {
+  .work-queue-list {
+    grid-template-columns: 1fr;
+  }
+}

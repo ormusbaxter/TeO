@@ -15,7 +15,7 @@ const appointmentSource = fs.readFileSync(
   "utf8",
 );
 const calendarStyles = fs.readFileSync(
-  path.join(projectRoot, "src/styles/85-planning-enhancements.css"),
+  path.join(projectRoot, "styles.css"),
   "utf8",
 );
 

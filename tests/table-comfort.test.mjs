@@ -108,15 +108,19 @@ test("Kompakte Tabellen und die feste erste Spalte der Matrizen", async () => {
   );
   assert.match(styles, /body\.is-compact-tables \.data-table td \{[^}]*padding: 7px 12px;/s);
 
-  // Beide Matrizen halten die Namensspalte beim seitlichen Blättern fest.
-  assert.match(
-    styles,
-    /\.device-matrix-table :is\(thead, tbody\) th:first-child,\s*\.training-matrix-table :is\(thead, tbody\) th:first-child \{[^}]*position: sticky;[^}]*left: 0;/s,
-  );
-  // Die Ecke oben links steht in beide Richtungen fest und muss deshalb über
-  // der Kopfzeile liegen.
-  assert.match(
-    styles,
-    /\.device-matrix-table thead th:first-child,\s*\.training-matrix-table thead th:first-child \{\s*z-index: 4;/s,
-  );
+  // Beide Matrizen halten die Namensspalte beim seitlichen Blättern fest. Die
+  // Ecke oben links steht in beide Richtungen fest und muss deshalb über der
+  // Kopfzeile liegen. Jede Matrix führt die Regel in der Datei ihres Bereichs.
+  for (const matrix of ["device-matrix-table", "training-matrix-table"]) {
+    assert.match(
+      styles,
+      new RegExp(`\\.${matrix} :is\\(thead, tbody\\) th:first-child \\{[^}]*position: sticky;[^}]*left: 0;`, "s"),
+      matrix,
+    );
+    assert.match(
+      styles,
+      new RegExp(`\\.${matrix} thead th:first-child \\{\\s*z-index: 4;`, "s"),
+      matrix,
+    );
+  }
 });

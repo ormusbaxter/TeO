@@ -1,0 +1,2068 @@
+/* Bausteine, die mehrere Bereiche teilen: Schaltflächen, Formularfelder, Karten,
+   Tabellen, Dialoge, Meldungen, Filter-Chips, Kontextmenü, Befehlspalette und
+   Schnellansicht. */
+
+.formatted-date-shell {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.formatted-date-shell .formatted-date-input {
+  width: 100%;
+  color: transparent !important;
+}
+
+.formatted-date-input::-webkit-datetime-edit {
+  color: transparent;
+}
+
+/* Waehrend der Eingabe zeigt das Feld seine eigene Segmentanzeige: Der Wert
+   eines unvollstaendigen Datums ist leer, die eigene Anzeige stuende deshalb
+   auf "TT.MM.JJJJ" und verdeckte, was gerade getippt wird. */
+.formatted-date-shell .formatted-date-input:focus {
+  color: var(--slate-800) !important;
+}
+
+.formatted-date-input:focus::-webkit-datetime-edit {
+  color: inherit;
+}
+
+.formatted-date-shell:focus-within .formatted-date-display {
+  display: none;
+}
+
+.formatted-date-display {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: 40px;
+  left: 12px;
+  overflow: hidden;
+  color: var(--slate-800);
+  font: inherit;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.formatted-date-display.is-placeholder {
+  color: var(--slate-400);
+}
+
+.button {
+  display: inline-flex;
+  min-height: 42px;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2;
+}
+
+.button-primary {
+  color: white;
+  background: var(--blue-700);
+  box-shadow: 0 6px 15px rgb(33 102 209 / 18%);
+}
+
+.button-primary:hover {
+  background: #195ab9;
+  box-shadow: 0 8px 20px rgb(33 102 209 / 25%);
+}
+
+.button-secondary {
+  color: var(--blue-700);
+  border-color: #c8dafa;
+  background: white;
+}
+
+.button-secondary:hover {
+  border-color: #9bbbef;
+  background: var(--blue-50);
+}
+
+.button-ghost {
+  color: var(--slate-700);
+  border-color: var(--slate-200);
+  background: white;
+}
+
+.button-ghost:hover {
+  border-color: var(--slate-300);
+  background: var(--slate-50);
+}
+
+.button-danger {
+  color: white;
+  background: var(--red-700);
+}
+
+.button-danger:hover {
+  background: #961b26;
+}
+
+.button-compact {
+  min-height: 38px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+}
+
+.panel {
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: rgb(255 255 255 / 94%);
+  box-shadow: var(--shadow-sm);
+}
+
+.panel-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+}
+
+.panel-header h2 {
+  margin: 4px 0 0;
+  color: var(--navy-950);
+  font-size: 1rem;
+  letter-spacing: -0.015em;
+}
+
+.text-button {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  padding: 5px;
+  cursor: pointer;
+  color: var(--blue-700);
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.text-button:hover {
+  background: var(--blue-50);
+}
+
+.text-button svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 140ms ease;
+}
+
+.text-button:hover svg {
+  transform: translateX(2px);
+}
+
+.progress-list {
+  padding: 0 24px 22px;
+}
+
+.progress-item {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(100px, 1.2fr) 48px;
+  gap: 16px;
+  align-items: center;
+  padding: 13px 0;
+  border-top: 1px solid var(--slate-100);
+}
+
+.progress-item:first-child {
+  border-top: 0;
+}
+
+.progress-name {
+  min-width: 0;
+}
+
+.progress-name strong {
+  display: block;
+  overflow: hidden;
+  color: var(--slate-800);
+  font-size: 0.77rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-name small {
+  display: block;
+  margin-top: 3px;
+  color: var(--slate-500);
+  font-size: 0.64rem;
+}
+
+.progress-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--slate-100);
+}
+
+.progress-bar {
+  width: var(--progress, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: var(--progress-color, var(--blue-600));
+  transition: width 300ms ease;
+}
+
+.progress-value {
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.avatar {
+  --avatar-status: #278253;
+  --avatar-track: var(--slate-200);
+  --avatar-inner: #e7f6ee;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  position: relative;
+  isolation: isolate;
+  padding: 3px;
+  color: var(--avatar-status);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--avatar-status) 0 var(--avatar-fill, 100%),
+    var(--avatar-track) var(--avatar-fill, 100%) 100%
+  );
+}
+
+.avatar::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  content: "";
+  border-radius: inherit;
+  background: var(--avatar-inner);
+}
+
+.avatar-initials {
+  line-height: 1;
+}
+
+.avatar-status-onboarding {
+  --avatar-status: #a66b00;
+  --avatar-inner: #fff5cc;
+}
+
+.avatar-status-inactive {
+  --avatar-status: #6b7788;
+  --avatar-inner: var(--slate-100);
+}
+
+.avatar.avatar-sm {
+  width: 30px;
+  height: 30px;
+  flex-basis: 30px;
+  font-size: 0.62rem;
+}
+
+.toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.search-field {
+  display: flex;
+  width: min(430px, 100%);
+  min-height: 40px;
+  gap: 9px;
+  align-items: center;
+  padding: 0 12px;
+  color: var(--slate-500);
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: var(--white);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.search-field:focus-within {
+  border-color: #8ab2ee;
+  box-shadow: 0 0 0 3px rgb(40 120 227 / 10%);
+}
+
+.search-field svg {
+  width: 16px;
+  height: 16px;
+}
+
+.search-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 0;
+  color: var(--slate-800);
+  font-size: 0.78rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.search-field input::placeholder {
+  color: var(--slate-400);
+}
+
+.segmented-control {
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: var(--slate-50);
+}
+
+.segmented-control button {
+  padding: 7px 12px;
+  cursor: pointer;
+  color: var(--slate-500);
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.segmented-control button:hover {
+  color: var(--slate-800);
+}
+
+.segmented-control button.is-active {
+  color: var(--blue-700);
+  background: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table th {
+  padding: 12px 16px;
+  color: var(--slate-500);
+  font-size: 0.63rem;
+  font-weight: 800;
+  text-align: left;
+  letter-spacing: 0.045em;
+  border-bottom: 1px solid var(--slate-200);
+  background: var(--slate-50);
+  text-transform: uppercase;
+}
+
+.data-table td {
+  padding: 15px 16px;
+  color: var(--slate-700);
+  font-size: 0.72rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table tbody tr {
+  transition: background 120ms ease;
+}
+
+.data-table tbody tr:hover {
+  background: #fafbfd;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 7px;
+  color: var(--blue-700);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.1;
+  border-radius: 5px;
+  background: var(--blue-50);
+}
+
+.tag-muted {
+  color: var(--slate-500);
+  background: var(--slate-100);
+}
+
+.status-badge {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 5px 8px;
+  color: var(--green-700);
+  font-size: 0.65rem;
+  font-weight: 750;
+  line-height: 1;
+  border-radius: 999px;
+  background: var(--green-100);
+}
+
+.status-badge::before {
+  width: 6px;
+  height: 6px;
+  content: "";
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-badge.inactive {
+  color: var(--slate-600);
+  background: var(--slate-100);
+}
+
+.status-badge.onboarding {
+  color: var(--orange-700);
+  background: var(--orange-100);
+}
+
+.status-badge.expired {
+  color: var(--red-700);
+  background: var(--red-100);
+}
+
+.status-badge.open {
+  color: var(--orange-700);
+  background: var(--orange-100);
+}
+
+.table-progress {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.table-progress .progress-track {
+  width: 65px;
+  flex: 0 0 65px;
+}
+
+.table-progress span {
+  color: var(--slate-600);
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+.table-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.icon-button {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  color: var(--slate-500);
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.icon-button:hover {
+  color: var(--blue-700);
+  border-color: var(--slate-200);
+  background: white;
+}
+
+.icon-button.danger:hover {
+  color: var(--red-700);
+  border-color: #f5c5ca;
+  background: #fff8f8;
+}
+
+.icon-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.empty-state {
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 34px;
+  text-align: center;
+}
+
+.empty-state.compact {
+  min-height: 190px;
+}
+
+.empty-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  color: var(--blue-700);
+  border-radius: 15px;
+  background: var(--blue-50);
+}
+
+.empty-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.empty-state h3 {
+  margin: 14px 0 5px;
+  color: var(--slate-800);
+  font-size: 0.9rem;
+}
+
+.empty-state p {
+  max-width: 360px;
+  margin: 0;
+  color: var(--slate-500);
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.empty-state .button {
+  margin-top: 16px;
+}
+
+.summary-chip {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 18px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: white;
+}
+
+.summary-chip-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  color: var(--chip-color, var(--blue-700));
+  border-radius: 9px;
+  background: var(--chip-bg, var(--blue-100));
+}
+
+.summary-chip-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Farbvarianten der Übersichtskacheln. Früher als Inline-Style gesetzt; als
+   Klasse kommt die Anwendung ohne style-Attribute und damit ohne
+   style-src-attr 'unsafe-inline' in der CSP aus. */
+.summary-chip-icon-teal {
+  --chip-color: var(--teal-700);
+  --chip-bg: var(--teal-100);
+}
+
+.summary-chip-icon-orange {
+  --chip-color: var(--orange-700);
+  --chip-bg: var(--orange-100);
+}
+
+.summary-chip strong {
+  display: block;
+  color: var(--slate-800);
+  font-size: 0.98rem;
+  line-height: 1.1;
+}
+
+.summary-chip small {
+  display: block;
+  margin-top: 4px;
+  color: var(--slate-500);
+  font-size: 0.63rem;
+}
+
+/* Material Symbols Outlined: notifications_active, FILL 0, wght 400,
+   GRAD 0, opsz 24. Als Maske eingebettet, damit das Icon ohne Webfont und
+   ohne Netzwerkzugriff verfuegbar bleibt. */
+.important-notification-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='M80-560q0-100 44.5-183.5T244-882l47 64q-60 44-95.5 111T160-560H80Zm720 0q0-80-35.5-147T669-818l47-64q75 55 119.5 138.5T880-560h-80ZM160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='M80-560q0-100 44.5-183.5T244-882l47 64q-60 44-95.5 111T160-560H80Zm720 0q0-80-35.5-147T669-818l47-64q75 55 119.5 138.5T880-560h-80ZM160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.modal {
+  width: min(570px, calc(100vw - 32px));
+  max-height: min(88vh, 850px);
+  padding: 0;
+  overflow: hidden;
+  color: var(--slate-900);
+  border: 0;
+  border-radius: var(--radius-xl);
+  background: white;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Kopf und Fuss behalten ihre Hoehe, der Koerper nimmt den Rest und scrollt.
+   Ohne diese Aufteilung waechst ein langer Koerper ueber die Dialoghoehe
+   hinaus, .modal { overflow: hidden } schneidet ihn ab, und weil die Hoehe
+   unbegrenzt bleibt, greift auch das Scrollen des Koerpers nicht - der Fuss
+   mit den Schaltflaechen ist dann nicht mehr erreichbar.
+   Die Regel gilt bewusst nur fuer [open]: Ein display-Wert ohne diese
+   Bedingung wuerde das UA-eigene dialog:not([open]) { display: none }
+   aushebeln und geschlossene Dialoge sichtbar machen. */
+.modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal[open] > form {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.modal-large {
+  width: min(800px, calc(100vw - 32px));
+}
+
+.modal-attendance {
+  width: min(1020px, calc(100vw - 32px));
+}
+
+.modal-subtitle {
+  margin: 6px 0 0;
+  color: var(--slate-500);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.efficiency-hint {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  color: var(--blue-700);
+  border: 1px solid #cfe0fa;
+  border-radius: 10px;
+  background: var(--blue-50);
+}
+
+.efficiency-hint-icon {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--blue-100);
+}
+
+.efficiency-hint-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.4;
+}
+
+.efficiency-hint p {
+  margin: 1px 0 0;
+  color: var(--slate-600);
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
+.efficiency-hint strong {
+  color: var(--blue-700);
+}
+
+.compact-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.compact-field > span {
+  color: var(--slate-600);
+  font-size: 0.62rem;
+  font-weight: 750;
+}
+
+.compact-field input,
+.compact-field select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--slate-800);
+  font-size: 0.7rem;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  outline: 0;
+  background: var(--white);
+}
+
+.compact-field input:focus,
+.compact-field select:focus {
+  border-color: #8ab2ee;
+  box-shadow: 0 0 0 3px rgb(40 120 227 / 10%);
+}
+
+.modal::backdrop {
+  background: rgb(9 23 38 / 60%);
+  backdrop-filter: blur(3px);
+  animation: backdrop-in 160ms ease both;
+}
+
+.modal[open] {
+  animation: modal-in 180ms ease both;
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+.modal form {
+  display: flex;
+  max-height: min(88vh, 850px);
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 28px 19px;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.modal-header h2 {
+  margin: 4px 0 0;
+  color: var(--navy-950);
+  font-size: 1.24rem;
+  letter-spacing: -0.02em;
+}
+
+.modal-header .icon-button {
+  margin-top: -5px;
+  margin-right: -8px;
+}
+
+.modal-body {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 23px 28px 28px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16px 28px;
+  border-top: 1px solid var(--slate-100);
+  background: #fafbfd;
+}
+
+.modal-footer-delete {
+  margin-right: auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid-single {
+  grid-template-columns: 1fr;
+}
+
+.form-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.form-field > span:first-child,
+.selection-heading strong {
+  color: var(--slate-700);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 750;
+}
+
+.form-field em,
+.selection-heading em {
+  color: var(--red-700);
+  font-style: normal;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 10px 11px;
+  color: var(--slate-800);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  outline: 0;
+  background: var(--white);
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.form-field input,
+.form-field select {
+  min-height: 41px;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: #8ab2ee;
+  box-shadow: 0 0 0 3px rgb(40 120 227 / 10%);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: var(--slate-400);
+}
+
+.input-suffix {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+}
+
+.input-suffix:focus-within {
+  border-color: #8ab2ee;
+  box-shadow: 0 0 0 3px rgb(40 120 227 / 10%);
+}
+
+.input-suffix input {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.input-suffix input:focus {
+  box-shadow: none;
+}
+
+.input-suffix > span:last-child {
+  display: grid;
+  min-width: 42px;
+  color: var(--slate-500);
+  font-size: 0.72rem;
+  place-items: center;
+  border-left: 1px solid var(--slate-100);
+  background: var(--slate-50);
+}
+
+.field-hint {
+  margin: 0 0 12px;
+  color: var(--slate-500);
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+.form-field .field-hint {
+  margin: 0;
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.switch > span {
+  position: relative;
+  display: block;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--slate-300);
+  transition: background 160ms ease;
+}
+
+.switch > span::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  content: "";
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgb(16 34 54 / 25%);
+  transition: transform 160ms ease;
+}
+
+.switch input:checked + span {
+  background: var(--green-700);
+}
+
+.switch input:checked + span::after {
+  transform: translateX(18px);
+}
+
+.switch input:focus-visible + span {
+  outline: 3px solid var(--blue-700);
+  outline-offset: 2px;
+}
+
+.check-card {
+  display: flex;
+  min-height: 42px;
+  gap: 9px;
+  align-items: center;
+  padding: 9px 10px;
+  cursor: pointer;
+  color: var(--slate-700);
+  font-size: 0.65rem;
+  font-weight: 600;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.check-card:hover {
+  border-color: #bed3f5;
+  background: var(--blue-50);
+}
+
+.check-card input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.check-box {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: transparent;
+  place-items: center;
+  border: 1px solid var(--slate-300);
+  border-radius: 5px;
+  background: white;
+}
+
+.check-box svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
+}
+
+.check-card:has(input:checked) {
+  color: var(--blue-700);
+  border-color: #b9d1f5;
+  background: var(--blue-50);
+}
+
+.check-card input:checked + .check-box {
+  color: white;
+  border-color: var(--blue-700);
+  background: var(--blue-700);
+}
+
+.check-card input:focus-visible + .check-box {
+  outline: 3px solid var(--blue-700);
+  outline-offset: 2px;
+}
+
+.selection-heading {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 25px;
+  padding-top: 22px;
+  border-top: 1px solid var(--slate-100);
+}
+
+.selection-heading p {
+  margin: 4px 0 0;
+  color: var(--slate-500);
+  font-size: 0.65rem;
+}
+
+.search-field-modal {
+  width: 100%;
+  margin-top: 14px;
+}
+
+/* Auswahlkarten und Auswahlkästchen sind zum Anklicken da, nicht zum Lesen:
+   Ohne diese Sperre markiert schon ein leicht verrutschter Klick den Namen des
+   Mitarbeiters, und der nächste Klick trifft die Markierung statt das
+   Kästchen. Der Fließtext der Anwendung bleibt unberührt markierbar. */
+.selection-card,
+.checkbox-field,
+.data-table .selection-column {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.selection-card {
+  display: flex;
+  min-width: 0;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 10px;
+  cursor: pointer;
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: white;
+}
+
+.selection-card:hover {
+  border-color: #bed3f5;
+  background: var(--blue-50);
+}
+
+.selection-card:has(input:checked) {
+  border-color: #a8c8f4;
+  background: var(--blue-50);
+}
+
+.selection-card > input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  accent-color: var(--blue-700);
+}
+
+.selection-card > span:last-child {
+  min-width: 0;
+}
+
+.selection-card strong,
+.selection-card small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selection-card strong {
+  color: var(--slate-700);
+  font-size: 0.66rem;
+}
+
+.selection-card small {
+  margin-top: 3px;
+  color: var(--slate-500);
+  font-size: 0.64rem;
+}
+
+.selection-count {
+  margin-right: auto;
+  color: var(--slate-500);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.form-error {
+  min-height: 16px;
+  margin: 7px 0 0;
+  color: var(--red-700);
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+
+.modal-confirm {
+  width: min(430px, calc(100vw - 32px));
+  padding: 28px 28px 0;
+  text-align: center;
+}
+
+.confirm-icon {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 15px;
+  color: var(--red-700);
+  place-items: center;
+  border-radius: 15px;
+  background: var(--red-100);
+}
+
+.confirm-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.modal-confirm h2 {
+  margin: 0;
+  color: var(--slate-800);
+  font-size: 1.05rem;
+}
+
+.modal-confirm > p {
+  margin: 9px auto 24px;
+  color: var(--slate-500);
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.modal-confirm .modal-footer {
+  margin: 0 -28px;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+.notification-stack {
+  position: fixed;
+  z-index: 100;
+  inset: auto 24px 24px auto;
+  display: flex;
+  width: min(380px, calc(100vw - 32px));
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: 9px;
+  overflow: visible;
+  pointer-events: none;
+  color: inherit;
+  border: 0;
+  background: transparent;
+}
+
+.notification-stack::backdrop {
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.toast-region {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.toast-region:empty {
+  display: none;
+}
+
+.toast {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 13px 15px;
+  color: var(--toast-text);
+  font-size: 0.7rem;
+  font-weight: 650;
+  border: 1px solid var(--toast-border);
+  border-radius: 10px;
+  background: var(--toast-surface);
+  box-shadow: var(--shadow-md);
+  animation: toast-in 200ms ease both;
+}
+
+.toast.is-leaving {
+  animation: toast-out 180ms ease both;
+}
+
+.toast-text {
+  flex: 1 1 auto;
+}
+
+/* Die Meldungsschicht laesst Klicks durch, damit sie die Arbeit darunter nicht
+   blockiert. Eine Meldung mit Knopf will aber getroffen werden und nimmt
+   Klicks deshalb selbst an. */
+.toast:has(.toast-action) {
+  pointer-events: auto;
+}
+
+/* Kompakte Tabellen: engere Zeilen, kleinere Zeichen, kleineres Bildzeichen.
+   Aus zwölf sichtbaren Zeilen werden so gut zwanzig - bei sechzig Mitarbeitern
+   der Unterschied zwischen Überblick und Blättern. */
+body.is-compact-tables .data-table th {
+  padding: 8px 12px;
+}
+
+body.is-compact-tables .data-table td {
+  padding: 7px 12px;
+  font-size: 0.69rem;
+}
+
+body.is-compact-tables .avatar {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  font-size: 0.6rem;
+}
+
+body.is-compact-tables .employee-cell small,
+body.is-compact-tables .profession-cell small {
+  display: none;
+}
+
+body.is-compact-tables :is(.table-actions, .qualification-tags) {
+  gap: 3px;
+}
+
+body.is-compact-tables .icon-button {
+  width: 28px;
+  height: 28px;
+}
+
+.column-choice-list {
+  display: grid;
+  gap: 10px;
+}
+
+/* Aktive Filter stehen als Chips unter der Filterleiste: Eine leere Liste
+   nennt so ihren Grund, und jeder Filter lässt sich einzeln wegklicken. */
+.filter-chip-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0 18px 14px;
+  flex-wrap: wrap;
+}
+
+.filter-chip-label {
+  color: var(--slate-500);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.filter-chip {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  padding: 5px 9px 5px 11px;
+  color: var(--blue-700);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  border: 1px solid var(--blue-100);
+  border-radius: 999px;
+  background: var(--blue-50);
+  transition:
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.filter-chip strong {
+  font-weight: 750;
+}
+
+.filter-chip svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.6;
+}
+
+.filter-chip:hover {
+  border-color: var(--blue-600);
+  background: var(--blue-100);
+}
+
+.filter-chip-remember {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-left: auto;
+  padding: 5px 11px;
+  color: var(--slate-600);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  border: 1px solid var(--slate-200);
+  border-radius: 999px;
+  background: var(--white);
+}
+
+.filter-chip-remember svg {
+  width: 13px;
+  height: 13px;
+}
+
+.filter-chip-remember:hover {
+  color: var(--slate-800);
+  border-color: var(--slate-300);
+  background: var(--slate-50);
+}
+
+/* Die Befehlspalette steht als schmales Feld im oberen Drittel - dort, wo der
+   Blick beim Tippen ohnehin liegt, und nicht mittig über der Arbeit. */
+.command-palette {
+  width: min(620px, calc(100vw - 32px));
+  max-height: min(560px, calc(100vh - 120px));
+  margin: 12vh auto auto;
+  padding: 0;
+  overflow: hidden;
+  color: var(--slate-800);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+
+.command-palette::backdrop {
+  background: rgb(9 23 38 / 60%);
+  backdrop-filter: blur(3px);
+  animation: backdrop-in 160ms ease both;
+}
+
+.command-palette-field {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.command-palette-field svg {
+  width: 18px;
+  height: 18px;
+  color: var(--slate-400);
+}
+
+.command-palette-field input {
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  border: 0;
+  background: transparent;
+}
+
+.command-palette-field input:focus {
+  outline: none;
+}
+
+.command-palette-results {
+  max-height: 380px;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.command-palette-group {
+  margin: 10px 8px 4px;
+  color: var(--slate-500);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.command-palette-group:first-child {
+  margin-top: 2px;
+}
+
+.command-palette-option {
+  display: grid;
+  width: 100%;
+  padding: 9px 10px;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+}
+
+.command-palette-option svg {
+  width: 17px;
+  height: 17px;
+  color: var(--slate-500);
+}
+
+.command-palette-option.is-active {
+  color: var(--blue-700);
+  background: var(--blue-50);
+}
+
+.command-palette-option.is-active svg {
+  color: var(--blue-600);
+}
+
+.command-palette-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-palette-hint {
+  color: var(--slate-500);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.command-palette-footer {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 10px 16px;
+  color: var(--slate-500);
+  font-size: 0.68rem;
+  border-top: 1px solid var(--slate-100);
+  background: var(--slate-50);
+}
+
+.command-palette-footer kbd {
+  margin-right: 3px;
+  padding: 1px 5px;
+  font: inherit;
+  font-size: 0.64rem;
+  font-weight: 800;
+  border: 1px solid var(--slate-300);
+  border-radius: 4px;
+  background: var(--white);
+}
+
+/* Die Kuerzeluebersicht: zwei Spalten, solange der Platz reicht. Die Tasten
+   stehen links in gleicher Breite, damit die Beschreibungen eine Kante
+   bilden. */
+.shortcut-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+}
+
+.shortcut-group h3 {
+  margin: 0 0 10px;
+  color: var(--slate-800);
+  font-size: 0.78rem;
+}
+
+.shortcut-hint {
+  margin: -4px 0 10px;
+  color: var(--slate-600);
+  font-size: 0.72rem;
+}
+
+.shortcut-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+}
+
+.shortcut-list > div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+
+.shortcut-list dt {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.shortcut-list dd {
+  margin: 0;
+  color: var(--slate-700);
+  font-size: 0.76rem;
+}
+
+.shortcut-list kbd,
+.shortcut-hint kbd {
+  min-width: 22px;
+  padding: 2px 6px;
+  color: var(--slate-800);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
+  border: 1px solid var(--slate-300);
+  border-radius: 5px;
+  background: var(--white);
+  box-shadow: 0 1px 0 var(--slate-300);
+}
+
+/* Der Knopf sitzt in der Meldung selbst - dort, wo der Blick nach dem Lesen
+   ohnehin ankommt. Die Meldung mit Knopf steht laenger als eine ohne. */
+.toast-action {
+  flex: 0 0 auto;
+  padding: 6px 11px;
+  color: inherit;
+  font: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+  border: 1px solid var(--toast-border);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 10%);
+  transition:
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.toast-action:hover {
+  border-color: rgb(255 255 255 / 30%);
+  background: rgb(255 255 255 / 20%);
+}
+
+.toast-icon {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  color: var(--toast-success-icon);
+  place-items: center;
+  border-radius: 50%;
+  background: var(--toast-success-tint);
+}
+
+.toast.is-error .toast-icon {
+  color: var(--toast-error-icon);
+  background: var(--toast-error-tint);
+}
+
+.toast.is-warning .toast-icon {
+  color: var(--toast-warning-icon);
+  background: var(--toast-warning-tint);
+}
+
+.toast-icon svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.5;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.text-danger {
+  color: var(--red-700);
+}
+
+.selection-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selection-toolbar .search-field {
+  width: min(430px, 100%);
+}
+
+.selection-column {
+  width: 42px;
+  padding-right: 6px !important;
+  padding-left: 14px !important;
+}
+
+.selection-column input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--blue-600);
+}
+
+.table-sort-button {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  border: 0;
+  background: transparent;
+  text-transform: inherit;
+}
+
+.table-sort-button:hover,
+.table-sort-button.is-active {
+  color: var(--blue-700);
+}
+
+.table-actions > span {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/* Desktop-Arbeitsplatz ---------------------------------------------------- */
+.action-menu {
+  position: relative;
+}
+
+.action-menu > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.action-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.action-menu-popover {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  width: max-content;
+  min-width: 250px;
+  padding: 7px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+
+.action-menu-popover button {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--slate-700);
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.action-menu-popover button:hover {
+  background: var(--slate-50);
+  color: var(--slate-900);
+}
+
+.action-menu-popover svg {
+  width: 17px;
+  height: 17px;
+}
+
+.action-menu-popover hr {
+  width: 100%;
+  margin: 5px 0;
+  border: 0;
+  border-top: 1px solid var(--slate-200);
+}
+
+.record-workspace {
+  display: grid;
+  min-width: 0;
+}
+
+.record-workspace:has(.record-inspector:not([hidden])) {
+  grid-template-columns: minmax(650px, 1fr) minmax(310px, 25vw);
+  gap: 16px;
+}
+
+.record-workspace > :first-child {
+  min-width: 0;
+  /* Ohne diese Zeile zoege die hohe Schnellansicht die Karten daneben auf
+     ihre Hoehe. */
+  align-self: start;
+}
+
+/* Der Kopf der Schnellansicht ohne Bild: Statt des Bildzeichens der Person
+   steht dort das Symbol der Datenart. */
+.record-inspector-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--blue-700);
+  border-radius: var(--radius-md);
+  background: var(--blue-50);
+}
+
+.record-inspector-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.record-inspector-text {
+  margin: 0;
+  color: var(--slate-700);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* Die Schnellansicht liegt neben Karten und Tabellen, die dieselbe Flaeche
+   benutzen - in mehreren Themes ist „weiss“ sogar derselbe Wert wie die Flaeche
+   daneben. Sie hebt sich deshalb dreifach ab: umlaufender Rahmen, Schatten und
+   eine leicht getoente Flaeche. Die Toenung entsteht aus den Farbmarken des
+   jeweiligen Themes, gilt also fuer helle wie dunkle gleichermassen; kennt ein
+   Browser color-mix nicht, bleibt es bei der gewoehnlichen Flaeche. */
+.record-inspector {
+  position: sticky;
+  top: 84px;
+  align-self: start;
+  max-height: calc(100vh - 105px);
+  overflow: auto;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  background: color-mix(in srgb, var(--white) 86%, var(--slate-200));
+  box-shadow: var(--shadow-md);
+}
+
+.record-inspector > div {
+  padding: 20px;
+}
+
+.record-inspector-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.record-inspector-header h2,
+.record-inspector-header p {
+  margin: 0;
+}
+
+.record-inspector-header small {
+  color: var(--slate-500);
+}
+
+.record-inspector-actions {
+  display: flex;
+  gap: 7px;
+  margin: 18px 0;
+}
+
+.record-inspector-actions .button {
+  flex: 1;
+  padding-inline: 10px;
+}
+
+.record-inspector-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: var(--slate-200);
+}
+
+.record-inspector-facts div {
+  min-width: 0;
+  padding: 10px;
+  background: var(--white);
+}
+
+/* Bei ungerader Anzahl fuellt die letzte Angabe die Zeile, statt ein leeres
+   Feld danebenstehen zu lassen. */
+.record-inspector-facts div:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.record-inspector-facts dt {
+  color: var(--slate-500);
+  font-size: 0.62rem;
+}
+
+.record-inspector-facts dd {
+  overflow: hidden;
+  margin: 4px 0 0;
+  color: var(--slate-800);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.record-inspector-section {
+  margin-top: 20px;
+}
+
+.record-inspector-section h3 {
+  margin: 0 0 10px;
+  font-size: 0.76rem;
+}
+
+.column-resize-handle {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: -3px;
+  width: 7px;
+  height: 100%;
+  cursor: col-resize;
+}
+
+.column-resize-handle:hover,
+body.is-resizing-column .column-resize-handle {
+  background: var(--blue-600);
+}
+
+body.is-resizing-column {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.column-choice-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+}
+
+.column-choice-row > .checkbox-field {
+  flex: 1;
+}
+
+.column-pin-choice {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--slate-500);
+  font-size: 0.68rem;
+}
+
+.column-order-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.column-unpin-button {
+  justify-self: start;
+}
+
+.command-palette-preview {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 16px;
+  color: var(--slate-600);
+  border-top: 1px solid var(--slate-100);
+  background: var(--blue-50);
+  font-size: 0.68rem;
+}
+
+.command-palette-preview span {
+  color: var(--blue-700);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.command-palette-preview strong {
+  overflow: hidden;
+  color: var(--slate-800);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-palette-preview small {
+  color: var(--slate-500);
+}
+
+.record-bulk-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  color: var(--blue-700);
+  border: 1px solid var(--blue-100);
+  border-radius: var(--radius-md);
+  background: var(--blue-50);
+  flex-wrap: wrap;
+}
+
+.record-bulk-bar[hidden] {
+  display: none;
+}
+
+.record-bulk-bar strong {
+  margin-right: auto;
+  font-size: 0.72rem;
+}
+
+.record-bulk-actions {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+/* Das Kontextmenü folgt dem Zeiger; die Stelle kommt als Marke aus dem
+   Programm, weil sie erst beim Öffnen feststeht. */
+.context-menu {
+  position: fixed;
+  z-index: 120;
+  top: var(--context-menu-top, 0);
+  left: var(--context-menu-left, 0);
+  display: grid;
+  min-width: 210px;
+  padding: 6px;
+  gap: 2px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+
+.context-menu[hidden] {
+  display: none;
+}
+
+.context-menu-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  color: var(--slate-800);
+  font: inherit;
+  font-size: 0.76rem;
+  text-align: left;
+  cursor: pointer;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.context-menu-item svg {
+  width: 15px;
+  height: 15px;
+  color: var(--slate-500);
+}
+
+.context-menu-item:hover,
+.context-menu-item:focus-visible {
+  background: var(--blue-50);
+  outline: none;
+}
+
+.context-menu-item.is-danger {
+  color: var(--red-700);
+}
+
+.context-menu-item.is-danger svg {
+  color: var(--red-700);
+}
+
+/* Ziehen im Raster: Der Zeiger zeigt den Griff, und der Tag unter dem Zeiger
+   hebt sich ab, solange ein Termin über ihm schwebt. */
+body.is-dragging-planner,
+body.is-dragging-appointment {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body.is-dragging-planner .vacation-day-cell,
+body.is-dragging-appointment .appointment-calendar-entry {
+  cursor: grabbing;
+}

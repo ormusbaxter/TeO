@@ -240,7 +240,7 @@ test("Die Einweisungsliste ist auf zehn sichtbare Einträge begrenzt", async () 
   const [indexHtml, deviceSource, styles] = await Promise.all([
     readFile(indexUrl, "utf8"),
     readFile(deviceSourceUrl, "utf8"),
-    readFile(new URL("../src/styles/00-core.css", import.meta.url), "utf8"),
+    readFile(new URL("../styles.css", import.meta.url), "utf8"),
   ]);
 
   assert.match(indexHtml, /id="deviceInstructionSearch"[^>]*type="search"/s);

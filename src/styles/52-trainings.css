@@ -1,0 +1,921 @@
+/* Pflichtfortbildungen: Katalog, Nachweise, Jahresmatrix und Zeitrechner. */
+
+.training-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.training-page-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.training-page-toolbar .compact-field {
+  width: min(220px, 100%);
+}
+
+.training-list {
+  display: grid;
+  gap: 14px;
+}
+
+.training-year-group {
+  display: grid;
+  gap: 12px;
+}
+
+.training-year-group + .training-year-group {
+  margin-top: 16px;
+  padding-top: 22px;
+  border-top: 1px solid var(--slate-200);
+}
+
+.training-year-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.training-year-header h2 {
+  margin: 3px 0 0;
+  color: var(--navy-950);
+  font-size: 1.3rem;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.training-year-header > span {
+  color: var(--slate-500);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.training-year-items {
+  display: grid;
+  gap: 14px;
+}
+
+.training-card {
+  overflow: hidden;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.training-card-main {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.2fr) minmax(190px, 0.8fr) auto;
+  gap: 28px;
+  align-items: center;
+  padding: 22px 24px;
+}
+
+.training-title-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.training-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  color: var(--teal-700);
+  border-radius: 11px;
+  background: var(--teal-100);
+}
+
+.training-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.training-title-row h2 {
+  margin: 1px 0 4px;
+  color: var(--slate-800);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.training-title-row p {
+  display: -webkit-box;
+  max-width: 540px;
+  margin: 0;
+  overflow: hidden;
+  color: var(--slate-500);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.training-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  color: var(--slate-500);
+  font-size: 0.65rem;
+}
+
+.training-meta svg {
+  width: 13px;
+  height: 13px;
+}
+
+.training-progress-block strong {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--slate-700);
+  font-size: 0.7rem;
+}
+
+.training-progress-block strong span:last-child {
+  color: var(--slate-500);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.training-progress-block small {
+  display: block;
+  margin-top: 7px;
+  color: var(--slate-500);
+  font-size: 0.6rem;
+}
+
+.training-actions {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.training-actions .button {
+  white-space: nowrap;
+}
+
+.training-card-details {
+  border-top: 1px solid var(--slate-100);
+  background: #fafbfd;
+}
+
+.training-card-details summary {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: max-content;
+  padding: 11px 24px;
+  cursor: pointer;
+  color: var(--slate-600);
+  font-size: 0.64rem;
+  font-weight: 700;
+  list-style: none;
+}
+
+.training-card-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.training-card-details summary::before {
+  width: 6px;
+  height: 6px;
+  content: "";
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 140ms ease;
+}
+
+.training-card-details[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.completion-history {
+  display: grid;
+  gap: 7px;
+  padding: 0 24px 18px;
+}
+
+.completion-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) 110px minmax(100px, 0.8fr) 34px;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 11px;
+  border: 1px solid var(--slate-100);
+  border-radius: 8px;
+  background: white;
+}
+
+.completion-person {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.completion-person strong {
+  overflow: hidden;
+  color: var(--slate-700);
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.completion-row > span {
+  overflow: hidden;
+  color: var(--slate-500);
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.completion-empty {
+  padding: 5px 0;
+  color: var(--slate-500);
+  font-size: 0.66rem;
+}
+
+.modal.training-matrix-dialog {
+  width: min(1400px, calc(100vw - 32px));
+}
+
+.modal.training-matrix-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.training-matrix-body {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.training-matrix-dialog .modal-header,
+.training-matrix-dialog .modal-footer {
+  flex: 0 0 auto;
+}
+
+.training-matrix-dialog .modal-footer {
+  flex-wrap: wrap;
+}
+
+.training-time-calculator-body {
+  display: grid;
+  gap: 24px;
+}
+
+.time-calculator-section {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: var(--slate-50);
+}
+
+.time-calculator-heading {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.time-calculator-heading h3 {
+  margin: 0 0 5px;
+  color: var(--navy-950);
+  font-size: 0.9rem;
+}
+
+.time-calculator-heading p,
+.time-calculator-empty p {
+  margin: 0;
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.time-span-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 20px;
+}
+
+.time-span-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 10px minmax(0, 1fr);
+  gap: 7px;
+  align-items: start;
+}
+
+.time-span-row > span {
+  padding-top: 10px;
+  color: var(--slate-500);
+  font-size: 0.7rem;
+  text-align: right;
+}
+
+.time-span-row label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.time-span-row label:focus-within {
+  border-color: #8ab2ee;
+  box-shadow: 0 0 0 3px rgb(40 120 227 / 10%);
+}
+
+.time-span-row input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  color: var(--slate-800);
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.time-span-row small {
+  display: grid;
+  min-width: 40px;
+  padding: 0 8px;
+  color: var(--slate-500);
+  font-size: 0.65rem;
+  place-items: center;
+  border-left: 1px solid var(--slate-100);
+  background: var(--slate-50);
+}
+
+.credited-training-time-list,
+.training-duration-settings {
+  display: grid;
+  gap: 8px;
+}
+
+.credited-training-time-row,
+.training-duration-setting-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(145px, 190px);
+  gap: 16px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: var(--white);
+}
+
+.credited-training-time-row > span:first-child,
+.training-duration-setting-row > span:first-child {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.credited-training-time-row strong,
+.training-duration-setting-row strong,
+.time-calculator-empty strong {
+  color: var(--slate-800);
+  font-size: 0.73rem;
+}
+
+.credited-training-time-row small,
+.training-duration-setting-row small {
+  color: var(--slate-500);
+  font-size: 0.64rem;
+}
+
+.credited-training-time-row .input-suffix input,
+.training-duration-setting-row .input-suffix input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  outline: 0;
+}
+
+.time-calculator-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  color: var(--blue-800);
+  border-radius: 10px;
+  background: var(--blue-100);
+}
+
+.time-calculator-result span {
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.time-calculator-result strong {
+  font-size: 0.76rem;
+}
+
+.time-calculator-formatted {
+  display: grid;
+  gap: 2px;
+  justify-items: end;
+}
+
+.time-calculator-formatted small {
+  color: var(--blue-700);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.time-calculator-formatted output {
+  min-width: 88px;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 850;
+  text-align: right;
+}
+
+.time-calculator-empty {
+  margin: 0;
+  padding: 14px;
+  color: var(--slate-600);
+  border: 1px dashed var(--slate-300);
+  border-radius: 9px;
+  background: var(--white);
+}
+
+.training-matrix-toolbar {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.training-rate-history {
+  margin-bottom: 16px;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  background: var(--slate-50);
+}
+
+.training-rate-history summary {
+  padding: 11px 14px;
+  color: var(--navy-950);
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.training-rate-history summary:focus-visible {
+  outline: 3px solid var(--blue-700);
+  outline-offset: 2px;
+}
+
+.training-rate-chart {
+  display: grid;
+  gap: 9px;
+  max-height: 230px;
+  padding: 3px 14px 14px;
+  overflow-y: auto;
+}
+
+.training-rate-bar-row {
+  display: grid;
+  grid-template-columns: 42px minmax(100px, 1fr) 44px;
+  gap: 10px;
+  align-items: center;
+  color: var(--slate-700);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.training-rate-bar-row > span:last-child {
+  text-align: right;
+}
+
+.training-rate-bar-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--slate-200);
+}
+
+.training-rate-bar-track span {
+  display: block;
+  width: var(--training-rate);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue-700), var(--teal-700));
+}
+
+.training-rate-chart-empty {
+  margin: 0;
+  padding: 3px 14px 14px;
+  color: var(--slate-500);
+  font-size: 0.66rem;
+}
+
+.training-matrix-toolbar .compact-field {
+  width: min(220px, 100%);
+}
+
+#trainingMatrixContent {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.training-matrix-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.training-matrix-summary strong {
+  color: var(--navy-950);
+  font-size: 0.9rem;
+}
+
+.training-matrix-summary span {
+  margin-top: 2px;
+  color: var(--slate-500);
+  font-size: 0.62rem;
+}
+
+.training-matrix-scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  background: white;
+  scrollbar-gutter: stable;
+}
+
+.training-matrix-horizontal-scroll {
+  height: 16px;
+  flex: 0 0 16px;
+  margin: 0 2px 7px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-color: var(--slate-400) var(--slate-100);
+  scrollbar-width: thin;
+}
+
+.training-matrix-horizontal-scroll[hidden] {
+  display: none;
+}
+
+.training-matrix-horizontal-spacer {
+  height: 1px;
+}
+
+.training-matrix-scroll:focus-visible {
+  outline: 3px solid var(--blue-700);
+  outline-offset: 2px;
+}
+
+.training-matrix-table {
+  width: max-content;
+  min-width: 100%;
+  table-layout: fixed;
+  border-spacing: 0;
+  border-collapse: separate;
+  color: var(--slate-700);
+  font-size: 0.66rem;
+}
+
+.training-matrix-table th,
+.training-matrix-table td {
+  height: 48px;
+  padding: 8px 12px;
+  text-align: center;
+  border-right: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--slate-100);
+  background: white;
+}
+
+.training-matrix-table thead th {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  /* Kopfzeile traegt Titel und Komplettierungsgrad und darf deshalb ueber die
+     feste Zeilenhoehe der Datenzellen hinauswachsen. */
+  height: auto;
+  width: 132px;
+  min-width: 132px;
+  max-width: 132px;
+  padding-bottom: 10px;
+  color: var(--slate-700);
+  font-size: 0.62rem;
+  line-height: 1.3;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  background: var(--slate-50);
+}
+
+.training-matrix-table thead th > span {
+  display: block;
+}
+
+.training-matrix-table th:first-child {
+  position: sticky;
+  z-index: 1;
+  left: 0;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  text-align: left;
+  background: white;
+}
+
+.training-matrix-table thead th:first-child {
+  z-index: 3;
+  background: var(--slate-50);
+}
+
+.training-matrix-table thead th:not(:first-child),
+.training-matrix-table tbody td {
+  width: 132px;
+  min-width: 132px;
+  max-width: 132px;
+}
+
+.training-matrix-table thead th {
+  height: 64px;
+}
+
+.training-matrix-table tbody th {
+  overflow: hidden;
+  color: var(--slate-800);
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 5px 0 8px rgb(16 34 54 / 3%);
+}
+
+.training-matrix-employee-link {
+  max-width: 100%;
+  padding: 0;
+  overflow: hidden;
+  color: var(--blue-700);
+  font: inherit;
+  font-weight: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--blue-600);
+  text-underline-offset: 2px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.training-matrix-employee-link:hover {
+  color: var(--navy-900);
+  text-decoration-color: currentcolor;
+}
+
+.training-matrix-employee-link:focus-visible {
+  outline: 2px solid var(--blue-700);
+  outline-offset: 2px;
+}
+
+.training-matrix-table tr:last-child th,
+.training-matrix-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.training-matrix-table th:last-child,
+.training-matrix-table td:last-child {
+  border-right: 0;
+}
+
+.matrix-status {
+  display: inline-grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+  border-radius: 50%;
+}
+
+.matrix-complete {
+  color: var(--green-700);
+  background: var(--green-100);
+}
+
+.matrix-open {
+  color: var(--red-700);
+  background: var(--red-100);
+}
+
+.training-matrix-legend {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-right: auto;
+  color: var(--slate-600);
+  font-size: 0.65rem;
+}
+
+.training-matrix-legend .matrix-status {
+  width: 22px;
+  height: 22px;
+  margin-left: 5px;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 1180px) {
+  .training-card-main {
+    grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.65fr);
+  }
+
+  .training-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-left: 52px;
+  }
+}
+
+@media (max-width: 900px) {
+  .time-span-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .training-matrix-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .training-matrix-summary {
+    align-items: flex-start;
+  }
+
+  .training-matrix-table th:first-child {
+    width: 165px;
+    min-width: 165px;
+    max-width: 165px;
+  }
+
+  .training-matrix-table thead th:not(:first-child),
+  .training-matrix-table tbody td {
+    width: 116px;
+    min-width: 116px;
+    max-width: 116px;
+  }
+
+  .training-matrix-legend {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .training-matrix-dialog .modal-footer {
+    align-items: stretch;
+  }
+
+  .training-matrix-dialog .modal-footer .button {
+    flex: 1 1 160px;
+  }
+
+  .training-card {
+    border-radius: 14px;
+  }
+
+  .training-summary {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .training-page-toolbar {
+    justify-content: stretch;
+  }
+
+  .training-page-toolbar .compact-field {
+    width: 100%;
+  }
+
+  .training-card-main {
+    grid-template-columns: 1fr;
+    gap: 17px;
+    padding: 18px;
+  }
+
+  .training-actions {
+    grid-column: auto;
+    padding-left: 52px;
+  }
+
+  .training-card-details summary {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .completion-history {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .completion-row {
+    grid-template-columns: 1fr auto 34px;
+  }
+
+  .completion-row > span:nth-child(3) {
+    display: none;
+  }
+
+  .time-calculator-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .time-calculator-heading .button {
+    align-self: flex-start;
+  }
+
+  .credited-training-time-row,
+  .training-duration-setting-row {
+    grid-template-columns: 1fr;
+  }
+
+  .time-calculator-result {
+    grid-template-columns: 1fr auto;
+  }
+
+  .time-calculator-result span {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 470px) {
+  .training-actions {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    padding-left: 0;
+  }
+
+  .training-actions .button {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}
+
+.training-matrix-table :is(thead, tbody) th:first-child {
+  position: sticky;
+  z-index: 3;
+  left: 0;
+  width: 190px;
+  min-width: 190px;
+  text-align: left;
+  box-shadow: 1px 0 0 var(--slate-200);
+}
+
+.training-matrix-table thead th:first-child {
+  z-index: 4;
+}
+
+.training-matrix-table thead th .completion-progress {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 3px 6px;
+  font-size: 0.56rem;
+  font-weight: 800;
+  border-radius: 999px;
+}
+
+.completion-progress.is-low {
+  color: var(--red-700);
+  background: var(--red-100);
+}
+
+.completion-progress.is-medium {
+  color: var(--orange-700);
+  background: var(--orange-100);
+}
+
+.completion-progress.is-high {
+  color: var(--green-700);
+  background: var(--green-100);
+}
