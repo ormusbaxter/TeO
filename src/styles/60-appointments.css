@@ -1,7 +1,6 @@
 /* Terminkalender: Terminliste und Monatsraster. */
 
-.appointment-toolbar,
-.memo-toolbar {
+.appointment-toolbar {
   display: flex;
   gap: 16px;
   align-items: center;
@@ -50,8 +49,7 @@
 }
 
 .appointment-group-pinned .appointment-group-title .important-notification-icon,
-.appointment-pinned-badge .important-notification-icon,
-.deadline-pin-badge .important-notification-icon {
+.appointment-pinned-badge .important-notification-icon {
   width: 14px;
   height: 14px;
 }
@@ -95,8 +93,7 @@
   opacity: 1;
 }
 
-.appointment-pinned-badge,
-.deadline-pin-badge {
+.appointment-pinned-badge {
   display: inline-flex;
   gap: 4px;
   align-items: center;

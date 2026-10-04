@@ -242,8 +242,7 @@ body.is-device-matrix-maximized {
 /* Die erste Spalte bleibt beim seitlichen Blättern stehen. Ohne sie weiß man
    nach ein paar Geräten nicht mehr, wessen Zeile man liest. Die Ecke oben
    links steht in beide Richtungen fest und liegt deshalb am höchsten. */
-.device-matrix-table :is(thead, tbody) th:first-child,
-.training-matrix-table :is(thead, tbody) th:first-child {
+.device-matrix-table :is(thead, tbody) th:first-child {
   position: sticky;
   z-index: 3;
   left: 0;
@@ -253,8 +252,7 @@ body.is-device-matrix-maximized {
   box-shadow: 1px 0 0 var(--slate-200);
 }
 
-.device-matrix-table thead th:first-child,
-.training-matrix-table thead th:first-child {
+.device-matrix-table thead th:first-child {
   z-index: 4;
 }
 
@@ -326,8 +324,7 @@ body.is-device-matrix-maximized {
   outline-offset: 1px;
 }
 
-.device-matrix-table thead th .completion-progress,
-.training-matrix-table thead th .completion-progress {
+.device-matrix-table thead th .completion-progress {
   display: inline-block;
   margin-top: 5px;
   padding: 3px 6px;
@@ -456,7 +453,6 @@ button.device-matrix-status {
 }
 
 #externalInstructorField[hidden],
-#employeeInstructorFields[hidden],
 .device-instructor-confirmation[hidden] {
   display: none;
 }
@@ -793,16 +789,14 @@ button.device-employee-overview-row:hover {
   }
 
   .device-filter-bar,
-  .device-overview-filter-bar,
-  .selection-toolbar {
+  .device-overview-filter-bar {
     align-items: stretch;
     grid-template-columns: 1fr;
     flex-direction: column;
   }
 
   .device-filter-bar .compact-field,
-  .device-filter-bar > .device-search-field,
-  .selection-toolbar .search-field {
+  .device-filter-bar > .device-search-field {
     width: 100%;
   }
 

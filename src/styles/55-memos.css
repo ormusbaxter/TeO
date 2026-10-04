@@ -1,6 +1,19 @@
 /* Memo / ToDo. */
 
 .memo-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.memo-toolbar {
   flex-wrap: wrap;
 }
 

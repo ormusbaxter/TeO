@@ -96,6 +96,28 @@
   margin-top: 22px;
 }
 
+.deadline-pin-badge .important-notification-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.deadline-pin-badge {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  margin-right: 8px;
+  padding: 3px 7px;
+  color: var(--orange-700);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  vertical-align: 2px;
+  text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, var(--orange-700) 38%, transparent);
+  border-radius: 999px;
+  background: var(--orange-100);
+}
+
 @media (max-width: 900px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -415,8 +437,7 @@
 }
 
 .deadline-row.is-overdue > :last-child strong,
-.deadline-row.is-overdue > :last-child small,
-.text-danger {
+.deadline-row.is-overdue > :last-child small {
   color: var(--red-700);
 }
 
@@ -430,11 +451,24 @@
     text-align: left;
   }
 
-  .deadline-summary,
-  .dossier-summary-grid,
-  .weekend-group-grid {
+  .deadline-summary {
     grid-template-columns: 1fr;
   }
+}
+
+.dashboard-layout-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-layout-row > span {
+  display: flex;
+  gap: 4px;
 }
 
 .dashboard-work-queue {

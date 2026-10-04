@@ -863,7 +863,7 @@ body.is-vacation-planner-maximized {
   border-color: var(--orange-700);
 }
 
-.vacation-table td.vacation-carry-over-expired input {
+.vacation-table td.vacation-carry-over-expired .vacation-additional-input {
   color: var(--slate-500);
   text-decoration: line-through;
 }
@@ -884,7 +884,7 @@ body.is-vacation-planner-maximized {
   background: var(--red-100) !important;
 }
 
-.vacation-overview-dialog {
+.modal.vacation-overview-dialog {
   width: min(96vw, 1500px);
   max-width: 1500px;
 }

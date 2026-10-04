@@ -350,6 +350,25 @@
   width: 100%;
 }
 
+.bulk-attendance-bar select,
+.attendance-status-field select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--slate-800);
+  font-size: 0.7rem;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  outline: 0;
+  background: var(--white);
+}
+
+.bulk-attendance-bar select:focus,
+.attendance-status-field select:focus {
+  border-color: #8ab2ee;
+  box-shadow: 0 0 0 3px rgb(40 120 227 / 10%);
+}
+
 .bulk-attendance-bar {
   display: grid;
   grid-template-columns: minmax(220px, 1fr) 190px auto;
@@ -493,6 +512,12 @@
   min-width: 0;
 }
 
+@media (max-width: 1180px) {
+  .meeting-card-main {
+    grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.65fr);
+  }
+}
+
 @media (max-width: 900px) {
   .meeting-stat-cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -524,6 +549,16 @@
 
   .meeting-chart-legend {
     width: 100%;
+  }
+
+  .meeting-card {
+    border-radius: 14px;
+  }
+
+  .meeting-card-main {
+    grid-template-columns: 1fr;
+    gap: 17px;
+    padding: 18px;
   }
 
   .meeting-attendance-history {

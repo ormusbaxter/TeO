@@ -276,6 +276,15 @@
   .employee-mini:nth-child(n + 4) {
     display: none;
   }
+
+  .qualification-grid,
+  .employee-selection {
+    grid-template-columns: 1fr;
+  }
+}
+
+#employeeInstructorFields[hidden] {
+  display: none;
 }
 
 #employeeInstructorFields {
@@ -445,6 +454,10 @@
     margin-right: 0;
   }
 
+  .dossier-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
   .qualification-expiry-row {
     grid-template-columns: 1fr;
   }
@@ -460,8 +473,7 @@
     width: 100%;
   }
 
-  .dossier-summary-grid,
-  .weekend-group-grid {
+  .dossier-summary-grid {
     grid-template-columns: 1fr;
   }
 }

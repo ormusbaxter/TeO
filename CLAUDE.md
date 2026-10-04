@@ -48,14 +48,22 @@ Nummernlogik wie `src/app/`: `00-foundation` (Farbmarken, Rücksetzen,
 Elementregeln), `10-components` (Bausteine mehrerer Bereiche: Schaltflächen,
 Felder, Tabellen, Dialoge, Meldungen …), `20-shell` (Seitenleiste, Seitenkopf,
 Anmeldemaske), danach je Fachbereich eine Datei bis `78-settings`, dann
-`80-themes` und `90-print`.
+`79-responsive`, `80-themes` und `90-print`.
 
 Die Reihenfolge ist Teil der Kaskade: Bausteine vor Rahmen, Rahmen vor den
 Fachbereichen, Themen und Druck zuletzt. Eine Regel, die einen Baustein für
 einen Bereich abwandelt, gehört deshalb in die Datei des Bereichs – dort steht
 sie hinter dem Baustein und gewinnt bei gleicher Spezifität. Eine neue Regel
 kommt in die Datei, deren Bereich sie betrifft, nicht ans Ende irgendeiner
-Datei.
+Datei; eine Selektorliste, die mehrere Bereiche anspricht, wird je Bereich
+aufgeteilt.
+
+Medienabfragen für Grundlagen, Bausteine und Rahmen stehen in
+`79-responsive.css`, hinter den Fachbereichen: Auf schmalen Bildschirmen sollen
+sie deren Grundgrößen überstimmen (Dialoge werden unter 720 Pixeln fast
+fensterbreit, auch wenn ein Bereich seinem Dialog eine Breite gibt).
+Abfragen, die nur einen Fachbereich betreffen, stehen in dessen Datei hinter
+seinen Grundregeln.
 
 ## Reihenfolge bei CHANGELOG-Einträgen
 

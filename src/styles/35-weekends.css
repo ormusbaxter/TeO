@@ -119,7 +119,7 @@
   overflow-y: auto;
 }
 
-.weekend-simulation-dialog {
+.modal.weekend-simulation-dialog {
   width: min(1180px, calc(100vw - 36px));
 }
 
@@ -340,6 +340,12 @@
   }
 }
 
+@media (max-width: 470px) {
+  .weekend-group-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 720px) {
   .weekend-simulation-summary,
   .weekend-simulation-groups,
@@ -353,6 +359,10 @@
 
   .weekend-simulation-employee > span:nth-last-child(-n + 2) {
     display: none;
+  }
+
+  .weekend-group-grid {
+    grid-template-columns: 1fr;
   }
 
   .weekend-comparison-note {

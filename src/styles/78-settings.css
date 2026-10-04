@@ -542,6 +542,15 @@
   padding-left: 60px;
 }
 
+.settings-empty-copy {
+  margin: 0;
+  padding: 14px;
+  color: var(--slate-600);
+  border: 1px dashed var(--slate-300);
+  border-radius: 9px;
+  background: var(--white);
+}
+
 /* Sachlicher Hinweis auf eine Einschraenkung, die man vor der Auswahl kennen
    muss - nicht als Fehler, aber deutlich abgesetzt vom Fliesstext. */
 .settings-warning-copy {

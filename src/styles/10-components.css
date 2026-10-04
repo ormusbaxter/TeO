@@ -742,9 +742,7 @@
 }
 
 .compact-field input,
-.compact-field select,
-.bulk-attendance-bar select,
-.attendance-status-field select {
+.compact-field select {
   width: 100%;
   min-height: 40px;
   padding: 8px 10px;
@@ -757,9 +755,7 @@
 }
 
 .compact-field input:focus,
-.compact-field select:focus,
-.bulk-attendance-bar select:focus,
-.attendance-status-field select:focus {
+.compact-field select:focus {
   border-color: #8ab2ee;
   box-shadow: 0 0 0 3px rgb(40 120 227 / 10%);
 }
@@ -1641,153 +1637,8 @@ body.is-compact-tables .icon-button {
   }
 }
 
-@media (max-width: 900px) {
-  .data-table th:nth-child(4),
-  .data-table td:nth-child(4) {
-    display: none;
-  }
-}
-
-@media (max-width: 720px) {
-  .panel,
-  .training-card,
-  .meeting-card {
-    border-radius: 14px;
-  }
-
-  .panel-header {
-    padding: 18px;
-  }
-
-  .progress-list {
-    padding: 0 18px 18px;
-  }
-
-  .progress-item {
-    grid-template-columns: minmax(110px, 1fr) minmax(60px, 0.8fr) 38px;
-    gap: 10px;
-  }
-
-  .toolbar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .segmented-control {
-    align-self: flex-start;
-  }
-
-  .data-table {
-    table-layout: auto;
-  }
-
-  .data-table th,
-  .data-table td {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-
-  .data-table th:nth-child(3),
-  .data-table td:nth-child(3),
-  .data-table th:nth-child(6),
-  .data-table td:nth-child(6) {
-    display: none;
-  }
-
-  .data-table th:first-child {
-    width: auto !important;
-  }
-
-  .data-table th:nth-last-child(2) {
-    width: 82px !important;
-  }
-
-  .data-table th:last-child {
-    width: 84px !important;
-  }
-
-  .summary-chip {
-    padding: 12px 14px;
-  }
-
-  .modal,
-  .modal-large {
-    width: calc(100vw - 20px);
-    max-height: calc(100dvh - 20px);
-    border-radius: 18px;
-  }
-
-  .modal form {
-    max-height: calc(100dvh - 20px);
-  }
-
-  .modal-header {
-    padding: 20px 19px 16px;
-  }
-
-  .modal-body {
-    padding: 20px 19px 24px;
-  }
-
-  .modal-footer {
-    padding: 14px 19px;
-  }
-
-  .form-grid,
-  .qualification-grid,
-  .employee-selection {
-    grid-template-columns: 1fr;
-  }
-
-  .form-field-wide {
-    grid-column: auto;
-  }
-
-  .modal-confirm {
-    padding: 24px 20px 0;
-  }
-
-  .modal-confirm .modal-footer {
-    margin: 0 -20px;
-  }
-
-  .notification-stack {
-    right: 16px;
-    bottom: 84px;
-    left: 16px;
-    width: auto;
-  }
-}
-
-@media (max-width: 470px) {
-  .panel-header {
-    align-items: flex-start;
-  }
-
-  .panel-header .text-button {
-    font-size: 0;
-  }
-
-  .panel-header .text-button svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .progress-item {
-    grid-template-columns: minmax(100px, 1fr) 55px 32px;
-  }
-
-  .segmented-control {
-    width: 100%;
-  }
-
-  .segmented-control button {
-    flex: 1;
-  }
-
-  .selection-count {
-    display: none;
-  }
+.text-danger {
+  color: var(--red-700);
 }
 
 .selection-toolbar {
@@ -2056,8 +1907,7 @@ body.is-resizing-column {
   user-select: none;
 }
 
-.column-choice-row,
-.dashboard-layout-row {
+.column-choice-row {
   display: flex;
   gap: 14px;
   align-items: center;
@@ -2079,8 +1929,7 @@ body.is-resizing-column {
   font-size: 0.68rem;
 }
 
-.column-order-actions,
-.dashboard-layout-row > span {
+.column-order-actions {
   display: flex;
   gap: 4px;
 }
@@ -2117,19 +1966,6 @@ body.is-resizing-column {
 
 .command-palette-preview small {
   color: var(--slate-500);
-}
-
-@media (max-width: 1199px) {
-  .record-workspace:has(.record-inspector:not([hidden])) {
-    grid-template-columns: 1fr;
-  }
-
-  .record-inspector {
-    position: static;
-    max-height: none;
-    border-top: 1px solid var(--slate-200);
-    border-left: 0;
-  }
 }
 
 .record-bulk-bar {
