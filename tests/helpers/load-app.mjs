@@ -29,6 +29,7 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       },
       getState() { return state; },
       getStateMutationSequence() { return stateMutationSequence; },
+      getUndoHistory() { return undoHistory; },
       setCurrentUser(value) { currentUser = value; },
       getCurrentUser() { return currentUser; },
       // Die Konfiguration der automatischen Sicherung entsteht sonst erst beim

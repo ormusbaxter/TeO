@@ -35,7 +35,10 @@ async function loadUndoApp(state) {
     [
       "commitStateMutation",
       "undoLastMutation",
+      "redoLastMutation",
       "hasUndoableMutation",
+      "hasRedoableMutation",
+      "clearUndoHistory",
       "describeMutation",
     ],
     { withDom: true },
@@ -128,6 +131,103 @@ test("Ohne Bezeichnung verfällt der gemerkte Schritt", async () => {
   assert.equal(app.getState().employees.length, 0, "Der Bestand bleibt, wie er ist");
 });
 
+// Löscht nacheinander die Mitarbeiter e1 … eN, jeden als eigenen Schritt.
+async function loescheNacheinander(app, anzahl) {
+  for (let i = 1; i <= anzahl; i += 1) {
+    await app.commitStateMutation(
+      () => {
+        app.getState().employees = app.getState().employees.filter(
+          (employee) => employee.id !== `e${i}`,
+        );
+      },
+      { undo: `e${i} gelöscht` },
+    );
+  }
+}
+
+const ids = (app) => app.getState().employees.map((employee) => employee.id).join(",");
+
+test("Zehn Schritte lassen sich nacheinander zurücknehmen, der elfte nicht", async () => {
+  const mitarbeiter = Array.from({ length: 11 }, (_, i) => createEmployee(`e${i + 1}`));
+  const app = await loadUndoApp(createMinimalState({ employees: mitarbeiter }));
+
+  await loescheNacheinander(app, 11);
+  assert.equal(ids(app), "");
+
+  for (let i = 0; i < 10; i += 1) {
+    assert.equal(await app.undoLastMutation(), true, `Schritt ${i + 1}`);
+  }
+  // Der älteste Schritt ist aus dem Verlauf gefallen: e1 bleibt gelöscht.
+  assert.equal(ids(app), "e2,e3,e4,e5,e6,e7,e8,e9,e10,e11");
+  assert.equal(app.hasUndoableMutation(), false);
+});
+
+test("Zurückgenommenes lässt sich wiederholen, in derselben Reihenfolge", async () => {
+  const app = await loadUndoApp(
+    createMinimalState({ employees: [createEmployee("e1"), createEmployee("e2")] }),
+  );
+  await loescheNacheinander(app, 2);
+  await app.undoLastMutation();
+  await app.undoLastMutation();
+  assert.equal(ids(app), "e1,e2");
+  assert.equal(app.hasRedoableMutation(), true);
+
+  assert.equal(await app.redoLastMutation(), true);
+  assert.equal(ids(app), "e2", "Zuerst kehrt die ältere Löschung zurück");
+  assert.equal(await app.redoLastMutation(), true);
+  assert.equal(ids(app), "");
+  assert.equal(app.hasRedoableMutation(), false);
+
+  // Das Wiederholte lässt sich erneut zurücknehmen.
+  assert.equal(await app.undoLastMutation(), true);
+  assert.equal(ids(app), "e2");
+  assert.equal(
+    app.getState().auditLog.map((entry) => entry.action).slice(0, 3).join(" | "),
+    "Rückgängig gemacht: e2 gelöscht | Wiederholt: e2 gelöscht | Wiederholt: e1 gelöscht",
+  );
+});
+
+test("Eine neue Änderung macht das Wiederholen hinfällig", async () => {
+  const app = await loadUndoApp(
+    createMinimalState({ employees: [createEmployee("e1"), createEmployee("e2")] }),
+  );
+  await loescheNacheinander(app, 1);
+  await app.undoLastMutation();
+  assert.equal(app.hasRedoableMutation(), true);
+
+  await loescheNacheinander(app, 2);
+  assert.equal(app.hasRedoableMutation(), false);
+  assert.equal(await app.redoLastMutation(), false);
+  assert.equal(app.hasUndoableMutation(), true, "Die neue Änderung selbst ist gemerkt");
+});
+
+test("Ein von außen geladener Bestand räumt den Verlauf ab", async () => {
+  const app = await loadUndoApp(
+    createMinimalState({ employees: [createEmployee("e1"), createEmployee("e2")] }),
+  );
+  await loescheNacheinander(app, 2);
+  await app.undoLastMutation();
+  assert.equal(app.hasUndoableMutation(), true);
+  assert.equal(app.hasRedoableMutation(), true);
+
+  // So rufen es Tab-Abgleich, Serverabgleich und Import auf: Ein gemerkter
+  // Stand überschriebe sonst, was andere inzwischen geändert haben.
+  app.clearUndoHistory();
+  assert.equal(app.hasUndoableMutation(), false);
+  assert.equal(app.hasRedoableMutation(), false);
+});
+
+test("Der Verlauf trägt kein Änderungsprotokoll mit", async () => {
+  const app = await loadUndoApp(
+    createMinimalState({ employees: [createEmployee("e1")] }),
+  );
+  await loescheNacheinander(app, 1);
+  // Das Protokoll ist der größte Posten im Bestand und wird beim Zurücknehmen
+  // ohnehin durch das aktuelle ersetzt.
+  const gemerkt = app.getUndoHistory()[0].state;
+  assert.equal("auditLog" in gemerkt, false);
+});
+
 test("Die Beschreibung benennt die geänderte Sammlung", async () => {
   const app = await loadUndoApp(createMinimalState());
   const vorher = createMinimalState({ employees: [createEmployee("e1")] });
@@ -164,7 +264,11 @@ test("Jede zurücknehmbare Änderung meldet sich auch als solche", async () => {
   // Diese Prüfung bleibt bewusst am Quelltext: Sie fragt nicht, wie eine
   // einzelne Aktion sich verhält, sondern ob im ganzen Bestand an Aktionen
   // eine vergessen wurde. Das lässt sich nicht an einem Beispiel zeigen.
-  const angeboten = [...combined.matchAll(/(?<!function )showUndoToast\(/g)].length;
+  // Ausgenommen ist das Wiederholen: Es legt den Schritt selbst wieder auf den
+  // Verlauf, ohne eigene Bezeichnung.
+  const angeboten = [
+    ...combined.matchAll(/(?<!function )showUndoToast\((?!`\$\{entry\.label\})/g),
+  ].length;
   const gemerkt = [...combined.matchAll(/\{ undo: /g)].length;
   assert.equal(
     angeboten,

@@ -20,6 +20,10 @@
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
+  // Ein Schritt im Verlauf ist eine Kopie des Datenbestands ohne Protokoll:
+  // mit der Demodatenbank (60 Mitarbeiter, rund 1,3 MB als JSON) etwa 2 MB
+  // Arbeitsspeicher, zehn Schritte also rund 20 MB.
+  const MAX_UNDO_STEPS = 10;
   // Mehr Betroffene merkt sich ein Protokolleintrag nicht; eine Sammelaktion
   // ueber das ganze Team bleibt so klein.
   const MAX_AUDIT_SUBJECTS = 100;
@@ -574,11 +578,14 @@
   let backendMode = "local";
   let remoteRevision = 0;
   let pendingRemoteConflictState = null;
-  // Der letzte Schritt, der sich zurücknehmen lässt: der Datenbestand, wie er
-  // vor der Änderung aussah, und ihre Bezeichnung für Meldung und Protokoll.
-  // Jede weitere Änderung räumt ihn ab - zurück geht es immer nur einen
-  // Schritt, und zwar den zuletzt gemeldeten.
-  let undoableMutation = null;
+  // Schritte, die sich zurücknehmen lassen: der Datenbestand, wie er vor der
+  // Änderung aussah, und ihre Bezeichnung für Meldung und Protokoll.
+  // Der Verlauf hält die letzten MAX_UNDO_STEPS gemeldeten Schritte, der
+  // jüngste zuletzt. Eine Änderung ohne Bezeichnung räumt ihn ab, ebenso ein
+  // von außen geladener Bestand. redoHistory hält zurückgenommene Schritte für
+  // „Wiederholen“, bis eine neue Änderung sie hinfällig macht.
+  let undoHistory = [];
+  let redoHistory = [];
   let backendStartupError = "";
   let backendHealth = null;
   let backendConnectionStatus = "local";
@@ -2976,9 +2983,15 @@
   // undo benennt die Aenderung fuer ein spaeteres Zuruecknehmen („Mitarbeiter
   // gelöscht“). Der Schnappschuss davor entsteht ohnehin fuer den Ruecklauf,
   // ein Schritt zurueck kostet also nur, ihn aufzuheben. Ohne undo verfaellt
-  // der zuletzt gemerkte Schritt: Was danach passiert ist, laesst sich nicht
-  // mehr ueberspringen.
-  async function commitStateMutation(mutate, { auditAction, undo = "" } = {}) {
+  // der ganze Verlauf: Was danach passiert ist, liesse sich nicht
+  // ueberspringen, ohne es mit zurueckzunehmen.
+  //
+  // historyStep ist Sache von undoLastMutation und redoLastMutation: Er sagt,
+  // auf welchen Stapel der Stand vor der Ruecknahme oder Wiederholung kommt.
+  async function commitStateMutation(
+    mutate,
+    { auditAction, undo = "", historyStep = null } = {},
+  ) {
     // Die Kopie fuer den Ruecklauf entsteht ueber JSON: In Chromium ist der
     // Umweg ueber Text fuer diesen Bestand messbar schneller als
     // structuredClone (6,5 ms gegenueber 11 ms bei 3600 Nachweisen).
@@ -2994,7 +3007,7 @@
     if (await persistState()) {
       stateMutationSequence += 1;
       databaseSaveReminderArmed = true;
-      undoableMutation = undo ? { label: undo, state: previousState } : null;
+      recordHistoryStep(previousState, undo, historyStep);
       renderAll();
       scheduleAutomaticBackup();
       return true;
@@ -3004,7 +3017,8 @@
     // gueltig - der Datenbestand ist derselbe wie zuvor. Hat dagegen der
     // Server einen anderen Stand geschickt, passt der Schnappschuss nicht mehr
     // dazu und wuerde fremde Aenderungen ueberschreiben.
-    if (pendingRemoteConflictState) undoableMutation = null;
+    if (pendingRemoteConflictState) clearUndoHistory();
+    else if (historyStep) restoreHistoryStep(historyStep);
     state = pendingRemoteConflictState || previousState;
     pendingRemoteConflictState = null;
     if (currentUser) {
@@ -3023,28 +3037,94 @@
   }
 
   function hasUndoableMutation() {
-    return Boolean(undoableMutation);
+    return undoHistory.length > 0;
+  }
+
+  function hasRedoableMutation() {
+    return redoHistory.length > 0;
+  }
+
+  // Ein Bestand, der von aussen kommt - aus einem anderen Tab, vom Server, aus
+  // einer Sicherung -, passt nicht mehr zu den gemerkten Staenden. Sie wieder
+  // einzuspielen, ueberschriebe fremde Aenderungen.
+  function clearUndoHistory() {
+    undoHistory = [];
+    redoHistory = [];
+  }
+
+  // Das Protokoll bleibt draussen: Beim Zuruecknehmen gilt ohnehin das
+  // aktuelle, und mit bis zu 1000 Eintraegen waere es je Schritt der
+  // groesste Posten.
+  function historySnapshot(snapshot, label) {
+    const { auditLog: _auditLog, ...data } = snapshot;
+    return { label, state: data };
+  }
+
+  function recordHistoryStep(previousState, label, historyStep) {
+    if (historyStep) {
+      const target = historyStep.direction === "undo" ? redoHistory : undoHistory;
+      target.push(historySnapshot(previousState, historyStep.label));
+      if (target.length > MAX_UNDO_STEPS) target.shift();
+      return;
+    }
+    if (!label) {
+      clearUndoHistory();
+      return;
+    }
+    undoHistory.push(historySnapshot(previousState, label));
+    if (undoHistory.length > MAX_UNDO_STEPS) undoHistory.shift();
+    redoHistory = [];
+  }
+
+  // Scheitert das Speichern einer Ruecknahme ohne fremden Stand, bleibt der
+  // Bestand, wie er war - und damit auch der Schritt verfuegbar.
+  function restoreHistoryStep(historyStep) {
+    const source = historyStep.direction === "undo" ? undoHistory : redoHistory;
+    source.push(historyStep.entry);
   }
 
   // Nimmt den zuletzt gemeldeten Schritt zurueck. Das Zuruecknehmen ist selbst
   // eine Aenderung: Es wird gespeichert und steht im Protokoll, damit im
   // Nachhinein nachvollziehbar bleibt, was wann verschwand und wiederkam.
   async function undoLastMutation() {
-    if (!undoableMutation) {
+    if (!undoHistory.length) {
       showToast("Es ist kein Schritt gemerkt, der sich zurücknehmen lässt.", "warning");
       return false;
     }
-    const { label, state: snapshot } = undoableMutation;
-    undoableMutation = null;
-    const committed = await commitStateMutation(
+    const entry = undoHistory.pop();
+    const committed = await applyHistoryEntry(entry, "undo");
+    if (committed) showRedoToast(`${entry.label} – wieder hergestellt.`);
+    return committed;
+  }
+
+  // Fuehrt den zuletzt zurueckgenommenen Schritt erneut aus. Auch das ist eine
+  // Aenderung mit eigener Zeile im Protokoll.
+  async function redoLastMutation() {
+    if (!redoHistory.length) {
+      showToast("Es ist kein zurückgenommener Schritt gemerkt.", "warning");
+      return false;
+    }
+    const entry = redoHistory.pop();
+    const committed = await applyHistoryEntry(entry, "redo");
+    if (committed) showUndoToast(`${entry.label} – erneut ausgeführt.`);
+    return committed;
+  }
+
+  async function applyHistoryEntry(entry, direction) {
+    const { label, state: snapshot } = entry;
+    return commitStateMutation(
       () => {
         // Das Protokoll bleibt, wie es ist: Der Schnappschuss kennt den
         // zurueckgenommenen Schritt noch nicht, und ein Protokoll, das die
         // eigene Geschichte loescht, waere keins. Nach dem Zuruecknehmen
         // stehen beide Zeilen darin - die Aenderung und ihre Ruecknahme.
-        const auditLog = state.auditLog;
-        state = snapshot;
-        state.auditLog = auditLog;
+        // Ebenso der Zeitpunkt der letzten Sicherung: Die Sicherung lief
+        // wirklich, auch wenn der Schritt davor zurueckgenommen wird.
+        state = {
+          ...snapshot,
+          auditLog: state.auditLog,
+          settings: { ...snapshot.settings, lastBackupAt: state.settings.lastBackupAt },
+        };
         // Der wiederhergestellte Bestand traegt eigene Kontoobjekte; ohne
         // diesen Abgleich zeigte die Oberflaeche weiter auf das alte.
         if (currentUser) {
@@ -3052,10 +3132,12 @@
             state.users.find((user) => user.id === currentUser.id) || currentUser;
         }
       },
-      { auditAction: `Rückgängig gemacht: ${label}` },
+      {
+        auditAction:
+          direction === "undo" ? `Rückgängig gemacht: ${label}` : `Wiederholt: ${label}`,
+        historyStep: { direction, label, entry },
+      },
     );
-    if (committed) showToast(`${label} – wieder hergestellt.`);
-    return committed;
   }
 
   // Gibt die Kennung des angelegten Eintrags zurueck, damit ein Aufrufer ihn
@@ -4437,6 +4519,7 @@
       openDialogs.forEach((dialog) => dialog.close());
 
       state = await loadState();
+      clearUndoHistory();
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       if (currentUser) {
         const refreshedUser = state.users.find((user) => user.id === currentUser.id);
@@ -4504,6 +4587,7 @@
       }
 
       state = normalizeState(result.state);
+      clearUndoHistory();
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       remoteRevision = nextRevision;
       remoteUpdateNoticeRevision = 0;
@@ -4881,6 +4965,7 @@
           password,
         );
         state = normalizeState(result.state);
+        clearUndoHistory();
         databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
         remoteRevision = Number(result.revision) || 0;
         backendStartupError = "";
@@ -8045,6 +8130,18 @@
       if (isTextEntry(event.target) || !hasUndoableMutation()) return;
       event.preventDefault();
       void undoLastMutation();
+      return;
+    }
+
+    // Wiederholen: Strg+Y wie unter Windows, Strg+Umschalt+Z wie unter macOS.
+    const pressed = event.key.toLowerCase();
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      ((pressed === "y" && !event.shiftKey) || (pressed === "z" && event.shiftKey))
+    ) {
+      if (isTextEntry(event.target) || !hasRedoableMutation()) return;
+      event.preventDefault();
+      void redoLastMutation();
       return;
     }
 
@@ -19464,6 +19561,7 @@
         if (pendingRemoteConflictState) {
           state = pendingRemoteConflictState;
           pendingRemoteConflictState = null;
+          clearUndoHistory();
         } else {
           state.settings.lastBackupAt = previousLastBackupAt;
           state.auditLog = state.auditLog.filter(
@@ -20836,6 +20934,7 @@
         health ? { health, synchronized: true } : { synchronized: true },
       );
       state = normalizeState(result.state);
+      clearUndoHistory();
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       backendStartupError = "";
       const remoteUser = state.users.find(
@@ -21246,6 +21345,8 @@
       renderAll();
       return false;
     }
+    // Die gemerkten Schritte gehoeren zum Bestand vor dem Import.
+    clearUndoHistory();
     stateMutationSequence += 1;
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
@@ -22652,6 +22753,19 @@
         label: "Rückgängig",
         onSelect: () => {
           void undoLastMutation();
+        },
+      },
+    });
+  }
+
+  // Nach einer Ruecknahme: Die Meldung bietet an, den Schritt doch wieder
+  // auszufuehren.
+  function showRedoToast(message) {
+    showToast(message, "success", {
+      action: {
+        label: "Wiederholen",
+        onSelect: () => {
+          void redoLastMutation();
         },
       },
     });

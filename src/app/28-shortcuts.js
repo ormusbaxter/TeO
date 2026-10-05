@@ -83,6 +83,18 @@
       return;
     }
 
+    // Wiederholen: Strg+Y wie unter Windows, Strg+Umschalt+Z wie unter macOS.
+    const pressed = event.key.toLowerCase();
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      ((pressed === "y" && !event.shiftKey) || (pressed === "z" && event.shiftKey))
+    ) {
+      if (isTextEntry(event.target) || !hasRedoableMutation()) return;
+      event.preventDefault();
+      void redoLastMutation();
+      return;
+    }
+
     if (event.ctrlKey || event.metaKey || event.altKey) return;
 
     // Esc raeumt eine Mehrfachauswahl ab - dieselbe Taste, die auch einen

@@ -737,6 +737,7 @@
         if (pendingRemoteConflictState) {
           state = pendingRemoteConflictState;
           pendingRemoteConflictState = null;
+          clearUndoHistory();
         } else {
           state.settings.lastBackupAt = previousLastBackupAt;
           state.auditLog = state.auditLog.filter(

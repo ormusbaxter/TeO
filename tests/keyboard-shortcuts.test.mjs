@@ -33,7 +33,7 @@ function keyEvent(key, { timeStamp = 1000, target, ...rest } = {}) {
 
 async function loadShortcutApp() {
   const app = await loadAppFunctions(
-    ["handleGlobalShortcut", "hasUndoableMutation", "commitStateMutation"],
+    ["handleGlobalShortcut", "hasUndoableMutation", "hasRedoableMutation", "commitStateMutation"],
     { withDom: true },
   );
   app.setDataStore({
@@ -139,6 +139,42 @@ test("Strg + Z nimmt zurück - außerhalb von Eingabefeldern", async () => {
   // genügt, damit sie abgeschlossen ist.
   await new Promise((resolve) => setTimeout(resolve, 0));
   assert.equal(app.getState().trainings.length, 0, "Die Fortbildung ist wieder weg");
+});
+
+test("Strg + Y und Strg + Umschalt + Z wiederholen das Zurückgenommene", async () => {
+  const app = await loadShortcutApp();
+  app.setState(createMinimalState({ trainings: [] }));
+  const body = new app.HTMLElement({ tagName: "BODY" });
+  const ablauf = () => new Promise((resolve) => setTimeout(resolve, 0));
+  await app.commitStateMutation(
+    () => {
+      app.getState().trainings = [
+        { id: "t1", title: "Reanimation", createdAt: "", updatedAt: "" },
+      ];
+    },
+    { undo: "Fortbildung angelegt" },
+  );
+
+  app.handleGlobalShortcut(keyEvent("z", { ctrlKey: true, target: body }));
+  await ablauf();
+  assert.equal(app.getState().trainings.length, 0);
+  assert.equal(app.hasRedoableMutation(), true);
+
+  // Im Eingabefeld bleibt auch das Wiederholen dem Browser.
+  const eingabefeld = new app.HTMLElement({ tagName: "INPUT" });
+  app.handleGlobalShortcut(keyEvent("y", { ctrlKey: true, target: eingabefeld }));
+  await ablauf();
+  assert.equal(app.getState().trainings.length, 0);
+
+  app.handleGlobalShortcut(keyEvent("y", { ctrlKey: true, target: body }));
+  await ablauf();
+  assert.equal(app.getState().trainings.length, 1, "Strg + Y wiederholt");
+
+  app.handleGlobalShortcut(keyEvent("z", { ctrlKey: true, target: body }));
+  await ablauf();
+  app.handleGlobalShortcut(keyEvent("Z", { ctrlKey: true, shiftKey: true, target: body }));
+  await ablauf();
+  assert.equal(app.getState().trainings.length, 1, "Strg + Umschalt + Z wiederholt");
 });
 
 test("Die Übersicht im Dialog nennt dieselben Kürzel wie das Programm", async () => {

@@ -317,6 +317,7 @@ im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.
 | **/** | Suchfeld der gezeigten Ansicht anspringen |
 | **n** | Neuen Eintrag der gezeigten Ansicht anlegen |
 | **Strg + Z** | Letzte Löschung oder Massenänderung zurücknehmen |
+| **Strg + Y** | Zurückgenommenen Schritt wiederholen (auch **Strg + Umschalt + Z**) |
 | **Esc** | Dialog schließen, Vollbild verlassen, Auswahl aufheben |
 | **Strg + Klick** | Karte zur Mehrfachauswahl hinzunehmen |
 | **Umschalt + Klick** | Alle Karten bis zur zuletzt angeklickten auswählen |
@@ -335,10 +336,19 @@ Nach dem Löschen eines Datensatzes und nach einer Sammelbearbeitung bietet die
 Meldung unten rechts **Rückgängig** an; dasselbe leistet **Strg + Z**. Damit
 kehrt der Datenbestand in den Zustand unmittelbar vor dieser Änderung zurück.
 
-Zurück geht es immer nur einen Schritt, und zwar den zuletzt gemeldeten: Sobald
-eine weitere Änderung gespeichert wurde, ist der vorherige Schritt nicht mehr
-verfügbar. Das Zurücknehmen ist selbst eine Änderung – im Änderungsprotokoll
-stehen anschließend beide Zeilen, die Löschung und ihre Rücknahme. Für ältere
+TeO merkt sich die letzten **zehn** solcher Schritte. Jedes weitere **Strg + Z**
+nimmt den nächstälteren zurück. Nach einer Rücknahme bietet die Meldung
+**Wiederholen** an; dasselbe leisten **Strg + Y** und **Strg + Umschalt + Z**.
+
+Der Verlauf gilt nur, solange nichts anderes dazwischenkommt: Jede andere
+gespeicherte Änderung, etwa ein bearbeiteter Mitarbeiter oder ein neuer
+Planungseintrag, leert ihn, ebenso Daten aus einem anderen Tab, vom Server oder
+aus einem Import. Eine neue zurücknehmbare Änderung verwirft die Schritte zum
+Wiederholen. Der Verlauf lebt nur in diesem Browserfenster und ist nach einem
+Neuladen leer.
+
+Zurücknehmen und Wiederholen sind selbst Änderungen – im Änderungsprotokoll
+stehen anschließend alle Zeilen, die Löschung und ihre Rücknahme. Für ältere
 Stände bleibt die Datensicherung der Weg zurück.
 
 ### Reihenfolge der Navigation anpassen

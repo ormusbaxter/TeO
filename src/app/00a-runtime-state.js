@@ -10,11 +10,14 @@
   let backendMode = "local";
   let remoteRevision = 0;
   let pendingRemoteConflictState = null;
-  // Der letzte Schritt, der sich zurücknehmen lässt: der Datenbestand, wie er
-  // vor der Änderung aussah, und ihre Bezeichnung für Meldung und Protokoll.
-  // Jede weitere Änderung räumt ihn ab - zurück geht es immer nur einen
-  // Schritt, und zwar den zuletzt gemeldeten.
-  let undoableMutation = null;
+  // Schritte, die sich zurücknehmen lassen: der Datenbestand, wie er vor der
+  // Änderung aussah, und ihre Bezeichnung für Meldung und Protokoll.
+  // Der Verlauf hält die letzten MAX_UNDO_STEPS gemeldeten Schritte, der
+  // jüngste zuletzt. Eine Änderung ohne Bezeichnung räumt ihn ab, ebenso ein
+  // von außen geladener Bestand. redoHistory hält zurückgenommene Schritte für
+  // „Wiederholen“, bis eine neue Änderung sie hinfällig macht.
+  let undoHistory = [];
+  let redoHistory = [];
   let backendStartupError = "";
   let backendHealth = null;
   let backendConnectionStatus = "local";

@@ -176,4 +176,17 @@
       },
     });
   }
+
+  // Nach einer Ruecknahme: Die Meldung bietet an, den Schritt doch wieder
+  // auszufuehren.
+  function showRedoToast(message) {
+    showToast(message, "success", {
+      action: {
+        label: "Wiederholen",
+        onSelect: () => {
+          void redoLastMutation();
+        },
+      },
+    });
+  }
 })();

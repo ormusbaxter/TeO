@@ -1,3 +1,10 @@
+### 4.57.0 – Zehn Schritte zurück und wieder vor
+
+- **Neu:** **Rückgängig** reicht jetzt bis zu zehn Schritte zurück: Jedes weitere **Strg + Z** nimmt die nächstältere Löschung oder Massenänderung zurück
+- **Neu:** Nach einer Rücknahme bietet die Meldung **Wiederholen** an; dasselbe leisten **Strg + Y** und **Strg + Umschalt + Z**
+- **Behoben:** Kamen zwischen einer Löschung und ihrer Rücknahme Daten aus einem anderen Tab, vom Server oder aus einem Import, konnte **Rückgängig** diese Daten überschreiben. Ein von außen geladener Bestand räumt den Verlauf jetzt ab
+- **Behoben:** **Rückgängig** setzte den Zeitpunkt der letzten Datensicherung zurück, wenn zwischendurch eine automatische Sicherung gelaufen war
+
 ### 4.56.3 – Farbthemen aufgeräumt
 
 - **Behoben:** In den dunklen Farbthemen fehlte einem Feiertag, der auf ein Wochenende fällt, in der Urlaubsplanung die rote Ecke. Er ist jetzt wie im hellen Thema gekennzeichnet
