@@ -1062,6 +1062,14 @@
     selectStartupBackupDirectoryButton: document.querySelector(
       "#selectStartupBackupDirectoryButton",
     ),
+    firstSharedFolderDialog: document.querySelector("#firstSharedFolderDialog"),
+    firstSharedFolderStatus: document.querySelector("#firstSharedFolderStatus"),
+    selectFirstSharedFolderButton: document.querySelector(
+      "#selectFirstSharedFolderButton",
+    ),
+    skipFirstSharedFolderButton: document.querySelector(
+      "#skipFirstSharedFolderButton",
+    ),
     dataOriginDialog: document.querySelector("#dataOriginDialog"),
     dataOriginStatus: document.querySelector("#dataOriginStatus"),
     createDataSetButton: document.querySelector("#createDataSetButton"),
@@ -3637,6 +3645,14 @@
       "change",
       handleStartupBackupFileSelection,
     );
+    elements.selectFirstSharedFolderButton.addEventListener(
+      "click",
+      () => void selectFirstSharedBackupDirectory(),
+    );
+    elements.skipFirstSharedFolderButton.addEventListener(
+      "click",
+      continueWithoutFirstSharedFolder,
+    );
     elements.validateBackupButton.addEventListener(
       "click",
       () => elements.validateBackupFile.click(),
@@ -4946,8 +4962,17 @@
       return;
     }
     databaseSaveReminderArmed = true;
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      firstSharedFilePending: true,
+    });
+    try {
+      await persistAutomaticBackupConfiguration();
+    } catch (error) {
+      console.warn("Die Ersteinrichtung des Sicherungsordners konnte nicht vermerkt werden.", error);
+    }
     elements.setupDialog.close();
-    completeLogin(admin, { requestStartupBackupPermission: true });
+    completeLogin(admin);
     showToast("TeO wurde eingerichtet.");
   }
 
@@ -5061,6 +5086,13 @@
     }
 
     if (!isMariaDbMode() && !startupBackupSynchronized) {
+      // Ein eben eingerichteter Datenbestand hat noch keine gemeinsame Datei,
+      // gegen die er abgeglichen werden koennte. Statt des Startabgleichs, der
+      // sie vergeblich verlangen wuerde, legt TeO sie zuerst an.
+      if (automaticBackupSettings?.firstSharedFilePending) {
+        showFirstSharedFolderDialog();
+        return;
+      }
       void synchronizeStartupBackupFromSavedDirectory({
         requestPermission: requestStartupBackupPermission,
       });
@@ -5093,6 +5125,30 @@
     applyAccessControl();
     if (!elements.loginDialog.open) elements.loginDialog.showModal();
     window.setTimeout(() => document.querySelector("#loginUsername").focus(), 0);
+  }
+
+  function showFirstSharedFolderDialog(status = "") {
+    document.body.classList.add("is-auth-locked");
+    elements.firstSharedFolderStatus.textContent = status;
+    const folderSelectionAvailable =
+      typeof window.showDirectoryPicker === "function";
+    elements.selectFirstSharedFolderButton.disabled = !folderSelectionAvailable;
+    elements.skipFirstSharedFolderButton.hidden = folderSelectionAvailable;
+    if (!folderSelectionAvailable && !status) {
+      elements.firstSharedFolderStatus.textContent =
+        "Einen Sicherungsordner können nur Chrome und Edge über HTTPS beziehungsweise localhost freigeben. Bis dahin arbeitet TeO nur mit dem Speicher dieses Browsers.";
+    }
+    if (!elements.firstSharedFolderDialog.open) {
+      elements.firstSharedFolderDialog.showModal();
+    }
+    window.setTimeout(
+      () =>
+        (folderSelectionAvailable
+          ? elements.selectFirstSharedFolderButton
+          : elements.skipFirstSharedFolderButton
+        ).focus(),
+      0,
+    );
   }
 
   function showStartupBackupDialog(status = "") {
@@ -5161,7 +5217,11 @@
     if (pendingLoginPassword) pendingLoginPassword = password;
     elements.changePasswordDialog.close();
     if (!isMariaDbMode() && !startupBackupSynchronized) {
-      void synchronizeStartupBackupFromSavedDirectory({ requestPermission: true });
+      if (automaticBackupSettings?.firstSharedFilePending) {
+        showFirstSharedFolderDialog();
+      } else {
+        void synchronizeStartupBackupFromSavedDirectory({ requestPermission: true });
+      }
     } else {
       document.body.classList.remove("is-auth-locked");
       applyAccessControl();
@@ -18864,6 +18924,9 @@
           ? parsedLastBackupSizeBytes
           : 0,
       directoryName: String(value.directoryName || "").trim().slice(0, 200),
+      // Ein hier neu eingerichteter Datenbestand, der noch nie in eine
+      // gemeinsame Datei geschrieben wurde. Mit ihm gibt es nichts abzugleichen.
+      firstSharedFilePending: Boolean(value.firstSharedFilePending),
     };
   }
 
@@ -20481,6 +20544,70 @@
       console.error("Die Ordnerverknüpfung konnte nicht gespeichert werden.", error);
     }
     return synchronizeStartupBackupFile(located.file);
+  }
+
+  // Schliesst die Ersteinrichtung ab: Der gewaehlte Ordner wird verknuepft und
+  // bekommt die erste teo-autosicherung.json. Liegt dort schon eine, gehoert
+  // sie zu einem anderen Datenbestand - ueberschrieben wird sie nicht.
+  async function selectFirstSharedBackupDirectory() {
+    const status = elements.firstSharedFolderStatus;
+    status.textContent = "";
+    const handle = await requestSharedBackupDirectory(status);
+    if (!handle) return false;
+    const located = await findStartupBackupFileInSavedDirectory(handle, true);
+    if (located.status === "found") {
+      status.textContent =
+        `In diesem Ordner liegt bereits eine ${AUTO_BACKUP_FILENAME}. Wählen Sie einen leeren Ordner – ` +
+        "oder melden Sie sich ab, um einen vorhandenen Datenbestand zu öffnen.";
+      return false;
+    }
+    if (located.status !== "file-missing") {
+      status.textContent = sharedBackupDirectoryMessage(located.status);
+      return false;
+    }
+    elements.selectFirstSharedFolderButton.disabled = true;
+    status.textContent = `${AUTO_BACKUP_FILENAME} wird angelegt …`;
+    try {
+      await linkAutomaticBackupDirectory(handle);
+      const written = await runAutomaticBackup({
+        force: true,
+        requestPermission: true,
+        overwriteForeignChanges: true,
+      });
+      if (!written) {
+        status.textContent =
+          automaticBackupNotice ||
+          `${AUTO_BACKUP_FILENAME} konnte nicht angelegt werden.`;
+        return false;
+      }
+      automaticBackupSettings = normalizeAutomaticBackupSettings({
+        ...automaticBackupSettings,
+        firstSharedFilePending: false,
+      });
+      await persistAutomaticBackupConfiguration();
+    } catch (error) {
+      console.error("Der Sicherungsordner konnte nicht eingerichtet werden.", error);
+      status.textContent = "Der Sicherungsordner konnte nicht eingerichtet werden.";
+      return false;
+    } finally {
+      elements.selectFirstSharedFolderButton.disabled = false;
+    }
+    finishFirstSharedFolderStep();
+    return true;
+  }
+
+  // Nur ohne Ordnerauswahl im Browser: Die Sitzung oeffnet, der Vermerk bleibt.
+  // Beim naechsten Start fragt TeO wieder nach dem Ordner statt nach einer
+  // Datei, die es nicht gibt.
+  function continueWithoutFirstSharedFolder() {
+    if (typeof window.showDirectoryPicker === "function") return;
+    finishFirstSharedFolderStep();
+  }
+
+  function finishFirstSharedFolderStep() {
+    startupBackupSynchronized = true;
+    if (elements.firstSharedFolderDialog.open) elements.firstSharedFolderDialog.close();
+    if (currentUser) completeLogin(currentUser);
   }
 
   async function handleStartupBackupFileSelection(event) {

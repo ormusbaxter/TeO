@@ -383,6 +383,70 @@
     return synchronizeStartupBackupFile(located.file);
   }
 
+  // Schliesst die Ersteinrichtung ab: Der gewaehlte Ordner wird verknuepft und
+  // bekommt die erste teo-autosicherung.json. Liegt dort schon eine, gehoert
+  // sie zu einem anderen Datenbestand - ueberschrieben wird sie nicht.
+  async function selectFirstSharedBackupDirectory() {
+    const status = elements.firstSharedFolderStatus;
+    status.textContent = "";
+    const handle = await requestSharedBackupDirectory(status);
+    if (!handle) return false;
+    const located = await findStartupBackupFileInSavedDirectory(handle, true);
+    if (located.status === "found") {
+      status.textContent =
+        `In diesem Ordner liegt bereits eine ${AUTO_BACKUP_FILENAME}. Wählen Sie einen leeren Ordner – ` +
+        "oder melden Sie sich ab, um einen vorhandenen Datenbestand zu öffnen.";
+      return false;
+    }
+    if (located.status !== "file-missing") {
+      status.textContent = sharedBackupDirectoryMessage(located.status);
+      return false;
+    }
+    elements.selectFirstSharedFolderButton.disabled = true;
+    status.textContent = `${AUTO_BACKUP_FILENAME} wird angelegt …`;
+    try {
+      await linkAutomaticBackupDirectory(handle);
+      const written = await runAutomaticBackup({
+        force: true,
+        requestPermission: true,
+        overwriteForeignChanges: true,
+      });
+      if (!written) {
+        status.textContent =
+          automaticBackupNotice ||
+          `${AUTO_BACKUP_FILENAME} konnte nicht angelegt werden.`;
+        return false;
+      }
+      automaticBackupSettings = normalizeAutomaticBackupSettings({
+        ...automaticBackupSettings,
+        firstSharedFilePending: false,
+      });
+      await persistAutomaticBackupConfiguration();
+    } catch (error) {
+      console.error("Der Sicherungsordner konnte nicht eingerichtet werden.", error);
+      status.textContent = "Der Sicherungsordner konnte nicht eingerichtet werden.";
+      return false;
+    } finally {
+      elements.selectFirstSharedFolderButton.disabled = false;
+    }
+    finishFirstSharedFolderStep();
+    return true;
+  }
+
+  // Nur ohne Ordnerauswahl im Browser: Die Sitzung oeffnet, der Vermerk bleibt.
+  // Beim naechsten Start fragt TeO wieder nach dem Ordner statt nach einer
+  // Datei, die es nicht gibt.
+  function continueWithoutFirstSharedFolder() {
+    if (typeof window.showDirectoryPicker === "function") return;
+    finishFirstSharedFolderStep();
+  }
+
+  function finishFirstSharedFolderStep() {
+    startupBackupSynchronized = true;
+    if (elements.firstSharedFolderDialog.open) elements.firstSharedFolderDialog.close();
+    if (currentUser) completeLogin(currentUser);
+  }
+
   async function handleStartupBackupFileSelection(event) {
     const file = event.target.files?.[0];
     event.target.value = "";

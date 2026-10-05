@@ -3119,6 +3119,16 @@ body.is-sidebar-collapsed .sidebar-search {
   flex-basis: 48px;
 }
 
+/* Drei Schaltflaechen passen nicht nebeneinander in den schmalen Dialog. Ohne
+   Umbruch ragte die erste links aus dem Fenster. */
+.auth-dialog .modal-footer {
+  flex-wrap: wrap;
+}
+
+.auth-dialog .modal-footer [data-logout] {
+  margin-right: auto;
+}
+
 .auth-error {
   min-height: 20px;
   margin-top: 14px;
@@ -9994,6 +10004,42 @@ button.device-employee-overview-row:hover {
 }
 
 .data-origin-choice small {
+  color: var(--slate-600);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+/* Hinweis im Startabgleich und bei der Ordnerwahl der Ersteinrichtung: wie
+   eine Wahlkachel aufgebaut, ohne die Hoehe und Mitte des leeren Zustands. */
+.auth-dialog .compact-empty-state {
+  min-height: 0;
+  flex-direction: row;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 15px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.auth-dialog .compact-empty-state svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  margin-top: 2px;
+  color: var(--blue-600);
+}
+
+.auth-dialog .compact-empty-state > div {
+  display: grid;
+  gap: 4px;
+}
+
+.auth-dialog .compact-empty-state strong {
+  font-size: 0.96rem;
+}
+
+.auth-dialog .compact-empty-state span {
   color: var(--slate-600);
   font-size: 0.82rem;
   line-height: 1.45;

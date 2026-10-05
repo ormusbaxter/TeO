@@ -1,3 +1,8 @@
+### 4.57.1 – Erster Start ohne Sperre
+
+- **Behoben:** Nach der Einrichtung eines neuen Datenbestands verlangte der Startabgleich `teo-autosicherung.json` – eine Datei, die es noch gar nicht gab. TeO blieb gesperrt, auch nach Neuladen und erneuter Anmeldung. Stattdessen wird jetzt der Sicherungsordner festgelegt: TeO legt dort die erste `teo-autosicherung.json` an und öffnet sich. Ein Ordner, in dem bereits eine solche Datei liegt, wird abgelehnt und nicht überschrieben
+- **Behoben:** Im Dialog des Startabgleichs ragte die Schaltfläche **Abmelden** links aus dem Fenster, und der Hinweistext stand übergroß in der Mitte
+
 ### 4.57.0 – Zehn Schritte zurück und wieder vor
 
 - **Neu:** **Rückgängig** reicht jetzt bis zu zehn Schritte zurück: Jedes weitere **Strg + Z** nimmt die nächstältere Löschung oder Massenänderung zurück

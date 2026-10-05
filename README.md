@@ -13,7 +13,9 @@ als Online-Hilfe in die Anwendung eingebettet.
 
 Im lokalen Einzelplatzmodus wird `index.html` in einem aktuellen Browser
 geöffnet. Beim ersten Start führt TeO durch die Einrichtung des ersten
-Administratorkontos.
+Administratorkontos und fragt anschließend nach dem Sicherungsordner, in dem es
+die gemeinsame Datei `teo-autosicherung.json` anlegt (siehe „Erster Start an
+einem weiteren Arbeitsplatz“).
 
 Für den gemeinsamen Betrieb über MariaDB wird die Anwendung über den
 TeO-Server aufgerufen. Die technische Einrichtung ist im Abschnitt
@@ -426,9 +428,9 @@ neben einen geöffneten Dialog auswirkt:
   Dialog.
 
 In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten
-Eingaben, fragt TeO vorher nach. Die fünf Dialoge rund um Start und Anmeldung –
-Herkunft des Datenbestands, Ersteinrichtung, Anmeldung, Startabgleich und
-Passwortänderung – bleiben von der Einstellung unberührt und lassen sich weder
+Eingaben, fragt TeO vorher nach. Die sechs Dialoge rund um Start und Anmeldung –
+Herkunft des Datenbestands, Ersteinrichtung, Sicherungsordner der
+Ersteinrichtung, Anmeldung, Startabgleich und Passwortänderung – bleiben von der Einstellung unberührt und lassen sich weder
 per Klick daneben noch per Escape schließen.
 
 ### Schulferien pflegen
@@ -1402,7 +1404,16 @@ zum ersten Mal geöffnet, fragt TeO zunächst, woher der Datenbestand kommt:
   Arbeitsplatz angelegt wurde, mit seinem gewohnten Passwort. Ordnerverknüpfung,
   Sicherungsschlüssel, Konten und Daten kommen damit in einem Schritt.
 - **Neuen Datenbestand einrichten** – nur für den allerersten Arbeitsplatz. Es
-  entsteht ein erstes Administratorkonto und ein leerer Datenbestand.
+  entsteht ein erstes Administratorkonto und ein leerer Datenbestand; darin
+  sind bereits der Gerätekatalog und die NRW-Schulferien hinterlegt. Danach
+  wird der Sicherungsordner festgelegt, am besten ein leerer Ordner auf einem
+  gemeinsamen Laufwerk. TeO legt dort die erste `teo-autosicherung.json` an,
+  verknüpft den Ordner und öffnet sich. Liegt in dem gewählten Ordner bereits
+  eine solche Datei, lehnt TeO ihn ab, statt einen vorhandenen Datenbestand zu
+  überschreiben. Bis der Ordner festgelegt ist, fragt TeO bei jedem Start
+  wieder danach statt nach der Datei. Browser ohne Ordnerfreigabe (etwa
+  Firefox) bieten stattdessen **Ohne Ordner fortfahren** an; TeO arbeitet dann
+  nur mit dem Speicher dieses Browsers.
 
 Ein Konto muss also nur einmal angelegt werden. Neue Konten, Passwortänderungen
 und Passwort-Resets werden über die gemeinsame Datei an alle Arbeitsplätze

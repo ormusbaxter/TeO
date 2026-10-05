@@ -303,8 +303,17 @@
       return;
     }
     databaseSaveReminderArmed = true;
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      firstSharedFilePending: true,
+    });
+    try {
+      await persistAutomaticBackupConfiguration();
+    } catch (error) {
+      console.warn("Die Ersteinrichtung des Sicherungsordners konnte nicht vermerkt werden.", error);
+    }
     elements.setupDialog.close();
-    completeLogin(admin, { requestStartupBackupPermission: true });
+    completeLogin(admin);
     showToast("TeO wurde eingerichtet.");
   }
 
@@ -418,6 +427,13 @@
     }
 
     if (!isMariaDbMode() && !startupBackupSynchronized) {
+      // Ein eben eingerichteter Datenbestand hat noch keine gemeinsame Datei,
+      // gegen die er abgeglichen werden koennte. Statt des Startabgleichs, der
+      // sie vergeblich verlangen wuerde, legt TeO sie zuerst an.
+      if (automaticBackupSettings?.firstSharedFilePending) {
+        showFirstSharedFolderDialog();
+        return;
+      }
       void synchronizeStartupBackupFromSavedDirectory({
         requestPermission: requestStartupBackupPermission,
       });
@@ -450,6 +466,30 @@
     applyAccessControl();
     if (!elements.loginDialog.open) elements.loginDialog.showModal();
     window.setTimeout(() => document.querySelector("#loginUsername").focus(), 0);
+  }
+
+  function showFirstSharedFolderDialog(status = "") {
+    document.body.classList.add("is-auth-locked");
+    elements.firstSharedFolderStatus.textContent = status;
+    const folderSelectionAvailable =
+      typeof window.showDirectoryPicker === "function";
+    elements.selectFirstSharedFolderButton.disabled = !folderSelectionAvailable;
+    elements.skipFirstSharedFolderButton.hidden = folderSelectionAvailable;
+    if (!folderSelectionAvailable && !status) {
+      elements.firstSharedFolderStatus.textContent =
+        "Einen Sicherungsordner können nur Chrome und Edge über HTTPS beziehungsweise localhost freigeben. Bis dahin arbeitet TeO nur mit dem Speicher dieses Browsers.";
+    }
+    if (!elements.firstSharedFolderDialog.open) {
+      elements.firstSharedFolderDialog.showModal();
+    }
+    window.setTimeout(
+      () =>
+        (folderSelectionAvailable
+          ? elements.selectFirstSharedFolderButton
+          : elements.skipFirstSharedFolderButton
+        ).focus(),
+      0,
+    );
   }
 
   function showStartupBackupDialog(status = "") {
@@ -518,7 +558,11 @@
     if (pendingLoginPassword) pendingLoginPassword = password;
     elements.changePasswordDialog.close();
     if (!isMariaDbMode() && !startupBackupSynchronized) {
-      void synchronizeStartupBackupFromSavedDirectory({ requestPermission: true });
+      if (automaticBackupSettings?.firstSharedFilePending) {
+        showFirstSharedFolderDialog();
+      } else {
+        void synchronizeStartupBackupFromSavedDirectory({ requestPermission: true });
+      }
     } else {
       document.body.classList.remove("is-auth-locked");
       applyAccessControl();
