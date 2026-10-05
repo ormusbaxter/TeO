@@ -1,3 +1,8 @@
+### 4.58.1 – Zusatzqualifikationen ohne eingefrorenen Dialog
+
+- **Behoben:** Ein Häkchen bei den Zusatzqualifikationen im Mitarbeiterdialog – etwa „Stellvertretende Stationsleitung“ – ließ den Dialog weiß werden: Sein Inhalt rollte nach oben aus dem Bild und war nicht mehr zu erreichen. Der Dialog bleibt jetzt stehen, und das Häkchen wird gesetzt. Dasselbe gilt für alle Ankreuzkarten in anderen Dialogen
+- **Behoben:** Beim allerersten Start meldete die Konsole einen Fehler beim Laden der Einstellungen der automatischen Sicherung
+
 ### 4.58.0 – Erst der Datenbestand, dann die Anmeldung
 
 - **Geändert:** Im lokalen Modus kommt der Datenbestand vor der Anmeldung. Angemeldet wird mit den Konten aus `teo-autosicherung.json`, nicht mit dem Stand, den dieser Browser zuletzt kannte – ein an einem anderen Arbeitsplatz geändertes Passwort oder gelöschtes Konto gilt damit sofort. Die Anmeldemaske nennt den Ordner, aus dem TeO den Bestand lädt
