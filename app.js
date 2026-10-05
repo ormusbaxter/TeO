@@ -754,7 +754,6 @@
     dashboardDate: document.querySelector("#dashboardDate"),
     dashboardSummary: document.querySelector("#dashboardSummary"),
     dashboardKpis: document.querySelector("#dashboardKpis"),
-    dashboardAbsence: document.querySelector("#dashboardAbsence"),
     projectBuildLabel: document.querySelector("#projectBuildLabel"),
     loginProjectVersion: document.querySelector("#loginProjectVersion"),
     deadlineOverview: document.querySelector("#deadlineOverview"),
@@ -6955,7 +6954,7 @@
   const DASHBOARD_LAYOUT_KEY = "teo-dashboard-layout-v2";
   const DASHBOARD_WIDGETS = Object.freeze([
     { key: "summary", label: "Kennzahlen" },
-    { key: "upcoming", label: "Als Nächstes, Abwesenheiten und Memos" },
+    { key: "upcoming", label: "Als Nächstes, Schnellzugriff und Memos" },
     { key: "trainings", label: "Offene Nachweise nach Fortbildung" },
   ]);
 
@@ -8843,7 +8842,6 @@
   function renderDashboard() {
     renderDashboardGreeting();
     renderDashboardSummary();
-    renderDashboardAbsences();
     renderDashboardTrainingProgress();
   }
 
@@ -8986,49 +8984,6 @@
         return true;
       })
       .sort(sortEmployees);
-  }
-
-  function renderDashboardAbsences(today = todayIso()) {
-    if (!elements.dashboardAbsence) return;
-    const days = dashboardWeekDates(today).map((date) => {
-      const parsed = parseLocalDate(date);
-      return {
-        date,
-        label: `${parsed.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "")} ${parsed.getDate()}.`,
-        employees: dashboardAbsencesOn(date),
-        stats: getPlannerDayStats(date),
-      };
-    });
-    const absentToday = dashboardAbsencesOn(today);
-    elements.dashboardAbsence.innerHTML = `
-      <div class="dashboard-week">
-        ${days
-          .map(({ date, label, employees, stats }) => {
-            const limitClass = stats.isOverLimit ? "is-over-limit" : stats.isAtLimit ? "is-at-limit" : "";
-            const names = employees.map(fullName).join(", ");
-            return `
-              <button
-                class="dashboard-week-day ${date === today ? "is-today" : ""} ${limitClass}"
-                type="button"
-                data-dashboard-absence-day="${date}"
-                title="${escapeHtml(names || "Niemand abwesend")}"
-              >
-                <span class="dashboard-week-label">${escapeHtml(label)}</span>
-                ${renderDashboardFaces(employees, 4, "is-column")}
-                <small>${employees.length ? `${employees.length} weg` : "alle da"}</small>
-              </button>
-            `;
-          })
-          .join("")}
-      </div>
-      <p class="dashboard-absence-note">${
-        absentToday.length
-          ? `Heute abwesend: ${escapeHtml(absentToday.map(fullName).join(" · "))}`
-          : dashboardWeekDates(today).includes(today)
-            ? "Heute sind alle im Dienst."
-            : "Die Übersicht zeigt die kommende Woche."
-      }</p>
-    `;
   }
 
   // Kürzel der Betroffenen, überlappend. Die Farbe folgt dem Mitarbeiter,
@@ -9319,10 +9274,6 @@
     const quality = event.target.closest("[data-deadline-quality]");
     if (quality) {
       openEmployeeDialog(quality.dataset.deadlineQuality);
-      return;
-    }
-    if (event.target.closest("[data-dashboard-absence-day]")) {
-      showView("vacations");
       return;
     }
     const training = event.target.closest("[data-dashboard-training]");

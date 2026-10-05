@@ -8,7 +8,7 @@
   const DASHBOARD_LAYOUT_KEY = "teo-dashboard-layout-v2";
   const DASHBOARD_WIDGETS = Object.freeze([
     { key: "summary", label: "Kennzahlen" },
-    { key: "upcoming", label: "Als Nächstes, Abwesenheiten und Memos" },
+    { key: "upcoming", label: "Als Nächstes, Schnellzugriff und Memos" },
     { key: "trainings", label: "Offene Nachweise nach Fortbildung" },
   ]);
 

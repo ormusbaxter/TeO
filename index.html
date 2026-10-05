@@ -487,19 +487,14 @@
             </section>
 
             <div class="dashboard-aside">
-              <section class="panel dashboard-absence-panel" aria-labelledby="dashboardAbsenceTitle">
+              <section class="panel dashboard-quick-panel" aria-labelledby="dashboardQuickTitle">
                 <div class="panel-header">
                   <div>
-                    <p class="eyebrow">Urlaubsplanung</p>
-                    <h2 id="dashboardAbsenceTitle">Wer ist diese Woche weg?</h2>
+                    <p class="eyebrow">Schnellzugriff</p>
+                    <h2 id="dashboardQuickTitle">Neue Einträge</h2>
                   </div>
-                  <button class="text-button" type="button" data-go-to="vacations">
-                    Planung
-                    <svg><use href="#icon-chevron"></use></svg>
-                  </button>
                 </div>
-                <div id="dashboardAbsence"></div>
-                <div class="quick-actions" aria-label="Schnellzugriff">
+                <div class="quick-actions">
                   <button class="quick-action" type="button" data-open-employee>
                     <svg><use href="#icon-users"></use></svg>
                     Mitarbeiter anlegen
@@ -2200,7 +2195,7 @@
 <h3 id="hilfe-hauptnavigation">Hauptnavigation</h3>
 <p>Die Desktop-Navigation befindet sich links. Auf kleinen Bildschirmen wird am unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.</p>
 <p>Folgende Bereiche stehen zur Verfügung:</p>
-<ul><li><strong>Übersicht:</strong> Wochenzusammenfassung, Kennzahlen, anstehende Fristen, Abwesenheiten der Woche und offene Nachweise</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung, wahlweise als Liste oder als Monatskalender</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
+<ul><li><strong>Übersicht:</strong> Wochenzusammenfassung, Kennzahlen, anstehende Fristen und offene Nachweise</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung, wahlweise als Liste oder als Monatskalender</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
 <p>Die Zahl neben einem Eintrag nennt bei <strong>Mitarbeitern</strong> die aktiven und die in Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei <strong>Terminen</strong> die noch bevorstehenden, bei <strong>Memo / ToDo</strong> die sichtbaren offenen Einträge und bei der <strong>Geräteverwaltung</strong> die Geräte im aktuellen Bestand.</p>
 <h3 id="hilfe-suche-und-filter">Suche und Filter</h3>
 <p>Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können kombiniert werden. Filter beziehen sich immer auf die aktuell sichtbare Ansicht.</p>
@@ -2232,9 +2227,9 @@
 <p>Darunter stehen vier Kennzahlen, jede ein Klick tief:</p>
 <ul><li><strong>Nachweise überfällig</strong> springt zu den offenen Nachweisen</li><li><strong>Fristen in 7 Tagen</strong> stellt die Liste „Als Nächstes“ auf sieben Tage</li><li><strong>heute abwesend</strong> öffnet die Urlaubsplanung</li><li><strong>Geburtstage</strong> zeigt die Liste „Als Nächstes“ für 30 Tage</li></ul>
 <p>Die Kennzahlen zählen immer den ganzen Bestand, unabhängig von den Filtern der Liste.</p>
-<p><strong>Als Nächstes</strong> ist der Fristenmonitor (siehe unten). <strong>Wer ist diese Woche weg?</strong> zeigt Montag bis Freitag der laufenden Woche – am Wochenende die kommende – mit den Kürzeln aller, die laut Urlaubsplanung abwesend sind. Ist die Tagesgrenze der Urlaubsplanung erreicht, ist die Zahl orange, wird sie überschritten, rot. Darunter liegen die Schnellzugriffe zum Anlegen von Mitarbeitern, Fortbildungen, Teamsitzungen und Memos.</p>
+<p><strong>Als Nächstes</strong> ist der Fristenmonitor (siehe unten). Daneben liegen die Schnellzugriffe zum Anlegen von Mitarbeitern, Fortbildungen, Teamsitzungen und Memos.</p>
 <p><strong>Offene Nachweise nach Fortbildung</strong> fasst die überfälligen Pflichtfortbildungen zusammen: eine Zeile je Fortbildung mit Erfüllungsgrad, der Zahl der überfälligen Nachweise und den Kürzeln der Betroffenen. Ein Klick auf die Zeile öffnet den Nachweisdialog für diese Fortbildung.</p>
-<p>Über <strong>Anpassen</strong> werden Kennzahlen, „Als Nächstes“ samt Abwesenheiten und die offenen Nachweise ein- oder ausgeblendet und neu angeordnet. Die Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum gemeinsamen Datenbestand oder zur Datensicherung.</p>
+<p>Über <strong>Anpassen</strong> werden Kennzahlen, „Als Nächstes“ samt Schnellzugriff und die offenen Nachweise ein- oder ausgeblendet und neu angeordnet. Die Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum gemeinsamen Datenbestand oder zur Datensicherung.</p>
 <h3 id="hilfe-was-ist-neu">Was ist neu?</h3>
 <p>Nach einer neuen Programmfassung erscheint beim ersten Start ein Hinweis mit den Änderungen genau dieser Fassung – derselbe Abschnitt, der auch in der <strong>Änderungshistorie</strong> dieser Hilfe steht. <strong>Ganze Änderungsliste</strong> führt dorthin. Der Hinweis erscheint einmal je Fassung und Arbeitsplatz; bei einer Neueinrichtung bleibt er aus.</p>
 <h3 id="hilfe-termine-im-monatsraster-verschieben">Termine im Monatsraster verschieben</h3>
@@ -2437,7 +2432,7 @@
 <p>Mit <strong>Für alle Nutzer sichtbar</strong> steht der Eintrag jedem angemeldeten Konto zur Verfügung. <strong>Nur in meiner Ansicht</strong> blendet ihn für andere Konten aus. Suche, Kategorie und Status können miteinander kombiniert werden.</p>
 <p>Wichtig zur Einordnung: „Nur in meiner Ansicht“ ist eine Anzeigeeinstellung, keine Verschlüsselung und keine Zugriffsbeschränkung. Der Eintrag bleibt Teil des gemeinsamen Datenbestands und erscheint deshalb unverändert in Datensicherungen sowie in der Datenbank. Vertrauliche Angaben – etwa zu einzelnen Personen – gehören nicht in ein Memo.</p>
 <p>Die Kategorien werden unter <strong>Einstellungen → Stammdaten &amp; Zugriffe → Memo-/ToDo-Kategorien</strong> angelegt, umbenannt oder gelöscht. Umbenennungen werden in vorhandene Einträge übernommen.</p>
-<p>Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der Übersichtsseite unter <strong>Wer ist diese Woche weg?</strong> – nur wenn es solche Einträge gibt.</p>
+<p>Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der Übersichtsseite unter dem Schnellzugriff – nur wenn es solche Einträge gibt.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-terminkalender-und-fristenmonitor">
 <h2 id="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</h2>
@@ -2641,7 +2636,7 @@
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
 <h3 id="hilfe-4-60-0-eine-freundlichere-ubersicht">4.60.0 – Eine freundlichere Übersicht</h3>
-<ul><li><strong>Neu:</strong> Die Übersicht begrüßt mit Datum und einem Satz zur Woche: anstehende Fristen, Abwesenheiten und fehlende Nachweise. <strong>Abschluss eintragen</strong> steht gleich daneben</li><li><strong>Neu:</strong> Vier Kennzahlen – überfällige Nachweise, Fristen in 7 Tagen, heute abwesend, Geburtstage – führen mit einem Klick zur passenden Liste</li><li><strong>Neu:</strong> <strong>Wer ist diese Woche weg?</strong> zeigt die Abwesenheiten von Montag bis Freitag aus der Urlaubsplanung; erreichte und überschrittene Tagesgrenzen sind farbig markiert</li><li><strong>Geändert:</strong> Arbeitsliste und Fristenmonitor sind zu <strong>Als Nächstes</strong> zusammengelegt: die nächsten sieben Tage als Zeitleiste, Späteres als kurze Liste, Zeitraum 7, 30 oder 90 Tage. Bisher standen dieselben Fristen doppelt da</li><li><strong>Geändert:</strong> Überfällige Pflichtfortbildungen stehen gebündelt unter <strong>Offene Nachweise nach Fortbildung</strong> – eine Zeile je Fortbildung mit Erfüllungsgrad und den Kürzeln der Betroffenen statt über hundert einzelner roter Zeilen. Ein Klick öffnet den Nachweisdialog</li><li><strong>Entfallen:</strong> Der Bereich <strong>Zuletzt bearbeitet</strong>. Die Anordnung unter <strong>Anpassen</strong> beginnt wegen der neuen Bausteine einmalig wieder bei der Grundeinstellung</li></ul>
+<ul><li><strong>Neu:</strong> Die Übersicht begrüßt mit Datum und einem Satz zur Woche: anstehende Fristen, Abwesenheiten und fehlende Nachweise. <strong>Abschluss eintragen</strong> steht gleich daneben</li><li><strong>Neu:</strong> Vier Kennzahlen – überfällige Nachweise, Fristen in 7 Tagen, heute abwesend, Geburtstage – führen mit einem Klick zur passenden Liste</li><li><strong>Geändert:</strong> Arbeitsliste und Fristenmonitor sind zu <strong>Als Nächstes</strong> zusammengelegt: die nächsten sieben Tage als Zeitleiste, Späteres als kurze Liste, Zeitraum 7, 30 oder 90 Tage. Bisher standen dieselben Fristen doppelt da</li><li><strong>Geändert:</strong> Überfällige Pflichtfortbildungen stehen gebündelt unter <strong>Offene Nachweise nach Fortbildung</strong> – eine Zeile je Fortbildung mit Erfüllungsgrad und den Kürzeln der Betroffenen statt über hundert einzelner roter Zeilen. Ein Klick öffnet den Nachweisdialog</li><li><strong>Entfallen:</strong> Der Bereich <strong>Zuletzt bearbeitet</strong>. Die Anordnung unter <strong>Anpassen</strong> beginnt wegen der neuen Bausteine einmalig wieder bei der Grundeinstellung</li></ul>
 <h3 id="hilfe-4-59-0-obermenus-in-der-seitenleiste">4.59.0 – Obermenüs in der Seitenleiste</h3>
 <ul><li><strong>Neu:</strong> Unter <strong>Einstellungen → Allgemein</strong> fasst <strong>Obermenüs in der Seitenleiste</strong> die Menüpunkte unter <strong>Personal</strong>, <strong>Termine</strong>, <strong>Fortbildungen</strong> und <strong>Geräte</strong> zusammen. Jedes Obermenü lässt sich auf- und zuklappen; Übersicht, Einstellungen und Hilfe bleiben für sich. Die Einstellung gilt nur an diesem Arbeitsplatz</li><li><strong>Geändert:</strong> Die Teamsitzungen stehen mit der neuesten zuerst</li></ul>
 <h3 id="hilfe-4-58-1-zusatzqualifikationen-ohne-eingefrorenen-dialog">4.58.1 – Zusatzqualifikationen ohne eingefrorenen Dialog</h3>

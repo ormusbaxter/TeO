@@ -35,7 +35,6 @@
     dashboardDate: document.querySelector("#dashboardDate"),
     dashboardSummary: document.querySelector("#dashboardSummary"),
     dashboardKpis: document.querySelector("#dashboardKpis"),
-    dashboardAbsence: document.querySelector("#dashboardAbsence"),
     projectBuildLabel: document.querySelector("#projectBuildLabel"),
     loginProjectVersion: document.querySelector("#loginProjectVersion"),
     deadlineOverview: document.querySelector("#deadlineOverview"),
