@@ -1,20 +1,3 @@
-  // Nach dem Lesen der gemeinsamen Datei: Ihr Schluesselverzeichnis kennt die
-  // Huelle des angemeldeten Kontos womoeglich, obwohl dieser Arbeitsplatz sie
-  // beim Login noch nicht hatte.
-  async function unlockAutomaticBackupWithPendingLogin() {
-    if (
-      automaticBackupPassword ||
-      !automaticBackupSettings?.encrypted ||
-      !pendingLoginPassword ||
-      !currentUser
-    ) {
-      return false;
-    }
-    // Jetzt ist das Verzeichnis der Datei bekannt. Bleibt die Huelle auch damit
-    // aus, ist der getrennt verwahrte Schluessel der letzte Weg.
-    return unlockAutomaticBackupForLogin(currentUser, pendingLoginPassword);
-  }
-
   async function handleBackupFileSelection(event) {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -147,28 +130,58 @@
     return "";
   }
 
-  async function synchronizeStartupBackupFromSavedDirectory({
-    requestPermission = false,
-  } = {}) {
-    document.body.classList.add("is-auth-locked");
+  // Vor der Anmeldung: Woher kommt der Datenbestand? Liegt die Datei im
+  // verknuepften Ordner, genuegt die Anmeldung - sie liest die Datei dann
+  // frisch. Ohne erreichbare Datei wird sie vorher gewaehlt, denn angemeldet
+  // wird gegen die Konten der Datei, nicht gegen einen womoeglich veralteten
+  // Stand dieses Browsers.
+  async function prepareStartupDataSet({ resumeUserId = "" } = {}) {
+    startupBackupSynchronized = false;
+    startupBackupFile = null;
     const located = await findStartupBackupFileInSavedDirectory(
       automaticBackupDirectoryHandle,
-      requestPermission,
+      false,
     );
-    if (!currentUser || startupBackupSynchronized) return false;
+    if (located.status === "found") {
+      if (resumeUserId && (await resumeSessionFromSharedDataSet(located.file, resumeUserId))) {
+        return;
+      }
+      showLoginDialog();
+      return;
+    }
+    // Den Ordnerzugriff erneut zu bestaetigen verlangt eine Bedienung. Die
+    // Anmeldung ist eine - der Browser fragt beim Klick auf „Anmelden“.
+    if (located.status === "permission-required") {
+      showLoginDialog();
+      return;
+    }
+    showStartupBackupDialog(startupBackupFallbackMessage(located.status));
+  }
 
-    if (located.status !== "found") {
-      showStartupBackupDialog(startupBackupFallbackMessage(located.status));
+  // Neuladen innerhalb einer Sitzung: Bei einer unverschluesselten Datei bleibt
+  // die Sitzung bestehen, sofern das Konto in der Datei noch gefuehrt wird.
+  // Verschluesselt braucht es das Passwort, also die Anmeldung.
+  async function resumeSessionFromSharedDataSet(file, userId) {
+    try {
+      const volume = backupVolumeAssessment(file.size);
+      if (volume.exceeded) return false;
+      const envelope = JSON.parse(await file.text());
+      if (envelope?.format === `${BACKUP_FORMAT}-verschluesselt`) return false;
+      const importedState = parseBackup(JSON.stringify(envelope));
+      const user = importedState.users.find((item) => item.id === userId);
+      if (!user || startupBackupIsOlder(importedState)) return false;
+      if (!(await importDatabase(importedState, { adoptUsers: true, resumeSession: false }))) {
+        return false;
+      }
+      startupBackupSynchronized = true;
+      await rememberSharedBackupFileStamp(file);
+      await rememberBackupVolume(volume.sizeBytes);
+      completeLogin(user);
+      return true;
+    } catch (error) {
+      console.warn("Die Sitzung konnte nicht aus der gemeinsamen Datei fortgesetzt werden.", error);
       return false;
     }
-
-    elements.startupBackupStatus.textContent =
-      "Gespeicherte Sicherungsdatei wird automatisch geladen …";
-    const synchronized = await synchronizeStartupBackupFile(located.file);
-    if (!synchronized && currentUser && !startupBackupSynchronized) {
-      showStartupBackupDialog(elements.startupBackupStatus.textContent);
-    }
-    return synchronized;
   }
 
   // Fragt den gemeinsamen Sicherungsordner ab. Meldungen gehen in das
@@ -264,30 +277,46 @@
     }
   }
 
-  // Erste Anmeldung an einem Arbeitsplatz ohne eigene Konten: Die Konten stehen
-  // im verschluesselten Teil der gemeinsamen Datei. Erst der Schluessel aus dem
-  // Verzeichnis oeffnet sie, danach wird das Passwort wie sonst geprueft.
-  // Rueckgabe ist die Meldung fuer den Anmeldedialog, leer bei Erfolg.
-  async function loginFromSharedDataSet(username, password) {
-    const located = await findStartupBackupFileInSavedDirectory(
-      automaticBackupDirectoryHandle,
-      true,
-    );
-    if (located.status !== "found") {
-      return (
-        startupBackupFallbackMessage(located.status) ||
-        `Im verknüpften Ordner wurde ${AUTO_BACKUP_FILENAME} nicht gefunden.`
+  // Jede Anmeldung im lokalen Modus: Die Konten stehen in der gemeinsamen
+  // Datei, bei Verschluesselung im verschluesselten Teil. Erst der Schluessel
+  // aus dem Verzeichnis oeffnet sie, danach wird das Passwort gegen die Konten
+  // der Datei geprueft und der Bestand in einem Zug uebernommen.
+  // Rueckgabe ist die Meldung fuer den Anmeldedialog, leer bei Erfolg oder
+  // wenn stattdessen die Dateiauswahl offen ist.
+  async function loginWithSharedDataSet(username, password) {
+    // Eine von Hand gewaehlte Datei gilt fuer diese Anmeldung. Sonst wird die
+    // Datei im Ordner frisch gelesen - sie kann sich seit dem Start geaendert
+    // haben, und erst jetzt darf der Browser nach dem Zugriff fragen.
+    let file = startupBackupFile;
+    if (!file) {
+      const located = await findStartupBackupFileInSavedDirectory(
+        automaticBackupDirectoryHandle,
+        true,
       );
+      if (located.status !== "found") {
+        return chooseStartupBackupFileFirst(
+          username,
+          password,
+          startupBackupFallbackMessage(located.status),
+        );
+      }
+      file = located.file;
     }
-    const volume = backupVolumeAssessment(located.file.size);
-    if (volume.exceeded) return backupVolumeMessage(volume);
+    const volume = backupVolumeAssessment(file.size);
+    if (volume.exceeded) {
+      return chooseStartupBackupFileFirst(username, password, backupVolumeMessage(volume));
+    }
 
-    let fileContent = await located.file.text();
+    let fileContent = await file.text();
     let envelope;
     try {
       envelope = JSON.parse(fileContent);
     } catch {
-      return "Die gemeinsame Sicherungsdatei enthält kein gültiges JSON.";
+      return chooseStartupBackupFileFirst(
+        username,
+        password,
+        "Die gemeinsame Sicherungsdatei enthält kein gültiges JSON.",
+      );
     }
 
     if (envelope?.format === `${BACKUP_FORMAT}-verschluesselt`) {
@@ -316,7 +345,8 @@
     try {
       importedState = parseBackup(fileContent);
     } catch (error) {
-      return error.message;
+      automaticBackupPassword = "";
+      return chooseStartupBackupFileFirst(username, password, error.message);
     }
 
     const user = importedState.users.find(
@@ -327,6 +357,14 @@
     if (!user || !(await verifyPassword(password, user))) {
       automaticBackupPassword = "";
       return "Benutzername oder Passwort ist nicht korrekt.";
+    }
+    if (startupBackupIsOlder(importedState)) {
+      automaticBackupPassword = "";
+      return chooseStartupBackupFileFirst(
+        username,
+        password,
+        "Diese Sicherungsdatei ist älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand. Bitte wählen Sie die aktuelle Datei aus.",
+      );
     }
 
     if (
@@ -341,9 +379,11 @@
 
     currentUser = user;
     startupBackupSynchronized = true;
-    pendingLoginPassword = "";
-    await rememberSharedBackupFileStamp(located.file);
+    startupBackupFile = null;
+    pendingStartupCredentials = null;
+    await rememberSharedBackupFileStamp(file);
     await rememberBackupVolume(volume.sizeBytes);
+    renderBackupVolumeMeter();
     if (
       automaticBackupPassword &&
       !automaticBackupSettings.keyEnvelopes?.[user.id]
@@ -360,9 +400,19 @@
     return "";
   }
 
-  // Im Startdialog: Statt der einzelnen Datei den Ordner freigeben. Damit gilt
-  // die Verknuepfung auch fuer die naechste Sitzung, und die Dateiauswahl
-  // entfaellt kuenftig.
+  // Die Datei ist nicht erreichbar oder taugt nicht: Vor der Anmeldung wird
+  // sie gewaehlt. Die Eingaben bleiben gemerkt, nach der Auswahl geht die
+  // Anmeldung von selbst weiter.
+  function chooseStartupBackupFileFirst(username, password, message) {
+    startupBackupFile = null;
+    pendingStartupCredentials = { username, password };
+    showStartupBackupDialog(message);
+    return "";
+  }
+
+  // Im Dateidialog: Statt der einzelnen Datei den Ordner freigeben. Damit gilt
+  // die Verknuepfung auch fuer die naechste Sitzung, und die Auswahl entfaellt
+  // kuenftig.
   async function selectStartupBackupDirectory() {
     const handle = await requestSharedBackupDirectory(
       elements.startupBackupStatus,
@@ -380,7 +430,7 @@
     } catch (error) {
       console.error("Die Ordnerverknüpfung konnte nicht gespeichert werden.", error);
     }
-    return synchronizeStartupBackupFile(located.file);
+    return acceptStartupBackupFile(located.file, { fromFolder: true });
   }
 
   // Schliesst die Ersteinrichtung ab: Der gewaehlte Ordner wird verknuepft und
@@ -507,12 +557,7 @@
   async function handleStartupBackupFileSelection(event) {
     const file = event.target.files?.[0];
     event.target.value = "";
-    await synchronizeStartupBackupFile(file);
-  }
-
-  async function synchronizeStartupBackupFile(file) {
-    if (!file || startupBackupImportRunning) return false;
-
+    if (!file) return false;
     if (file.name.toLocaleLowerCase("de-DE") !== AUTO_BACKUP_FILENAME) {
       elements.startupBackupStatus.textContent =
         `Bitte wählen Sie die Datei „${AUTO_BACKUP_FILENAME}“ aus.`;
@@ -523,60 +568,32 @@
       elements.startupBackupStatus.textContent = backupVolumeMessage(volume);
       return false;
     }
+    return acceptStartupBackupFile(file);
+  }
 
+  // Die Datei steht fest; geprueft und uebernommen wird sie mit der Anmeldung.
+  // Waren Benutzername und Passwort schon eingegeben, geht es gleich weiter.
+  async function acceptStartupBackupFile(file, { fromFolder = false } = {}) {
+    if (startupBackupImportRunning) return false;
+    const credentials = pendingStartupCredentials;
+    pendingStartupCredentials = null;
+    // Aus dem eben verknuepften Ordner liest die Anmeldung selbst frisch.
+    startupBackupFile = fromFolder ? null : file;
+    if (elements.startupBackupDialog.open) elements.startupBackupDialog.close();
+    showLoginDialog();
+    if (!credentials) return true;
     startupBackupImportRunning = true;
-    elements.selectStartupBackupFileButton.disabled = true;
-    elements.startupBackupStatus.textContent = "Sicherungsdatei wird geprüft …";
     try {
-      const importedState = await readBackupFile(file, {
-        adoptKeyDirectory: true,
-      });
-      if (!importedState) {
-        elements.startupBackupStatus.textContent =
-          "Der Startabgleich wurde nicht abgeschlossen.";
-        return false;
-      }
-      if (startupBackupIsOlder(importedState)) {
-        elements.startupBackupStatus.textContent =
-          "Diese Sicherungsdatei ist älter als der zuletzt lokal gesicherte Datenstand. Bitte wählen Sie die aktuelle Datei aus.";
-        return false;
-      }
-      elements.startupBackupStatus.textContent = "Datenbestand wird übernommen …";
-      // Der Startabgleich laedt den gemeinsamen Datenbestand, keinen Teilimport:
-      // Die Konten gehoeren dazu, sonst kennt jeder Arbeitsplatz nur die dort
-      // angelegten und ueberschreibt beim naechsten Sichern die uebrigen.
-      if (!(await importDatabase(importedState, { adoptUsers: true }))) {
-        elements.startupBackupStatus.textContent =
-          "Der Datenbestand konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.";
-        return false;
-      }
-
-      startupBackupSynchronized = true;
-      pendingLoginPassword = "";
-      await rememberSharedBackupFileStamp(file);
-      await rememberBackupVolume(volume.sizeBytes);
-      renderBackupVolumeMeter();
-      if (elements.startupBackupDialog.open) elements.startupBackupDialog.close();
-      document.body.classList.remove("is-auth-locked");
-      applyAccessControl();
-      scheduleAutomaticBackup();
-      // Der zweite Weg in die freigeschaltete Anwendung - completeLogin endet
-      // hier vorzeitig, weil erst der Datenbestand geladen werden musste.
-      showWhatsNewIfUpdated();
-      showToast(
-        volume.warning
-          ? backupVolumeMessage(volume)
-          : "Der aktuelle Datenbestand wurde aus teo-autosicherung.json geladen.",
-        volume.warning ? "warning" : undefined,
+      const message = await loginWithSharedDataSet(
+        credentials.username,
+        credentials.password,
       );
-      return true;
-    } catch (error) {
-      console.warn("Startabgleich konnte nicht abgeschlossen werden.", error);
-      elements.startupBackupStatus.textContent =
-        error.message || "Die Sicherungsdatei ist ungültig.";
-      return false;
+      if (message && elements.loginDialog.open) {
+        document.querySelector("#loginUsername").value = credentials.username;
+        elements.loginError.textContent = message;
+      }
+      return !message;
     } finally {
       startupBackupImportRunning = false;
-      elements.selectStartupBackupFileButton.disabled = false;
     }
   }

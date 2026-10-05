@@ -337,6 +337,7 @@
     loginDialog: document.querySelector("#loginDialog"),
     loginForm: document.querySelector("#loginForm"),
     loginError: document.querySelector("#loginError"),
+    loginDataSource: document.querySelector("#loginDataSource"),
     startupBackupDialog: document.querySelector("#startupBackupDialog"),
     startupBackupFile: document.querySelector("#startupBackupFile"),
     selectStartupBackupFileButton: document.querySelector(

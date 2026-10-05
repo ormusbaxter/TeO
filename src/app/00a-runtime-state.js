@@ -77,12 +77,12 @@
   let automaticBackupNotice = "";
   let startupBackupSynchronized = false;
   let startupBackupImportRunning = false;
-  // Das Login-Passwort der laufenden Anmeldung, nur bis zum Ende des
-  // Startabgleichs. Die Schluesselhuellen aus der gemeinsamen Datei sind erst
-  // nach dem Lesen der Datei bekannt - ohne das gemerkte Passwort muesste TeO
-  // dort nach dem Wiederherstellungsschluessel fragen, obwohl die passende
-  // Huelle gleich danach vorliegt.
-  let pendingLoginPassword = "";
+  // Von Hand gewaehlte teo-autosicherung.json fuer die naechste Anmeldung.
+  // Bei verknuepftem Ordner bleibt das leer: Die Anmeldung liest dort frisch.
+  let startupBackupFile = null;
+  // Benutzername und Passwort einer Anmeldung, die erst auf die Auswahl der
+  // Datei wartet. Nach der Auswahl geht sie von selbst weiter.
+  let pendingStartupCredentials = null;
   // Groesse und Aenderungszeit der zuletzt gelesenen oder selbst geschriebenen
   // teo-autosicherung.json. Weicht die Datei davon ab, hat inzwischen ein
   // anderer Arbeitsplatz geschrieben.

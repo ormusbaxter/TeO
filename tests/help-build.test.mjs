@@ -37,7 +37,7 @@ assert.match(indexHtml, /data-help-nav-target/);
 assert.match(indexHtml, /Datensicherung und Wiederherstellung/);
 assert.match(indexHtml, /Häufig gestellte Fragen/);
 assert.match(indexHtml, /Können mehrere Personen gleichzeitig mit derselben JSON-Datei arbeiten\?/);
-assert.match(indexHtml, /verpflichtenden Startabgleich/);
+assert.match(indexHtml, /Warum lässt sich die Sicherungsdatei nicht überspringen\?/);
 assert.match(indexHtml, /Für den parallelen Betrieb an mehreren Arbeitsplätzen muss MariaDB/);
 assert.match(indexHtml, /Datenschutz und IT-Sicherheit/);
 assert.match(indexHtml, /<strong>Telefonliste drucken<\/strong>/);

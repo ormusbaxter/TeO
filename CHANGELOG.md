@@ -1,3 +1,9 @@
+### 4.58.0 – Erst der Datenbestand, dann die Anmeldung
+
+- **Geändert:** Im lokalen Modus kommt der Datenbestand vor der Anmeldung. Angemeldet wird mit den Konten aus `teo-autosicherung.json`, nicht mit dem Stand, den dieser Browser zuletzt kannte – ein an einem anderen Arbeitsplatz geändertes Passwort oder gelöschtes Konto gilt damit sofort. Die Anmeldemaske nennt den Ordner, aus dem TeO den Bestand lädt
+- **Geändert:** Ist die Datei nicht erreichbar, wird sie vor der Anmeldung gewählt, statt dass TeO nach der Anmeldung gesperrt bleibt. Stellt sich das erst beim Anmelden heraus, geht die Anmeldung nach der Auswahl von selbst weiter
+- **Verbessert:** Wer TeO innerhalb einer Sitzung neu lädt, bleibt bei einer unverschlüsselten Datei angemeldet, sofern das Konto dort noch geführt wird
+
 ### 4.57.1 – Erster Start ohne Sperre
 
 - **Behoben:** Nach der Einrichtung eines neuen Datenbestands verlangte der Startabgleich `teo-autosicherung.json` – eine Datei, die es noch gar nicht gab. TeO blieb gesperrt, auch nach Neuladen und erneuter Anmeldung. Stattdessen wird jetzt der Sicherungsordner festgelegt: TeO legt dort die erste `teo-autosicherung.json` an und öffnet sich. Ein Ordner, in dem bereits eine solche Datei liegt, wird nicht überschrieben. Stattdessen bietet TeO **Vorhandenen Datenbestand öffnen** an: Nach Rückfrage wird der eben eingerichtete Bestand samt neuem Konto verworfen, und man meldet sich mit einem Konto aus der Datei an

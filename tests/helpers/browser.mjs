@@ -224,19 +224,19 @@ export async function openTeO(
   }
   if (anmeldenAls) {
     const konto = DEMO_KONTEN[anmeldenAls];
-    await page.waitForSelector("#loginDialog[open]");
-    await page.fill("#loginUsername", konto.username);
-    await page.fill("#loginPassword", konto.password);
-    await page.evaluate(() => document.querySelector("#loginForm").requestSubmit());
-    // Der Startabgleich verlangt die gemeinsame Sicherungsdatei. Es ist
-    // dieselbe Sicherung, mit der TeO gestartet wurde - auch ein angepasster
-    // Bestand bleibt dabei erhalten.
+    // Vor der Anmeldung verlangt TeO die gemeinsame Sicherungsdatei, denn
+    // angemeldet wird gegen ihre Konten. Es ist dieselbe Sicherung, mit der
+    // TeO gestartet wurde - auch ein angepasster Bestand bleibt dabei erhalten.
     await page.waitForSelector("#startupBackupDialog[open]");
     await page.setInputFiles("#startupBackupFile", {
       name: "teo-autosicherung.json",
       mimeType: "application/json",
       buffer: Buffer.from(JSON.stringify(sicherung)),
     });
+    await page.waitForSelector("#loginDialog[open]");
+    await page.fill("#loginUsername", konto.username);
+    await page.fill("#loginPassword", konto.password);
+    await page.evaluate(() => document.querySelector("#loginForm").requestSubmit());
     await page.waitForFunction(
       () =>
         !document.body.classList.contains("is-auth-locked") &&

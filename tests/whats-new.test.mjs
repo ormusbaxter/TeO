@@ -23,12 +23,12 @@ test("Der Hinweis auf die neue Fassung erscheint einmal je Fassung", async () =>
     /rememberSeenVersion\(version\);\s*if \(!lastSeen\) return false;/,
   );
 
-  // Beide Wege in die freigeschaltete Anwendung melden sich: die gewöhnliche
-  // Anmeldung und der Umweg über die Startsicherung.
+  // Die Sperre fällt an genau einer Stelle, am Ende der Anmeldung - seit der
+  // Datenbestand vor ihr geladen wird, gibt es keinen zweiten Weg mehr.
   assert.equal(
     [...appSource.matchAll(/showWhatsNewIfUpdated\(\);/g)].length,
-    2,
-    "Der Hinweis hängt an beiden Stellen, an denen die Sperre fällt",
+    1,
+    "Der Hinweis hängt an der Stelle, an der die Sperre fällt",
   );
 });
 

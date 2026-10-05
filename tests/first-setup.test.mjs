@@ -95,6 +95,11 @@ test("Nach der Ersteinrichtung legt TeO die gemeinsame Datei an, statt sie zu ve
   // Der nächste Start gleicht sich mit genau dieser Datei ab - ohne Auswahl.
   const neu = await openTeO(t, { neustart: true });
   await neu.page.waitForSelector("#loginDialog[open]");
+  assert.match(
+    await neu.evaluate(() => document.querySelector("#loginDataSource").textContent),
+    /im Ordner „gemeinsam“/,
+    "Die Anmeldung nennt, woher der Datenbestand kommt",
+  );
   await neu.page.fill("#loginUsername", "leitung1");
   await neu.page.fill("#loginPassword", "Geheim123");
   await neu.evaluate(() => document.querySelector("#loginForm").requestSubmit());
@@ -186,8 +191,8 @@ test("Die Schaltflächen der Anmeldedialoge bleiben im Dialog", async (t) => {
   const teo = await openTeO(t);
   if (!teo) return;
   await teo.page.waitForSelector("#dataOriginDialog[open]");
-  // Der Startabgleich trägt drei Schaltflächen - früher ragte die erste links
-  // aus dem Dialog.
+  // Die Fußleisten tragen bis zu drei Schaltflächen - früher ragte die erste
+  // links aus dem Dialog.
   const lage = await teo.evaluate(() => {
     document.querySelector("#dataOriginDialog").close();
     const dialog = document.querySelector("#startupBackupDialog");
@@ -198,5 +203,5 @@ test("Die Schaltflächen der Anmeldedialoge bleiben im Dialog", async (t) => {
       return feld.left >= rahmen.left && feld.right <= rahmen.right;
     });
   });
-  assert.equal(lage.join(","), "true,true,true");
+  assert.equal(lage.join(","), "true,true");
 });
