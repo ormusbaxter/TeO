@@ -810,6 +810,16 @@ body.is-sidebar-collapsed .sidebar-search {
   flex-basis: 48px;
 }
 
+/* Drei Schaltflaechen passen nicht nebeneinander in den schmalen Dialog. Ohne
+   Umbruch ragte die erste links aus dem Fenster. */
+.auth-dialog .modal-footer {
+  flex-wrap: wrap;
+}
+
+.auth-dialog .modal-footer [data-logout] {
+  margin-right: auto;
+}
+
 .auth-error {
   min-height: 20px;
   margin-top: 14px;

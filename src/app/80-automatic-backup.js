@@ -40,6 +40,9 @@
           ? parsedLastBackupSizeBytes
           : 0,
       directoryName: String(value.directoryName || "").trim().slice(0, 200),
+      // Ein hier neu eingerichteter Datenbestand, der noch nie in eine
+      // gemeinsame Datei geschrieben wurde. Mit ihm gibt es nichts abzugleichen.
+      firstSharedFilePending: Boolean(value.firstSharedFilePending),
     };
   }
 

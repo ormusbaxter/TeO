@@ -261,6 +261,7 @@ test("Die automatische Sicherung normalisiert die Login-Verschlüsselung", async
       lastBackupAt: "2026-08-03T12:00:00.000Z",
       lastBackupSizeBytes: 123456,
       directoryName: "TeO-Sicherungen",
+      firstSharedFilePending: false,
     },
   );
 
@@ -271,6 +272,10 @@ test("Die automatische Sicherung normalisiert die Login-Verschlüsselung", async
   assert.equal(fallback.keyFingerprint, "");
   assert.deepEqual(JSON.parse(JSON.stringify(fallback.keyEnvelopes)), {});
   assert.equal(fallback.lastBackupAt, "");
+  assert.equal(
+    app.normalizeAutomaticBackupSettings({ firstSharedFilePending: 1 }).firstSharedFilePending,
+    true,
+  );
 });
 
 test("Automatische Sicherungen warten nach Änderungen zwei Sekunden", async () => {

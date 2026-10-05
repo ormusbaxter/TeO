@@ -348,6 +348,14 @@
       "change",
       handleStartupBackupFileSelection,
     );
+    elements.selectFirstSharedFolderButton.addEventListener(
+      "click",
+      () => void selectFirstSharedBackupDirectory(),
+    );
+    elements.skipFirstSharedFolderButton.addEventListener(
+      "click",
+      continueWithoutFirstSharedFolder,
+    );
     elements.validateBackupButton.addEventListener(
       "click",
       () => elements.validateBackupFile.click(),

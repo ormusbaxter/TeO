@@ -2221,7 +2221,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-schnellstart">
 <h2 id="hilfe-schnellstart">Schnellstart</h2>
 <h3 id="hilfe-anwendung-starten">Anwendung starten</h3>
-<p>Im lokalen Einzelplatzmodus wird <code>index.html</code> in einem aktuellen Browser geöffnet. Beim ersten Start führt TeO durch die Einrichtung des ersten Administratorkontos.</p>
+<p>Im lokalen Einzelplatzmodus wird <code>index.html</code> in einem aktuellen Browser geöffnet. Beim ersten Start führt TeO durch die Einrichtung des ersten Administratorkontos und fragt anschließend nach dem Sicherungsordner, in dem es die gemeinsame Datei <code>teo-autosicherung.json</code> anlegt (siehe „Erster Start an einem weiteren Arbeitsplatz“).</p>
 <p>Für den gemeinsamen Betrieb über MariaDB wird die Anwendung über den TeO-Server aufgerufen. Die technische Einrichtung ist im Abschnitt „Datenspeicherung und MariaDB“ beschrieben.</p>
 <h3 id="hilfe-erste-sinnvolle-schritte">Erste sinnvolle Schritte</h3>
 <ol><li>Unter <strong>Einstellungen</strong> das gewünschte Farbthema – es gilt für das eigene Benutzerkonto – und die Sicherungserinnerung festlegen.</li><li>Unter <strong>Mitarbeiter</strong> Personalstammdaten, Stellenanteile, Berufe und Qualifikationen erfassen.</li><li>Stationsleitung und stellvertretende Stationsleitung kennzeichnen.</li><li>Unter <strong>Einstellungen → Feste Dienstwochenenden</strong> die beiden verantwortlichen Personen bestimmen.</li><li>Pflichtfortbildungen, Teamsitzungen, Termine und Geräte katalogisieren.</li><li>Eine erste vollständige Datensicherung exportieren.</li></ol>
@@ -2313,7 +2313,7 @@
 <h3 id="hilfe-dialoge-schlie-en">Dialoge schließen</h3>
 <p>Unter <strong>Einstellungen → Dialoge schließen</strong> wird festgelegt, wie sich ein Klick neben einen geöffneten Dialog auswirkt:</p>
 <ul><li><strong>Schließt den Dialog nicht</strong> (Voreinstellung) – Dialoge lassen sich nur über ihre Schaltflächen oder die Escape-Taste verlassen. Das verhindert, dass ein versehentlicher Klick eine begonnene Eingabe beendet.</li><li><strong>Schließt den Dialog</strong> – ein Klick auf die abgedunkelte Fläche schließt den Dialog.</li></ul>
-<p>In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten Eingaben, fragt TeO vorher nach. Die fünf Dialoge rund um Start und Anmeldung – Herkunft des Datenbestands, Ersteinrichtung, Anmeldung, Startabgleich und Passwortänderung – bleiben von der Einstellung unberührt und lassen sich weder per Klick daneben noch per Escape schließen.</p>
+<p>In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten Eingaben, fragt TeO vorher nach. Die sechs Dialoge rund um Start und Anmeldung – Herkunft des Datenbestands, Ersteinrichtung, Sicherungsordner der Ersteinrichtung, Anmeldung, Startabgleich und Passwortänderung – bleiben von der Einstellung unberührt und lassen sich weder per Klick daneben noch per Escape schließen.</p>
 <h3 id="hilfe-schulferien-pflegen">Schulferien pflegen</h3>
 <p>Unter <strong>Einstellungen → Schulferien</strong> werden die Zeiträume gepflegt, die die Urlaubsplanung farblich markiert. Jeder Eintrag besteht aus Beginn, Ende und einer Bezeichnung wie „Sommerferien“.</p>
 <p>Bei der ersten Verwendung ist die amtliche Ferienordnung NRW für die Schuljahre 2024/25 bis 2029/30 hinterlegt – 26 Zeiträume bis April 2030. Weitere Jahre lassen sich ohne Obergrenze ergänzen; ein Programmwechsel ist dafür nicht mehr nötig.</p>
@@ -2573,7 +2573,7 @@
 <p>Hat ein anderer Arbeitsplatz die Datei zwischenzeitlich geschrieben, überschreibt TeO sie nicht. Stattdessen erscheint ein Hinweis; der sichere Weg ist abmelden, TeO neu laden und den Startabgleich wiederholen. Wer die Änderungen der laufenden Sitzung dennoch sichern muss, wählt <strong>Jetzt automatisch sichern</strong> und bestätigt das Überschreiben ausdrücklich.</p>
 <h3 id="hilfe-erster-start-an-einem-weiteren-arbeitsplatz">Erster Start an einem weiteren Arbeitsplatz</h3>
 <p>Liegt TeO in einem gemeinsamen Ordner und wird es an einem weiteren Arbeitsplatz zum ersten Mal geöffnet, fragt TeO zunächst, woher der Datenbestand kommt:</p>
-<ul><li><strong>Vorhandenen Datenbestand öffnen</strong> – der Regelfall. TeO fragt nach dem gemeinsamen Sicherungsordner, liest dort <code>teo-autosicherung.json</code> und öffnet anschließend die Anmeldung. Dort gilt das Konto, das bereits am ersten Arbeitsplatz angelegt wurde, mit seinem gewohnten Passwort. Ordnerverknüpfung, Sicherungsschlüssel, Konten und Daten kommen damit in einem Schritt.</li><li><strong>Neuen Datenbestand einrichten</strong> – nur für den allerersten Arbeitsplatz. Es entsteht ein erstes Administratorkonto und ein leerer Datenbestand.</li></ul>
+<ul><li><strong>Vorhandenen Datenbestand öffnen</strong> – der Regelfall. TeO fragt nach dem gemeinsamen Sicherungsordner, liest dort <code>teo-autosicherung.json</code> und öffnet anschließend die Anmeldung. Dort gilt das Konto, das bereits am ersten Arbeitsplatz angelegt wurde, mit seinem gewohnten Passwort. Ordnerverknüpfung, Sicherungsschlüssel, Konten und Daten kommen damit in einem Schritt.</li><li><strong>Neuen Datenbestand einrichten</strong> – nur für den allerersten Arbeitsplatz. Es entsteht ein erstes Administratorkonto und ein leerer Datenbestand; darin sind bereits der Gerätekatalog und die NRW-Schulferien hinterlegt. Danach wird der Sicherungsordner festgelegt, am besten ein leerer Ordner auf einem gemeinsamen Laufwerk. TeO legt dort die erste <code>teo-autosicherung.json</code> an, verknüpft den Ordner und öffnet sich. Liegt in dem gewählten Ordner bereits eine solche Datei, lehnt TeO ihn ab, statt einen vorhandenen Datenbestand zu überschreiben. Bis der Ordner festgelegt ist, fragt TeO bei jedem Start wieder danach statt nach der Datei. Browser ohne Ordnerfreigabe (etwa Firefox) bieten stattdessen <strong>Ohne Ordner fortfahren</strong> an; TeO arbeitet dann nur mit dem Speicher dieses Browsers.</li></ul>
 <p>Ein Konto muss also nur einmal angelegt werden. Neue Konten, Passwortänderungen und Passwort-Resets werden über die gemeinsame Datei an alle Arbeitsplätze weitergegeben, sobald dort die nächste automatische Sicherung geschrieben wurde.</p>
 <h3 id="hilfe-sicherung-prufen">Sicherung prüfen</h3>
 <p>Über <strong>Sicherung prüfen</strong> wird eine Datei validiert, ohne den aktuellen Datenbestand zu verändern.</p>
@@ -2662,6 +2662,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-57-1-erster-start-ohne-sperre">4.57.1 – Erster Start ohne Sperre</h3>
+<ul><li><strong>Behoben:</strong> Nach der Einrichtung eines neuen Datenbestands verlangte der Startabgleich <code>teo-autosicherung.json</code> – eine Datei, die es noch gar nicht gab. TeO blieb gesperrt, auch nach Neuladen und erneuter Anmeldung. Stattdessen wird jetzt der Sicherungsordner festgelegt: TeO legt dort die erste <code>teo-autosicherung.json</code> an und öffnet sich. Ein Ordner, in dem bereits eine solche Datei liegt, wird abgelehnt und nicht überschrieben</li><li><strong>Behoben:</strong> Im Dialog des Startabgleichs ragte die Schaltfläche <strong>Abmelden</strong> links aus dem Fenster, und der Hinweistext stand übergroß in der Mitte</li></ul>
 <h3 id="hilfe-4-57-0-zehn-schritte-zuruck-und-wieder-vor">4.57.0 – Zehn Schritte zurück und wieder vor</h3>
 <ul><li><strong>Neu:</strong> <strong>Rückgängig</strong> reicht jetzt bis zu zehn Schritte zurück: Jedes weitere <strong>Strg + Z</strong> nimmt die nächstältere Löschung oder Massenänderung zurück</li><li><strong>Neu:</strong> Nach einer Rücknahme bietet die Meldung <strong>Wiederholen</strong> an; dasselbe leisten <strong>Strg + Y</strong> und <strong>Strg + Umschalt + Z</strong></li><li><strong>Behoben:</strong> Kamen zwischen einer Löschung und ihrer Rücknahme Daten aus einem anderen Tab, vom Server oder aus einem Import, konnte <strong>Rückgängig</strong> diese Daten überschreiben. Ein von außen geladener Bestand räumt den Verlauf jetzt ab</li><li><strong>Behoben:</strong> <strong>Rückgängig</strong> setzte den Zeitpunkt der letzten Datensicherung zurück, wenn zwischendurch eine automatische Sicherung gelaufen war</li></ul>
 <h3 id="hilfe-4-56-3-farbthemen-aufgeraumt">4.56.3 – Farbthemen aufgeräumt</h3>
@@ -3133,6 +3135,47 @@
         <button class="button button-primary" id="selectStartupBackupDirectoryButton" type="button">
           <svg><use href="#icon-download"></use></svg>
           Sicherungsordner freigeben
+        </button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
+      id="firstSharedFolderDialog"
+      aria-labelledby="firstSharedFolderDialogTitle"
+      data-persistent-dialog
+    >
+      <div class="modal-header auth-dialog-header">
+        <span class="brand-mark">
+          <svg><use href="#icon-logo"></use></svg>
+        </span>
+        <div>
+          <p class="eyebrow">Ersteinrichtung abschließen</p>
+          <h2 id="firstSharedFolderDialogTitle">Sicherungsordner festlegen</h2>
+          <p class="modal-subtitle">
+            TeO legt dort die gemeinsame Datei <strong>teo-autosicherung.json</strong> an
+            und gleicht jeden weiteren Start mit ihr ab.
+          </p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="empty-state compact-empty-state">
+          <svg><use href="#icon-download"></use></svg>
+          <div>
+            <strong>Leerer Ordner, am besten auf einem gemeinsamen Laufwerk</strong>
+            <span>Weitere Arbeitsplätze öffnen den Datenbestand später über denselben Ordner. Liegt dort schon eine teo-autosicherung.json, wählen Sie einen anderen.</span>
+          </div>
+        </div>
+        <p class="form-error auth-error" id="firstSharedFolderStatus" role="alert"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-ghost" type="button" data-logout>Abmelden</button>
+        <button class="button button-ghost" id="skipFirstSharedFolderButton" type="button" hidden>
+          Ohne Ordner fortfahren
+        </button>
+        <button class="button button-primary" id="selectFirstSharedFolderButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          Sicherungsordner wählen
         </button>
       </div>
     </dialog>

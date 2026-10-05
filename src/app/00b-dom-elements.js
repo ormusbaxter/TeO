@@ -346,6 +346,14 @@
     selectStartupBackupDirectoryButton: document.querySelector(
       "#selectStartupBackupDirectoryButton",
     ),
+    firstSharedFolderDialog: document.querySelector("#firstSharedFolderDialog"),
+    firstSharedFolderStatus: document.querySelector("#firstSharedFolderStatus"),
+    selectFirstSharedFolderButton: document.querySelector(
+      "#selectFirstSharedFolderButton",
+    ),
+    skipFirstSharedFolderButton: document.querySelector(
+      "#skipFirstSharedFolderButton",
+    ),
     dataOriginDialog: document.querySelector("#dataOriginDialog"),
     dataOriginStatus: document.querySelector("#dataOriginStatus"),
     createDataSetButton: document.querySelector("#createDataSetButton"),

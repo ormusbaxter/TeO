@@ -218,6 +218,47 @@
 
     <dialog
       class="modal auth-dialog"
+      id="firstSharedFolderDialog"
+      aria-labelledby="firstSharedFolderDialogTitle"
+      data-persistent-dialog
+    >
+      <div class="modal-header auth-dialog-header">
+        <span class="brand-mark">
+          <svg><use href="#icon-logo"></use></svg>
+        </span>
+        <div>
+          <p class="eyebrow">Ersteinrichtung abschließen</p>
+          <h2 id="firstSharedFolderDialogTitle">Sicherungsordner festlegen</h2>
+          <p class="modal-subtitle">
+            TeO legt dort die gemeinsame Datei <strong>teo-autosicherung.json</strong> an
+            und gleicht jeden weiteren Start mit ihr ab.
+          </p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="empty-state compact-empty-state">
+          <svg><use href="#icon-download"></use></svg>
+          <div>
+            <strong>Leerer Ordner, am besten auf einem gemeinsamen Laufwerk</strong>
+            <span>Weitere Arbeitsplätze öffnen den Datenbestand später über denselben Ordner. Liegt dort schon eine teo-autosicherung.json, wählen Sie einen anderen.</span>
+          </div>
+        </div>
+        <p class="form-error auth-error" id="firstSharedFolderStatus" role="alert"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-ghost" type="button" data-logout>Abmelden</button>
+        <button class="button button-ghost" id="skipFirstSharedFolderButton" type="button" hidden>
+          Ohne Ordner fortfahren
+        </button>
+        <button class="button button-primary" id="selectFirstSharedFolderButton" type="button">
+          <svg><use href="#icon-download"></use></svg>
+          Sicherungsordner wählen
+        </button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
       id="changePasswordDialog"
       aria-labelledby="changePasswordDialogTitle"
       data-persistent-dialog
