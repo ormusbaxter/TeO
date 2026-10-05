@@ -9,7 +9,10 @@
     window.setTimeout(() => elements.confirmCancel.focus(), 0);
   }
 
-  function normalizeAutomaticBackupSettings(value = {}) {
+  function normalizeAutomaticBackupSettings(stored = {}) {
+    // Ein frischer Browser liefert null statt undefined - die Vorgabe greift
+    // dann nicht.
+    const value = stored || {};
     const parsedLastBackupAt = Date.parse(value.lastBackupAt);
     const parsedLastBackupSizeBytes = Number(value.lastBackupSizeBytes);
     const keyFingerprint = String(value.keyFingerprint || "").slice(0, 200);

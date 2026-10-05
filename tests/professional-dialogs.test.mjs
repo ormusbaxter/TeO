@@ -183,3 +183,29 @@ test("Die Druckvorschau ist als Blatt mit Kopf und Fuß aufgebaut", async (t) =>
   assert.equal(gemessen.anzeige, "grid");
   assert.equal(gemessen.zeilen, 3, "Kopf, Blatt und Fußzeile stehen untereinander");
 });
+
+test("Ein Häkchen bei den Zusatzqualifikationen rollt den Dialog nicht weg", async (t) => {
+  // Das unsichtbare Kästchen einer Karte lag ohne Bezugsrahmen in der Karte.
+  // Beim Fokussieren rollte der Browser darum den Dialog selbst, trotz
+  // overflow: hidden - der Inhalt verschwand nach oben, zurück kam niemand.
+  const teo = await openTeO(t, { angemeldetAls: "admin", mitDemodaten: true });
+  if (!teo) return;
+  await teo.zeigeAnsicht("employees");
+  await teo.page.click("[data-action='edit-employee']");
+  await teo.page.waitForSelector("#employeeDialog[open]");
+  const kaestchen = teo.page.locator(
+    '#employeeDialog input[name="qualification"][value="stellvertretendeStationsleitung"]',
+  );
+  const vorher = await kaestchen.isChecked();
+  await kaestchen.click();
+
+  const lage = await teo.evaluate(() => {
+    const dialog = document.querySelector("#employeeDialog");
+    const rahmen = dialog.getBoundingClientRect();
+    const kopf = dialog.querySelector(".modal-header").getBoundingClientRect();
+    return { gerollt: dialog.scrollTop, kopfSichtbar: kopf.top >= rahmen.top - 1 };
+  });
+  assert.equal(lage.gerollt, 0, "Der Dialog selbst rollt nicht");
+  assert.equal(lage.kopfSichtbar, true, "Der Kopf des Dialogs bleibt an seinem Platz");
+  assert.equal(await kaestchen.isChecked(), !vorher, "Das Häkchen ist gesetzt");
+});
