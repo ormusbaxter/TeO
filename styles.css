@@ -73,6 +73,23 @@
   --button-secondary-shadow: none;
   --button-secondary-hover-border: #9bbbef;
   --button-secondary-hover-bg: var(--blue-50);
+  /* Urlaubsplanung: Planungsarten ohne eigene Grundfarbe, Dienstwochenenden,
+     Schulferien, Feiertage und Geburtstage. */
+  --planner-onboarding: #0891b2;
+  --planner-onboarding-border: #087f9c;
+  --planner-external: #805bad;
+  --weekend-a-bg: #eef5ff;
+  --weekend-a-swatch: #dcebff;
+  --weekend-a-accent: #73a9f1;
+  --weekend-b-bg: #f7f0ff;
+  --weekend-b-swatch: #f0e6ff;
+  --weekend-b-accent: #a57adb;
+  --school-vacation: #e7b900;
+  --school-vacation-accent: #d8a800;
+  --school-vacation-bg: #fff8cf;
+  --holiday-corner: rgb(180 35 47 / 44%);
+  --birthday-accent: #c79414;
+  --birthday-hatch: rgb(199 148 20 / 62%);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
@@ -4117,7 +4134,7 @@ body.is-sidebar-collapsed .sidebar-search {
 }
 
 .legend-planner-onboarding-vacation {
-  background: #0891b2;
+  background: var(--planner-onboarding);
 }
 
 .legend-planner-school {
@@ -4133,7 +4150,7 @@ body.is-sidebar-collapsed .sidebar-search {
 }
 
 .legend-planner-external {
-  background: #805bad;
+  background: var(--planner-external);
 }
 
 /* „Frei geplant“ nutzt bewusst dieselbe Farbe wie Urlaub und unterscheidet
@@ -4148,13 +4165,13 @@ body.is-sidebar-collapsed .sidebar-search {
 }
 
 .legend-weekend-weekend_a {
-  background: #dcebff;
-  border-color: #73a9f1 !important;
+  background: var(--weekend-a-swatch);
+  border-color: var(--weekend-a-accent) !important;
 }
 
 .legend-weekend-weekend_b {
-  background: #f0e6ff;
-  border-color: #a57adb !important;
+  background: var(--weekend-b-swatch);
+  border-color: var(--weekend-b-accent) !important;
 }
 
 .legend-holiday {
@@ -4169,18 +4186,18 @@ body.is-sidebar-collapsed .sidebar-search {
 }
 
 .legend-school-vacation {
-  border-color: #d8a800 !important;
+  border-color: var(--school-vacation-accent) !important;
   background:
-    linear-gradient(#e7b900 0 4px, transparent 4px),
-    #fff8cf;
+    linear-gradient(var(--school-vacation) 0 4px, transparent 4px),
+    var(--school-vacation-bg);
 }
 
 .legend-birthday {
-  border-color: #c79414 !important;
+  border-color: var(--birthday-accent) !important;
   background:
     repeating-linear-gradient(
       135deg,
-      rgb(199 148 20 / 62%) 0 3px,
+      var(--birthday-hatch) 0 3px,
       transparent 3px 8px
     ),
     var(--white);
@@ -4443,8 +4460,8 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-shortcut-symbol.planner-entry-onboardingVacation {
-  border-color: #087f9c;
-  background: #0891b2;
+  border-color: var(--planner-onboarding-border);
+  background: var(--planner-onboarding);
 }
 
 .vacation-shortcut-symbol.planner-entry-school {
@@ -4463,8 +4480,8 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-shortcut-symbol.planner-entry-external {
-  border-color: #805bad;
-  background: #805bad;
+  border-color: var(--planner-external);
+  background: var(--planner-external);
 }
 
 .vacation-shortcut-symbol.planner-entry-mandatoryDuty {
@@ -4536,16 +4553,16 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-table tbody .vacation-employee-weekend-weekend_a {
-  background: #eef5ff;
+  background: var(--weekend-a-bg);
   box-shadow:
-    inset 5px 0 #73a9f1,
+    inset 5px 0 var(--weekend-a-accent),
     7px 0 12px -12px rgb(16 34 54 / 55%);
 }
 
 .vacation-table tbody .vacation-employee-weekend-weekend_b {
-  background: #f7f0ff;
+  background: var(--weekend-b-bg);
   box-shadow:
-    inset 5px 0 #a57adb,
+    inset 5px 0 var(--weekend-b-accent),
     7px 0 12px -12px rgb(16 34 54 / 55%);
 }
 
@@ -4661,7 +4678,7 @@ body.is-vacation-planner-maximized {
 .vacation-day-column.is-over-limit.vacation-school-vacation {
   box-shadow:
     inset 0 0 0 3px var(--red-700),
-    inset 0 7px #e7b900;
+    inset 0 7px var(--school-vacation);
 }
 
 .vacation-day-cell.is-over-limit {
@@ -4710,18 +4727,18 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-weekend-weekend_a {
-  background: #eef5ff !important;
+  background: var(--weekend-a-bg) !important;
 }
 
 .vacation-weekend-weekend_b {
-  background: #f7f0ff !important;
+  background: var(--weekend-b-bg) !important;
 }
 
 .vacation-holiday {
   background-image: linear-gradient(
     135deg,
     transparent 0 88%,
-    rgb(180 35 47 / 44%) 88% 100%
+    var(--holiday-corner) 88% 100%
   ) !important;
 }
 
@@ -4735,7 +4752,7 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-school-vacation {
-  box-shadow: inset 0 4px #e7b900;
+  box-shadow: inset 0 4px var(--school-vacation);
 }
 
 .vacation-school-vacation-dot {
@@ -4744,7 +4761,7 @@ body.is-vacation-planner-maximized {
   height: 3px;
   margin: 2px auto 0;
   border-radius: 99px;
-  background: #d8a800;
+  background: var(--school-vacation-accent);
 }
 
 /* Geburtstage bleiben auch dann erkennbar, wenn im Feld bereits ein
@@ -4763,7 +4780,7 @@ body.is-vacation-planner-maximized {
   pointer-events: none;
   background: repeating-linear-gradient(
     135deg,
-    rgb(199 148 20 / 62%) 0 3px,
+    var(--birthday-hatch) 0 3px,
     transparent 3px 8px
   );
 }
@@ -4839,8 +4856,8 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-day-cell button.planner-entry-onboardingVacation {
-  border-color: #087f9c;
-  background: #0891b2;
+  border-color: var(--planner-onboarding-border);
+  background: var(--planner-onboarding);
 }
 
 .vacation-day-cell button.planner-entry-school {
@@ -4859,8 +4876,8 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-day-cell button.planner-entry-external {
-  border-color: #805bad;
-  background: #805bad;
+  border-color: var(--planner-external);
+  background: var(--planner-external);
 }
 
 .vacation-day-cell button.planner-entry-plannedOff {
@@ -5097,13 +5114,13 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-year-weekend-swatch.is-weekend_a {
-  background: #eef5ff;
-  border-color: #73a9f1;
+  background: var(--weekend-a-bg);
+  border-color: var(--weekend-a-accent);
 }
 
 .vacation-year-weekend-swatch.is-weekend_b {
-  background: #f7f0ff;
-  border-color: #a57adb;
+  background: var(--weekend-b-bg);
+  border-color: var(--weekend-b-accent);
 }
 
 .vacation-year-matrix-scroll {
@@ -5203,7 +5220,7 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-year-entry.planner-entry-onboardingVacation {
-  background: #0891b2;
+  background: var(--planner-onboarding);
 }
 
 .vacation-year-entry.planner-entry-school {
@@ -5219,7 +5236,7 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-year-entry.planner-entry-external {
-  background: #805bad;
+  background: var(--planner-external);
 }
 
 .vacation-year-entry.planner-entry-plannedOff {
@@ -5234,36 +5251,6 @@ body.is-vacation-planner-maximized {
 
 .vacation-table tr.is-inactive {
   opacity: 0.55;
-}
-
-:is(
-    html[data-theme="dark"],
-    html[data-theme="nord"],
-    html[data-theme="dracula"],
-    html[data-theme="gruvbox-dark"],
-    html[data-theme="tokyo-night"],
-    html[data-theme="github-dark"]
-  ) :is(
-    .legend-weekend-weekend_a,
-    .vacation-weekend-weekend_a,
-    .vacation-employee-weekend-weekend_a
-  ) {
-  background: rgb(40 120 227 / 20%) !important;
-}
-
-:is(
-    html[data-theme="dark"],
-    html[data-theme="nord"],
-    html[data-theme="dracula"],
-    html[data-theme="gruvbox-dark"],
-    html[data-theme="tokyo-night"],
-    html[data-theme="github-dark"]
-  ) :is(
-    .legend-weekend-weekend_b,
-    .vacation-weekend-weekend_b,
-    .vacation-employee-weekend-weekend_b
-  ) {
-  background: rgb(165 122 219 / 20%) !important;
 }
 
 @media (max-width: 720px) {
@@ -10894,6 +10881,10 @@ html[data-theme="dark"] {
   --page-bg: #111922;
   --sidebar-bg: #0c141d;
   --brand-mark-background: linear-gradient(145deg, #357fce, #20568f);
+  --weekend-a-bg: rgb(40 120 227 / 20%);
+  --weekend-a-swatch: rgb(40 120 227 / 20%);
+  --weekend-b-bg: rgb(165 122 219 / 20%);
+  --weekend-b-swatch: rgb(165 122 219 / 20%);
 }
 
 /* Die Meldung braucht eine eigene Flaeche: --navy-900 ist im dunklen Schema
@@ -11277,6 +11268,10 @@ html[data-theme="tokyo-night"] {
   --button-primary-shadow: 0 6px 15px rgb(0 0 0 / 22%);
   --button-primary-hover-bg: var(--theme-primary-hover);
   --button-primary-hover-shadow: 0 6px 15px rgb(0 0 0 / 22%);
+  --weekend-a-bg: rgb(40 120 227 / 20%);
+  --weekend-a-swatch: rgb(40 120 227 / 20%);
+  --weekend-b-bg: rgb(165 122 219 / 20%);
+  --weekend-b-swatch: rgb(165 122 219 / 20%);
 }
 
 :is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"], html[data-theme="github-dark"]) .panel {

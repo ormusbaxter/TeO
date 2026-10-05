@@ -129,6 +129,10 @@ html[data-theme="dark"] {
   --page-bg: #111922;
   --sidebar-bg: #0c141d;
   --brand-mark-background: linear-gradient(145deg, #357fce, #20568f);
+  --weekend-a-bg: rgb(40 120 227 / 20%);
+  --weekend-a-swatch: rgb(40 120 227 / 20%);
+  --weekend-b-bg: rgb(165 122 219 / 20%);
+  --weekend-b-swatch: rgb(165 122 219 / 20%);
 }
 
 /* Die Meldung braucht eine eigene Flaeche: --navy-900 ist im dunklen Schema
@@ -512,6 +516,10 @@ html[data-theme="tokyo-night"] {
   --button-primary-shadow: 0 6px 15px rgb(0 0 0 / 22%);
   --button-primary-hover-bg: var(--theme-primary-hover);
   --button-primary-hover-shadow: 0 6px 15px rgb(0 0 0 / 22%);
+  --weekend-a-bg: rgb(40 120 227 / 20%);
+  --weekend-a-swatch: rgb(40 120 227 / 20%);
+  --weekend-b-bg: rgb(165 122 219 / 20%);
+  --weekend-b-swatch: rgb(165 122 219 / 20%);
 }
 
 :is(html[data-theme="nord"], html[data-theme="dracula"], html[data-theme="gruvbox-dark"], html[data-theme="tokyo-night"], html[data-theme="github-dark"]) .panel {

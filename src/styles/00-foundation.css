@@ -72,6 +72,23 @@
   --button-secondary-shadow: none;
   --button-secondary-hover-border: #9bbbef;
   --button-secondary-hover-bg: var(--blue-50);
+  /* Urlaubsplanung: Planungsarten ohne eigene Grundfarbe, Dienstwochenenden,
+     Schulferien, Feiertage und Geburtstage. */
+  --planner-onboarding: #0891b2;
+  --planner-onboarding-border: #087f9c;
+  --planner-external: #805bad;
+  --weekend-a-bg: #eef5ff;
+  --weekend-a-swatch: #dcebff;
+  --weekend-a-accent: #73a9f1;
+  --weekend-b-bg: #f7f0ff;
+  --weekend-b-swatch: #f0e6ff;
+  --weekend-b-accent: #a57adb;
+  --school-vacation: #e7b900;
+  --school-vacation-accent: #d8a800;
+  --school-vacation-bg: #fff8cf;
+  --holiday-corner: rgb(180 35 47 / 44%);
+  --birthday-accent: #c79414;
+  --birthday-hatch: rgb(199 148 20 / 62%);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
