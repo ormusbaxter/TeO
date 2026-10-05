@@ -58,7 +58,7 @@ erhalten.
 
 ## Voraussetzungen
 
-- Node.js 20 oder neuer
+- Node.js 22 oder neuer
 - MariaDB mit einer leeren Datenbank
 - ein ausschließlich für TeO verwendetes Datenbankkonto
 - HTTPS beziehungsweise ein vorgeschalteter Reverse Proxy für den produktiven Betrieb

@@ -48,7 +48,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       # Enthält npm run verify: Build, Strukturprüfung und Tests. Schlägt eine
       # der Prüfungen fehl, entsteht keine Veröffentlichung.

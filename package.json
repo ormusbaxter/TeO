@@ -16,7 +16,7 @@
     "version:fix": "node tools/bump-version.mjs fix"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

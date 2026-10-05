@@ -1483,7 +1483,7 @@ Beim ersten Verbinden kann der lokale Datenbestand kontrolliert auf den Server
 - werden offene Formulare bei externen Änderungen vorsorglich geschlossen
 - werden Sitzungen und Rollen serverseitig geprüft
 
-Für den Server wird Node.js 20 oder neuer benötigt. Details stehen in
+Für den Server wird Node.js 22 oder neuer benötigt. Details stehen in
 [`server/README.md`](server/README.md).
 
 Bestehende MariaDB-Installationen mit dem früheren JSON-Gesamtbestand werden

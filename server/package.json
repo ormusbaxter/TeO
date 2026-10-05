@@ -5,7 +5,7 @@
   "type": "module",
   "description": "MariaDB-API und Webserver für TeO – Team & Employee Organizer",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "start": "node src/server.js",
