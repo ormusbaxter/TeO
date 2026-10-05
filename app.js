@@ -655,6 +655,9 @@
   // teo-autosicherung.json. Weicht die Datei davon ab, hat inzwischen ein
   // anderer Arbeitsplatz geschrieben.
   let sharedBackupFileStamp = null;
+  // Ordner, den die Ordnerwahl der Ersteinrichtung abgelehnt hat, weil dort
+  // schon ein Datenbestand liegt. Er laesst sich stattdessen oeffnen.
+  let firstSharedFolderOccupiedHandle = null;
   let browserPersistenceNotice = "";
   // Beim Laden verworfene Benutzerkonten, damit der Verlust nicht unbemerkt
   // bleibt. Wird nach dem Start einmalig gemeldet.
@@ -1066,6 +1069,9 @@
     firstSharedFolderStatus: document.querySelector("#firstSharedFolderStatus"),
     selectFirstSharedFolderButton: document.querySelector(
       "#selectFirstSharedFolderButton",
+    ),
+    openOccupiedSharedFolderButton: document.querySelector(
+      "#openOccupiedSharedFolderButton",
     ),
     skipFirstSharedFolderButton: document.querySelector(
       "#skipFirstSharedFolderButton",
@@ -3649,6 +3655,10 @@
       "click",
       () => void selectFirstSharedBackupDirectory(),
     );
+    elements.openOccupiedSharedFolderButton.addEventListener(
+      "click",
+      confirmOpenOccupiedSharedFolder,
+    );
     elements.skipFirstSharedFolderButton.addEventListener(
       "click",
       continueWithoutFirstSharedFolder,
@@ -5130,6 +5140,8 @@
   function showFirstSharedFolderDialog(status = "") {
     document.body.classList.add("is-auth-locked");
     elements.firstSharedFolderStatus.textContent = status;
+    firstSharedFolderOccupiedHandle = null;
+    elements.openOccupiedSharedFolderButton.hidden = true;
     const folderSelectionAvailable =
       typeof window.showDirectoryPicker === "function";
     elements.selectFirstSharedFolderButton.disabled = !folderSelectionAvailable;
@@ -20552,13 +20564,17 @@
   async function selectFirstSharedBackupDirectory() {
     const status = elements.firstSharedFolderStatus;
     status.textContent = "";
+    firstSharedFolderOccupiedHandle = null;
+    elements.openOccupiedSharedFolderButton.hidden = true;
     const handle = await requestSharedBackupDirectory(status);
     if (!handle) return false;
     const located = await findStartupBackupFileInSavedDirectory(handle, true);
     if (located.status === "found") {
+      firstSharedFolderOccupiedHandle = handle;
+      elements.openOccupiedSharedFolderButton.hidden = false;
       status.textContent =
         `In diesem Ordner liegt bereits eine ${AUTO_BACKUP_FILENAME}. Wählen Sie einen leeren Ordner – ` +
-        "oder melden Sie sich ab, um einen vorhandenen Datenbestand zu öffnen.";
+        "oder öffnen Sie den vorhandenen Datenbestand.";
       return false;
     }
     if (located.status !== "file-missing") {
@@ -20593,6 +20609,59 @@
       elements.selectFirstSharedFolderButton.disabled = false;
     }
     finishFirstSharedFolderStep();
+    return true;
+  }
+
+  // Wer eben „neu“ gewaehlt hat, den Datenbestand aber schon im Ordner findet,
+  // kehrt hier auf den Weg „Vorhandenen Datenbestand öffnen“ zurueck. Der eben
+  // angelegte Bestand ist leer bis auf das neue Konto und wird verworfen - nur
+  // nach Rueckfrage, die Datei im Ordner bleibt dabei unberuehrt.
+  function confirmOpenOccupiedSharedFolder() {
+    if (!firstSharedFolderOccupiedHandle) return;
+    requestConfirmation({
+      title: "Vorhandenen Datenbestand öffnen?",
+      message:
+        `TeO verwirft den eben eingerichteten Datenbestand samt dem Konto „${currentUser?.username || ""}“ ` +
+        `und lädt ${AUTO_BACKUP_FILENAME} aus dem gewählten Ordner. Angemeldet wird anschließend ` +
+        "mit einem Konto aus dieser Datei.",
+      acceptLabel: "Verwerfen und öffnen",
+      callback: () => void openOccupiedSharedFolder(),
+    });
+  }
+
+  async function openOccupiedSharedFolder() {
+    const handle = firstSharedFolderOccupiedHandle;
+    const status = elements.firstSharedFolderStatus;
+    if (!handle) return false;
+    const located = await findStartupBackupFileInSavedDirectory(handle, true);
+    if (located.status !== "found") {
+      status.textContent = sharedBackupDirectoryMessage(located.status);
+      return false;
+    }
+    const previousState = state;
+    state = emptyState();
+    if (!(await persistState())) {
+      state = previousState;
+      status.textContent = "Der eingerichtete Datenbestand konnte nicht verworfen werden.";
+      return false;
+    }
+    clearUndoHistory();
+    databaseSaveReminderArmed = false;
+    try {
+      await linkAutomaticBackupDirectory(handle);
+      automaticBackupSettings = normalizeAutomaticBackupSettings({
+        ...automaticBackupSettings,
+        firstSharedFilePending: false,
+      });
+      await persistAutomaticBackupConfiguration();
+    } catch (error) {
+      console.error("Die Ordnerverknüpfung konnte nicht gespeichert werden.", error);
+    }
+    await adoptSharedKeyDirectoryFromFile(located.file);
+    firstSharedFolderOccupiedHandle = null;
+    showLoginDialog();
+    elements.loginError.textContent =
+      "Melden Sie sich mit Ihrem vorhandenen TeO-Konto an. Der gemeinsame Datenbestand wird dabei geladen.";
     return true;
   }
 

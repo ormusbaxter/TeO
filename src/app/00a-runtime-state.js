@@ -87,6 +87,9 @@
   // teo-autosicherung.json. Weicht die Datei davon ab, hat inzwischen ein
   // anderer Arbeitsplatz geschrieben.
   let sharedBackupFileStamp = null;
+  // Ordner, den die Ordnerwahl der Ersteinrichtung abgelehnt hat, weil dort
+  // schon ein Datenbestand liegt. Er laesst sich stattdessen oeffnen.
+  let firstSharedFolderOccupiedHandle = null;
   let browserPersistenceNotice = "";
   // Beim Laden verworfene Benutzerkonten, damit der Verlust nicht unbemerkt
   // bleibt. Wird nach dem Start einmalig gemeldet.

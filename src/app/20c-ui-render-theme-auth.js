@@ -471,6 +471,8 @@
   function showFirstSharedFolderDialog(status = "") {
     document.body.classList.add("is-auth-locked");
     elements.firstSharedFolderStatus.textContent = status;
+    firstSharedFolderOccupiedHandle = null;
+    elements.openOccupiedSharedFolderButton.hidden = true;
     const folderSelectionAvailable =
       typeof window.showDirectoryPicker === "function";
     elements.selectFirstSharedFolderButton.disabled = !folderSelectionAvailable;
