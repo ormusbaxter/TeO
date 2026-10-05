@@ -14,7 +14,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       # Der ausgelieferte Stand kommt ohne Abhängigkeiten aus - npm run verify
       # braucht deshalb kein npm ci und läuft an jedem Arbeitsplatz, an dem
@@ -48,11 +48,14 @@ jobs:
       - name: Regelprüfung
         run: npm run lint
 
-      # Alle übrigen Tests laufen ohne Browser. Dieser eine startet TeO
-      # wirklich - ohne ihn bliebe ungeprüft, ob die Oberfläche überhaupt
-      # hochkommt.
+      # Oben im verify-Lauf fehlt Playwright, die Tests, die TeO wirklich
+      # starten, haben sich dort übersprungen. Hier laufen sie mit Browser -
+      # samt Rauchtest. TEO_BROWSER_PFLICHT macht aus dem Überspringen einen
+      # Fehler: Fehlt der Browser, wird der Schritt rot statt still grün.
       - name: Browser holen
         run: npx playwright install --with-deps chromium
 
-      - name: Rauchtest im Browser
-        run: node --test tests/browser-smoke.test.mjs
+      - name: Tests im Browser
+        run: npm test
+        env:
+          TEO_BROWSER_PFLICHT: "1"

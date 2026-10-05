@@ -30,6 +30,17 @@ const MIME = {
 
 let shared = null;
 
+// In der CI ist der Browser Pflicht: Dort setzt der Workflow
+// TEO_BROWSER_PFLICHT, und ein fehlendes Playwright oder ein fehlender Browser
+// lässt den Test scheitern, statt ihn still zu überspringen - sonst bliebe ein
+// kaputter Browserschritt grün. Am Arbeitsplatz bleibt es beim Überspringen.
+export function browserFehlt(t, grund) {
+  if (process.env.TEO_BROWSER_PFLICHT) {
+    throw new Error(`Browsertest nicht ausführbar: ${grund}`);
+  }
+  t.skip(grund);
+}
+
 // Die Browserdatei gehört nicht zum Paket, sie wird getrennt geholt. Fehlt
 // sie oder passt sie nicht zur installierten Playwright-Fassung, gilt dasselbe
 // wie bei fehlendem Playwright: Der Test überspringt sich mit Ansage, statt den
@@ -38,7 +49,8 @@ async function startBrowser(playwright, t) {
   try {
     return await playwright.chromium.launch();
   } catch (error) {
-    t.skip(
+    browserFehlt(
+      t,
       "Playwright findet keinen Browser - „npx playwright install chromium“ " +
         `holt ihn nach (${String(error.message).split("\n")[0]})`,
     );
@@ -140,7 +152,7 @@ export async function openTeO(
   }
   const playwright = await loadPlaywright();
   if (!playwright) {
-    t.skip("Playwright ist nicht installiert - „npm ci“ holt es nach");
+    browserFehlt(t, "Playwright ist nicht installiert - „npm ci“ holt es nach");
     return null;
   }
 

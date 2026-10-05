@@ -4,13 +4,14 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { browserFehlt } from "./helpers/browser.mjs";
 
 const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
 );
 
-// Alle übrigen Tests laufen ohne Browser. Sie prüfen damit alles außer der
+// Die meisten Tests laufen ohne Browser. Sie prüfen damit alles außer der
 // Frage, ob die Oberfläche im Browser überhaupt hochkommt - und genau dort
 // fällt eine kaputte Vorlage, ein doppelter Bezeichner oder eine verletzte
 // CSP auf. Dieser eine Test füllt die Lücke.
@@ -58,7 +59,7 @@ function startServer() {
 test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) => {
   const playwright = await loadPlaywright();
   if (!playwright) {
-    t.skip("Playwright ist nicht installiert - „npm ci“ holt es nach");
+    browserFehlt(t, "Playwright ist nicht installiert - „npm ci“ holt es nach");
     return;
   }
 
@@ -68,7 +69,8 @@ test("TeO startet im Browser und baut die Hilfe erst bei Bedarf auf", async (t) 
   try {
     browser = await playwright.chromium.launch();
   } catch (error) {
-    t.skip(
+    browserFehlt(
+      t,
       "Playwright findet keinen Browser - „npx playwright install chromium“ " +
         `holt ihn nach (${String(error.message).split("\n")[0]})`,
     );

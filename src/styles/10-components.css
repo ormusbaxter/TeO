@@ -88,25 +88,27 @@
 }
 
 .button-primary {
-  color: white;
-  background: var(--blue-700);
-  box-shadow: 0 6px 15px rgb(33 102 209 / 18%);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+  background: var(--button-primary-bg);
+  box-shadow: var(--button-primary-shadow);
 }
 
 .button-primary:hover {
-  background: #195ab9;
-  box-shadow: 0 8px 20px rgb(33 102 209 / 25%);
+  background: var(--button-primary-hover-bg);
+  box-shadow: var(--button-primary-hover-shadow);
 }
 
 .button-secondary {
   color: var(--blue-700);
-  border-color: #c8dafa;
-  background: white;
+  border-color: var(--button-secondary-border);
+  background: var(--button-secondary-bg);
+  box-shadow: var(--button-secondary-shadow);
 }
 
 .button-secondary:hover {
-  border-color: #9bbbef;
-  background: var(--blue-50);
+  border-color: var(--button-secondary-hover-border);
+  background: var(--button-secondary-hover-bg);
 }
 
 .button-ghost {

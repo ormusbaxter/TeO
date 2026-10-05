@@ -41,6 +41,54 @@
   --toast-error-tint: rgb(230 88 101 / 15%);
   --toast-warning-icon: #f4c86d;
   --toast-warning-tint: rgb(230 170 66 / 15%);
+  /* Bauteilmarken: Die Themes belegen diese Marken neu, statt die Regeln der
+     Bausteine zu überschreiben. Wer ein Theme anlegt, setzt hier an. */
+  --page-glow: rgb(40 120 227 / 7%);
+  --page-bg: #f5f7fa;
+  --page-background:
+    radial-gradient(circle at 78% -20%, var(--page-glow), transparent 33rem), var(--page-bg);
+  --sidebar-text: #dce7f1;
+  --sidebar-muted: #afc0cf;
+  --sidebar-sheen: rgb(255 255 255 / 3%);
+  --sidebar-bg: var(--navy-950);
+  --sidebar-background:
+    linear-gradient(180deg, var(--sidebar-sheen), transparent 40%), var(--sidebar-bg);
+  --brand-mark-background: linear-gradient(145deg, #3e91f4, #1566ce);
+  --brand-mark-shadow: 0 8px 20px rgb(0 0 0 / 20%);
+  --nav-active-background: linear-gradient(
+    90deg,
+    rgb(56 137 231 / 25%),
+    rgb(56 137 231 / 10%)
+  );
+  --nav-active-shadow: inset 3px 0 #56a1f6;
+  --button-primary-text: white;
+  --button-primary-border: transparent;
+  --button-primary-bg: var(--blue-700);
+  --button-primary-shadow: 0 6px 15px rgb(33 102 209 / 18%);
+  --button-primary-hover-bg: #195ab9;
+  --button-primary-hover-shadow: 0 8px 20px rgb(33 102 209 / 25%);
+  --button-secondary-border: #c8dafa;
+  --button-secondary-bg: white;
+  --button-secondary-shadow: none;
+  --button-secondary-hover-border: #9bbbef;
+  --button-secondary-hover-bg: var(--blue-50);
+  /* Urlaubsplanung: Planungsarten ohne eigene Grundfarbe, Dienstwochenenden,
+     Schulferien, Feiertage und Geburtstage. */
+  --planner-onboarding: #0891b2;
+  --planner-onboarding-border: #087f9c;
+  --planner-external: #805bad;
+  --weekend-a-bg: #eef5ff;
+  --weekend-a-swatch: #dcebff;
+  --weekend-a-accent: #73a9f1;
+  --weekend-b-bg: #f7f0ff;
+  --weekend-b-swatch: #f0e6ff;
+  --weekend-b-accent: #a57adb;
+  --school-vacation: #e7b900;
+  --school-vacation-accent: #d8a800;
+  --school-vacation-bg: #fff8cf;
+  --holiday-corner: rgb(180 35 47 / 44%);
+  --birthday-accent: #c79414;
+  --birthday-hatch: rgb(199 148 20 / 62%);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
@@ -76,9 +124,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background:
-    radial-gradient(circle at 78% -20%, rgb(40 120 227 / 7%), transparent 33rem),
-    #f5f7fa;
+  background: var(--page-background);
 }
 
 button,
