@@ -331,46 +331,6 @@
     );
   }
 
-  function renderRecentEmployees() {
-    const employees = [...state.employees]
-      .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
-      .slice(0, 4);
-
-    if (employees.length === 0) {
-      elements.recentEmployees.innerHTML = renderEmptyState({
-        title: "Das Team ist noch leer",
-        text: "Nach dem ersten Eintrag erscheinen die zuletzt bearbeiteten Mitarbeiter hier.",
-        compact: true,
-      });
-      return;
-    }
-
-    elements.recentEmployees.innerHTML = `
-      <div class="employee-strip">
-        ${employees
-          .map(
-            (employee) => `
-              <button
-                class="employee-mini"
-                type="button"
-                data-edit-recent-employee="${employee.id}"
-                aria-label="${escapeHtml(fullName(employee))} bearbeiten"
-              >
-                ${renderAvatar(employee)}
-                <span>
-                  <strong>${escapeHtml(fullName(employee))}</strong>
-                  <small>${escapeHtml(
-                    employee.profession || "Beruf nicht angegeben",
-                  )} · ${escapeHtml(employeeStatusLabel(employee))}</small>
-                </span>
-              </button>
-            `,
-          )
-          .join("")}
-      </div>
-    `;
-  }
-
   function renderEmployees() {
     renderEmployeeFilterOptions();
     renderViewFilterChips("employees");

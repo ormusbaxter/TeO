@@ -77,11 +77,6 @@
     renderEmployees();
   }
 
-  function handleRecentEmployeeAction(event) {
-    const button = event.target.closest("[data-edit-recent-employee]");
-    if (button) openEmployeeDialog(button.dataset.editRecentEmployee);
-  }
-
   function handleTrainingAction(event) {
     const button = event.target.closest("[data-action][data-id]");
     if (!button) return;

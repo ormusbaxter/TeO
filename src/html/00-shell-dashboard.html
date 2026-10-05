@@ -416,44 +416,42 @@
         </header>
 
         <section class="view is-active" id="dashboardView" data-view-panel="dashboard">
-          <div class="page-header">
+          <div class="page-header dashboard-hero">
             <div class="page-header-text">
               <p class="eyebrow">
                 <svg class="eyebrow-icon"><use href="#icon-dashboard"></use></svg>
                 <span>Intensivstation</span>
+                <span class="dashboard-date" id="dashboardDate"></span>
               </p>
               <h1 id="dashboardGreeting">Guten Tag!</h1>
-              <p class="page-subtitle">Personal und Pflichtfortbildungen kompakt im Blick.</p>
+              <p class="page-subtitle dashboard-summary" id="dashboardSummary">Personal und Pflichtfortbildungen kompakt im Blick.</p>
             </div>
             <div class="header-actions">
               <button class="button button-secondary" id="openDashboardLayoutButton" type="button">
                 <svg><use href="#icon-columns"></use></svg>
-                Dashboard anpassen
+                Anpassen
+              </button>
+              <button class="button button-primary" type="button" data-open-completion>
+                <svg><use href="#icon-check"></use></svg>
+                Abschluss eintragen
               </button>
             </div>
           </div>
 
-          <section class="panel dashboard-work-queue" id="dashboardWorkQueuePanel" data-dashboard-widget="work-queue">
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Arbeitsliste</p>
-                <h2>Was jetzt Aufmerksamkeit braucht</h2>
-              </div>
-              <div class="segmented-control dashboard-work-filter" role="group" aria-label="Arbeitsliste filtern">
-                <button class="is-active" type="button" data-work-queue-filter="all" aria-pressed="true">Alles</button>
-                <button type="button" data-work-queue-filter="overdue" aria-pressed="false">Überfällig</button>
-                <button type="button" data-work-queue-filter="week" aria-pressed="false">7 Tage</button>
-              </div>
-            </div>
-            <div id="dashboardWorkQueue"></div>
-          </section>
+          <div class="dashboard-kpis" id="dashboardKpis" data-dashboard-widget="summary"></div>
 
-          <div class="dashboard-priority-grid" id="dashboardPriorityGrid" data-dashboard-widget="deadlines">
-          <section class="panel deadline-panel" aria-labelledby="deadlineOverviewTitle">
-            <div class="panel-header deadline-panel-header">
-              <div>
-                <p class="eyebrow">Fristenmonitor</p>
-                <h2 id="deadlineOverviewTitle">Anstehende und überfällige Fristen</h2>
+          <div class="dashboard-priority-grid" id="dashboardPriorityGrid" data-dashboard-widget="upcoming">
+            <section class="panel deadline-panel" id="dashboardUpcomingPanel" aria-labelledby="deadlineOverviewTitle">
+              <div class="panel-header deadline-panel-header">
+                <div>
+                  <p class="eyebrow">Als Nächstes</p>
+                  <h2 id="deadlineOverviewTitle">Fristen und Termine</h2>
+                </div>
+                <div class="segmented-control dashboard-horizon" role="group" aria-label="Zeitraum">
+                  <button type="button" data-deadline-horizon="7" aria-pressed="false">7 Tage</button>
+                  <button class="is-active" type="button" data-deadline-horizon="30" aria-pressed="true">30 Tage</button>
+                  <button type="button" data-deadline-horizon="90" aria-pressed="false">90 Tage</button>
+                </div>
               </div>
               <div class="deadline-controls">
                 <fieldset class="deadline-filter-group">
@@ -483,119 +481,75 @@
                   <input id="deadlineHideOverdue" type="checkbox" />
                   <span>Überfällige ausblenden</span>
                 </label>
-                <label class="compact-field">
-                  <span>Zeitraum</span>
-                  <select id="deadlineHorizon">
-                    <option value="30">30 Tage</option>
-                    <option value="60">60 Tage</option>
-                    <option value="90" selected>90 Tage</option>
-                  </select>
-                </label>
               </div>
-            </div>
-            <div id="deadlineOverview"></div>
-          </section>
-
-          <section
-            class="panel dashboard-memo-panel"
-            id="dashboardMemoPanel"
-            aria-labelledby="dashboardMemoTitle"
-            hidden
-          >
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Memo / ToDo</p>
-                <h2 id="dashboardMemoTitle">Offene Einträge</h2>
-              </div>
-              <button class="text-button" type="button" data-go-to="memos">
-                Alle anzeigen
-                <svg><use href="#icon-chevron"></use></svg>
-              </button>
-            </div>
-            <div id="dashboardMemoList"></div>
-          </section>
-          </div>
-
-          <div class="dashboard-grid" data-dashboard-widget="overview">
-            <section class="panel panel-large">
-              <div class="panel-header">
-                <div>
-                  <p class="eyebrow">Fortbildungsstatus</p>
-                  <h2>Pflichtfortbildungen</h2>
-                </div>
-                <button class="text-button" type="button" data-go-to="trainings">
-                  Alle anzeigen
-                  <svg><use href="#icon-chevron"></use></svg>
-                </button>
-              </div>
-              <div id="dashboardTrainingProgress"></div>
+              <div id="deadlineOverview"></div>
             </section>
 
-            <section class="panel">
-              <div class="panel-header">
-                <div>
-                  <p class="eyebrow">Schnellzugriff</p>
-                  <h2>Neue Einträge</h2>
+            <div class="dashboard-aside">
+              <section class="panel dashboard-absence-panel" aria-labelledby="dashboardAbsenceTitle">
+                <div class="panel-header">
+                  <div>
+                    <p class="eyebrow">Urlaubsplanung</p>
+                    <h2 id="dashboardAbsenceTitle">Wer ist diese Woche weg?</h2>
+                  </div>
+                  <button class="text-button" type="button" data-go-to="vacations">
+                    Planung
+                    <svg><use href="#icon-chevron"></use></svg>
+                  </button>
                 </div>
-              </div>
-              <div class="quick-actions">
-                <button class="quick-action" type="button" data-open-employee>
-                  <span class="quick-action-icon quick-action-icon-blue">
+                <div id="dashboardAbsence"></div>
+                <div class="quick-actions" aria-label="Schnellzugriff">
+                  <button class="quick-action" type="button" data-open-employee>
                     <svg><use href="#icon-users"></use></svg>
-                  </span>
-                  <span>
-                    <strong>Mitarbeiter anlegen</strong>
-                    <small>Stammdaten und Qualifikationen erfassen</small>
-                  </span>
-                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
-                </button>
-                <button class="quick-action" type="button" data-open-training>
-                  <span class="quick-action-icon quick-action-icon-teal">
+                    Mitarbeiter anlegen
+                  </button>
+                  <button class="quick-action" type="button" data-open-training>
                     <svg><use href="#icon-training"></use></svg>
-                  </span>
-                  <span>
-                    <strong>Pflichtfortbildung anlegen</strong>
-                    <small>Neue Fortbildung definieren</small>
-                  </span>
-                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
-                </button>
-                <button class="quick-action" type="button" data-open-completion>
-                  <span class="quick-action-icon quick-action-icon-orange">
-                    <svg><use href="#icon-check"></use></svg>
-                  </span>
-                  <span>
-                    <strong>Abschluss eintragen</strong>
-                    <small>Nachweis für aktive Mitarbeiter erfassen</small>
-                  </span>
-                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
-                </button>
-                <button class="quick-action" type="button" data-open-meeting>
-                  <span class="quick-action-icon quick-action-icon-purple">
+                    Fortbildung anlegen
+                  </button>
+                  <button class="quick-action" type="button" data-open-meeting>
                     <svg><use href="#icon-meeting"></use></svg>
-                  </span>
-                  <span>
-                    <strong>Teamsitzung anlegen</strong>
-                    <small>Termin und Teilnahmen dokumentieren</small>
-                  </span>
-                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
-                </button>
-              </div>
-            </section>
+                    Teamsitzung anlegen
+                  </button>
+                  <button class="quick-action" type="button" data-open-memo>
+                    <svg><use href="#icon-memo"></use></svg>
+                    Memo schreiben
+                  </button>
+                </div>
+              </section>
+
+              <section
+                class="panel dashboard-memo-panel"
+                id="dashboardMemoPanel"
+                aria-labelledby="dashboardMemoTitle"
+                hidden
+              >
+                <div class="panel-header">
+                  <div>
+                    <p class="eyebrow">Memo / ToDo</p>
+                    <h2 id="dashboardMemoTitle">Offene Einträge</h2>
+                  </div>
+                  <button class="text-button" type="button" data-go-to="memos">
+                    Alle anzeigen
+                    <svg><use href="#icon-chevron"></use></svg>
+                  </button>
+                </div>
+                <div id="dashboardMemoList"></div>
+              </section>
+            </div>
           </div>
 
-
-          <section class="panel recent-panel" data-dashboard-widget="recent">
+          <section class="panel dashboard-training-panel" id="dashboardTrainingPanel" data-dashboard-widget="trainings">
             <div class="panel-header">
               <div>
-                <p class="eyebrow">Team</p>
-                <h2>Zuletzt bearbeitet</h2>
+                <p class="eyebrow">Pflichtfortbildungen</p>
+                <h2>Offene Nachweise nach Fortbildung</h2>
               </div>
-              <button class="text-button" type="button" data-go-to="employees">
-                Mitarbeiter verwalten
+              <button class="text-button" type="button" data-go-to="trainings">
+                Alle Fortbildungen
                 <svg><use href="#icon-chevron"></use></svg>
               </button>
             </div>
-            <div id="recentEmployees"></div>
+            <div id="dashboardTrainingProgress"></div>
           </section>
-
         </section>

@@ -155,8 +155,8 @@
   // Dienstjubiläen, die der Fristenmonitor nennt.
   const SERVICE_ANNIVERSARY_YEARS = Object.freeze([10, 20, 25, 30, 40]);
   const PROBATION_MONTHS = 6;
-  // So viele Fristen bleiben im Monitor sichtbar, weitere sind scrollbar.
-  const VISIBLE_DEADLINE_ROWS = 6;
+  // So viele Zeilen zeigt die Liste „Als Nächstes“ höchstens.
+  const DASHBOARD_TIMELINE_ROWS = 25;
   const DEADLINE_KIND_LABELS = Object.freeze({
     appointment: "Termine",
     birthday: "Geburtstage",

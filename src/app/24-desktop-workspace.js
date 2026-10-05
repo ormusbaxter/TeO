@@ -3,12 +3,13 @@
   const WORKSPACE_HISTORY_KEY = "teo-workspace-history-v1";
   const WORKSPACE_FAVORITES_KEY = "teo-workspace-favorites-v1";
   const WORKSPACE_COMMANDS_KEY = "teo-workspace-commands-v1";
-  const DASHBOARD_LAYOUT_KEY = "teo-dashboard-layout-v1";
+  // v2: Mit dem neuen Dashboard haben sich die Bausteine geändert; eine
+  // Anordnung der alten Bausteine lässt sich nicht sinnvoll übertragen.
+  const DASHBOARD_LAYOUT_KEY = "teo-dashboard-layout-v2";
   const DASHBOARD_WIDGETS = Object.freeze([
-    { key: "work-queue", label: "Arbeitsliste" },
-    { key: "deadlines", label: "Fristen und offene Memos" },
-    { key: "overview", label: "Fortbildungen und Schnellzugriff" },
-    { key: "recent", label: "Zuletzt bearbeitete Mitarbeiter" },
+    { key: "summary", label: "Kennzahlen" },
+    { key: "upcoming", label: "Als Nächstes, Abwesenheiten und Memos" },
+    { key: "trainings", label: "Offene Nachweise nach Fortbildung" },
   ]);
 
   let employeeInspectorId = "";
@@ -16,14 +17,13 @@
   let workspaceFavorites = readWorkspaceList(WORKSPACE_FAVORITES_KEY);
   let workspaceCommandHistory = readWorkspaceCommands();
   let dashboardLayout = readDashboardLayout();
-  let workQueueFilter = "all";
 
   function bindDesktopWorkspace() {
     document.querySelector("#openDashboardLayoutButton")?.addEventListener("click", openDashboardLayoutDialog);
     document.querySelector("#resetDashboardLayoutButton")?.addEventListener("click", resetDashboardLayout);
     document.querySelector("#dashboardLayoutList")?.addEventListener("click", handleDashboardLayoutAction);
     document.querySelector("#dashboardLayoutList")?.addEventListener("change", handleDashboardLayoutVisibility);
-    document.querySelector("#dashboardWorkQueuePanel")?.addEventListener("click", handleWorkQueueAction);
+    document.querySelector("#dashboardView")?.addEventListener("click", handleDashboardAction);
     elements.employeeTable?.addEventListener("click", handleEmployeeWorkspaceClick);
     elements.employeeTable?.addEventListener("keydown", handleEmployeeWorkspaceKeydown);
     document.querySelector("#employeeInspector")?.addEventListener("click", handleEmployeeInspectorAction);
@@ -39,7 +39,6 @@
 
   function renderDesktopWorkspace() {
     applyDashboardLayout();
-    renderDashboardWorkQueue();
   }
 
   function handleEmployeeWorkspaceClick(event) {
@@ -147,58 +146,6 @@
     };
     document.addEventListener("pointermove", move);
     document.addEventListener("pointerup", finish, { once: true });
-  }
-
-  function renderDashboardWorkQueue() {
-    const target = document.querySelector("#dashboardWorkQueue");
-    if (!target) return;
-    const deadlineItems = getDeadlineItems().filter((item) => item.daysUntil <= 30).map((item) => ({
-      type: item.kind === "appointment" ? "appointment" : "employee",
-      id: item.kind === "appointment" ? item.appointment.id : item.employeeId,
-      title: item.kind === "birthday" ? `${fullName(item.employee)} · ${item.title}` : item.title,
-      detail: item.kind === "appointment" ? item.type : `${fullName(item.employee)} · ${item.type}`,
-      daysUntil: item.daysUntil,
-      date: item.dueDate,
-      icon: item.kind === "appointment" ? "icon-calendar" : "icon-alert",
-    }));
-    const memoItems = visibleMemos().filter((memo) => !memo.completed).map((memo) => {
-      const dueDate = parseLocalDate(memo.date);
-      const daysUntil = dueDate ? daysBetween(parseLocalDate(todayIso()), dueDate) : 365;
-      return { type: "memo", id: memo.id, title: memo.title, detail: memo.category || "Memo / ToDo", daysUntil, date: memo.date, icon: "icon-memo" };
-    });
-    const qualityItems = getDataQualityIssues().filter((issue) => issue.severity === "high").map((issue) => ({
-      type: "employee-edit", id: issue.employeeId, title: issue.title, detail: issue.detail, daysUntil: -1, date: "", icon: "icon-alert",
-    }));
-    let items = [...qualityItems, ...memoItems, ...deadlineItems].sort((a, b) => a.daysUntil - b.daysUntil || a.title.localeCompare(b.title, "de"));
-    if (workQueueFilter === "overdue") items = items.filter((item) => item.daysUntil < 0);
-    if (workQueueFilter === "week") items = items.filter((item) => item.daysUntil >= 0 && item.daysUntil <= 7);
-    target.innerHTML = items.length ? `<div class="work-queue-list">${items.slice(0, 12).map((item) => `
-      <button class="work-queue-row ${item.daysUntil < 0 ? "is-overdue" : ""}" type="button" data-work-type="${item.type}" data-work-id="${item.id}">
-        <span class="work-queue-icon"><svg><use href="#${item.icon}"></use></svg></span>
-        <span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span>
-        <span><strong>${item.date ? formatDate(item.date) : "Prüfen"}</strong><small>${item.date ? deadlineRelativeLabel(item.daysUntil) : "Datenqualität"}</small></span>
-      </button>`).join("")}</div>${items.length > 12 ? `<p class="field-hint">${items.length - 12} weitere Einträge</p>` : ""}` : renderEmptyState({ title: "Alles im grünen Bereich", text: "Für diesen Filter gibt es aktuell nichts zu bearbeiten.", compact: true });
-  }
-
-  function handleWorkQueueAction(event) {
-    const filter = event.target.closest("[data-work-queue-filter]");
-    if (filter) {
-      workQueueFilter = filter.dataset.workQueueFilter;
-      document.querySelectorAll("[data-work-queue-filter]").forEach((button) => {
-        const active = button === filter;
-        button.classList.toggle("is-active", active);
-        button.setAttribute("aria-pressed", String(active));
-      });
-      renderDashboardWorkQueue();
-      return;
-    }
-    const row = event.target.closest("[data-work-type]");
-    if (!row) return;
-    const { workType, workId } = row.dataset;
-    if (workType === "employee") { showView("employees"); selectEmployeeInspector(workId); }
-    if (workType === "employee-edit") { showView("employees"); openEmployeeDialog(workId); }
-    if (workType === "appointment") { showView("appointments"); openAppointmentDialog(workId); }
-    if (workType === "memo") { showView("memos"); openMemoDialog(workId); }
   }
 
   function readWorkspaceList(key) {

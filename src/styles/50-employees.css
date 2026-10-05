@@ -1,53 +1,4 @@
 /* Mitarbeiter: Tabelle, Gesamtakte, Beschäftigungszeiten, Qualifikationen und
-   Telefonliste. */
-
-.employee-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  padding: 0 14px 18px;
-}
-
-.employee-mini {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  min-width: 0;
-  padding: 12px;
-  cursor: pointer;
-  text-align: left;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-}
-
-.employee-mini:hover {
-  background: var(--slate-50);
-}
-
-.employee-mini > span:last-child {
-  min-width: 0;
-}
-
-.employee-mini strong,
-.employee-mini small {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.employee-mini strong {
-  color: var(--slate-800);
-  font-size: 0.72rem;
-}
-
-.employee-mini small {
-  margin-top: 3px;
-  color: var(--slate-500);
-  font-size: 0.62rem;
-}
-
 .employee-cell {
   display: flex;
   gap: 11px;
@@ -251,10 +202,6 @@
 }
 
 @media (max-width: 1180px) {
-  .employee-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .employee-table :is(th, td)[data-column="profession"] {
     display: none;
   }
@@ -267,14 +214,6 @@
 
   .phone-list-preview-hint {
     width: 100%;
-  }
-
-  .employee-strip {
-    grid-template-columns: 1fr;
-  }
-
-  .employee-mini:nth-child(n + 4) {
-    display: none;
   }
 
   .qualification-grid,

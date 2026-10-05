@@ -153,7 +153,6 @@
     const memos = visibleMemos().filter((memo) => !memo.completed).sort(sortMemos);
     const visible = memos.length > 0;
     elements.dashboardMemoPanel.hidden = !visible;
-    elements.dashboardPriorityGrid.classList.toggle("has-memos", visible);
     if (!visible) {
       elements.dashboardMemoList.innerHTML = "";
       return;

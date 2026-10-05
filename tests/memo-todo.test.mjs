@@ -40,16 +40,14 @@ test("Angepinnte Memos stehen vor offenen und erledigten Einträgen", async () =
 });
 
 test("Memo-Oberfläche, Kategorien und das bedarfsabhängige Dashboard sind verdrahtet", async () => {
-  const [html, appSource, css] = await Promise.all([
+  const [html, appSource] = await Promise.all([
     fs.readFile("index.html", "utf8"),
     fs.readFile("app.js", "utf8"),
-    fs.readFile("styles.css", "utf8"),
   ]);
 
   assert.ok(html.indexOf('data-view="appointments"') < html.indexOf('data-view="memos"'));
   assert.match(html, /id="memoDialog"[\s\S]*id="memoDate"[\s\S]*id="memoVisibility"/);
   assert.match(html, /id="memoCategoryForm"[\s\S]*id="memoCategoryList"/);
   assert.match(html, /id="dashboardPriorityGrid"[\s\S]*id="dashboardMemoPanel"/);
-  assert.match(appSource, /dashboardPriorityGrid\.classList\.toggle\("has-memos", visible\)/);
-  assert.match(css, /\.dashboard-priority-grid\.has-memos\s*\{[\s\S]*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(appSource, /dashboardMemoPanel\.hidden = !visible/);
 });

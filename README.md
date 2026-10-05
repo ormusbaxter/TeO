@@ -65,7 +65,7 @@ unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.
 
 Folgende Bereiche stehen zur Verfügung:
 
-- **Übersicht:** Kennzahlen, Fristenmonitor und zuletzt bearbeitete Daten
+- **Übersicht:** Wochenzusammenfassung, Kennzahlen, anstehende Fristen, Abwesenheiten der Woche und offene Nachweise
 - **Mitarbeiter:** Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten
 - **Wochenendverteilung:** Vergleich der beiden festen Dienstwochenenden
 - **Urlaubsplanung:** Monats- und Jahresplanung von Urlaub und Abwesenheiten
@@ -210,17 +210,38 @@ Kontextmenü:
 
 **Esc** schließt das Menü, ein Klick daneben ebenfalls.
 
-### Arbeitsliste und Dashboard
+### Die Übersicht
 
-Die Arbeitsliste auf der Übersicht führt die wichtigsten offenen Punkte aus
-mehreren Bereichen zusammen: überfällige und anstehende Fristen, Termine,
-offene Memos und Datenqualitätsprobleme mit hoher Priorität. **Überfällig** und
-**7 Tage** begrenzen die Liste auf den unmittelbar relevanten Zeitraum. Ein
-Klick führt direkt zum betreffenden Datensatz.
+Oben begrüßt die Übersicht mit dem Datum und einem Satz zur Woche: wie viele
+Fristen in den nächsten sieben Tagen anstehen, wie viele Personen diese Woche
+abwesend sind und wie viele Nachweise bei den Pflichtfortbildungen noch fehlen.
+Daneben öffnet **Abschluss eintragen** direkt den Nachweisdialog.
 
-Über **Dashboard anpassen** werden Arbeitsliste, Fristen, Fortbildungsübersicht
-und zuletzt bearbeitete Mitarbeiter ein- oder ausgeblendet und neu angeordnet.
-Die Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum
+Darunter stehen vier Kennzahlen, jede ein Klick tief:
+
+- **Nachweise überfällig** springt zu den offenen Nachweisen
+- **Fristen in 7 Tagen** stellt die Liste „Als Nächstes“ auf sieben Tage
+- **heute abwesend** öffnet die Urlaubsplanung
+- **Geburtstage** zeigt die Liste „Als Nächstes“ für 30 Tage
+
+Die Kennzahlen zählen immer den ganzen Bestand, unabhängig von den Filtern der
+Liste.
+
+**Als Nächstes** ist der Fristenmonitor (siehe unten). **Wer ist diese Woche
+weg?** zeigt Montag bis Freitag der laufenden Woche – am Wochenende die
+kommende – mit den Kürzeln aller, die laut Urlaubsplanung abwesend sind. Ist
+die Tagesgrenze der Urlaubsplanung erreicht, ist die Zahl orange, wird sie
+überschritten, rot. Darunter liegen die Schnellzugriffe zum Anlegen von
+Mitarbeitern, Fortbildungen, Teamsitzungen und Memos.
+
+**Offene Nachweise nach Fortbildung** fasst die überfälligen
+Pflichtfortbildungen zusammen: eine Zeile je Fortbildung mit Erfüllungsgrad,
+der Zahl der überfälligen Nachweise und den Kürzeln der Betroffenen. Ein Klick
+auf die Zeile öffnet den Nachweisdialog für diese Fortbildung.
+
+Über **Anpassen** werden Kennzahlen, „Als Nächstes“ samt Abwesenheiten und die
+offenen Nachweise ein- oder ausgeblendet und neu angeordnet. Die
+Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum
 gemeinsamen Datenbestand oder zur Datensicherung.
 
 ### Was ist neu?
@@ -311,7 +332,7 @@ untereinander:
   Geräts; dazu Sicherung exportieren, Datenqualität prüfen, Berufe und
   Qualifikationen, Tastenkürzel und Abmelden. Administratoren finden hier
   außerdem Änderungsprotokoll und Benutzerverwaltung
-- **Direktbefehle** – unter anderem die überfällige Arbeitsliste und der Filter
+- **Direktbefehle** – unter anderem die offenen Nachweise auf der Übersicht und der Filter
   für aktuell beschäftigte Mitarbeiter
 - **Datensätze** – Mitarbeiter, Termine, Memos, Pflichtfortbildungen,
   Teamsitzungen und Geräte, sobald etwas eingegeben wurde
@@ -1025,9 +1046,8 @@ Memo-/ToDo-Kategorien** angelegt, umbenannt oder gelöscht. Umbenennungen werden
 in vorhandene Einträge übernommen.
 
 Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der
-Übersichtsseite neben dem Fristenmonitor. Nur wenn solche Einträge vorhanden
-sind, teilen sich beide Bereiche die verfügbare Breite zu gleichen Teilen; auf
-schmaleren Bildschirmen stehen sie untereinander.
+Übersichtsseite unter **Wer ist diese Woche weg?** – nur wenn es solche
+Einträge gibt.
 
 ## Terminkalender und Fristenmonitor
 
@@ -1083,16 +1103,19 @@ Tagesfeld statt der Titel farbige Balken – ein Tippen öffnet den Termin.
 
 ### Fristenmonitor
 
-Der Fristenmonitor steht auf der Übersichtsseite direkt unter den Kennzahlen.
-Sechs Einträge bleiben sichtbar, weitere sind innerhalb des Bereichs
-scrollbar.
+Der Fristenmonitor steht auf der Übersichtsseite unter den Kennzahlen und
+heißt dort **Als Nächstes**. Die nächsten sieben Tage stehen als Zeitleiste mit
+Datum, alles Spätere als kurze Liste; höchstens 25 Einträge, angeheftete
+Termine immer. Überfälliges und Datenqualitätsprobleme mit hoher Priorität
+stehen oben unter **Überfällig und zu prüfen**.
 
 Er zeigt:
 
 - anstehende Termine; Schulungen und Geräteeinweisungen aus dem Terminkalender
   werden dabei dem Filter **Fortbildungen** zugeordnet
 - Geburtstage
-- fällige und überfällige Pflichtfortbildungen
+- fällige Pflichtfortbildungen; überfällige stehen gebündelt unter **Offene
+  Nachweise nach Fortbildung**
 - ablaufende Zusatzqualifikationen
 - unter **Personal**: Ende der Probezeit (sechs Monate nach Eintritt),
   bevorstehende Austritte und Änderungen des Stellenumfangs sowie
@@ -1100,7 +1123,7 @@ Er zeigt:
   Personalfristen erscheinen nicht – ein abgelaufenes Probezeitende ist
   erledigt, keine offene Aufgabe.
 
-Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien
+Der Zeitraum kann auf 7, 30 oder 90 Tage eingestellt werden. Kategorien
 lassen sich einzeln ein- oder ausblenden.
 Der zusätzliche Filter **Überfällige ausblenden** zeigt nur aktuell anstehende
 Einträge und wird gemeinsam mit den Kategorie-Filtern gespeichert.

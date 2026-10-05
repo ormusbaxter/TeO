@@ -89,7 +89,7 @@ test("Urlaubseinstellungen und Termin-Druckablauf sind vollständig verdrahtet",
   );
   assert.match(appointmentDialog, /value="print"[^>]*>[\s\S]*Speichern &amp; Drucken/);
   assert.match(footerHtml, /id="appointmentPrintSurface"/);
-  assert.match(appSource, /openAppointmentDialog\(button\.dataset\.deadlineAppointment\)/);
+  assert.match(appSource, /openAppointmentDialog\(appointment\.dataset\.deadlineAppointment\)/);
   assert.match(printCss, /@page appointment\s*{[^}]*size: A4 portrait;/s);
   assert.match(printCss, /@page appointment\s*{[^}]*margin: 10mm;/s);
   assert.doesNotMatch(

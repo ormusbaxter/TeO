@@ -417,44 +417,42 @@
         </header>
 
         <section class="view is-active" id="dashboardView" data-view-panel="dashboard">
-          <div class="page-header">
+          <div class="page-header dashboard-hero">
             <div class="page-header-text">
               <p class="eyebrow">
                 <svg class="eyebrow-icon"><use href="#icon-dashboard"></use></svg>
                 <span>Intensivstation</span>
+                <span class="dashboard-date" id="dashboardDate"></span>
               </p>
               <h1 id="dashboardGreeting">Guten Tag!</h1>
-              <p class="page-subtitle">Personal und Pflichtfortbildungen kompakt im Blick.</p>
+              <p class="page-subtitle dashboard-summary" id="dashboardSummary">Personal und Pflichtfortbildungen kompakt im Blick.</p>
             </div>
             <div class="header-actions">
               <button class="button button-secondary" id="openDashboardLayoutButton" type="button">
                 <svg><use href="#icon-columns"></use></svg>
-                Dashboard anpassen
+                Anpassen
+              </button>
+              <button class="button button-primary" type="button" data-open-completion>
+                <svg><use href="#icon-check"></use></svg>
+                Abschluss eintragen
               </button>
             </div>
           </div>
 
-          <section class="panel dashboard-work-queue" id="dashboardWorkQueuePanel" data-dashboard-widget="work-queue">
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Arbeitsliste</p>
-                <h2>Was jetzt Aufmerksamkeit braucht</h2>
-              </div>
-              <div class="segmented-control dashboard-work-filter" role="group" aria-label="Arbeitsliste filtern">
-                <button class="is-active" type="button" data-work-queue-filter="all" aria-pressed="true">Alles</button>
-                <button type="button" data-work-queue-filter="overdue" aria-pressed="false">Überfällig</button>
-                <button type="button" data-work-queue-filter="week" aria-pressed="false">7 Tage</button>
-              </div>
-            </div>
-            <div id="dashboardWorkQueue"></div>
-          </section>
+          <div class="dashboard-kpis" id="dashboardKpis" data-dashboard-widget="summary"></div>
 
-          <div class="dashboard-priority-grid" id="dashboardPriorityGrid" data-dashboard-widget="deadlines">
-          <section class="panel deadline-panel" aria-labelledby="deadlineOverviewTitle">
-            <div class="panel-header deadline-panel-header">
-              <div>
-                <p class="eyebrow">Fristenmonitor</p>
-                <h2 id="deadlineOverviewTitle">Anstehende und überfällige Fristen</h2>
+          <div class="dashboard-priority-grid" id="dashboardPriorityGrid" data-dashboard-widget="upcoming">
+            <section class="panel deadline-panel" id="dashboardUpcomingPanel" aria-labelledby="deadlineOverviewTitle">
+              <div class="panel-header deadline-panel-header">
+                <div>
+                  <p class="eyebrow">Als Nächstes</p>
+                  <h2 id="deadlineOverviewTitle">Fristen und Termine</h2>
+                </div>
+                <div class="segmented-control dashboard-horizon" role="group" aria-label="Zeitraum">
+                  <button type="button" data-deadline-horizon="7" aria-pressed="false">7 Tage</button>
+                  <button class="is-active" type="button" data-deadline-horizon="30" aria-pressed="true">30 Tage</button>
+                  <button type="button" data-deadline-horizon="90" aria-pressed="false">90 Tage</button>
+                </div>
               </div>
               <div class="deadline-controls">
                 <fieldset class="deadline-filter-group">
@@ -484,121 +482,77 @@
                   <input id="deadlineHideOverdue" type="checkbox" />
                   <span>Überfällige ausblenden</span>
                 </label>
-                <label class="compact-field">
-                  <span>Zeitraum</span>
-                  <select id="deadlineHorizon">
-                    <option value="30">30 Tage</option>
-                    <option value="60">60 Tage</option>
-                    <option value="90" selected>90 Tage</option>
-                  </select>
-                </label>
               </div>
-            </div>
-            <div id="deadlineOverview"></div>
-          </section>
-
-          <section
-            class="panel dashboard-memo-panel"
-            id="dashboardMemoPanel"
-            aria-labelledby="dashboardMemoTitle"
-            hidden
-          >
-            <div class="panel-header">
-              <div>
-                <p class="eyebrow">Memo / ToDo</p>
-                <h2 id="dashboardMemoTitle">Offene Einträge</h2>
-              </div>
-              <button class="text-button" type="button" data-go-to="memos">
-                Alle anzeigen
-                <svg><use href="#icon-chevron"></use></svg>
-              </button>
-            </div>
-            <div id="dashboardMemoList"></div>
-          </section>
-          </div>
-
-          <div class="dashboard-grid" data-dashboard-widget="overview">
-            <section class="panel panel-large">
-              <div class="panel-header">
-                <div>
-                  <p class="eyebrow">Fortbildungsstatus</p>
-                  <h2>Pflichtfortbildungen</h2>
-                </div>
-                <button class="text-button" type="button" data-go-to="trainings">
-                  Alle anzeigen
-                  <svg><use href="#icon-chevron"></use></svg>
-                </button>
-              </div>
-              <div id="dashboardTrainingProgress"></div>
+              <div id="deadlineOverview"></div>
             </section>
 
-            <section class="panel">
-              <div class="panel-header">
-                <div>
-                  <p class="eyebrow">Schnellzugriff</p>
-                  <h2>Neue Einträge</h2>
+            <div class="dashboard-aside">
+              <section class="panel dashboard-absence-panel" aria-labelledby="dashboardAbsenceTitle">
+                <div class="panel-header">
+                  <div>
+                    <p class="eyebrow">Urlaubsplanung</p>
+                    <h2 id="dashboardAbsenceTitle">Wer ist diese Woche weg?</h2>
+                  </div>
+                  <button class="text-button" type="button" data-go-to="vacations">
+                    Planung
+                    <svg><use href="#icon-chevron"></use></svg>
+                  </button>
                 </div>
-              </div>
-              <div class="quick-actions">
-                <button class="quick-action" type="button" data-open-employee>
-                  <span class="quick-action-icon quick-action-icon-blue">
+                <div id="dashboardAbsence"></div>
+                <div class="quick-actions" aria-label="Schnellzugriff">
+                  <button class="quick-action" type="button" data-open-employee>
                     <svg><use href="#icon-users"></use></svg>
-                  </span>
-                  <span>
-                    <strong>Mitarbeiter anlegen</strong>
-                    <small>Stammdaten und Qualifikationen erfassen</small>
-                  </span>
-                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
-                </button>
-                <button class="quick-action" type="button" data-open-training>
-                  <span class="quick-action-icon quick-action-icon-teal">
+                    Mitarbeiter anlegen
+                  </button>
+                  <button class="quick-action" type="button" data-open-training>
                     <svg><use href="#icon-training"></use></svg>
-                  </span>
-                  <span>
-                    <strong>Pflichtfortbildung anlegen</strong>
-                    <small>Neue Fortbildung definieren</small>
-                  </span>
-                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
-                </button>
-                <button class="quick-action" type="button" data-open-completion>
-                  <span class="quick-action-icon quick-action-icon-orange">
-                    <svg><use href="#icon-check"></use></svg>
-                  </span>
-                  <span>
-                    <strong>Abschluss eintragen</strong>
-                    <small>Nachweis für aktive Mitarbeiter erfassen</small>
-                  </span>
-                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
-                </button>
-                <button class="quick-action" type="button" data-open-meeting>
-                  <span class="quick-action-icon quick-action-icon-purple">
+                    Fortbildung anlegen
+                  </button>
+                  <button class="quick-action" type="button" data-open-meeting>
                     <svg><use href="#icon-meeting"></use></svg>
-                  </span>
-                  <span>
-                    <strong>Teamsitzung anlegen</strong>
-                    <small>Termin und Teilnahmen dokumentieren</small>
-                  </span>
-                  <svg class="quick-action-chevron"><use href="#icon-chevron"></use></svg>
-                </button>
-              </div>
-            </section>
+                    Teamsitzung anlegen
+                  </button>
+                  <button class="quick-action" type="button" data-open-memo>
+                    <svg><use href="#icon-memo"></use></svg>
+                    Memo schreiben
+                  </button>
+                </div>
+              </section>
+
+              <section
+                class="panel dashboard-memo-panel"
+                id="dashboardMemoPanel"
+                aria-labelledby="dashboardMemoTitle"
+                hidden
+              >
+                <div class="panel-header">
+                  <div>
+                    <p class="eyebrow">Memo / ToDo</p>
+                    <h2 id="dashboardMemoTitle">Offene Einträge</h2>
+                  </div>
+                  <button class="text-button" type="button" data-go-to="memos">
+                    Alle anzeigen
+                    <svg><use href="#icon-chevron"></use></svg>
+                  </button>
+                </div>
+                <div id="dashboardMemoList"></div>
+              </section>
+            </div>
           </div>
 
-
-          <section class="panel recent-panel" data-dashboard-widget="recent">
+          <section class="panel dashboard-training-panel" id="dashboardTrainingPanel" data-dashboard-widget="trainings">
             <div class="panel-header">
               <div>
-                <p class="eyebrow">Team</p>
-                <h2>Zuletzt bearbeitet</h2>
+                <p class="eyebrow">Pflichtfortbildungen</p>
+                <h2>Offene Nachweise nach Fortbildung</h2>
               </div>
-              <button class="text-button" type="button" data-go-to="employees">
-                Mitarbeiter verwalten
+              <button class="text-button" type="button" data-go-to="trainings">
+                Alle Fortbildungen
                 <svg><use href="#icon-chevron"></use></svg>
               </button>
             </div>
-            <div id="recentEmployees"></div>
+            <div id="dashboardTrainingProgress"></div>
           </section>
-
         </section>
 
         <section class="view" id="employeesView" data-view-panel="employees">
@@ -2246,7 +2200,7 @@
 <h3 id="hilfe-hauptnavigation">Hauptnavigation</h3>
 <p>Die Desktop-Navigation befindet sich links. Auf kleinen Bildschirmen wird am unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.</p>
 <p>Folgende Bereiche stehen zur Verfügung:</p>
-<ul><li><strong>Übersicht:</strong> Kennzahlen, Fristenmonitor und zuletzt bearbeitete Daten</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung, wahlweise als Liste oder als Monatskalender</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
+<ul><li><strong>Übersicht:</strong> Wochenzusammenfassung, Kennzahlen, anstehende Fristen, Abwesenheiten der Woche und offene Nachweise</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung, wahlweise als Liste oder als Monatskalender</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
 <p>Die Zahl neben einem Eintrag nennt bei <strong>Mitarbeitern</strong> die aktiven und die in Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei <strong>Terminen</strong> die noch bevorstehenden, bei <strong>Memo / ToDo</strong> die sichtbaren offenen Einträge und bei der <strong>Geräteverwaltung</strong> die Geräte im aktuellen Bestand.</p>
 <h3 id="hilfe-suche-und-filter">Suche und Filter</h3>
 <p>Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können kombiniert werden. Filter beziehen sich immer auf die aktuell sichtbare Ansicht.</p>
@@ -2273,9 +2227,14 @@
 <p>Die rechte Maustaste öffnet auf einer Mitarbeiterzeile und auf jeder Karte ein Kontextmenü:</p>
 <ul><li><strong>Einzelner Eintrag</strong> – Schnellansicht, Bearbeiten und die weiteren Aktionen der Datenart (Gesamtakte, Kalender, Erledigt, Übersicht), Löschen sowie <strong>Zur Auswahl hinzufügen</strong>.</li><li><strong>Teil einer Mehrfachauswahl</strong> – stattdessen die Sammelaktionen für alle ausgewählten Einträge.</li></ul>
 <p><strong>Esc</strong> schließt das Menü, ein Klick daneben ebenfalls.</p>
-<h3 id="hilfe-arbeitsliste-und-dashboard">Arbeitsliste und Dashboard</h3>
-<p>Die Arbeitsliste auf der Übersicht führt die wichtigsten offenen Punkte aus mehreren Bereichen zusammen: überfällige und anstehende Fristen, Termine, offene Memos und Datenqualitätsprobleme mit hoher Priorität. <strong>Überfällig</strong> und <strong>7 Tage</strong> begrenzen die Liste auf den unmittelbar relevanten Zeitraum. Ein Klick führt direkt zum betreffenden Datensatz.</p>
-<p>Über <strong>Dashboard anpassen</strong> werden Arbeitsliste, Fristen, Fortbildungsübersicht und zuletzt bearbeitete Mitarbeiter ein- oder ausgeblendet und neu angeordnet. Die Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum gemeinsamen Datenbestand oder zur Datensicherung.</p>
+<h3 id="hilfe-die-ubersicht">Die Übersicht</h3>
+<p>Oben begrüßt die Übersicht mit dem Datum und einem Satz zur Woche: wie viele Fristen in den nächsten sieben Tagen anstehen, wie viele Personen diese Woche abwesend sind und wie viele Nachweise bei den Pflichtfortbildungen noch fehlen. Daneben öffnet <strong>Abschluss eintragen</strong> direkt den Nachweisdialog.</p>
+<p>Darunter stehen vier Kennzahlen, jede ein Klick tief:</p>
+<ul><li><strong>Nachweise überfällig</strong> springt zu den offenen Nachweisen</li><li><strong>Fristen in 7 Tagen</strong> stellt die Liste „Als Nächstes“ auf sieben Tage</li><li><strong>heute abwesend</strong> öffnet die Urlaubsplanung</li><li><strong>Geburtstage</strong> zeigt die Liste „Als Nächstes“ für 30 Tage</li></ul>
+<p>Die Kennzahlen zählen immer den ganzen Bestand, unabhängig von den Filtern der Liste.</p>
+<p><strong>Als Nächstes</strong> ist der Fristenmonitor (siehe unten). <strong>Wer ist diese Woche weg?</strong> zeigt Montag bis Freitag der laufenden Woche – am Wochenende die kommende – mit den Kürzeln aller, die laut Urlaubsplanung abwesend sind. Ist die Tagesgrenze der Urlaubsplanung erreicht, ist die Zahl orange, wird sie überschritten, rot. Darunter liegen die Schnellzugriffe zum Anlegen von Mitarbeitern, Fortbildungen, Teamsitzungen und Memos.</p>
+<p><strong>Offene Nachweise nach Fortbildung</strong> fasst die überfälligen Pflichtfortbildungen zusammen: eine Zeile je Fortbildung mit Erfüllungsgrad, der Zahl der überfälligen Nachweise und den Kürzeln der Betroffenen. Ein Klick auf die Zeile öffnet den Nachweisdialog für diese Fortbildung.</p>
+<p>Über <strong>Anpassen</strong> werden Kennzahlen, „Als Nächstes“ samt Abwesenheiten und die offenen Nachweise ein- oder ausgeblendet und neu angeordnet. Die Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum gemeinsamen Datenbestand oder zur Datensicherung.</p>
 <h3 id="hilfe-was-ist-neu">Was ist neu?</h3>
 <p>Nach einer neuen Programmfassung erscheint beim ersten Start ein Hinweis mit den Änderungen genau dieser Fassung – derselbe Abschnitt, der auch in der <strong>Änderungshistorie</strong> dieser Hilfe steht. <strong>Ganze Änderungsliste</strong> führt dorthin. Der Hinweis erscheint einmal je Fassung und Arbeitsplatz; bei einer Neueinrichtung bleibt er aus.</p>
 <h3 id="hilfe-termine-im-monatsraster-verschieben">Termine im Monatsraster verschieben</h3>
@@ -2294,7 +2253,7 @@
 <p>Auch der Fuß der Seitenleiste schrumpft mit: Angemeldetes Konto, Systemstatus und Namenszug stehen dann als drei gleich große Kacheln untereinander – Konto mit den Schaltflächen für Benutzerverwaltung und Abmelden, Status als farbiger Punkt, darunter das Programmzeichen. Alles, was dabei wegfällt, nennt der Kurzhinweis der jeweiligen Kachel: Benutzername und Rolle, Verbindung und Speicherstatus sowie Fassung und Urheberrecht. Im lokalen Modus zeigt der Systemstatus nur den Speicherort im Browserprofil und Datum samt Uhrzeit der letzten erfolgreichen Speicherung; im MariaDB-Modus bleiben Backend, Server, Revision und DB-Schema sichtbar.</p>
 <h3 id="hilfe-suchen-und-ausfuhren-befehlspalette">Suchen und ausführen (Befehlspalette)</h3>
 <p><strong>Strg + K</strong> – oder der Knopf <strong>Suchen</strong> über der Navigation – öffnet ein einzelnes Feld für alles. Während der Eingabe zeigt es, gruppiert und untereinander:</p>
-<ul><li><strong>Favoriten, zuletzt geöffnet und letzte Befehle</strong> – angeheftete sowie zuletzt verwendete Mitarbeiter, Termine und Memos und die zuletzt ausgeführten Ansichten oder Aktionen</li><li><strong>Ansichten</strong> – jeder Bereich der Anwendung, mit seinem Tastenkürzel dahinter</li><li><strong>Aktionen</strong> – Anlegen eines Mitarbeiters, Termins, Memos, einer Fortbildung, eines Nachweises, einer Teamsitzung, einer Geräteeinweisung oder eines Geräts; dazu Sicherung exportieren, Datenqualität prüfen, Berufe und Qualifikationen, Tastenkürzel und Abmelden. Administratoren finden hier außerdem Änderungsprotokoll und Benutzerverwaltung</li><li><strong>Direktbefehle</strong> – unter anderem die überfällige Arbeitsliste und der Filter für aktuell beschäftigte Mitarbeiter</li><li><strong>Datensätze</strong> – Mitarbeiter, Termine, Memos, Pflichtfortbildungen, Teamsitzungen und Geräte, sobald etwas eingegeben wurde</li></ul>
+<ul><li><strong>Favoriten, zuletzt geöffnet und letzte Befehle</strong> – angeheftete sowie zuletzt verwendete Mitarbeiter, Termine und Memos und die zuletzt ausgeführten Ansichten oder Aktionen</li><li><strong>Ansichten</strong> – jeder Bereich der Anwendung, mit seinem Tastenkürzel dahinter</li><li><strong>Aktionen</strong> – Anlegen eines Mitarbeiters, Termins, Memos, einer Fortbildung, eines Nachweises, einer Teamsitzung, einer Geräteeinweisung oder eines Geräts; dazu Sicherung exportieren, Datenqualität prüfen, Berufe und Qualifikationen, Tastenkürzel und Abmelden. Administratoren finden hier außerdem Änderungsprotokoll und Benutzerverwaltung</li><li><strong>Direktbefehle</strong> – unter anderem die offenen Nachweise auf der Übersicht und der Filter für aktuell beschäftigte Mitarbeiter</li><li><strong>Datensätze</strong> – Mitarbeiter, Termine, Memos, Pflichtfortbildungen, Teamsitzungen und Geräte, sobald etwas eingegeben wurde</li></ul>
 <p><strong>Pfeil hoch</strong> und <strong>Pfeil runter</strong> wählen, <strong>Enter</strong> öffnet, <strong>Esc</strong> schließt. Ein gewählter Datensatz wechselt in seine Ansicht und öffnet ihn dort unmittelbar zum Bearbeiten. Die Vorschau unter der Trefferliste nennt Gruppe, Bezeichnung und Zusatz des gerade markierten Eintrags.</p>
 <p>Gesucht wird so nachsichtig wie überall in TeO: Umlaute dürfen fehlen oder ausgeschrieben sein, „ß“ und „ss“ finden einander. Treffer am Wortanfang stehen vor Treffern in der Mitte. Je Gruppe erscheinen die fünf besten Treffer; die Palette zeigt außerdem nur, was das angemeldete Konto ohnehin sehen darf.</p>
 <h3 id="hilfe-tastenkurzel">Tastenkürzel</h3>
@@ -2478,7 +2437,7 @@
 <p>Mit <strong>Für alle Nutzer sichtbar</strong> steht der Eintrag jedem angemeldeten Konto zur Verfügung. <strong>Nur in meiner Ansicht</strong> blendet ihn für andere Konten aus. Suche, Kategorie und Status können miteinander kombiniert werden.</p>
 <p>Wichtig zur Einordnung: „Nur in meiner Ansicht“ ist eine Anzeigeeinstellung, keine Verschlüsselung und keine Zugriffsbeschränkung. Der Eintrag bleibt Teil des gemeinsamen Datenbestands und erscheint deshalb unverändert in Datensicherungen sowie in der Datenbank. Vertrauliche Angaben – etwa zu einzelnen Personen – gehören nicht in ein Memo.</p>
 <p>Die Kategorien werden unter <strong>Einstellungen → Stammdaten &amp; Zugriffe → Memo-/ToDo-Kategorien</strong> angelegt, umbenannt oder gelöscht. Umbenennungen werden in vorhandene Einträge übernommen.</p>
-<p>Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der Übersichtsseite neben dem Fristenmonitor. Nur wenn solche Einträge vorhanden sind, teilen sich beide Bereiche die verfügbare Breite zu gleichen Teilen; auf schmaleren Bildschirmen stehen sie untereinander.</p>
+<p>Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der Übersichtsseite unter <strong>Wer ist diese Woche weg?</strong> – nur wenn es solche Einträge gibt.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-terminkalender-und-fristenmonitor">
 <h2 id="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</h2>
@@ -2495,10 +2454,10 @@
 <ul><li>Ein Klick auf ein Tagesfeld legt einen Termin für genau diesen Tag an.</li><li>Ein Klick auf einen Eintrag öffnet seine Schnellansicht; ein Termin lässt sich auch auf einen anderen Tag ziehen.</li><li>Die Pfeile wechseln den Monat, <strong>Heute</strong> springt zum laufenden Monat zurück.</li></ul>
 <p>Suchfeld und Zeitraumfilter wirken in beiden Darstellungen; angepinnte Termine bleiben wie in der Liste unabhängig vom Zeitraumfilter sichtbar. Die gewählte Darstellung und der zuletzt angesehene Monat bleiben im Browser gespeichert und stehen beim nächsten Aufruf wieder bereit. Auf schmalen Bildschirmen zeigt jedes Tagesfeld statt der Titel farbige Balken – ein Tippen öffnet den Termin.</p>
 <h3 id="hilfe-fristenmonitor">Fristenmonitor</h3>
-<p>Der Fristenmonitor steht auf der Übersichtsseite direkt unter den Kennzahlen. Sechs Einträge bleiben sichtbar, weitere sind innerhalb des Bereichs scrollbar.</p>
+<p>Der Fristenmonitor steht auf der Übersichtsseite unter den Kennzahlen und heißt dort <strong>Als Nächstes</strong>. Die nächsten sieben Tage stehen als Zeitleiste mit Datum, alles Spätere als kurze Liste; höchstens 25 Einträge, angeheftete Termine immer. Überfälliges und Datenqualitätsprobleme mit hoher Priorität stehen oben unter <strong>Überfällig und zu prüfen</strong>.</p>
 <p>Er zeigt:</p>
-<ul><li>anstehende Termine; Schulungen und Geräteeinweisungen aus dem Terminkalender werden dabei dem Filter <strong>Fortbildungen</strong> zugeordnet</li><li>Geburtstage</li><li>fällige und überfällige Pflichtfortbildungen</li><li>ablaufende Zusatzqualifikationen</li><li>unter <strong>Personal</strong>: Ende der Probezeit (sechs Monate nach Eintritt), bevorstehende Austritte und Änderungen des Stellenumfangs sowie Dienstjubiläen nach 10, 20, 25, 30 und 40 Jahren. Bereits vergangene Personalfristen erscheinen nicht – ein abgelaufenes Probezeitende ist erledigt, keine offene Aufgabe.</li></ul>
-<p>Der Zeitraum kann auf 30, 60 oder 90 Tage eingestellt werden. Kategorien lassen sich einzeln ein- oder ausblenden. Der zusätzliche Filter <strong>Überfällige ausblenden</strong> zeigt nur aktuell anstehende Einträge und wird gemeinsam mit den Kategorie-Filtern gespeichert.</p>
+<ul><li>anstehende Termine; Schulungen und Geräteeinweisungen aus dem Terminkalender werden dabei dem Filter <strong>Fortbildungen</strong> zugeordnet</li><li>Geburtstage</li><li>fällige Pflichtfortbildungen; überfällige stehen gebündelt unter <strong>Offene Nachweise nach Fortbildung</strong></li><li>ablaufende Zusatzqualifikationen</li><li>unter <strong>Personal</strong>: Ende der Probezeit (sechs Monate nach Eintritt), bevorstehende Austritte und Änderungen des Stellenumfangs sowie Dienstjubiläen nach 10, 20, 25, 30 und 40 Jahren. Bereits vergangene Personalfristen erscheinen nicht – ein abgelaufenes Probezeitende ist erledigt, keine offene Aufgabe.</li></ul>
+<p>Der Zeitraum kann auf 7, 30 oder 90 Tage eingestellt werden. Kategorien lassen sich einzeln ein- oder ausblenden. Der zusätzliche Filter <strong>Überfällige ausblenden</strong> zeigt nur aktuell anstehende Einträge und wird gemeinsam mit den Kategorie-Filtern gespeichert.</p>
 <p>Geburtstage erscheinen mit Name, erreichtem Lebensjahr und vollständigem Geburtsdatum.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-pflichtfortbildungen">
@@ -2681,6 +2640,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-60-0-eine-freundlichere-ubersicht">4.60.0 – Eine freundlichere Übersicht</h3>
+<ul><li><strong>Neu:</strong> Die Übersicht begrüßt mit Datum und einem Satz zur Woche: anstehende Fristen, Abwesenheiten und fehlende Nachweise. <strong>Abschluss eintragen</strong> steht gleich daneben</li><li><strong>Neu:</strong> Vier Kennzahlen – überfällige Nachweise, Fristen in 7 Tagen, heute abwesend, Geburtstage – führen mit einem Klick zur passenden Liste</li><li><strong>Neu:</strong> <strong>Wer ist diese Woche weg?</strong> zeigt die Abwesenheiten von Montag bis Freitag aus der Urlaubsplanung; erreichte und überschrittene Tagesgrenzen sind farbig markiert</li><li><strong>Geändert:</strong> Arbeitsliste und Fristenmonitor sind zu <strong>Als Nächstes</strong> zusammengelegt: die nächsten sieben Tage als Zeitleiste, Späteres als kurze Liste, Zeitraum 7, 30 oder 90 Tage. Bisher standen dieselben Fristen doppelt da</li><li><strong>Geändert:</strong> Überfällige Pflichtfortbildungen stehen gebündelt unter <strong>Offene Nachweise nach Fortbildung</strong> – eine Zeile je Fortbildung mit Erfüllungsgrad und den Kürzeln der Betroffenen statt über hundert einzelner roter Zeilen. Ein Klick öffnet den Nachweisdialog</li><li><strong>Entfallen:</strong> Der Bereich <strong>Zuletzt bearbeitet</strong>. Die Anordnung unter <strong>Anpassen</strong> beginnt wegen der neuen Bausteine einmalig wieder bei der Grundeinstellung</li></ul>
 <h3 id="hilfe-4-59-0-obermenus-in-der-seitenleiste">4.59.0 – Obermenüs in der Seitenleiste</h3>
 <ul><li><strong>Neu:</strong> Unter <strong>Einstellungen → Allgemein</strong> fasst <strong>Obermenüs in der Seitenleiste</strong> die Menüpunkte unter <strong>Personal</strong>, <strong>Termine</strong>, <strong>Fortbildungen</strong> und <strong>Geräte</strong> zusammen. Jedes Obermenü lässt sich auf- und zuklappen; Übersicht, Einstellungen und Hilfe bleiben für sich. Die Einstellung gilt nur an diesem Arbeitsplatz</li><li><strong>Geändert:</strong> Die Teamsitzungen stehen mit der neuesten zuerst</li></ul>
 <h3 id="hilfe-4-58-1-zusatzqualifikationen-ohne-eingefrorenen-dialog">4.58.1 – Zusatzqualifikationen ohne eingefrorenen Dialog</h3>
