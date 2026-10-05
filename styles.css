@@ -4125,8 +4125,15 @@ body.is-sidebar-collapsed .sidebar-search {
 .vacation-legend i {
   width: 15px;
   height: 15px;
-  border: 1px solid transparent;
+  border-width: 1px;
+  border-style: solid;
   border-radius: 4px;
+}
+
+/* Ohne Gewicht, damit die Randfarbe der einzelnen Legendenfelder ohne
+   !important durchkommt. */
+:where(.vacation-legend i) {
+  border-color: transparent;
 }
 
 .legend-vacation {
@@ -4160,18 +4167,18 @@ body.is-sidebar-collapsed .sidebar-search {
 }
 
 .legend-planner-duty {
-  border-color: var(--orange-700) !important;
+  border-color: var(--orange-700);
   background: var(--orange-100);
 }
 
 .legend-weekend-weekend_a {
   background: var(--weekend-a-swatch);
-  border-color: var(--weekend-a-accent) !important;
+  border-color: var(--weekend-a-accent);
 }
 
 .legend-weekend-weekend_b {
   background: var(--weekend-b-swatch);
-  border-color: var(--weekend-b-accent) !important;
+  border-color: var(--weekend-b-accent);
 }
 
 .legend-holiday {
@@ -4182,18 +4189,18 @@ body.is-sidebar-collapsed .sidebar-search {
     var(--white) 4px,
     var(--white) 8px
   );
-  border-color: var(--red-700) !important;
+  border-color: var(--red-700);
 }
 
 .legend-school-vacation {
-  border-color: var(--school-vacation-accent) !important;
+  border-color: var(--school-vacation-accent);
   background:
     linear-gradient(var(--school-vacation) 0 4px, transparent 4px),
     var(--school-vacation-bg);
 }
 
 .legend-birthday {
-  border-color: var(--birthday-accent) !important;
+  border-color: var(--birthday-accent);
   background:
     repeating-linear-gradient(
       135deg,
@@ -4513,8 +4520,10 @@ body.is-vacation-planner-maximized {
   font-size: 0.76rem;
 }
 
-.vacation-table th,
-.vacation-table td {
+/* Die Grundregeln der Zellen tragen nur das Gewicht der Tabellenklasse. So
+   setzen sich Spalten- und Zustandsklassen wie Wochenende, Summenspalte oder
+   Überplanung über die Reihenfolge durch, ohne !important. */
+.vacation-table :where(th, td) {
   height: 50px;
   padding: 5px;
   text-align: center;
@@ -4523,7 +4532,7 @@ body.is-vacation-planner-maximized {
   background: var(--white);
 }
 
-.vacation-table thead th {
+.vacation-table :where(thead th) {
   position: sticky;
   z-index: 3;
   top: 0;
@@ -4632,8 +4641,8 @@ body.is-vacation-planner-maximized {
   width: 34px;
   min-width: 34px;
   max-width: 34px;
-  padding-right: 2px !important;
-  padding-left: 2px !important;
+  padding-right: 2px;
+  padding-left: 2px;
 }
 
 .vacation-day-column strong,
@@ -4727,11 +4736,11 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-weekend-weekend_a {
-  background: var(--weekend-a-bg) !important;
+  background: var(--weekend-a-bg);
 }
 
 .vacation-weekend-weekend_b {
-  background: var(--weekend-b-bg) !important;
+  background: var(--weekend-b-bg);
 }
 
 .vacation-holiday {
@@ -4739,7 +4748,7 @@ body.is-vacation-planner-maximized {
     135deg,
     transparent 0 88%,
     var(--holiday-corner) 88% 100%
-  ) !important;
+  );
 }
 
 .vacation-holiday-dot {
@@ -4771,8 +4780,8 @@ body.is-vacation-planner-maximized {
 }
 
 /* Die Schraffur liegt als eigene Ebene ueber dem Feld. So bleiben Wochenend-,
-   Feiertags- und Ueberplanungsfarben erhalten, die ihren Hintergrund mit
-   !important setzen. */
+   Feiertags- und Ueberplanungsfarben erhalten, die ihren eigenen Hintergrund
+   setzen. */
 .vacation-birthday-marker {
   position: absolute;
   z-index: 0;
@@ -4897,9 +4906,9 @@ body.is-vacation-planner-maximized {
   width: var(--vacation-total-width);
   min-width: var(--vacation-total-width);
   max-width: var(--vacation-total-width);
-  padding-right: 3px !important;
-  padding-left: 3px !important;
-  background: var(--slate-50) !important;
+  padding-right: 3px;
+  padding-left: 3px;
+  background: var(--slate-50);
 }
 
 .vacation-table tbody .vacation-total-column {
@@ -4937,7 +4946,7 @@ body.is-vacation-planner-maximized {
 }
 
 .vacation-table td.vacation-carry-over-expiring {
-  background: var(--orange-100) !important;
+  background: var(--orange-100);
 }
 
 .vacation-table td.vacation-carry-over-expiring input {
@@ -4962,7 +4971,7 @@ body.is-vacation-planner-maximized {
 
 .vacation-negative {
   color: var(--red-700);
-  background: var(--red-100) !important;
+  background: var(--red-100);
 }
 
 .modal.vacation-overview-dialog {
@@ -5139,8 +5148,10 @@ body.is-vacation-planner-maximized {
   table-layout: fixed;
 }
 
-.vacation-year-matrix th,
-.vacation-year-matrix td {
+/* Nur das Gewicht des Elements: Die Jahresmatrix steht in der Datei hinter den
+   Feiertags- und Ferienklassen der Monatsplanung, die auch ihre Zellen
+   färben. Über die Reihenfolge allein würde der weiße Grund sie verdecken. */
+:where(.vacation-year-matrix) :is(th, td) {
   width: 35px;
   min-width: 35px;
   height: 42px;
@@ -5410,7 +5421,7 @@ body.is-vacation-planner-maximized {
     135deg,
     var(--slate-100) 0 4px,
     transparent 4px 8px
-  ) !important;
+  );
 }
 
 .vacation-table td.is-outside-employment button {
