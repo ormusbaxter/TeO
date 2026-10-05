@@ -348,6 +348,11 @@
       "change",
       handleStartupBackupFileSelection,
     );
+    elements.continueWithBrowserDataButton.addEventListener(
+      "click",
+      confirmContinueWithBrowserData,
+    );
+    elements.startOverButton.addEventListener("click", confirmStartOver);
     elements.selectFirstSharedFolderButton.addEventListener(
       "click",
       () => void selectFirstSharedBackupDirectory(),

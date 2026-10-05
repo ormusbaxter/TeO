@@ -128,3 +128,41 @@ test("Fehlt die Datei erst beim Anmelden, geht die Anmeldung nach der Auswahl we
   assert.equal(await offeneDialoge(teo), "", "Die gemerkte Anmeldung ging von selbst weiter");
   assert.deepEqual(teo.problems, []);
 });
+
+test("Ohne Sicherungsdatei lässt sich bei null beginnen", async (t) => {
+  const teo = await openTeO(t, { mitDemodaten: true });
+  if (!teo) return;
+  await teo.page.waitForSelector("#startupBackupDialog[open]");
+  await teo.page.click("#startOverButton");
+  await teo.page.waitForSelector("#confirmDialog[open]");
+  await teo.page.click("#confirmAccept");
+  await teo.page.waitForSelector("#dataOriginDialog[open]");
+  assert.equal(await offeneDialoge(teo), "dataOriginDialog");
+  assert.equal(
+    await teo.evaluate(() => document.querySelector("#navEmployeeCount").textContent.trim()),
+    "0",
+    "Der alte Bestand dieses Browsers ist gelöscht",
+  );
+
+  // Auch nach dem Neuladen bleibt es beim leeren Anfang.
+  await teo.page.reload({ waitUntil: "load" });
+  await teo.page.waitForSelector("#dataOriginDialog[open]");
+});
+
+test("Ohne Sicherungsdatei geht es auch mit dem Stand dieses Browsers weiter", async (t) => {
+  const teo = await openTeO(t, { mitDemodaten: true });
+  if (!teo) return;
+  await teo.page.waitForSelector("#startupBackupDialog[open]");
+  await teo.page.click("#continueWithBrowserDataButton");
+  await teo.page.waitForSelector("#confirmDialog[open]");
+  await teo.page.click("#confirmAccept");
+  await teo.page.waitForSelector("#loginDialog[open]");
+  assert.match(
+    await teo.evaluate(() => document.querySelector("#loginDataSource").textContent),
+    /wird nach der Anmeldung angelegt/,
+  );
+  await meldeAn(teo, "DemoAdmin", "DemoStart2026!");
+  // Danach legt TeO die erste gemeinsame Datei an, wie nach der Ersteinrichtung.
+  await teo.page.waitForSelector("#firstSharedFolderDialog[open]");
+  assert.equal(await offeneDialoge(teo), "firstSharedFolderDialog");
+});

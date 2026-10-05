@@ -1063,6 +1063,10 @@
       "#selectStartupBackupFileButton",
     ),
     startupBackupStatus: document.querySelector("#startupBackupStatus"),
+    continueWithBrowserDataButton: document.querySelector(
+      "#continueWithBrowserDataButton",
+    ),
+    startOverButton: document.querySelector("#startOverButton"),
     selectStartupBackupDirectoryButton: document.querySelector(
       "#selectStartupBackupDirectoryButton",
     ),
@@ -3652,6 +3656,11 @@
       "change",
       handleStartupBackupFileSelection,
     );
+    elements.continueWithBrowserDataButton.addEventListener(
+      "click",
+      confirmContinueWithBrowserData,
+    );
+    elements.startOverButton.addEventListener("click", confirmStartOver);
     elements.selectFirstSharedFolderButton.addEventListener(
       "click",
       () => void selectFirstSharedBackupDirectory(),
@@ -20730,6 +20739,88 @@
     startupBackupSynchronized = true;
     if (elements.firstSharedFolderDialog.open) elements.firstSharedFolderDialog.close();
     if (currentUser) completeLogin(currentUser);
+  }
+
+  // Ohne jede gemeinsame Datei: Der Stand dieses Browsers wird zum
+  // Datenbestand. Angemeldet wird dann mit seinen Konten, danach legt TeO die
+  // erste teo-autosicherung.json an - wie nach der Ersteinrichtung.
+  function confirmContinueWithBrowserData() {
+    requestConfirmation({
+      title: "Mit dem Stand dieses Browsers weiter?",
+      message:
+        `TeO verwendet den Datenbestand und die Konten, die dieser Browser zuletzt kannte, und legt ` +
+        `nach der Anmeldung eine neue ${AUTO_BACKUP_FILENAME} an. Gibt es die Datei eigentlich ` +
+        "auf einem gemeinsamen Laufwerk, wählen Sie stattdessen diese – sonst arbeiten zwei " +
+        "Arbeitsplätze mit verschiedenen Ständen.",
+      acceptLabel: "Weiter mit diesem Stand",
+      tone: "primary",
+      callback: () => void continueWithBrowserData(),
+    });
+  }
+
+  async function continueWithBrowserData() {
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      firstSharedFilePending: true,
+    });
+    try {
+      await persistAutomaticBackupConfiguration();
+    } catch (error) {
+      console.warn("Der Neubeginn der gemeinsamen Datei konnte nicht vermerkt werden.", error);
+    }
+    startupBackupFile = null;
+    const credentials = pendingStartupCredentials;
+    pendingStartupCredentials = null;
+    showLoginDialog();
+    if (credentials) {
+      document.querySelector("#loginUsername").value = credentials.username;
+    }
+  }
+
+  // Bei null anfangen: Datenbestand, Konten, Ordnerverknuepfung und Schluessel
+  // dieses Browsers werden geloescht, danach folgt die Ersteinrichtung. Eine
+  // Datei auf einem Laufwerk bleibt unberuehrt. Ohne Anmeldung erreichbar, wie
+  // das Loeschen der Websitedaten im Browser auch - aber nie ein Export.
+  function confirmStartOver() {
+    requestConfirmation({
+      title: "Neu beginnen?",
+      message:
+        "TeO löscht den Datenbestand und die Benutzerkonten dieses Browsers und führt durch die " +
+        `Ersteinrichtung. Eine ${AUTO_BACKUP_FILENAME} auf einem Laufwerk bleibt unberührt. Ist ` +
+        "dieser Browser der einzige Ort Ihrer Daten, gehen sie dabei verloren.",
+      acceptLabel: "Alles löschen und neu beginnen",
+      callback: () => void startOver(),
+    });
+  }
+
+  async function startOver() {
+    const previousState = state;
+    state = emptyState();
+    if (!(await persistState())) {
+      state = previousState;
+      elements.startupBackupStatus.textContent =
+        "Der Datenbestand dieses Browsers konnte nicht gelöscht werden.";
+      return false;
+    }
+    clearUndoHistory();
+    databaseSaveReminderArmed = false;
+    clearAutomaticBackupTimer();
+    automaticBackupDirectoryHandle = null;
+    automaticBackupPassword = "";
+    automaticBackupSettings = normalizeAutomaticBackupSettings();
+    try {
+      await Promise.all([
+        dataStore.removeItem(AUTO_BACKUP_DIRECTORY_KEY),
+        persistAutomaticBackupConfiguration(),
+      ]);
+    } catch (error) {
+      console.warn("Die Ordnerverknüpfung konnte nicht entfernt werden.", error);
+    }
+    startupBackupFile = null;
+    pendingStartupCredentials = null;
+    renderAll();
+    showDataOriginDialog();
+    return true;
   }
 
   async function handleStartupBackupFileSelection(event) {
