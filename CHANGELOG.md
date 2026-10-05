@@ -1,3 +1,8 @@
+### 4.56.3 – Farbthemen aufgeräumt
+
+- **Behoben:** In den dunklen Farbthemen fehlte einem Feiertag, der auf ein Wochenende fällt, in der Urlaubsplanung die rote Ecke. Er ist jetzt wie im hellen Thema gekennzeichnet
+- **Geändert:** Der Server für den MariaDB-Modus setzt Node.js 22 oder neuer voraus; Node.js 20 erhält keine Sicherheitsupdates mehr
+
 ### 4.56.2 – Handbuch durchgesehen
 
 - **Behoben:** Das Handbuch beschreibt jetzt richtig, was ein Klick öffnet: Die Gesamtakte erreicht man über **Mitarbeiterakte** in der Zeile sowie über Schnellansicht, Kontextmenü und Befehlspalette; im Terminkalender öffnet ein Klick auf eine Karte oder einen Eintrag im Monatsraster die Schnellansicht
