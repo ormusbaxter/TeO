@@ -430,7 +430,8 @@ neben einen geöffneten Dialog auswirkt:
 In beiden Fällen gilt: Enthält der Dialog ein Formular mit ungespeicherten
 Eingaben, fragt TeO vorher nach. Die sechs Dialoge rund um Start und Anmeldung –
 Herkunft des Datenbestands, Ersteinrichtung, Sicherungsordner der
-Ersteinrichtung, Anmeldung, Startabgleich und Passwortänderung – bleiben von der Einstellung unberührt und lassen sich weder
+Ersteinrichtung, Laden des Datenbestands, Anmeldung und Passwortänderung –
+bleiben von der Einstellung unberührt und lassen sich weder
 per Klick daneben noch per Escape schließen.
 
 ### Schulferien pflegen
@@ -1331,7 +1332,7 @@ Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.
 Administratoren können unter **Einstellungen → Sicherungserinnerung** die
 maximale Größe einer Sicherungsdatei zwischen 1 und 100 MB festlegen. Der
 Standardwert beträgt 20 MB. Die Grenze gilt beim Erstellen, Prüfen,
-Startabgleich und Import. Ab 90 % des eingestellten Volumens zeigt TeO eine
+Laden vor der Anmeldung und Import. Ab 90 % des eingestellten Volumens zeigt TeO eine
 Warnung mit aktueller Dateigröße und Grenzwert an. Wird die Grenze
 überschritten, muss sie vor der nächsten Sicherung oder dem Import erhöht
 werden.
@@ -1373,23 +1374,34 @@ solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen
 angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben
 unabhängig davon verfügbar.
 
-Beim Start in der lokalen Browser-Betriebsart sucht TeO nach der Anmeldung
-zuerst im zuletzt verknüpften Sicherungsordner nach `teo-autosicherung.json` und
-lädt sie ohne zusätzliche Auswahl. Nur wenn der Ordnerzugriff nicht mehr gilt,
-die Datei dort fehlt oder nicht gelesen werden kann, erscheint der Startdialog.
-Dort lässt sich entweder die Datei einzeln wählen oder – besser – der
+In der lokalen Browser-Betriebsart kommt der Datenbestand **vor der
+Anmeldung**: Angemeldet wird mit den Konten aus `teo-autosicherung.json`, nicht
+mit dem Stand, den dieser Browser zuletzt kannte. Ein an einem anderen
+Arbeitsplatz geändertes Passwort oder gelöschtes Konto gilt damit sofort.
+
+Beim Start sucht TeO die Datei im zuletzt verknüpften Sicherungsordner; die
+Anmeldemaske nennt diesen Ordner. Mit der Anmeldung liest TeO die Datei frisch,
+prüft Benutzername und Passwort gegen ihre Konten, entschlüsselt sie
+gegebenenfalls mit dem Passwort und übernimmt sie als aktuellen Datenbestand –
+**einschließlich der Benutzerkonten**, denn die gemeinsame Datei ist der
+vollständige Datenbestand. Muss der Browser den Ordnerzugriff erneut bestätigen
+lassen, fragt er beim Klick auf **Anmelden**.
+
+Ist der Ordner nicht verknüpft, fehlt die Datei dort oder kann sie nicht
+gelesen werden, erscheint vor der Anmeldung der Dialog **Aktuellen Datenbestand
+laden**. Dort lässt sich die Datei einzeln wählen oder – besser – der
 Sicherungsordner freigeben; die Verknüpfung gilt dann auch für die nächste
-Sitzung. Die Bedienoberfläche bleibt bis zum erfolgreichen Abgleich gesperrt.
-Die Datei wird geprüft, gegebenenfalls mit dem beim Login entsperrten Schlüssel
-entschlüsselt und als aktueller Datenbestand übernommen – **einschließlich der
-Benutzerkonten**, denn die gemeinsame Datei ist der vollständige Datenbestand.
-Eine Sicherung, die älter als der zuletzt lokal gesicherte Stand ist, wird
-abgewiesen. In der MariaDB-Betriebsart übernimmt stattdessen der Server den
-verbindlichen Startabgleich.
+Sitzung. Stellt sich das erst beim Anmelden heraus, erscheint derselbe Dialog,
+und die Anmeldung geht nach der Auswahl von selbst weiter. Eine Sicherung, die
+älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand ist, wird
+abgewiesen. Wer TeO innerhalb einer Sitzung neu lädt, bleibt bei einer
+unverschlüsselten Datei angemeldet, sofern das Konto dort noch geführt wird; bei
+einer verschlüsselten verlangt TeO das Passwort erneut. In der
+MariaDB-Betriebsart prüft stattdessen der Server Anmeldung und Datenbestand.
 
 Hat ein anderer Arbeitsplatz die Datei zwischenzeitlich geschrieben, überschreibt
 TeO sie nicht. Stattdessen erscheint ein Hinweis; der sichere Weg ist abmelden,
-TeO neu laden und den Startabgleich wiederholen. Wer die Änderungen der
+TeO neu laden und erneut anmelden. Wer die Änderungen der
 laufenden Sitzung dennoch sichern muss, wählt **Jetzt automatisch sichern** und
 bestätigt das Überschreiben ausdrücklich.
 
@@ -1569,24 +1581,24 @@ Die Datenqualitätsprüfung sucht unter anderem nach:
 
 ## Häufig gestellte Fragen
 
-### Welche Datei muss ich nach der Anmeldung auswählen?
+### Welche Datei muss ich vor der Anmeldung auswählen?
 
 Im lokalen Browserbetrieb lädt TeO die gemeinsame Datei
 `teo-autosicherung.json` automatisch aus dem zuletzt verknüpften Sicherungsordner.
 Eine Auswahl ist nur erforderlich, wenn die gespeicherte Freigabe nicht mehr
 gilt, die Datei fehlt oder nicht gelesen werden kann. Wird dort statt der Datei
-der Sicherungsordner freigegeben, entfällt die Auswahl auch künftig. Erst nach
-erfolgreicher Prüfung und Übernahme wird die Anwendung freigegeben. Im
-MariaDB-Betrieb entfällt dieser Startabgleich, weil der Server bereits den
-verbindlichen Datenstand liefert.
+der Sicherungsordner freigegeben, entfällt die Auswahl auch künftig. Im
+MariaDB-Betrieb entfällt die Auswahl, weil der Server bereits den verbindlichen
+Datenstand liefert.
 
-### Warum lässt sich der Startabgleich nicht überspringen?
+### Warum lässt sich die Sicherungsdatei nicht überspringen?
 
-Der verpflichtende Abgleich verhindert, dass versehentlich mit einem veralteten
-Browserstand weitergearbeitet wird. Ohne gültige Sicherungsdatei kann die lokale
-Anwendung deshalb nur abgemeldet, aber nicht geöffnet werden. Falls die Datei
-nicht erreichbar ist, prüfen Sie die Netzwerkverbindung, den freigegebenen
-Ordner und Ihre Zugriffsrechte.
+Angemeldet wird mit den Konten aus der gemeinsamen Datei, und erst sie liefert
+den aktuellen Datenbestand. So wird nie versehentlich mit einem veralteten
+Browserstand weitergearbeitet. Ohne gültige Sicherungsdatei lässt sich die
+lokale Anwendung deshalb nicht öffnen. Falls die Datei nicht erreichbar ist,
+prüfen Sie die Netzwerkverbindung, den freigegebenen Ordner und Ihre
+Zugriffsrechte.
 
 ### Warum wird `teo-autosicherung.json` beim Start abgelehnt?
 
@@ -1600,7 +1612,7 @@ TeO lehnt die Datei ab, wenn sie:
 - älter als die zuletzt in diesem Browser erfolgreich erstellte Autosicherung ist
 - verschlüsselt ist und nicht entschlüsselt werden kann
 
-Die Meldung im Startdialog nennt den erkannten Grund. Verwenden Sie nicht
+Die Meldung im Dialog **Aktuellen Datenbestand laden** nennt den erkannten Grund. Verwenden Sie nicht
 ersatzweise eine beliebige umbenannte JSON-Datei.
 
 ### Muss ich für eine verschlüsselte Autosicherung ein zweites Passwort eingeben?
@@ -1638,10 +1650,10 @@ Datenbestand verwendet werden.
 
 ### Warum sehe ich Änderungen eines anderen Arbeitsplatzes nicht sofort?
 
-Im lokalen Betrieb wird die gemeinsame Datei nur beim verpflichtenden
-Startabgleich eingelesen. Während einer bereits laufenden Sitzung werden fremde
-Dateiänderungen nicht automatisch zusammengeführt. Melden Sie sich ab, laden
-Sie TeO neu und wählen Sie anschließend erneut `teo-autosicherung.json`. Im
+Im lokalen Betrieb wird die gemeinsame Datei nur bei der Anmeldung eingelesen.
+Während einer bereits laufenden Sitzung werden fremde Dateiänderungen nicht
+automatisch zusammengeführt. Melden Sie sich ab und wieder an; TeO liest die
+Datei dabei frisch. Im
 MariaDB-Betrieb prüft TeO regelmäßig, ob eine neuere Serverrevision vorliegt.
 
 ### Warum fragt der Browser erneut nach dem Sicherungsordner?

@@ -820,6 +820,17 @@ body.is-sidebar-collapsed .sidebar-search {
   margin-right: auto;
 }
 
+.auth-data-source {
+  margin: 14px 0 0;
+  color: var(--slate-600);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.auth-data-source:empty {
+  display: none;
+}
+
 .auth-error {
   min-height: 20px;
   margin-top: 14px;

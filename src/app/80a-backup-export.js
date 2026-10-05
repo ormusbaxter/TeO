@@ -381,7 +381,7 @@
     }
   }
 
-  async function readBackupFile(file, { adoptKeyDirectory = false } = {}) {
+  async function readBackupFile(file) {
     const fileContent = await file.text();
     let envelope;
     try {
@@ -390,15 +390,9 @@
       throw new Error("Die ausgewählte Datei enthält kein gültiges JSON.");
     }
     if (envelope?.format === `${BACKUP_FORMAT}-verschluesselt`) {
-      // Nur die gemeinsame Datei darf das Verzeichnis stellen. Ein von Hand
-      // gewaehlter Import kann aus einem fremden Datenbestand stammen und
-      // wuerde den Schluessel dieses Bestands verdraengen.
-      if (adoptKeyDirectory) {
-        await adoptAutomaticBackupKeyDirectory(
-          readAutomaticBackupKeyDirectory(envelope),
-        );
-        await unlockAutomaticBackupWithPendingLogin();
-      }
+      // Das Schluesselverzeichnis uebernimmt nur die Anmeldung aus der
+      // gemeinsamen Datei. Ein von Hand gewaehlter Import kann aus einem
+      // fremden Datenbestand stammen und wuerde den Schluessel verdraengen.
       if (automaticBackupPassword) {
         try {
           return parseBackup(

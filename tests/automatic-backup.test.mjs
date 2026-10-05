@@ -70,9 +70,11 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
     /decryptBackup\(envelope, automaticBackupPassword\)/,
   );
   assert.match(appSource, /handleStartupBackupFileSelection/);
+  // Die Anmeldung liest die Datei im Ordner frisch und darf dabei nach dem
+  // Zugriff fragen - sie ist die Bedienung, die der Browser dafür verlangt.
   assert.match(
     appSource,
-    /synchronizeStartupBackupFromSavedDirectory\(\{[\s\S]*requestPermission:/,
+    /findStartupBackupFileInSavedDirectory\(\s*automaticBackupDirectoryHandle,\s*true,\s*\)/,
   );
   assert.match(
     appSource,
@@ -84,6 +86,7 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
     appSource,
     /!isMariaDbMode\(\) && !startupBackupSynchronized/,
   );
+  assert.match(appSource, /loginWithSharedDataSet\(username, password\)/);
   assert.match(styles, /\.data-origin-choice\s*\{/);
   assert.match(styles, /\.automatic-backup-panel\s*\{/);
   assert.match(styles, /\.backup-reminder-settings-form\s*\{/);

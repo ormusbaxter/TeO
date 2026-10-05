@@ -200,6 +200,15 @@
       showDataOriginDialog();
       return;
     }
+    // Lokal kommt der Datenbestand vor der Anmeldung. Nur ein eben
+    // eingerichteter Bestand hat noch keine gemeinsame Datei; er meldet sich
+    // gegen sein eigenes Konto an und legt sie danach an.
+    if (!isMariaDbMode() && !automaticBackupSettings?.firstSharedFilePending) {
+      void prepareStartupDataSet({
+        resumeUserId: sessionStorage.getItem(SESSION_USER_KEY) || "",
+      });
+      return;
+    }
     const sessionUserId = sessionStorage.getItem(SESSION_USER_KEY);
     const user = state.users.find((item) => item.id === sessionUserId);
     if (user && automaticBackupSettings?.encrypted) {
@@ -360,10 +369,12 @@
       (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
     );
 
-    // Erste Anmeldung an einem weiteren Arbeitsplatz: Die Konten liegen noch in
-    // der gemeinsamen Datei, nicht in diesem Browserprofil.
-    if (!user && state.users.length === 0 && automaticBackupDirectoryHandle) {
-      const message = await loginFromSharedDataSet(username, password);
+    // Angemeldet wird gegen die Konten der gemeinsamen Datei, nicht gegen die
+    // dieses Browsers: Ein anderswo geaendertes Passwort oder geloeschtes Konto
+    // gilt damit sofort. Ausnahme ist nur ein eben eingerichteter Bestand, der
+    // noch keine gemeinsame Datei hat.
+    if (!automaticBackupSettings?.firstSharedFilePending) {
+      const message = await loginWithSharedDataSet(username, password);
       if (message) {
         elements.loginError.textContent = message;
         document.querySelector("#loginPassword").value = "";
@@ -387,11 +398,8 @@
       return;
     }
 
-    // Bis zum Ende des Startabgleichs gemerkt: Fehlt die Schluesselhuelle
-    // dieses Kontos hier noch, bringt sie das Verzeichnis der gemeinsamen Datei
-    // mit - danach genuegt dasselbe Passwort. Erst wenn auch das fehlschlaegt,
-    // wird nach dem Wiederherstellungsschluessel gefragt.
-    pendingLoginPassword = password;
+    // Nur noch der eben eingerichtete Bestand meldet sich gegen die Konten
+    // dieses Browsers an. Seine Sicherung ist noch unverschluesselt.
     try {
       await unlockAutomaticBackupForLogin(user, password, {
         promptRecovery: false,
@@ -401,13 +409,10 @@
       automaticBackupNotice =
         "Sicherungsschlüssel nicht entsperrt – erneut anmelden oder Wiederherstellungsschlüssel verwenden.";
     }
-    completeLogin(user, { requestStartupBackupPermission: true });
+    completeLogin(user);
   }
 
-  function completeLogin(
-    user,
-    { requestStartupBackupPermission = false } = {},
-  ) {
+  function completeLogin(user) {
     currentUser = user;
     sessionStorage.setItem(SESSION_USER_KEY, user.id);
     // Jede Anmeldung bringt das Farbthema des Kontos mit.
@@ -426,17 +431,11 @@
       return;
     }
 
+    // Ein eben eingerichteter Datenbestand hat noch keine gemeinsame Datei.
+    // TeO legt sie an, bevor es sich oeffnet.
     if (!isMariaDbMode() && !startupBackupSynchronized) {
-      // Ein eben eingerichteter Datenbestand hat noch keine gemeinsame Datei,
-      // gegen die er abgeglichen werden koennte. Statt des Startabgleichs, der
-      // sie vergeblich verlangen wuerde, legt TeO sie zuerst an.
-      if (automaticBackupSettings?.firstSharedFilePending) {
-        showFirstSharedFolderDialog();
-        return;
-      }
-      void synchronizeStartupBackupFromSavedDirectory({
-        requestPermission: requestStartupBackupPermission,
-      });
+      if (automaticBackupSettings?.firstSharedFilePending) showFirstSharedFolderDialog();
+      else void prepareStartupDataSet();
       return;
     }
 
@@ -454,7 +453,6 @@
     applyTheme(activeThemeKey());
     clearAutomaticBackupTimer();
     automaticBackupPassword = "";
-    pendingLoginPassword = "";
     startupBackupSynchronized = false;
     startupBackupImportRunning = false;
     backupReminderShown = false;
@@ -463,9 +461,24 @@
     document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
     elements.loginForm.reset();
     elements.loginError.textContent = "";
+    elements.loginDataSource.textContent = loginDataSourceText();
     applyAccessControl();
     if (!elements.loginDialog.open) elements.loginDialog.showModal();
     window.setTimeout(() => document.querySelector("#loginUsername").focus(), 0);
+  }
+
+  // Woher die Anmeldung ihre Konten nimmt - im lokalen Modus die gemeinsame
+  // Datei, deren Ort hier steht.
+  function loginDataSourceText() {
+    if (isMariaDbMode()) return "";
+    if (automaticBackupSettings?.firstSharedFilePending) {
+      return `Neuer Datenbestand – ${AUTO_BACKUP_FILENAME} wird nach der Anmeldung angelegt.`;
+    }
+    if (startupBackupFile) return `Datenbestand: die ausgewählte ${AUTO_BACKUP_FILENAME}`;
+    if (automaticBackupDirectoryHandle) {
+      return `Datenbestand: ${AUTO_BACKUP_FILENAME} im Ordner „${automaticBackupSettings.directoryName}“`;
+    }
+    return "";
   }
 
   function showFirstSharedFolderDialog(status = "") {
@@ -496,6 +509,7 @@
 
   function showStartupBackupDialog(status = "") {
     document.body.classList.add("is-auth-locked");
+    if (elements.loginDialog.open) elements.loginDialog.close();
     elements.startupBackupFile.value = "";
     elements.startupBackupStatus.textContent = status;
     elements.selectStartupBackupFileButton.disabled = false;
@@ -556,15 +570,9 @@
       );
     }
     currentUser = state.users.find((user) => user.id === currentUser.id);
-    // Der Startabgleich steht noch aus; er braucht das jetzt gueltige Passwort.
-    if (pendingLoginPassword) pendingLoginPassword = password;
     elements.changePasswordDialog.close();
     if (!isMariaDbMode() && !startupBackupSynchronized) {
-      if (automaticBackupSettings?.firstSharedFilePending) {
-        showFirstSharedFolderDialog();
-      } else {
-        void synchronizeStartupBackupFromSavedDirectory({ requestPermission: true });
-      }
+      showFirstSharedFolderDialog();
     } else {
       document.body.classList.remove("is-auth-locked");
       applyAccessControl();

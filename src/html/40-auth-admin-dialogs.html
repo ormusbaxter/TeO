@@ -155,6 +155,7 @@
               />
             </label>
           </div>
+          <p class="auth-data-source" id="loginDataSource"></p>
           <p class="form-error auth-error" id="loginError" role="alert"></p>
           <p class="auth-software-meta" aria-label="Softwareinformationen">
             <span id="loginProjectVersion">Version wird geladen</span>
@@ -178,11 +179,12 @@
           <svg><use href="#icon-logo"></use></svg>
         </span>
         <div>
-          <p class="eyebrow">Verpflichtender Startabgleich</p>
+          <p class="eyebrow">Vor der Anmeldung</p>
           <h2 id="startupBackupDialogTitle">Aktuellen Datenbestand laden</h2>
           <p class="modal-subtitle">
-            Wählen Sie die gemeinsame Datei <strong>teo-autosicherung.json</strong> aus.
-            TeO bleibt bis zum erfolgreichen Abgleich gesperrt.
+            Angemeldet wird mit den Konten aus der gemeinsamen Datei
+            <strong>teo-autosicherung.json</strong>. Wählen Sie deshalb zuerst den
+            Sicherungsordner oder die Datei.
           </p>
         </div>
       </div>
@@ -191,7 +193,7 @@
           <svg><use href="#icon-upload"></use></svg>
           <div>
             <strong>Gemeinsame Sicherungsdatei erforderlich</strong>
-            <span>Die Datei wird geprüft, bei Bedarf automatisch entschlüsselt und anschließend als aktueller Datenstand übernommen. Über den freigegebenen Ordner findet TeO sie künftig ohne Auswahl.</span>
+            <span>Beim Anmelden wird die Datei geprüft, bei Bedarf mit Ihrem Passwort entschlüsselt und als aktueller Datenbestand übernommen. Über den freigegebenen Ordner findet TeO sie künftig ohne Auswahl.</span>
           </div>
         </div>
         <input
@@ -204,7 +206,6 @@
         <p class="form-error auth-error" id="startupBackupStatus" role="alert"></p>
       </div>
       <div class="modal-footer">
-        <button class="button button-ghost" type="button" data-logout>Abmelden</button>
         <button class="button button-ghost" id="selectStartupBackupFileButton" type="button">
           <svg><use href="#icon-upload"></use></svg>
           teo-autosicherung.json auswählen
