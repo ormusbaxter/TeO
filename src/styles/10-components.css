@@ -187,43 +187,6 @@
   transform: translateX(2px);
 }
 
-.progress-list {
-  padding: 0 24px 22px;
-}
-
-.progress-item {
-  display: grid;
-  grid-template-columns: minmax(130px, 1fr) minmax(100px, 1.2fr) 48px;
-  gap: 16px;
-  align-items: center;
-  padding: 13px 0;
-  border-top: 1px solid var(--slate-100);
-}
-
-.progress-item:first-child {
-  border-top: 0;
-}
-
-.progress-name {
-  min-width: 0;
-}
-
-.progress-name strong {
-  display: block;
-  overflow: hidden;
-  color: var(--slate-800);
-  font-size: 0.77rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.progress-name small {
-  display: block;
-  margin-top: 3px;
-  color: var(--slate-500);
-  font-size: 0.64rem;
-}
-
 .progress-track {
   height: 7px;
   overflow: hidden;

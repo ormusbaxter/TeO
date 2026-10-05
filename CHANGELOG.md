@@ -1,3 +1,12 @@
+### 4.60.0 – Eine freundlichere Übersicht
+
+- **Neu:** Die Übersicht begrüßt mit Datum und einem Satz zur Woche: anstehende Fristen, Abwesenheiten und fehlende Nachweise. **Abschluss eintragen** steht gleich daneben
+- **Neu:** Vier Kennzahlen – überfällige Nachweise, Fristen in 7 Tagen, heute abwesend, Geburtstage – führen mit einem Klick zur passenden Liste
+- **Neu:** **Wer ist diese Woche weg?** zeigt die Abwesenheiten von Montag bis Freitag aus der Urlaubsplanung; erreichte und überschrittene Tagesgrenzen sind farbig markiert
+- **Geändert:** Arbeitsliste und Fristenmonitor sind zu **Als Nächstes** zusammengelegt: die nächsten sieben Tage als Zeitleiste, Späteres als kurze Liste, Zeitraum 7, 30 oder 90 Tage. Bisher standen dieselben Fristen doppelt da
+- **Geändert:** Überfällige Pflichtfortbildungen stehen gebündelt unter **Offene Nachweise nach Fortbildung** – eine Zeile je Fortbildung mit Erfüllungsgrad und den Kürzeln der Betroffenen statt über hundert einzelner roter Zeilen. Ein Klick öffnet den Nachweisdialog
+- **Entfallen:** Der Bereich **Zuletzt bearbeitet**. Die Anordnung unter **Anpassen** beginnt wegen der neuen Bausteine einmalig wieder bei der Grundeinstellung
+
 ### 4.59.0 – Obermenüs in der Seitenleiste
 
 - **Neu:** Unter **Einstellungen → Allgemein** fasst **Obermenüs in der Seitenleiste** die Menüpunkte unter **Personal**, **Termine**, **Fortbildungen** und **Geräte** zusammen. Jedes Obermenü lässt sich auf- und zuklappen; Übersicht, Einstellungen und Hilfe bleiben für sich. Die Einstellung gilt nur an diesem Arbeitsplatz

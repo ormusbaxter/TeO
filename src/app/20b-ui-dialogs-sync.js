@@ -14,7 +14,6 @@
     elements.vacationPlanner.addEventListener("pointerleave", () =>
       setVacationCrosshair(null),
     );
-    elements.recentEmployees.addEventListener("click", handleRecentEmployeeAction);
     elements.trainingList.addEventListener("click", handleTrainingAction);
     elements.meetingList.addEventListener("click", handleMeetingAction);
     elements.appointmentList.addEventListener("click", handleAppointmentAction);

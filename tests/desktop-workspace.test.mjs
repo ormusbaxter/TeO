@@ -55,76 +55,59 @@ test("Die Schnellansicht zeigt den gewählten Mitarbeiter", async () => {
   assert.match(app.dom.markupText("#employeeInspectorContent"), /Bert/);
 });
 
-test("Die Arbeitsliste bündelt Überfälliges und lässt sich eingrenzen", async () => {
+function vorEinemJahr(tage) {
+  const datum = heuteVerschoben(tage);
+  return `${Number(datum.slice(0, 4)) - 1}${datum.slice(4)}`;
+}
+
+test("Das Dashboard bündelt überfällige Nachweise und blickt nach vorn", async () => {
   const app = await loadAppFunctions(
-    ["renderDashboardWorkQueue", "handleWorkQueueAction"],
+    [
+      "renderDeadlineOverview",
+      "renderDashboardTrainingProgress",
+      "renderDashboardSummary",
+      "handleDashboardAction",
+    ],
     { withDom: true },
   );
+  const vorjahr = Number(heuteVerschoben(0).slice(0, 4)) - 1;
   app.setState(
     createMinimalState({
-      employees: [createEmployee("e1")],
-      memos: [
-        {
-          id: "m1",
-          title: "Längst fällig",
-          category: "Aufgabe",
-          visibility: "all",
-          date: heuteVerschoben(-5),
-          completed: false,
-          createdAt: "2026-01-01T00:00:00.000Z",
-          updatedAt: "2026-01-01T00:00:00.000Z",
-        },
-        {
-          id: "m2",
-          title: "Nächste Woche",
-          category: "Aufgabe",
-          visibility: "all",
-          date: heuteVerschoben(4),
-          completed: false,
-          createdAt: "2026-01-01T00:00:00.000Z",
-          updatedAt: "2026-01-01T00:00:00.000Z",
-        },
-        {
-          id: "m3",
-          title: "Erledigt",
-          category: "Aufgabe",
-          visibility: "all",
-          date: heuteVerschoben(-2),
-          completed: true,
-          createdAt: "2026-01-01T00:00:00.000Z",
-          updatedAt: "2026-01-01T00:00:00.000Z",
-        },
+      employees: [{ ...createEmployee("e1"), firstName: "Anna", lastName: "Berg" }],
+      trainings: [
+        { id: "t1", title: "Brandschutz", year: vorjahr, recurrenceMonths: 12, createdAt: "", updatedAt: "" },
+        { id: "t2", title: "Hygiene", year: vorjahr, recurrenceMonths: 12, createdAt: "", updatedAt: "" },
+      ],
+      // Hygiene wurde vor knapp einem Jahr abgeschlossen und ist in 20 Tagen
+      // wieder fällig; Brandschutz fehlt ganz und ist damit überfällig.
+      completions: [
+        { id: "c1", employeeId: "e1", trainingId: "t2", completedOn: vorEinemJahr(20), note: "", createdAt: "" },
       ],
     }),
   );
-
   app.setCurrentUser({ id: "u1", username: "Demo", role: "admin" });
-  app.renderDashboardWorkQueue();
-  const alles = app.dom.markupText("#dashboardWorkQueue");
-  assert.match(alles, /Längst fällig/);
-  assert.match(alles, /Nächste Woche/);
-  assert.doesNotMatch(alles, /Erledigt/, "Erledigtes gehört nicht in die Arbeitsliste");
-  assert.match(alles, /is-overdue/, "Überfälliges hebt sich ab");
 
-  // Der Filter „Überfällig“ lässt nur stehen, was schon vorbei ist.
-  const filter = new app.HTMLElement({
-    tagName: "BUTTON",
-    dataset: { workQueueFilter: "overdue" },
-  });
-  app.handleWorkQueueAction({ target: filter });
-  const nurUeberfaellig = app.dom.markupText("#dashboardWorkQueue");
-  assert.match(nurUeberfaellig, /Längst fällig/);
-  assert.doesNotMatch(nurUeberfaellig, /Nächste Woche/);
+  app.renderDeadlineOverview();
+  const vorschau = app.dom.markupText("#deadlineOverview");
+  assert.match(vorschau, /Hygiene/, "In 20 Tagen Fälliges steht im 30-Tage-Blick");
+  assert.doesNotMatch(
+    vorschau,
+    /Brandschutz/,
+    "Überfällige Pflichtfortbildungen stehen gebündelt unter den offenen Nachweisen",
+  );
 
-  // Und „7 Tage“ lässt das Überfällige weg.
-  const woche = new app.HTMLElement({
-    tagName: "BUTTON",
-    dataset: { workQueueFilter: "week" },
-  });
-  app.handleWorkQueueAction({ target: woche });
-  const nurWoche = app.dom.markupText("#dashboardWorkQueue");
-  assert.doesNotMatch(nurWoche, /Längst fällig/);
-  assert.match(nurWoche, /Nächste Woche/);
+  app.renderDashboardTrainingProgress();
+  const nachweise = app.dom.markupText("#dashboardTrainingProgress");
+  assert.match(nachweise, /Brandschutz[\s\S]*1 überfällig/);
+  assert.match(nachweise, /AB/, "Die Betroffenen erscheinen als Kürzel");
+
+  app.renderDashboardSummary();
+  assert.match(app.dom.markupText("#dashboardKpis"), /1<\/strong>[\s\S]*Nachweis überfällig/);
+
+  // „7 Tage“ grenzt den Blick ein - die Hygiene in 20 Tagen fällt heraus.
+  const woche = new app.HTMLElement({ tagName: "BUTTON", dataset: { deadlineHorizon: "7" } });
+  app.handleDashboardAction({ target: woche });
+  assert.doesNotMatch(app.dom.markupText("#deadlineOverview"), /Hygiene/);
 });
 
 test("Favoriten und Verlauf erscheinen in der Befehlspalette", async () => {

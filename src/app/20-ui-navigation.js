@@ -91,9 +91,6 @@
     // Dashboard seine endgueltige Hoehe misst.
     if (staleViews.has(view)) renderView(view);
 
-    // Erst jetzt ist das Dashboard vermessbar.
-    if (view === "dashboard") limitDeadlineListHeight();
-
     document.querySelectorAll("[data-view]").forEach((button) => {
       const active = button.dataset.view === view;
       button.classList.toggle("is-active", active);
@@ -289,7 +286,6 @@
       updateMeetingAttendanceThreshold,
     );
     elements.exportMeetingStatsCsvButton.addEventListener("click", exportMeetingStatsCsv);
-    elements.deadlineHorizon.addEventListener("change", renderDeadlineOverview);
     elements.deadlineFilters.forEach((filter) => {
       filter.addEventListener("change", updateDeadlineFilters);
     });

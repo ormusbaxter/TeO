@@ -155,15 +155,6 @@
     padding: 18px;
   }
 
-  .progress-list {
-    padding: 0 18px 18px;
-  }
-
-  .progress-item {
-    grid-template-columns: minmax(110px, 1fr) minmax(60px, 0.8fr) 38px;
-    gap: 10px;
-  }
-
   .toolbar {
     align-items: stretch;
     flex-direction: column;
@@ -292,10 +283,6 @@
   .panel-header .text-button svg {
     width: 18px;
     height: 18px;
-  }
-
-  .progress-item {
-    grid-template-columns: minmax(100px, 1fr) 55px 32px;
   }
 
   .segmented-control {

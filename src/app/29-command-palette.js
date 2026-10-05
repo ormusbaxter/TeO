@@ -209,14 +209,12 @@
         run: () => openDataQualityDialog(),
       },
       {
-        label: "Arbeitsliste: Überfällig",
+        label: "Übersicht: Offene Nachweise",
         icon: "icon-alert",
-        keywords: "Dashboard Fristen offen Aufgaben",
+        keywords: "Dashboard Fristen überfällig Fortbildungen Arbeitsliste",
         run: () => {
-          workQueueFilter = "overdue";
           showView("dashboard");
-          renderDesktopWorkspace();
-          document.querySelector("#dashboardWorkQueuePanel")?.scrollIntoView({ block: "start" });
+          document.querySelector("#dashboardTrainingPanel")?.scrollIntoView({ block: "start" });
         },
       },
       {
