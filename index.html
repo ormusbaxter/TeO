@@ -1508,6 +1508,15 @@
                   Diese Einstellung gilt nur an diesem Arbeitsplatz.
                 </span>
               </label>
+              <label class="checkbox-field settings-density-field">
+                <input id="sidebarGroupingToggle" type="checkbox" />
+                <span>
+                  Obermenüs in der Seitenleiste – Personal, Termine,
+                  Fortbildungen und Geräte fassen ihre Menüpunkte zusammen und
+                  lassen sich auf- und zuklappen. Auch diese Einstellung gilt
+                  nur an diesem Arbeitsplatz.
+                </span>
+              </label>
               <label class="settings-field">
                 <span>Aktives Farbthema</span>
                 <select data-theme-select aria-label="Farbthema auswählen">
@@ -2275,6 +2284,10 @@
 <p>Datumswerte werden einheitlich als <code>TT.MM.JJJJ</code> dargestellt. Intern speichert TeO Datumswerte im ISO-Format, damit Sortierung und Berechnung zuverlässig funktionieren.</p>
 <p>In jedem Datumsfeld gibt es eine Schnelleingabe: Ist das Feld aktiv, trägt <strong>h</strong> das heutige Datum ein, <strong>g</strong> das gestrige und <strong>m</strong> das morgige. Das spart bei Einweisungs- und Fortbildungsnachweisen den Griff zur Zahlenreihe. Die Tasten stehen auch im Kurzhinweis des Feldes. Felder mit einer Grenze bleiben unberührt, wenn das Datum sie verletzen würde – ein Nachweis, der nicht in der Zukunft liegen darf, nimmt <strong>m</strong> also nicht an. Ziffern funktionieren unverändert.</p>
 <p>Uhrzeiten werden im 24-Stunden-Format <code>HH:MM</code> angezeigt.</p>
+<h3 id="hilfe-obermenus-in-der-seitenleiste">Obermenüs in der Seitenleiste</h3>
+<p>Unter <strong>Einstellungen → Allgemein</strong> fasst <strong>Obermenüs in der Seitenleiste</strong> die Menüpunkte zu Bereichen zusammen:</p>
+<ul><li><strong>Personal:</strong> Mitarbeiter, Wochenendverteilung, Urlaubsplanung</li><li><strong>Termine:</strong> Terminkalender, Memo / ToDo</li><li><strong>Fortbildungen:</strong> Pflichtfortbildungen, Teamsitzungen</li><li><strong>Geräte:</strong> Geräteeinweisungen, Geräteverwaltung</li></ul>
+<p>Übersicht, Einstellungen und Hilfe bleiben für sich. Ein Klick auf ein Obermenü klappt es auf oder zu; ein zugeklapptes Obermenü, in dem die gerade geöffnete Ansicht liegt, ist hervorgehoben. Wer eine Ansicht über die Suche oder ein Tastenkürzel öffnet, sieht ihren Menüpunkt, weil das Obermenü dann aufgeht. Umsortiert wird innerhalb eines Obermenüs; ein Obermenü steht dort, wo sein erster Eintrag in der eigenen Reihenfolge steht. In der eingeklappten Seitenleiste entfallen die Obermenüs, und alle Menüpunkte stehen wie gewohnt als Symbole untereinander. Die Einstellung und welche Obermenüs zugeklappt sind, gelten nur an diesem Arbeitsplatz.</p>
 <h3 id="hilfe-seitenleiste-einklappen">Seitenleiste einklappen</h3>
 <p>Der Winkel neben dem Namenszug klappt die Seitenleiste nach links ein. Im eingeklappten Zustand bleibt eine schmale Spur mit den Symbolen der Menüpunkte; wer mit der Maus darauf zeigt, sieht Bezeichnung und Zähler als Kurzhinweis. Ein erneuter Klick klappt sie wieder auf. Der Zustand wird im Browserprofil gespeichert und gilt beim nächsten Start wieder – er gehört wie die Reihenfolge der Navigation nicht zum gemeinsamen Datenbestand.</p>
 <p>Das Untermenü der Einstellungen entfällt im eingeklappten Zustand – die fünf Bereiche stehen ohnehin als Leiste über den Einstellungen selbst.</p>
@@ -2514,7 +2527,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-teamsitzungen">
 <h2 id="hilfe-teamsitzungen">Teamsitzungen</h2>
 <h3 id="hilfe-sitzung-anlegen">Sitzung anlegen</h3>
-<p>Titel, Datum, Uhrzeit und Notizen werden erfasst. Die Sitzungen werden chronologisch sortiert.</p>
+<p>Titel, Datum, Uhrzeit und Notizen werden erfasst. Die Sitzungen stehen mit der neuesten zuerst.</p>
 <h3 id="hilfe-teilnahme-effizient-dokumentieren">Teilnahme effizient dokumentieren</h3>
 <p>Für das aktive Team stehen folgende Statuswerte zur Verfügung:</p>
 <ul><li>teilgenommen</li><li>Urlaub</li><li>Dienst</li><li>Krankheit</li><li>Schule</li><li>entschuldigt</li><li>unentschuldigt</li><li>nicht zutreffend</li></ul>
@@ -2668,6 +2681,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-59-0-obermenus-in-der-seitenleiste">4.59.0 – Obermenüs in der Seitenleiste</h3>
+<ul><li><strong>Neu:</strong> Unter <strong>Einstellungen → Allgemein</strong> fasst <strong>Obermenüs in der Seitenleiste</strong> die Menüpunkte unter <strong>Personal</strong>, <strong>Termine</strong>, <strong>Fortbildungen</strong> und <strong>Geräte</strong> zusammen. Jedes Obermenü lässt sich auf- und zuklappen; Übersicht, Einstellungen und Hilfe bleiben für sich. Die Einstellung gilt nur an diesem Arbeitsplatz</li><li><strong>Geändert:</strong> Die Teamsitzungen stehen mit der neuesten zuerst</li></ul>
 <h3 id="hilfe-4-58-1-zusatzqualifikationen-ohne-eingefrorenen-dialog">4.58.1 – Zusatzqualifikationen ohne eingefrorenen Dialog</h3>
 <ul><li><strong>Behoben:</strong> Ein Häkchen bei den Zusatzqualifikationen im Mitarbeiterdialog – etwa „Stellvertretende Stationsleitung“ – ließ den Dialog weiß werden: Sein Inhalt rollte nach oben aus dem Bild und war nicht mehr zu erreichen. Der Dialog bleibt jetzt stehen, und das Häkchen wird gesetzt. Dasselbe gilt für alle Ankreuzkarten in anderen Dialogen</li><li><strong>Behoben:</strong> Beim allerersten Start meldete die Konsole einen Fehler beim Laden der Einstellungen der automatischen Sicherung</li></ul>
 <h3 id="hilfe-4-58-0-erst-der-datenbestand-dann-die-anmeldung">4.58.0 – Erst der Datenbestand, dann die Anmeldung</h3>

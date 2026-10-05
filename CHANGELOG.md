@@ -1,3 +1,8 @@
+### 4.59.0 – Obermenüs in der Seitenleiste
+
+- **Neu:** Unter **Einstellungen → Allgemein** fasst **Obermenüs in der Seitenleiste** die Menüpunkte unter **Personal**, **Termine**, **Fortbildungen** und **Geräte** zusammen. Jedes Obermenü lässt sich auf- und zuklappen; Übersicht, Einstellungen und Hilfe bleiben für sich. Die Einstellung gilt nur an diesem Arbeitsplatz
+- **Geändert:** Die Teamsitzungen stehen mit der neuesten zuerst
+
 ### 4.58.1 – Zusatzqualifikationen ohne eingefrorenen Dialog
 
 - **Behoben:** Ein Häkchen bei den Zusatzqualifikationen im Mitarbeiterdialog – etwa „Stellvertretende Stationsleitung“ – ließ den Dialog weiß werden: Sein Inhalt rollte nach oben aus dem Bild und war nicht mehr zu erreichen. Der Dialog bleibt jetzt stehen, und das Häkchen wird gesetzt. Dasselbe gilt für alle Ankreuzkarten in anderen Dialogen

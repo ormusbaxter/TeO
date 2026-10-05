@@ -58,12 +58,14 @@
       return;
     }
 
+    // Neueste Sitzung zuerst: Die gerade anstehende oder zuletzt gehaltene
+    // ist die, an der man arbeitet.
     elements.meetingList.innerHTML = displayedMeetings
       .sort(
         (a, b) =>
-          a.date.localeCompare(b.date) ||
-          a.time.localeCompare(b.time) ||
-          Date.parse(a.createdAt) - Date.parse(b.createdAt),
+          b.date.localeCompare(a.date) ||
+          b.time.localeCompare(a.time) ||
+          Date.parse(b.createdAt) - Date.parse(a.createdAt),
       )
       .map(renderMeetingCard)
       .join("");

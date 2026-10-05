@@ -254,6 +254,26 @@ unverändert.
 
 Uhrzeiten werden im 24-Stunden-Format `HH:MM` angezeigt.
 
+### Obermenüs in der Seitenleiste
+
+Unter **Einstellungen → Allgemein** fasst **Obermenüs in der Seitenleiste**
+die Menüpunkte zu Bereichen zusammen:
+
+- **Personal:** Mitarbeiter, Wochenendverteilung, Urlaubsplanung
+- **Termine:** Terminkalender, Memo / ToDo
+- **Fortbildungen:** Pflichtfortbildungen, Teamsitzungen
+- **Geräte:** Geräteeinweisungen, Geräteverwaltung
+
+Übersicht, Einstellungen und Hilfe bleiben für sich. Ein Klick auf ein
+Obermenü klappt es auf oder zu; ein zugeklapptes Obermenü, in dem die gerade
+geöffnete Ansicht liegt, ist hervorgehoben. Wer eine Ansicht über die Suche
+oder ein Tastenkürzel öffnet, sieht ihren Menüpunkt, weil das Obermenü dann
+aufgeht. Umsortiert wird innerhalb eines Obermenüs; ein Obermenü steht dort,
+wo sein erster Eintrag in der eigenen Reihenfolge steht. In der eingeklappten
+Seitenleiste entfallen die Obermenüs, und alle Menüpunkte stehen wie gewohnt
+als Symbole untereinander. Die Einstellung und welche Obermenüs zugeklappt
+sind, gelten nur an diesem Arbeitsplatz.
+
 ### Seitenleiste einklappen
 
 Der Winkel neben dem Namenszug klappt die Seitenleiste nach links ein. Im
@@ -1164,8 +1184,8 @@ exportiert werden.
 
 ### Sitzung anlegen
 
-Titel, Datum, Uhrzeit und Notizen werden erfasst. Die Sitzungen werden
-chronologisch sortiert.
+Titel, Datum, Uhrzeit und Notizen werden erfasst. Die Sitzungen stehen mit
+der neuesten zuerst.
 
 ### Teilnahme effizient dokumentieren
 
