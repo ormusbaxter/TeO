@@ -344,6 +344,10 @@
       "#selectStartupBackupFileButton",
     ),
     startupBackupStatus: document.querySelector("#startupBackupStatus"),
+    continueWithBrowserDataButton: document.querySelector(
+      "#continueWithBrowserDataButton",
+    ),
+    startOverButton: document.querySelector("#startOverButton"),
     selectStartupBackupDirectoryButton: document.querySelector(
       "#selectStartupBackupDirectoryButton",
     ),

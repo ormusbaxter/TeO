@@ -1392,7 +1392,24 @@ gelesen werden, erscheint vor der Anmeldung der Dialog **Aktuellen Datenbestand
 laden**. Dort lässt sich die Datei einzeln wählen oder – besser – der
 Sicherungsordner freigeben; die Verknüpfung gilt dann auch für die nächste
 Sitzung. Stellt sich das erst beim Anmelden heraus, erscheint derselbe Dialog,
-und die Anmeldung geht nach der Auswahl von selbst weiter. Eine Sicherung, die
+und die Anmeldung geht nach der Auswahl von selbst weiter.
+
+Gibt es gar keine Sicherungsdatei, bietet derselbe Dialog unter **Keine
+Sicherungsdatei vorhanden?** zwei Auswege:
+
+- **Mit dem Stand dieses Browsers weiter** – angemeldet wird mit den Konten, die
+  dieser Browser zuletzt kannte; danach legt TeO wie nach der Ersteinrichtung
+  eine neue `teo-autosicherung.json` im gewählten Sicherungsordner an.
+- **Neu beginnen** – löscht nach Rückfrage Datenbestand, Konten,
+  Ordnerverknüpfung und Sicherungsschlüssel dieses Browsers und führt durch die
+  Ersteinrichtung. Eine Datei auf einem Laufwerk bleibt unberührt; ist dieser
+  Browser der einzige Ort der Daten, gehen sie verloren.
+
+Gibt es die Datei eigentlich auf einem gemeinsamen Laufwerk, ist sie in beiden
+Fällen die bessere Wahl – sonst arbeiten zwei Arbeitsplätze mit verschiedenen
+Ständen.
+
+Eine Sicherung, die
 älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand ist, wird
 abgewiesen. Wer TeO innerhalb einer Sitzung neu lädt, bleibt bei einer
 unverschlüsselten Datei angemeldet, sofern das Konto dort noch geführt wird; bei

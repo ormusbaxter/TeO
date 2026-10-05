@@ -764,6 +764,31 @@
   line-height: 1.45;
 }
 
+/* Auswege, wenn es keine gemeinsame Datei gibt - bewusst leiser als die
+   Auswahl der Datei, die der Regelfall ist. */
+.startup-backup-alternatives {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--slate-100);
+  color: var(--slate-600);
+  font-size: 0.82rem;
+}
+
+.startup-backup-alternative-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Zwei breite Schaltflaechen passen nicht nebeneinander. Umgebrochen fuellen
+   sie die Zeile, statt rechts ungleich zu stehen. */
+.startup-backup-dialog .modal-footer .button {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
 /* Hinweis im Startabgleich und bei der Ordnerwahl der Ersteinrichtung: wie
    eine Wahlkachel aufgebaut, ohne die Hoehe und Mitte des leeren Zustands. */
 .auth-dialog .compact-empty-state {

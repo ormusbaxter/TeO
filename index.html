@@ -2571,7 +2571,11 @@
 <p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
 <p>In der lokalen Browser-Betriebsart kommt der Datenbestand <strong>vor der Anmeldung</strong>: Angemeldet wird mit den Konten aus <code>teo-autosicherung.json</code>, nicht mit dem Stand, den dieser Browser zuletzt kannte. Ein an einem anderen Arbeitsplatz geändertes Passwort oder gelöschtes Konto gilt damit sofort.</p>
 <p>Beim Start sucht TeO die Datei im zuletzt verknüpften Sicherungsordner; die Anmeldemaske nennt diesen Ordner. Mit der Anmeldung liest TeO die Datei frisch, prüft Benutzername und Passwort gegen ihre Konten, entschlüsselt sie gegebenenfalls mit dem Passwort und übernimmt sie als aktuellen Datenbestand – <strong>einschließlich der Benutzerkonten</strong>, denn die gemeinsame Datei ist der vollständige Datenbestand. Muss der Browser den Ordnerzugriff erneut bestätigen lassen, fragt er beim Klick auf <strong>Anmelden</strong>.</p>
-<p>Ist der Ordner nicht verknüpft, fehlt die Datei dort oder kann sie nicht gelesen werden, erscheint vor der Anmeldung der Dialog <strong>Aktuellen Datenbestand laden</strong>. Dort lässt sich die Datei einzeln wählen oder – besser – der Sicherungsordner freigeben; die Verknüpfung gilt dann auch für die nächste Sitzung. Stellt sich das erst beim Anmelden heraus, erscheint derselbe Dialog, und die Anmeldung geht nach der Auswahl von selbst weiter. Eine Sicherung, die älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand ist, wird abgewiesen. Wer TeO innerhalb einer Sitzung neu lädt, bleibt bei einer unverschlüsselten Datei angemeldet, sofern das Konto dort noch geführt wird; bei einer verschlüsselten verlangt TeO das Passwort erneut. In der MariaDB-Betriebsart prüft stattdessen der Server Anmeldung und Datenbestand.</p>
+<p>Ist der Ordner nicht verknüpft, fehlt die Datei dort oder kann sie nicht gelesen werden, erscheint vor der Anmeldung der Dialog <strong>Aktuellen Datenbestand laden</strong>. Dort lässt sich die Datei einzeln wählen oder – besser – der Sicherungsordner freigeben; die Verknüpfung gilt dann auch für die nächste Sitzung. Stellt sich das erst beim Anmelden heraus, erscheint derselbe Dialog, und die Anmeldung geht nach der Auswahl von selbst weiter.</p>
+<p>Gibt es gar keine Sicherungsdatei, bietet derselbe Dialog unter <strong>Keine Sicherungsdatei vorhanden?</strong> zwei Auswege:</p>
+<ul><li><strong>Mit dem Stand dieses Browsers weiter</strong> – angemeldet wird mit den Konten, die dieser Browser zuletzt kannte; danach legt TeO wie nach der Ersteinrichtung eine neue <code>teo-autosicherung.json</code> im gewählten Sicherungsordner an.</li><li><strong>Neu beginnen</strong> – löscht nach Rückfrage Datenbestand, Konten, Ordnerverknüpfung und Sicherungsschlüssel dieses Browsers und führt durch die Ersteinrichtung. Eine Datei auf einem Laufwerk bleibt unberührt; ist dieser Browser der einzige Ort der Daten, gehen sie verloren.</li></ul>
+<p>Gibt es die Datei eigentlich auf einem gemeinsamen Laufwerk, ist sie in beiden Fällen die bessere Wahl – sonst arbeiten zwei Arbeitsplätze mit verschiedenen Ständen.</p>
+<p>Eine Sicherung, die älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand ist, wird abgewiesen. Wer TeO innerhalb einer Sitzung neu lädt, bleibt bei einer unverschlüsselten Datei angemeldet, sofern das Konto dort noch geführt wird; bei einer verschlüsselten verlangt TeO das Passwort erneut. In der MariaDB-Betriebsart prüft stattdessen der Server Anmeldung und Datenbestand.</p>
 <p>Hat ein anderer Arbeitsplatz die Datei zwischenzeitlich geschrieben, überschreibt TeO sie nicht. Stattdessen erscheint ein Hinweis; der sichere Weg ist abmelden, TeO neu laden und erneut anmelden. Wer die Änderungen der laufenden Sitzung dennoch sichern muss, wählt <strong>Jetzt automatisch sichern</strong> und bestätigt das Überschreiben ausdrücklich.</p>
 <h3 id="hilfe-erster-start-an-einem-weiteren-arbeitsplatz">Erster Start an einem weiteren Arbeitsplatz</h3>
 <p>Liegt TeO in einem gemeinsamen Ordner und wird es an einem weiteren Arbeitsplatz zum ersten Mal geöffnet, fragt TeO zunächst, woher der Datenbestand kommt:</p>
@@ -2665,7 +2669,7 @@
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
 <h3 id="hilfe-4-58-0-erst-der-datenbestand-dann-die-anmeldung">4.58.0 – Erst der Datenbestand, dann die Anmeldung</h3>
-<ul><li><strong>Geändert:</strong> Im lokalen Modus kommt der Datenbestand vor der Anmeldung. Angemeldet wird mit den Konten aus <code>teo-autosicherung.json</code>, nicht mit dem Stand, den dieser Browser zuletzt kannte – ein an einem anderen Arbeitsplatz geändertes Passwort oder gelöschtes Konto gilt damit sofort. Die Anmeldemaske nennt den Ordner, aus dem TeO den Bestand lädt</li><li><strong>Geändert:</strong> Ist die Datei nicht erreichbar, wird sie vor der Anmeldung gewählt, statt dass TeO nach der Anmeldung gesperrt bleibt. Stellt sich das erst beim Anmelden heraus, geht die Anmeldung nach der Auswahl von selbst weiter</li><li><strong>Verbessert:</strong> Wer TeO innerhalb einer Sitzung neu lädt, bleibt bei einer unverschlüsselten Datei angemeldet, sofern das Konto dort noch geführt wird</li></ul>
+<ul><li><strong>Geändert:</strong> Im lokalen Modus kommt der Datenbestand vor der Anmeldung. Angemeldet wird mit den Konten aus <code>teo-autosicherung.json</code>, nicht mit dem Stand, den dieser Browser zuletzt kannte – ein an einem anderen Arbeitsplatz geändertes Passwort oder gelöschtes Konto gilt damit sofort. Die Anmeldemaske nennt den Ordner, aus dem TeO den Bestand lädt</li><li><strong>Geändert:</strong> Ist die Datei nicht erreichbar, wird sie vor der Anmeldung gewählt, statt dass TeO nach der Anmeldung gesperrt bleibt. Stellt sich das erst beim Anmelden heraus, geht die Anmeldung nach der Auswahl von selbst weiter</li><li><strong>Neu:</strong> Gibt es keine Sicherungsdatei, bietet der Dialog vor der Anmeldung <strong>Mit dem Stand dieses Browsers weiter</strong> (TeO legt danach eine neue <code>teo-autosicherung.json</code> an) und <strong>Neu beginnen</strong> (löscht nach Rückfrage den Bestand dieses Browsers und führt durch die Ersteinrichtung)</li><li><strong>Verbessert:</strong> Wer TeO innerhalb einer Sitzung neu lädt, bleibt bei einer unverschlüsselten Datei angemeldet, sofern das Konto dort noch geführt wird</li></ul>
 <h3 id="hilfe-4-57-1-erster-start-ohne-sperre">4.57.1 – Erster Start ohne Sperre</h3>
 <ul><li><strong>Behoben:</strong> Nach der Einrichtung eines neuen Datenbestands verlangte der Startabgleich <code>teo-autosicherung.json</code> – eine Datei, die es noch gar nicht gab. TeO blieb gesperrt, auch nach Neuladen und erneuter Anmeldung. Stattdessen wird jetzt der Sicherungsordner festgelegt: TeO legt dort die erste <code>teo-autosicherung.json</code> an und öffnet sich. Ein Ordner, in dem bereits eine solche Datei liegt, wird nicht überschrieben. Stattdessen bietet TeO <strong>Vorhandenen Datenbestand öffnen</strong> an: Nach Rückfrage wird der eben eingerichtete Bestand samt neuem Konto verworfen, und man meldet sich mit einem Konto aus der Datei an</li><li><strong>Behoben:</strong> Im Dialog des Startabgleichs ragte die Schaltfläche <strong>Abmelden</strong> links aus dem Fenster, und der Hinweistext stand übergroß in der Mitte</li></ul>
 <h3 id="hilfe-4-57-0-zehn-schritte-zuruck-und-wieder-vor">4.57.0 – Zehn Schritte zurück und wieder vor</h3>
@@ -3096,7 +3100,7 @@
     </dialog>
 
     <dialog
-      class="modal auth-dialog"
+      class="modal auth-dialog startup-backup-dialog"
       id="startupBackupDialog"
       aria-labelledby="startupBackupDialogTitle"
       data-persistent-dialog
@@ -3131,6 +3135,17 @@
           aria-label="teo-autosicherung.json für den Startabgleich auswählen"
         />
         <p class="form-error auth-error" id="startupBackupStatus" role="alert"></p>
+        <div class="startup-backup-alternatives">
+          <strong>Keine Sicherungsdatei vorhanden?</strong>
+          <div class="startup-backup-alternative-actions">
+            <button class="button button-ghost" id="continueWithBrowserDataButton" type="button">
+              Mit dem Stand dieses Browsers weiter
+            </button>
+            <button class="button button-ghost" id="startOverButton" type="button">
+              Neu beginnen
+            </button>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="button button-ghost" id="selectStartupBackupFileButton" type="button">

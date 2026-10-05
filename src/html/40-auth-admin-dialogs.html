@@ -169,7 +169,7 @@
     </dialog>
 
     <dialog
-      class="modal auth-dialog"
+      class="modal auth-dialog startup-backup-dialog"
       id="startupBackupDialog"
       aria-labelledby="startupBackupDialogTitle"
       data-persistent-dialog
@@ -204,6 +204,17 @@
           aria-label="teo-autosicherung.json für den Startabgleich auswählen"
         />
         <p class="form-error auth-error" id="startupBackupStatus" role="alert"></p>
+        <div class="startup-backup-alternatives">
+          <strong>Keine Sicherungsdatei vorhanden?</strong>
+          <div class="startup-backup-alternative-actions">
+            <button class="button button-ghost" id="continueWithBrowserDataButton" type="button">
+              Mit dem Stand dieses Browsers weiter
+            </button>
+            <button class="button button-ghost" id="startOverButton" type="button">
+              Neu beginnen
+            </button>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="button button-ghost" id="selectStartupBackupFileButton" type="button">
