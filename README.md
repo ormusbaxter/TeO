@@ -65,7 +65,7 @@ unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.
 
 Folgende Bereiche stehen zur Verfügung:
 
-- **Übersicht:** Wochenzusammenfassung, Kennzahlen, anstehende Fristen, Abwesenheiten der Woche und offene Nachweise
+- **Übersicht:** Wochenzusammenfassung, Kennzahlen, anstehende Fristen und offene Nachweise
 - **Mitarbeiter:** Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten
 - **Wochenendverteilung:** Vergleich der beiden festen Dienstwochenenden
 - **Urlaubsplanung:** Monats- und Jahresplanung von Urlaub und Abwesenheiten
@@ -227,19 +227,16 @@ Darunter stehen vier Kennzahlen, jede ein Klick tief:
 Die Kennzahlen zählen immer den ganzen Bestand, unabhängig von den Filtern der
 Liste.
 
-**Als Nächstes** ist der Fristenmonitor (siehe unten). **Wer ist diese Woche
-weg?** zeigt Montag bis Freitag der laufenden Woche – am Wochenende die
-kommende – mit den Kürzeln aller, die laut Urlaubsplanung abwesend sind. Ist
-die Tagesgrenze der Urlaubsplanung erreicht, ist die Zahl orange, wird sie
-überschritten, rot. Darunter liegen die Schnellzugriffe zum Anlegen von
-Mitarbeitern, Fortbildungen, Teamsitzungen und Memos.
+**Als Nächstes** ist der Fristenmonitor (siehe unten). Daneben liegen die
+Schnellzugriffe zum Anlegen von Mitarbeitern, Fortbildungen, Teamsitzungen und
+Memos.
 
 **Offene Nachweise nach Fortbildung** fasst die überfälligen
 Pflichtfortbildungen zusammen: eine Zeile je Fortbildung mit Erfüllungsgrad,
 der Zahl der überfälligen Nachweise und den Kürzeln der Betroffenen. Ein Klick
 auf die Zeile öffnet den Nachweisdialog für diese Fortbildung.
 
-Über **Anpassen** werden Kennzahlen, „Als Nächstes“ samt Abwesenheiten und die
+Über **Anpassen** werden Kennzahlen, „Als Nächstes“ samt Schnellzugriff und die
 offenen Nachweise ein- oder ausgeblendet und neu angeordnet. Die
 Zusammenstellung ist persönlich für diesen Browser und gehört nicht zum
 gemeinsamen Datenbestand oder zur Datensicherung.
@@ -1046,7 +1043,7 @@ Memo-/ToDo-Kategorien** angelegt, umbenannt oder gelöscht. Umbenennungen werden
 in vorhandene Einträge übernommen.
 
 Offene, für das angemeldete Konto sichtbare Einträge erscheinen auf der
-Übersichtsseite unter **Wer ist diese Woche weg?** – nur wenn es solche
+Übersichtsseite unter dem Schnellzugriff – nur wenn es solche
 Einträge gibt.
 
 ## Terminkalender und Fristenmonitor

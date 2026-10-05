@@ -3180,7 +3180,7 @@ body.is-sidebar-collapsed .sidebar-search {
 }
 
 /* Übersicht: Begrüßung mit Wochenzusammenfassung, Kennzahlen, „Als Nächstes“
-   mit Abwesenheiten der Woche und offene Nachweise nach Fortbildung. */
+   mit Schnellzugriff und offene Nachweise nach Fortbildung. */
 
 #dashboardView.is-active {
   display: grid;
@@ -3305,7 +3305,7 @@ body.is-sidebar-collapsed .sidebar-search {
   white-space: nowrap;
 }
 
-/* Als Nächstes, daneben Abwesenheiten, Schnellzugriff und Memos */
+/* Als Nächstes, daneben Schnellzugriff und Memos */
 
 .dashboard-priority-grid {
   display: grid;
@@ -3566,82 +3566,8 @@ body.is-sidebar-collapsed .sidebar-search {
   margin: -8px 24px 20px;
 }
 
-/* Wer ist diese Woche weg? */
-
-.dashboard-week {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
-  padding: 0 24px;
-}
-
-.dashboard-week-day {
-  display: grid;
-  gap: 10px;
-  align-content: start;
-  justify-items: center;
-  min-width: 0;
-  min-height: 150px;
-  padding: 12px 4px;
-  color: inherit;
-  cursor: pointer;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-md);
-  background: var(--white);
-}
-
-.dashboard-week-day:hover {
-  border-color: var(--button-secondary-hover-border);
-}
-
-.dashboard-week-label {
-  color: var(--slate-600);
-  font-size: 0.78rem;
-  font-weight: 650;
-}
-
-.dashboard-week-day small {
-  align-self: end;
-  margin-top: auto;
-  padding: 2px 9px;
-  color: var(--slate-600);
-  font-size: 0.7rem;
-  font-weight: 650;
-  border-radius: 999px;
-  background: var(--slate-100);
-}
-
-.dashboard-week-day.is-today {
-  border-color: var(--blue-600);
-  background: var(--blue-50);
-}
-
-.dashboard-week-day.is-today .dashboard-week-label {
-  color: var(--blue-700);
-}
-
-.dashboard-week-day.is-at-limit small {
-  color: var(--orange-700);
-  background: var(--orange-100);
-}
-
-.dashboard-week-day.is-over-limit small {
-  color: var(--red-700);
-  background: var(--red-100);
-}
-
-.dashboard-absence-note {
-  margin: 14px 24px 0;
-  color: var(--slate-600);
-  font-size: 0.82rem;
-}
-
 .dashboard-faces {
   display: flex;
-}
-
-.dashboard-faces.is-column {
-  flex-direction: column;
 }
 
 .dashboard-face {
@@ -3660,10 +3586,6 @@ body.is-sidebar-collapsed .sidebar-search {
 
 .dashboard-face + .dashboard-face {
   margin-left: -8px;
-}
-
-.dashboard-faces.is-column .dashboard-face + .dashboard-face {
-  margin: -8px 0 0;
 }
 
 .dashboard-faces.is-small .dashboard-face {
@@ -3706,9 +3628,7 @@ body.is-sidebar-collapsed .sidebar-search {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  margin: 18px 24px 22px;
-  padding-top: 18px;
-  border-top: 1px solid var(--slate-100);
+  margin: 0 24px 22px;
 }
 
 .quick-action {
@@ -3947,19 +3867,6 @@ body.is-sidebar-collapsed .sidebar-search {
   .deadline-list,
   .dashboard-training-list {
     padding-inline: 16px;
-  }
-
-  .dashboard-week {
-    gap: 4px;
-    padding: 0 16px;
-  }
-
-  .dashboard-week-day {
-    min-height: 0;
-  }
-
-  .dashboard-faces.is-column {
-    display: none;
   }
 
   .quick-actions {
