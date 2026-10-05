@@ -564,6 +564,7 @@
     whatsNewEntries: document.querySelector("#whatsNewEntries"),
     whatsNewHelpButton: document.querySelector("#whatsNewHelpButton"),
     tableDensityToggle: document.querySelector("#tableDensityToggle"),
+    sidebarGroupingToggle: document.querySelector("#sidebarGroupingToggle"),
     openEmployeeColumnsButton: document.querySelector("#openEmployeeColumnsButton"),
     employeeColumnsDialog: document.querySelector("#employeeColumnsDialog"),
     employeeColumnsList: document.querySelector("#employeeColumnsList"),

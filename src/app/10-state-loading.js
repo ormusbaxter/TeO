@@ -35,6 +35,7 @@
     bindNavigation();
     bindSidebarOrder();
     bindSidebarCollapse();
+    bindSidebarGroups();
     bindKeyboardShortcuts();
     bindCommandPalette();
     bindViewFilterChips();

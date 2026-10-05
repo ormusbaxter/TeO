@@ -11,6 +11,10 @@
 
   let sidebarDragState = null;
   let suppressNextNavClick = false;
+  // Die Standardreihenfolge ist die des Markups. Sie wird beim ersten Lesen
+  // festgehalten, denn die Obermenues (25a) haengen die Eintraege spaeter in
+  // ihre Gruppen um - danach gaebe das Dokument eine andere Folge wieder.
+  let sidebarStandardOrder = [];
 
   function sidebarNavItems() {
     if (!elements.mainNav) return [];
@@ -18,7 +22,10 @@
   }
 
   function defaultSidebarOrder() {
-    return sidebarNavItems().map((item) => item.dataset.view);
+    if (!sidebarStandardOrder.length) {
+      sidebarStandardOrder = sidebarNavItems().map((item) => item.dataset.view);
+    }
+    return [...sidebarStandardOrder];
   }
 
   function readStoredSidebarOrder() {
@@ -70,6 +77,7 @@
         settingsPosition < 0 ? order.length : settingsPosition,
       );
     }
+    applySidebarGroupOrder(order);
     if (elements.resetSidebarOrderButton) {
       elements.resetSidebarOrderButton.hidden = !hasCustomSidebarOrder();
     }
@@ -99,13 +107,38 @@
       `${label} steht jetzt an Position ${order.indexOf(item.dataset.view) + 1} von ${order.length}.`;
   }
 
+  // Verschoben wird nur unter Nachbarn: ohne Obermenues sind das alle
+  // Eintraege, mit ihnen die Eintraege derselben Gruppe bzw. die ohne Gruppe.
+  function sidebarSiblingViews(item) {
+    return sidebarNavItems()
+      .filter((other) => other.parentElement === item.parentElement)
+      .map((other) => other.dataset.view);
+  }
+
+  // Setzt die neue Folge der Nachbarn in deren bisherige Plaetze der
+  // Gesamtreihenfolge ein; alle anderen Eintraege bleiben, wo sie sind.
+  function placeSiblingOrder(order, nachbarn) {
+    const plaetze = order
+      .map((view, index) => (nachbarn.includes(view) ? index : -1))
+      .filter((index) => index >= 0);
+    const ergebnis = [...order];
+    plaetze.forEach((platz, index) => {
+      ergebnis[platz] = nachbarn[index];
+    });
+    return ergebnis;
+  }
+
   function moveSidebarItem(view, richtung) {
     const order = resolveSidebarOrder();
-    const index = order.indexOf(view);
+    const item = sidebarNavItems().find((other) => other.dataset.view === view);
+    if (!item) return false;
+    const geschwister = sidebarSiblingViews(item);
+    const nachbarn = order.filter((other) => geschwister.includes(other));
+    const index = nachbarn.indexOf(view);
     const ziel = index + richtung;
-    if (index < 0 || ziel < 0 || ziel >= order.length) return false;
-    order.splice(ziel, 0, ...order.splice(index, 1));
-    persistSidebarOrder(order);
+    if (index < 0 || ziel < 0 || ziel >= nachbarn.length) return false;
+    nachbarn.splice(ziel, 0, ...nachbarn.splice(index, 1));
+    persistSidebarOrder(placeSiblingOrder(order, nachbarn));
     return true;
   }
 
@@ -122,7 +155,7 @@
   // ersten Eintrag, dessen Mitte unterhalb des Zeigers liegt.
   function sidebarDropIndex(clientY, gezogen) {
     const andere = sidebarNavItems()
-      .filter((item) => item !== gezogen)
+      .filter((item) => item !== gezogen && item.parentElement === gezogen.parentElement)
       .sort(
         (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top,
       );
@@ -134,9 +167,9 @@
         break;
       }
     }
-    const order = andere.map((item) => item.dataset.view);
-    order.splice(index, 0, gezogen.dataset.view);
-    return order;
+    const nachbarn = andere.map((item) => item.dataset.view);
+    nachbarn.splice(index, 0, gezogen.dataset.view);
+    return placeSiblingOrder(resolveSidebarOrder(), nachbarn);
   }
 
   function beginSidebarDrag(event) {
@@ -235,6 +268,11 @@
       const label = item.querySelector("span")?.textContent.trim() || "";
       const count = item.querySelector(".nav-count")?.textContent.trim() || "";
       if (label) item.title = count ? `${label} (${count})` : label;
+    });
+    elements.mainNav?.querySelectorAll(".nav-group-toggle").forEach((toggle) => {
+      const label = toggle.querySelector("span")?.textContent.trim() || "";
+      if (collapsed && label) toggle.title = label;
+      else toggle.removeAttribute("title");
     });
 
     updateSidebarFooterSummaries(collapsed);

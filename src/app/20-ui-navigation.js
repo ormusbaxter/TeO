@@ -100,6 +100,7 @@
       if (active) button.setAttribute("aria-current", "page");
       else button.removeAttribute("aria-current");
     });
+    revealActiveSidebarGroup();
 
     if (view === "settings") showSettingsSection(activeSettingsSection);
 

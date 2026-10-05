@@ -2390,6 +2390,17 @@ body.is-sidebar-collapsed :is(.nav-item, .nav-order-reset) {
   padding: 12px 0;
 }
 
+/* Eingeklappt treten die Obermenüs zurück: Ihr Symbol wiederholte das des
+   ersten Eintrags, und zwei gleiche Symbole übereinander sagen nichts. Die
+   Spur zeigt deshalb alle Einträge, auch die zugeklappter Gruppen. */
+body.is-sidebar-collapsed .nav-group-toggle {
+  display: none;
+}
+
+body.is-sidebar-collapsed .nav-group:not(.is-open) .nav-group-items {
+  display: flex;
+}
+
 body.is-sidebar-collapsed .main-nav {
   width: 100%;
   margin-top: 22px;
@@ -2666,6 +2677,46 @@ body.is-sidebar-collapsed .sidebar-toggle svg {
 .nav-item.is-active .nav-count {
   color: white;
   background: rgb(255 255 255 / 13%);
+}
+
+/* Obermenüs: Kopf und Einträge stehen untereinander wie die übrigen
+   Menüpunkte. Die Einträge darin folgen derselben persönlichen Reihenfolge,
+   deshalb ist auch der Inhalt eine Flexspalte - sonst wirkte "order" nicht. */
+.nav-group,
+.nav-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Zugeklappt per Klasse, nicht per hidden: Das ist in den Grundlagen
+   unumstößlich, die eingeklappte Spur braucht die Einträge aber weiter. */
+.nav-group:not(.is-open) .nav-group-items {
+  display: none;
+}
+
+.nav-group-items .nav-item {
+  padding-left: 25px;
+}
+
+.nav-group-chevron {
+  justify-self: end;
+  transition: transform 160ms ease;
+}
+
+.nav-item svg.nav-group-chevron {
+  width: 14px;
+  height: 14px;
+}
+
+.nav-group.is-open .nav-group-chevron {
+  transform: rotate(90deg);
+}
+
+/* Zugeklappt verrät der Kopf, dass die aktive Ansicht darin liegt. */
+.nav-group-toggle.has-active-view:not([aria-expanded="true"]) {
+  color: white;
+  box-shadow: var(--nav-active-shadow);
 }
 
 /* Eingeklappt bleibt das Untermenü weg: Auf 52 Bildpunkten wären fünf
