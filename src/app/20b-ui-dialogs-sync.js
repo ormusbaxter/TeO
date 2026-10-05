@@ -261,6 +261,7 @@
       openDialogs.forEach((dialog) => dialog.close());
 
       state = await loadState();
+      clearUndoHistory();
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       if (currentUser) {
         const refreshedUser = state.users.find((user) => user.id === currentUser.id);
@@ -328,6 +329,7 @@
       }
 
       state = normalizeState(result.state);
+      clearUndoHistory();
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       remoteRevision = nextRevision;
       remoteUpdateNoticeRevision = 0;

@@ -19,6 +19,10 @@
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
+  // Ein Schritt im Verlauf ist eine Kopie des Datenbestands ohne Protokoll:
+  // mit der Demodatenbank (60 Mitarbeiter, rund 1,3 MB als JSON) etwa 2 MB
+  // Arbeitsspeicher, zehn Schritte also rund 20 MB.
+  const MAX_UNDO_STEPS = 10;
   // Mehr Betroffene merkt sich ein Protokolleintrag nicht; eine Sammelaktion
   // ueber das ganze Team bleibt so klein.
   const MAX_AUDIT_SUBJECTS = 100;

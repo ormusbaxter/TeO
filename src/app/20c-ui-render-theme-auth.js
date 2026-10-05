@@ -322,6 +322,7 @@
           password,
         );
         state = normalizeState(result.state);
+        clearUndoHistory();
         databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
         remoteRevision = Number(result.revision) || 0;
         backendStartupError = "";

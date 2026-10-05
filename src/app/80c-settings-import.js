@@ -372,6 +372,7 @@
         health ? { health, synchronized: true } : { synchronized: true },
       );
       state = normalizeState(result.state);
+      clearUndoHistory();
       databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
       backendStartupError = "";
       const remoteUser = state.users.find(
@@ -782,6 +783,8 @@
       renderAll();
       return false;
     }
+    // Die gemerkten Schritte gehoeren zum Bestand vor dem Import.
+    clearUndoHistory();
     stateMutationSequence += 1;
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
 
