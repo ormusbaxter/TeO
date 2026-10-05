@@ -352,6 +352,10 @@
       "click",
       () => void selectFirstSharedBackupDirectory(),
     );
+    elements.openOccupiedSharedFolderButton.addEventListener(
+      "click",
+      confirmOpenOccupiedSharedFolder,
+    );
     elements.skipFirstSharedFolderButton.addEventListener(
       "click",
       continueWithoutFirstSharedFolder,

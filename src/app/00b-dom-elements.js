@@ -351,6 +351,9 @@
     selectFirstSharedFolderButton: document.querySelector(
       "#selectFirstSharedFolderButton",
     ),
+    openOccupiedSharedFolderButton: document.querySelector(
+      "#openOccupiedSharedFolderButton",
+    ),
     skipFirstSharedFolderButton: document.querySelector(
       "#skipFirstSharedFolderButton",
     ),

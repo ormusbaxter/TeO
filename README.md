@@ -1409,8 +1409,11 @@ zum ersten Mal geöffnet, fragt TeO zunächst, woher der Datenbestand kommt:
   wird der Sicherungsordner festgelegt, am besten ein leerer Ordner auf einem
   gemeinsamen Laufwerk. TeO legt dort die erste `teo-autosicherung.json` an,
   verknüpft den Ordner und öffnet sich. Liegt in dem gewählten Ordner bereits
-  eine solche Datei, lehnt TeO ihn ab, statt einen vorhandenen Datenbestand zu
-  überschreiben. Bis der Ordner festgelegt ist, fragt TeO bei jedem Start
+  eine solche Datei, überschreibt TeO sie nicht. Stattdessen lässt sich ein
+  leerer Ordner wählen oder über **Vorhandenen Datenbestand öffnen** doch der
+  bestehende laden: Nach Rückfrage verwirft TeO den eben eingerichteten
+  Bestand samt neuem Konto, und die Anmeldung erfolgt mit einem Konto aus der
+  Datei. Bis der Ordner festgelegt ist, fragt TeO bei jedem Start
   wieder danach statt nach der Datei. Browser ohne Ordnerfreigabe (etwa
   Firefox) bieten stattdessen **Ohne Ordner fortfahren** an; TeO arbeitet dann
   nur mit dem Speicher dieses Browsers.
