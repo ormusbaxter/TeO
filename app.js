@@ -10693,8 +10693,8 @@
           (${state.settings.vacationWeekdayAbsenceLimit} werktags,
           ${state.settings.vacationWeekendAbsenceLimit} an Wochenenden und Feiertagen).
           Eine Überschreitung bleibt möglich und rahmt den Tag rot ein. Auf einem
-          Dienstwochenende gleicht die Zusage eines Mitarbeiters vom jeweils anderen
-          festen Wochenende einen Urlaub auf dem eigenen Wochenende aus.
+          Dienstwochenende verringert jede Dienstzusage eines Mitarbeiters vom
+          jeweils anderen festen Wochenende die Abwesenheiten des Tages um eins.
         </span>
         <span class="vacation-note-detail">
           Abwesenheiten von ${escapeHtml(absenceLimitExemptProfessionNote())}
@@ -12513,12 +12513,9 @@
       parsed && [0, 6].includes(parsed.getDay())
         ? getWeekendRotationForDate(date)
         : "";
-    const ownWeekendVacationCount = weekendGroup
-      ? limitEntries.filter((entry) => {
-          if (entry.type !== "vacation") return false;
-          return getEmployee(entry.employeeId)?.serviceWeekend === weekendGroup;
-        }).length
-      : 0;
+    // Eine Dienstzusage aus dem jeweils anderen festen Wochenende ist eine
+    // Dienstuebernahme: Sie verringert die Ueberplanung des Tages um einen,
+    // gleich welche Abwesenheit sie ausgleicht.
     const foreignWeekendDutyCount = weekendGroup
       ? limitEntries.filter((entry) => {
           if (entry.type !== "mandatoryDuty") return false;
@@ -12530,7 +12527,7 @@
         }).length
       : 0;
     const compensatedAbsenceCount = Math.min(
-      ownWeekendVacationCount,
+      absenceCount,
       foreignWeekendDutyCount,
     );
     const effectiveAbsenceCount = Math.max(
@@ -12548,7 +12545,6 @@
       exemptAbsenceCount,
       effectiveAbsenceCount,
       dutyCount,
-      ownWeekendVacationCount,
       foreignWeekendDutyCount,
       compensatedAbsenceCount,
       weekendGroup,

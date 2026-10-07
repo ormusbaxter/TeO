@@ -1,3 +1,7 @@
+### 4.61.0 – Dienstübernahmen senken die Überplanung
+
+- **Geändert:** In der Urlaubsplanung zählt jede verpflichtende Dienstzusage eines Mitarbeiters vom jeweils anderen festen Wochenende als Dienstübernahme und verringert die wirksamen Abwesenheiten des Tages um eins – im Spaltenkopf als `−1`, `−2` … neben der Zahl der Dienstzusagen (`D1`, `D2` …). Bisher glich sie nur einen Urlaub von jemandem aus, dessen eigenes Dienstwochenende es war; Schule, Externer Einsatz oder Urlaub vom anderen Wochenende blieben trotz Übernahme überplant. Unter null sinkt die Zahl nicht, und Zusagen auf dem eigenen Dienstwochenende zählen weiterhin nicht
+
 ### 4.60.0 – Eine freundlichere Übersicht
 
 - **Neu:** Die Übersicht begrüßt mit Datum und einem Satz zur Woche: anstehende Fristen, Abwesenheiten und fehlende Nachweise. **Abschluss eintragen** steht gleich daneben

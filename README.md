@@ -967,9 +967,17 @@ den zugehörigen Monat der Planungstabelle.
 
 ### Dienstwochenenden und Kompensation
 
-Urlaub auf dem eigenen Dienstwochenende wirkt auf die
-Abwesenheitsberechnung. Eine verpflichtende Dienstzusage eines Mitarbeiters
-aus dem jeweils anderen Wochenende kann diesen Effekt kompensieren.
+Übernimmt ein Mitarbeiter einen Dienst an dem Wochenende, das nicht sein
+festes Dienstwochenende ist – eingetragen als **Verpflichtende Dienstzusage**
+(`D`) –, verringert das die wirksamen Abwesenheiten dieses Tages um eins. Jede
+solche Dienstübernahme wird also von einer Überplanung abgezogen, gleich welche
+Abwesenheit sie ausgleicht; unter null sinkt die Zahl nicht.
+
+Im Spaltenkopf steht dann neben der Belegung, um wie viel sie gesenkt wurde
+(etwa `−2`), und `D2` nennt die Zahl aller Dienstzusagen des Tages. Eine
+Dienstzusage auf dem eigenen Dienstwochenende, an einem Werktag oder von einem
+Mitarbeiter ohne festes Dienstwochenende zählt nicht, ebenso wenig die
+Zusage eines nicht angerechneten Assistenzberufs.
 
 ### Jahresübersicht je Mitarbeiter
 
