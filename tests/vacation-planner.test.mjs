@@ -297,3 +297,80 @@ test("Ueberschreitungen der Tagesgrenze werden mit Beteiligten aufgelistet", asy
 
   assert.equal(app.collectVacationConflicts(2025).length, 1);
 });
+
+test("Jede Dienstuebernahme vom anderen Wochenende senkt die Ueberplanung", async () => {
+  const app = await loadAppFunctions([
+    "getPlannerDayStats",
+    "countsTowardsAbsenceLimit",
+    "normalizeState",
+  ]);
+  // 2026-06-20 ist ein Samstag und als Referenz Dienstwochenende A.
+  const SAMSTAG = "2026-06-20";
+  const zustand = mitMitarbeitern(
+    app,
+    [
+      // Abwesend, aber nicht vom eigenen Dienstwochenende: Bisher glich eine
+      // Dienstzusage nur Urlaub auf dem eigenen Wochenende aus.
+      mitarbeiter("b-1", "Pflegefachkraft", { serviceWeekend: "weekend_b" }),
+      mitarbeiter("b-2", "Pflegefachkraft", { serviceWeekend: "weekend_b" }),
+      mitarbeiter("ohne-1", "Pflegefachkraft", { serviceWeekend: "none" }),
+      // Dienstuebernahmen vom anderen Wochenende
+      mitarbeiter("b-3", "Pflegefachkraft", { serviceWeekend: "weekend_b" }),
+      mitarbeiter("b-4", "Pflegefachkraft", { serviceWeekend: "weekend_b" }),
+      // zaehlen nicht: eigenes Wochenende, ohne festes Wochenende, MFA
+      mitarbeiter("a-1", "Pflegefachkraft", { serviceWeekend: "weekend_a" }),
+      mitarbeiter("ohne-2", "Pflegefachkraft", { serviceWeekend: "none" }),
+      mitarbeiter("mfa-b", "Medizinische/r Fachangestellte/r", {
+        serviceWeekend: "weekend_b",
+      }),
+    ],
+    [
+      urlaub("b-1", SAMSTAG),
+      urlaub("b-2", SAMSTAG, "school"),
+      urlaub("ohne-1", SAMSTAG),
+      urlaub("b-3", SAMSTAG, "mandatoryDuty"),
+      urlaub("b-4", SAMSTAG, "mandatoryDuty"),
+      urlaub("a-1", SAMSTAG, "mandatoryDuty"),
+      urlaub("ohne-2", SAMSTAG, "mandatoryDuty"),
+      urlaub("mfa-b", SAMSTAG, "mandatoryDuty"),
+    ],
+  );
+  zustand.settings.vacationWeekendAReferenceSaturday = SAMSTAG;
+
+  const stats = app.getPlannerDayStats(SAMSTAG);
+  assert.equal(stats.weekendGroup, "weekend_a");
+  assert.equal(stats.absenceCount, 3);
+  assert.equal(stats.foreignWeekendDutyCount, 2);
+  assert.equal(stats.compensatedAbsenceCount, 2);
+  assert.equal(stats.effectiveAbsenceCount, 1);
+  assert.equal(stats.isOverLimit, false);
+  assert.equal(stats.isAtLimit, true);
+  assert.equal(stats.dutyCount, 5, "D zaehlt weiterhin alle Dienstzusagen");
+});
+
+test("Dienstuebernahmen senken die Abwesenheiten nicht unter null", async () => {
+  const app = await loadAppFunctions([
+    "getPlannerDayStats",
+    "countsTowardsAbsenceLimit",
+    "normalizeState",
+  ]);
+  const SAMSTAG = "2026-06-20";
+  const zustand = mitMitarbeitern(
+    app,
+    [
+      mitarbeiter("a-1", "Pflegefachkraft", { serviceWeekend: "weekend_a" }),
+      mitarbeiter("b-1", "Pflegefachkraft", { serviceWeekend: "weekend_b" }),
+      mitarbeiter("b-2", "Pflegefachkraft", { serviceWeekend: "weekend_b" }),
+    ],
+    [
+      urlaub("a-1", SAMSTAG),
+      urlaub("b-1", SAMSTAG, "mandatoryDuty"),
+      urlaub("b-2", SAMSTAG, "mandatoryDuty"),
+    ],
+  );
+  zustand.settings.vacationWeekendAReferenceSaturday = SAMSTAG;
+
+  const stats = app.getPlannerDayStats(SAMSTAG);
+  assert.equal(stats.compensatedAbsenceCount, 1);
+  assert.equal(stats.effectiveAbsenceCount, 0);
+});
