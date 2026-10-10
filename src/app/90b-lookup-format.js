@@ -91,9 +91,26 @@
   }
 
   // Angezeigt wird „Nachname, Vorname“; gesucht werden soll trotzdem auch in
-  // der gesprochenen Reihenfolge „Vorname Nachname“.
+  // der gesprochenen Reihenfolge „Vorname Nachname“ - und nach einer
+  // Namensänderung weiter unter dem früheren Namen.
   function employeeSearchText(employee) {
-    return `${employee.firstName} ${employee.lastName} ${fullName(employee)}`;
+    return [employee, ...(employee.nameChanges || [])]
+      .map((name) => `${name.firstName} ${name.lastName} ${fullName(name)}`)
+      .join(" ");
+  }
+
+  // Frühere Namen, jüngster zuerst; ein Eintrag, der nur den heutigen Namen
+  // wiederholt, zählt nicht.
+  function formerEmployeeNames(employee) {
+    const current = fullName(employee);
+    return [
+      ...new Set(
+        [...(employee.nameChanges || [])]
+          .reverse()
+          .map((change) => fullName(change))
+          .filter((name) => name && name !== current),
+      ),
+    ];
   }
 
   function initials(employee) {

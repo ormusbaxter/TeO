@@ -1,3 +1,9 @@
+### 4.63.0 – Namensänderungen
+
+- **Neu:** Im Mitarbeiterdialog hält **Namensänderung eintragen** den bisherigen Namen mit Datum und optional einem Grund (Heirat, Scheidung …) fest, danach wird der neue Name eingetragen. Wer den Namen nur überschreibt, bekommt einen Hinweis darauf
+- **Neu:** Frühere Namen bleiben auffindbar: Mitarbeitersuche, Auswahllisten und Befehlspalette finden den Mitarbeiter auch unter dem alten Namen, die Liste nennt ihn („früher: …“), Schnellansicht und Akte zeigen den Namensverlauf. Nachweise, Planung und Einweisungen bleiben unverändert zugeordnet
+- **Geändert:** Datenformat 27. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit festgehaltene frühere Namen nicht verloren gehen
+
 ### 4.62.0 – Neueinweisung nach einem Softwareupdate
 
 - **Neu:** Geräteeinweisungen lassen sich für nichtig erklären, etwa wenn ein Softwareupdate ein Gerät erneut einweisungspflichtig macht. **Neueinweisung anordnen** (Warnsymbol an der Gerätekarte oder in der Einweisungsübersicht des Geräts) setzt einen Stichtag mit Grund; alle Einweisungen davor sind nichtig, bleiben aber als Verlauf erhalten. Eine Einweisung am Stichtag zählt bereits. Der Dialog nennt vorab, wie viele Mitarbeiter betroffen sind, und eine irrtümliche Anordnung lässt sich dort wieder aufheben

@@ -275,7 +275,7 @@
         icon: "icon-users",
         label: fullName(employee),
         hint: employee.profession || "",
-        keywords: employee.email || "",
+        keywords: [employee.email, ...formerEmployeeNames(employee)].filter(Boolean).join(" "),
         run: () => {
           showView("employees");
           openEmployeeDossier(employee.id);

@@ -265,6 +265,12 @@ function validateDates(state, issues) {
         entry.effectiveDate,
       ]),
     ),
+    ...state.employees.flatMap((employee) =>
+      (employee.nameChanges || []).map((entry) => [
+        "Namensänderung",
+        entry.date,
+      ]),
+    ),
     ...state.vacationDays.map((entry) => ["Abwesenheit", entry.date]),
   ];
   values.forEach(([label, value]) => {

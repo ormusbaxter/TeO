@@ -267,6 +267,7 @@
       employmentPercent: clampNumber(employee.employmentPercent, 1, 100, 100),
       ...normalizeEmploymentPeriod(employee),
       employmentChanges: normalizeEmploymentChanges(employee.employmentChanges),
+      nameChanges: normalizeNameChanges(employee.nameChanges),
       profession: normalizeProfession(employee.profession),
       serviceWeekend: normalizeServiceWeekend(employee.serviceWeekend),
       active: employmentStatus !== "inactive",
@@ -302,6 +303,29 @@
     return [...byDate.values()]
       .sort((a, b) => a.from.localeCompare(b.from))
       .slice(0, 50);
+  }
+
+  // Eine Namensänderung hält den Namen fest, der bis zum Stichtag galt; der
+  // aktuelle Name steht weiter in firstName/lastName. Je Stichtag höchstens
+  // ein Eintrag, aufsteigend sortiert.
+  function normalizeNameChanges(changes) {
+    const byDate = new Map();
+    (Array.isArray(changes) ? changes : []).forEach((change) => {
+      const date = normalizeOptionalDate(change?.date);
+      const firstName = String(change?.firstName || "").trim().slice(0, 80);
+      const lastName = String(change?.lastName || "").trim().slice(0, 80);
+      if (date && (firstName || lastName)) {
+        byDate.set(date, {
+          date,
+          firstName,
+          lastName,
+          reason: String(change?.reason || "").trim().slice(0, 120),
+        });
+      }
+    });
+    return [...byDate.values()]
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-20);
   }
 
   function normalizeTraining(training) {

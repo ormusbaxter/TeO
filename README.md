@@ -585,6 +585,23 @@ Ausgangswert bis zur ersten Änderung. Überall angezeigt wird der heute
 gültige Wert; eine bevorstehende Änderung nennt die Mitarbeiterliste unter
 dem Wert („ab 01.01.2027: 75 %“), die Akte zeigt den Verlauf.
 
+### Namensänderungen
+
+Ändert sich ein Name, etwa nach Heirat oder Scheidung, hält
+**Namensänderung eintragen** im Mitarbeiterdialog den bisherigen Namen mit
+Datum und optional einem Grund fest; danach wird oben der neue Name
+eingetragen. Wer den Namen nur überschreibt, ändert ihn dagegen ohne
+früheren Namen – das passt für Tippfehler. Weicht der eingetippte Name vom gespeicherten
+ab, ohne dass der bisherige festgehalten ist, erinnert ein Hinweis daran.
+
+Der frühere Name bleibt auffindbar: Die Suche in der Mitarbeiterliste, in den
+Auswahllisten und in der Befehlspalette findet den Mitarbeiter auch darunter,
+die Liste nennt ihn unter dem Namen („früher: Albers, Felix“), die Akte zeigt
+den **Namensverlauf**. Fortbildungsnachweise, Sitzungsteilnahmen, Planung und
+Geräteeinweisungen hängen am Mitarbeiter, nicht am Namen, und bleiben deshalb
+unverändert zugeordnet. Bei Einweisungen, die der Mitarbeiter selbst gegeben
+hat, steht als einweisende Person weiter der Name vom Tag der Einweisung.
+
 ### Mitarbeiterstatus
 
 TeO unterscheidet:
@@ -629,6 +646,7 @@ Befehlspalette. Sie enthält:
 
 - Stammdaten und Kontaktdaten
 - Beschäftigungsstatus und Stellenanteil
+- Namensverlauf nach Namensänderungen
 - Qualifikationen und Ablaufdaten
 - Pflichtfortbildungsstatus
 - Teamsitzungsteilnahmen

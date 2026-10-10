@@ -28,6 +28,11 @@
                 <span>Nachname <em>*</em></span>
                 <input id="lastName" name="lastName" type="text" maxlength="80" required />
               </label>
+              <p class="field-hint form-field-wide name-change-hint" id="nameChangeHint" hidden>
+                Neuer Name nach Heirat oder Scheidung? Mit „Namensänderung
+                eintragen“ bleibt der bisherige Name in Suche und Akte
+                auffindbar.
+              </p>
               <label class="form-field">
                 <span>Geburtsdatum</span>
                 <input id="birthDate" name="birthDate" type="date" />
@@ -67,6 +72,29 @@
                   placeholder="name@klinik.de"
                 />
               </label>
+              <div class="form-field form-field-wide name-change-field">
+                <span>Namensänderungen</span>
+                <div class="name-change-list" id="nameChangeList"></div>
+                <button
+                  class="button button-secondary button-compact"
+                  id="addNameChangeButton"
+                  type="button"
+                >
+                  <svg><use href="#icon-plus"></use></svg>
+                  Namensänderung eintragen
+                </button>
+                <small class="field-hint">
+                  Hält den bisherigen Namen mit Datum und Grund fest; danach
+                  oben den neuen Namen eintragen. Nachweise, Planung und
+                  Einweisungen bleiben beim Mitarbeiter.
+                </small>
+                <datalist id="nameChangeReasons">
+                  <option value="Heirat"></option>
+                  <option value="Scheidung"></option>
+                  <option value="Eingetragene Lebenspartnerschaft"></option>
+                  <option value="Namensänderung auf Antrag"></option>
+                </datalist>
+              </div>
             </div>
           </fieldset>
 

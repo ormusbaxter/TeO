@@ -9,6 +9,11 @@
     );
     elements.employmentChangeList.addEventListener("click", handleEmploymentChangeAction);
     elements.addEmploymentChangeButton.addEventListener("click", addEmploymentChangeRow);
+    elements.nameChangeList.addEventListener("click", handleNameChangeAction);
+    elements.addNameChangeButton.addEventListener("click", addNameChangeRow);
+    ["#firstName", "#lastName"].forEach((selector) =>
+      document.querySelector(selector).addEventListener("input", updateNameChangeHint),
+    );
     elements.vacationPlanner.addEventListener("pointerover", handleVacationCrosshair);
     elements.vacationPlanner.addEventListener("focusin", handleVacationCrosshair);
     elements.vacationPlanner.addEventListener("pointerleave", () =>

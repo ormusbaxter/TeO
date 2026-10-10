@@ -33,6 +33,7 @@
   const EMPLOYEE_FIELD_LABELS = Object.freeze({
     firstName: "Vorname",
     lastName: "Nachname",
+    nameChanges: "Namensänderungen",
     username: "Benutzername",
     birthDate: "Geburtsdatum",
     phone: "Telefon",
@@ -886,6 +887,9 @@
     vacationBaseDays: document.querySelector("#vacationBaseDays"),
     vacationSortMode: document.querySelector("#vacationSortMode"),
     employmentChangeList: document.querySelector("#employmentChangeList"),
+    nameChangeList: document.querySelector("#nameChangeList"),
+    addNameChangeButton: document.querySelector("#addNameChangeButton"),
+    nameChangeHint: document.querySelector("#nameChangeHint"),
     addEmploymentChangeButton: document.querySelector("#addEmploymentChangeButton"),
     vacationCrosshairToggle: document.querySelector("#vacationCrosshairToggle"),
     vacationCarryOverExpiry: document.querySelector("#vacationCarryOverExpiry"),
@@ -2473,6 +2477,7 @@
       employmentPercent: clampNumber(employee.employmentPercent, 1, 100, 100),
       ...normalizeEmploymentPeriod(employee),
       employmentChanges: normalizeEmploymentChanges(employee.employmentChanges),
+      nameChanges: normalizeNameChanges(employee.nameChanges),
       profession: normalizeProfession(employee.profession),
       serviceWeekend: normalizeServiceWeekend(employee.serviceWeekend),
       active: employmentStatus !== "inactive",
@@ -2508,6 +2513,29 @@
     return [...byDate.values()]
       .sort((a, b) => a.from.localeCompare(b.from))
       .slice(0, 50);
+  }
+
+  // Eine Namensänderung hält den Namen fest, der bis zum Stichtag galt; der
+  // aktuelle Name steht weiter in firstName/lastName. Je Stichtag höchstens
+  // ein Eintrag, aufsteigend sortiert.
+  function normalizeNameChanges(changes) {
+    const byDate = new Map();
+    (Array.isArray(changes) ? changes : []).forEach((change) => {
+      const date = normalizeOptionalDate(change?.date);
+      const firstName = String(change?.firstName || "").trim().slice(0, 80);
+      const lastName = String(change?.lastName || "").trim().slice(0, 80);
+      if (date && (firstName || lastName)) {
+        byDate.set(date, {
+          date,
+          firstName,
+          lastName,
+          reason: String(change?.reason || "").trim().slice(0, 120),
+        });
+      }
+    });
+    return [...byDate.values()]
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-20);
   }
 
   function normalizeTraining(training) {
@@ -4406,6 +4434,11 @@
     );
     elements.employmentChangeList.addEventListener("click", handleEmploymentChangeAction);
     elements.addEmploymentChangeButton.addEventListener("click", addEmploymentChangeRow);
+    elements.nameChangeList.addEventListener("click", handleNameChangeAction);
+    elements.addNameChangeButton.addEventListener("click", addNameChangeRow);
+    ["#firstName", "#lastName"].forEach((selector) =>
+      document.querySelector(selector).addEventListener("input", updateNameChangeHint),
+    );
     elements.vacationPlanner.addEventListener("pointerover", handleVacationCrosshair);
     elements.vacationPlanner.addEventListener("focusin", handleVacationCrosshair);
     elements.vacationPlanner.addEventListener("pointerleave", () =>
@@ -7152,6 +7185,7 @@
       </div>
       <dl class="record-inspector-facts">
         <div><dt>Status</dt><dd>${escapeHtml(employeeStatusLabel(employee))}</dd></div>
+        ${formerEmployeeNames(employee).length ? `<div><dt>Früherer Name</dt><dd>${escapeHtml(formerEmployeeNames(employee).join("; "))}</dd></div>` : ""}
         <div><dt>Stellenumfang</dt><dd>${currentEmploymentPercent(employee)}&thinsp;%</dd></div>
         <div><dt>Dienstwochenende</dt><dd>${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</dd></div>
         <div><dt>Fortbildungen</dt><dd>${training.current}/${training.total} aktuell</dd></div>
@@ -8878,7 +8912,7 @@
         icon: "icon-users",
         label: fullName(employee),
         hint: employee.profession || "",
-        keywords: employee.email || "",
+        keywords: [employee.email, ...formerEmployeeNames(employee)].filter(Boolean).join(" "),
         run: () => {
           showView("employees");
           openEmployeeDossier(employee.id);
@@ -9646,6 +9680,35 @@
     return `in ${days} Tag${days === 1 ? "" : "en"}`;
   }
 
+  // Jüngster Name zuerst: Der heutige gilt seit der letzten Änderung, jeder
+  // frühere bis zu dem Tag, an dem der nächste Name galt.
+  function renderDossierNameHistory(employee) {
+    const changes = employee.nameChanges || [];
+    if (!changes.length) return "";
+    const latest = changes[changes.length - 1];
+    const rows = [
+      { name: fullName(employee), period: `seit ${formatDate(latest.date)}`, reason: "" },
+      ...[...changes].reverse().map((change) => ({
+        name: fullName(change),
+        period: `bis ${formatDate(change.date)}`,
+        reason: change.reason,
+      })),
+    ];
+    return `<section class="dossier-section">
+      <h3>Namensverlauf</h3>
+      <div class="dossier-list">
+        ${rows
+          .map(
+            (row) => `<div class="dossier-list-row">
+              <strong>${escapeHtml(row.name)}</strong>
+              <span>${escapeHtml([row.period, row.reason].filter(Boolean).join(" · "))}</span>
+            </div>`,
+          )
+          .join("")}
+      </div>
+    </section>`;
+  }
+
   function openEmployeeDossier(employeeId) {
     const employee = getEmployee(employeeId);
     if (!employee) return;
@@ -9714,6 +9777,7 @@
             </section>`
           : ""
       }
+      ${renderDossierNameHistory(employee)}
       <section class="dossier-section">
         <h3>Zusatzqualifikationen</h3>
         ${
@@ -13739,6 +13803,9 @@
               <strong>${escapeHtml(fullName(employee))}</strong>
               <small>${escapeHtml(
                 [
+                  formerEmployeeNames(employee).length
+                    ? `früher: ${formerEmployeeNames(employee)[0]}`
+                    : "",
                   employee.username
                     ? `Benutzername: ${employee.username}`
                     : "",
@@ -18654,6 +18721,7 @@
     document.querySelector("#employmentPercent").value = "100";
     document.querySelector("#employeeStatus").value = "active";
     renderEmploymentChangeRows([]);
+    renderNameChangeRows([]);
 
     const employee = employeeId ? getEmployee(employeeId) : null;
     if (employee) trackWorkspaceRecord("employee", employee.id);
@@ -18676,6 +18744,7 @@
       document.querySelector("#entryDate").value = employee.entryDate || "";
       document.querySelector("#exitDate").value = employee.exitDate || "";
       renderEmploymentChangeRows(employee.employmentChanges || []);
+      renderNameChangeRows(employee.nameChanges || []);
       document.querySelector("#employeeStatus").value = employee.employmentStatus;
 
       document.querySelectorAll('input[name="qualification"]').forEach((checkbox) => {
@@ -18683,6 +18752,7 @@
       });
     }
 
+    updateNameChangeHint();
     elements.employeeDialog.showModal();
     captureCleanForm(elements.employeeForm);
     window.setTimeout(() => document.querySelector("#firstName").focus(), 0);
@@ -18751,6 +18821,132 @@
         percent: Number(row.querySelector("[data-employment-change-percent]").value),
       }))
       .filter((change) => change.from && Number.isFinite(change.percent));
+  }
+
+  function renderNameChangeRows(changes) {
+    elements.nameChangeList.innerHTML = changes
+      .map((change) => nameChangeRowMarkup(change))
+      .join("");
+  }
+
+  function nameChangeRowMarkup({ date = "", firstName = "", lastName = "", reason = "" } = {}) {
+    return `
+      <div class="name-change-row">
+        <label>
+          <span>Geändert am</span>
+          <input type="date" data-name-change-date value="${escapeHtml(date)}" required />
+        </label>
+        <label>
+          <span>Früherer Nachname</span>
+          <input type="text" maxlength="80" data-name-change-last-name value="${escapeHtml(lastName)}" />
+        </label>
+        <label>
+          <span>Früherer Vorname</span>
+          <input type="text" maxlength="80" data-name-change-first-name value="${escapeHtml(firstName)}" />
+        </label>
+        <label>
+          <span>Grund</span>
+          <input
+            type="text"
+            maxlength="120"
+            list="nameChangeReasons"
+            data-name-change-reason
+            value="${escapeHtml(reason)}"
+            placeholder="z. B. Heirat"
+          />
+        </label>
+        <button
+          class="icon-button danger"
+          type="button"
+          data-remove-name-change
+          aria-label="Namensänderung entfernen"
+          title="Namensänderung entfernen"
+        ><svg><use href="#icon-trash"></use></svg></button>
+      </div>
+    `;
+  }
+
+  function handleNameChangeAction(event) {
+    const remove = event.target.closest("[data-remove-name-change]");
+    if (!remove) return;
+    remove.closest(".name-change-row").remove();
+    updateNameChangeHint();
+  }
+
+  // Festgehalten wird der Name, unter dem der Mitarbeiter bisher geführt
+  // wurde - beim Bearbeiten der gespeicherte, auch wenn oben schon getippt
+  // wurde. Danach geht es gleich zum Nachnamen, der sich meist ändert.
+  function addNameChangeRow() {
+    const employee = getEmployee(document.querySelector("#employeeId").value);
+    const firstNameInput = document.querySelector("#firstName");
+    const lastNameInput = document.querySelector("#lastName");
+    elements.nameChangeList.insertAdjacentHTML(
+      "beforeend",
+      nameChangeRowMarkup({
+        date: todayIso(),
+        firstName: employee ? employee.firstName : firstNameInput.value.trim(),
+        lastName: employee ? employee.lastName : lastNameInput.value.trim(),
+      }),
+    );
+    updateNameChangeHint();
+    lastNameInput.focus();
+    lastNameInput.select();
+  }
+
+  function readNameChangeRows() {
+    return [...elements.nameChangeList.querySelectorAll(".name-change-row")].map((row) => ({
+      row,
+      date: row.querySelector("[data-name-change-date]").value,
+      firstName: row.querySelector("[data-name-change-first-name]").value.trim(),
+      lastName: row.querySelector("[data-name-change-last-name]").value.trim(),
+      reason: row.querySelector("[data-name-change-reason]").value.trim(),
+    }));
+  }
+
+  // Wer beim Bearbeiten den Namen überschreibt, ohne den alten festzuhalten,
+  // korrigiert vielleicht nur einen Tippfehler - oder verliert den früheren
+  // Namen. Der Hinweis erinnert daran, ohne zu bremsen.
+  function updateNameChangeHint() {
+    const employee = getEmployee(document.querySelector("#employeeId").value);
+    const typedName = fullName({
+      firstName: document.querySelector("#firstName").value,
+      lastName: document.querySelector("#lastName").value,
+    });
+    elements.nameChangeHint.hidden =
+      !employee ||
+      typedName === fullName(employee) ||
+      readNameChangeRows().some((change) => fullName(change) === fullName(employee));
+  }
+
+  // Ungültig ist eine Zeile ohne Namen, mit einem Datum in der Zukunft oder -
+  // bei der jüngsten - mit genau dem Namen, der ab dann gelten soll.
+  function nameChangeRowsValid(firstName, lastName) {
+    const rows = readNameChangeRows();
+    const latest = [...rows].sort((a, b) => b.date.localeCompare(a.date))[0];
+    const problem = rows
+      .map((change) => {
+        const field = (selector) => change.row.querySelector(selector);
+        if (!change.firstName && !change.lastName) {
+          return [field("[data-name-change-last-name]"), "Bitte den früheren Namen eintragen."];
+        }
+        if (change.date > todayIso()) {
+          return [field("[data-name-change-date]"), "Das Datum darf nicht in der Zukunft liegen."];
+        }
+        if (change === latest && fullName(change) === fullName({ firstName, lastName })) {
+          return [
+            document.querySelector("#lastName"),
+            "Bitte oben den neuen Namen eintragen – der frühere Name ist schon festgehalten.",
+          ];
+        }
+        return null;
+      })
+      .find(Boolean);
+    if (!problem) return true;
+    const [input, message] = problem;
+    input.setCustomValidity(message);
+    input.reportValidity();
+    input.setCustomValidity("");
+    return false;
   }
 
   function renderEmployeeCatalogFields(employee = null) {
@@ -18898,6 +19094,10 @@
       return;
     }
     const employmentChanges = normalizeEmploymentChanges(readEmploymentChangeRows());
+    if (!nameChangeRowsValid(firstNameInput.value.trim(), lastNameInput.value.trim())) {
+      return;
+    }
+    const nameChanges = normalizeNameChanges(readNameChangeRows());
 
     const employee = {
       id: existingEmployee?.id || createId(),
@@ -18916,6 +19116,7 @@
       entryDate,
       exitDate,
       employmentChanges,
+      nameChanges,
       profession: normalizeProfession(professionInput.value),
       serviceWeekend:
         ownerWeekend ||
@@ -23622,9 +23823,26 @@
   }
 
   // Angezeigt wird „Nachname, Vorname“; gesucht werden soll trotzdem auch in
-  // der gesprochenen Reihenfolge „Vorname Nachname“.
+  // der gesprochenen Reihenfolge „Vorname Nachname“ - und nach einer
+  // Namensänderung weiter unter dem früheren Namen.
   function employeeSearchText(employee) {
-    return `${employee.firstName} ${employee.lastName} ${fullName(employee)}`;
+    return [employee, ...(employee.nameChanges || [])]
+      .map((name) => `${name.firstName} ${name.lastName} ${fullName(name)}`)
+      .join(" ");
+  }
+
+  // Frühere Namen, jüngster zuerst; ein Eintrag, der nur den heutigen Namen
+  // wiederholt, zählt nicht.
+  function formerEmployeeNames(employee) {
+    const current = fullName(employee);
+    return [
+      ...new Set(
+        [...(employee.nameChanges || [])]
+          .reverse()
+          .map((change) => fullName(change))
+          .filter((name) => name && name !== current),
+      ),
+    ];
   }
 
   function initials(employee) {

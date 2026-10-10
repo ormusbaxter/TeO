@@ -32,6 +32,7 @@
   const EMPLOYEE_FIELD_LABELS = Object.freeze({
     firstName: "Vorname",
     lastName: "Nachname",
+    nameChanges: "Namensänderungen",
     username: "Benutzername",
     birthDate: "Geburtsdatum",
     phone: "Telefon",

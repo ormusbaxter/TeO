@@ -461,6 +461,9 @@
               <strong>${escapeHtml(fullName(employee))}</strong>
               <small>${escapeHtml(
                 [
+                  formerEmployeeNames(employee).length
+                    ? `früher: ${formerEmployeeNames(employee)[0]}`
+                    : "",
                   employee.username
                     ? `Benutzername: ${employee.username}`
                     : "",
