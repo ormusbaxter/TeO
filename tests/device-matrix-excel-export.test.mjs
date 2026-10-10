@@ -129,6 +129,7 @@ function bestand() {
         ],
       }),
       geraet("d-alt", "Alt", "Ausgemustert", { currentInventory: false }),
+      geraet("d-ohne", "Braun", "Infusion ohne Anlage", { annex1: false }),
     ],
     deviceInstructions: [
       einweisung("i1", "d-pumpe", "2025-02-03", ["e-mueller", "e-becker"]),
@@ -140,7 +141,16 @@ function bestand() {
   });
 }
 
-test("Excel-Export der Einweisungsmatrix: Köpfe, Namen und letzte gültige Einweisung", async () => {
+const BLAETTER = ["Alle Geräte", "Anlage 1", "Außer Anlage 1", "Nicht in Betrieb"];
+
+// Spaltenköpfe ab C eines Blatts, in Reihenfolge.
+function geraetespalten(c) {
+  return Object.keys(c)
+    .filter((ref) => /^[A-Z]+1$/.test(ref) && !["A1", "B1"].includes(ref))
+    .map((ref) => c[ref].wert);
+}
+
+test("Excel-Export der Einweisungsmatrix: ein Blatt je Geräteauswahl, alle Mitarbeiter", async () => {
   const app = await loadAppFunctions(["createDeviceMatrixWorkbook"]);
   app.setState(bestand());
 
@@ -152,35 +162,54 @@ test("Excel-Export der Einweisungsmatrix: Köpfe, Namen und letzte gültige Einw
     "xl/_rels/workbook.xml.rels",
     "xl/styles.xml",
     "xl/worksheets/sheet1.xml",
+    "xl/worksheets/sheet4.xml",
   ]) {
     assert.ok(dateien.has(teil), `${teil} fehlt`);
   }
-  assert.match(dateien.get("xl/workbook.xml"), /<sheet name="Einweisungsmatrix"/);
+  const mappe = dateien.get("xl/workbook.xml");
+  assert.equal(
+    [...mappe.matchAll(/<sheet name="([^"]+)"/g)].map((m) => m[1]).join("|"),
+    BLAETTER.join("|"),
+  );
+  const blaetter = BLAETTER.map((_, i) => zellen(dateien.get(`xl/worksheets/sheet${i + 1}.xml`)));
 
-  const blatt = dateien.get("xl/worksheets/sheet1.xml");
-  const c = zellen(blatt);
-  // Spalten wie in der Matrix gefiltert und sortiert: das ausgemusterte
-  // Gerät fehlt, inaktive Mitarbeiter ebenso.
+  // Die Geräte verteilen sich auf die Blätter, unabhängig vom Matrixfilter
+  // (der zeigt nur aktuelle Geräte).
+  assert.equal(
+    geraetespalten(blaetter[0]).join("|"),
+    "Alt Ausgemustert|Dräger Evita V500|Braun Infusion ohne Anlage|Braun Perfusor &lt;Space&gt;",
+  );
+  assert.equal(
+    geraetespalten(blaetter[1]).join("|"),
+    "Dräger Evita V500|Braun Perfusor &lt;Space&gt;",
+  );
+  assert.equal(geraetespalten(blaetter[2]).join("|"), "Braun Infusion ohne Anlage");
+  assert.equal(geraetespalten(blaetter[3]).join("|"), "Alt Ausgemustert");
+
+  // Alle Mitarbeiter, auch inaktive; die Spalte Status schaltet per Autofilter.
+  const c = blaetter[1];
   assert.equal(c.A1.wert, "Mitarbeiter");
-  assert.equal(c.B1.wert, "Dräger Evita V500");
-  assert.equal(c.C1.wert, "Braun Perfusor &lt;Space&gt;");
-  assert.equal(c.D1, undefined);
-  assert.equal(c.A2.wert, "Becker &amp; Co, Ben");
-  assert.equal(c.A3.wert, "Müller, geb. Schmidt, Anna, MP-Beauftragte/r");
-  assert.equal(c.A4, undefined);
+  assert.equal(c.B1.wert, "Status");
+  assert.equal(c.A2.wert, "Alt, Ina");
+  assert.equal(c.B2.wert, "Inaktiv");
+  assert.equal(c.A3.wert, "Becker &amp; Co, Ben");
+  assert.equal(c.B3.wert, "Aktiv");
+  assert.equal(c.A4.wert, "Müller, geb. Schmidt, Anna, MP-Beauftragte/r");
 
-  assert.equal(c.B2.wert, seriell("2026-09-01"));
-  assert.equal(c.C2.wert, seriell("2025-02-03"));
-  assert.equal(c.B3.wert, "", "nichtige Einweisung zählt nicht");
-  assert.equal(c.C3.wert, seriell("2026-04-20"), "jüngste Einweisung");
+  assert.equal(c.C3.wert, seriell("2026-09-01"));
+  assert.equal(c.D3.wert, seriell("2025-02-03"));
+  assert.equal(c.C4.wert, "", "nichtige Einweisung zählt nicht");
+  assert.equal(c.D4.wert, seriell("2026-04-20"), "jüngste Einweisung");
 
   // Datumszellen tragen das Datumsformat TT.MM.JJJJ.
   const stile = [...dateien.get("xl/styles.xml").matchAll(/<xf numFmtId="(\d+)"[^>]*xfId/g)];
-  assert.equal(stile[Number(c.C3.stil)][1], "164");
+  assert.equal(stile[Number(c.D4.stil)][1], "164");
   assert.match(dateien.get("xl/styles.xml"), /numFmtId="164" formatCode="dd\\.mm\\.yyyy"/);
 
-  assert.match(blatt, /<pane xSplit="1" ySplit="1" topLeftCell="B2"[^>]*state="frozen"/);
-  assert.match(blatt, /<autoFilter ref="A1:C3"\/>/);
+  const blatt = dateien.get("xl/worksheets/sheet2.xml");
+  assert.match(blatt, /<pane xSplit="2" ySplit="1" topLeftCell="C2"[^>]*state="frozen"/);
+  assert.match(blatt, /<autoFilter ref="A1:D4"\/>/);
+  assert.match(mappe, /localSheetId="1" hidden="1">'Anlage 1'!\$A\$1:\$D\$4</);
 });
 
 test("Ein Geburtsname, der dem heutigen Nachnamen entspricht, erscheint nicht", async () => {
@@ -191,33 +220,28 @@ test("Ein Geburtsname, der dem heutigen Nachnamen entspricht, erscheint nicht", 
   ];
   app.setState(daten);
   const c = zellen(entpacke(app.createDeviceMatrixWorkbook()).get("xl/worksheets/sheet1.xml"));
-  assert.equal(c.A3.wert, "Müller, Anna, MP-Beauftragte/r");
+  assert.equal(c.A4.wert, "Müller, Anna, MP-Beauftragte/r");
 });
 
-test("Export Excel an der Einweisungsmatrix lädt eine .xlsx-Datei herunter", async (t) => {
+test("Export Excel an der Einweisungsmatrix lädt alle Mitarbeiter und Geräte herunter", async (t) => {
   const teo = await openTeO(t, { angemeldetAls: "admin", mitDemodaten: true });
   if (!teo) return;
   await teo.zeigeAnsicht("devices");
+  // Ein Matrixfilter wirkt nicht auf den Export.
+  await teo.page.fill("#deviceEmployeeSearch", "Ahrens");
 
   const [download] = await Promise.all([
     teo.page.waitForEvent("download"),
     teo.page.click("#exportDeviceMatrixExcelButton"),
   ]);
   assert.match(download.suggestedFilename(), /^TeO-Einweisungsmatrix-\d{4}-\d{2}-\d{2}\.xlsx$/);
-  const pfad = await download.path();
   const { readFile } = await import("node:fs/promises");
-  const dateien = entpacke(await readFile(pfad));
+  const dateien = entpacke(await readFile(await download.path()));
   const c = zellen(dateien.get("xl/worksheets/sheet1.xml"));
 
-  const erwartet = await teo.evaluate(() => {
-    const kopf = [...document.querySelectorAll(".device-matrix-table thead th")];
-    const zeilen = document.querySelectorAll(".device-matrix-table tbody tr");
-    return { spalten: kopf.length, zeilen: zeilen.length };
-  });
-  const spalten = Object.keys(c).filter((ref) => /^[A-Z]+1$/.test(ref)).length;
   const zeilen = Object.keys(c).filter((ref) => /^A\d+$/.test(ref)).length - 1;
-  assert.equal(spalten, erwartet.spalten);
-  assert.equal(zeilen, erwartet.zeilen);
+  assert.equal(zeilen, 60);
+  assert.ok(geraetespalten(c).length > 0);
   assert.ok(
     Object.values(c).some((zelle) => typeof zelle.wert === "number"),
     "mindestens ein Einweisungsdatum",

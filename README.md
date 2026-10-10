@@ -1365,8 +1365,17 @@ für die eine Einweisung dokumentiert ist, **Nur Geräte im Bestand** die
 ausgemusterten. Beide Filter lassen sich kombinieren und bleiben beim Wechsel
 zum nächsten Mitarbeiter eingestellt.
 
-**Export Excel** im Kopf der Matrix speichert sie als Excel-Datei (`.xlsx`),
-mit denselben Filtern wie auf dem Bildschirm:
+**Export Excel** im Kopf der Matrix speichert sie als Excel-Datei (`.xlsx`).
+Die Filter der Matrix gelten dafür nicht: Die Datei enthält immer alle
+Mitarbeiter und alle Geräte. Umgeschaltet wird in Excel selbst:
+
+- **Geräte** über die Blätter **Alle Geräte**, **Anlage 1**, **Außer Anlage 1**
+  und **Nicht in Betrieb**. Anlage 1 und Außer Anlage 1 enthalten nur Geräte
+  im Bestand
+- **Mitarbeiter** über den Filterpfeil der Spalte **Status** (Aktiv, In
+  Einarbeitung, Inaktiv) – etwa nur „Aktiv“ anhaken
+
+Aufbau jedes Blatts:
 
 - Spaltenköpfe: Hersteller und Gerätename, etwa „Dräger Evita V500“
 - Zeilenköpfe: Nachname, gegebenenfalls Geburtsname, Vorname und die
@@ -1378,8 +1387,8 @@ mit denselben Filtern wie auf dem Bildschirm:
   alle Einweisungen durch eine angeordnete Neueinweisung nichtig sind, bleibt
   die Zelle leer
 
-Kopfzeile und Namensspalte sind fixiert, die Kopfzeile trägt einen
-Autofilter, und die Daten lassen sich in Excel als Datum sortieren.
+Kopfzeile, Namens- und Statusspalte sind fixiert, und die Daten lassen sich in
+Excel als Datum sortieren.
 
 Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch
 aufgelistet und können bearbeitet werden.
