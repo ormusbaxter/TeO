@@ -1,3 +1,32 @@
+  // Jüngster Name zuerst: Der heutige gilt seit der letzten Änderung, jeder
+  // frühere bis zu dem Tag, an dem der nächste Name galt.
+  function renderDossierNameHistory(employee) {
+    const changes = employee.nameChanges || [];
+    if (!changes.length) return "";
+    const latest = changes[changes.length - 1];
+    const rows = [
+      { name: fullName(employee), period: `seit ${formatDate(latest.date)}`, reason: "" },
+      ...[...changes].reverse().map((change) => ({
+        name: fullName(change),
+        period: `bis ${formatDate(change.date)}`,
+        reason: change.reason,
+      })),
+    ];
+    return `<section class="dossier-section">
+      <h3>Namensverlauf</h3>
+      <div class="dossier-list">
+        ${rows
+          .map(
+            (row) => `<div class="dossier-list-row">
+              <strong>${escapeHtml(row.name)}</strong>
+              <span>${escapeHtml([row.period, row.reason].filter(Boolean).join(" · "))}</span>
+            </div>`,
+          )
+          .join("")}
+      </div>
+    </section>`;
+  }
+
   function openEmployeeDossier(employeeId) {
     const employee = getEmployee(employeeId);
     if (!employee) return;
@@ -66,6 +95,7 @@
             </section>`
           : ""
       }
+      ${renderDossierNameHistory(employee)}
       <section class="dossier-section">
         <h3>Zusatzqualifikationen</h3>
         ${

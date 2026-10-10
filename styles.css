@@ -6138,6 +6138,55 @@ body.is-vacation-planner-maximized {
   font-weight: 700;
 }
 
+/* Namensänderungen: dieselbe Bauform wie die Änderungen des Stellenumfangs,
+   mit einer Spalte je Angabe. */
+.name-change-hint {
+  margin: 0;
+}
+
+.name-change-field {
+  display: grid;
+  gap: 8px;
+}
+
+.name-change-list {
+  display: grid;
+  gap: 8px;
+}
+
+.name-change-list:empty {
+  display: none;
+}
+
+.name-change-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) repeat(3, minmax(0, 1fr)) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.name-change-row label {
+  display: grid;
+  gap: 4px;
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.name-change-field > .button {
+  justify-self: start;
+}
+
+@media (max-width: 720px) {
+  .name-change-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .name-change-row .icon-button {
+    justify-self: start;
+  }
+}
+
 /* Pflichtfortbildungen: Katalog, Nachweise, Jahresmatrix und Zeitrechner. */
 
 .training-summary {

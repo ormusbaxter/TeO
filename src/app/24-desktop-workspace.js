@@ -95,6 +95,7 @@
       </div>
       <dl class="record-inspector-facts">
         <div><dt>Status</dt><dd>${escapeHtml(employeeStatusLabel(employee))}</dd></div>
+        ${formerEmployeeNames(employee).length ? `<div><dt>Früherer Name</dt><dd>${escapeHtml(formerEmployeeNames(employee).join("; "))}</dd></div>` : ""}
         <div><dt>Stellenumfang</dt><dd>${currentEmploymentPercent(employee)}&thinsp;%</dd></div>
         <div><dt>Dienstwochenende</dt><dd>${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</dd></div>
         <div><dt>Fortbildungen</dt><dd>${training.current}/${training.total} aktuell</dd></div>

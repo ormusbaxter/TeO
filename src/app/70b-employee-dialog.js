@@ -13,6 +13,7 @@
     document.querySelector("#employmentPercent").value = "100";
     document.querySelector("#employeeStatus").value = "active";
     renderEmploymentChangeRows([]);
+    renderNameChangeRows([]);
 
     const employee = employeeId ? getEmployee(employeeId) : null;
     if (employee) trackWorkspaceRecord("employee", employee.id);
@@ -35,6 +36,7 @@
       document.querySelector("#entryDate").value = employee.entryDate || "";
       document.querySelector("#exitDate").value = employee.exitDate || "";
       renderEmploymentChangeRows(employee.employmentChanges || []);
+      renderNameChangeRows(employee.nameChanges || []);
       document.querySelector("#employeeStatus").value = employee.employmentStatus;
 
       document.querySelectorAll('input[name="qualification"]').forEach((checkbox) => {
@@ -42,6 +44,7 @@
       });
     }
 
+    updateNameChangeHint();
     elements.employeeDialog.showModal();
     captureCleanForm(elements.employeeForm);
     window.setTimeout(() => document.querySelector("#firstName").focus(), 0);
@@ -110,6 +113,132 @@
         percent: Number(row.querySelector("[data-employment-change-percent]").value),
       }))
       .filter((change) => change.from && Number.isFinite(change.percent));
+  }
+
+  function renderNameChangeRows(changes) {
+    elements.nameChangeList.innerHTML = changes
+      .map((change) => nameChangeRowMarkup(change))
+      .join("");
+  }
+
+  function nameChangeRowMarkup({ date = "", firstName = "", lastName = "", reason = "" } = {}) {
+    return `
+      <div class="name-change-row">
+        <label>
+          <span>Geändert am</span>
+          <input type="date" data-name-change-date value="${escapeHtml(date)}" required />
+        </label>
+        <label>
+          <span>Früherer Nachname</span>
+          <input type="text" maxlength="80" data-name-change-last-name value="${escapeHtml(lastName)}" />
+        </label>
+        <label>
+          <span>Früherer Vorname</span>
+          <input type="text" maxlength="80" data-name-change-first-name value="${escapeHtml(firstName)}" />
+        </label>
+        <label>
+          <span>Grund</span>
+          <input
+            type="text"
+            maxlength="120"
+            list="nameChangeReasons"
+            data-name-change-reason
+            value="${escapeHtml(reason)}"
+            placeholder="z. B. Heirat"
+          />
+        </label>
+        <button
+          class="icon-button danger"
+          type="button"
+          data-remove-name-change
+          aria-label="Namensänderung entfernen"
+          title="Namensänderung entfernen"
+        ><svg><use href="#icon-trash"></use></svg></button>
+      </div>
+    `;
+  }
+
+  function handleNameChangeAction(event) {
+    const remove = event.target.closest("[data-remove-name-change]");
+    if (!remove) return;
+    remove.closest(".name-change-row").remove();
+    updateNameChangeHint();
+  }
+
+  // Festgehalten wird der Name, unter dem der Mitarbeiter bisher geführt
+  // wurde - beim Bearbeiten der gespeicherte, auch wenn oben schon getippt
+  // wurde. Danach geht es gleich zum Nachnamen, der sich meist ändert.
+  function addNameChangeRow() {
+    const employee = getEmployee(document.querySelector("#employeeId").value);
+    const firstNameInput = document.querySelector("#firstName");
+    const lastNameInput = document.querySelector("#lastName");
+    elements.nameChangeList.insertAdjacentHTML(
+      "beforeend",
+      nameChangeRowMarkup({
+        date: todayIso(),
+        firstName: employee ? employee.firstName : firstNameInput.value.trim(),
+        lastName: employee ? employee.lastName : lastNameInput.value.trim(),
+      }),
+    );
+    updateNameChangeHint();
+    lastNameInput.focus();
+    lastNameInput.select();
+  }
+
+  function readNameChangeRows() {
+    return [...elements.nameChangeList.querySelectorAll(".name-change-row")].map((row) => ({
+      row,
+      date: row.querySelector("[data-name-change-date]").value,
+      firstName: row.querySelector("[data-name-change-first-name]").value.trim(),
+      lastName: row.querySelector("[data-name-change-last-name]").value.trim(),
+      reason: row.querySelector("[data-name-change-reason]").value.trim(),
+    }));
+  }
+
+  // Wer beim Bearbeiten den Namen überschreibt, ohne den alten festzuhalten,
+  // korrigiert vielleicht nur einen Tippfehler - oder verliert den früheren
+  // Namen. Der Hinweis erinnert daran, ohne zu bremsen.
+  function updateNameChangeHint() {
+    const employee = getEmployee(document.querySelector("#employeeId").value);
+    const typedName = fullName({
+      firstName: document.querySelector("#firstName").value,
+      lastName: document.querySelector("#lastName").value,
+    });
+    elements.nameChangeHint.hidden =
+      !employee ||
+      typedName === fullName(employee) ||
+      readNameChangeRows().some((change) => fullName(change) === fullName(employee));
+  }
+
+  // Ungültig ist eine Zeile ohne Namen, mit einem Datum in der Zukunft oder -
+  // bei der jüngsten - mit genau dem Namen, der ab dann gelten soll.
+  function nameChangeRowsValid(firstName, lastName) {
+    const rows = readNameChangeRows();
+    const latest = [...rows].sort((a, b) => b.date.localeCompare(a.date))[0];
+    const problem = rows
+      .map((change) => {
+        const field = (selector) => change.row.querySelector(selector);
+        if (!change.firstName && !change.lastName) {
+          return [field("[data-name-change-last-name]"), "Bitte den früheren Namen eintragen."];
+        }
+        if (change.date > todayIso()) {
+          return [field("[data-name-change-date]"), "Das Datum darf nicht in der Zukunft liegen."];
+        }
+        if (change === latest && fullName(change) === fullName({ firstName, lastName })) {
+          return [
+            document.querySelector("#lastName"),
+            "Bitte oben den neuen Namen eintragen – der frühere Name ist schon festgehalten.",
+          ];
+        }
+        return null;
+      })
+      .find(Boolean);
+    if (!problem) return true;
+    const [input, message] = problem;
+    input.setCustomValidity(message);
+    input.reportValidity();
+    input.setCustomValidity("");
+    return false;
   }
 
   function renderEmployeeCatalogFields(employee = null) {
@@ -257,6 +386,10 @@
       return;
     }
     const employmentChanges = normalizeEmploymentChanges(readEmploymentChangeRows());
+    if (!nameChangeRowsValid(firstNameInput.value.trim(), lastNameInput.value.trim())) {
+      return;
+    }
+    const nameChanges = normalizeNameChanges(readNameChangeRows());
 
     const employee = {
       id: existingEmployee?.id || createId(),
@@ -275,6 +408,7 @@
       entryDate,
       exitDate,
       employmentChanges,
+      nameChanges,
       profession: normalizeProfession(professionInput.value),
       serviceWeekend:
         ownerWeekend ||

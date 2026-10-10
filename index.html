@@ -2309,6 +2309,9 @@
 <p>Auch Pflichtfortbildungen und Teamsitzungen beachten die Beschäftigung:</p>
 <ul><li>Zu einer Pflichtfortbildung eines Jahres zählt, wer zum Jahresende beschäftigt ist – im laufenden Jahr, wer heute beschäftigt ist. Wer im Herbst eintritt, ist für das Jahr also schon verpflichtet; wer im Frühjahr ausgetreten ist, nicht mehr.</li><li>Zu einer Teamsitzung erwartet wird, wer am Sitzungstag beschäftigt war. Bereits dokumentierte Teilnahmen bleiben in jedem Fall erhalten.</li></ul>
 <p>Ändert sich der Stellenumfang, trägt <strong>Änderung hinzufügen</strong> den neuen Wert mit dem Tag ein, ab dem er gilt. Das Feld <strong>Stellenumfang</strong> ist dann der Ausgangswert bis zur ersten Änderung. Überall angezeigt wird der heute gültige Wert; eine bevorstehende Änderung nennt die Mitarbeiterliste unter dem Wert („ab 01.01.2027: 75 %“), die Akte zeigt den Verlauf.</p>
+<h3 id="hilfe-namensanderungen">Namensänderungen</h3>
+<p>Ändert sich ein Name, etwa nach Heirat oder Scheidung, hält <strong>Namensänderung eintragen</strong> im Mitarbeiterdialog den bisherigen Namen mit Datum und optional einem Grund fest; danach wird oben der neue Name eingetragen. Wer den Namen nur überschreibt, ändert ihn dagegen ohne früheren Namen – das passt für Tippfehler. Weicht der eingetippte Name vom gespeicherten ab, ohne dass der bisherige festgehalten ist, erinnert ein Hinweis daran.</p>
+<p>Der frühere Name bleibt auffindbar: Die Suche in der Mitarbeiterliste, in den Auswahllisten und in der Befehlspalette findet den Mitarbeiter auch darunter, die Liste nennt ihn unter dem Namen („früher: Albers, Felix“), die Akte zeigt den <strong>Namensverlauf</strong>. Fortbildungsnachweise, Sitzungsteilnahmen, Planung und Geräteeinweisungen hängen am Mitarbeiter, nicht am Namen, und bleiben deshalb unverändert zugeordnet. Bei Einweisungen, die der Mitarbeiter selbst gegeben hat, steht als einweisende Person weiter der Name vom Tag der Einweisung.</p>
 <h3 id="hilfe-mitarbeiterstatus">Mitarbeiterstatus</h3>
 <p>TeO unterscheidet:</p>
 <ul><li><strong>Aktiv:</strong> regulär beschäftigte Person</li><li><strong>In Einarbeitung:</strong> beschäftigte Person mit gesonderter Kennzeichnung</li><li><strong>Inaktiv:</strong> wird in aktuellen Planungen und Auswahlfeldern nicht regulär angeboten</li></ul>
@@ -2322,7 +2325,7 @@
 <p>Verantwortliche Personen eines Dienstwochenendes können nicht durch eine Sammelaktion in ein anderes Wochenende verschoben werden.</p>
 <h3 id="hilfe-mitarbeiter-gesamtakte">Mitarbeiter-Gesamtakte</h3>
 <p>Die Schaltfläche <strong>Mitarbeiterakte</strong> in der Zeile öffnet die Gesamtakte – ebenso <strong>Gesamtakte</strong> in der Schnellansicht, im Kontextmenü und in der Befehlspalette. Sie enthält:</p>
-<ul><li>Stammdaten und Kontaktdaten</li><li>Beschäftigungsstatus und Stellenanteil</li><li>Qualifikationen und Ablaufdaten</li><li>Pflichtfortbildungsstatus</li><li>Teamsitzungsteilnahmen</li><li>Änderungsverlauf (nur für Administratoren)</li><li>Druckansicht</li></ul>
+<ul><li>Stammdaten und Kontaktdaten</li><li>Beschäftigungsstatus und Stellenanteil</li><li>Namensverlauf nach Namensänderungen</li><li>Qualifikationen und Ablaufdaten</li><li>Pflichtfortbildungsstatus</li><li>Teamsitzungsteilnahmen</li><li>Änderungsverlauf (nur für Administratoren)</li><li>Druckansicht</li></ul>
 <p>Der <strong>Änderungsverlauf</strong> zeigt die letzten 25 Änderungen an diesem Mitarbeiter: wann, durch wen und was – etwa „Stammdaten: Beruf, Stellenumfang“, „Abwesenheitsplanung: 3 Einträge“, „Fortbildungsnachweis“ oder „Geräteeinweisung“. Erfasst sind Änderungen ab Version 4.51.0; was davor geschah, steht nur im allgemeinen Änderungsprotokoll ohne Bezug zum Mitarbeiter. Ältere Einträge fallen heraus, sobald das Protokoll seine Höchstzahl von 1000 Einträgen erreicht.</p>
 <h3 id="hilfe-e-mail-adressen-exportieren">E-Mail-Adressen exportieren</h3>
 <p><strong>E-Mails kopieren</strong> erzeugt aus den sichtbaren, aktiven Mitarbeitern einen einzelnen String. Die Adressen werden durch Semikolon getrennt und direkt in die Zwischenablage kopiert.</p>
@@ -2644,6 +2647,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-63-0-namensanderungen">4.63.0 – Namensänderungen</h3>
+<ul><li><strong>Neu:</strong> Im Mitarbeiterdialog hält <strong>Namensänderung eintragen</strong> den bisherigen Namen mit Datum und optional einem Grund (Heirat, Scheidung …) fest, danach wird der neue Name eingetragen. Wer den Namen nur überschreibt, bekommt einen Hinweis darauf</li><li><strong>Neu:</strong> Frühere Namen bleiben auffindbar: Mitarbeitersuche, Auswahllisten und Befehlspalette finden den Mitarbeiter auch unter dem alten Namen, die Liste nennt ihn („früher: …“), Schnellansicht und Akte zeigen den Namensverlauf. Nachweise, Planung und Einweisungen bleiben unverändert zugeordnet</li><li><strong>Geändert:</strong> Datenformat 27. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit festgehaltene frühere Namen nicht verloren gehen</li></ul>
 <h3 id="hilfe-4-62-0-neueinweisung-nach-einem-softwareupdate">4.62.0 – Neueinweisung nach einem Softwareupdate</h3>
 <ul><li><strong>Neu:</strong> Geräteeinweisungen lassen sich für nichtig erklären, etwa wenn ein Softwareupdate ein Gerät erneut einweisungspflichtig macht. <strong>Neueinweisung anordnen</strong> (Warnsymbol an der Gerätekarte oder in der Einweisungsübersicht des Geräts) setzt einen Stichtag mit Grund; alle Einweisungen davor sind nichtig, bleiben aber als Verlauf erhalten. Eine Einweisung am Stichtag zählt bereits. Der Dialog nennt vorab, wie viele Mitarbeiter betroffen sind, und eine irrtümliche Anordnung lässt sich dort wieder aufheben</li><li><strong>Neu:</strong> Die Einweisungsmatrix zeigt nichtige Einweisungen orange mit <strong>↻</strong>; Prozentwerte, Einweisungsberechtigte, Gerätekarten und Kennzahlen zählen nur gültige Einweisungen. Die Einweisungsübersicht eines Geräts filtert <strong>Neueinweisung nötig</strong></li><li><strong>Neu:</strong> Die Übersicht führt Geräte mit offenen Neueinweisungen unter <strong>Überfällig und zu prüfen</strong>; der Excel-Export des Gerätekatalogs enthält Stichtag und Grund</li><li><strong>Geändert:</strong> Datenformat 26. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit angeordnete Neueinweisungen nicht verloren gehen</li></ul>
 <h3 id="hilfe-4-61-0-dienstubernahmen-senken-die-uberplanung">4.61.0 – Dienstübernahmen senken die Überplanung</h3>
@@ -3886,6 +3891,11 @@
                 <span>Nachname <em>*</em></span>
                 <input id="lastName" name="lastName" type="text" maxlength="80" required />
               </label>
+              <p class="field-hint form-field-wide name-change-hint" id="nameChangeHint" hidden>
+                Neuer Name nach Heirat oder Scheidung? Mit „Namensänderung
+                eintragen“ bleibt der bisherige Name in Suche und Akte
+                auffindbar.
+              </p>
               <label class="form-field">
                 <span>Geburtsdatum</span>
                 <input id="birthDate" name="birthDate" type="date" />
@@ -3925,6 +3935,29 @@
                   placeholder="name@klinik.de"
                 />
               </label>
+              <div class="form-field form-field-wide name-change-field">
+                <span>Namensänderungen</span>
+                <div class="name-change-list" id="nameChangeList"></div>
+                <button
+                  class="button button-secondary button-compact"
+                  id="addNameChangeButton"
+                  type="button"
+                >
+                  <svg><use href="#icon-plus"></use></svg>
+                  Namensänderung eintragen
+                </button>
+                <small class="field-hint">
+                  Hält den bisherigen Namen mit Datum und Grund fest; danach
+                  oben den neuen Namen eintragen. Nachweise, Planung und
+                  Einweisungen bleiben beim Mitarbeiter.
+                </small>
+                <datalist id="nameChangeReasons">
+                  <option value="Heirat"></option>
+                  <option value="Scheidung"></option>
+                  <option value="Eingetragene Lebenspartnerschaft"></option>
+                  <option value="Namensänderung auf Antrag"></option>
+                </datalist>
+              </div>
             </div>
           </fieldset>
 
