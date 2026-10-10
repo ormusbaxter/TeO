@@ -1341,6 +1341,12 @@ Der Einweisungsstand je Gerät wird farblich angezeigt:
 Bei Medizinproduktebeauftragten wird eine Herstellereinweisung gold
 gekennzeichnet.
 
+Ein Klick auf einen Mitarbeiter öffnet seine Geräteübersicht mit allen Geräten
+und ihrem Einweisungsstand. **Nur offene Einweisungen** blendet die Geräte aus,
+für die eine Einweisung dokumentiert ist, **Nur Geräte im Bestand** die
+ausgemusterten. Beide Filter lassen sich kombinieren und bleiben beim Wechsel
+zum nächsten Mitarbeiter eingestellt.
+
 Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch
 aufgelistet und können bearbeitet werden.
 

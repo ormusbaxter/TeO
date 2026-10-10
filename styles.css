@@ -8203,6 +8203,22 @@ button.device-matrix-status {
   flex-wrap: wrap;
 }
 
+.device-employee-overview-filters {
+  display: flex;
+  gap: 8px 18px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.device-employee-overview-filters .checkbox-field {
+  align-items: center;
+  color: var(--slate-700);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .device-overview-filter-bar {
   display: grid;
   grid-template-columns: minmax(220px, 1fr) minmax(155px, auto) minmax(190px, auto);

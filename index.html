@@ -2518,6 +2518,7 @@
 <p>Der Einweisungsstand je Gerät wird farblich angezeigt:</p>
 <ul><li>0 bis 65 Prozent: rot</li><li>66 bis 80 Prozent: orange</li><li>81 bis 100 Prozent: grün</li></ul>
 <p>Bei Medizinproduktebeauftragten wird eine Herstellereinweisung gold gekennzeichnet.</p>
+<p>Ein Klick auf einen Mitarbeiter öffnet seine Geräteübersicht mit allen Geräten und ihrem Einweisungsstand. <strong>Nur offene Einweisungen</strong> blendet die Geräte aus, für die eine Einweisung dokumentiert ist, <strong>Nur Geräte im Bestand</strong> die ausgemusterten. Beide Filter lassen sich kombinieren und bleiben beim Wechsel zum nächsten Mitarbeiter eingestellt.</p>
 <p>Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch aufgelistet und können bearbeitet werden.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-datensicherung-und-wiederherstellung">
@@ -2637,7 +2638,7 @@
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
 <h3 id="hilfe-4-61-0-dienstubernahmen-senken-die-uberplanung">4.61.0 – Dienstübernahmen senken die Überplanung</h3>
-<ul><li><strong>Geändert:</strong> In der Urlaubsplanung zählt jede verpflichtende Dienstzusage eines Mitarbeiters vom jeweils anderen festen Wochenende als Dienstübernahme und verringert die wirksamen Abwesenheiten des Tages um eins – im Spaltenkopf als <code>−1</code>, <code>−2</code> … neben der Zahl der Dienstzusagen (<code>D1</code>, <code>D2</code> …). Bisher glich sie nur einen Urlaub von jemandem aus, dessen eigenes Dienstwochenende es war; Schule, Externer Einsatz oder Urlaub vom anderen Wochenende blieben trotz Übernahme überplant. Unter null sinkt die Zahl nicht, und Zusagen auf dem eigenen Dienstwochenende zählen weiterhin nicht</li></ul>
+<ul><li><strong>Geändert:</strong> In der Urlaubsplanung zählt jede verpflichtende Dienstzusage eines Mitarbeiters vom jeweils anderen festen Wochenende als Dienstübernahme und verringert die wirksamen Abwesenheiten des Tages um eins – im Spaltenkopf als <code>−1</code>, <code>−2</code> … neben der Zahl der Dienstzusagen (<code>D1</code>, <code>D2</code> …). Bisher glich sie nur einen Urlaub von jemandem aus, dessen eigenes Dienstwochenende es war; Schule, Externer Einsatz oder Urlaub vom anderen Wochenende blieben trotz Übernahme überplant. Unter null sinkt die Zahl nicht, und Zusagen auf dem eigenen Dienstwochenende zählen weiterhin nicht</li><li><strong>Neu:</strong> Die Geräteübersicht eines Mitarbeiters (Klick auf den Namen in der Einweisungsmatrix) filtert mit <strong>Nur offene Einweisungen</strong> und <strong>Nur Geräte im Bestand</strong>. Beide Filter lassen sich kombinieren und bleiben beim Wechsel zum nächsten Mitarbeiter eingestellt</li></ul>
 <h3 id="hilfe-4-60-0-eine-freundlichere-ubersicht">4.60.0 – Eine freundlichere Übersicht</h3>
 <ul><li><strong>Neu:</strong> Die Übersicht begrüßt mit Datum und einem Satz zur Woche: anstehende Fristen, Abwesenheiten und fehlende Nachweise. <strong>Abschluss eintragen</strong> steht gleich daneben</li><li><strong>Neu:</strong> Vier Kennzahlen – überfällige Nachweise, Fristen in 7 Tagen, heute abwesend, Geburtstage – führen mit einem Klick zur passenden Liste</li><li><strong>Geändert:</strong> Arbeitsliste und Fristenmonitor sind zu <strong>Als Nächstes</strong> zusammengelegt: die nächsten sieben Tage als Zeitleiste, Späteres als kurze Liste, Zeitraum 7, 30 oder 90 Tage. Bisher standen dieselben Fristen doppelt da</li><li><strong>Geändert:</strong> Überfällige Pflichtfortbildungen stehen gebündelt unter <strong>Offene Nachweise nach Fortbildung</strong> – eine Zeile je Fortbildung mit Erfüllungsgrad und den Kürzeln der Betroffenen statt über hundert einzelner roter Zeilen. Ein Klick öffnet den Nachweisdialog</li><li><strong>Entfallen:</strong> Der Bereich <strong>Zuletzt bearbeitet</strong>. Die Anordnung unter <strong>Anpassen</strong> beginnt wegen der neuen Bausteine einmalig wieder bei der Grundeinstellung</li></ul>
 <h3 id="hilfe-4-59-0-obermenus-in-der-seitenleiste">4.59.0 – Obermenüs in der Seitenleiste</h3>
@@ -4835,7 +4836,19 @@
           <svg><use href="#icon-close"></use></svg>
         </button>
       </div>
-      <div class="modal-body" id="deviceEmployeeOverviewContent"></div>
+      <div class="modal-body">
+        <div class="device-employee-overview-filters" role="group" aria-label="Geräte filtern">
+          <label class="checkbox-field">
+            <input id="deviceEmployeeOverviewOpenFilter" type="checkbox" />
+            <span>Nur offene Einweisungen</span>
+          </label>
+          <label class="checkbox-field">
+            <input id="deviceEmployeeOverviewInventoryFilter" type="checkbox" />
+            <span>Nur Geräte im Bestand</span>
+          </label>
+        </div>
+        <div id="deviceEmployeeOverviewContent"></div>
+      </div>
       <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
