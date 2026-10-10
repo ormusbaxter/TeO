@@ -28,16 +28,27 @@
                 <p class="eyebrow">Auswertung</p>
                 <h2 id="deviceMatrixWidgetTitle">Einweisungsmatrix</h2>
               </div>
-              <button
-                class="button button-secondary button-compact"
-                id="toggleDeviceMatrixMaximizeButton"
-                type="button"
-                aria-controls="deviceInstructionMatrix"
-                aria-pressed="false"
-              >
-                <svg><use id="deviceMatrixMaximizeIcon" href="#icon-maximize"></use></svg>
-                <span id="deviceMatrixMaximizeLabel">Maximieren</span>
-              </button>
+              <div class="device-matrix-widget-actions">
+                <button
+                  class="button button-secondary button-compact"
+                  id="exportDeviceMatrixExcelButton"
+                  type="button"
+                  title="Einweisungsmatrix mit den aktuellen Filtern als Excel-Datei exportieren"
+                >
+                  <svg><use href="#icon-spreadsheet"></use></svg>
+                  Export Excel
+                </button>
+                <button
+                  class="button button-secondary button-compact"
+                  id="toggleDeviceMatrixMaximizeButton"
+                  type="button"
+                  aria-controls="deviceInstructionMatrix"
+                  aria-pressed="false"
+                >
+                  <svg><use id="deviceMatrixMaximizeIcon" href="#icon-maximize"></use></svg>
+                  <span id="deviceMatrixMaximizeLabel">Maximieren</span>
+                </button>
+              </div>
             </header>
             <div class="device-filter-bar">
               <label class="search-field device-search-field" for="deviceSearch">

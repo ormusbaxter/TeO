@@ -67,6 +67,13 @@
   background: var(--white);
 }
 
+.device-matrix-widget-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .device-matrix-widget-header h2 {
   margin: 3px 0 0;
   color: var(--slate-900);

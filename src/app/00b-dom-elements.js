@@ -255,6 +255,9 @@
     memoCategoryFilter: document.querySelector("#memoCategoryFilter"),
     deviceSummary: document.querySelector("#deviceSummary"),
     deviceMatrixWidget: document.querySelector("#deviceMatrixWidget"),
+    exportDeviceMatrixExcelButton: document.querySelector(
+      "#exportDeviceMatrixExcelButton",
+    ),
     toggleDeviceMatrixMaximizeButton: document.querySelector(
       "#toggleDeviceMatrixMaximizeButton",
     ),

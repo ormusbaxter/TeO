@@ -1,3 +1,7 @@
+### 4.64.0 – Einweisungsmatrix als Excel-Datei
+
+- **Neu:** **Export Excel** im Kopf der Einweisungsmatrix speichert die Matrix mit den aktuellen Filtern als `.xlsx`. Spalten sind die Geräte (Hersteller und Gerätename), Zeilen die Mitarbeiter (Nachname, ggf. Geburtsname, Vorname, ggf. MP-Beauftragte/r), jede Zelle nennt das Datum der letzten gültigen Einweisung. Durch eine Neueinweisung nichtige Einweisungen zählen nicht. Kopfzeile und Namensspalte sind fixiert, die Kopfzeile filterbar
+
 ### 4.63.0 – Namensänderungen
 
 - **Neu:** Im Mitarbeiterdialog hält **Namensänderung eintragen** den bisherigen Namen mit Datum und optional einem Grund (Heirat, Scheidung …) fest, danach wird der neue Name eingetragen. Wer den Namen nur überschreibt, bekommt einen Hinweis darauf

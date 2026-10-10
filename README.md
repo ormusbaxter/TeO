@@ -1365,6 +1365,22 @@ für die eine Einweisung dokumentiert ist, **Nur Geräte im Bestand** die
 ausgemusterten. Beide Filter lassen sich kombinieren und bleiben beim Wechsel
 zum nächsten Mitarbeiter eingestellt.
 
+**Export Excel** im Kopf der Matrix speichert sie als Excel-Datei (`.xlsx`),
+mit denselben Filtern wie auf dem Bildschirm:
+
+- Spaltenköpfe: Hersteller und Gerätename, etwa „Dräger Evita V500“
+- Zeilenköpfe: Nachname, gegebenenfalls Geburtsname, Vorname und die
+  Kennzeichnung als Medizinproduktebeauftragte/r, etwa „Müller, geb. Schmidt,
+  Anna, MP-Beauftragte/r“. Als Geburtsname gilt der Nachname des ältesten
+  eingetragenen Namens (siehe Namensänderungen), sofern er vom heutigen
+  abweicht
+- Zellen: Datum der letzten gültigen Einweisung. Ohne Einweisung oder wenn
+  alle Einweisungen durch eine angeordnete Neueinweisung nichtig sind, bleibt
+  die Zelle leer
+
+Kopfzeile und Namensspalte sind fixiert, die Kopfzeile trägt einen
+Autofilter, und die Daten lassen sich in Excel als Datum sortieren.
+
 Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch
 aufgelistet und können bearbeitet werden.
 

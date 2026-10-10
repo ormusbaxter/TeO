@@ -302,6 +302,10 @@
       deviceAnnexFilter = event.target.value;
       renderDevices();
     });
+    elements.exportDeviceMatrixExcelButton.addEventListener(
+      "click",
+      exportDeviceMatrixExcel,
+    );
     elements.toggleDeviceMatrixMaximizeButton.addEventListener(
       "click",
       toggleDeviceMatrixMaximized,
