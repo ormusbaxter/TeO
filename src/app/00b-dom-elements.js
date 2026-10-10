@@ -487,6 +487,12 @@
     deviceEmployeeOverviewContent: document.querySelector(
       "#deviceEmployeeOverviewContent",
     ),
+    deviceEmployeeOverviewOpenFilter: document.querySelector(
+      "#deviceEmployeeOverviewOpenFilter",
+    ),
+    deviceEmployeeOverviewInventoryFilter: document.querySelector(
+      "#deviceEmployeeOverviewInventoryFilter",
+    ),
     deviceOverviewDialog: document.querySelector("#deviceOverviewDialog"),
     deviceOverviewTitle: document.querySelector("#deviceOverviewTitle"),
     deviceOverviewSubtitle: document.querySelector("#deviceOverviewSubtitle"),

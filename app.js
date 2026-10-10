@@ -695,6 +695,12 @@
   let deviceOverviewInstructionFilter = "all";
   let deviceOverviewEmploymentFilter = "employed";
   let deviceOverviewSearchTerm = "";
+  // Geräteübersicht eines Mitarbeiters: Die Filter bleiben beim Wechsel zum
+  // nächsten Mitarbeiter stehen, damit sich die Matrix der Reihe nach
+  // durchgehen lässt.
+  let deviceEmployeeOverviewEmployeeId = "";
+  let deviceEmployeeOverviewOpenOnly = false;
+  let deviceEmployeeOverviewInventoryOnly = false;
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
   let deviceInstructionSearchTerm = "";
@@ -1205,6 +1211,12 @@
     ),
     deviceEmployeeOverviewContent: document.querySelector(
       "#deviceEmployeeOverviewContent",
+    ),
+    deviceEmployeeOverviewOpenFilter: document.querySelector(
+      "#deviceEmployeeOverviewOpenFilter",
+    ),
+    deviceEmployeeOverviewInventoryFilter: document.querySelector(
+      "#deviceEmployeeOverviewInventoryFilter",
     ),
     deviceOverviewDialog: document.querySelector("#deviceOverviewDialog"),
     deviceOverviewTitle: document.querySelector("#deviceOverviewTitle"),
@@ -4194,6 +4206,20 @@
       (event) => {
         deviceOverviewEmploymentFilter = event.target.value;
         renderDeviceOverview();
+      },
+    );
+    elements.deviceEmployeeOverviewOpenFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceEmployeeOverviewOpenOnly = event.target.checked;
+        renderDeviceEmployeeOverview();
+      },
+    );
+    elements.deviceEmployeeOverviewInventoryFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceEmployeeOverviewInventoryOnly = event.target.checked;
+        renderDeviceEmployeeOverview();
       },
     );
     elements.deviceParticipantSearch.addEventListener("input", (event) => {
@@ -17195,22 +17221,62 @@
     `;
   }
 
+  // Eine Einweisung gilt als offen, solange für das Gerät keine dokumentiert
+  // ist. Weitere Gründe (etwa eine für nichtig erklärte Einweisung) gehören
+  // hierher, damit Filter und Zählung sie gleich behandeln.
+  function isDeviceInstructionOpen({ isInstructed }) {
+    return !isInstructed;
+  }
+
+  function filterEmployeeDeviceOverview(
+    overview,
+    { openOnly = false, inventoryOnly = false } = {},
+  ) {
+    return overview.filter((item) => {
+      if (openOnly && !isDeviceInstructionOpen(item)) return false;
+      if (inventoryOnly && !item.device.currentInventory) return false;
+      return true;
+    });
+  }
+
   function openDeviceEmployeeOverview(employeeId) {
     const employee = getEmployee(employeeId);
     if (!employee) return;
-    const overview = getEmployeeDeviceOverview(employeeId);
-    const instructedCount = overview.filter((item) => item.isInstructed).length;
+    deviceEmployeeOverviewEmployeeId = employee.id;
+    elements.deviceEmployeeOverviewOpenFilter.checked =
+      deviceEmployeeOverviewOpenOnly;
+    elements.deviceEmployeeOverviewInventoryFilter.checked =
+      deviceEmployeeOverviewInventoryOnly;
+    renderDeviceEmployeeOverview();
+    if (!elements.deviceEmployeeOverviewDialog.open) {
+      elements.deviceEmployeeOverviewDialog.showModal();
+    }
+  }
+
+  function renderDeviceEmployeeOverview() {
+    const employeeId = deviceEmployeeOverviewEmployeeId;
+    const employee = getEmployee(employeeId);
+    if (!employee) return;
+    const completeOverview = getEmployeeDeviceOverview(employeeId);
+    const completeInstructedCount = completeOverview.filter(
+      (item) => !isDeviceInstructionOpen(item),
+    ).length;
+    const overview = filterEmployeeDeviceOverview(completeOverview, {
+      openOnly: deviceEmployeeOverviewOpenOnly,
+      inventoryOnly: deviceEmployeeOverviewInventoryOnly,
+    });
+    const isFiltered =
+      deviceEmployeeOverviewOpenOnly || deviceEmployeeOverviewInventoryOnly;
+    const instructedCount = overview.filter(
+      (item) => !isDeviceInstructionOpen(item),
+    ).length;
     elements.deviceEmployeeOverviewTitle.textContent = fullName(employee);
-    elements.deviceEmployeeOverviewSubtitle.textContent = overview.length
-      ? `${instructedCount} von ${overview.length} Geräten mit dokumentierter Einweisung`
+    elements.deviceEmployeeOverviewSubtitle.textContent = completeOverview.length
+      ? `${completeInstructedCount} von ${completeOverview.length} Geräten mit dokumentierter Einweisung`
       : "Keine Geräte angelegt";
-    elements.deviceEmployeeOverviewContent.innerHTML = overview.length
-      ? `
-        <div class="device-employee-overview-summary" aria-label="Zusammenfassung">
-          <span><strong>${overview.length}</strong> Geräte gesamt</span>
-          <span class="is-complete"><strong>${instructedCount}</strong> eingewiesen</span>
-          <span class="is-missing"><strong>${overview.length - instructedCount}</strong> nicht eingewiesen</span>
-        </div>
+    let list;
+    if (overview.length) {
+      list = `
         <div class="device-employee-overview-list">
           ${overview
             .map(({ device, instructions, latestInstruction, isInstructed }) => {
@@ -17245,15 +17311,34 @@
             })
             .join("")}
         </div>
-      `
-      : renderEmptyState({
-          title: "Noch keine Geräte",
-          text: "Nach dem Anlegen eines Geräts erscheint hier der Einweisungsstatus.",
-          compact: true,
-        });
-    if (!elements.deviceEmployeeOverviewDialog.open) {
-      elements.deviceEmployeeOverviewDialog.showModal();
+      `;
+    } else if (completeOverview.length) {
+      list = renderEmptyState({
+        title: deviceEmployeeOverviewOpenOnly
+          ? "Keine offenen Einweisungen"
+          : "Keine Geräte für diese Filter",
+        text: deviceEmployeeOverviewOpenOnly
+          ? "Für alle Geräte dieser Auswahl ist eine Einweisung dokumentiert."
+          : "Ändern Sie die ausgewählten Filter.",
+        compact: true,
+      });
+    } else {
+      list = renderEmptyState({
+        title: "Noch keine Geräte",
+        text: "Nach dem Anlegen eines Geräts erscheint hier der Einweisungsstatus.",
+        compact: true,
+      });
     }
+    elements.deviceEmployeeOverviewContent.innerHTML = completeOverview.length
+      ? `
+        <div class="device-employee-overview-summary" aria-label="Zusammenfassung">
+          <span><strong>${overview.length}</strong> ${isFiltered ? "sichtbar" : "Geräte gesamt"}</span>
+          <span class="is-complete"><strong>${instructedCount}</strong> eingewiesen</span>
+          <span class="is-missing"><strong>${overview.length - instructedCount}</strong> nicht eingewiesen</span>
+        </div>
+        ${list}
+      `
+      : list;
   }
 
   function openDeviceInstructionHistory(employeeId, deviceId) {

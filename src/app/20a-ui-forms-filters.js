@@ -359,6 +359,20 @@
         renderDeviceOverview();
       },
     );
+    elements.deviceEmployeeOverviewOpenFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceEmployeeOverviewOpenOnly = event.target.checked;
+        renderDeviceEmployeeOverview();
+      },
+    );
+    elements.deviceEmployeeOverviewInventoryFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceEmployeeOverviewInventoryOnly = event.target.checked;
+        renderDeviceEmployeeOverview();
+      },
+    );
     elements.deviceParticipantSearch.addEventListener("input", (event) => {
       deviceParticipantSearchTerm = searchKey(event.target.value);
       renderDeviceParticipantList();

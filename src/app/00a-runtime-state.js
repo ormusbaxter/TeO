@@ -127,6 +127,12 @@
   let deviceOverviewInstructionFilter = "all";
   let deviceOverviewEmploymentFilter = "employed";
   let deviceOverviewSearchTerm = "";
+  // Geräteübersicht eines Mitarbeiters: Die Filter bleiben beim Wechsel zum
+  // nächsten Mitarbeiter stehen, damit sich die Matrix der Reihe nach
+  // durchgehen lässt.
+  let deviceEmployeeOverviewEmployeeId = "";
+  let deviceEmployeeOverviewOpenOnly = false;
+  let deviceEmployeeOverviewInventoryOnly = false;
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
   let deviceInstructionSearchTerm = "";

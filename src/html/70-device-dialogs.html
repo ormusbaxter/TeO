@@ -241,7 +241,19 @@
           <svg><use href="#icon-close"></use></svg>
         </button>
       </div>
-      <div class="modal-body" id="deviceEmployeeOverviewContent"></div>
+      <div class="modal-body">
+        <div class="device-employee-overview-filters" role="group" aria-label="Geräte filtern">
+          <label class="checkbox-field">
+            <input id="deviceEmployeeOverviewOpenFilter" type="checkbox" />
+            <span>Nur offene Einweisungen</span>
+          </label>
+          <label class="checkbox-field">
+            <input id="deviceEmployeeOverviewInventoryFilter" type="checkbox" />
+            <span>Nur Geräte im Bestand</span>
+          </label>
+        </div>
+        <div id="deviceEmployeeOverviewContent"></div>
+      </div>
       <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
