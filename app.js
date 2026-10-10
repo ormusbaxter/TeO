@@ -16223,8 +16223,6 @@
       .sort(sortEmployees);
   }
 
-  // Die Matrix und ihr Excel-Export zeigen dieselben Mitarbeiter: Wer im
-  // Filter steht, steht auch in der Datei.
   function deviceMatrixEmployees() {
     return [...state.employees]
       .filter((employee) => {
@@ -16251,10 +16249,6 @@
   function renderDeviceInstructionMatrix() {
     const devices = filteredDevices();
     const employees = deviceMatrixEmployees();
-    if (elements.exportDeviceMatrixExcelButton) {
-      elements.exportDeviceMatrixExcelButton.disabled =
-        !devices.length || !employees.length;
-    }
 
     if (!state.devices.length) {
       elements.deviceInstructionMatrix.innerHTML = renderEmptyState({
@@ -18104,57 +18098,92 @@
     );
   }
 
-  function createDeviceMatrixWorkbook(
-    devices = filteredDevices(),
-    employees = deviceMatrixEmployees(),
-  ) {
-    const rows = [
-      [
-        { value: "Mitarbeiter", style: "header" },
-        ...devices.map((device) => ({
-          value: deviceMatrixColumnLabel(device),
-          style: "header",
-        })),
-      ],
-      ...employees.map((employee) => [
-        { value: deviceMatrixRowLabel(employee), style: "rowHeader" },
-        ...devices.map((device) => ({
-          value: latestValidDeviceInstructionDate(employee, device),
-          type: "date",
-        })),
-      ]),
-    ];
-    return createXlsxWorkbook({
-      sheetName: "Einweisungsmatrix",
-      rows,
-      columnWidths: [42, ...devices.map(() => 18)],
+  // Unabhängig von den Filtern der Matrix: Die Datei enthält alle Mitarbeiter
+  // und je Geräteauswahl ein Blatt. Umgeschaltet wird in Excel - zwischen den
+  // Geräten über die Blattreiter, zwischen den Mitarbeitern über den
+  // Autofilter der Spalte Status. Spalten lassen sich in Excel ohne Makros
+  // nicht filtern, deshalb die Blätter.
+  const DEVICE_MATRIX_EXPORT_SHEETS = [
+    { name: "Alle Geräte", matches: () => true },
+    {
+      name: "Anlage 1",
+      matches: (device) => device.currentInventory && device.annex1,
+    },
+    {
+      name: "Außer Anlage 1",
+      matches: (device) => device.currentInventory && !device.annex1,
+    },
+    { name: "Nicht in Betrieb", matches: (device) => !device.currentInventory },
+  ];
+
+  function deviceMatrixExportDevices() {
+    return [...state.devices].sort(
+      (a, b) =>
+        a.productName.localeCompare(b.productName, "de") ||
+        a.manufacturer.localeCompare(b.manufacturer, "de"),
+    );
+  }
+
+  function createDeviceMatrixSheet(name, devices, employees) {
+    const header = (value) => ({ value, style: "header" });
+    return {
+      name,
+      frozenColumns: 2,
       headerHeight: 48,
-    });
+      columnWidths: [42, 16, ...devices.map(() => 18)],
+      rows: [
+        [
+          header("Mitarbeiter"),
+          header("Status"),
+          ...devices.map((device) => header(deviceMatrixColumnLabel(device))),
+        ],
+        ...employees.map((employee) => [
+          { value: deviceMatrixRowLabel(employee), style: "rowHeader" },
+          { value: EMPLOYMENT_STATUSES[employee.employmentStatus] || "" },
+          ...devices.map((device) => ({
+            value: latestValidDeviceInstructionDate(employee, device),
+            type: "date",
+          })),
+        ]),
+      ],
+    };
+  }
+
+  function createDeviceMatrixWorkbook(
+    devices = deviceMatrixExportDevices(),
+    employees = [...state.employees].sort(sortEmployees),
+  ) {
+    return createXlsxWorkbook(
+      DEVICE_MATRIX_EXPORT_SHEETS.map((sheet) =>
+        createDeviceMatrixSheet(sheet.name, devices.filter(sheet.matches), employees),
+      ),
+    );
   }
 
   function exportDeviceMatrixExcel() {
-    const devices = filteredDevices();
-    const employees = deviceMatrixEmployees();
-    if (!devices.length || !employees.length) {
-      showToast("Für diese Filter enthält die Einweisungsmatrix keine Einträge.", "warning");
+    if (!state.devices.length || !state.employees.length) {
+      showToast("Für den Export fehlen noch Geräte oder Mitarbeiter.", "warning");
       return;
     }
     downloadTextFile(
       `TeO-Einweisungsmatrix-${todayIso()}.xlsx`,
-      createDeviceMatrixWorkbook(devices, employees),
+      createDeviceMatrixWorkbook(),
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     showToast(
-      `Einweisungsmatrix mit ${employees.length} Mitarbeiter${
-        employees.length === 1 ? "" : "n"
-      } und ${devices.length} Gerät${devices.length === 1 ? "" : "en"} wurde nach Excel exportiert.`,
+      `Einweisungsmatrix mit ${state.employees.length} Mitarbeiter${
+        state.employees.length === 1 ? "" : "n"
+      } und ${state.devices.length} Gerät${
+        state.devices.length === 1 ? "" : "en"
+      } wurde nach Excel exportiert.`,
     );
   }
 
   // --- Office Open XML -------------------------------------------------------
-  // Eine Arbeitsmappe mit einem Blatt, Texte als Inline-Zeichenketten, Daten
-  // als Excel-Seriennummer mit Datumsformat. Die erste Zeile und die erste
-  // Spalte sind fixiert, die Kopfzeile trägt einen Autofilter.
+  // Eine Arbeitsmappe mit einem oder mehreren Blättern, Texte als
+  // Inline-Zeichenketten, Daten als Excel-Seriennummer mit Datumsformat. Je
+  // Blatt sind die Kopfzeile und die vorderen Spalten fixiert, die Kopfzeile
+  // trägt einen Autofilter.
   const XLSX_STYLE_INDEX = { default: 0, header: 1, rowHeader: 2, date: 3 };
 
   function xlsxColumnName(index) {
@@ -18202,9 +18231,10 @@
     )}</t></is></c>`;
   }
 
-  function createXlsxWorkbook({ sheetName, rows, columnWidths = [], headerHeight }) {
+  function renderXlsxSheet({ rows, columnWidths = [], headerHeight, frozenColumns = 1 }) {
     const columnCount = Math.max(1, ...rows.map((row) => row.length));
     const lastCell = `${xlsxColumnName(columnCount - 1)}${Math.max(1, rows.length)}`;
+    const topLeft = `${xlsxColumnName(frozenColumns)}2`;
     const sheetRows = rows
       .map((row, rowIndex) => {
         const height =
@@ -18226,24 +18256,45 @@
           )
           .join("")}</cols>`
       : "";
-    const xmlHead = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
-    const mainNs = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
-    const relNs = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
-    const packageRelNs = "http://schemas.openxmlformats.org/package/2006/relationships";
-
-    const sheet = `${xmlHead}<worksheet xmlns="${mainNs}" xmlns:r="${relNs}">\
+    return {
+      range: `$A$1:$${xlsxColumnName(columnCount - 1)}$${Math.max(1, rows.length)}`,
+      xml: `${XLSX_XML_HEAD}<worksheet xmlns="${XLSX_MAIN_NS}" xmlns:r="${XLSX_REL_NS}">\
 <dimension ref="A1:${lastCell}"/>\
 <sheetViews><sheetView workbookViewId="0">\
-<pane xSplit="1" ySplit="1" topLeftCell="B2" activePane="bottomRight" state="frozen"/>\
+<pane xSplit="${frozenColumns}" ySplit="1" topLeftCell="${topLeft}" activePane="bottomRight" state="frozen"/>\
 <selection pane="topRight"/><selection pane="bottomLeft"/>\
-<selection pane="bottomRight" activeCell="B2" sqref="B2"/>\
+<selection pane="bottomRight" activeCell="${topLeft}" sqref="${topLeft}"/>\
 </sheetView></sheetViews>\
 <sheetFormatPr defaultRowHeight="15"/>${columns}\
 <sheetData>${sheetRows}</sheetData>\
 <autoFilter ref="A1:${lastCell}"/>\
 <pageMargins left="0.5" right="0.5" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>\
 <pageSetup orientation="landscape" paperSize="9"/>\
-</worksheet>`;
+</worksheet>`,
+    };
+  }
+
+  const XLSX_XML_HEAD = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  const XLSX_MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+  const XLSX_REL_NS =
+    "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+  const XLSX_PACKAGE_REL_NS =
+    "http://schemas.openxmlformats.org/package/2006/relationships";
+
+  // Blattnamen: höchstens 31 Zeichen, ohne : \ / ? * [ ]
+  function xlsxSheetName(name) {
+    return String(name || "Tabelle").replace(/[:\\/?*[\]]/g, " ").slice(0, 31);
+  }
+
+  function createXlsxWorkbook(sheets) {
+    const xmlHead = XLSX_XML_HEAD;
+    const mainNs = XLSX_MAIN_NS;
+    const relNs = XLSX_REL_NS;
+    const packageRelNs = XLSX_PACKAGE_REL_NS;
+    const rendered = sheets.map((sheet) => ({
+      ...renderXlsxSheet(sheet),
+      name: xlsxSheetName(sheet.name),
+    }));
 
     // Einfache Anfuehrungszeichen am Rahmenstil: Die Strukturpruefung sucht
     // style-Attribute in doppelten Anfuehrungszeichen als verbotenes
@@ -18274,10 +18325,20 @@
 </styleSheet>`;
 
     const workbook = `${xmlHead}<workbook xmlns="${mainNs}" xmlns:r="${relNs}">\
-<sheets><sheet name="${escapeXlsxText(String(sheetName).slice(0, 31))}" sheetId="1" r:id="rId1"/></sheets>\
-<definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">'${escapeXlsxText(
-      String(sheetName).slice(0, 31).replaceAll("'", "''"),
-    )}'!$A$1:$${xlsxColumnName(columnCount - 1)}$${Math.max(1, rows.length)}</definedName></definedNames>\
+<sheets>${rendered
+      .map(
+        (sheet, index) =>
+          `<sheet name="${escapeXlsxText(sheet.name)}" sheetId="${index + 1}" r:id="rId${index + 1}"/>`,
+      )
+      .join("")}</sheets>\
+<definedNames>${rendered
+      .map(
+        (sheet, index) =>
+          `<definedName name="_xlnm._FilterDatabase" localSheetId="${index}" hidden="1">'${escapeXlsxText(
+            sheet.name.replaceAll("'", "''"),
+          )}'!${sheet.range}</definedName>`,
+      )
+      .join("")}</definedNames>\
 </workbook>`;
 
     return createZipArchive([
@@ -18287,7 +18348,12 @@
 <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\
 <Default Extension="xml" ContentType="application/xml"/>\
 <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>\
-<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>\
+${rendered
+  .map(
+    (sheet, index) =>
+      `<Override PartName="/xl/worksheets/sheet${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`,
+  )
+  .join("")}\
 <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>\
 </Types>`,
       },
@@ -18301,12 +18367,20 @@
       {
         name: "xl/_rels/workbook.xml.rels",
         content: `${xmlHead}<Relationships xmlns="${packageRelNs}">\
-<Relationship Id="rId1" Type="${relNs}/worksheet" Target="worksheets/sheet1.xml"/>\
-<Relationship Id="rId2" Type="${relNs}/styles" Target="styles.xml"/>\
+${rendered
+  .map(
+    (sheet, index) =>
+      `<Relationship Id="rId${index + 1}" Type="${relNs}/worksheet" Target="worksheets/sheet${index + 1}.xml"/>`,
+  )
+  .join("")}\
+<Relationship Id="rId${rendered.length + 1}" Type="${relNs}/styles" Target="styles.xml"/>\
 </Relationships>`,
       },
       { name: "xl/styles.xml", content: styles },
-      { name: "xl/worksheets/sheet1.xml", content: sheet },
+      ...rendered.map((sheet, index) => ({
+        name: `xl/worksheets/sheet${index + 1}.xml`,
+        content: sheet.xml,
+      })),
     ]);
   }
 

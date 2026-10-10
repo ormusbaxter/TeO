@@ -1,5 +1,3 @@
-  // Die Matrix und ihr Excel-Export zeigen dieselben Mitarbeiter: Wer im
-  // Filter steht, steht auch in der Datei.
   function deviceMatrixEmployees() {
     return [...state.employees]
       .filter((employee) => {
@@ -26,10 +24,6 @@
   function renderDeviceInstructionMatrix() {
     const devices = filteredDevices();
     const employees = deviceMatrixEmployees();
-    if (elements.exportDeviceMatrixExcelButton) {
-      elements.exportDeviceMatrixExcelButton.disabled =
-        !devices.length || !employees.length;
-    }
 
     if (!state.devices.length) {
       elements.deviceInstructionMatrix.innerHTML = renderEmptyState({
