@@ -108,8 +108,9 @@
       </div>
       <p class="device-matrix-hint">
         Grün zeigt eine dokumentierte Einweisung. Gold kennzeichnet eine
-        Herstellereinweisung als Gerätebeauftragte/r. Gerätenamen und Statusfelder
-        öffnen die jeweilige Detailübersicht.
+        Herstellereinweisung als Gerätebeauftragte/r. Orange mit ↻ heißt: Die
+        Einweisung ist durch eine angeordnete Neueinweisung nichtig. Gerätenamen
+        und Statusfelder öffnen die jeweilige Detailübersicht.
       </p>
     `;
   }
@@ -139,6 +140,7 @@
               : "Herstellereinweisung",
             instruction.date,
             String(instruction.createdAt || "").slice(0, 10),
+            isDeviceInstructionValid(instruction) ? "" : "nichtig Neueinweisung",
             ...participantNames,
           ]
             .filter(Boolean)
@@ -197,10 +199,18 @@
                 }`;
               })
               .filter(Boolean);
+            const voided = !isDeviceInstructionValid(instruction);
             return `
-              <article class="device-instruction-log-row">
+              <article class="device-instruction-log-row ${voided ? "is-voided" : ""}">
                 <time datetime="${instruction.date}">
                   ${formatDate(instruction.date)}
+                  ${
+                    voided
+                      ? `<small class="device-instruction-voided">nichtig seit ${formatDate(
+                          deviceInstructionCutoff(instruction.deviceId),
+                        )}</small>`
+                      : ""
+                  }
                   ${
                     nachEingabe
                       ? `<small>erfasst ${formatDate(
@@ -311,6 +321,7 @@
   const EMPTY_EMPLOYEE_IDS = new Set();
   const deviceInstructionIndexCache = {
     instructions: null,
+    devices: null,
     count: -1,
     value: { byPair: new Map(), byDevice: new Map() },
   };
@@ -319,11 +330,17 @@
     const cache = deviceInstructionIndexCache;
     if (
       cache.instructions === state.deviceInstructions &&
+      cache.devices === state.devices &&
       cache.count === state.deviceInstructions.length
     ) {
       return cache.value;
     }
 
+    // byDevice kennt nur gueltig Eingewiesene; byPair behaelt auch die durch
+    // eine Neueinweisung nichtigen Nachweise fuer den Verlauf.
+    const cutoffs = new Map(
+      state.devices.map((device) => [device.id, deviceInstructionCutoff(device)]),
+    );
     const byPair = new Map();
     const byDevice = new Map();
     for (const instruction of state.deviceInstructions) {
@@ -332,8 +349,12 @@
         employeeIds = new Set();
         byDevice.set(instruction.deviceId, employeeIds);
       }
+      const valid = isDeviceInstructionValid(
+        instruction,
+        cutoffs.get(instruction.deviceId) || "",
+      );
       for (const participant of instruction.participants) {
-        employeeIds.add(participant.employeeId);
+        if (valid) employeeIds.add(participant.employeeId);
         const key = `${instruction.deviceId}|${participant.employeeId}`;
         const bucket = byPair.get(key);
         if (bucket) bucket.push(instruction);
@@ -345,6 +366,7 @@
     }
 
     cache.instructions = state.deviceInstructions;
+    cache.devices = state.devices;
     cache.count = state.deviceInstructions.length;
     cache.value = { byPair, byDevice };
     return cache.value;
@@ -369,7 +391,32 @@
       `;
     }
     const latest = instructions[0];
-    const hasManufacturerOfficerInstruction = instructions.some(
+    const cutoff = deviceInstructionCutoff(device);
+    const validInstructions = instructions.filter((instruction) =>
+      isDeviceInstructionValid(instruction, cutoff),
+    );
+    if (!validInstructions.length) {
+      return `
+        <td>
+          <button
+            class="device-matrix-status is-voided"
+            type="button"
+            data-device-history-employee="${employee.id}"
+            data-device-history-device="${device.id}"
+            aria-label="Einweisung von ${escapeHtml(fullName(employee))} in ${escapeHtml(
+              deviceLabel(device),
+            )} vom ${formatDate(latest.date)} ist nichtig seit ${formatDate(
+              cutoff,
+            )}, Neueinweisung nötig"
+            title="Nichtig seit ${formatDate(cutoff)} – Neueinweisung nötig"
+          >
+            <span>↻</span>
+            <small>${formatDate(latest.date)}</small>
+          </button>
+        </td>
+      `;
+    }
+    const hasManufacturerOfficerInstruction = validInstructions.some(
       (instruction) =>
         instruction.instructorType === "manufacturer" &&
         instruction.participants.some(
@@ -412,6 +459,7 @@
     if (action === "add-device-instruction") openDeviceInstructionDialog(id);
     if (action === "edit-device") openDeviceDialog(id);
     if (action === "delete-device") requestDeleteDevice(id);
+    if (action === "reinstruct-device") openDeviceReinstructionDialog(id);
   }
 
   function handleDeviceMatrixAction(event) {
@@ -552,6 +600,7 @@
       category: category.value.trim(),
       annex1: document.querySelector("#deviceAnnex1").value === "yes",
       currentInventory: document.querySelector("#deviceCurrentInventory").checked,
+      instructionResets: existingDevice?.instructionResets || [],
       createdAt: existingDevice?.createdAt || now,
       updatedAt: now,
     };

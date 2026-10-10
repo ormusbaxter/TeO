@@ -32,6 +32,24 @@
       "submit",
       handleDeviceInstructionSubmit,
     );
+    elements.deviceReinstructionForm.addEventListener(
+      "submit",
+      handleDeviceReinstructionSubmit,
+    );
+    elements.deviceReinstructionDate.addEventListener("input", () => {
+      elements.deviceReinstructionDate.setCustomValidity("");
+      renderDeviceReinstructionDialog();
+    });
+    elements.deviceReinstructionReason.addEventListener("input", () => {
+      elements.deviceReinstructionReason.setCustomValidity("");
+    });
+    elements.deviceReinstructionHistoryList.addEventListener(
+      "click",
+      handleDeviceReinstructionHistoryAction,
+    );
+    elements.deviceOverviewReinstructButton.addEventListener("click", () =>
+      openDeviceReinstructionDialog(deviceOverviewDeviceId),
+    );
     elements.attendanceForm.addEventListener("submit", handleAttendanceSubmit);
     elements.bulkEditForm.addEventListener("submit", handleBulkEditSubmit);
 
@@ -86,6 +104,7 @@
     });
     elements.deviceInstructionDate.addEventListener("input", () => {
       elements.deviceInstructionDate.setCustomValidity("");
+      updateDeviceInstructionCutoffHint();
     });
     document
       .querySelectorAll("#appointmentStartTime, #appointmentEndTime")

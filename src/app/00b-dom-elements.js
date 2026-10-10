@@ -475,6 +475,33 @@
     deviceInstructionHistoryContent: document.querySelector(
       "#deviceInstructionHistoryContent",
     ),
+    deviceInstructionCutoffHint: document.querySelector(
+      "#deviceInstructionCutoffHint",
+    ),
+    deviceOverviewReinstructButton: document.querySelector(
+      "#deviceOverviewReinstructButton",
+    ),
+    deviceReinstructionDialog: document.querySelector("#deviceReinstructionDialog"),
+    deviceReinstructionForm: document.querySelector("#deviceReinstructionForm"),
+    deviceReinstructionSubtitle: document.querySelector(
+      "#deviceReinstructionSubtitle",
+    ),
+    deviceReinstructionDeviceId: document.querySelector(
+      "#deviceReinstructionDeviceId",
+    ),
+    deviceReinstructionDate: document.querySelector("#deviceReinstructionDate"),
+    deviceReinstructionReason: document.querySelector(
+      "#deviceReinstructionReason",
+    ),
+    deviceReinstructionPreview: document.querySelector(
+      "#deviceReinstructionPreview",
+    ),
+    deviceReinstructionHistory: document.querySelector(
+      "#deviceReinstructionHistory",
+    ),
+    deviceReinstructionHistoryList: document.querySelector(
+      "#deviceReinstructionHistoryList",
+    ),
     deviceEmployeeOverviewDialog: document.querySelector(
       "#deviceEmployeeOverviewDialog",
     ),

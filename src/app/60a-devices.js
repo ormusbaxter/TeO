@@ -116,9 +116,15 @@
     elements.deviceEmployeeStatusFilter.value = deviceEmployeeStatusFilter;
 
     const instructedEmployeeIds = new Set(
-      state.deviceInstructions.flatMap((instruction) =>
-        instruction.participants.map((participant) => participant.employeeId),
-      ),
+      state.deviceInstructions
+        .filter((instruction) => isDeviceInstructionValid(instruction))
+        .flatMap((instruction) =>
+          instruction.participants.map((participant) => participant.employeeId),
+        ),
+    );
+    const openReinstructions = getOpenDeviceReinstructions().reduce(
+      (sum, { status }) => sum + status.pending.length,
+      0,
     );
     elements.deviceSummary.innerHTML = `
       ${renderSummaryChip(
@@ -146,6 +152,16 @@
         "Mitarbeiter mit Einweisung",
         "teal",
       )}
+      ${
+        openReinstructions
+          ? renderSummaryChip(
+              "alert",
+              openReinstructions,
+              "Neueinweisungen offen",
+              "orange",
+            )
+          : ""
+      }
     `;
     elements.deviceManagementSummary.innerHTML = `
       ${renderSummaryChip("empty", state.devices.length, "Geräte gesamt")}
@@ -284,6 +300,8 @@
       "Gerätekategorie",
       "Anlage 1",
       "aktuell",
+      "Neueinweisung seit",
+      "Grund der Neueinweisung",
     ];
     const rows = [...devices]
       .sort(
@@ -292,14 +310,19 @@
           a.manufacturer.localeCompare(b.manufacturer, "de") ||
           a.id.localeCompare(b.id, "de"),
       )
-      .map((device) => [
-        device.id,
-        device.manufacturer,
-        device.productName,
-        device.category,
-        device.annex1 ? "Ja" : "Nein",
-        device.currentInventory ? "Ja" : "Nein",
-      ]);
+      .map((device) => {
+        const reset = latestDeviceInstructionReset(device);
+        return [
+          device.id,
+          device.manufacturer,
+          device.productName,
+          device.category,
+          device.annex1 ? "Ja" : "Nein",
+          device.currentInventory ? "Ja" : "Nein",
+          reset ? formatDate(reset.effectiveDate) : "",
+          reset?.reason || "",
+        ];
+      });
     const escapeXml = (value) =>
       String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -339,17 +362,19 @@
   </Style>
  </Styles>
  <Worksheet ss:Name="Geräte">
-  <Table ss:ExpandedColumnCount="6" ss:ExpandedRowCount="${rowCount}" x:FullColumns="1" x:FullRows="1">
+  <Table ss:ExpandedColumnCount="8" ss:ExpandedRowCount="${rowCount}" x:FullColumns="1" x:FullRows="1">
    <Column ss:Width="150" />
    <Column ss:Width="120" />
    <Column ss:Width="150" />
    <Column ss:Width="130" />
    <Column ss:Width="70" />
    <Column ss:Width="70" />
+   <Column ss:Width="110" />
+   <Column ss:Width="200" />
    ${renderRow(headers, "Header")}
    ${rows.map((row) => renderRow(row, "Data")).join("\n   ")}
   </Table>
-  <AutoFilter x:Range="R1C1:R${rowCount}C6" xmlns="urn:schemas-microsoft-com:office:excel" />
+  <AutoFilter x:Range="R1C1:R${rowCount}C8" xmlns="urn:schemas-microsoft-com:office:excel" />
   <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
    <FreezePanes />
    <FrozenNoSplit />
@@ -375,8 +400,11 @@
   }
 
   function renderDeviceCard(device) {
+    const cutoff = deviceInstructionCutoff(device);
     const instructions = state.deviceInstructions.filter(
-      (instruction) => instruction.deviceId === device.id,
+      (instruction) =>
+        instruction.deviceId === device.id &&
+        isDeviceInstructionValid(instruction, cutoff),
     );
     const participantCount = new Set(
       instructions.flatMap((instruction) =>
@@ -425,6 +453,7 @@
                   }
                 </span>
               </div>
+              ${deviceReinstructionNotice(device)}
             </div>
           </div>
           <div class="training-actions">
@@ -436,6 +465,16 @@
             >
               <svg><use href="#icon-check"></use></svg>
               Einweisung
+            </button>
+            <button
+              class="icon-button"
+              type="button"
+              data-action="reinstruct-device"
+              data-id="${device.id}"
+              aria-label="Neueinweisung für ${escapeHtml(device.productName)} anordnen"
+              title="Neueinweisung anordnen"
+            >
+              <svg><use href="#icon-alert"></use></svg>
             </button>
             <button
               class="icon-button"
@@ -469,7 +508,8 @@
         .filter(
           (instruction) =>
             instruction.deviceId === deviceId &&
-            instruction.instructorType === "manufacturer",
+            instruction.instructorType === "manufacturer" &&
+            isDeviceInstructionValid(instruction),
         )
         .flatMap((instruction) =>
           instruction.participants

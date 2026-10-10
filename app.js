@@ -1200,6 +1200,33 @@
     deviceInstructionHistoryContent: document.querySelector(
       "#deviceInstructionHistoryContent",
     ),
+    deviceInstructionCutoffHint: document.querySelector(
+      "#deviceInstructionCutoffHint",
+    ),
+    deviceOverviewReinstructButton: document.querySelector(
+      "#deviceOverviewReinstructButton",
+    ),
+    deviceReinstructionDialog: document.querySelector("#deviceReinstructionDialog"),
+    deviceReinstructionForm: document.querySelector("#deviceReinstructionForm"),
+    deviceReinstructionSubtitle: document.querySelector(
+      "#deviceReinstructionSubtitle",
+    ),
+    deviceReinstructionDeviceId: document.querySelector(
+      "#deviceReinstructionDeviceId",
+    ),
+    deviceReinstructionDate: document.querySelector("#deviceReinstructionDate"),
+    deviceReinstructionReason: document.querySelector(
+      "#deviceReinstructionReason",
+    ),
+    deviceReinstructionPreview: document.querySelector(
+      "#deviceReinstructionPreview",
+    ),
+    deviceReinstructionHistory: document.querySelector(
+      "#deviceReinstructionHistory",
+    ),
+    deviceReinstructionHistoryList: document.querySelector(
+      "#deviceReinstructionHistoryList",
+    ),
     deviceEmployeeOverviewDialog: document.querySelector(
       "#deviceEmployeeOverviewDialog",
     ),
@@ -2665,9 +2692,40 @@
       category,
       annex1: Boolean(device.annex1),
       currentInventory: device.currentInventory !== false,
+      instructionResets: normalizeDeviceInstructionResets(
+        device.instructionResets,
+      ),
       createdAt: validTimestamp(device.createdAt),
       updatedAt: validTimestamp(device.updatedAt || device.createdAt),
     };
+  }
+
+  // Eine angeordnete Neueinweisung erklaert alle Einweisungen in das Geraet
+  // vor ihrem Stichtag fuer nichtig. Die Liste bleibt als Verlauf erhalten;
+  // maßgeblich ist der spaeteste Stichtag.
+  function normalizeDeviceInstructionResets(resets) {
+    if (!Array.isArray(resets)) return [];
+    const seen = new Set();
+    return resets
+      .map((reset) => {
+        const id = normalizeId(reset?.id);
+        const effectiveDate = normalizeOptionalDate(reset?.effectiveDate);
+        const reason = String(reset?.reason || "").trim().slice(0, 200);
+        if (!id || !effectiveDate || !reason || seen.has(id)) return null;
+        seen.add(id);
+        return {
+          id,
+          effectiveDate,
+          reason,
+          createdAt: validTimestamp(reset.createdAt),
+        };
+      })
+      .filter(Boolean)
+      .sort(
+        (a, b) =>
+          a.effectiveDate.localeCompare(b.effectiveDate) ||
+          a.createdAt.localeCompare(b.createdAt),
+      );
   }
 
   function createDefaultDeviceCatalog() {
@@ -2679,6 +2737,7 @@
         category,
         annex1,
         currentInventory,
+        instructionResets: [],
         createdAt: DEFAULT_DEVICE_CATALOG_TIMESTAMP,
         updatedAt: DEFAULT_DEVICE_CATALOG_TIMESTAMP,
       }),
@@ -3881,6 +3940,24 @@
       "submit",
       handleDeviceInstructionSubmit,
     );
+    elements.deviceReinstructionForm.addEventListener(
+      "submit",
+      handleDeviceReinstructionSubmit,
+    );
+    elements.deviceReinstructionDate.addEventListener("input", () => {
+      elements.deviceReinstructionDate.setCustomValidity("");
+      renderDeviceReinstructionDialog();
+    });
+    elements.deviceReinstructionReason.addEventListener("input", () => {
+      elements.deviceReinstructionReason.setCustomValidity("");
+    });
+    elements.deviceReinstructionHistoryList.addEventListener(
+      "click",
+      handleDeviceReinstructionHistoryAction,
+    );
+    elements.deviceOverviewReinstructButton.addEventListener("click", () =>
+      openDeviceReinstructionDialog(deviceOverviewDeviceId),
+    );
     elements.attendanceForm.addEventListener("submit", handleAttendanceSubmit);
     elements.bulkEditForm.addEventListener("submit", handleBulkEditSubmit);
 
@@ -3935,6 +4012,7 @@
     });
     elements.deviceInstructionDate.addEventListener("input", () => {
       elements.deviceInstructionDate.setCustomValidity("");
+      updateDeviceInstructionCutoffHint();
     });
     document
       .querySelectorAll("#appointmentStartTime, #appointmentEndTime")
@@ -4560,6 +4638,7 @@
         elements.deviceEmployeeOverviewDialog,
         elements.deviceOverviewDialog,
         elements.deviceInstructionHistoryDialog,
+        elements.deviceReinstructionDialog,
         elements.attendanceDialog,
         elements.meetingStatsDialog,
         elements.accountDialog,
@@ -6686,17 +6765,23 @@
         find: (id) => getDevice(id),
         title: (device) => deviceLabel(device),
         subtitle: (device) => device.category || "Ohne Kategorie",
-        facts: (device) => [
-          ["Hersteller", device.manufacturer],
-          ["Produkt", device.productName],
-          ["Kategorie", device.category || "–"],
-          ["Anlage 1", device.annex1 ? "Ja" : "Nein"],
-          ["Bestand", device.currentInventory ? "Aktuell" : "Nicht mehr im Bestand"],
-          [
-            "Eingewiesen",
-            `${getDeviceInstructionPercentage(device.id, activeEmployeeList())} %`,
-          ],
-        ],
+        facts: (device) => {
+          const reset = latestDeviceInstructionReset(device);
+          return [
+            ["Hersteller", device.manufacturer],
+            ["Produkt", device.productName],
+            ["Kategorie", device.category || "–"],
+            ["Anlage 1", device.annex1 ? "Ja" : "Nein"],
+            ["Bestand", device.currentInventory ? "Aktuell" : "Nicht mehr im Bestand"],
+            [
+              "Eingewiesen",
+              `${getDeviceInstructionPercentage(device.id, activeEmployeeList())} %`,
+            ],
+            ...(reset
+              ? [["Neueinweisung", `seit ${formatDate(reset.effectiveDate)} · ${reset.reason}`]]
+              : []),
+          ];
+        },
         sections: (device) => {
           const authorized = getDeviceAuthorizedEmployees(device.id);
           return [
@@ -9136,8 +9221,15 @@
     const qualityIssues = hideOverdue
       ? []
       : getDataQualityIssues().filter((issue) => issue.severity === "high");
+    // Angeordnete Neueinweisungen sind keine Frist mit Datum, aber offen wie
+    // ein überfälliger Nachweis; sie stehen deshalb bei den zu prüfenden.
+    const reinstructions = hideOverdue ? [] : getOpenDeviceReinstructions();
 
-    if (deadlines.length === 0 && qualityIssues.length === 0) {
+    if (
+      deadlines.length === 0 &&
+      qualityIssues.length === 0 &&
+      reinstructions.length === 0
+    ) {
       const selectedLabels = DEADLINE_KINDS.filter((kind) =>
         activeKinds.has(kind),
       ).map((kind) => DEADLINE_KIND_LABELS[kind]);
@@ -9159,7 +9251,13 @@
     const regular = deadlines.filter((item) => !item.appointment?.pinned);
     const displayed = regular.slice(
       0,
-      Math.max(0, DASHBOARD_TIMELINE_ROWS - pinnedDeadlines.length - qualityIssues.length),
+      Math.max(
+        0,
+        DASHBOARD_TIMELINE_ROWS -
+          pinnedDeadlines.length -
+          qualityIssues.length -
+          reinstructions.length,
+      ),
     );
     const overdue = displayed.filter((item) => item.daysUntil < 0);
     const soon = displayed.filter((item) => item.daysUntil >= 0 && item.daysUntil <= 7);
@@ -9181,6 +9279,18 @@
                   <span class="timeline-tag is-quality">Datenqualität</span>
                   <strong>${escapeHtml(issue.title)}</strong>
                   <small>${escapeHtml(issue.detail)}</small>
+                </button>`,
+            ),
+            ...reinstructions.map(
+              ({ device, status }) => `
+                <button class="deadline-row is-overdue" type="button" data-deadline-device="${device.id}">
+                  <span class="timeline-tag is-reinstruction">Neueinweisung</span>
+                  <strong>${escapeHtml(deviceLabel(device))}</strong>
+                  <small>${escapeHtml(
+                    `${status.pending.length} offen · seit ${formatDate(
+                      status.reset.effectiveDate,
+                    )} · ${status.reset.reason}`,
+                  )}</small>
                 </button>`,
             ),
             ...overdue.map((item) => renderDeadlineRow(item)),
@@ -9295,6 +9405,11 @@
     const appointment = event.target.closest("[data-deadline-appointment]");
     if (appointment) {
       openAppointmentDialog(appointment.dataset.deadlineAppointment);
+      return;
+    }
+    const device = event.target.closest("[data-deadline-device]");
+    if (device) {
+      openDeviceOverview(device.dataset.deadlineDevice);
       return;
     }
     const quality = event.target.closest("[data-deadline-quality]");
@@ -15627,9 +15742,15 @@
     elements.deviceEmployeeStatusFilter.value = deviceEmployeeStatusFilter;
 
     const instructedEmployeeIds = new Set(
-      state.deviceInstructions.flatMap((instruction) =>
-        instruction.participants.map((participant) => participant.employeeId),
-      ),
+      state.deviceInstructions
+        .filter((instruction) => isDeviceInstructionValid(instruction))
+        .flatMap((instruction) =>
+          instruction.participants.map((participant) => participant.employeeId),
+        ),
+    );
+    const openReinstructions = getOpenDeviceReinstructions().reduce(
+      (sum, { status }) => sum + status.pending.length,
+      0,
     );
     elements.deviceSummary.innerHTML = `
       ${renderSummaryChip(
@@ -15657,6 +15778,16 @@
         "Mitarbeiter mit Einweisung",
         "teal",
       )}
+      ${
+        openReinstructions
+          ? renderSummaryChip(
+              "alert",
+              openReinstructions,
+              "Neueinweisungen offen",
+              "orange",
+            )
+          : ""
+      }
     `;
     elements.deviceManagementSummary.innerHTML = `
       ${renderSummaryChip("empty", state.devices.length, "Geräte gesamt")}
@@ -15795,6 +15926,8 @@
       "Gerätekategorie",
       "Anlage 1",
       "aktuell",
+      "Neueinweisung seit",
+      "Grund der Neueinweisung",
     ];
     const rows = [...devices]
       .sort(
@@ -15803,14 +15936,19 @@
           a.manufacturer.localeCompare(b.manufacturer, "de") ||
           a.id.localeCompare(b.id, "de"),
       )
-      .map((device) => [
-        device.id,
-        device.manufacturer,
-        device.productName,
-        device.category,
-        device.annex1 ? "Ja" : "Nein",
-        device.currentInventory ? "Ja" : "Nein",
-      ]);
+      .map((device) => {
+        const reset = latestDeviceInstructionReset(device);
+        return [
+          device.id,
+          device.manufacturer,
+          device.productName,
+          device.category,
+          device.annex1 ? "Ja" : "Nein",
+          device.currentInventory ? "Ja" : "Nein",
+          reset ? formatDate(reset.effectiveDate) : "",
+          reset?.reason || "",
+        ];
+      });
     const escapeXml = (value) =>
       String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -15850,17 +15988,19 @@
   </Style>
  </Styles>
  <Worksheet ss:Name="Geräte">
-  <Table ss:ExpandedColumnCount="6" ss:ExpandedRowCount="${rowCount}" x:FullColumns="1" x:FullRows="1">
+  <Table ss:ExpandedColumnCount="8" ss:ExpandedRowCount="${rowCount}" x:FullColumns="1" x:FullRows="1">
    <Column ss:Width="150" />
    <Column ss:Width="120" />
    <Column ss:Width="150" />
    <Column ss:Width="130" />
    <Column ss:Width="70" />
    <Column ss:Width="70" />
+   <Column ss:Width="110" />
+   <Column ss:Width="200" />
    ${renderRow(headers, "Header")}
    ${rows.map((row) => renderRow(row, "Data")).join("\n   ")}
   </Table>
-  <AutoFilter x:Range="R1C1:R${rowCount}C6" xmlns="urn:schemas-microsoft-com:office:excel" />
+  <AutoFilter x:Range="R1C1:R${rowCount}C8" xmlns="urn:schemas-microsoft-com:office:excel" />
   <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
    <FreezePanes />
    <FrozenNoSplit />
@@ -15886,8 +16026,11 @@
   }
 
   function renderDeviceCard(device) {
+    const cutoff = deviceInstructionCutoff(device);
     const instructions = state.deviceInstructions.filter(
-      (instruction) => instruction.deviceId === device.id,
+      (instruction) =>
+        instruction.deviceId === device.id &&
+        isDeviceInstructionValid(instruction, cutoff),
     );
     const participantCount = new Set(
       instructions.flatMap((instruction) =>
@@ -15936,6 +16079,7 @@
                   }
                 </span>
               </div>
+              ${deviceReinstructionNotice(device)}
             </div>
           </div>
           <div class="training-actions">
@@ -15947,6 +16091,16 @@
             >
               <svg><use href="#icon-check"></use></svg>
               Einweisung
+            </button>
+            <button
+              class="icon-button"
+              type="button"
+              data-action="reinstruct-device"
+              data-id="${device.id}"
+              aria-label="Neueinweisung für ${escapeHtml(device.productName)} anordnen"
+              title="Neueinweisung anordnen"
+            >
+              <svg><use href="#icon-alert"></use></svg>
             </button>
             <button
               class="icon-button"
@@ -15980,7 +16134,8 @@
         .filter(
           (instruction) =>
             instruction.deviceId === deviceId &&
-            instruction.instructorType === "manufacturer",
+            instruction.instructorType === "manufacturer" &&
+            isDeviceInstructionValid(instruction),
         )
         .flatMap((instruction) =>
           instruction.participants
@@ -16104,8 +16259,9 @@
       </div>
       <p class="device-matrix-hint">
         Grün zeigt eine dokumentierte Einweisung. Gold kennzeichnet eine
-        Herstellereinweisung als Gerätebeauftragte/r. Gerätenamen und Statusfelder
-        öffnen die jeweilige Detailübersicht.
+        Herstellereinweisung als Gerätebeauftragte/r. Orange mit ↻ heißt: Die
+        Einweisung ist durch eine angeordnete Neueinweisung nichtig. Gerätenamen
+        und Statusfelder öffnen die jeweilige Detailübersicht.
       </p>
     `;
   }
@@ -16135,6 +16291,7 @@
               : "Herstellereinweisung",
             instruction.date,
             String(instruction.createdAt || "").slice(0, 10),
+            isDeviceInstructionValid(instruction) ? "" : "nichtig Neueinweisung",
             ...participantNames,
           ]
             .filter(Boolean)
@@ -16193,10 +16350,18 @@
                 }`;
               })
               .filter(Boolean);
+            const voided = !isDeviceInstructionValid(instruction);
             return `
-              <article class="device-instruction-log-row">
+              <article class="device-instruction-log-row ${voided ? "is-voided" : ""}">
                 <time datetime="${instruction.date}">
                   ${formatDate(instruction.date)}
+                  ${
+                    voided
+                      ? `<small class="device-instruction-voided">nichtig seit ${formatDate(
+                          deviceInstructionCutoff(instruction.deviceId),
+                        )}</small>`
+                      : ""
+                  }
                   ${
                     nachEingabe
                       ? `<small>erfasst ${formatDate(
@@ -16307,6 +16472,7 @@
   const EMPTY_EMPLOYEE_IDS = new Set();
   const deviceInstructionIndexCache = {
     instructions: null,
+    devices: null,
     count: -1,
     value: { byPair: new Map(), byDevice: new Map() },
   };
@@ -16315,11 +16481,17 @@
     const cache = deviceInstructionIndexCache;
     if (
       cache.instructions === state.deviceInstructions &&
+      cache.devices === state.devices &&
       cache.count === state.deviceInstructions.length
     ) {
       return cache.value;
     }
 
+    // byDevice kennt nur gueltig Eingewiesene; byPair behaelt auch die durch
+    // eine Neueinweisung nichtigen Nachweise fuer den Verlauf.
+    const cutoffs = new Map(
+      state.devices.map((device) => [device.id, deviceInstructionCutoff(device)]),
+    );
     const byPair = new Map();
     const byDevice = new Map();
     for (const instruction of state.deviceInstructions) {
@@ -16328,8 +16500,12 @@
         employeeIds = new Set();
         byDevice.set(instruction.deviceId, employeeIds);
       }
+      const valid = isDeviceInstructionValid(
+        instruction,
+        cutoffs.get(instruction.deviceId) || "",
+      );
       for (const participant of instruction.participants) {
-        employeeIds.add(participant.employeeId);
+        if (valid) employeeIds.add(participant.employeeId);
         const key = `${instruction.deviceId}|${participant.employeeId}`;
         const bucket = byPair.get(key);
         if (bucket) bucket.push(instruction);
@@ -16341,6 +16517,7 @@
     }
 
     cache.instructions = state.deviceInstructions;
+    cache.devices = state.devices;
     cache.count = state.deviceInstructions.length;
     cache.value = { byPair, byDevice };
     return cache.value;
@@ -16365,7 +16542,32 @@
       `;
     }
     const latest = instructions[0];
-    const hasManufacturerOfficerInstruction = instructions.some(
+    const cutoff = deviceInstructionCutoff(device);
+    const validInstructions = instructions.filter((instruction) =>
+      isDeviceInstructionValid(instruction, cutoff),
+    );
+    if (!validInstructions.length) {
+      return `
+        <td>
+          <button
+            class="device-matrix-status is-voided"
+            type="button"
+            data-device-history-employee="${employee.id}"
+            data-device-history-device="${device.id}"
+            aria-label="Einweisung von ${escapeHtml(fullName(employee))} in ${escapeHtml(
+              deviceLabel(device),
+            )} vom ${formatDate(latest.date)} ist nichtig seit ${formatDate(
+              cutoff,
+            )}, Neueinweisung nötig"
+            title="Nichtig seit ${formatDate(cutoff)} – Neueinweisung nötig"
+          >
+            <span>↻</span>
+            <small>${formatDate(latest.date)}</small>
+          </button>
+        </td>
+      `;
+    }
+    const hasManufacturerOfficerInstruction = validInstructions.some(
       (instruction) =>
         instruction.instructorType === "manufacturer" &&
         instruction.participants.some(
@@ -16408,6 +16610,7 @@
     if (action === "add-device-instruction") openDeviceInstructionDialog(id);
     if (action === "edit-device") openDeviceDialog(id);
     if (action === "delete-device") requestDeleteDevice(id);
+    if (action === "reinstruct-device") openDeviceReinstructionDialog(id);
   }
 
   function handleDeviceMatrixAction(event) {
@@ -16548,6 +16751,7 @@
       category: category.value.trim(),
       annex1: document.querySelector("#deviceAnnex1").value === "yes",
       currentInventory: document.querySelector("#deviceCurrentInventory").checked,
+      instructionResets: existingDevice?.instructionResets || [],
       createdAt: existingDevice?.createdAt || now,
       updatedAt: now,
     };
@@ -16781,6 +16985,26 @@
         ? "Sichtbare abwählen"
         : "Sichtbare auswählen";
     if (selectedCount) elements.deviceInstructionDeviceError.textContent = "";
+    updateDeviceInstructionCutoffHint();
+  }
+
+  // Ein Nachweis vor dem Stichtag einer angeordneten Neueinweisung laesst
+  // sich speichern (etwa als Nachtrag), zaehlt aber nicht.
+  function updateDeviceInstructionCutoffHint() {
+    const date = elements.deviceInstructionDate.value;
+    const affected = date
+      ? [...deviceInstructionDeviceDraft]
+          .map(getDevice)
+          .filter((device) => device && date < deviceInstructionCutoff(device))
+      : [];
+    elements.deviceInstructionCutoffHint.hidden = !affected.length;
+    elements.deviceInstructionCutoffHint.textContent = affected.length
+      ? affected.length === 1
+        ? `Für ${affected[0].productName} ist seit ${formatDate(
+            deviceInstructionCutoff(affected[0]),
+          )} eine Neueinweisung angeordnet. Eine Einweisung mit früherem Datum ist nichtig.`
+        : `Für ${affected.length} der gewählten Geräte gilt eine angeordnete Neueinweisung nach diesem Datum. Die Einweisung ist dort nichtig.`
+      : "";
   }
 
   function handleInstructionDeviceChange(event) {
@@ -17074,13 +17298,43 @@
                 String(a.createdAt || ""),
               ),
           );
-        return {
-          device,
-          instructions,
-          latestInstruction: instructions[0] || null,
-          isInstructed: instructions.length > 0,
-        };
+        return deviceOverviewEntry({ device }, device, instructions);
       });
+  }
+
+  // Eingewiesen ist, wer eine gueltige Einweisung hat. Nichtig heisst: Es gibt
+  // Nachweise, aber alle liegen vor dem Stichtag einer Neueinweisung.
+  function deviceOverviewEntry(entry, device, instructions) {
+    const cutoff = deviceInstructionCutoff(device);
+    const isInstructed = instructions.some((instruction) =>
+      isDeviceInstructionValid(instruction, cutoff),
+    );
+    return {
+      ...entry,
+      instructions,
+      latestInstruction: instructions[0] || null,
+      isInstructed,
+      isVoided: !isInstructed && instructions.length > 0,
+      cutoff,
+    };
+  }
+
+  function deviceOverviewStatus({ latestInstruction, isInstructed, isVoided, cutoff }, missingText) {
+    if (isInstructed) {
+      return {
+        details: `Zuletzt am ${formatDate(latestInstruction.date)} · Einweisende Person: ${escapeHtml(latestInstruction.instructorName)}`,
+        badgeClass: "",
+        badgeLabel: "Eingewiesen",
+      };
+    }
+    if (isVoided) {
+      return {
+        details: `Einweisung vom ${formatDate(latestInstruction.date)} ist nichtig seit ${formatDate(cutoff)}.`,
+        badgeClass: "open",
+        badgeLabel: "Neueinweisung nötig",
+      };
+    }
+    return { details: missingText, badgeClass: "inactive", badgeLabel: "Nicht eingewiesen" };
   }
 
   function getDeviceEmployeeOverview(deviceId) {
@@ -17098,12 +17352,7 @@
             b.date.localeCompare(a.date) ||
             String(b.createdAt || "").localeCompare(String(a.createdAt || "")),
         );
-      return {
-        employee,
-        instructions,
-        latestInstruction: instructions[0] || null,
-        isInstructed: instructions.length > 0,
-      };
+      return deviceOverviewEntry({ employee }, getDevice(deviceId), instructions);
     });
   }
 
@@ -17116,9 +17365,10 @@
     } = {},
   ) {
     const normalizedSearch = searchKey(searchTerm);
-    return overview.filter(({ employee, isInstructed }) => {
+    return overview.filter(({ employee, isInstructed, isVoided }) => {
       if (instructionFilter === "instructed" && !isInstructed) return false;
       if (instructionFilter === "missing" && isInstructed) return false;
+      if (instructionFilter === "voided" && !isVoided) return false;
       if (
         employmentFilter === "employed" &&
         employee.employmentStatus === "inactive"
@@ -17173,21 +17423,34 @@
       employmentFilter: deviceOverviewEmploymentFilter,
     });
     const instructedCount = overview.filter((item) => item.isInstructed).length;
-    const missingCount = overview.length - instructedCount;
+    const voidedCount = overview.filter((item) => item.isVoided).length;
+    const missingCount = overview.length - instructedCount - voidedCount;
+    const reset = latestDeviceInstructionReset(device);
     elements.deviceOverviewContent.innerHTML = `
+      ${
+        reset
+          ? `<div class="device-reinstruction-notice">
+              <strong>Neueinweisung seit ${formatDate(reset.effectiveDate)}</strong>
+              <span>${escapeHtml(reset.reason)} · Einweisungen vor diesem Tag sind nichtig.</span>
+            </div>`
+          : ""
+      }
       <div class="device-employee-overview-summary" aria-label="Zusammenfassung der gefilterten Mitarbeiter">
         <span><strong>${overview.length}</strong> sichtbar</span>
         <span class="is-complete"><strong>${instructedCount}</strong> eingewiesen</span>
+        ${voidedCount ? `<span class="is-voided"><strong>${voidedCount}</strong> Neueinweisung nötig</span>` : ""}
         <span class="is-missing"><strong>${missingCount}</strong> nicht eingewiesen</span>
       </div>
       ${
         overview.length
           ? `<div class="device-employee-overview-list">
               ${overview
-                .map(({ employee, instructions, latestInstruction, isInstructed }) => {
-                  const details = isInstructed
-                    ? `Zuletzt am ${formatDate(latestInstruction.date)} · Einweisende Person: ${escapeHtml(latestInstruction.instructorName)}`
-                    : "Für diese Person ist keine Einweisung dokumentiert.";
+                .map((item) => {
+                  const { employee, instructions } = item;
+                  const { details, badgeClass, badgeLabel } = deviceOverviewStatus(
+                    item,
+                    "Für diese Person ist keine Einweisung dokumentiert.",
+                  );
                   const content = `
                     ${renderAvatar(employee, true)}
                     <span class="device-employee-overview-device">
@@ -17195,12 +17458,10 @@
                       <small>${escapeHtml(employee.profession)} · ${escapeHtml(employeeStatusLabel(employee))}</small>
                       <small>${details}</small>
                     </span>
-                    <span class="status-badge ${isInstructed ? "" : "inactive"}">
-                      ${isInstructed ? "Eingewiesen" : "Nicht eingewiesen"}
-                    </span>
+                    <span class="status-badge ${badgeClass}">${badgeLabel}</span>
                     ${instructions.length > 1 ? `<span class="device-employee-overview-count">${instructions.length} Nachweise</span>` : ""}
                   `;
-                  return isInstructed
+                  return instructions.length
                     ? `<button
                         class="device-employee-overview-row"
                         type="button"
@@ -17221,9 +17482,8 @@
     `;
   }
 
-  // Eine Einweisung gilt als offen, solange für das Gerät keine dokumentiert
-  // ist. Weitere Gründe (etwa eine für nichtig erklärte Einweisung) gehören
-  // hierher, damit Filter und Zählung sie gleich behandeln.
+  // Eine Einweisung gilt als offen, solange für das Gerät keine gültige
+  // dokumentiert ist – nie eingewiesen oder durch eine Neueinweisung nichtig.
   function isDeviceInstructionOpen({ isInstructed }) {
     return !isInstructed;
   }
@@ -17272,17 +17532,19 @@
     ).length;
     elements.deviceEmployeeOverviewTitle.textContent = fullName(employee);
     elements.deviceEmployeeOverviewSubtitle.textContent = completeOverview.length
-      ? `${completeInstructedCount} von ${completeOverview.length} Geräten mit dokumentierter Einweisung`
+      ? `${completeInstructedCount} von ${completeOverview.length} Geräten mit gültiger Einweisung`
       : "Keine Geräte angelegt";
     let list;
     if (overview.length) {
       list = `
         <div class="device-employee-overview-list">
           ${overview
-            .map(({ device, instructions, latestInstruction, isInstructed }) => {
-              const details = isInstructed
-                ? `Zuletzt am ${formatDate(latestInstruction.date)} · Einweisende Person: ${escapeHtml(latestInstruction.instructorName)}`
-                : "Für dieses Gerät ist keine Einweisung dokumentiert.";
+            .map((item) => {
+              const { device, instructions } = item;
+              const { details, badgeClass, badgeLabel } = deviceOverviewStatus(
+                item,
+                "Für dieses Gerät ist keine Einweisung dokumentiert.",
+              );
               const content = `
                 <span class="device-employee-overview-icon" aria-hidden="true">
                   <svg><use href="#icon-device"></use></svg>
@@ -17292,12 +17554,10 @@
                   <small>${escapeHtml(device.category)}${device.currentInventory ? "" : " · nicht mehr im Bestand"}</small>
                   <small>${details}</small>
                 </span>
-                <span class="status-badge ${isInstructed ? "" : "inactive"}">
-                  ${isInstructed ? "Eingewiesen" : "Nicht eingewiesen"}
-                </span>
+                <span class="status-badge ${badgeClass}">${badgeLabel}</span>
                 ${instructions.length > 1 ? `<span class="device-employee-overview-count">${instructions.length} Nachweise</span>` : ""}
               `;
-              return isInstructed
+              return instructions.length
                 ? `
                   <button
                     class="device-employee-overview-row"
@@ -17318,7 +17578,7 @@
           ? "Keine offenen Einweisungen"
           : "Keine Geräte für diese Filter",
         text: deviceEmployeeOverviewOpenOnly
-          ? "Für alle Geräte dieser Auswahl ist eine Einweisung dokumentiert."
+          ? "Für alle Geräte dieser Auswahl ist eine gültige Einweisung dokumentiert."
           : "Ändern Sie die ausgewählten Filter.",
         compact: true,
       });
@@ -17354,6 +17614,7 @@
           ),
       )
       .sort((a, b) => b.date.localeCompare(a.date));
+    const cutoff = deviceInstructionCutoff(device);
     elements.deviceInstructionHistoryTitle.textContent = fullName(employee);
     elements.deviceInstructionHistorySubtitle.textContent = deviceLabel(device);
     elements.deviceInstructionHistoryContent.innerHTML = instructions.length
@@ -17364,10 +17625,15 @@
               const participant = instruction.participants.find(
                 (item) => item.employeeId === employeeId,
               );
+              const voided = !isDeviceInstructionValid(instruction, cutoff);
               return `
-                <article class="device-history-row">
+                <article class="device-history-row ${voided ? "is-voided" : ""}">
                   <div>
-                    <strong>${formatDate(instruction.date)}</strong>
+                    <strong>${formatDate(instruction.date)}${
+                      voided
+                        ? ` <span class="device-instruction-voided">nichtig seit ${formatDate(cutoff)}</span>`
+                        : ""
+                    }</strong>
                     <small>
                       Einweisende Person: ${escapeHtml(instruction.instructorName)}
                       · ${
@@ -17444,6 +17710,268 @@
 
   function deviceLabel(device) {
     return `${device.manufacturer} ${device.productName}`.trim();
+  }
+
+  // Neueinweisung: Ein Softwareupdate oder ein Umbau kann ein Geraet erneut
+  // einweisungspflichtig machen. Statt Nachweise zu loeschen, bekommt das
+  // Geraet einen Stichtag; jede Einweisung davor ist ab dann nichtig, bleibt
+  // aber als Verlauf sichtbar. Eine Einweisung am Stichtag selbst zaehlt.
+  function latestDeviceInstructionReset(deviceOrId) {
+    const device =
+      typeof deviceOrId === "string" ? getDevice(deviceOrId) : deviceOrId;
+    const resets = device?.instructionResets || [];
+    return resets.reduce(
+      (latest, reset) =>
+        !latest ||
+        reset.effectiveDate > latest.effectiveDate ||
+        (reset.effectiveDate === latest.effectiveDate &&
+          reset.createdAt > latest.createdAt)
+          ? reset
+          : latest,
+      null,
+    );
+  }
+
+  function deviceInstructionCutoff(deviceOrId) {
+    return latestDeviceInstructionReset(deviceOrId)?.effectiveDate || "";
+  }
+
+  function isDeviceInstructionValid(
+    instruction,
+    cutoff = deviceInstructionCutoff(instruction.deviceId),
+  ) {
+    return !cutoff || instruction.date >= cutoff;
+  }
+
+  // Wer an diesem Geraet nur nichtige Einweisungen hat und noch beschaeftigt
+  // ist, muss neu eingewiesen werden.
+  function getDeviceReinstructionStatus(device, today = todayIso()) {
+    const reset = latestDeviceInstructionReset(device);
+    if (!reset) return null;
+    const employees = employedActiveEmployees(today);
+    const index = deviceInstructionIndex();
+    const pending = [];
+    const renewed = [];
+    employees.forEach((employee) => {
+      const instructions =
+        index.byPair.get(`${device.id}|${employee.id}`) || [];
+      if (!instructions.length) return;
+      if (instructions.some((item) => item.date >= reset.effectiveDate)) {
+        if (instructions.some((item) => item.date < reset.effectiveDate)) {
+          renewed.push(employee);
+        }
+      } else {
+        pending.push(employee);
+      }
+    });
+    return { reset, pending, renewed };
+  }
+
+  // Geraete im aktuellen Bestand mit offenen Neueinweisungen, fuer
+  // Kennzahlen und das Dashboard.
+  function getOpenDeviceReinstructions(today = todayIso()) {
+    return state.devices
+      .filter((device) => device.currentInventory)
+      .map((device) => ({ device, status: getDeviceReinstructionStatus(device, today) }))
+      .filter(({ status }) => status?.pending.length)
+      .sort(
+        (a, b) =>
+          b.status.reset.effectiveDate.localeCompare(a.status.reset.effectiveDate) ||
+          a.device.productName.localeCompare(b.device.productName, "de"),
+      );
+  }
+
+  function deviceReinstructionNotice(device) {
+    const status = getDeviceReinstructionStatus(device);
+    if (!status) return "";
+    const total = status.pending.length + status.renewed.length;
+    return `
+      <div class="device-reinstruction-notice">
+        <strong>Neueinweisung seit ${formatDate(status.reset.effectiveDate)}</strong>
+        <span>${escapeHtml(status.reset.reason)} · ${status.renewed.length} von ${total} neu eingewiesen</span>
+      </div>
+    `;
+  }
+
+  function openDeviceReinstructionDialog(deviceId) {
+    const device = getDevice(deviceId);
+    if (!device) return;
+    elements.deviceReinstructionForm.reset();
+    elements.deviceReinstructionDeviceId.value = device.id;
+    elements.deviceReinstructionSubtitle.textContent = deviceLabel(device);
+    elements.deviceReinstructionDate.max = todayIso();
+    elements.deviceReinstructionDate.value = todayIso();
+    elements.deviceReinstructionDate.setCustomValidity("");
+    elements.deviceReinstructionReason.setCustomValidity("");
+    renderDeviceReinstructionDialog();
+    elements.deviceReinstructionDialog.showModal();
+    captureCleanForm(elements.deviceReinstructionForm);
+    window.setTimeout(() => elements.deviceReinstructionReason.focus(), 0);
+  }
+
+  // Wie viele Einweisungen ein Stichtag nichtig machen wuerde: Massgeblich
+  // ist, wer danach keine gueltige Einweisung mehr haette.
+  function previewDeviceReinstruction(device, effectiveDate) {
+    const currentCutoff = deviceInstructionCutoff(device);
+    const cutoff =
+      effectiveDate && effectiveDate > currentCutoff ? effectiveDate : currentCutoff;
+    const employeeIds = new Set();
+    const affected = new Set();
+    const authorizedBefore = getDeviceAuthorizedEmployees(device.id).length;
+    let authorizedAfter = new Set();
+    state.deviceInstructions
+      .filter((instruction) => instruction.deviceId === device.id)
+      .forEach((instruction) => {
+        const valid = isDeviceInstructionValid(instruction, cutoff);
+        instruction.participants.forEach((participant) => {
+          if (valid) {
+            employeeIds.add(participant.employeeId);
+            if (
+              instruction.instructorType === "manufacturer" &&
+              participant.wasMedicalProductsOfficer
+            ) {
+              authorizedAfter.add(participant.employeeId);
+            }
+          } else if (isDeviceInstructionValid(instruction, currentCutoff)) {
+            affected.add(participant.employeeId);
+          }
+        });
+      });
+    const voided = [...affected].filter(
+      (employeeId) => !employeeIds.has(employeeId) && getEmployee(employeeId),
+    ).length;
+    authorizedAfter = [...authorizedAfter].filter(getEmployee).length;
+    return {
+      voided,
+      lostAuthorizations: Math.max(0, authorizedBefore - authorizedAfter),
+    };
+  }
+
+  function renderDeviceReinstructionDialog() {
+    const device = getDevice(elements.deviceReinstructionDeviceId.value);
+    if (!device) return;
+    const effectiveDate = elements.deviceReinstructionDate.value;
+    const preview = previewDeviceReinstruction(device, effectiveDate);
+    elements.deviceReinstructionPreview.textContent = !effectiveDate
+      ? "Bitte einen Stichtag wählen."
+      : preview.voided
+        ? `Damit werden die Einweisungen von ${preview.voided} Mitarbeiter${
+            preview.voided === 1 ? "/in" : "/innen"
+          } nichtig${
+            preview.lostAuthorizations
+              ? `, ${preview.lostAuthorizations} Einweisungsberechtigung${
+                  preview.lostAuthorizations === 1 ? " entfällt" : "en entfallen"
+                }`
+              : ""
+          }.`
+        : "Damit wird keine bestehende Einweisung nichtig; neue Einweisungen zählen erst ab dem Stichtag.";
+    const resets = [...(device.instructionResets || [])].sort(
+      (a, b) =>
+        b.effectiveDate.localeCompare(a.effectiveDate) ||
+        b.createdAt.localeCompare(a.createdAt),
+    );
+    elements.deviceReinstructionHistory.hidden = !resets.length;
+    elements.deviceReinstructionHistoryList.innerHTML = resets
+      .map(
+        (reset) => `
+          <li class="device-reinstruction-history-row">
+            <span>
+              <strong>ab ${formatDate(reset.effectiveDate)}</strong>
+              <small>${escapeHtml(reset.reason)}</small>
+            </span>
+            <button
+              class="text-button"
+              type="button"
+              data-remove-device-reinstruction="${reset.id}"
+              aria-label="Neueinweisung ab ${formatDate(reset.effectiveDate)} aufheben"
+            >
+              Aufheben
+            </button>
+          </li>
+        `,
+      )
+      .join("");
+  }
+
+  async function handleDeviceReinstructionSubmit(event) {
+    event.preventDefault();
+    const device = getDevice(elements.deviceReinstructionDeviceId.value);
+    if (!device) return;
+    const dateInput = elements.deviceReinstructionDate;
+    const reasonInput = elements.deviceReinstructionReason;
+    const effectiveDate = dateInput.value;
+    const reason = reasonInput.value.trim();
+    dateInput.setCustomValidity(
+      !effectiveDate
+        ? "Bitte einen Stichtag wählen."
+        : effectiveDate > todayIso()
+          ? "Der Stichtag darf nicht in der Zukunft liegen."
+          : "",
+    );
+    reasonInput.setCustomValidity(
+      reason ? "" : "Bitte einen Grund angeben, etwa das Softwareupdate.",
+    );
+    if (!elements.deviceReinstructionForm.reportValidity()) return;
+
+    const now = new Date().toISOString();
+    const reset = { id: createId(), effectiveDate, reason, createdAt: now };
+    const committed = await commitStateMutation(
+      () => {
+        state.devices = state.devices.map((item) =>
+          item.id === device.id
+            ? {
+                ...item,
+                instructionResets: [...(item.instructionResets || []), reset],
+                updatedAt: now,
+              }
+            : item,
+        );
+      },
+      { undo: "Neueinweisung angeordnet" },
+    );
+    if (!committed) return;
+    markFormClean(elements.deviceReinstructionForm);
+    elements.deviceReinstructionDialog.close();
+    refreshOpenDeviceOverviews();
+    showUndoToast(
+      `Neueinweisung für ${device.productName} ab ${formatDate(effectiveDate)} angeordnet.`,
+    );
+  }
+
+  async function handleDeviceReinstructionHistoryAction(event) {
+    const button = event.target.closest("[data-remove-device-reinstruction]");
+    if (!button) return;
+    const device = getDevice(elements.deviceReinstructionDeviceId.value);
+    const resetId = button.dataset.removeDeviceReinstruction;
+    const reset = device?.instructionResets?.find((item) => item.id === resetId);
+    if (!reset) return;
+    const committed = await commitStateMutation(
+      () => {
+        state.devices = state.devices.map((item) =>
+          item.id === device.id
+            ? {
+                ...item,
+                instructionResets: item.instructionResets.filter(
+                  (entry) => entry.id !== resetId,
+                ),
+                updatedAt: new Date().toISOString(),
+              }
+            : item,
+        );
+      },
+      { undo: "Neueinweisung aufgehoben" },
+    );
+    if (!committed) return;
+    renderDeviceReinstructionDialog();
+    refreshOpenDeviceOverviews();
+    showUndoToast(
+      `Neueinweisung ab ${formatDate(reset.effectiveDate)} wurde aufgehoben.`,
+    );
+  }
+
+  function refreshOpenDeviceOverviews() {
+    if (elements.deviceOverviewDialog.open) renderDeviceOverview();
+    if (elements.deviceEmployeeOverviewDialog.open) renderDeviceEmployeeOverview();
   }
 
   function renderMeetings() {

@@ -331,7 +331,7 @@
   background: var(--blue-100);
 }
 
-.timeline-tag.is-birthday {
+.timeline-tag:is(.is-birthday, .is-reinstruction) {
   color: var(--orange-700);
   background: var(--orange-100);
 }

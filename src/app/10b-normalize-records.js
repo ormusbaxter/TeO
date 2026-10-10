@@ -486,9 +486,40 @@
       category,
       annex1: Boolean(device.annex1),
       currentInventory: device.currentInventory !== false,
+      instructionResets: normalizeDeviceInstructionResets(
+        device.instructionResets,
+      ),
       createdAt: validTimestamp(device.createdAt),
       updatedAt: validTimestamp(device.updatedAt || device.createdAt),
     };
+  }
+
+  // Eine angeordnete Neueinweisung erklaert alle Einweisungen in das Geraet
+  // vor ihrem Stichtag fuer nichtig. Die Liste bleibt als Verlauf erhalten;
+  // maßgeblich ist der spaeteste Stichtag.
+  function normalizeDeviceInstructionResets(resets) {
+    if (!Array.isArray(resets)) return [];
+    const seen = new Set();
+    return resets
+      .map((reset) => {
+        const id = normalizeId(reset?.id);
+        const effectiveDate = normalizeOptionalDate(reset?.effectiveDate);
+        const reason = String(reset?.reason || "").trim().slice(0, 200);
+        if (!id || !effectiveDate || !reason || seen.has(id)) return null;
+        seen.add(id);
+        return {
+          id,
+          effectiveDate,
+          reason,
+          createdAt: validTimestamp(reset.createdAt),
+        };
+      })
+      .filter(Boolean)
+      .sort(
+        (a, b) =>
+          a.effectiveDate.localeCompare(b.effectiveDate) ||
+          a.createdAt.localeCompare(b.createdAt),
+      );
   }
 
   function createDefaultDeviceCatalog() {
@@ -500,6 +531,7 @@
         category,
         annex1,
         currentInventory,
+        instructionResets: [],
         createdAt: DEFAULT_DEVICE_CATALOG_TIMESTAMP,
         updatedAt: DEFAULT_DEVICE_CATALOG_TIMESTAMP,
       }),

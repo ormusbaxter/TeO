@@ -21,13 +21,43 @@
                 String(a.createdAt || ""),
               ),
           );
-        return {
-          device,
-          instructions,
-          latestInstruction: instructions[0] || null,
-          isInstructed: instructions.length > 0,
-        };
+        return deviceOverviewEntry({ device }, device, instructions);
       });
+  }
+
+  // Eingewiesen ist, wer eine gueltige Einweisung hat. Nichtig heisst: Es gibt
+  // Nachweise, aber alle liegen vor dem Stichtag einer Neueinweisung.
+  function deviceOverviewEntry(entry, device, instructions) {
+    const cutoff = deviceInstructionCutoff(device);
+    const isInstructed = instructions.some((instruction) =>
+      isDeviceInstructionValid(instruction, cutoff),
+    );
+    return {
+      ...entry,
+      instructions,
+      latestInstruction: instructions[0] || null,
+      isInstructed,
+      isVoided: !isInstructed && instructions.length > 0,
+      cutoff,
+    };
+  }
+
+  function deviceOverviewStatus({ latestInstruction, isInstructed, isVoided, cutoff }, missingText) {
+    if (isInstructed) {
+      return {
+        details: `Zuletzt am ${formatDate(latestInstruction.date)} · Einweisende Person: ${escapeHtml(latestInstruction.instructorName)}`,
+        badgeClass: "",
+        badgeLabel: "Eingewiesen",
+      };
+    }
+    if (isVoided) {
+      return {
+        details: `Einweisung vom ${formatDate(latestInstruction.date)} ist nichtig seit ${formatDate(cutoff)}.`,
+        badgeClass: "open",
+        badgeLabel: "Neueinweisung nötig",
+      };
+    }
+    return { details: missingText, badgeClass: "inactive", badgeLabel: "Nicht eingewiesen" };
   }
 
   function getDeviceEmployeeOverview(deviceId) {
@@ -45,12 +75,7 @@
             b.date.localeCompare(a.date) ||
             String(b.createdAt || "").localeCompare(String(a.createdAt || "")),
         );
-      return {
-        employee,
-        instructions,
-        latestInstruction: instructions[0] || null,
-        isInstructed: instructions.length > 0,
-      };
+      return deviceOverviewEntry({ employee }, getDevice(deviceId), instructions);
     });
   }
 
@@ -63,9 +88,10 @@
     } = {},
   ) {
     const normalizedSearch = searchKey(searchTerm);
-    return overview.filter(({ employee, isInstructed }) => {
+    return overview.filter(({ employee, isInstructed, isVoided }) => {
       if (instructionFilter === "instructed" && !isInstructed) return false;
       if (instructionFilter === "missing" && isInstructed) return false;
+      if (instructionFilter === "voided" && !isVoided) return false;
       if (
         employmentFilter === "employed" &&
         employee.employmentStatus === "inactive"
@@ -120,21 +146,34 @@
       employmentFilter: deviceOverviewEmploymentFilter,
     });
     const instructedCount = overview.filter((item) => item.isInstructed).length;
-    const missingCount = overview.length - instructedCount;
+    const voidedCount = overview.filter((item) => item.isVoided).length;
+    const missingCount = overview.length - instructedCount - voidedCount;
+    const reset = latestDeviceInstructionReset(device);
     elements.deviceOverviewContent.innerHTML = `
+      ${
+        reset
+          ? `<div class="device-reinstruction-notice">
+              <strong>Neueinweisung seit ${formatDate(reset.effectiveDate)}</strong>
+              <span>${escapeHtml(reset.reason)} · Einweisungen vor diesem Tag sind nichtig.</span>
+            </div>`
+          : ""
+      }
       <div class="device-employee-overview-summary" aria-label="Zusammenfassung der gefilterten Mitarbeiter">
         <span><strong>${overview.length}</strong> sichtbar</span>
         <span class="is-complete"><strong>${instructedCount}</strong> eingewiesen</span>
+        ${voidedCount ? `<span class="is-voided"><strong>${voidedCount}</strong> Neueinweisung nötig</span>` : ""}
         <span class="is-missing"><strong>${missingCount}</strong> nicht eingewiesen</span>
       </div>
       ${
         overview.length
           ? `<div class="device-employee-overview-list">
               ${overview
-                .map(({ employee, instructions, latestInstruction, isInstructed }) => {
-                  const details = isInstructed
-                    ? `Zuletzt am ${formatDate(latestInstruction.date)} · Einweisende Person: ${escapeHtml(latestInstruction.instructorName)}`
-                    : "Für diese Person ist keine Einweisung dokumentiert.";
+                .map((item) => {
+                  const { employee, instructions } = item;
+                  const { details, badgeClass, badgeLabel } = deviceOverviewStatus(
+                    item,
+                    "Für diese Person ist keine Einweisung dokumentiert.",
+                  );
                   const content = `
                     ${renderAvatar(employee, true)}
                     <span class="device-employee-overview-device">
@@ -142,12 +181,10 @@
                       <small>${escapeHtml(employee.profession)} · ${escapeHtml(employeeStatusLabel(employee))}</small>
                       <small>${details}</small>
                     </span>
-                    <span class="status-badge ${isInstructed ? "" : "inactive"}">
-                      ${isInstructed ? "Eingewiesen" : "Nicht eingewiesen"}
-                    </span>
+                    <span class="status-badge ${badgeClass}">${badgeLabel}</span>
                     ${instructions.length > 1 ? `<span class="device-employee-overview-count">${instructions.length} Nachweise</span>` : ""}
                   `;
-                  return isInstructed
+                  return instructions.length
                     ? `<button
                         class="device-employee-overview-row"
                         type="button"
@@ -168,9 +205,8 @@
     `;
   }
 
-  // Eine Einweisung gilt als offen, solange für das Gerät keine dokumentiert
-  // ist. Weitere Gründe (etwa eine für nichtig erklärte Einweisung) gehören
-  // hierher, damit Filter und Zählung sie gleich behandeln.
+  // Eine Einweisung gilt als offen, solange für das Gerät keine gültige
+  // dokumentiert ist – nie eingewiesen oder durch eine Neueinweisung nichtig.
   function isDeviceInstructionOpen({ isInstructed }) {
     return !isInstructed;
   }
@@ -219,17 +255,19 @@
     ).length;
     elements.deviceEmployeeOverviewTitle.textContent = fullName(employee);
     elements.deviceEmployeeOverviewSubtitle.textContent = completeOverview.length
-      ? `${completeInstructedCount} von ${completeOverview.length} Geräten mit dokumentierter Einweisung`
+      ? `${completeInstructedCount} von ${completeOverview.length} Geräten mit gültiger Einweisung`
       : "Keine Geräte angelegt";
     let list;
     if (overview.length) {
       list = `
         <div class="device-employee-overview-list">
           ${overview
-            .map(({ device, instructions, latestInstruction, isInstructed }) => {
-              const details = isInstructed
-                ? `Zuletzt am ${formatDate(latestInstruction.date)} · Einweisende Person: ${escapeHtml(latestInstruction.instructorName)}`
-                : "Für dieses Gerät ist keine Einweisung dokumentiert.";
+            .map((item) => {
+              const { device, instructions } = item;
+              const { details, badgeClass, badgeLabel } = deviceOverviewStatus(
+                item,
+                "Für dieses Gerät ist keine Einweisung dokumentiert.",
+              );
               const content = `
                 <span class="device-employee-overview-icon" aria-hidden="true">
                   <svg><use href="#icon-device"></use></svg>
@@ -239,12 +277,10 @@
                   <small>${escapeHtml(device.category)}${device.currentInventory ? "" : " · nicht mehr im Bestand"}</small>
                   <small>${details}</small>
                 </span>
-                <span class="status-badge ${isInstructed ? "" : "inactive"}">
-                  ${isInstructed ? "Eingewiesen" : "Nicht eingewiesen"}
-                </span>
+                <span class="status-badge ${badgeClass}">${badgeLabel}</span>
                 ${instructions.length > 1 ? `<span class="device-employee-overview-count">${instructions.length} Nachweise</span>` : ""}
               `;
-              return isInstructed
+              return instructions.length
                 ? `
                   <button
                     class="device-employee-overview-row"
@@ -265,7 +301,7 @@
           ? "Keine offenen Einweisungen"
           : "Keine Geräte für diese Filter",
         text: deviceEmployeeOverviewOpenOnly
-          ? "Für alle Geräte dieser Auswahl ist eine Einweisung dokumentiert."
+          ? "Für alle Geräte dieser Auswahl ist eine gültige Einweisung dokumentiert."
           : "Ändern Sie die ausgewählten Filter.",
         compact: true,
       });
@@ -301,6 +337,7 @@
           ),
       )
       .sort((a, b) => b.date.localeCompare(a.date));
+    const cutoff = deviceInstructionCutoff(device);
     elements.deviceInstructionHistoryTitle.textContent = fullName(employee);
     elements.deviceInstructionHistorySubtitle.textContent = deviceLabel(device);
     elements.deviceInstructionHistoryContent.innerHTML = instructions.length
@@ -311,10 +348,15 @@
               const participant = instruction.participants.find(
                 (item) => item.employeeId === employeeId,
               );
+              const voided = !isDeviceInstructionValid(instruction, cutoff);
               return `
-                <article class="device-history-row">
+                <article class="device-history-row ${voided ? "is-voided" : ""}">
                   <div>
-                    <strong>${formatDate(instruction.date)}</strong>
+                    <strong>${formatDate(instruction.date)}${
+                      voided
+                        ? ` <span class="device-instruction-voided">nichtig seit ${formatDate(cutoff)}</span>`
+                        : ""
+                    }</strong>
                     <small>
                       Einweisende Person: ${escapeHtml(instruction.instructorName)}
                       · ${
