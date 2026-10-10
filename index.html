@@ -1204,16 +1204,27 @@
                 <p class="eyebrow">Auswertung</p>
                 <h2 id="deviceMatrixWidgetTitle">Einweisungsmatrix</h2>
               </div>
-              <button
-                class="button button-secondary button-compact"
-                id="toggleDeviceMatrixMaximizeButton"
-                type="button"
-                aria-controls="deviceInstructionMatrix"
-                aria-pressed="false"
-              >
-                <svg><use id="deviceMatrixMaximizeIcon" href="#icon-maximize"></use></svg>
-                <span id="deviceMatrixMaximizeLabel">Maximieren</span>
-              </button>
+              <div class="device-matrix-widget-actions">
+                <button
+                  class="button button-secondary button-compact"
+                  id="exportDeviceMatrixExcelButton"
+                  type="button"
+                  title="Einweisungsmatrix mit den aktuellen Filtern als Excel-Datei exportieren"
+                >
+                  <svg><use href="#icon-spreadsheet"></use></svg>
+                  Export Excel
+                </button>
+                <button
+                  class="button button-secondary button-compact"
+                  id="toggleDeviceMatrixMaximizeButton"
+                  type="button"
+                  aria-controls="deviceInstructionMatrix"
+                  aria-pressed="false"
+                >
+                  <svg><use id="deviceMatrixMaximizeIcon" href="#icon-maximize"></use></svg>
+                  <span id="deviceMatrixMaximizeLabel">Maximieren</span>
+                </button>
+              </div>
             </header>
             <div class="device-filter-bar">
               <label class="search-field device-search-field" for="deviceSearch">
@@ -2522,6 +2533,9 @@
 <ul><li>0 bis 65 Prozent: rot</li><li>66 bis 80 Prozent: orange</li><li>81 bis 100 Prozent: grün</li></ul>
 <p>Bei Medizinproduktebeauftragten wird eine Herstellereinweisung gold gekennzeichnet.</p>
 <p>Ein Klick auf einen Mitarbeiter öffnet seine Geräteübersicht mit allen Geräten und ihrem Einweisungsstand. <strong>Nur offene Einweisungen</strong> blendet die Geräte aus, für die eine Einweisung dokumentiert ist, <strong>Nur Geräte im Bestand</strong> die ausgemusterten. Beide Filter lassen sich kombinieren und bleiben beim Wechsel zum nächsten Mitarbeiter eingestellt.</p>
+<p><strong>Export Excel</strong> im Kopf der Matrix speichert sie als Excel-Datei (<code>.xlsx</code>), mit denselben Filtern wie auf dem Bildschirm:</p>
+<ul><li>Spaltenköpfe: Hersteller und Gerätename, etwa „Dräger Evita V500“</li><li>Zeilenköpfe: Nachname, gegebenenfalls Geburtsname, Vorname und die Kennzeichnung als Medizinproduktebeauftragte/r, etwa „Müller, geb. Schmidt, Anna, MP-Beauftragte/r“. Als Geburtsname gilt der Nachname des ältesten eingetragenen Namens (siehe Namensänderungen), sofern er vom heutigen abweicht</li><li>Zellen: Datum der letzten gültigen Einweisung. Ohne Einweisung oder wenn alle Einweisungen durch eine angeordnete Neueinweisung nichtig sind, bleibt die Zelle leer</li></ul>
+<p>Kopfzeile und Namensspalte sind fixiert, die Kopfzeile trägt einen Autofilter, und die Daten lassen sich in Excel als Datum sortieren.</p>
 <p>Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch aufgelistet und können bearbeitet werden.</p>
 <h3 id="hilfe-neueinweisung-anordnen">Neueinweisung anordnen</h3>
 <p>Macht ein Softwareupdate oder ein Umbau ein Gerät erneut einweisungspflichtig, werden die bisherigen Einweisungen <strong>für nichtig erklärt</strong>, statt sie zu löschen. Dazu dient <strong>Neueinweisung anordnen</strong> – das Warnsymbol an der Gerätekarte oder die Schaltfläche in der Einweisungsübersicht des Geräts. Anzugeben sind:</p>
@@ -2647,6 +2661,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-64-0-einweisungsmatrix-als-excel-datei">4.64.0 – Einweisungsmatrix als Excel-Datei</h3>
+<ul><li><strong>Neu:</strong> <strong>Export Excel</strong> im Kopf der Einweisungsmatrix speichert die Matrix mit den aktuellen Filtern als <code>.xlsx</code>. Spalten sind die Geräte (Hersteller und Gerätename), Zeilen die Mitarbeiter (Nachname, ggf. Geburtsname, Vorname, ggf. MP-Beauftragte/r), jede Zelle nennt das Datum der letzten gültigen Einweisung. Durch eine Neueinweisung nichtige Einweisungen zählen nicht. Kopfzeile und Namensspalte sind fixiert, die Kopfzeile filterbar</li></ul>
 <h3 id="hilfe-4-63-0-namensanderungen">4.63.0 – Namensänderungen</h3>
 <ul><li><strong>Neu:</strong> Im Mitarbeiterdialog hält <strong>Namensänderung eintragen</strong> den bisherigen Namen mit Datum und optional einem Grund (Heirat, Scheidung …) fest, danach wird der neue Name eingetragen. Wer den Namen nur überschreibt, bekommt einen Hinweis darauf</li><li><strong>Neu:</strong> Frühere Namen bleiben auffindbar: Mitarbeitersuche, Auswahllisten und Befehlspalette finden den Mitarbeiter auch unter dem alten Namen, die Liste nennt ihn („früher: …“), Schnellansicht und Akte zeigen den Namensverlauf. Nachweise, Planung und Einweisungen bleiben unverändert zugeordnet</li><li><strong>Geändert:</strong> Datenformat 27. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit festgehaltene frühere Namen nicht verloren gehen</li></ul>
 <h3 id="hilfe-4-62-0-neueinweisung-nach-einem-softwareupdate">4.62.0 – Neueinweisung nach einem Softwareupdate</h3>
