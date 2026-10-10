@@ -87,6 +87,7 @@
               <option value="all">Alle</option>
               <option value="instructed">Eingewiesen</option>
               <option value="missing">Nicht eingewiesen</option>
+              <option value="voided">Neueinweisung nötig</option>
             </select>
           </label>
           <label class="compact-field">
@@ -103,8 +104,67 @@
         <div id="deviceOverviewContent"></div>
       </div>
       <div class="modal-footer">
+        <button class="button button-secondary" id="deviceOverviewReinstructButton" type="button">
+          <svg><use href="#icon-alert"></use></svg>
+          Neueinweisung anordnen …
+        </button>
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
+    </dialog>
+
+    <dialog
+      class="modal device-reinstruction-dialog"
+      id="deviceReinstructionDialog"
+      aria-labelledby="deviceReinstructionTitle"
+    >
+      <form id="deviceReinstructionForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Geräteeinweisungen</p>
+            <h2 id="deviceReinstructionTitle">Neueinweisung anordnen</h2>
+            <p class="modal-subtitle" id="deviceReinstructionSubtitle"></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="deviceReinstructionDeviceId" type="hidden" />
+          <p class="field-hint">
+            Alle Einweisungen in dieses Gerät vor dem Stichtag werden nichtig,
+            etwa nach einem Softwareupdate. Die Nachweise bleiben als Verlauf
+            erhalten; Einweisungen ab dem Stichtag zählen wieder.
+          </p>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Neueinweisung erforderlich ab <em>*</em></span>
+              <input id="deviceReinstructionDate" type="date" required />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Grund <em>*</em></span>
+              <input
+                id="deviceReinstructionReason"
+                type="text"
+                maxlength="200"
+                placeholder="z. B. Softwareupdate 3.2"
+                required
+              />
+            </label>
+          </div>
+          <p class="device-reinstruction-preview" id="deviceReinstructionPreview" aria-live="polite"></p>
+          <section class="device-reinstruction-history" id="deviceReinstructionHistory" hidden>
+            <h3>Bisher angeordnet</h3>
+            <ul id="deviceReinstructionHistoryList"></ul>
+          </section>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            Neueinweisung anordnen
+          </button>
+        </div>
+      </form>
     </dialog>
 
     <dialog
@@ -159,6 +219,7 @@
             <label class="form-field">
               <span>Einweisungsdatum <em>*</em></span>
               <input id="deviceInstructionDate" type="date" required />
+              <span class="field-hint device-instruction-cutoff-hint" id="deviceInstructionCutoffHint" role="status" hidden></span>
             </label>
             <label class="form-field form-field-wide">
               <span>Art des Einweisenden <em>*</em></span>

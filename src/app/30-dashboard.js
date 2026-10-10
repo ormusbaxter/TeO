@@ -273,8 +273,15 @@
     const qualityIssues = hideOverdue
       ? []
       : getDataQualityIssues().filter((issue) => issue.severity === "high");
+    // Angeordnete Neueinweisungen sind keine Frist mit Datum, aber offen wie
+    // ein überfälliger Nachweis; sie stehen deshalb bei den zu prüfenden.
+    const reinstructions = hideOverdue ? [] : getOpenDeviceReinstructions();
 
-    if (deadlines.length === 0 && qualityIssues.length === 0) {
+    if (
+      deadlines.length === 0 &&
+      qualityIssues.length === 0 &&
+      reinstructions.length === 0
+    ) {
       const selectedLabels = DEADLINE_KINDS.filter((kind) =>
         activeKinds.has(kind),
       ).map((kind) => DEADLINE_KIND_LABELS[kind]);
@@ -296,7 +303,13 @@
     const regular = deadlines.filter((item) => !item.appointment?.pinned);
     const displayed = regular.slice(
       0,
-      Math.max(0, DASHBOARD_TIMELINE_ROWS - pinnedDeadlines.length - qualityIssues.length),
+      Math.max(
+        0,
+        DASHBOARD_TIMELINE_ROWS -
+          pinnedDeadlines.length -
+          qualityIssues.length -
+          reinstructions.length,
+      ),
     );
     const overdue = displayed.filter((item) => item.daysUntil < 0);
     const soon = displayed.filter((item) => item.daysUntil >= 0 && item.daysUntil <= 7);
@@ -318,6 +331,18 @@
                   <span class="timeline-tag is-quality">Datenqualität</span>
                   <strong>${escapeHtml(issue.title)}</strong>
                   <small>${escapeHtml(issue.detail)}</small>
+                </button>`,
+            ),
+            ...reinstructions.map(
+              ({ device, status }) => `
+                <button class="deadline-row is-overdue" type="button" data-deadline-device="${device.id}">
+                  <span class="timeline-tag is-reinstruction">Neueinweisung</span>
+                  <strong>${escapeHtml(deviceLabel(device))}</strong>
+                  <small>${escapeHtml(
+                    `${status.pending.length} offen · seit ${formatDate(
+                      status.reset.effectiveDate,
+                    )} · ${status.reset.reason}`,
+                  )}</small>
                 </button>`,
             ),
             ...overdue.map((item) => renderDeadlineRow(item)),
@@ -432,6 +457,11 @@
     const appointment = event.target.closest("[data-deadline-appointment]");
     if (appointment) {
       openAppointmentDialog(appointment.dataset.deadlineAppointment);
+      return;
+    }
+    const device = event.target.closest("[data-deadline-device]");
+    if (device) {
+      openDeviceOverview(device.dataset.deadlineDevice);
       return;
     }
     const quality = event.target.closest("[data-deadline-quality]");

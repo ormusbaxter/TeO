@@ -167,7 +167,7 @@ Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster
 | --- | --- | --- |
 | Termin | Datum, Uhrzeit, Ort, Kategorie, angepinnt, Teilnehmerliste, Beschreibung | Anheften · Bearbeiten · **Kalender** (springt in den Monat des Termins) |
 | Memo / ToDo | Datum, Kategorie, Sichtbarkeit, Status, angepinnt, Beschreibung | Anheften · Bearbeiten · **Erledigt** beziehungsweise **Wieder öffnen** |
-| Gerät | Hersteller, Produkt, Kategorie, Anlage 1, Bestand, Einweisungsquote, Einweisungsberechtigte | Anheften · Bearbeiten · **Übersicht** (Einweisungen des Geräts) |
+| Gerät | Hersteller, Produkt, Kategorie, Anlage 1, Bestand, Einweisungsquote, angeordnete Neueinweisung, Einweisungsberechtigte | Anheften · Bearbeiten · **Übersicht** (Einweisungen des Geräts) |
 
 Die Schaltflächen auf der Karte behalten ihre Aufgabe: Der Stift öffnet weiterhin
 unmittelbar den Bearbeitungsdialog, der Papierkorb löscht. Persönliche Memos
@@ -1349,6 +1349,46 @@ zum nächsten Mitarbeiter eingestellt.
 
 Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch
 aufgelistet und können bearbeitet werden.
+
+### Neueinweisung anordnen
+
+Macht ein Softwareupdate oder ein Umbau ein Gerät erneut
+einweisungspflichtig, werden die bisherigen Einweisungen **für nichtig
+erklärt**, statt sie zu löschen. Dazu dient **Neueinweisung anordnen** – das
+Warnsymbol an der Gerätekarte oder die Schaltfläche in der Einweisungsübersicht
+des Geräts. Anzugeben sind:
+
+- der **Stichtag**, ab dem neu einzuweisen ist (vorbelegt mit heute, nicht in
+  der Zukunft)
+- ein **Grund**, etwa „Softwareupdate 3.2“
+
+Der Dialog nennt vorab, wie viele Mitarbeiter ihre gültige Einweisung verlieren
+und wie viele Einweisungsberechtigungen entfallen.
+
+Danach gilt:
+
+- Alle Einweisungen **vor** dem Stichtag sind nichtig. Eine Einweisung **am**
+  Stichtag selbst zählt bereits.
+- In der Matrix erscheinen nichtige Einweisungen orange mit **↻** und dem alten
+  Datum. Der Prozentwert je Gerät zählt nur gültige Einweisungen.
+- Die Nachweise bleiben im Verlauf und in **Erfasste Einweisungen** stehen,
+  gekennzeichnet mit **nichtig seit …**.
+- Wer als Medizinproduktebeauftragte/r nur vor dem Stichtag vom Hersteller
+  eingewiesen wurde, ist nicht mehr **einweisungsberechtigt**, bis eine neue
+  Herstellereinweisung dokumentiert ist.
+- Die Gerätekarte zeigt Stichtag, Grund und wie viele schon neu eingewiesen
+  sind. In der Einweisungsübersicht des Geräts filtert **Neueinweisung nötig**
+  die Betroffenen; **Nur offene Einweisungen** in der Geräteübersicht eines
+  Mitarbeiters schließt nichtige Einweisungen ein.
+- Die Übersicht führt unter **Überfällig und zu prüfen** jedes Gerät im Bestand
+  mit offenen Neueinweisungen; ein Klick öffnet seine Einweisungsübersicht.
+- Wird beim Dokumentieren ein Datum vor dem Stichtag gewählt, weist der Dialog
+  darauf hin. Speichern bleibt möglich, etwa für Nachträge.
+
+Mehrere Neueinweisungen nacheinander sind möglich; maßgeblich ist der späteste
+Stichtag. Im selben Dialog lässt sich eine irrtümlich angeordnete
+Neueinweisung mit **Aufheben** zurücknehmen. Der Excel-Export des
+Gerätekatalogs enthält Stichtag und Grund.
 
 ## Datensicherung und Wiederherstellung
 

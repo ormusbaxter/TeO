@@ -259,6 +259,12 @@ function validateDates(state, issues) {
       .filter((entry) => entry.date)
       .map((entry) => ["Memo/ToDo", entry.date]),
     ...state.deviceInstructions.map((entry) => ["Geräteeinweisung", entry.date]),
+    ...state.devices.flatMap((device) =>
+      (device.instructionResets || []).map((entry) => [
+        "Neueinweisung",
+        entry.effectiveDate,
+      ]),
+    ),
     ...state.vacationDays.map((entry) => ["Abwesenheit", entry.date]),
   ];
   values.forEach(([label, value]) => {

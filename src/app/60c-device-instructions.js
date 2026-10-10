@@ -183,6 +183,26 @@
         ? "Sichtbare abwählen"
         : "Sichtbare auswählen";
     if (selectedCount) elements.deviceInstructionDeviceError.textContent = "";
+    updateDeviceInstructionCutoffHint();
+  }
+
+  // Ein Nachweis vor dem Stichtag einer angeordneten Neueinweisung laesst
+  // sich speichern (etwa als Nachtrag), zaehlt aber nicht.
+  function updateDeviceInstructionCutoffHint() {
+    const date = elements.deviceInstructionDate.value;
+    const affected = date
+      ? [...deviceInstructionDeviceDraft]
+          .map(getDevice)
+          .filter((device) => device && date < deviceInstructionCutoff(device))
+      : [];
+    elements.deviceInstructionCutoffHint.hidden = !affected.length;
+    elements.deviceInstructionCutoffHint.textContent = affected.length
+      ? affected.length === 1
+        ? `Für ${affected[0].productName} ist seit ${formatDate(
+            deviceInstructionCutoff(affected[0]),
+          )} eine Neueinweisung angeordnet. Eine Einweisung mit früherem Datum ist nichtig.`
+        : `Für ${affected.length} der gewählten Geräte gilt eine angeordnete Neueinweisung nach diesem Datum. Die Einweisung ist dort nichtig.`
+      : "";
   }
 
   function handleInstructionDeviceChange(event) {

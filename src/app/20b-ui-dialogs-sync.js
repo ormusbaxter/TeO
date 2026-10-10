@@ -241,6 +241,7 @@
         elements.deviceEmployeeOverviewDialog,
         elements.deviceOverviewDialog,
         elements.deviceInstructionHistoryDialog,
+        elements.deviceReinstructionDialog,
         elements.attendanceDialog,
         elements.meetingStatsDialog,
         elements.accountDialog,

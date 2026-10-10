@@ -86,17 +86,23 @@
         find: (id) => getDevice(id),
         title: (device) => deviceLabel(device),
         subtitle: (device) => device.category || "Ohne Kategorie",
-        facts: (device) => [
-          ["Hersteller", device.manufacturer],
-          ["Produkt", device.productName],
-          ["Kategorie", device.category || "–"],
-          ["Anlage 1", device.annex1 ? "Ja" : "Nein"],
-          ["Bestand", device.currentInventory ? "Aktuell" : "Nicht mehr im Bestand"],
-          [
-            "Eingewiesen",
-            `${getDeviceInstructionPercentage(device.id, activeEmployeeList())} %`,
-          ],
-        ],
+        facts: (device) => {
+          const reset = latestDeviceInstructionReset(device);
+          return [
+            ["Hersteller", device.manufacturer],
+            ["Produkt", device.productName],
+            ["Kategorie", device.category || "–"],
+            ["Anlage 1", device.annex1 ? "Ja" : "Nein"],
+            ["Bestand", device.currentInventory ? "Aktuell" : "Nicht mehr im Bestand"],
+            [
+              "Eingewiesen",
+              `${getDeviceInstructionPercentage(device.id, activeEmployeeList())} %`,
+            ],
+            ...(reset
+              ? [["Neueinweisung", `seit ${formatDate(reset.effectiveDate)} · ${reset.reason}`]]
+              : []),
+          ];
+        },
         sections: (device) => {
           const authorized = getDeviceAuthorizedEmployees(device.id);
           return [

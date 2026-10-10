@@ -2211,7 +2211,7 @@
 <h3 id="hilfe-schnellansicht">Schnellansicht</h3>
 <p>Ein Klick auf eine freie Stelle einer Mitarbeiterzeile öffnet rechts neben der Tabelle eine Schnellansicht. Sie zeigt Status, Stellenumfang, Dienstwochenende, Kontakt, Fortbildungsstand und Qualifikationen, ohne die Liste zu verlassen. Von dort lässt sich der Mitarbeiter bearbeiten, seine Gesamtakte öffnen oder für den Schnellzugriff anheften. Mit <strong>Pfeil hoch</strong> und <strong>Pfeil runter</strong> bewegt sich der Fokus durch die Tabellenzeilen, <strong>Enter</strong> öffnet die Schnellansicht.</p>
 <p>Dieselbe Schnellansicht gibt es für <strong>Termine</strong>, <strong>Memos</strong> und <strong>Geräte</strong>: Ein Klick auf die Karte – im Terminkalender auch auf einen Eintrag im Monatsraster – öffnet sie rechts neben der Liste.</p>
-<p>| Datenart | Angaben | Aktionen | | --- | --- | --- | | Termin | Datum, Uhrzeit, Ort, Kategorie, angepinnt, Teilnehmerliste, Beschreibung | Anheften · Bearbeiten · <strong>Kalender</strong> (springt in den Monat des Termins) | | Memo / ToDo | Datum, Kategorie, Sichtbarkeit, Status, angepinnt, Beschreibung | Anheften · Bearbeiten · <strong>Erledigt</strong> beziehungsweise <strong>Wieder öffnen</strong> | | Gerät | Hersteller, Produkt, Kategorie, Anlage 1, Bestand, Einweisungsquote, Einweisungsberechtigte | Anheften · Bearbeiten · <strong>Übersicht</strong> (Einweisungen des Geräts) |</p>
+<p>| Datenart | Angaben | Aktionen | | --- | --- | --- | | Termin | Datum, Uhrzeit, Ort, Kategorie, angepinnt, Teilnehmerliste, Beschreibung | Anheften · Bearbeiten · <strong>Kalender</strong> (springt in den Monat des Termins) | | Memo / ToDo | Datum, Kategorie, Sichtbarkeit, Status, angepinnt, Beschreibung | Anheften · Bearbeiten · <strong>Erledigt</strong> beziehungsweise <strong>Wieder öffnen</strong> | | Gerät | Hersteller, Produkt, Kategorie, Anlage 1, Bestand, Einweisungsquote, angeordnete Neueinweisung, Einweisungsberechtigte | Anheften · Bearbeiten · <strong>Übersicht</strong> (Einweisungen des Geräts) |</p>
 <p>Die Schaltflächen auf der Karte behalten ihre Aufgabe: Der Stift öffnet weiterhin unmittelbar den Bearbeitungsdialog, der Papierkorb löscht. Persönliche Memos anderer Konten erscheinen auch hier nicht. Angeheftete Datensätze und die zuletzt geöffneten stehen in <strong>Strg + K</strong> und führen von dort wieder in die Schnellansicht.</p>
 <h3 id="hilfe-mehrere-eintrage-auf-einmal">Mehrere Einträge auf einmal</h3>
 <p>Termine, Memos und Geräte lassen sich wie Dateien in einer Liste auswählen:</p>
@@ -2520,6 +2520,13 @@
 <p>Bei Medizinproduktebeauftragten wird eine Herstellereinweisung gold gekennzeichnet.</p>
 <p>Ein Klick auf einen Mitarbeiter öffnet seine Geräteübersicht mit allen Geräten und ihrem Einweisungsstand. <strong>Nur offene Einweisungen</strong> blendet die Geräte aus, für die eine Einweisung dokumentiert ist, <strong>Nur Geräte im Bestand</strong> die ausgemusterten. Beide Filter lassen sich kombinieren und bleiben beim Wechsel zum nächsten Mitarbeiter eingestellt.</p>
 <p>Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch aufgelistet und können bearbeitet werden.</p>
+<h3 id="hilfe-neueinweisung-anordnen">Neueinweisung anordnen</h3>
+<p>Macht ein Softwareupdate oder ein Umbau ein Gerät erneut einweisungspflichtig, werden die bisherigen Einweisungen <strong>für nichtig erklärt</strong>, statt sie zu löschen. Dazu dient <strong>Neueinweisung anordnen</strong> – das Warnsymbol an der Gerätekarte oder die Schaltfläche in der Einweisungsübersicht des Geräts. Anzugeben sind:</p>
+<ul><li>der <strong>Stichtag</strong>, ab dem neu einzuweisen ist (vorbelegt mit heute, nicht in der Zukunft)</li><li>ein <strong>Grund</strong>, etwa „Softwareupdate 3.2“</li></ul>
+<p>Der Dialog nennt vorab, wie viele Mitarbeiter ihre gültige Einweisung verlieren und wie viele Einweisungsberechtigungen entfallen.</p>
+<p>Danach gilt:</p>
+<ul><li>Alle Einweisungen <strong>vor</strong> dem Stichtag sind nichtig. Eine Einweisung <strong>am</strong> Stichtag selbst zählt bereits.</li><li>In der Matrix erscheinen nichtige Einweisungen orange mit <strong>↻</strong> und dem alten Datum. Der Prozentwert je Gerät zählt nur gültige Einweisungen.</li><li>Die Nachweise bleiben im Verlauf und in <strong>Erfasste Einweisungen</strong> stehen, gekennzeichnet mit <strong>nichtig seit …</strong>.</li><li>Wer als Medizinproduktebeauftragte/r nur vor dem Stichtag vom Hersteller eingewiesen wurde, ist nicht mehr <strong>einweisungsberechtigt</strong>, bis eine neue Herstellereinweisung dokumentiert ist.</li><li>Die Gerätekarte zeigt Stichtag, Grund und wie viele schon neu eingewiesen sind. In der Einweisungsübersicht des Geräts filtert <strong>Neueinweisung nötig</strong> die Betroffenen; <strong>Nur offene Einweisungen</strong> in der Geräteübersicht eines Mitarbeiters schließt nichtige Einweisungen ein.</li><li>Die Übersicht führt unter <strong>Überfällig und zu prüfen</strong> jedes Gerät im Bestand mit offenen Neueinweisungen; ein Klick öffnet seine Einweisungsübersicht.</li><li>Wird beim Dokumentieren ein Datum vor dem Stichtag gewählt, weist der Dialog darauf hin. Speichern bleibt möglich, etwa für Nachträge.</li></ul>
+<p>Mehrere Neueinweisungen nacheinander sind möglich; maßgeblich ist der späteste Stichtag. Im selben Dialog lässt sich eine irrtümlich angeordnete Neueinweisung mit <strong>Aufheben</strong> zurücknehmen. Der Excel-Export des Gerätekatalogs enthält Stichtag und Grund.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-datensicherung-und-wiederherstellung">
 <h2 id="hilfe-datensicherung-und-wiederherstellung">Datensicherung und Wiederherstellung</h2>
@@ -2637,6 +2644,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-62-0-neueinweisung-nach-einem-softwareupdate">4.62.0 – Neueinweisung nach einem Softwareupdate</h3>
+<ul><li><strong>Neu:</strong> Geräteeinweisungen lassen sich für nichtig erklären, etwa wenn ein Softwareupdate ein Gerät erneut einweisungspflichtig macht. <strong>Neueinweisung anordnen</strong> (Warnsymbol an der Gerätekarte oder in der Einweisungsübersicht des Geräts) setzt einen Stichtag mit Grund; alle Einweisungen davor sind nichtig, bleiben aber als Verlauf erhalten. Eine Einweisung am Stichtag zählt bereits. Der Dialog nennt vorab, wie viele Mitarbeiter betroffen sind, und eine irrtümliche Anordnung lässt sich dort wieder aufheben</li><li><strong>Neu:</strong> Die Einweisungsmatrix zeigt nichtige Einweisungen orange mit <strong>↻</strong>; Prozentwerte, Einweisungsberechtigte, Gerätekarten und Kennzahlen zählen nur gültige Einweisungen. Die Einweisungsübersicht eines Geräts filtert <strong>Neueinweisung nötig</strong></li><li><strong>Neu:</strong> Die Übersicht führt Geräte mit offenen Neueinweisungen unter <strong>Überfällig und zu prüfen</strong>; der Excel-Export des Gerätekatalogs enthält Stichtag und Grund</li><li><strong>Geändert:</strong> Datenformat 26. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit angeordnete Neueinweisungen nicht verloren gehen</li></ul>
 <h3 id="hilfe-4-61-0-dienstubernahmen-senken-die-uberplanung">4.61.0 – Dienstübernahmen senken die Überplanung</h3>
 <ul><li><strong>Geändert:</strong> In der Urlaubsplanung zählt jede verpflichtende Dienstzusage eines Mitarbeiters vom jeweils anderen festen Wochenende als Dienstübernahme und verringert die wirksamen Abwesenheiten des Tages um eins – im Spaltenkopf als <code>−1</code>, <code>−2</code> … neben der Zahl der Dienstzusagen (<code>D1</code>, <code>D2</code> …). Bisher glich sie nur einen Urlaub von jemandem aus, dessen eigenes Dienstwochenende es war; Schule, Externer Einsatz oder Urlaub vom anderen Wochenende blieben trotz Übernahme überplant. Unter null sinkt die Zahl nicht, und Zusagen auf dem eigenen Dienstwochenende zählen weiterhin nicht</li><li><strong>Neu:</strong> Die Geräteübersicht eines Mitarbeiters (Klick auf den Namen in der Einweisungsmatrix) filtert mit <strong>Nur offene Einweisungen</strong> und <strong>Nur Geräte im Bestand</strong>. Beide Filter lassen sich kombinieren und bleiben beim Wechsel zum nächsten Mitarbeiter eingestellt</li></ul>
 <h3 id="hilfe-4-60-0-eine-freundlichere-ubersicht">4.60.0 – Eine freundlichere Übersicht</h3>
@@ -4682,6 +4691,7 @@
               <option value="all">Alle</option>
               <option value="instructed">Eingewiesen</option>
               <option value="missing">Nicht eingewiesen</option>
+              <option value="voided">Neueinweisung nötig</option>
             </select>
           </label>
           <label class="compact-field">
@@ -4698,8 +4708,67 @@
         <div id="deviceOverviewContent"></div>
       </div>
       <div class="modal-footer">
+        <button class="button button-secondary" id="deviceOverviewReinstructButton" type="button">
+          <svg><use href="#icon-alert"></use></svg>
+          Neueinweisung anordnen …
+        </button>
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>
+    </dialog>
+
+    <dialog
+      class="modal device-reinstruction-dialog"
+      id="deviceReinstructionDialog"
+      aria-labelledby="deviceReinstructionTitle"
+    >
+      <form id="deviceReinstructionForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Geräteeinweisungen</p>
+            <h2 id="deviceReinstructionTitle">Neueinweisung anordnen</h2>
+            <p class="modal-subtitle" id="deviceReinstructionSubtitle"></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input id="deviceReinstructionDeviceId" type="hidden" />
+          <p class="field-hint">
+            Alle Einweisungen in dieses Gerät vor dem Stichtag werden nichtig,
+            etwa nach einem Softwareupdate. Die Nachweise bleiben als Verlauf
+            erhalten; Einweisungen ab dem Stichtag zählen wieder.
+          </p>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Neueinweisung erforderlich ab <em>*</em></span>
+              <input id="deviceReinstructionDate" type="date" required />
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Grund <em>*</em></span>
+              <input
+                id="deviceReinstructionReason"
+                type="text"
+                maxlength="200"
+                placeholder="z. B. Softwareupdate 3.2"
+                required
+              />
+            </label>
+          </div>
+          <p class="device-reinstruction-preview" id="deviceReinstructionPreview" aria-live="polite"></p>
+          <section class="device-reinstruction-history" id="deviceReinstructionHistory" hidden>
+            <h3>Bisher angeordnet</h3>
+            <ul id="deviceReinstructionHistoryList"></ul>
+          </section>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" data-close-dialog>Abbrechen</button>
+          <button class="button button-primary" type="submit">
+            <svg><use href="#icon-check"></use></svg>
+            Neueinweisung anordnen
+          </button>
+        </div>
+      </form>
     </dialog>
 
     <dialog
@@ -4754,6 +4823,7 @@
             <label class="form-field">
               <span>Einweisungsdatum <em>*</em></span>
               <input id="deviceInstructionDate" type="date" required />
+              <span class="field-hint device-instruction-cutoff-hint" id="deviceInstructionCutoffHint" role="status" hidden></span>
             </label>
             <label class="form-field form-field-wide">
               <span>Art des Einweisenden <em>*</em></span>

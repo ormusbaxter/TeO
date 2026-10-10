@@ -1,3 +1,10 @@
+### 4.62.0 – Neueinweisung nach einem Softwareupdate
+
+- **Neu:** Geräteeinweisungen lassen sich für nichtig erklären, etwa wenn ein Softwareupdate ein Gerät erneut einweisungspflichtig macht. **Neueinweisung anordnen** (Warnsymbol an der Gerätekarte oder in der Einweisungsübersicht des Geräts) setzt einen Stichtag mit Grund; alle Einweisungen davor sind nichtig, bleiben aber als Verlauf erhalten. Eine Einweisung am Stichtag zählt bereits. Der Dialog nennt vorab, wie viele Mitarbeiter betroffen sind, und eine irrtümliche Anordnung lässt sich dort wieder aufheben
+- **Neu:** Die Einweisungsmatrix zeigt nichtige Einweisungen orange mit **↻**; Prozentwerte, Einweisungsberechtigte, Gerätekarten und Kennzahlen zählen nur gültige Einweisungen. Die Einweisungsübersicht eines Geräts filtert **Neueinweisung nötig**
+- **Neu:** Die Übersicht führt Geräte mit offenen Neueinweisungen unter **Überfällig und zu prüfen**; der Excel-Export des Gerätekatalogs enthält Stichtag und Grund
+- **Geändert:** Datenformat 26. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit angeordnete Neueinweisungen nicht verloren gehen
+
 ### 4.61.0 – Dienstübernahmen senken die Überplanung
 
 - **Geändert:** In der Urlaubsplanung zählt jede verpflichtende Dienstzusage eines Mitarbeiters vom jeweils anderen festen Wochenende als Dienstübernahme und verringert die wirksamen Abwesenheiten des Tages um eins – im Spaltenkopf als `−1`, `−2` … neben der Zahl der Dienstzusagen (`D1`, `D2` …). Bisher glich sie nur einen Urlaub von jemandem aus, dessen eigenes Dienstwochenende es war; Schule, Externer Einsatz oder Urlaub vom anderen Wochenende blieben trotz Übernahme überplant. Unter null sinkt die Zahl nicht, und Zusagen auf dem eigenen Dienstwochenende zählen weiterhin nicht

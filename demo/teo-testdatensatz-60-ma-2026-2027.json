@@ -1,7 +1,7 @@
 {
   "format": "intensivteam-datensicherung",
   "formatVersion": 1,
-  "appVersion": 25,
+  "appVersion": 26,
   "exportedAt": "2026-10-05T12:00:00.000Z",
   "synthetic": true,
   "generator": {
@@ -10,7 +10,7 @@
     "note": "Alle Mitarbeiter-, Kontakt- und Verlaufsdaten sind synthetisch."
   },
   "data": {
-    "version": 25,
+    "version": 26,
     "employees": [
       {
         "id": "employee-test-001",
