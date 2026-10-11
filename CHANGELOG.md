@@ -1,6 +1,7 @@
 ### 4.64.0 – Einweisungsmatrix als Excel-Datei
 
 - **Neu:** **Export Excel** im Kopf der Einweisungsmatrix speichert sie als `.xlsx` mit allen Mitarbeitern und Geräten, unabhängig von den Filtern der Matrix. Umgeschaltet wird in Excel: zwischen den Blättern **Alle Geräte**, **Anlage 1**, **Außer Anlage 1** und **Nicht in Betrieb** und über den Filter der Spalte **Status** zwischen allen und nur aktiven Mitarbeitern. Spalten sind die Geräte (Hersteller und Gerätename), Zeilen die Mitarbeiter (Nachname, ggf. Geburtsname, Vorname, ggf. MP-Beauftragte/r), jede Zelle nennt das Datum der letzten gültigen Einweisung. Durch eine Neueinweisung nichtige Einweisungen zählen nicht
+- **Neu:** Die Excel-Datei ist gestaltet wie TeO: Titel mit Stand je Blatt, blaue Kopfzeile, grün hinterlegte Einweisungsdaten, feine Rahmen, inaktive Mitarbeiter grau. Kopfzeile und Namensspalten wiederholen sich beim Drucken auf jeder Seite
 
 ### 4.63.0 – Namensänderungen
 

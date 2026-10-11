@@ -146,7 +146,7 @@ const BLAETTER = ["Alle Geräte", "Anlage 1", "Außer Anlage 1", "Nicht in Betri
 // Spaltenköpfe ab C eines Blatts, in Reihenfolge.
 function geraetespalten(c) {
   return Object.keys(c)
-    .filter((ref) => /^[A-Z]+1$/.test(ref) && !["A1", "B1"].includes(ref))
+    .filter((ref) => /^[A-Z]+3$/.test(ref) && !["A3", "B3"].includes(ref))
     .map((ref) => c[ref].wert);
 }
 
@@ -186,30 +186,48 @@ test("Excel-Export der Einweisungsmatrix: ein Blatt je Geräteauswahl, alle Mita
   assert.equal(geraetespalten(blaetter[2]).join("|"), "Braun Infusion ohne Anlage");
   assert.equal(geraetespalten(blaetter[3]).join("|"), "Alt Ausgemustert");
 
-  // Alle Mitarbeiter, auch inaktive; die Spalte Status schaltet per Autofilter.
+  // Titel und Erläuterung über der Tabelle, Kopfzeile in Zeile 3.
   const c = blaetter[1];
-  assert.equal(c.A1.wert, "Mitarbeiter");
-  assert.equal(c.B1.wert, "Status");
-  assert.equal(c.A2.wert, "Alt, Ina");
-  assert.equal(c.B2.wert, "Inaktiv");
-  assert.equal(c.A3.wert, "Becker &amp; Co, Ben");
-  assert.equal(c.B3.wert, "Aktiv");
-  assert.equal(c.A4.wert, "Müller, geb. Schmidt, Anna, MP-Beauftragte/r");
+  assert.equal(c.A1.wert, "Einweisungsmatrix – Anlage 1");
+  assert.match(String(c.A2.wert), /^Stand \d{2}\.\d{2}\.\d{4} · /);
+  assert.equal(c.A3.wert, "Mitarbeiter");
+  assert.equal(c.B3.wert, "Status");
 
-  assert.equal(c.C3.wert, seriell("2026-09-01"));
-  assert.equal(c.D3.wert, seriell("2025-02-03"));
-  assert.equal(c.C4.wert, "", "nichtige Einweisung zählt nicht");
-  assert.equal(c.D4.wert, seriell("2026-04-20"), "jüngste Einweisung");
+  // Alle Mitarbeiter, auch inaktive; die Spalte Status schaltet per Autofilter.
+  assert.equal(c.A4.wert, "Alt, Ina");
+  assert.equal(c.B4.wert, "Inaktiv");
+  assert.equal(c.A5.wert, "Becker &amp; Co, Ben");
+  assert.equal(c.B5.wert, "Aktiv");
+  assert.equal(c.A6.wert, "Müller, geb. Schmidt, Anna, MP-Beauftragte/r");
 
-  // Datumszellen tragen das Datumsformat TT.MM.JJJJ.
-  const stile = [...dateien.get("xl/styles.xml").matchAll(/<xf numFmtId="(\d+)"[^>]*xfId/g)];
-  assert.equal(stile[Number(c.D4.stil)][1], "164");
-  assert.match(dateien.get("xl/styles.xml"), /numFmtId="164" formatCode="dd\\.mm\\.yyyy"/);
+  assert.equal(c.C5.wert, seriell("2026-09-01"));
+  assert.equal(c.D5.wert, seriell("2025-02-03"));
+  assert.equal(c.C6.wert, "", "nichtige Einweisung zählt nicht");
+  assert.equal(c.D6.wert, seriell("2026-04-20"), "jüngste Einweisung");
+
+  // Datumszellen tragen das Datumsformat TT.MM.JJJJ und sind grün
+  // hinterlegt, leere nicht; Inaktive stehen in eigener, grauer Schrift.
+  const styles = dateien.get("xl/styles.xml");
+  const xfs = [...styles.match(/<cellXfs[^>]*>([\s\S]*?)<\/cellXfs>/)[1].matchAll(/<xf [^>]*>/g)].map(
+    (m) => m[0],
+  );
+  const fuellungen = [...styles.match(/<fills[^>]*>([\s\S]*?)<\/fills>/)[1].matchAll(/<fill>[\s\S]*?<\/fill>/g)].map(
+    (m) => m[0],
+  );
+  const fuellung = (zelle) => fuellungen[Number(/fillId="(\d+)"/.exec(xfs[Number(zelle.stil)])[1])];
+  assert.match(xfs[Number(c.D6.stil)], /numFmtId="164"/);
+  assert.match(fuellung(c.D6), /rgb="FFE2F5EB"/);
+  assert.match(fuellung(c.C6), /patternType="none"/);
+  assert.notEqual(c.A4.stil, c.A5.stil);
+  assert.match(styles, /numFmtId="164" formatCode="dd\\.mm\\.yyyy"/);
+  assert.match(styles, /<name val="Segoe UI"\/>/);
 
   const blatt = dateien.get("xl/worksheets/sheet2.xml");
-  assert.match(blatt, /<pane xSplit="2" ySplit="1" topLeftCell="C2"[^>]*state="frozen"/);
-  assert.match(blatt, /<autoFilter ref="A1:D4"\/>/);
-  assert.match(mappe, /localSheetId="1" hidden="1">'Anlage 1'!\$A\$1:\$D\$4</);
+  assert.match(blatt, /<pane xSplit="2" ySplit="3" topLeftCell="C4"[^>]*state="frozen"/);
+  assert.match(blatt, /<autoFilter ref="A3:D6"\/>/);
+  assert.match(blatt, /showGridLines="0"/);
+  assert.match(mappe, /localSheetId="1" hidden="1">'Anlage 1'!\$A\$3:\$D\$6</);
+  assert.match(mappe, /_xlnm\.Print_Titles" localSheetId="1">'Anlage 1'!\$A:\$B,'Anlage 1'!\$1:\$3</);
 });
 
 test("Ein Geburtsname, der dem heutigen Nachnamen entspricht, erscheint nicht", async () => {
@@ -220,7 +238,7 @@ test("Ein Geburtsname, der dem heutigen Nachnamen entspricht, erscheint nicht", 
   ];
   app.setState(daten);
   const c = zellen(entpacke(app.createDeviceMatrixWorkbook()).get("xl/worksheets/sheet1.xml"));
-  assert.equal(c.A4.wert, "Müller, Anna, MP-Beauftragte/r");
+  assert.equal(c.A6.wert, "Müller, Anna, MP-Beauftragte/r");
 });
 
 test("Export Excel an der Einweisungsmatrix lädt alle Mitarbeiter und Geräte herunter", async (t) => {
@@ -239,7 +257,7 @@ test("Export Excel an der Einweisungsmatrix lädt alle Mitarbeiter und Geräte h
   const dateien = entpacke(await readFile(await download.path()));
   const c = zellen(dateien.get("xl/worksheets/sheet1.xml"));
 
-  const zeilen = Object.keys(c).filter((ref) => /^A\d+$/.test(ref)).length - 1;
+  const zeilen = Object.keys(c).filter((ref) => /^A\d+$/.test(ref)).length - 3;
   assert.equal(zeilen, 60);
   assert.ok(geraetespalten(c).length > 0);
   assert.ok(
