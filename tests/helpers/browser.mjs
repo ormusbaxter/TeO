@@ -137,6 +137,10 @@ const DEMO_KONTEN = {
 //   Datei. Anders als angemeldetAls, das nur die Sperre löst und die Rolle an
 //   der Oberfläche setzt, ist danach intern jemand angemeldet: Was Rechte
 //   prüft, verhält sich wie im Betrieb. Lädt die Demodaten von selbst.
+// - uhr: Zeitpunkt, auf den die Uhr der Seite gestellt wird, als ISO-Text
+//   mit Zone (die Seite rechnet in Europe/Berlin). Sie läuft von dort weiter;
+//   `teo.page.clock` stellt sie während des Tests vor. Mit neustart wird die
+//   Uhr des vorigen Aufrufs auf den neuen Zeitpunkt gesetzt.
 export async function openTeO(
   t,
   {
@@ -145,6 +149,7 @@ export async function openTeO(
     urlaubsansicht = null,
     neustart = false,
     anmeldenAls = "",
+    uhr = null,
   } = {},
 ) {
   if (anmeldenAls && !DEMO_KONTEN[anmeldenAls]) {
@@ -170,11 +175,16 @@ export async function openTeO(
 
   if (neustart && shared.context) {
     await shared.page?.close().catch(() => {});
+    if (uhr) await shared.context.clock.setSystemTime(new Date(uhr));
   } else {
     await shared.context?.close().catch(() => {});
     shared.context = await shared.browser.newContext({
       viewport: { width: 1440, height: 900 },
+      // Mit gestellter Uhr auch eine feste Zone, sonst hinge der Ortstag
+      // davon ab, wo der Test läuft.
+      ...(uhr ? { timezoneId: "Europe/Berlin" } : {}),
     });
+    if (uhr) await shared.context.clock.install({ time: new Date(uhr) });
   }
   const page = await shared.context.newPage();
   shared.page = page;
