@@ -1,3 +1,8 @@
+### 4.64.1 – Tageswechsel bei geöffnetem TeO
+
+- **Behoben:** Blieb TeO über Mitternacht geöffnet, zeigten Dashboard und Ansichten bis zum nächsten Speichern oder Neuladen den Vortag: Datum, Fristen, Abwesenheiten, Quoten, die Zahl der Beschäftigten und Änderungen des Stellenumfangs. TeO bemerkt den neuen Tag jetzt innerhalb einer Minute oder bei der Rückkehr zum Fenster und aktualisiert alles
+- **Behoben:** Nach dem Jahreswechsel zeigen Pflichtfortbildungen und Teamsitzungen das neue Jahr, auch ohne Neuladen. Ein bewusst gewähltes anderes Jahr bleibt stehen, ebenso der Monat in Urlaubsplanung und Terminkalender
+
 ### 4.64.0 – Einweisungsmatrix als Excel-Datei
 
 - **Neu:** **Export Excel** im Kopf der Einweisungsmatrix speichert sie als `.xlsx` mit allen Mitarbeitern und Geräten, unabhängig von den Filtern der Matrix. Umgeschaltet wird in Excel: zwischen den Blättern **Alle Geräte**, **Anlage 1**, **Außer Anlage 1** und **Nicht in Betrieb** und über den Filter der Spalte **Status** zwischen allen und nur aktiven Mitarbeitern. Spalten sind die Geräte (Hersteller und Gerätename), Zeilen die Mitarbeiter (Nachname, ggf. Geburtsname, Vorname, ggf. MP-Beauftragte/r), jede Zelle nennt das Datum der letzten gültigen Einweisung. Durch eine Neueinweisung nichtige Einweisungen zählen nicht

@@ -55,6 +55,7 @@
     bindCatalogManagement();
     bindDataSync();
     bindRemoteSync();
+    bindDayChange();
 
     observeDynamicStyles();
     const initialHash = window.location.hash.replace("#", "");

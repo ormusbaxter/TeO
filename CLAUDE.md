@@ -167,6 +167,12 @@ wirklich an, mit den Konten der Demodatenbank, und durchläuft den
 Startabgleich mit derselben Datei. Das lädt die Demodaten von selbst und
 dauert etwas länger.
 
+Für alles, was am Datum hängt, stellt `uhr` die Uhr der Seite, als ISO-Text
+mit Zone (`"2026-12-31T23:58:00+01:00"`); gerechnet wird dann in
+Europe/Berlin. Die Uhr läuft von dort weiter, `teo.page.clock.fastForward("03:00")`
+springt vor und löst fällige Zeitgeber aus – so lässt sich etwa ein
+Jahreswechsel bei geöffnetem TeO durchspielen.
+
 Soll etwas den nächsten Start überleben, öffnet der zweite Aufruf mit
 `neustart: true`: Er lädt TeO im Kontext des vorigen Aufrufs neu, mit dessen
 Speicher.
