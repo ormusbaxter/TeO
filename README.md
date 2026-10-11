@@ -1387,8 +1387,10 @@ Aufbau jedes Blatts:
   alle Einweisungen durch eine angeordnete Neueinweisung nichtig sind, bleibt
   die Zelle leer
 
-Kopfzeile, Namens- und Statusspalte sind fixiert, und die Daten lassen sich in
-Excel als Datum sortieren.
+Jedes Blatt beginnt mit Titel und Stand. Eingewiesene Zellen sind grün
+hinterlegt, inaktive Mitarbeiter grau gesetzt. Kopfzeile, Namens- und
+Statusspalte sind fixiert und wiederholen sich beim Drucken auf jeder Seite;
+die Daten lassen sich in Excel als Datum sortieren.
 
 Unterhalb der Matrix werden dokumentierte Einweisungen chronologisch
 aufgelistet und können bearbeitet werden.

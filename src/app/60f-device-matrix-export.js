@@ -50,16 +50,22 @@
   // Autofilter der Spalte Status. Spalten lassen sich in Excel ohne Makros
   // nicht filtern, deshalb die Blätter.
   const DEVICE_MATRIX_EXPORT_SHEETS = [
-    { name: "Alle Geräte", matches: () => true },
+    { name: "Alle Geräte", tabColor: "2166D1", matches: () => true },
     {
       name: "Anlage 1",
+      tabColor: "197149",
       matches: (device) => device.currentInventory && device.annex1,
     },
     {
       name: "Außer Anlage 1",
+      tabColor: "5E6D7C",
       matches: (device) => device.currentInventory && !device.annex1,
     },
-    { name: "Nicht in Betrieb", matches: (device) => !device.currentInventory },
+    {
+      name: "Nicht in Betrieb",
+      tabColor: "9BA6B2",
+      matches: (device) => !device.currentInventory,
+    },
   ];
 
   function deviceMatrixExportDevices() {
@@ -70,27 +76,51 @@
     );
   }
 
-  function createDeviceMatrixSheet(name, devices, employees) {
+  // Aufbau je Blatt: Titel, eine Zeile Erläuterung, dann die Tabelle. Grün
+  // hinterlegt ist, wer gültig eingewiesen ist - wie in der Matrix. Inaktive
+  // Mitarbeiter stehen grau, damit sie beim Lesen zurücktreten.
+  function createDeviceMatrixSheet(sheet, devices, employees, today = todayIso()) {
     const header = (value) => ({ value, style: "header" });
     return {
-      name,
+      name: sheet.name,
+      tabColor: sheet.tabColor,
+      headerRow: 2,
       frozenColumns: 2,
-      headerHeight: 48,
-      columnWidths: [42, 16, ...devices.map(() => 18)],
+      rowHeights: { 0: 28, 1: 20, 2: 66 },
+      defaultRowHeight: 18,
+      columnWidths: [40, 15, ...devices.map(() => 15)],
       rows: [
+        [{ value: `Einweisungsmatrix – ${sheet.name}`, style: "title" }],
         [
-          header("Mitarbeiter"),
-          header("Status"),
+          {
+            value: `Stand ${formatDate(today)} · Datum der letzten gültigen Einweisung, leer = keine gültige Einweisung · Mitarbeiter über den Filter in „Status“ wählen`,
+            style: "subtitle",
+          },
+        ],
+        [
+          { value: "Mitarbeiter", style: "headerLeft" },
+          { value: "Status", style: "headerLeft" },
           ...devices.map((device) => header(deviceMatrixColumnLabel(device))),
         ],
-        ...employees.map((employee) => [
-          { value: deviceMatrixRowLabel(employee), style: "rowHeader" },
-          { value: EMPLOYMENT_STATUSES[employee.employmentStatus] || "" },
-          ...devices.map((device) => ({
-            value: latestValidDeviceInstructionDate(employee, device),
-            type: "date",
-          })),
-        ]),
+        ...employees.map((employee) => {
+          const muted = employee.employmentStatus === "inactive";
+          return [
+            {
+              value: deviceMatrixRowLabel(employee),
+              style: muted ? "rowHeaderMuted" : "rowHeader",
+            },
+            {
+              value: EMPLOYMENT_STATUSES[employee.employmentStatus] || "",
+              style: muted ? "statusMuted" : "status",
+            },
+            ...devices.map((device) => {
+              const date = latestValidDeviceInstructionDate(employee, device);
+              return date
+                ? { value: date, type: "date", style: "date" }
+                : { value: "", style: "empty" };
+            }),
+          ];
+        }),
       ],
     };
   }
@@ -101,7 +131,7 @@
   ) {
     return createXlsxWorkbook(
       DEVICE_MATRIX_EXPORT_SHEETS.map((sheet) =>
-        createDeviceMatrixSheet(sheet.name, devices.filter(sheet.matches), employees),
+        createDeviceMatrixSheet(sheet, devices.filter(sheet.matches), employees),
       ),
     );
   }
@@ -130,7 +160,25 @@
   // Inline-Zeichenketten, Daten als Excel-Seriennummer mit Datumsformat. Je
   // Blatt sind die Kopfzeile und die vorderen Spalten fixiert, die Kopfzeile
   // trägt einen Autofilter.
-  const XLSX_STYLE_INDEX = { default: 0, header: 1, rowHeader: 2, date: 3 };
+  // Farben aus den Farbmarken von TeO (00-foundation.css), Schrift Segoe UI
+  // wie auf jedem Windows-Arbeitsplatz vorhanden. Die Reihenfolge ergibt den
+  // Index in cellXfs.
+  const XLSX_CELL_STYLES = [
+    "default",
+    "header",
+    "headerLeft",
+    "rowHeader",
+    "rowHeaderMuted",
+    "status",
+    "statusMuted",
+    "date",
+    "empty",
+    "title",
+    "subtitle",
+  ];
+  const XLSX_STYLE_INDEX = Object.fromEntries(
+    XLSX_CELL_STYLES.map((name, index) => [name, index]),
+  );
 
   function xlsxColumnName(index) {
     let name = "";
@@ -163,7 +211,8 @@
   }
 
   function renderXlsxCell(cell, reference) {
-    const style = XLSX_STYLE_INDEX[cell.type === "date" ? "date" : cell.style] || 0;
+    const style =
+      XLSX_STYLE_INDEX[cell.style] ?? (cell.type === "date" ? XLSX_STYLE_INDEX.date : 0);
     if (cell.type === "date") {
       const serial = xlsxDateSerial(cell.value);
       return serial === null
@@ -177,16 +226,27 @@
     )}</t></is></c>`;
   }
 
-  function renderXlsxSheet({ rows, columnWidths = [], headerHeight, frozenColumns = 1 }) {
+  function renderXlsxSheet({
+    name,
+    rows,
+    columnWidths = [],
+    headerRow = 0,
+    frozenColumns = 1,
+    rowHeights = {},
+    defaultRowHeight = 15,
+    tabColor = "",
+  }) {
     const columnCount = Math.max(1, ...rows.map((row) => row.length));
-    const lastCell = `${xlsxColumnName(columnCount - 1)}${Math.max(1, rows.length)}`;
-    const topLeft = `${xlsxColumnName(frozenColumns)}2`;
+    const lastColumn = xlsxColumnName(columnCount - 1);
+    const lastRow = Math.max(headerRow + 1, rows.length);
+    const firstRow = headerRow + 1;
+    const filterRange = `A${firstRow}:${lastColumn}${lastRow}`;
+    const topLeft = `${xlsxColumnName(frozenColumns)}${firstRow + 1}`;
     const sheetRows = rows
       .map((row, rowIndex) => {
-        const height =
-          rowIndex === 0 && headerHeight
-            ? ` ht="${headerHeight}" customHeight="1"`
-            : "";
+        const height = rowHeights[rowIndex]
+          ? ` ht="${rowHeights[rowIndex]}" customHeight="1"`
+          : "";
         return `<row r="${rowIndex + 1}"${height}>${row
           .map((cell, columnIndex) =>
             renderXlsxCell(cell, `${xlsxColumnName(columnIndex)}${rowIndex + 1}`),
@@ -202,20 +262,27 @@
           )
           .join("")}</cols>`
       : "";
+    const quotedName = `'${xlsxSheetName(name).replaceAll("'", "''")}'`;
     return {
-      range: `$A$1:$${xlsxColumnName(columnCount - 1)}$${Math.max(1, rows.length)}`,
+      filterRange: `${quotedName}!$A$${firstRow}:$${lastColumn}$${lastRow}`,
+      // Beim Drucken wiederholen sich Kopfzeile und Namensspalten auf jeder
+      // Seite.
+      printTitles: `${quotedName}!$A:$${xlsxColumnName(Math.max(0, frozenColumns - 1))},${quotedName}!$1:$${firstRow}`,
       xml: `${XLSX_XML_HEAD}<worksheet xmlns="${XLSX_MAIN_NS}" xmlns:r="${XLSX_REL_NS}">\
-<dimension ref="A1:${lastCell}"/>\
-<sheetViews><sheetView workbookViewId="0">\
-<pane xSplit="${frozenColumns}" ySplit="1" topLeftCell="${topLeft}" activePane="bottomRight" state="frozen"/>\
+<sheetPr>${tabColor ? `<tabColor rgb="FF${tabColor}"/>` : ""}</sheetPr>\
+<dimension ref="A1:${lastColumn}${lastRow}"/>\
+<sheetViews><sheetView showGridLines="0" workbookViewId="0">\
+<pane xSplit="${frozenColumns}" ySplit="${firstRow}" topLeftCell="${topLeft}" activePane="bottomRight" state="frozen"/>\
 <selection pane="topRight"/><selection pane="bottomLeft"/>\
 <selection pane="bottomRight" activeCell="${topLeft}" sqref="${topLeft}"/>\
 </sheetView></sheetViews>\
-<sheetFormatPr defaultRowHeight="15"/>${columns}\
+<sheetFormatPr defaultRowHeight="${defaultRowHeight}" customHeight="1"/>${columns}\
 <sheetData>${sheetRows}</sheetData>\
-<autoFilter ref="A1:${lastCell}"/>\
-<pageMargins left="0.5" right="0.5" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>\
-<pageSetup orientation="landscape" paperSize="9"/>\
+<autoFilter ref="${filterRange}"/>\
+<printOptions horizontalCentered="1"/>\
+<pageMargins left="0.4" right="0.4" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>\
+<pageSetup paperSize="9" orientation="landscape"/>\
+<headerFooter><oddFooter>&amp;L&amp;8&amp;A&amp;R&amp;8Seite &amp;P von &amp;N</oddFooter></headerFooter>\
 </worksheet>`,
     };
   }
@@ -245,28 +312,62 @@
     // Einfache Anfuehrungszeichen am Rahmenstil: Die Strukturpruefung sucht
     // style-Attribute in doppelten Anfuehrungszeichen als verbotenes
     // HTML-Attribut, hier ist es Excel-XML.
+    const font = (size, color, extra = "") =>
+      `<font>${extra}<sz val="${size}"/><color rgb="FF${color}"/><name val="Segoe UI"/><family val="2"/></font>`;
+    const fill = (color) =>
+      `<fill><patternFill patternType="solid"><fgColor rgb="FF${color}"/><bgColor indexed="64"/></patternFill></fill>`;
+    const side = (edge, color) => `<${edge} style='thin'><color rgb="FF${color}"/></${edge}>`;
+    const border = (color) =>
+      `<border>${["left", "right", "top", "bottom"].map((edge) => side(edge, color)).join("")}<diagonal/></border>`;
+    // Schriften: 0 Text, 1 Kopf, 2 Name, 3 Titel, 4 Erläuterung, 5 Datum, 6 inaktiv
+    const fonts = [
+      font(10, "29384A"),
+      font(10, "FFFFFF", "<b/>"),
+      font(10, "182230", "<b/>"),
+      font(15, "182230", "<b/>"),
+      font(9, "5E6D7C"),
+      font(10, "197149"),
+      font(10, "9BA6B2", "<i/>"),
+    ];
+    // Füllungen: 0 und 1 verlangt Excel, 2 Kopf, 3 eingewiesen, 4 Namensspalte
+    const fills = [
+      '<fill><patternFill patternType="none"/></fill>',
+      '<fill><patternFill patternType="gray125"/></fill>',
+      fill("2166D1"),
+      fill("E2F5EB"),
+      fill("F7F8FA"),
+    ];
+    // Rahmen: 0 keiner, 1 Tabelle, 2 Kopf
+    const borders = [
+      "<border><left/><right/><top/><bottom/><diagonal/></border>",
+      border("E1E6EB"),
+      border("1B57B3"),
+    ];
+    const xf = ({ font: fontId = 0, fill: fillId = 0, border: borderId = 0, numFmt = 0, align = "" }) =>
+      `<xf numFmtId="${numFmt}" fontId="${fontId}" fillId="${fillId}" borderId="${borderId}" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment ${align}/></xf>`;
+    const cellFormats = {
+      default: xf({}),
+      header: xf({ font: 1, fill: 2, border: 2, align: 'horizontal="center" vertical="center" wrapText="1"' }),
+      headerLeft: xf({ font: 1, fill: 2, border: 2, align: 'horizontal="left" vertical="center" indent="1"' }),
+      rowHeader: xf({ font: 2, fill: 4, border: 1, align: 'vertical="center" indent="1"' }),
+      rowHeaderMuted: xf({ font: 6, fill: 4, border: 1, align: 'vertical="center" indent="1"' }),
+      status: xf({ font: 0, fill: 4, border: 1, align: 'vertical="center" indent="1"' }),
+      statusMuted: xf({ font: 6, fill: 4, border: 1, align: 'vertical="center" indent="1"' }),
+      date: xf({ font: 5, fill: 3, border: 1, numFmt: 164, align: 'horizontal="center" vertical="center"' }),
+      empty: xf({ border: 1, align: 'horizontal="center" vertical="center"' }),
+      title: xf({ font: 3, align: 'vertical="center"' }),
+      subtitle: xf({ font: 4, align: 'vertical="center"' }),
+    };
+    // Einfache Anfuehrungszeichen am Rahmenstil: Die Strukturpruefung sucht
+    // style-Attribute in doppelten Anfuehrungszeichen als verbotenes
+    // HTML-Attribut, hier ist es Excel-XML.
     const styles = `${xmlHead}<styleSheet xmlns="${mainNs}">\
 <numFmts count="1"><numFmt numFmtId="164" formatCode="dd\\.mm\\.yyyy"/></numFmts>\
-<fonts count="2">\
-<font><sz val="11"/><color rgb="FF222222"/><name val="Calibri"/><family val="2"/></font>\
-<font><b/><sz val="11"/><color rgb="FF222222"/><name val="Calibri"/><family val="2"/></font>\
-</fonts>\
-<fills count="3">\
-<fill><patternFill patternType="none"/></fill>\
-<fill><patternFill patternType="gray125"/></fill>\
-<fill><patternFill patternType="solid"><fgColor rgb="FFE7E6E6"/><bgColor indexed="64"/></patternFill></fill>\
-</fills>\
-<borders count="2">\
-<border><left/><right/><top/><bottom/><diagonal/></border>\
-<border><left/><right/><top/><bottom style='thin'><color rgb="FFA6A6A6"/></bottom><diagonal/></border>\
-</borders>\
+<fonts count="${fonts.length}">${fonts.join("")}</fonts>\
+<fills count="${fills.length}">${fills.join("")}</fills>\
+<borders count="${borders.length}">${borders.join("")}</borders>\
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>\
-<cellXfs count="4">\
-<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>\
-<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>\
-<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>\
-<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="center"/></xf>\
-</cellXfs>\
+<cellXfs count="${XLSX_CELL_STYLES.length}">${XLSX_CELL_STYLES.map((name) => cellFormats[name]).join("")}</cellXfs>\
 <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>\
 </styleSheet>`;
 
@@ -280,9 +381,11 @@
 <definedNames>${rendered
       .map(
         (sheet, index) =>
-          `<definedName name="_xlnm._FilterDatabase" localSheetId="${index}" hidden="1">'${escapeXlsxText(
-            sheet.name.replaceAll("'", "''"),
-          )}'!${sheet.range}</definedName>`,
+          `<definedName name="_xlnm._FilterDatabase" localSheetId="${index}" hidden="1">${escapeXlsxText(
+            sheet.filterRange,
+          )}</definedName><definedName name="_xlnm.Print_Titles" localSheetId="${index}">${escapeXlsxText(
+            sheet.printTitles,
+          )}</definedName>`,
       )
       .join("")}</definedNames>\
 </workbook>`;
