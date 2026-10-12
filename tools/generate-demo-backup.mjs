@@ -285,9 +285,8 @@ function createMeetings(employees) {
             : weightedPick([
                 ["dienst", 29],
                 ["urlaub", 24],
-                ["krankheit", 22],
                 ["schule", 11],
-                ["entschuldigt", 11],
+                ["entschuldigt", 33],
                 ["unentschuldigt", 3],
               ]);
         meetingAttendances.push({

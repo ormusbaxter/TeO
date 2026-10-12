@@ -1281,11 +1281,15 @@ Für das aktive Team stehen folgende Statuswerte zur Verfügung:
 - teilgenommen
 - Urlaub
 - Dienst
-- Krankheit
 - Schule
 - entschuldigt
 - unentschuldigt
 - nicht zutreffend
+
+Einen Status „Krankheit“ gibt es bewusst nicht: Der Grund einer Erkrankung ist
+ein Gesundheitsdatum und für die Teilnahmestatistik nicht nötig. Wer krank
+fehlt, gilt als **entschuldigt**. Einträge „Krankheit“ aus Fassungen vor
+4.68.0 übernimmt TeO beim Laden als „entschuldigt“.
 
 Der Status **nicht zutreffend** ist beispielsweise für Personen vorgesehen,
 die zum Sitzungszeitpunkt noch nicht zum Team gehörten. Diese Einträge werden

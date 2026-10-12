@@ -8784,7 +8784,6 @@ button.device-employee-overview-row:hover {
   --badge-bg: #f0e9fa;
 }
 
-.attendance-red,
 .attendance-dark-red {
   --badge-color: var(--red-700);
   --badge-bg: var(--red-100);

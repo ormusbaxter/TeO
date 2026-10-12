@@ -658,7 +658,10 @@
     const id = normalizeId(attendance?.id);
     const meetingId = normalizeId(attendance?.meetingId);
     const employeeId = normalizeId(attendance?.employeeId);
-    const status = String(attendance?.status || "");
+    const rawStatus = String(attendance?.status || "");
+    const status = Object.hasOwn(LEGACY_ATTENDANCE_STATUSES, rawStatus)
+      ? LEGACY_ATTENDANCE_STATUSES[rawStatus]
+      : rawStatus;
     if (
       !attendance ||
       !id ||

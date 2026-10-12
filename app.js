@@ -530,18 +530,23 @@
     teilgenommen: { label: "Teilgenommen", tone: "green" },
     urlaub: { label: "Urlaub", tone: "blue" },
     dienst: { label: "Dienst", tone: "purple" },
-    krankheit: { label: "Krankheit", tone: "red" },
     schule: { label: "Schule", tone: "teal" },
     entschuldigt: { label: "Entschuldigt", tone: "orange" },
     unentschuldigt: { label: "Unentschuldigt", tone: "dark-red" },
     nicht_zutreffend: { label: "Nicht zutreffend", tone: "muted" },
   };
 
+  // Fruehere Fassungen kannten den Status "Krankheit". Fuer eine Teamsitzung
+  // genuegt, dass jemand entschuldigt fehlte; ein Gesundheitsdatum braucht es
+  // dafuer nicht. Vorhandene Eintraege gehen deshalb in "Entschuldigt" auf.
+  const LEGACY_ATTENDANCE_STATUSES = {
+    krankheit: "entschuldigt",
+  };
+
   const ATTENDANCE_CHART_COLORS = {
     teilgenommen: "#2b9b68",
     urlaub: "#4f8fdf",
     dienst: "#805bad",
-    krankheit: "#d2525d",
     schule: "#25a29d",
     entschuldigt: "#dc8a31",
     unentschuldigt: "#9f2731",
@@ -2888,7 +2893,10 @@
     const id = normalizeId(attendance?.id);
     const meetingId = normalizeId(attendance?.meetingId);
     const employeeId = normalizeId(attendance?.employeeId);
-    const status = String(attendance?.status || "");
+    const rawStatus = String(attendance?.status || "");
+    const status = Object.hasOwn(LEGACY_ATTENDANCE_STATUSES, rawStatus)
+      ? LEGACY_ATTENDANCE_STATUSES[rawStatus]
+      : rawStatus;
     if (
       !attendance ||
       !id ||
@@ -19249,7 +19257,6 @@ ${rendered
                 <th scope="col">Teilgenommen</th>
                 <th scope="col">Urlaub</th>
                 <th scope="col">Dienst</th>
-                <th scope="col">Krankheit</th>
                 <th scope="col">Schule</th>
                 <th scope="col">Entschuldigt</th>
                 <th scope="col">Unentschuldigt</th>
@@ -19272,7 +19279,6 @@ ${rendered
                       <td>${employee.statusCounts.teilgenommen}</td>
                       <td>${employee.statusCounts.urlaub}</td>
                       <td>${employee.statusCounts.dienst}</td>
-                      <td>${employee.statusCounts.krankheit}</td>
                       <td>${employee.statusCounts.schule}</td>
                       <td>${employee.statusCounts.entschuldigt}</td>
                       <td>${employee.statusCounts.unentschuldigt}</td>
@@ -19318,7 +19324,6 @@ ${rendered
         "Teilgenommen",
         "Urlaub",
         "Dienst",
-        "Krankheit",
         "Schule",
         "Entschuldigt",
         "Unentschuldigt",
@@ -19332,7 +19337,6 @@ ${rendered
         employee.statusCounts.teilgenommen,
         employee.statusCounts.urlaub,
         employee.statusCounts.dienst,
-        employee.statusCounts.krankheit,
         employee.statusCounts.schule,
         employee.statusCounts.entschuldigt,
         employee.statusCounts.unentschuldigt,

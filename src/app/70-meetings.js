@@ -412,7 +412,6 @@
                 <th scope="col">Teilgenommen</th>
                 <th scope="col">Urlaub</th>
                 <th scope="col">Dienst</th>
-                <th scope="col">Krankheit</th>
                 <th scope="col">Schule</th>
                 <th scope="col">Entschuldigt</th>
                 <th scope="col">Unentschuldigt</th>
@@ -435,7 +434,6 @@
                       <td>${employee.statusCounts.teilgenommen}</td>
                       <td>${employee.statusCounts.urlaub}</td>
                       <td>${employee.statusCounts.dienst}</td>
-                      <td>${employee.statusCounts.krankheit}</td>
                       <td>${employee.statusCounts.schule}</td>
                       <td>${employee.statusCounts.entschuldigt}</td>
                       <td>${employee.statusCounts.unentschuldigt}</td>
@@ -481,7 +479,6 @@
         "Teilgenommen",
         "Urlaub",
         "Dienst",
-        "Krankheit",
         "Schule",
         "Entschuldigt",
         "Unentschuldigt",
@@ -495,7 +492,6 @@
         employee.statusCounts.teilgenommen,
         employee.statusCounts.urlaub,
         employee.statusCounts.dienst,
-        employee.statusCounts.krankheit,
         employee.statusCounts.schule,
         employee.statusCounts.entschuldigt,
         employee.statusCounts.unentschuldigt,
