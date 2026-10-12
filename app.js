@@ -740,6 +740,10 @@
     databaseSaveWarningText: document.querySelector(
       "#databaseSaveWarningText",
     ),
+    databaseSaveWarningTitle: document.querySelector("#databaseSaveWarningTitle"),
+    databaseSaveWarningActionLabel: document.querySelector(
+      "#databaseSaveWarningActionLabel",
+    ),
     databaseSaveWarningExportButton: document.querySelector(
       "#databaseSaveWarningExportButton",
     ),
@@ -3755,7 +3759,7 @@
     elements.exportDataButton.addEventListener("click", exportDatabase);
     elements.databaseSaveWarningExportButton.addEventListener(
       "click",
-      exportDatabase,
+      handleDatabaseSaveWarningAction,
     );
     elements.exportEncryptedDataButton.addEventListener("click", exportEncryptedDatabase);
     elements.selectAutomaticBackupDirectoryButton.addEventListener(
@@ -21363,6 +21367,8 @@ ${rendered
 
   function renderAutomaticBackupStatus() {
     if (!automaticBackupSettings) return;
+    // Der Sicherungshinweis haengt am Zustand der automatischen Sicherung.
+    renderDatabaseSaveWarning();
     elements.automaticBackupEncryption.checked =
       automaticBackupSettings.encrypted;
     renderAutomaticBackupEncryptionControls();
@@ -23346,12 +23352,53 @@ ${rendered
     }
   }
 
+  // Laeuft die automatische Sicherung, folgt jeder Aenderung nach zwei
+  // Sekunden die Datei - ein Hinweis auf fehlende Sicherung waere dann falsch
+  // und blitzte nach jeder Eingabe auf. Er erscheint erst wieder, wenn die
+  // Sicherung aus ist oder ins Stocken geraten ist.
+  function automaticBackupConfigured() {
+    return Boolean(
+      automaticBackupSettings?.enabled && automaticBackupDirectoryHandle,
+    );
+  }
+
+  function automaticBackupProblem() {
+    if (!automaticBackupConfigured()) return "";
+    if (automaticBackupNotice) return automaticBackupNotice;
+    if (automaticBackupSettings.encrypted && !automaticBackupPassword) {
+      return "Verschlüsselung aktiv – erneut anmelden oder Wiederherstellungsschlüssel eingeben.";
+    }
+    return "";
+  }
+
+  function automaticBackupCoversChanges() {
+    return automaticBackupConfigured() && !automaticBackupProblem();
+  }
+
+  function handleDatabaseSaveWarningAction() {
+    if (automaticBackupProblem()) {
+      void runAutomaticBackupOnDemand();
+      return;
+    }
+    void exportDatabase();
+  }
+
   function renderDatabaseSaveWarning() {
-    const visible = Boolean(currentUser && databaseSaveReminderArmed);
+    const visible = Boolean(
+      currentUser && databaseSaveReminderArmed && !automaticBackupCoversChanges(),
+    );
     elements.databaseSaveWarning.hidden = !visible;
     if (visible) {
+      const problem = automaticBackupProblem();
+      elements.databaseSaveWarningTitle.textContent = problem
+        ? "Automatische Sicherung gestoppt:"
+        : "Datensicherung erforderlich:";
       elements.databaseSaveWarningText.textContent =
+        problem ||
         "Änderungen wurden automatisch gespeichert, aber noch nicht als Datensicherung exportiert.";
+      elements.databaseSaveWarningActionLabel.textContent = problem
+        ? "Jetzt sichern"
+        : "Jetzt exportieren";
     }
     // Die Warnung teilt sich die oberste Ebene mit den Meldungen: erscheint sie
     // als einzige, muss das Popover geoeffnet werden, verschwindet sie als

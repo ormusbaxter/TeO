@@ -41,6 +41,8 @@ export async function loadAppFunctions(names, { withDom = false } = {}) {
       setAutomaticBackupDirectoryHandle(value) {
         automaticBackupDirectoryHandle = value;
       },
+      setAutomaticBackupNotice(value) { automaticBackupNotice = value; },
+      setDatabaseSaveReminderArmed(value) { databaseSaveReminderArmed = value; },
       setSharedBackupFileStamp(value) { sharedBackupFileStamp = value; },
       getSharedBackupFileStamp() { return sharedBackupFileStamp; },
       setActiveView(value) { activeView = value; },

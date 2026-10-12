@@ -322,7 +322,7 @@
     elements.exportDataButton.addEventListener("click", exportDatabase);
     elements.databaseSaveWarningExportButton.addEventListener(
       "click",
-      exportDatabase,
+      handleDatabaseSaveWarningAction,
     );
     elements.exportEncryptedDataButton.addEventListener("click", exportEncryptedDatabase);
     elements.selectAutomaticBackupDirectoryButton.addEventListener(

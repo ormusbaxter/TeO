@@ -2678,7 +2678,7 @@
 <ol><li>In der Warnleiste <strong>Jetzt exportieren</strong> wählen oder <strong>Einstellungen → Sicherung exportieren</strong> öffnen.</li><li>Die JSON-Datei an einem geschützten Ort speichern.</li><li>Prüfen, ob die Datei vollständig heruntergeladen wurde.</li></ol>
 <p>Optional kann die Sicherung mit Passwort, PBKDF2 und AES-GCM verschlüsselt werden. TeO verwendet dafür einen eigenen Passwortdialog mit Wiederholung, Eingabeprüfung und optionaler Passwortanzeige. Das Passwort kann nicht aus der Datei wiederhergestellt werden.</p>
 <h3 id="hilfe-automatische-sicherung-in-einen-ordner">Automatische Sicherung in einen Ordner</h3>
-<p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung erneut. Jede Sicherung überschreibt dieselbe Datei <code>teo-autosicherung.json</code>. Der Dateiname bleibt auch bei aktivierter Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.</p>
+<p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung erneut. Jede Sicherung überschreibt dieselbe Datei <code>teo-autosicherung.json</code>. Solange sie läuft, entfällt der Hinweis <strong>Datensicherung erforderlich</strong>. Stockt sie, etwa weil der Ordnerzugriff neu bestätigt werden muss, erscheint stattdessen <strong>Automatische Sicherung gestoppt</strong> mit dem Grund und der Schaltfläche <strong>Jetzt sichern</strong>. Der Dateiname bleibt auch bei aktivierter Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.</p>
 <p>Administratoren können unter <strong>Einstellungen → Sicherungserinnerung</strong> die maximale Größe einer Sicherungsdatei zwischen 1 und 100 MB festlegen. Der Standardwert beträgt 20 MB. Die Grenze gilt beim Erstellen, Prüfen, Laden vor der Anmeldung und Import. Ab 90 % des eingestellten Volumens zeigt TeO eine Warnung mit aktueller Dateigröße und Grenzwert an. Wird die Grenze überschritten, muss sie vor der nächsten Sicherung oder dem Import erhöht werden.</p>
 <p>Ein farbiger Balken in den Einstellungen zeigt die zuletzt gemessene Sicherungsgröße als „xx von yy MB“. Solange noch keine Sicherung in diesem Browser erstellt oder eingelesen wurde, verwendet TeO eine Schätzung des aktuellen unverschlüsselten Datenbestands. Der Balken ist unter 90 % grün, ab 90 % gelb und bei überschrittenem Grenzwert rot.</p>
 <p>Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
@@ -2784,6 +2784,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-67-0-sicherungshinweis-nur-bei-bedarf">4.67.0 – Sicherungshinweis nur bei Bedarf</h3>
+<ul><li><strong>Geändert:</strong> Ist die automatische Sicherung in einen Ordner eingerichtet und läuft, erscheint der Hinweis <strong>Datensicherung erforderlich</strong> nicht mehr nach jeder Änderung – die Datei <code>teo-autosicherung.json</code> wird ohnehin zwei Sekunden später geschrieben. Ohne automatische Sicherung bleibt er wie bisher</li><li><strong>Neu:</strong> Stockt die automatische Sicherung (Ordnerzugriff nicht bestätigt, Schreiben fehlgeschlagen, Verschlüsselung gesperrt, Datei von einem anderen Arbeitsplatz geändert), meldet der Hinweis <strong>Automatische Sicherung gestoppt</strong> mit dem Grund, und <strong>Jetzt sichern</strong> holt die Sicherung nach</li></ul>
 <h3 id="hilfe-4-66-0-ubersichtlichere-einstellungen">4.66.0 – Übersichtlichere Einstellungen</h3>
 <ul><li><strong>Geändert:</strong> Jeder Bereich der Einstellungen ist ein eigenes Registerblatt mit geordneten Karten: unter <strong>Allgemein</strong> stehen <strong>Darstellung</strong> (Farbthema und Symbolsatz, für das eigene Konto) und <strong>Ansicht</strong> (kompakte Tabellen und Obermenüs, nur an diesem Arbeitsplatz) jetzt getrennt, unter <strong>Stammdaten &amp; Zugriffe</strong> kommt die Verwaltung vor den Memo-Kategorien, die Datensicherung gehört sichtbar zu <strong>Daten &amp; Sicherung</strong></li><li><strong>Neu:</strong> Die Bereichsleiste ist mit der Tastatur bedienbar: Pfeiltasten wechseln den Bereich, <strong>Pos1</strong> und <strong>Ende</strong> springen an den Anfang und das Ende. Vorleseprogramme erkennen Reiter und Registerblätter, das Untermenü der Seitenleiste meldet den aktuellen Bereich, und Erläuterungen werden zu ihrem Schalter oder Feld mit vorgelesen</li><li><strong>Behoben:</strong> Datumsfelder für Schulferien und den Referenzsamstag waren nur eine schmale Linie hoch; Felder mit Einheit (Tage, MB) hatten keinen Innenabstand, die Felder der Urlaubsplanung standen versetzt. Die Schalter für kompakte Tabellen, Obermenüs und verschlüsselte Sicherungen sowie der Warnhinweis zum lokalen Speicher erschienen in großer Schrift, und der Speicherknopf der Sicherungserinnerung drückte die Karte auseinander. Die Schrift der Bereichsleiste und des Untermenüs ist etwas größer, der Knopf heißt jetzt <strong>Erinnerung speichern</strong></li></ul>
 <h3 id="hilfe-4-65-0-passworthinweis">4.65.0 – Passworthinweis</h3>
@@ -5442,7 +5444,7 @@
       >
         <svg aria-hidden="true"><use href="#icon-alert"></use></svg>
         <p class="database-save-warning-message">
-          <strong>Datensicherung erforderlich:</strong>
+          <strong id="databaseSaveWarningTitle">Datensicherung erforderlich:</strong>
           <span id="databaseSaveWarningText">
             Änderungen wurden gespeichert, aber noch nicht exportiert.
           </span>
@@ -5453,7 +5455,7 @@
           type="button"
         >
           <svg><use href="#icon-download"></use></svg>
-          Jetzt exportieren
+          <span id="databaseSaveWarningActionLabel">Jetzt exportieren</span>
         </button>
       </section>
     </div>

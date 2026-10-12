@@ -1,3 +1,8 @@
+### 4.67.0 – Sicherungshinweis nur bei Bedarf
+
+- **Geändert:** Ist die automatische Sicherung in einen Ordner eingerichtet und läuft, erscheint der Hinweis **Datensicherung erforderlich** nicht mehr nach jeder Änderung – die Datei `teo-autosicherung.json` wird ohnehin zwei Sekunden später geschrieben. Ohne automatische Sicherung bleibt er wie bisher
+- **Neu:** Stockt die automatische Sicherung (Ordnerzugriff nicht bestätigt, Schreiben fehlgeschlagen, Verschlüsselung gesperrt, Datei von einem anderen Arbeitsplatz geändert), meldet der Hinweis **Automatische Sicherung gestoppt** mit dem Grund, und **Jetzt sichern** holt die Sicherung nach
+
 ### 4.66.0 – Übersichtlichere Einstellungen
 
 - **Geändert:** Jeder Bereich der Einstellungen ist ein eigenes Registerblatt mit geordneten Karten: unter **Allgemein** stehen **Darstellung** (Farbthema und Symbolsatz, für das eigene Konto) und **Ansicht** (kompakte Tabellen und Obermenüs, nur an diesem Arbeitsplatz) jetzt getrennt, unter **Stammdaten & Zugriffe** kommt die Verwaltung vor den Memo-Kategorien, die Datensicherung gehört sichtbar zu **Daten & Sicherung**

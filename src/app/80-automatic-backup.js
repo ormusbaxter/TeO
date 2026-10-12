@@ -512,6 +512,8 @@
 
   function renderAutomaticBackupStatus() {
     if (!automaticBackupSettings) return;
+    // Der Sicherungshinweis haengt am Zustand der automatischen Sicherung.
+    renderDatabaseSaveWarning();
     elements.automaticBackupEncryption.checked =
       automaticBackupSettings.encrypted;
     renderAutomaticBackupEncryptionControls();
