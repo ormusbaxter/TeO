@@ -125,7 +125,7 @@ und ist nicht Teil der Datensicherung. Ist ein gemerkter Wert später entfallen
 
 ### Tabellen anpassen
 
-- **Kompakte Tabellen** – unter **Einstellungen → Allgemein**. Die
+- **Kompakte Tabellen** – unter **Einstellungen → Allgemein → Ansicht**. Die
   Zeilen rücken enger zusammen, Zweitzeilen wie Kontaktdaten treten zurück; im
   gleichen Bildausschnitt sind damit rund zwanzig statt zwölf Mitarbeiter
   sichtbar. Die Einstellung gilt nur an diesem Arbeitsplatz.
@@ -272,9 +272,28 @@ unverändert.
 
 Uhrzeiten werden im 24-Stunden-Format `HH:MM` angezeigt.
 
+### Aufbau der Einstellungen
+
+Die Einstellungen sind in fünf Bereiche geteilt, die als Reiter über der Seite
+und als Untermenü unter dem Menüpunkt **Einstellungen** stehen:
+
+- **Allgemein:** **Darstellung** (Farbthema und Symbolsatz, gespeichert für
+  das eigene Konto), **Ansicht** (kompakte Tabellen und Obermenüs, nur an
+  diesem Arbeitsplatz) und **Dialoge schließen**
+- **Planung:** feste Dienstwochenenden, Urlaubsplanung und Schulferien
+- **Pflichtfortbildungen:** Soll-Zeiten
+- **Stammdaten & Zugriffe:** Benutzer, Berufe und Qualifikationen,
+  Datenqualität sowie die Kategorien für Memo / ToDo
+- **Daten & Sicherung:** Speicherort, Sicherungserinnerung und Datensicherung
+
+Mit der Tastatur führt **Tab** auf den gewählten Reiter, **Pfeil links/rechts**
+wechseln den Bereich, **Pos1** und **Ende** springen zum ersten und letzten.
+Vorleseprogramme kündigen die Reiter als Registerkarten an und nennen die
+Erläuterung eines Schalters oder Felds mit.
+
 ### Obermenüs in der Seitenleiste
 
-Unter **Einstellungen → Allgemein** fasst **Obermenüs in der Seitenleiste**
+Unter **Einstellungen → Allgemein → Ansicht** fasst **Obermenüs in der Seitenleiste**
 die Menüpunkte zu Bereichen zusammen:
 
 - **Personal:** Mitarbeiter, Wochenendverteilung, Urlaubsplanung

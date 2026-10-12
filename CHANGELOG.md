@@ -1,3 +1,9 @@
+### 4.66.0 – Übersichtlichere Einstellungen
+
+- **Geändert:** Jeder Bereich der Einstellungen ist ein eigenes Registerblatt mit geordneten Karten: unter **Allgemein** stehen **Darstellung** (Farbthema und Symbolsatz, für das eigene Konto) und **Ansicht** (kompakte Tabellen und Obermenüs, nur an diesem Arbeitsplatz) jetzt getrennt, unter **Stammdaten & Zugriffe** kommt die Verwaltung vor den Memo-Kategorien, die Datensicherung gehört sichtbar zu **Daten & Sicherung**
+- **Neu:** Die Bereichsleiste ist mit der Tastatur bedienbar: Pfeiltasten wechseln den Bereich, **Pos1** und **Ende** springen an den Anfang und das Ende. Vorleseprogramme erkennen Reiter und Registerblätter, das Untermenü der Seitenleiste meldet den aktuellen Bereich, und Erläuterungen werden zu ihrem Schalter oder Feld mit vorgelesen
+- **Behoben:** Datumsfelder für Schulferien und den Referenzsamstag waren nur eine schmale Linie hoch; Felder mit Einheit (Tage, MB) hatten keinen Innenabstand, die Felder der Urlaubsplanung standen versetzt. Die Schalter für kompakte Tabellen, Obermenüs und verschlüsselte Sicherungen sowie der Warnhinweis zum lokalen Speicher erschienen in großer Schrift, und der Speicherknopf der Sicherungserinnerung drückte die Karte auseinander. Die Schrift der Bereichsleiste und des Untermenüs ist etwas größer, der Knopf heißt jetzt **Erinnerung speichern**
+
 ### 4.65.0 – Passworthinweis
 
 - **Neu:** Zu jedem Konto gehört ein Passworthinweis. Er ist Pflicht bei der Ersteinrichtung und bei jedem neuen Passwort und darf das Passwort nicht enthalten. Konten ohne Hinweis legen ihn nach der nächsten Anmeldung fest, ändern lässt er sich über **Konto → Passworthinweis ändern**

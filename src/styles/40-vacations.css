@@ -195,6 +195,9 @@ body.is-vacation-view .main-content {
   align-items: center;
   justify-content: space-between;
   padding: 4px 6px 4px 12px;
+  color: var(--slate-800);
+  font-size: 0.76rem;
+  font-weight: 650;
   border: 1px solid var(--slate-200);
   border-radius: var(--radius-sm);
 }

@@ -260,694 +260,807 @@
             </div>
           </div>
 
-          <nav class="settings-section-nav" aria-label="Einstellungsbereiche">
-            <button type="button" data-settings-section-target="general">Allgemein</button>
-            <button type="button" data-settings-section-target="planning">Planung</button>
-            <button type="button" data-settings-section-target="training">Pflichtfortbildungen</button>
-            <button type="button" data-settings-section-target="master-data">Stammdaten &amp; Zugriffe</button>
-            <button type="button" data-settings-section-target="data">Daten &amp; Sicherung</button>
-          </nav>
-
-          <div class="settings-grid">
-            <section class="panel settings-card" data-settings-section="general">
-              <div class="settings-card-heading">
-                <span class="settings-card-icon">
-                  <svg><use href="#icon-palette"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Darstellung</p>
-                  <h2>Farbthema</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                Das gewählte Erscheinungsbild wird für das angemeldete
-                Benutzerkonto gespeichert und gilt an jedem Arbeitsplatz, an dem
-                sich dieses Konto anmeldet. Andere Konten behalten ihr eigenes
-                Farbthema.
-              </p>
-              <label class="checkbox-field settings-density-field">
-                <input id="tableDensityToggle" type="checkbox" />
-                <span>
-                  Kompakte Tabellen – engere Zeilen, mehr Einträge im Bild.
-                  Diese Einstellung gilt nur an diesem Arbeitsplatz.
-                </span>
-              </label>
-              <label class="checkbox-field settings-density-field">
-                <input id="sidebarGroupingToggle" type="checkbox" />
-                <span>
-                  Obermenüs in der Seitenleiste – Personal, Termine,
-                  Fortbildungen und Geräte fassen ihre Menüpunkte zusammen und
-                  lassen sich auf- und zuklappen. Auch diese Einstellung gilt
-                  nur an diesem Arbeitsplatz.
-                </span>
-              </label>
-              <label class="settings-field">
-                <span>Aktives Farbthema</span>
-                <select data-theme-select aria-label="Farbthema auswählen">
-                  <option value="standard">Standard</option>
-                  <option value="dark">Dark Mode</option>
-                  <option value="solarized-light">Solarized Light</option>
-                  <option value="nord">Nord</option>
-                  <option value="dracula">Dracula</option>
-                  <option value="gruvbox-dark">Gruvbox Dark</option>
-                  <option value="tokyo-night">Tokyo Night</option>
-                  <option value="catppuccin-latte">Catppuccin Latte</option>
-                  <option value="github">GitHub</option>
-                  <option value="github-dark">GitHub Dark</option>
-                  <option value="windows-95">Windows 95</option>
-                  <option value="cellitinnen">Cellitinnen</option>
-                  <option value="cellitinnen-red">Cellitinnen Rot</option>
-                </select>
-              </label>
-              <label class="settings-field">
-                <span>Symbolsatz</span>
-                <select data-icon-set-select aria-label="Symbolsatz auswählen">
-                  <option value="standard">TeO (Standard)</option>
-                  <option value="lucide">Lucide</option>
-                  <option value="tabler">Tabler</option>
-                  <option value="heroicons">Heroicons</option>
-                  <option value="phosphor">Phosphor</option>
-                </select>
-              </label>
-              <p class="settings-description">
-                Der Symbolsatz bestimmt, welche Symbole in der ganzen Anwendung
-                erscheinen: die eigenen von TeO oder die eines der freien Sätze
-                Lucide, Tabler, Heroicons und Phosphor. Er lässt sich mit jedem
-                Farbthema kombinieren und wird ebenfalls für das angemeldete
-                Benutzerkonto gespeichert.
-              </p>
-            </section>
-
-            <section class="panel settings-card" data-settings-section="planning">
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-storage">
-                  <svg><use href="#icon-calendar"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Dienstplanung</p>
-                  <h2>Feste Dienstwochenenden</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                Jedem Wochenende wird eine Stationsleitung oder stellvertretende
-                Stationsleitung zugewiesen. Die Bezeichnung entspricht automatisch
-                dem Vornamen der verantwortlichen Person.
-              </p>
-              <div class="settings-weekend-config">
-                <fieldset>
-                  <legend>Wochenende A</legend>
-                  <label class="settings-field">
-                    <span>Bezeichnung (automatisch)</span>
-                    <input id="settingsWeekendNameA" type="text" readonly />
-                  </label>
-                  <label class="settings-field">
-                    <span>Verantwortliche Person</span>
-                    <select id="settingsWeekendOwnerA"></select>
-                  </label>
-                </fieldset>
-                <fieldset>
-                  <legend>Wochenende B</legend>
-                  <label class="settings-field">
-                    <span>Bezeichnung (automatisch)</span>
-                    <input id="settingsWeekendNameB" type="text" readonly />
-                  </label>
-                  <label class="settings-field">
-                    <span>Verantwortliche Person</span>
-                    <select id="settingsWeekendOwnerB"></select>
-                  </label>
-                </fieldset>
-              </div>
-              <div class="settings-actions">
-                <button
-                  class="button button-primary"
-                  id="saveWeekendSettingsButton"
-                  type="button"
-                >
-                  Wochenenden speichern
-                </button>
-              </div>
-            </section>
-
-            <section class="panel settings-card" data-settings-section="master-data">
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-admin">
-                  <svg><use href="#icon-memo"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Memo / ToDo</p>
-                  <h2>Kategorien</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                Kategorien für Memos und ToDos hinzufügen, umbenennen oder entfernen.
-              </p>
-              <form class="catalog-add-row" id="memoCategoryForm">
-                <input
-                  id="newMemoCategory"
-                  type="text"
-                  maxlength="60"
-                  placeholder="Neue Kategorie"
-                  aria-label="Neue Memo- oder ToDo-Kategorie"
-                  required
-                />
-                <button class="button button-primary button-compact" type="submit">
-                  <svg><use href="#icon-plus"></use></svg>
-                  Hinzufügen
-                </button>
-              </form>
-              <div class="catalog-list" id="memoCategoryList"></div>
-            </section>
-
-            <section
-              class="panel settings-card settings-card-wide"
-              data-settings-section="planning"
+          <div class="settings-section-nav" role="tablist" aria-label="Einstellungsbereiche">
+            <button
+              id="settingsTab-general"
+              type="button"
+              role="tab"
+              aria-controls="settingsPanel-general"
+              data-settings-section-target="general"
             >
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-storage">
-                  <svg><use href="#icon-calendar"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Urlaub</p>
-                  <h2>Urlaubsplanung</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                Grundurlaub, tägliche Abwesenheitsgrenzen und die Zuordnung der
-                festen Dienstwochenenden für die Urlaubsplanung festlegen.
-              </p>
-              <div class="settings-inline-form vacation-settings-form">
-                <label class="settings-field">
-                  <span>Vollzeit-Grundurlaub</span>
-                  <span class="input-suffix">
-                    <input id="vacationBaseDays" type="number" min="1" max="60" step="0.5" />
-                    <span>Tage</span>
-                  </span>
-                </label>
-                <label class="settings-field">
-                  <span>Max. abwesend werktags</span>
-                  <input id="vacationWeekdayAbsenceLimit" type="number" min="1" max="100" step="1" />
-                </label>
-                <label class="settings-field">
-                  <span>Max. Wochenende / Feiertag</span>
-                  <input id="vacationWeekendAbsenceLimit" type="number" min="1" max="100" step="1" />
-                </label>
-                <label class="settings-field">
-                  <span>Resturlaub verfällt am</span>
-                  <input
-                    id="vacationCarryOverExpiry"
-                    type="text"
-                    inputmode="numeric"
-                    placeholder="31.03."
-                    maxlength="6"
-                    aria-describedby="vacationCarryOverExpiryHint"
-                  />
-                  <small id="vacationCarryOverExpiryHint">Tag und Monat, z. B. 31.03.</small>
-                </label>
-                <label class="settings-field">
-                  <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
-                  <input id="vacationWeekendAReferenceSaturday" type="date" />
-                </label>
-              </div>
-              <div class="settings-actions">
-                <button class="button button-primary" id="saveVacationSettingsButton" type="button">
-                  Urlaubseinstellungen speichern
-                </button>
-              </div>
-              <div class="vacation-sort-order-settings">
-                <h3>Sortierung nach Qualifikation</h3>
-                <p class="settings-description">
-                  In dieser Reihenfolge stehen die Gruppen in der Planungstabelle,
-                  wenn dort „Sortierung: Qualifikation“ gewählt ist; innerhalb
-                  einer Gruppe alphabetisch nach Nachname. Wer in keine Gruppe
-                  fällt, steht am Ende. Jede Verschiebung gilt sofort.
-                </p>
-                <ol class="vacation-sort-order-list" id="vacationSortOrderList"></ol>
-                <div class="settings-actions">
-                  <button class="button button-secondary" id="resetVacationSortOrderButton" type="button">
-                    Vorgabe wiederherstellen
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <section
-              class="panel settings-card settings-card-wide"
-              data-settings-section="training"
+              Allgemein
+            </button>
+            <button
+              id="settingsTab-planning"
+              type="button"
+              role="tab"
+              aria-controls="settingsPanel-planning"
+              data-settings-section-target="planning"
             >
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-storage">
-                  <svg><use href="#icon-training"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Pflichtfortbildungen</p>
-                  <h2>Soll-Zeiten</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                Optionale Dauer je Pflichtfortbildung in Minuten. Fortbildungen mit
-                Soll-Zeit werden im Rechner für die anrechenbare Arbeitszeit angeboten.
-              </p>
-              <div class="training-duration-settings" id="trainingDurationSettings"></div>
-              <div class="settings-actions">
-                <button class="button button-primary" id="saveTrainingDurationsButton" type="button">
-                  Soll-Zeiten speichern
-                </button>
-              </div>
-            </section>
-
-            <section
-              class="panel settings-card"
-              data-settings-section="data"
-              data-admin-only
+              Planung
+            </button>
+            <button
+              id="settingsTab-training"
+              type="button"
+              role="tab"
+              aria-controls="settingsPanel-training"
+              data-settings-section-target="training"
             >
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-storage">
-                  <svg><use href="#icon-lock"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Speicherort</p>
-                  <h2>Datenbank-Backend</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                TeO kann lokal mit localForage oder gemeinsam über den geschützten
-                MariaDB-API-Dienst betrieben werden.
-              </p>
-              <label class="settings-field">
-                <span>Aktiver Datenspeicher</span>
-                <select id="settingsStorageBackend">
-                  <option value="local">Lokaler Browser – localForage / IndexedDB</option>
-                  <option value="mariadb">MariaDB – zentraler TeO-Server</option>
-                </select>
-              </label>
-              <p class="settings-warning-copy">
-                <strong>Lokaler Browser: kein Zugriffsschutz.</strong>
-                Anmeldung und Rollen steuern in diesem Modus nur die Bedienung.
-                Der Datenbestand liegt unverschlüsselt im Browserprofil und ist
-                für jeden lesbar, der an diesem Benutzerkonto des Rechners
-                arbeitet – auch ohne TeO-Anmeldung. Verwenden Sie den lokalen
-                Modus deshalb nur auf einem persönlich gesicherten Rechner mit
-                eigenem Windows- oder macOS-Konto und aktiver
-                Bildschirmsperre. Für den gemeinsamen Stationsrechner ist
-                MariaDB vorgesehen: Dort prüft der Server jede Anmeldung und
-                jede Änderung.
-              </p>
-              <div class="backend-settings-fields" id="mariaDbSettingsFields" hidden>
-                <label class="settings-field">
-                  <span>Adresse des TeO-Servers</span>
-                  <input
-                    id="settingsMariaDbApiUrl"
-                    type="url"
-                    inputmode="url"
-                    placeholder="http://server-name:3000"
-                    autocomplete="url"
-                  />
-                </label>
-                <label class="settings-field">
-                  <span>Aktuelles Administratorpasswort</span>
-                  <input
-                    id="settingsMariaDbPassword"
-                    type="password"
-                    autocomplete="current-password"
-                    placeholder="Nur zum Verbinden erforderlich"
-                  />
-                </label>
-                <label class="settings-field">
-                  <span>Einrichtungsschlüssel</span>
-                  <input
-                    id="settingsMariaDbBootstrapToken"
-                    type="password"
-                    autocomplete="off"
-                    placeholder="Nur bei leerer Serverdatenbank erforderlich"
-                  />
-                  <small class="field-hint">
-                    Entspricht TEO_BOOTSTRAP_TOKEN am Server und wird nicht gespeichert.
-                  </small>
-                </label>
-              </div>
-              <p class="settings-backend-hint" id="settingsBackendHint"></p>
-              <span class="settings-status" id="settingsBackendStatus">
-                <i></i>
-                Lokal verbunden
-              </span>
-              <div class="settings-actions backend-settings-actions">
-                <button
-                  class="button button-secondary"
-                  id="testBackendConnectionButton"
-                  type="button"
-                >
-                  <svg><use href="#icon-check"></use></svg>
-                  Verbindung testen
-                </button>
-                <button
-                  class="button button-primary"
-                  id="applyStorageBackendButton"
-                  type="button"
-                >
-                  Backend aktivieren
-                </button>
-              </div>
-            </section>
-
-            <section class="panel settings-card" data-settings-section="master-data">
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-admin">
-                  <svg><use href="#icon-edit"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Verwaltung</p>
-                  <h2>Stammdaten &amp; Zugriffe</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                Kataloge und die Qualität des Datenbestands zentral verwalten.
-                Benutzerkonten sind Administratoren vorbehalten.
-              </p>
-              <div class="settings-actions">
-                <button
-                  class="button button-secondary"
-                  type="button"
-                  data-open-user-management
-                  data-admin-only
-                >
-                  <svg><use href="#icon-users"></use></svg>
-                  Benutzer verwalten
-                </button>
-                <button
-                  class="button button-secondary"
-                  type="button"
-                  data-open-catalog-management
-                >
-                  <svg><use href="#icon-edit"></use></svg>
-                  Berufe &amp; Qualifikationen
-                </button>
-                <button class="button button-secondary" type="button" data-open-data-quality>
-                  <svg><use href="#icon-alert"></use></svg>
-                  Datenqualität prüfen
-                </button>
-              </div>
-            </section>
-
-            <section
-              class="panel settings-card"
-              data-settings-section="data"
-              data-admin-only
+              Pflichtfortbildungen
+            </button>
+            <button
+              id="settingsTab-master-data"
+              type="button"
+              role="tab"
+              aria-controls="settingsPanel-master-data"
+              data-settings-section-target="master-data"
             >
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-reminder">
-                  <svg><use href="#icon-alert"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Sicherheit</p>
-                  <h2>Sicherungserinnerung</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                TeO warnt, sobald die letzte Datensicherung länger als der gewählte
-                Zeitraum zurückliegt.
-              </p>
-              <div class="settings-inline-form backup-reminder-settings-form">
-                <label class="settings-field">
-                  <span>Erinnerung nach</span>
-                  <span class="input-suffix">
-                    <input
-                      id="settingsBackupReminderDays"
-                      type="number"
-                      min="1"
-                      max="365"
-                      step="1"
-                    />
-                    <span>Tagen</span>
-                  </span>
-                </label>
-                <label class="settings-field">
-                  <span>Maximale Sicherungsgröße</span>
-                  <span class="input-suffix">
-                    <input
-                      id="settingsMaxBackupFileSizeMb"
-                      type="number"
-                      min="1"
-                      max="100"
-                      step="1"
-                    />
-                    <span>MB</span>
-                  </span>
-                </label>
-                <button
-                  class="button button-primary"
-                  id="saveGeneralSettingsButton"
-                  type="button"
-                >
-                  Speichern
-                </button>
-                <div
-                  class="backup-volume-meter"
-                  id="backupVolumeMeter"
-                  role="progressbar"
-                  aria-label="Belegtes Sicherungsvolumen"
-                  aria-valuemin="0"
-                >
-                  <div class="backup-volume-heading">
-                    <strong>Sicherungsvolumen</strong>
-                    <span id="backupVolumeLabel">0 von 20 MB</span>
-                  </div>
-                  <div class="backup-volume-track" aria-hidden="true">
-                    <span id="backupVolumeBar"></span>
-                  </div>
-                  <small id="backupVolumeHint">Warnung ab 90&nbsp;% des eingestellten Volumens.</small>
-                </div>
-              </div>
-            </section>
-
-            <section
-              class="panel settings-card"
-              data-settings-section="general"
-              data-admin-only
+              Stammdaten &amp; Zugriffe
+            </button>
+            <button
+              id="settingsTab-data"
+              type="button"
+              role="tab"
+              aria-controls="settingsPanel-data"
+              data-settings-section-target="data"
             >
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-admin">
-                  <svg><use href="#icon-edit"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Bedienung</p>
-                  <h2>Dialoge schließen</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                Legt fest, ob ein Klick neben einen geöffneten Dialog diesen
-                schließt. Ist die Einstellung aus, lassen sich Dialoge nur über
-                ihre Schaltflächen oder die Escape-Taste verlassen. Bei
-                ungespeicherten Eingaben wird in beiden Fällen nachgefragt.
-              </p>
-              <div class="settings-inline-form">
-                <label class="settings-field">
-                  <span>Klick neben den Dialog</span>
-                  <select id="settingsCloseDialogOnOutsideClick">
-                    <option value="off">Schließt den Dialog nicht</option>
-                    <option value="on">Schließt den Dialog</option>
-                  </select>
-                </label>
-              </div>
-            </section>
-
-            <section
-              class="panel settings-card settings-card-wide"
-              data-settings-section="planning"
-              data-admin-only
-            >
-              <div class="settings-card-heading">
-                <span class="settings-card-icon settings-card-icon-storage">
-                  <svg><use href="#icon-calendar"></use></svg>
-                </span>
-                <div>
-                  <p class="eyebrow">Urlaubsplanung</p>
-                  <h2>Schulferien</h2>
-                </div>
-              </div>
-              <p class="settings-description">
-                In der Urlaubsplanung markierte Ferienzeiträume. Die
-                Voreinstellung folgt der amtlichen Ferienordnung NRW bis
-                April 2030; weitere Jahre lassen sich beliebig ergänzen.
-                Bewegliche Ferientage sind nicht enthalten.
-              </p>
-              <p class="settings-status" id="schoolVacationCount"></p>
-              <form class="school-vacation-form" id="schoolVacationForm">
-                <label class="settings-field">
-                  <span>Beginn</span>
-                  <input id="newSchoolVacationStart" type="date" required />
-                </label>
-                <label class="settings-field">
-                  <span>Ende</span>
-                  <input id="newSchoolVacationEnd" type="date" required />
-                </label>
-                <label class="settings-field">
-                  <span>Bezeichnung</span>
-                  <input
-                    id="newSchoolVacationLabel"
-                    type="text"
-                    maxlength="60"
-                    placeholder="z. B. Sommerferien"
-                    autocomplete="off"
-                    required
-                  />
-                </label>
-                <button class="button button-primary" type="submit">
-                  <svg><use href="#icon-plus"></use></svg>
-                  Hinzufügen
-                </button>
-              </form>
-              <div class="school-vacation-list" id="schoolVacationList"></div>
-              <div class="settings-actions">
-                <button
-                  class="button button-secondary"
-                  id="restoreOfficialSchoolVacationsButton"
-                  type="button"
-                >
-                  <svg><use href="#icon-check"></use></svg>
-                  Amtliche NRW-Termine ergänzen
-                </button>
-              </div>
-            </section>
+              Daten &amp; Sicherung
+            </button>
           </div>
 
-          <section
-            class="panel backup-panel settings-backup-panel"
-            data-settings-section="data"
-            aria-labelledby="backupTitle"
+          <div
+            class="settings-section-panel"
+            id="settingsPanel-general"
+            role="tabpanel"
+            aria-labelledby="settingsTab-general"
+            data-settings-section="general"
           >
-            <div class="backup-content">
-              <span class="backup-icon" aria-hidden="true">
-                <svg><use href="#icon-lock"></use></svg>
-              </span>
-              <div>
-                <p class="eyebrow">Datensicherung</p>
-                <h2 id="backupTitle">Gesamten Datenbestand sichern</h2>
-                <p class="backup-description">
-                  Exportiert oder ersetzt Mitarbeiter, Termine, Fortbildungen,
-                  Nachweise, Teamsitzungen, Geräteeinweisungen und die
-                  Abwesenheitsplanung gemeinsam.
-                </p>
-                <p class="backup-status" id="backupStatus"></p>
-                <div class="automatic-backup-panel">
-                  <div>
-                    <strong>Automatische Sicherung</strong>
-                    <p class="browser-storage-status" id="automaticBackupStatus"></p>
+            <div class="settings-grid">
+                <section class="panel settings-card" aria-labelledby="settingsAppearanceTitle">
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon" aria-hidden="true">
+                      <svg><use href="#icon-palette"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Für dieses Benutzerkonto</p>
+                      <h2 id="settingsAppearanceTitle">Darstellung</h2>
+                    </div>
                   </div>
-                  <p class="field-hint">
-                    Nach einer Änderung wird die Sicherung automatisch mit
-                    2 Sekunden Verzögerung geschrieben.
+                  <p class="settings-description">
+                    Farbthema und Symbolsatz werden für das angemeldete
+                    Benutzerkonto gespeichert und gelten an jedem Arbeitsplatz,
+                    an dem sich dieses Konto anmeldet. Andere Konten behalten
+                    ihre eigene Darstellung.
                   </p>
-                  <div class="automatic-backup-fields">
-                    <label class="checkbox-field automatic-backup-encryption-field">
-                      <input id="automaticBackupEncryption" type="checkbox" />
-                      <span>JSON-Sicherungen verschlüsseln</span>
+                  <label class="settings-field">
+                    <span>Farbthema</span>
+                    <select data-theme-select id="settingsThemeSelect">
+                      <option value="standard">Standard</option>
+                      <option value="dark">Dark Mode</option>
+                      <option value="solarized-light">Solarized Light</option>
+                      <option value="nord">Nord</option>
+                      <option value="dracula">Dracula</option>
+                      <option value="gruvbox-dark">Gruvbox Dark</option>
+                      <option value="tokyo-night">Tokyo Night</option>
+                      <option value="catppuccin-latte">Catppuccin Latte</option>
+                      <option value="github">GitHub</option>
+                      <option value="github-dark">GitHub Dark</option>
+                      <option value="windows-95">Windows 95</option>
+                      <option value="cellitinnen">Cellitinnen</option>
+                      <option value="cellitinnen-red">Cellitinnen Rot</option>
+                    </select>
+                  </label>
+                  <label class="settings-field">
+                    <span>Symbolsatz</span>
+                    <select data-icon-set-select
+                      id="settingsIconSetSelect"
+                      aria-describedby="settingsIconSetHint"
+                    >
+                      <option value="standard">TeO (Standard)</option>
+                      <option value="lucide">Lucide</option>
+                      <option value="tabler">Tabler</option>
+                      <option value="heroicons">Heroicons</option>
+                      <option value="phosphor">Phosphor</option>
+                    </select>
+                    <small id="settingsIconSetHint">
+                      Bestimmt die Symbole der ganzen Anwendung: die eigenen von
+                      TeO oder die eines der freien Sätze Lucide, Tabler,
+                      Heroicons und Phosphor. Lässt sich mit jedem Farbthema
+                      kombinieren.
+                    </small>
+                  </label>
+                </section>
+
+                <section class="panel settings-card" aria-labelledby="settingsWorkstationTitle">
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon" aria-hidden="true">
+                      <svg><use href="#icon-dashboard"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Nur an diesem Arbeitsplatz</p>
+                      <h2 id="settingsWorkstationTitle">Ansicht</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    Diese Einstellungen merkt sich der Browser dieses Rechners.
+                    Andere Arbeitsplätze bleiben unberührt.
+                  </p>
+                  <div class="settings-option">
+                    <input
+                      id="tableDensityToggle"
+                      type="checkbox"
+                      aria-describedby="tableDensityHint"
+                    />
+                    <label for="tableDensityToggle">Kompakte Tabellen</label>
+                    <small id="tableDensityHint">
+                      Engere Zeilen, mehr Einträge im Bild.
+                    </small>
+                  </div>
+                  <div class="settings-option">
+                    <input
+                      id="sidebarGroupingToggle"
+                      type="checkbox"
+                      aria-describedby="sidebarGroupingHint"
+                    />
+                    <label for="sidebarGroupingToggle">Obermenüs in der Seitenleiste</label>
+                    <small id="sidebarGroupingHint">
+                      Personal, Termine, Fortbildungen und Geräte fassen ihre
+                      Menüpunkte zusammen und lassen sich auf- und zuklappen.
+                    </small>
+                  </div>
+                </section>
+
+                <section
+                  class="panel settings-card"
+                  data-admin-only
+                >
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-admin" aria-hidden="true">
+                      <svg><use href="#icon-edit"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Bedienung</p>
+                      <h2>Dialoge schließen</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description" id="settingsCloseDialogHint">
+                    Legt fest, ob ein Klick neben einen geöffneten Dialog diesen
+                    schließt. Ist die Einstellung aus, lassen sich Dialoge nur über
+                    ihre Schaltflächen oder die Escape-Taste verlassen. Bei
+                    ungespeicherten Eingaben wird in beiden Fällen nachgefragt.
+                  </p>
+                  <div class="settings-inline-form">
+                    <label class="settings-field">
+                      <span>Klick neben den Dialog</span>
+                      <select
+                        id="settingsCloseDialogOnOutsideClick"
+                        aria-describedby="settingsCloseDialogHint"
+                      >
+                        <option value="off">Schließt den Dialog nicht</option>
+                        <option value="on">Schließt den Dialog</option>
+                      </select>
                     </label>
                   </div>
-                  <div class="automatic-backup-actions">
+                </section>
+            </div>
+          </div>
+
+          <div
+            class="settings-section-panel"
+            id="settingsPanel-planning"
+            role="tabpanel"
+            aria-labelledby="settingsTab-planning"
+            data-settings-section="planning"
+          >
+            <div class="settings-grid">
+                <section class="panel settings-card">
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-storage" aria-hidden="true">
+                      <svg><use href="#icon-calendar"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Dienstplanung</p>
+                      <h2>Feste Dienstwochenenden</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    Jedem Wochenende wird eine Stationsleitung oder stellvertretende
+                    Stationsleitung zugewiesen. Die Bezeichnung entspricht automatisch
+                    dem Vornamen der verantwortlichen Person.
+                  </p>
+                  <div class="settings-weekend-config">
+                    <fieldset>
+                      <legend>Wochenende A</legend>
+                      <label class="settings-field">
+                        <span>Bezeichnung (automatisch)</span>
+                        <input id="settingsWeekendNameA" type="text" readonly />
+                      </label>
+                      <label class="settings-field">
+                        <span>Verantwortliche Person</span>
+                        <select id="settingsWeekendOwnerA"></select>
+                      </label>
+                    </fieldset>
+                    <fieldset>
+                      <legend>Wochenende B</legend>
+                      <label class="settings-field">
+                        <span>Bezeichnung (automatisch)</span>
+                        <input id="settingsWeekendNameB" type="text" readonly />
+                      </label>
+                      <label class="settings-field">
+                        <span>Verantwortliche Person</span>
+                        <select id="settingsWeekendOwnerB"></select>
+                      </label>
+                    </fieldset>
+                  </div>
+                  <div class="settings-actions">
                     <button
-                      class="button button-secondary"
-                      id="selectAutomaticBackupDirectoryButton"
+                      class="button button-primary"
+                      id="saveWeekendSettingsButton"
                       type="button"
                     >
-                      <svg><use href="#icon-download"></use></svg>
-                      Sicherungsordner auswählen
+                      Wochenenden speichern
+                    </button>
+                  </div>
+                </section>
+
+                <section
+                  class="panel settings-card settings-card-wide"
+                >
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-storage" aria-hidden="true">
+                      <svg><use href="#icon-calendar"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Urlaub</p>
+                      <h2>Urlaubsplanung</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    Grundurlaub, tägliche Abwesenheitsgrenzen und die Zuordnung der
+                    festen Dienstwochenenden für die Urlaubsplanung festlegen.
+                  </p>
+                  <div class="settings-inline-form vacation-settings-form">
+                    <label class="settings-field">
+                      <span>Vollzeit-Grundurlaub</span>
+                      <span class="input-suffix">
+                        <input id="vacationBaseDays" type="number" min="1" max="60" step="0.5" />
+                        <span>Tage</span>
+                      </span>
+                    </label>
+                    <label class="settings-field">
+                      <span>Max. abwesend werktags</span>
+                      <input id="vacationWeekdayAbsenceLimit" type="number" min="1" max="100" step="1" />
+                    </label>
+                    <label class="settings-field">
+                      <span>Max. Wochenende / Feiertag</span>
+                      <input id="vacationWeekendAbsenceLimit" type="number" min="1" max="100" step="1" />
+                    </label>
+                    <label class="settings-field">
+                      <span>Resturlaub verfällt am</span>
+                      <input
+                        id="vacationCarryOverExpiry"
+                        type="text"
+                        inputmode="numeric"
+                        placeholder="31.03."
+                        maxlength="6"
+                        aria-describedby="vacationCarryOverExpiryHint"
+                      />
+                      <small id="vacationCarryOverExpiryHint">Tag und Monat, z. B. 31.03.</small>
+                    </label>
+                    <label class="settings-field">
+                      <span id="vacationWeekendAReferenceLabel">Referenzsamstag Wochenende A</span>
+                      <input id="vacationWeekendAReferenceSaturday" type="date" />
+                    </label>
+                  </div>
+                  <div class="settings-actions">
+                    <button class="button button-primary" id="saveVacationSettingsButton" type="button">
+                      Urlaubseinstellungen speichern
+                    </button>
+                  </div>
+                  <div class="vacation-sort-order-settings">
+                    <h3 id="vacationSortOrderTitle">Sortierung nach Qualifikation</h3>
+                    <p class="settings-description">
+                      In dieser Reihenfolge stehen die Gruppen in der Planungstabelle,
+                      wenn dort „Sortierung: Qualifikation“ gewählt ist; innerhalb
+                      einer Gruppe alphabetisch nach Nachname. Wer in keine Gruppe
+                      fällt, steht am Ende. Jede Verschiebung gilt sofort.
+                    </p>
+                    <ol
+                      class="vacation-sort-order-list"
+                      id="vacationSortOrderList"
+                      aria-labelledby="vacationSortOrderTitle"
+                    ></ol>
+                    <div class="settings-actions">
+                      <button class="button button-secondary" id="resetVacationSortOrderButton" type="button">
+                        Vorgabe wiederherstellen
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                <section
+                  class="panel settings-card settings-card-wide"
+                  data-admin-only
+                >
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-storage" aria-hidden="true">
+                      <svg><use href="#icon-calendar"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Urlaubsplanung</p>
+                      <h2>Schulferien</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    In der Urlaubsplanung markierte Ferienzeiträume. Die
+                    Voreinstellung folgt der amtlichen Ferienordnung NRW bis
+                    April 2030; weitere Jahre lassen sich beliebig ergänzen.
+                    Bewegliche Ferientage sind nicht enthalten.
+                  </p>
+                  <p class="settings-status" id="schoolVacationCount"></p>
+                  <form class="school-vacation-form" id="schoolVacationForm">
+                    <label class="settings-field">
+                      <span>Beginn</span>
+                      <input id="newSchoolVacationStart" type="date" required />
+                    </label>
+                    <label class="settings-field">
+                      <span>Ende</span>
+                      <input id="newSchoolVacationEnd" type="date" required />
+                    </label>
+                    <label class="settings-field">
+                      <span>Bezeichnung</span>
+                      <input
+                        id="newSchoolVacationLabel"
+                        type="text"
+                        maxlength="60"
+                        placeholder="z. B. Sommerferien"
+                        autocomplete="off"
+                        required
+                      />
+                    </label>
+                    <button class="button button-primary" type="submit">
+                      <svg><use href="#icon-plus"></use></svg>
+                      Hinzufügen
+                    </button>
+                  </form>
+                  <div class="school-vacation-list" id="schoolVacationList"></div>
+                  <div class="settings-actions">
+                    <button
+                      class="button button-secondary"
+                      id="restoreOfficialSchoolVacationsButton"
+                      type="button"
+                    >
+                      <svg><use href="#icon-check"></use></svg>
+                      Amtliche NRW-Termine ergänzen
+                    </button>
+                  </div>
+                </section>
+            </div>
+          </div>
+
+          <div
+            class="settings-section-panel"
+            id="settingsPanel-training"
+            role="tabpanel"
+            aria-labelledby="settingsTab-training"
+            data-settings-section="training"
+          >
+            <div class="settings-grid">
+                <section
+                  class="panel settings-card settings-card-wide"
+                >
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-storage" aria-hidden="true">
+                      <svg><use href="#icon-training"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Pflichtfortbildungen</p>
+                      <h2>Soll-Zeiten</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    Optionale Dauer je Pflichtfortbildung in Minuten. Fortbildungen mit
+                    Soll-Zeit werden im Rechner für die anrechenbare Arbeitszeit angeboten.
+                  </p>
+                  <div class="training-duration-settings" id="trainingDurationSettings"></div>
+                  <div class="settings-actions">
+                    <button class="button button-primary" id="saveTrainingDurationsButton" type="button">
+                      Soll-Zeiten speichern
+                    </button>
+                  </div>
+                </section>
+            </div>
+          </div>
+
+          <div
+            class="settings-section-panel"
+            id="settingsPanel-master-data"
+            role="tabpanel"
+            aria-labelledby="settingsTab-master-data"
+            data-settings-section="master-data"
+          >
+            <div class="settings-grid">
+                <section class="panel settings-card">
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-admin" aria-hidden="true">
+                      <svg><use href="#icon-edit"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Verwaltung</p>
+                      <h2>Stammdaten &amp; Zugriffe</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    Kataloge und die Qualität des Datenbestands zentral verwalten.
+                    Benutzerkonten sind Administratoren vorbehalten.
+                  </p>
+                  <div class="settings-actions">
+                    <button
+                      class="button button-secondary"
+                      type="button"
+                      data-open-user-management
+                      data-admin-only
+                    >
+                      <svg><use href="#icon-users"></use></svg>
+                      Benutzer verwalten
                     </button>
                     <button
                       class="button button-secondary"
-                      id="setAutomaticBackupPasswordButton"
                       type="button"
-                      hidden
+                      data-open-catalog-management
                     >
+                      <svg><use href="#icon-edit"></use></svg>
+                      Berufe &amp; Qualifikationen
+                    </button>
+                    <button class="button button-secondary" type="button" data-open-data-quality>
+                      <svg><use href="#icon-alert"></use></svg>
+                      Datenqualität prüfen
+                    </button>
+                  </div>
+                </section>
+
+                <section class="panel settings-card">
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-admin" aria-hidden="true">
+                      <svg><use href="#icon-memo"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Memo / ToDo</p>
+                      <h2>Kategorien</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    Kategorien für Memos und ToDos hinzufügen, umbenennen oder entfernen.
+                  </p>
+                  <form class="catalog-add-row" id="memoCategoryForm">
+                    <input
+                      id="newMemoCategory"
+                      type="text"
+                      maxlength="60"
+                      placeholder="Neue Kategorie"
+                      aria-label="Neue Memo- oder ToDo-Kategorie"
+                      required
+                    />
+                    <button class="button button-primary button-compact" type="submit">
+                      <svg><use href="#icon-plus"></use></svg>
+                      Hinzufügen
+                    </button>
+                  </form>
+                  <div class="catalog-list" id="memoCategoryList"></div>
+                </section>
+            </div>
+          </div>
+
+          <div
+            class="settings-section-panel"
+            id="settingsPanel-data"
+            role="tabpanel"
+            aria-labelledby="settingsTab-data"
+            data-settings-section="data"
+          >
+            <div class="settings-grid">
+                <section
+                  class="panel settings-card"
+                  data-admin-only
+                >
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-storage" aria-hidden="true">
                       <svg><use href="#icon-lock"></use></svg>
-                      Login-Verschlüsselung einrichten
-                    </button>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Speicherort</p>
+                      <h2>Datenbank-Backend</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    TeO kann lokal mit localForage oder gemeinsam über den geschützten
+                    MariaDB-API-Dienst betrieben werden.
+                  </p>
+                  <label class="settings-field">
+                    <span>Aktiver Datenspeicher</span>
+                    <select id="settingsStorageBackend" aria-describedby="settingsBackendHint">
+                      <option value="local">Lokaler Browser – localForage / IndexedDB</option>
+                      <option value="mariadb">MariaDB – zentraler TeO-Server</option>
+                    </select>
+                  </label>
+                  <p class="settings-warning-copy">
+                    <strong>Lokaler Browser: kein Zugriffsschutz.</strong>
+                    Anmeldung und Rollen steuern in diesem Modus nur die Bedienung.
+                    Der Datenbestand liegt unverschlüsselt im Browserprofil und ist
+                    für jeden lesbar, der an diesem Benutzerkonto des Rechners
+                    arbeitet – auch ohne TeO-Anmeldung. Verwenden Sie den lokalen
+                    Modus deshalb nur auf einem persönlich gesicherten Rechner mit
+                    eigenem Windows- oder macOS-Konto und aktiver
+                    Bildschirmsperre. Für den gemeinsamen Stationsrechner ist
+                    MariaDB vorgesehen: Dort prüft der Server jede Anmeldung und
+                    jede Änderung.
+                  </p>
+                  <div class="backend-settings-fields" id="mariaDbSettingsFields" hidden>
+                    <label class="settings-field">
+                      <span>Adresse des TeO-Servers</span>
+                      <input
+                        id="settingsMariaDbApiUrl"
+                        type="url"
+                        inputmode="url"
+                        placeholder="http://server-name:3000"
+                        autocomplete="url"
+                      />
+                    </label>
+                    <label class="settings-field">
+                      <span>Aktuelles Administratorpasswort</span>
+                      <input
+                        id="settingsMariaDbPassword"
+                        type="password"
+                        autocomplete="current-password"
+                        placeholder="Nur zum Verbinden erforderlich"
+                      />
+                    </label>
+                    <label class="settings-field">
+                      <span>Einrichtungsschlüssel</span>
+                      <input
+                        id="settingsMariaDbBootstrapToken"
+                        type="password"
+                        autocomplete="off"
+                        placeholder="Nur bei leerer Serverdatenbank erforderlich"
+                      />
+                      <small class="field-hint">
+                        Entspricht TEO_BOOTSTRAP_TOKEN am Server und wird nicht gespeichert.
+                      </small>
+                    </label>
+                  </div>
+                  <p class="settings-backend-hint" id="settingsBackendHint"></p>
+                  <span class="settings-status" id="settingsBackendStatus" role="status">
+                    <i></i>
+                    Lokal verbunden
+                  </span>
+                  <div class="settings-actions backend-settings-actions">
                     <button
                       class="button button-secondary"
-                      id="saveAutomaticBackupSettingsButton"
+                      id="testBackendConnectionButton"
                       type="button"
                     >
-                      Einstellungen speichern
+                      <svg><use href="#icon-check"></use></svg>
+                      Verbindung testen
                     </button>
                     <button
                       class="button button-primary"
-                      id="runAutomaticBackupButton"
+                      id="applyStorageBackendButton"
                       type="button"
                     >
-                      <svg><use href="#icon-download"></use></svg>
-                      Jetzt automatisch sichern
-                    </button>
-                    <button
-                      class="button button-ghost"
-                      id="removeAutomaticBackupDirectoryButton"
-                      type="button"
-                    >
-                      Ordnerverknüpfung entfernen
+                      Backend aktivieren
                     </button>
                   </div>
-                  <p class="field-hint">
-                    Die Ordnerfreigabe gilt nur für dieses Browserprofil. Der
-                    Sicherungsschlüssel wird beim Login automatisch mit dem
-                    jeweiligen Benutzerpasswort entsperrt. Jede Sicherung
-                    überschreibt die Datei <strong>teo-autosicherung.json</strong>.
+                </section>
+
+                <section
+                  class="panel settings-card"
+                  data-admin-only
+                >
+                  <div class="settings-card-heading">
+                    <span class="settings-card-icon settings-card-icon-reminder" aria-hidden="true">
+                      <svg><use href="#icon-alert"></use></svg>
+                    </span>
+                    <div>
+                      <p class="eyebrow">Sicherheit</p>
+                      <h2>Sicherungserinnerung</h2>
+                    </div>
+                  </div>
+                  <p class="settings-description">
+                    TeO warnt, sobald die letzte Datensicherung länger als der gewählte
+                    Zeitraum zurückliegt.
                   </p>
-                </div>
-                <div class="browser-storage-info">
-                  <p class="browser-storage-status" id="browserStorageStatus">
-                    Browserspeicher wird ermittelt …
+                  <div class="settings-inline-form backup-reminder-settings-form">
+                    <label class="settings-field">
+                      <span>Erinnerung nach</span>
+                      <span class="input-suffix">
+                        <input
+                          id="settingsBackupReminderDays"
+                          type="number"
+                          min="1"
+                          max="365"
+                          step="1"
+                        />
+                        <span>Tagen</span>
+                      </span>
+                    </label>
+                    <label class="settings-field">
+                      <span>Maximale Sicherungsgröße</span>
+                      <span class="input-suffix">
+                        <input
+                          id="settingsMaxBackupFileSizeMb"
+                          type="number"
+                          min="1"
+                          max="100"
+                          step="1"
+                        />
+                        <span>MB</span>
+                      </span>
+                    </label>
+                    <button
+                      class="button button-primary"
+                      id="saveGeneralSettingsButton"
+                      type="button"
+                    >
+                      Erinnerung speichern
+                    </button>
+                    <div
+                      class="backup-volume-meter"
+                      id="backupVolumeMeter"
+                      role="progressbar"
+                      aria-label="Belegtes Sicherungsvolumen"
+                      aria-valuemin="0"
+                    >
+                      <div class="backup-volume-heading">
+                        <strong>Sicherungsvolumen</strong>
+                        <span id="backupVolumeLabel">0 von 20 MB</span>
+                      </div>
+                      <div class="backup-volume-track" aria-hidden="true">
+                        <span id="backupVolumeBar"></span>
+                      </div>
+                      <small id="backupVolumeHint">Warnung ab 90&nbsp;% des eingestellten Volumens.</small>
+                    </div>
+                  </div>
+                </section>
+            </div>
+
+            <section
+              class="panel backup-panel settings-backup-panel"
+              aria-labelledby="backupTitle"
+            >
+              <div class="backup-content">
+                <span class="backup-icon" aria-hidden="true">
+                  <svg><use href="#icon-lock"></use></svg>
+                </span>
+                <div>
+                  <p class="eyebrow">Datensicherung</p>
+                  <h2 id="backupTitle">Gesamten Datenbestand sichern</h2>
+                  <p class="backup-description">
+                    Exportiert oder ersetzt Mitarbeiter, Termine, Fortbildungen,
+                    Nachweise, Teamsitzungen, Geräteeinweisungen und die
+                    Abwesenheitsplanung gemeinsam.
                   </p>
-                  <button
-                    class="button button-ghost button-compact"
-                    id="requestPersistentStorageButton"
-                    type="button"
-                  >
-                    <svg><use href="#icon-lock"></use></svg>
-                    Dauerhaften Speicher aktivieren
-                  </button>
+                  <p class="backup-status" id="backupStatus"></p>
+                  <div class="automatic-backup-panel">
+                    <div>
+                      <strong>Automatische Sicherung</strong>
+                      <p class="browser-storage-status" id="automaticBackupStatus"></p>
+                    </div>
+                    <p class="field-hint">
+                      Nach einer Änderung wird die Sicherung automatisch mit
+                      2 Sekunden Verzögerung geschrieben.
+                    </p>
+                    <div class="automatic-backup-fields">
+                      <label class="checkbox-field automatic-backup-encryption-field">
+                        <input id="automaticBackupEncryption" type="checkbox" />
+                        <span>JSON-Sicherungen verschlüsseln</span>
+                      </label>
+                    </div>
+                    <div class="automatic-backup-actions">
+                      <button
+                        class="button button-secondary"
+                        id="selectAutomaticBackupDirectoryButton"
+                        type="button"
+                      >
+                        <svg><use href="#icon-download"></use></svg>
+                        Sicherungsordner auswählen
+                      </button>
+                      <button
+                        class="button button-secondary"
+                        id="setAutomaticBackupPasswordButton"
+                        type="button"
+                        hidden
+                      >
+                        <svg><use href="#icon-lock"></use></svg>
+                        Login-Verschlüsselung einrichten
+                      </button>
+                      <button
+                        class="button button-secondary"
+                        id="saveAutomaticBackupSettingsButton"
+                        type="button"
+                      >
+                        Einstellungen speichern
+                      </button>
+                      <button
+                        class="button button-primary"
+                        id="runAutomaticBackupButton"
+                        type="button"
+                      >
+                        <svg><use href="#icon-download"></use></svg>
+                        Jetzt automatisch sichern
+                      </button>
+                      <button
+                        class="button button-ghost"
+                        id="removeAutomaticBackupDirectoryButton"
+                        type="button"
+                      >
+                        Ordnerverknüpfung entfernen
+                      </button>
+                    </div>
+                    <p class="field-hint">
+                      Die Ordnerfreigabe gilt nur für dieses Browserprofil. Der
+                      Sicherungsschlüssel wird beim Login automatisch mit dem
+                      jeweiligen Benutzerpasswort entsperrt. Jede Sicherung
+                      überschreibt die Datei <strong>teo-autosicherung.json</strong>.
+                    </p>
+                  </div>
+                  <div class="browser-storage-info">
+                    <p class="browser-storage-status" id="browserStorageStatus">
+                      Browserspeicher wird ermittelt …
+                    </p>
+                    <button
+                      class="button button-ghost button-compact"
+                      id="requestPersistentStorageButton"
+                      type="button"
+                    >
+                      <svg><use href="#icon-lock"></use></svg>
+                      Dauerhaften Speicher aktivieren
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="backup-actions">
-              <button
-                class="button button-ghost"
-                id="openAuditLogButton"
-                type="button"
-                data-admin-only
-              >
-                <svg><use href="#icon-more"></use></svg>
-                Änderungsprotokoll
-              </button>
-              <button class="button button-secondary" id="validateBackupButton" type="button">
-                <svg><use href="#icon-check"></use></svg>
-                Sicherung prüfen
-              </button>
-              <button class="button button-secondary" id="importDataButton" type="button">
-                <svg><use href="#icon-upload"></use></svg>
-                Sicherung importieren
-              </button>
-              <button class="button button-primary" id="exportDataButton" type="button">
-                <svg><use href="#icon-download"></use></svg>
-                Sicherung exportieren
-              </button>
-              <button class="button button-secondary" id="exportEncryptedDataButton" type="button">
-                <svg><use href="#icon-lock"></use></svg>
-                Verschlüsselt exportieren
-              </button>
-              <input
-                class="sr-only"
-                id="importDataFile"
-                type="file"
-                accept="application/json,.json"
-                aria-label="JSON-Sicherungsdatei auswählen"
-              />
-              <input
-                class="sr-only"
-                id="validateBackupFile"
-                type="file"
-                accept="application/json,.json"
-                aria-label="JSON-Sicherungsdatei zur Prüfung auswählen"
-              />
-            </div>
-          </section>
+              <div class="backup-actions">
+                <button
+                  class="button button-ghost"
+                  id="openAuditLogButton"
+                  type="button"
+                  data-admin-only
+                >
+                  <svg><use href="#icon-more"></use></svg>
+                  Änderungsprotokoll
+                </button>
+                <button class="button button-secondary" id="validateBackupButton" type="button">
+                  <svg><use href="#icon-check"></use></svg>
+                  Sicherung prüfen
+                </button>
+                <button class="button button-secondary" id="importDataButton" type="button">
+                  <svg><use href="#icon-upload"></use></svg>
+                  Sicherung importieren
+                </button>
+                <button class="button button-primary" id="exportDataButton" type="button">
+                  <svg><use href="#icon-download"></use></svg>
+                  Sicherung exportieren
+                </button>
+                <button class="button button-secondary" id="exportEncryptedDataButton" type="button">
+                  <svg><use href="#icon-lock"></use></svg>
+                  Verschlüsselt exportieren
+                </button>
+                <input
+                  class="sr-only"
+                  id="importDataFile"
+                  type="file"
+                  accept="application/json,.json"
+                  aria-label="JSON-Sicherungsdatei auswählen"
+                />
+                <input
+                  class="sr-only"
+                  id="validateBackupFile"
+                  type="file"
+                  accept="application/json,.json"
+                  aria-label="JSON-Sicherungsdatei zur Prüfung auswählen"
+                />
+              </div>
+            </section>
+          </div>
         </section>
 
         <section class="view" id="helpView" data-view-panel="help">

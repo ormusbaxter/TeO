@@ -304,7 +304,7 @@
       ? state.catalogs.memoCategories.map((category, index) => `
           <div class="catalog-row" data-memo-category-index="${index}">
             <input type="text" maxlength="60" value="${escapeHtml(category)}" aria-label="Kategorie ${escapeHtml(category)} bearbeiten" />
-            <button class="icon-button" type="button" data-memo-category-action="save" aria-label="Änderung speichern" title="Änderung speichern"><svg><use href="#icon-check"></use></svg></button>
+            <button class="icon-button" type="button" data-memo-category-action="save" aria-label="Änderung an ${escapeHtml(category)} speichern" title="Änderung speichern"><svg><use href="#icon-check"></use></svg></button>
             <button class="icon-button danger" type="button" data-memo-category-action="delete" aria-label="${escapeHtml(category)} löschen" title="Löschen"><svg><use href="#icon-trash"></use></svg></button>
           </div>`).join("")
       : '<p class="settings-empty-copy">Noch keine Kategorien angelegt.</p>';
