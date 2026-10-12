@@ -308,6 +308,7 @@
   };
 
   const PASSWORD_ITERATIONS = 210000;
+  const PASSWORD_HINT_MAX_LENGTH = 120;
   const USER_FIRST_NAME_FALLBACKS = {
     becke003: "Oliver",
     botze003: "Elisabeth",
@@ -618,6 +619,9 @@
   let attendanceEmployeeIds = [];
   let confirmCallback = null;
   let backupPasswordResolver = null;
+  // Ob der Dialog fuer den Passworthinweis die Anmeldung abschliesst oder
+  // nur aus dem Kontodialog geoeffnet wurde.
+  let passwordHintRequired = false;
   let currentUser = null;
   let selectedEmployeeIds = new Set();
   let employeeProfessionFilter = "all";
@@ -1069,6 +1073,8 @@
     loginDialog: document.querySelector("#loginDialog"),
     loginForm: document.querySelector("#loginForm"),
     loginError: document.querySelector("#loginError"),
+    loginPasswordHint: document.querySelector("#loginPasswordHint"),
+    showPasswordHintButton: document.querySelector("#showPasswordHintButton"),
     loginDataSource: document.querySelector("#loginDataSource"),
     startupBackupDialog: document.querySelector("#startupBackupDialog"),
     startupBackupFile: document.querySelector("#startupBackupFile"),
@@ -1104,6 +1110,12 @@
     changePasswordDialog: document.querySelector("#changePasswordDialog"),
     changePasswordForm: document.querySelector("#changePasswordForm"),
     changePasswordError: document.querySelector("#changePasswordError"),
+    passwordHintDialog: document.querySelector("#passwordHintDialog"),
+    passwordHintForm: document.querySelector("#passwordHintForm"),
+    passwordHintValue: document.querySelector("#passwordHintValue"),
+    passwordHintError: document.querySelector("#passwordHintError"),
+    passwordHintLogoutButton: document.querySelector("#passwordHintLogoutButton"),
+    passwordHintCancelButton: document.querySelector("#passwordHintCancelButton"),
     accountDialog: document.querySelector("#accountDialog"),
     accountDialogTitle: document.querySelector("#accountDialogTitle"),
     accountDialogRole: document.querySelector("#accountDialogRole"),
@@ -2364,9 +2376,17 @@
       passwordSalt,
       passwordHash,
       mustChangePassword: Boolean(user.mustChangePassword),
+      passwordHint: normalizePasswordHint(user.passwordHint),
       theme: normalizeUserTheme(user.theme),
       iconSet: normalizeUserIconSet(user.iconSet),
     };
+  }
+
+  // Der Passworthinweis ist Pflicht, fehlt aber bei Konten aus aelteren
+  // Fassungen. Leer heisst hier "noch nicht festgelegt" - nach der naechsten
+  // Anmeldung fragt TeO ihn ab.
+  function normalizePasswordHint(hint) {
+    return String(hint || "").trim().slice(0, PASSWORD_HINT_MAX_LENGTH);
   }
 
   function normalizeTheme(theme) {
@@ -4590,6 +4610,20 @@
     elements.setupForm.addEventListener("submit", handleSetupSubmit);
     elements.loginForm.addEventListener("submit", handleLoginSubmit);
     elements.changePasswordForm.addEventListener("submit", handlePasswordChangeSubmit);
+    elements.passwordHintForm.addEventListener("submit", handlePasswordHintSubmit);
+    elements.passwordHintCancelButton.addEventListener("click", () =>
+      elements.passwordHintDialog.close(),
+    );
+    document.querySelectorAll("[data-open-password-hint]").forEach((button) => {
+      button.addEventListener("click", () => showPasswordHintDialog());
+    });
+    elements.showPasswordHintButton.addEventListener(
+      "click",
+      () => void showLoginPasswordHint(),
+    );
+    document
+      .querySelector("#loginUsername")
+      .addEventListener("input", hideLoginPasswordHint);
     document.querySelectorAll("[data-logout]").forEach((button) => {
       button.addEventListener("click", logout);
     });
@@ -5101,9 +5135,11 @@
     const username = document.querySelector("#setupUsername").value.trim();
     const password = document.querySelector("#setupPassword").value;
     const confirmation = document.querySelector("#setupPasswordConfirmation").value;
+    const passwordHint = document.querySelector("#setupPasswordHint").value.trim();
     elements.setupError.textContent =
       /^[A-Za-z0-9]{4,40}$/.test(username)
-        ? validateNewPassword(password, confirmation)
+        ? validateNewPassword(password, confirmation) ||
+          validatePasswordHint(passwordHint, password)
         : "Der Benutzername muss aus 4 bis 40 Buchstaben oder Ziffern bestehen.";
     if (elements.setupError.textContent) return;
 
@@ -5123,6 +5159,7 @@
       role: "admin",
       ...credentials,
       mustChangePassword: false,
+      passwordHint,
     };
     state.users = [admin];
     currentUser = admin;
@@ -5249,11 +5286,23 @@
       document.body.classList.add("is-auth-locked");
       elements.changePasswordForm.reset();
       elements.changePasswordError.textContent = "";
+      document.querySelector("#newPasswordHint").value = user.passwordHint || "";
       if (!elements.changePasswordDialog.open) elements.changePasswordDialog.showModal();
       window.setTimeout(() => document.querySelector("#newPassword").focus(), 0);
       return;
     }
 
+    // Der Passworthinweis ist Pflicht. Konten aus der Zeit davor legen ihn
+    // fest, bevor TeO sich oeffnet.
+    if (!user.passwordHint) {
+      showPasswordHintDialog({ required: true });
+      return;
+    }
+
+    continueLoginAfterAccountChecks();
+  }
+
+  function continueLoginAfterAccountChecks() {
     // Ein eben eingerichteter Datenbestand hat noch keine gemeinsame Datei.
     // TeO legt sie an, bevor es sich oeffnet.
     if (!isMariaDbMode() && !startupBackupSynchronized) {
@@ -5284,6 +5333,7 @@
     document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
     elements.loginForm.reset();
     elements.loginError.textContent = "";
+    hideLoginPasswordHint();
     elements.loginDataSource.textContent = loginDataSourceText();
     applyAccessControl();
     if (!elements.loginDialog.open) elements.loginDialog.showModal();
@@ -5362,7 +5412,10 @@
 
     const password = document.querySelector("#newPassword").value;
     const confirmation = document.querySelector("#confirmNewPassword").value;
-    const validationError = validateNewPassword(password, confirmation);
+    const passwordHint = document.querySelector("#newPasswordHint").value.trim();
+    const validationError =
+      validateNewPassword(password, confirmation) ||
+      validatePasswordHint(passwordHint, password);
     if (validationError) {
       elements.changePasswordError.textContent = validationError;
       return;
@@ -5377,7 +5430,7 @@
     const committed = await commitStateMutation(() => {
       state.users = state.users.map((user) =>
         user.id === currentUser.id
-          ? { ...user, ...credentials, mustChangePassword: false }
+          ? { ...user, ...credentials, mustChangePassword: false, passwordHint }
           : user,
       );
     });
@@ -5645,6 +5698,7 @@
       role,
       ...credentials,
       mustChangePassword: true,
+      passwordHint: "",
     };
 
     const committed = await commitStateMutation(() => {
@@ -5793,7 +5847,9 @@
     const committed = await commitStateMutation(() => {
       state.users = state.users.map((item) =>
         item.id === user.id
-          ? { ...item, ...credentials, mustChangePassword: true }
+          ? // Der alte Hinweis gehoert zum alten Passwort. Mit dem neuen
+            // Passwort wird auch ein neuer Hinweis festgelegt.
+            { ...item, ...credentials, mustChangePassword: true, passwordHint: "" }
           : item,
       );
     });
@@ -5828,6 +5884,136 @@
       .sort((a, b) => a.order - b.order)
       .map((item) => item.character)
       .join("");
+  }
+
+  // Der Passworthinweis ist eine Gedaechtnisstuetze, die vor der Anmeldung
+  // angezeigt werden kann - also fuer jeden lesbar, der den Benutzernamen
+  // kennt. Das Passwort selbst darf darin deshalb nicht vorkommen.
+  function validatePasswordHint(hint, password = "") {
+    const text = String(hint || "").trim();
+    if (!text) return "Bitte einen Passworthinweis angeben.";
+    if (text.length > PASSWORD_HINT_MAX_LENGTH) {
+      return `Der Passworthinweis darf höchstens ${PASSWORD_HINT_MAX_LENGTH} Zeichen lang sein.`;
+    }
+    if (
+      password &&
+      text.toLocaleLowerCase("de-DE").includes(password.toLocaleLowerCase("de-DE"))
+    ) {
+      return "Der Passworthinweis darf das Passwort nicht enthalten.";
+    }
+    return "";
+  }
+
+  // required: nach der Anmeldung eines Kontos ohne Hinweis - TeO bleibt bis
+  // dahin gesperrt, der Ausweg ist das Abmelden. Sonst aus dem Kontodialog,
+  // dann laesst er sich abbrechen.
+  function showPasswordHintDialog({ required = false } = {}) {
+    if (!currentUser) {
+      showLoginDialog();
+      return;
+    }
+    passwordHintRequired = required;
+    if (required) document.body.classList.add("is-auth-locked");
+    if (elements.accountDialog.open) elements.accountDialog.close();
+    elements.passwordHintForm.reset();
+    elements.passwordHintValue.value = currentUser.passwordHint || "";
+    elements.passwordHintError.textContent = "";
+    elements.passwordHintLogoutButton.hidden = !required;
+    elements.passwordHintCancelButton.hidden = required;
+    if (!elements.passwordHintDialog.open) elements.passwordHintDialog.showModal();
+    window.setTimeout(() => elements.passwordHintValue.focus(), 0);
+  }
+
+  async function handlePasswordHintSubmit(event) {
+    event.preventDefault();
+    if (!currentUser) {
+      showLoginDialog();
+      return;
+    }
+    const passwordHint = elements.passwordHintValue.value.trim();
+    let validationError = validatePasswordHint(passwordHint);
+    // Das Passwort selbst kennt TeO hier nicht mehr, nur seinen Hash. Damit
+    // laesst sich wenigstens ausschliessen, dass der Hinweis das Passwort ist.
+    if (
+      !validationError &&
+      currentUser.passwordHash &&
+      (await verifyPassword(passwordHint, currentUser))
+    ) {
+      validationError = "Der Passworthinweis darf das Passwort nicht enthalten.";
+    }
+    if (validationError) {
+      elements.passwordHintError.textContent = validationError;
+      return;
+    }
+
+    const userId = currentUser.id;
+    const committed = await commitStateMutation(
+      () => {
+        state.users = state.users.map((user) =>
+          user.id === userId ? { ...user, passwordHint } : user,
+        );
+      },
+      { auditAction: "Passworthinweis festgelegt" },
+    );
+    if (!committed) return;
+
+    currentUser = state.users.find((user) => user.id === userId) || currentUser;
+    elements.passwordHintDialog.close();
+    if (passwordHintRequired) {
+      passwordHintRequired = false;
+      continueLoginAfterAccountChecks();
+    }
+    showToast("Der Passworthinweis wurde gespeichert.");
+  }
+
+  // "Passwort vergessen?" an der Anmeldung. Auf einen unbekannten
+  // Benutzernamen antwortet TeO genauso wie auf ein Konto ohne Hinweis, damit
+  // sich nicht ausprobieren laesst, welche Konten es gibt.
+  async function showLoginPasswordHint() {
+    const username = document.querySelector("#loginUsername").value.trim();
+    if (!username) {
+      elements.loginError.textContent =
+        "Bitte zuerst den Benutzernamen eingeben, dann wird der Passworthinweis angezeigt.";
+      document.querySelector("#loginUsername").focus();
+      return;
+    }
+    elements.loginError.textContent = "";
+    let hint;
+    try {
+      hint = await lookupPasswordHint(username);
+    } catch (error) {
+      console.warn("Der Passworthinweis konnte nicht abgerufen werden.", error);
+      elements.loginError.textContent =
+        error.message || "Der Passworthinweis konnte nicht abgerufen werden.";
+      return;
+    }
+    elements.loginPasswordHint.textContent = hint
+      ? `Passworthinweis: ${hint}`
+      : "Für diesen Benutzernamen ist hier kein Passworthinweis bekannt. Ein Administrator kann das Passwort zurücksetzen.";
+    elements.loginPasswordHint.hidden = false;
+  }
+
+  // Im lokalen Betrieb stehen die Konten der gemeinsamen Datei erst nach dem
+  // Entschluesseln bereit. Der Hinweis kommt deshalb aus dem zuletzt in diesem
+  // Browser geladenen Bestand; im Serverbetrieb fragt TeO den Server.
+  async function lookupPasswordHint(username) {
+    if (isMariaDbMode()) {
+      const result = await window.TeOBackend.passwordHint(
+        backendConfig.apiUrl,
+        username,
+      );
+      return String(result?.hint || "");
+    }
+    const normalized = username.toLocaleLowerCase("de-DE");
+    const user = state.users.find(
+      (item) => item.username.toLocaleLowerCase("de-DE") === normalized,
+    );
+    return user?.passwordHint || "";
+  }
+
+  function hideLoginPasswordHint() {
+    elements.loginPasswordHint.hidden = true;
+    elements.loginPasswordHint.textContent = "";
   }
 
   function openCatalogManagementDialog() {

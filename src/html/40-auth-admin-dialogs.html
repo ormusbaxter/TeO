@@ -105,6 +105,20 @@
                 required
               />
             </label>
+            <label class="form-field">
+              <span>Passworthinweis</span>
+              <input
+                id="setupPasswordHint"
+                name="passwordHint"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <small class="field-hint">
+                Pflichtangabe: eine Gedächtnisstütze, die vor der Anmeldung angezeigt werden kann. Sie darf das Passwort nicht enthalten.
+              </small>
+            </label>
           </div>
           <p class="form-error auth-error" id="setupError" role="alert"></p>
         </div>
@@ -157,12 +171,16 @@
           </div>
           <p class="auth-data-source" id="loginDataSource"></p>
           <p class="form-error auth-error" id="loginError" role="alert"></p>
+          <p class="auth-password-hint" id="loginPasswordHint" role="status" hidden></p>
           <p class="auth-software-meta" aria-label="Softwareinformationen">
             <span id="loginProjectVersion">Version wird geladen</span>
             <span id="loginCopyright">&copy; 2026 Oliver Becker</span>
           </p>
         </div>
         <div class="modal-footer">
+          <button class="button button-ghost" type="button" id="showPasswordHintButton">
+            Passwort vergessen?
+          </button>
           <button class="button button-primary" type="submit">Anmelden</button>
         </div>
       </form>
@@ -316,12 +334,69 @@
                 required
               />
             </label>
+            <label class="form-field">
+              <span>Passworthinweis</span>
+              <input
+                id="newPasswordHint"
+                name="passwordHint"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <small class="field-hint">
+                Pflichtangabe: eine Gedächtnisstütze, die vor der Anmeldung angezeigt werden kann. Sie darf das Passwort nicht enthalten.
+              </small>
+            </label>
           </div>
           <p class="form-error auth-error" id="changePasswordError" role="alert"></p>
         </div>
         <div class="modal-footer">
           <button class="button button-ghost" type="button" data-logout>Abmelden</button>
           <button class="button button-primary" type="submit">Passwort speichern</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
+      id="passwordHintDialog"
+      aria-labelledby="passwordHintDialogTitle"
+      data-persistent-dialog
+    >
+      <form id="passwordHintForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Benutzerkonto</p>
+            <h2 id="passwordHintDialogTitle">Passworthinweis festlegen</h2>
+            <p class="modal-subtitle" id="passwordHintDialogSubtitle">
+              Zu jedem Konto gehört ein Passworthinweis. Er hilft, wenn das Passwort vergessen wurde.
+            </p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Passworthinweis</span>
+              <input
+                id="passwordHintValue"
+                name="passwordHint"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <small class="field-hint">
+                Pflichtangabe: eine Gedächtnisstütze, die vor der Anmeldung angezeigt werden kann. Sie darf das Passwort nicht enthalten.
+              </small>
+            </label>
+          </div>
+          <p class="form-error auth-error" id="passwordHintError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" id="passwordHintLogoutButton" data-logout>Abmelden</button>
+          <button class="button button-ghost" type="button" id="passwordHintCancelButton" hidden>Abbrechen</button>
+          <button class="button button-primary" type="submit">Hinweis speichern</button>
         </div>
       </form>
     </dialog>
@@ -345,6 +420,9 @@
           data-admin-only
         >
           Benutzer verwalten
+        </button>
+        <button class="button button-secondary" type="button" data-open-password-hint>
+          Passworthinweis ändern
         </button>
         <button class="button button-danger" type="button" data-logout>Abmelden</button>
       </div>

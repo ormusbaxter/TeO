@@ -260,6 +260,15 @@ app.post("/api/auth/login", loginRateLimit, asyncHandler(async (request, respons
   });
 }));
 
+// "Passwort vergessen?" an der Anmeldung. Ein unbekannter Benutzername bekommt
+// dieselbe Antwort wie ein Konto ohne Hinweis, und jede Abfrage zaehlt wie ein
+// Anmeldeversuch - sonst liesse sich hier ausprobieren, welche Konten es gibt.
+app.post("/api/auth/password-hint", loginRateLimit, asyncHandler(async (request, response) => {
+  const row = await readStateRow();
+  const user = row ? findUser(row.state, request.body?.username) : null;
+  response.json({ hint: String(user?.passwordHint || "") });
+}));
+
 app.delete("/api/auth/session", requireSession, asyncHandler(async (request, response) => {
   await sessionStore.removeByHash(request.session.tokenHash);
   response.sendStatus(204);
@@ -609,9 +618,14 @@ function publicUser(user) {
 // liesse es in jeder Antwort des Servers mitlesen.
 function stateForClient(state, currentUserId) {
   const clientState = structuredClone(state);
-  clientState.users = clientState.users.map((user) =>
-    ({ ...user, passwordSalt: "", passwordHash: "" }),
-  );
+  // Den Passworthinweis bekommt nur das eigene Konto mit; fremde Hinweise
+  // braucht kein Browser nach der Anmeldung.
+  clientState.users = clientState.users.map((user) => ({
+    ...user,
+    passwordSalt: "",
+    passwordHash: "",
+    ...(user.id === currentUserId ? {} : { passwordHint: "" }),
+  }));
   const currentUser = state.users?.find((user) => user.id === currentUserId);
   if (currentUser?.role !== "admin") clientState.auditLog = [];
   return clientState;
@@ -625,11 +639,18 @@ function mergeProtectedCredentials(currentState, nextState) {
   hydratedState.users = hydratedState.users.map((user) => {
     const currentUser = currentUsers.get(user.id);
     if (!currentUser || (user.passwordSalt && user.passwordHash)) return user;
-    return {
+    // Ein neues Passwort bringt seinen Hinweis selbst mit (oder, nach einem
+    // Zuruecksetzen, bewusst keinen). Sonst fehlt der Hinweis nur, weil ihn
+    // der Browser nie bekommen hat.
+    const merged = {
       ...user,
       passwordSalt: currentUser.passwordSalt,
       passwordHash: currentUser.passwordHash,
     };
+    const passwordHint = user.passwordHint || currentUser.passwordHint;
+    if (passwordHint) merged.passwordHint = passwordHint;
+    else if (!Object.hasOwn(currentUser, "passwordHint")) delete merged.passwordHint;
+    return merged;
   });
   return hydratedState;
 }

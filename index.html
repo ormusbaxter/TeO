@@ -2308,6 +2308,10 @@
 <h3 id="hilfe-ersteinrichtung-und-passworter">Ersteinrichtung und Passwörter</h3>
 <p>TeO enthält keine fest eingebauten Produktivkonten oder Standardpasswörter. Beim ersten Start wird ein Administratorkonto erstellt.</p>
 <p>Wird das Passwort eines normalen Benutzers zurückgesetzt, erzeugt TeO ein temporäres Passwort. Beim nächsten Anmelden muss der Benutzer ein neues Passwort festlegen.</p>
+<h3 id="hilfe-passworthinweis">Passworthinweis</h3>
+<p>Zu jedem Konto gehört ein <strong>Passworthinweis</strong> – eine Gedächtnisstütze, keine zweite Anmeldung. Er ist Pflicht und wird zusammen mit dem Passwort festgelegt: bei der Ersteinrichtung und immer dann, wenn ein neues Passwort gesetzt wird. Der Hinweis darf das Passwort nicht enthalten, denn er lässt sich vor der Anmeldung lesen. Konten ohne Hinweis (aus Fassungen vor 4.65.0) legen ihn direkt nach der nächsten Anmeldung fest; bis dahin bleibt TeO gesperrt. Ändern lässt er sich über <strong>Konto → Passworthinweis ändern</strong>.</p>
+<p>An der Anmeldung zeigt <strong>Passwort vergessen?</strong> den Hinweis zum eingegebenen Benutzernamen. Für einen unbekannten Namen antwortet TeO genauso wie für ein Konto ohne Hinweis, damit sich nicht ausprobieren lässt, welche Konten es gibt. Im lokalen Modus stammt der Hinweis aus dem zuletzt an diesem Arbeitsplatz geladenen Datenbestand, im MariaDB-Modus vom Server; dort zählt jede Abfrage wie ein Anmeldeversuch.</p>
+<p>Hilft auch der Hinweis nicht, setzt ein Administrator das Passwort zurück. Der alte Hinweis entfällt dabei, mit dem neuen Passwort entsteht ein neuer. Hat der einzige Administrator sein Passwort vergessen, gibt es in TeO keinen Weg zurück – ein zweites Administratorkonto beugt dem vor.</p>
 <p>Passwörter werden mit PBKDF2 gehasht gespeichert. Im lokalen Modus steuert die Anmeldung die Bedienung der Oberfläche, schützt den Datenbestand aber nicht (siehe „Was der lokale Modus leistet – und was nicht“). Im MariaDB-Modus werden Anmeldung und Rollen zusätzlich serverseitig geprüft.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-mitarbeiterverwaltung">
@@ -2663,6 +2667,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-65-0-passworthinweis">4.65.0 – Passworthinweis</h3>
+<ul><li><strong>Neu:</strong> Zu jedem Konto gehört ein Passworthinweis. Er ist Pflicht bei der Ersteinrichtung und bei jedem neuen Passwort und darf das Passwort nicht enthalten. Konten ohne Hinweis legen ihn nach der nächsten Anmeldung fest, ändern lässt er sich über <strong>Konto → Passworthinweis ändern</strong></li><li><strong>Neu:</strong> <strong>Passwort vergessen?</strong> an der Anmeldung zeigt den Hinweis zum eingegebenen Benutzernamen. Ein unbekannter Name bekommt dieselbe Antwort wie ein Konto ohne Hinweis. Im MariaDB-Betrieb liefert der Server nur den eigenen Hinweis aus, und jede Abfrage zählt wie ein Anmeldeversuch</li><li><strong>Geändert:</strong> Setzt ein Administrator ein Passwort zurück, entfällt der alte Hinweis; mit dem neuen Passwort wird ein neuer festgelegt</li></ul>
 <h3 id="hilfe-4-64-1-tageswechsel-bei-geoffnetem-teo">4.64.1 – Tageswechsel bei geöffnetem TeO</h3>
 <ul><li><strong>Behoben:</strong> Blieb TeO über Mitternacht geöffnet, zeigten Dashboard und Ansichten bis zum nächsten Speichern oder Neuladen den Vortag: Datum, Fristen, Abwesenheiten, Quoten, die Zahl der Beschäftigten und Änderungen des Stellenumfangs. TeO bemerkt den neuen Tag jetzt innerhalb einer Minute oder bei der Rückkehr zum Fenster und aktualisiert alles</li><li><strong>Behoben:</strong> Nach dem Jahreswechsel zeigen Pflichtfortbildungen und Teamsitzungen das neue Jahr, auch ohne Neuladen. Ein bewusst gewähltes anderes Jahr bleibt stehen, ebenso der Monat in Urlaubsplanung und Terminkalender</li></ul>
 <h3 id="hilfe-4-64-0-einweisungsmatrix-als-excel-datei">4.64.0 – Einweisungsmatrix als Excel-Datei</h3>
@@ -3047,6 +3053,20 @@
                 required
               />
             </label>
+            <label class="form-field">
+              <span>Passworthinweis</span>
+              <input
+                id="setupPasswordHint"
+                name="passwordHint"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <small class="field-hint">
+                Pflichtangabe: eine Gedächtnisstütze, die vor der Anmeldung angezeigt werden kann. Sie darf das Passwort nicht enthalten.
+              </small>
+            </label>
           </div>
           <p class="form-error auth-error" id="setupError" role="alert"></p>
         </div>
@@ -3099,12 +3119,16 @@
           </div>
           <p class="auth-data-source" id="loginDataSource"></p>
           <p class="form-error auth-error" id="loginError" role="alert"></p>
+          <p class="auth-password-hint" id="loginPasswordHint" role="status" hidden></p>
           <p class="auth-software-meta" aria-label="Softwareinformationen">
             <span id="loginProjectVersion">Version wird geladen</span>
             <span id="loginCopyright">&copy; 2026 Oliver Becker</span>
           </p>
         </div>
         <div class="modal-footer">
+          <button class="button button-ghost" type="button" id="showPasswordHintButton">
+            Passwort vergessen?
+          </button>
           <button class="button button-primary" type="submit">Anmelden</button>
         </div>
       </form>
@@ -3258,12 +3282,69 @@
                 required
               />
             </label>
+            <label class="form-field">
+              <span>Passworthinweis</span>
+              <input
+                id="newPasswordHint"
+                name="passwordHint"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <small class="field-hint">
+                Pflichtangabe: eine Gedächtnisstütze, die vor der Anmeldung angezeigt werden kann. Sie darf das Passwort nicht enthalten.
+              </small>
+            </label>
           </div>
           <p class="form-error auth-error" id="changePasswordError" role="alert"></p>
         </div>
         <div class="modal-footer">
           <button class="button button-ghost" type="button" data-logout>Abmelden</button>
           <button class="button button-primary" type="submit">Passwort speichern</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog
+      class="modal auth-dialog"
+      id="passwordHintDialog"
+      aria-labelledby="passwordHintDialogTitle"
+      data-persistent-dialog
+    >
+      <form id="passwordHintForm">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Benutzerkonto</p>
+            <h2 id="passwordHintDialogTitle">Passworthinweis festlegen</h2>
+            <p class="modal-subtitle" id="passwordHintDialogSubtitle">
+              Zu jedem Konto gehört ein Passworthinweis. Er hilft, wenn das Passwort vergessen wurde.
+            </p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid form-grid-single">
+            <label class="form-field">
+              <span>Passworthinweis</span>
+              <input
+                id="passwordHintValue"
+                name="passwordHint"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <small class="field-hint">
+                Pflichtangabe: eine Gedächtnisstütze, die vor der Anmeldung angezeigt werden kann. Sie darf das Passwort nicht enthalten.
+              </small>
+            </label>
+          </div>
+          <p class="form-error auth-error" id="passwordHintError" role="alert"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="button button-ghost" type="button" id="passwordHintLogoutButton" data-logout>Abmelden</button>
+          <button class="button button-ghost" type="button" id="passwordHintCancelButton" hidden>Abbrechen</button>
+          <button class="button button-primary" type="submit">Hinweis speichern</button>
         </div>
       </form>
     </dialog>
@@ -3287,6 +3368,9 @@
           data-admin-only
         >
           Benutzer verwalten
+        </button>
+        <button class="button button-secondary" type="button" data-open-password-hint>
+          Passworthinweis ändern
         </button>
         <button class="button button-danger" type="button" data-logout>Abmelden</button>
       </div>

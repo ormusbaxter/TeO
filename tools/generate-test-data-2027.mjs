@@ -617,6 +617,7 @@ function users() {
       passwordSalt: "IsuQeqq+lG55f5qseebb0w==",
       passwordHash: "+T4fSji3T70wJDJi7CfoM+8kRrah2J2TelxOq3XT0z0=",
       mustChangePassword: false,
+      passwordHint: "Siehe demo/README.md",
     },
     {
       id: "user-test-1",
@@ -625,6 +626,7 @@ function users() {
       passwordSalt: "M9joS35LnetkzDqbmevCug==",
       passwordHash: "SfywWsFa6OsRZTdKSlO7IcS3R/kC+kMWII86a/FB7AQ=",
       mustChangePassword: false,
+      passwordHint: "Siehe demo/README.md",
     },
   ];
 }

@@ -169,6 +169,11 @@ anschließend nicht zulässig.
   geänderte Zeilen werden aktualisiert.
 - Passworthashes werden keinem Browser ausgeliefert und beim Speichern
   serverseitig geschützt wieder ergänzt.
+- Passworthinweise bekommt ein Browser nach der Anmeldung nur für das eigene
+  Konto; fremde Hinweise werden beim Speichern wieder ergänzt. Vor der
+  Anmeldung liefert `POST /api/auth/password-hint` den Hinweis zu einem
+  Benutzernamen – für unbekannte Namen dieselbe leere Antwort, und jede Abfrage
+  zählt wie ein Anmeldeversuch.
 - Ein unveränderbares Serverprotokoll in `teo_audit_log` dokumentiert
   Initialisierung und Datenrevisionen zusätzlich zum fachlichen App-Protokoll.
 - Versionierte Migrationen in `src/migrations.js` aktualisieren das

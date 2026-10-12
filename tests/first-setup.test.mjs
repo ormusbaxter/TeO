@@ -23,6 +23,7 @@ async function richteEin(teo) {
   await page.fill("#setupUsername", "leitung1");
   await page.fill("#setupPassword", "Geheim123");
   await page.fill("#setupPasswordConfirmation", "Geheim123");
+  await page.fill("#setupPasswordHint", "Wie immer");
   await page.evaluate(() => document.querySelector("#setupForm").requestSubmit());
   await page.waitForSelector("#firstSharedFolderDialog[open]");
 }

@@ -278,9 +278,11 @@
     const username = document.querySelector("#setupUsername").value.trim();
     const password = document.querySelector("#setupPassword").value;
     const confirmation = document.querySelector("#setupPasswordConfirmation").value;
+    const passwordHint = document.querySelector("#setupPasswordHint").value.trim();
     elements.setupError.textContent =
       /^[A-Za-z0-9]{4,40}$/.test(username)
-        ? validateNewPassword(password, confirmation)
+        ? validateNewPassword(password, confirmation) ||
+          validatePasswordHint(passwordHint, password)
         : "Der Benutzername muss aus 4 bis 40 Buchstaben oder Ziffern bestehen.";
     if (elements.setupError.textContent) return;
 
@@ -300,6 +302,7 @@
       role: "admin",
       ...credentials,
       mustChangePassword: false,
+      passwordHint,
     };
     state.users = [admin];
     currentUser = admin;
@@ -426,11 +429,23 @@
       document.body.classList.add("is-auth-locked");
       elements.changePasswordForm.reset();
       elements.changePasswordError.textContent = "";
+      document.querySelector("#newPasswordHint").value = user.passwordHint || "";
       if (!elements.changePasswordDialog.open) elements.changePasswordDialog.showModal();
       window.setTimeout(() => document.querySelector("#newPassword").focus(), 0);
       return;
     }
 
+    // Der Passworthinweis ist Pflicht. Konten aus der Zeit davor legen ihn
+    // fest, bevor TeO sich oeffnet.
+    if (!user.passwordHint) {
+      showPasswordHintDialog({ required: true });
+      return;
+    }
+
+    continueLoginAfterAccountChecks();
+  }
+
+  function continueLoginAfterAccountChecks() {
     // Ein eben eingerichteter Datenbestand hat noch keine gemeinsame Datei.
     // TeO legt sie an, bevor es sich oeffnet.
     if (!isMariaDbMode() && !startupBackupSynchronized) {
@@ -461,6 +476,7 @@
     document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
     elements.loginForm.reset();
     elements.loginError.textContent = "";
+    hideLoginPasswordHint();
     elements.loginDataSource.textContent = loginDataSourceText();
     applyAccessControl();
     if (!elements.loginDialog.open) elements.loginDialog.showModal();
@@ -539,7 +555,10 @@
 
     const password = document.querySelector("#newPassword").value;
     const confirmation = document.querySelector("#confirmNewPassword").value;
-    const validationError = validateNewPassword(password, confirmation);
+    const passwordHint = document.querySelector("#newPasswordHint").value.trim();
+    const validationError =
+      validateNewPassword(password, confirmation) ||
+      validatePasswordHint(passwordHint, password);
     if (validationError) {
       elements.changePasswordError.textContent = validationError;
       return;
@@ -554,7 +573,7 @@
     const committed = await commitStateMutation(() => {
       state.users = state.users.map((user) =>
         user.id === currentUser.id
-          ? { ...user, ...credentials, mustChangePassword: false }
+          ? { ...user, ...credentials, mustChangePassword: false, passwordHint }
           : user,
       );
     });

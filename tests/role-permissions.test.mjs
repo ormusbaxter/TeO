@@ -24,6 +24,7 @@ async function loadServerPermissionChecks() {
     "isPermittedOwnUserMutation",
     "deepEqual",
     "stateForClient",
+    "mergeProtectedCredentials",
     "protectAuditLog",
     "appendOnlyAuditLog",
   ];
@@ -492,4 +493,54 @@ test("Beim Import eines normalen Kontos bleibt das Protokoll der Sicherung drau�
   assert.equal(backend.gesendet.length, 1);
   assert.equal(backend.gesendet[0].auditLog.length, 0);
   assert.equal(backend.gesendet[0].employees[0].id, "employee-9");
+});
+
+test("Fremde Passworthinweise verlassen den Server nicht und gehen beim Speichern nicht verloren", async () => {
+  const { stateForClient, mergeProtectedCredentials, isPermittedUserMutation } =
+    await loadServerPermissionChecks();
+  const state = createServerState();
+  state.users = state.users.map((user) => ({ ...user, passwordHint: `Hinweis ${user.id}` }));
+
+  const fuerKonto = stateForClient(state, USER_ID);
+  const eigenes = fuerKonto.users.find((user) => user.id === USER_ID);
+  const fremdes = fuerKonto.users.find((user) => user.id !== USER_ID);
+  assert.equal(eigenes.passwordHint, `Hinweis ${USER_ID}`);
+  assert.equal(fremdes.passwordHint, "");
+
+  // Der Browser schickt den Bestand zur체ck und 채ndert dabei den eigenen Hinweis.
+  eigenes.passwordHint = "Neuer Hinweis";
+  const gespeichert = mergeProtectedCredentials(state, fuerKonto);
+  assert.equal(
+    gespeichert.users.find((user) => user.id !== USER_ID).passwordHint,
+    `Hinweis ${fremdes.id}`,
+    "Der fremde Hinweis wird wieder erg채nzt",
+  );
+  assert.equal(
+    gespeichert.users.find((user) => user.id === USER_ID).passwordHint,
+    "Neuer Hinweis",
+  );
+  assert.equal(
+    isPermittedUserMutation(state, gespeichert, USER_ID),
+    true,
+    "Den eigenen Hinweis darf auch ein normales Konto 채ndern",
+  );
+
+  // Konten aus der Zeit vor dem Hinweis: Das leere Feld aus dem Browser
+  // ver채ndert sie nicht.
+  const alt = createServerState();
+  const altGespeichert = mergeProtectedCredentials(alt, stateForClient(alt, USER_ID));
+  assert.equal(isPermittedUserMutation(alt, altGespeichert, USER_ID), true);
+
+  // Ein neues Passwort bringt seinen Hinweis selbst mit, auch keinen.
+  const zurueckgesetzt = stateForClient(state, ADMIN_USER.id);
+  zurueckgesetzt.users = zurueckgesetzt.users.map((user) =>
+    user.id === USER_ID
+      ? { ...user, passwordSalt: "salt-neu", passwordHash: "hash-neu", passwordHint: "" }
+      : user,
+  );
+  assert.equal(
+    mergeProtectedCredentials(state, zurueckgesetzt).users.find((user) => user.id === USER_ID)
+      .passwordHint,
+    "",
+  );
 });

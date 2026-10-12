@@ -536,6 +536,28 @@ Wird das Passwort eines normalen Benutzers zurückgesetzt, erzeugt TeO ein
 temporäres Passwort. Beim nächsten Anmelden muss der Benutzer ein neues
 Passwort festlegen.
 
+### Passworthinweis
+
+Zu jedem Konto gehört ein **Passworthinweis** – eine Gedächtnisstütze, keine
+zweite Anmeldung. Er ist Pflicht und wird zusammen mit dem Passwort
+festgelegt: bei der Ersteinrichtung und immer dann, wenn ein neues Passwort
+gesetzt wird. Der Hinweis darf das Passwort nicht enthalten, denn er lässt sich
+vor der Anmeldung lesen. Konten ohne Hinweis (aus Fassungen vor 4.65.0) legen
+ihn direkt nach der nächsten Anmeldung fest; bis dahin bleibt TeO gesperrt.
+Ändern lässt er sich über **Konto → Passworthinweis ändern**.
+
+An der Anmeldung zeigt **Passwort vergessen?** den Hinweis zum eingegebenen
+Benutzernamen. Für einen unbekannten Namen antwortet TeO genauso wie für ein
+Konto ohne Hinweis, damit sich nicht ausprobieren lässt, welche Konten es gibt.
+Im lokalen Modus stammt der Hinweis aus dem zuletzt an diesem Arbeitsplatz
+geladenen Datenbestand, im MariaDB-Modus vom Server; dort zählt jede Abfrage wie
+ein Anmeldeversuch.
+
+Hilft auch der Hinweis nicht, setzt ein Administrator das Passwort zurück. Der
+alte Hinweis entfällt dabei, mit dem neuen Passwort entsteht ein neuer. Hat der
+einzige Administrator sein Passwort vergessen, gibt es in TeO keinen Weg
+zurück – ein zweites Administratorkonto beugt dem vor.
+
 Passwörter werden mit PBKDF2 gehasht gespeichert. Im lokalen Modus steuert die
 Anmeldung die Bedienung der Oberfläche, schützt den Datenbestand aber nicht
 (siehe „Was der lokale Modus leistet – und was nicht“). Im MariaDB-Modus werden

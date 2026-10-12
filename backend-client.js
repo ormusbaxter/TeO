@@ -124,6 +124,13 @@
     });
   }
 
+  async function passwordHint(apiUrl, username) {
+    return request(apiUrl, "/api/auth/password-hint", {
+      method: "POST",
+      body: { username },
+    });
+  }
+
   async function logout(apiUrl, token) {
     if (!token) return;
     try {
@@ -158,6 +165,7 @@
     health,
     bootstrap,
     login,
+    passwordHint,
     logout,
     load,
     save,

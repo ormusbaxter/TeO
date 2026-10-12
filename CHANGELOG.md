@@ -1,3 +1,9 @@
+### 4.65.0 – Passworthinweis
+
+- **Neu:** Zu jedem Konto gehört ein Passworthinweis. Er ist Pflicht bei der Ersteinrichtung und bei jedem neuen Passwort und darf das Passwort nicht enthalten. Konten ohne Hinweis legen ihn nach der nächsten Anmeldung fest, ändern lässt er sich über **Konto → Passworthinweis ändern**
+- **Neu:** **Passwort vergessen?** an der Anmeldung zeigt den Hinweis zum eingegebenen Benutzernamen. Ein unbekannter Name bekommt dieselbe Antwort wie ein Konto ohne Hinweis. Im MariaDB-Betrieb liefert der Server nur den eigenen Hinweis aus, und jede Abfrage zählt wie ein Anmeldeversuch
+- **Geändert:** Setzt ein Administrator ein Passwort zurück, entfällt der alte Hinweis; mit dem neuen Passwort wird ein neuer festgelegt
+
 ### 4.64.1 – Tageswechsel bei geöffnetem TeO
 
 - **Behoben:** Blieb TeO über Mitternacht geöffnet, zeigten Dashboard und Ansichten bis zum nächsten Speichern oder Neuladen den Vortag: Datum, Fristen, Abwesenheiten, Quoten, die Zahl der Beschäftigten und Änderungen des Stellenumfangs. TeO bemerkt den neuen Tag jetzt innerhalb einer Minute oder bei der Rückkehr zum Fenster und aktualisiert alles
