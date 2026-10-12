@@ -3446,6 +3446,9 @@
         showSettingsSection(button.dataset.settingsSectionTarget);
       });
     });
+    document
+      .querySelector(".settings-section-nav")
+      ?.addEventListener("keydown", handleSettingsTabKeydown);
 
     // Das Inhaltsverzeichnis der Hilfe entsteht erst beim Einhaengen des
     // Handbuchs. Der Aufruf wird deshalb am Behaelter abgefangen, der von
@@ -3573,23 +3576,46 @@
     requestStickyHeaderUpdate();
   }
 
+  const SETTINGS_SECTIONS = ["general", "planning", "training", "master-data", "data"];
+
+  // Die Leiste über den Einstellungen ist eine Registerleiste: Die Bereiche
+  // sind Reiter, nur der gewählte liegt in der Tab-Reihenfolge, die übrigen
+  // erreicht man mit den Pfeiltasten. Das Untermenü der Seitenleiste führt zu
+  // denselben Bereichen, ist aber Navigation - dort markiert aria-current den
+  // aktuellen Bereich.
   function showSettingsSection(section = "general") {
-    const availableSections = new Set([
-      "general",
-      "planning",
-      "training",
-      "master-data",
-      "data",
-    ]);
-    activeSettingsSection = availableSections.has(section) ? section : "general";
+    activeSettingsSection = SETTINGS_SECTIONS.includes(section) ? section : "general";
     document.querySelectorAll("[data-settings-section]").forEach((panel) => {
       panel.hidden = panel.dataset.settingsSection !== activeSettingsSection;
     });
     document.querySelectorAll("[data-settings-section-target]").forEach((button) => {
       const active = button.dataset.settingsSectionTarget === activeSettingsSection;
       button.classList.toggle("is-active", active);
-      button.setAttribute("aria-pressed", String(active));
+      if (button.getAttribute("role") === "tab") {
+        button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
+      } else if (active) {
+        button.setAttribute("aria-current", "true");
+      } else {
+        button.removeAttribute("aria-current");
+      }
     });
+  }
+
+  function handleSettingsTabKeydown(event) {
+    const tabs = [...event.currentTarget.querySelectorAll('[role="tab"]')];
+    const index = tabs.indexOf(event.target);
+    if (index < 0) return;
+    const target = {
+      ArrowRight: tabs[(index + 1) % tabs.length],
+      ArrowLeft: tabs[(index - 1 + tabs.length) % tabs.length],
+      Home: tabs[0],
+      End: tabs[tabs.length - 1],
+    }[event.key];
+    if (!target) return;
+    event.preventDefault();
+    showSettingsSection(target.dataset.settingsSectionTarget);
+    target.focus();
   }
 
   // Was „Anlegen“ in der gezeigten Ansicht bedeutet. Der Knopf am unteren
@@ -15209,7 +15235,7 @@
       ? state.catalogs.memoCategories.map((category, index) => `
           <div class="catalog-row" data-memo-category-index="${index}">
             <input type="text" maxlength="60" value="${escapeHtml(category)}" aria-label="Kategorie ${escapeHtml(category)} bearbeiten" />
-            <button class="icon-button" type="button" data-memo-category-action="save" aria-label="Änderung speichern" title="Änderung speichern"><svg><use href="#icon-check"></use></svg></button>
+            <button class="icon-button" type="button" data-memo-category-action="save" aria-label="Änderung an ${escapeHtml(category)} speichern" title="Änderung speichern"><svg><use href="#icon-check"></use></svg></button>
             <button class="icon-button danger" type="button" data-memo-category-action="delete" aria-label="${escapeHtml(category)} löschen" title="Löschen"><svg><use href="#icon-trash"></use></svg></button>
           </div>`).join("")
       : '<p class="settings-empty-copy">Noch keine Kategorien angelegt.</p>';

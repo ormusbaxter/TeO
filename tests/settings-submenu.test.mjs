@@ -117,3 +117,133 @@ test("Das Untermenü steht bei seinem Menüpunkt", async (t) => {
     "und vor dem nächsten Menüpunkt",
   );
 });
+
+test("Die Bereichsleiste ist eine Registerleiste mit je einem Registerblatt", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  await teo.zeigeAnsicht("settings");
+  const befund = await teo.evaluate(() => {
+    const leiste = document.querySelector(".settings-section-nav");
+    const reiter = [...leiste.querySelectorAll('[role="tab"]')];
+    return {
+      rolle: leiste.getAttribute("role"),
+      reiter: reiter.map((tab) => {
+        const blatt = document.getElementById(tab.getAttribute("aria-controls"));
+        return {
+          ziel: tab.dataset.settingsSectionTarget,
+          gewaehlt: tab.getAttribute("aria-selected"),
+          tabIndex: tab.tabIndex,
+          blattRolle: blatt?.getAttribute("role"),
+          blattBereich: blatt?.dataset.settingsSection,
+          blattBeschriftung: blatt?.getAttribute("aria-labelledby") === tab.id,
+          blattVerborgen: blatt?.hidden,
+        };
+      }),
+    };
+  });
+
+  assert.equal(befund.rolle, "tablist");
+  assert.equal(befund.reiter.length, BEREICHE.length);
+  for (const reiter of befund.reiter) {
+    const aktiv = reiter.ziel === "general";
+    assert.equal(reiter.gewaehlt, String(aktiv), `aria-selected an „${reiter.ziel}“`);
+    // Nur der gewählte Reiter liegt in der Tab-Reihenfolge.
+    assert.equal(reiter.tabIndex, aktiv ? 0 : -1, `tabIndex an „${reiter.ziel}“`);
+    assert.equal(reiter.blattRolle, "tabpanel", `Registerblatt zu „${reiter.ziel}“`);
+    assert.equal(reiter.blattBereich, reiter.ziel);
+    assert.equal(reiter.blattBeschriftung, true, `Blatt „${reiter.ziel}“ trägt den Namen seines Reiters`);
+    assert.equal(reiter.blattVerborgen, !aktiv, `Blatt „${reiter.ziel}“ sichtbar nur, wenn gewählt`);
+  }
+});
+
+test("Pfeiltasten, Pos1 und Ende wechseln den Bereich", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  await teo.zeigeAnsicht("settings");
+  await teo.page.focus("#settingsTab-general");
+
+  const zustand = () =>
+    teo.evaluate(() => ({
+      fokus: document.activeElement?.dataset.settingsSectionTarget,
+      gewaehlt: document
+        .querySelector('.settings-section-nav [aria-selected="true"]')
+        ?.dataset.settingsSectionTarget,
+      sichtbar: [...document.querySelectorAll(".settings-section-panel")]
+        .filter((blatt) => !blatt.hidden)
+        .map((blatt) => blatt.dataset.settingsSection)
+        .join(","),
+    }));
+
+  for (const [taste, erwartet] of [
+    ["ArrowRight", "planning"],
+    ["ArrowRight", "training"],
+    ["End", "data"],
+    ["ArrowRight", "general"],
+    ["ArrowLeft", "data"],
+    ["Home", "general"],
+  ]) {
+    await teo.page.keyboard.press(taste);
+    const jetzt = await zustand();
+    assert.equal(jetzt.fokus, erwartet, `${taste}: Fokus`);
+    assert.equal(jetzt.gewaehlt, erwartet, `${taste}: gewählter Reiter`);
+    assert.equal(jetzt.sichtbar, erwartet, `${taste}: sichtbares Blatt`);
+  }
+});
+
+test("Das Untermenü der Seitenleiste markiert den Bereich mit aria-current", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  await teo.zeigeAnsicht("settings");
+  const markiert = await teo.evaluate(() => {
+    document.querySelector('#settingsSidebarSubnav [data-settings-section-target="training"]').click();
+    return [...document.querySelectorAll("#settingsSidebarSubnav button")].map((button) => ({
+      ziel: button.dataset.settingsSectionTarget,
+      current: button.getAttribute("aria-current"),
+      pressed: button.getAttribute("aria-pressed"),
+    }));
+  });
+
+  for (const punkt of markiert) {
+    assert.equal(punkt.current, punkt.ziel === "training" ? "true" : null, punkt.ziel);
+    // Navigation ist kein Umschalter.
+    assert.equal(punkt.pressed, null, punkt.ziel);
+  }
+});
+
+test("Jedes Feld der Einstellungen hat einen Namen, jeder Verweis ein Ziel", async (t) => {
+  const teo = await openTeO(t, { mitDemodaten: true, angemeldetAls: "admin" });
+  if (!teo) return;
+
+  await teo.zeigeAnsicht("settings");
+  const befund = await teo.evaluate(() => {
+    const ansicht = document.querySelector("#settingsView");
+    const ohneNamen = [...ansicht.querySelectorAll("input, select, textarea")]
+      .filter((feld) => feld.type !== "hidden")
+      .filter(
+        (feld) =>
+          !feld.labels?.length &&
+          !feld.getAttribute("aria-label") &&
+          !feld.getAttribute("aria-labelledby"),
+      )
+      .map((feld) => feld.id || feld.outerHTML.slice(0, 80));
+    const verwaiste = [];
+    for (const attribut of ["aria-describedby", "aria-labelledby", "aria-controls"]) {
+      ansicht.querySelectorAll(`[${attribut}]`).forEach((element) => {
+        for (const id of element.getAttribute(attribut).split(/\s+/)) {
+          if (!document.getElementById(id)) verwaiste.push(`${attribut}=${id}`);
+        }
+      });
+    }
+    const sprechendeSymbole = [...ansicht.querySelectorAll(".settings-card-icon")]
+      .filter((symbol) => symbol.getAttribute("aria-hidden") !== "true")
+      .length;
+    return { ohneNamen, verwaiste, sprechendeSymbole };
+  });
+
+  assert.equal(befund.ohneNamen.join(" | "), "", "Felder ohne Namen");
+  assert.equal(befund.verwaiste.join(" | "), "", "Verweise ins Leere");
+  assert.equal(befund.sprechendeSymbole, 0, "Kartensymbole sind Zierde und bleiben stumm");
+});
