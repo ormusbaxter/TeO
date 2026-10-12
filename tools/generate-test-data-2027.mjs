@@ -298,8 +298,8 @@ function createMeetings(employees) {
           index < attending
             ? "teilgenommen"
             : weightedPick([
-                ["dienst", 30], ["urlaub", 24], ["krankheit", 20],
-                ["schule", 12], ["entschuldigt", 11], ["unentschuldigt", 3],
+                ["dienst", 30], ["urlaub", 24],
+                ["schule", 12], ["entschuldigt", 31], ["unentschuldigt", 3],
               ]),
         createdAt: timestamp(date, 16, 30),
         updatedAt: timestamp(date, 16, 30),

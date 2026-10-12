@@ -529,18 +529,23 @@
     teilgenommen: { label: "Teilgenommen", tone: "green" },
     urlaub: { label: "Urlaub", tone: "blue" },
     dienst: { label: "Dienst", tone: "purple" },
-    krankheit: { label: "Krankheit", tone: "red" },
     schule: { label: "Schule", tone: "teal" },
     entschuldigt: { label: "Entschuldigt", tone: "orange" },
     unentschuldigt: { label: "Unentschuldigt", tone: "dark-red" },
     nicht_zutreffend: { label: "Nicht zutreffend", tone: "muted" },
   };
 
+  // Fruehere Fassungen kannten den Status "Krankheit". Fuer eine Teamsitzung
+  // genuegt, dass jemand entschuldigt fehlte; ein Gesundheitsdatum braucht es
+  // dafuer nicht. Vorhandene Eintraege gehen deshalb in "Entschuldigt" auf.
+  const LEGACY_ATTENDANCE_STATUSES = {
+    krankheit: "entschuldigt",
+  };
+
   const ATTENDANCE_CHART_COLORS = {
     teilgenommen: "#2b9b68",
     urlaub: "#4f8fdf",
     dienst: "#805bad",
-    krankheit: "#d2525d",
     schule: "#25a29d",
     entschuldigt: "#dc8a31",
     unentschuldigt: "#9f2731",

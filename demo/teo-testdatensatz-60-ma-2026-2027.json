@@ -5253,7 +5253,7 @@
         "id": "attendance-2026-01-055",
         "meetingId": "meeting-test-2026-01",
         "employeeId": "employee-test-055",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-01-13T16:30:00.000Z",
         "updatedAt": "2026-01-13T16:30:00.000Z"
       },
@@ -5285,7 +5285,7 @@
         "id": "attendance-2026-01-019",
         "meetingId": "meeting-test-2026-01",
         "employeeId": "employee-test-019",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-01-13T16:30:00.000Z",
         "updatedAt": "2026-01-13T16:30:00.000Z"
       },
@@ -5685,7 +5685,7 @@
         "id": "attendance-2026-02-020",
         "meetingId": "meeting-test-2026-02",
         "employeeId": "employee-test-020",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-02-10T16:30:00.000Z",
         "updatedAt": "2026-02-10T16:30:00.000Z"
       },
@@ -5693,7 +5693,7 @@
         "id": "attendance-2026-02-025",
         "meetingId": "meeting-test-2026-02",
         "employeeId": "employee-test-025",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-02-10T16:30:00.000Z",
         "updatedAt": "2026-02-10T16:30:00.000Z"
       },
@@ -6117,7 +6117,7 @@
         "id": "attendance-2026-03-048",
         "meetingId": "meeting-test-2026-03",
         "employeeId": "employee-test-048",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-03-10T16:30:00.000Z",
         "updatedAt": "2026-03-10T16:30:00.000Z"
       },
@@ -6157,7 +6157,7 @@
         "id": "attendance-2026-03-035",
         "meetingId": "meeting-test-2026-03",
         "employeeId": "employee-test-035",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-03-10T16:30:00.000Z",
         "updatedAt": "2026-03-10T16:30:00.000Z"
       },
@@ -6165,7 +6165,7 @@
         "id": "attendance-2026-03-060",
         "meetingId": "meeting-test-2026-03",
         "employeeId": "employee-test-060",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-03-10T16:30:00.000Z",
         "updatedAt": "2026-03-10T16:30:00.000Z"
       },
@@ -6197,7 +6197,7 @@
         "id": "attendance-2026-03-036",
         "meetingId": "meeting-test-2026-03",
         "employeeId": "employee-test-036",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-03-10T16:30:00.000Z",
         "updatedAt": "2026-03-10T16:30:00.000Z"
       },
@@ -6645,7 +6645,7 @@
         "id": "attendance-2026-04-060",
         "meetingId": "meeting-test-2026-04",
         "employeeId": "employee-test-060",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-04-14T16:30:00.000Z",
         "updatedAt": "2026-04-14T16:30:00.000Z"
       },
@@ -6669,7 +6669,7 @@
         "id": "attendance-2026-04-049",
         "meetingId": "meeting-test-2026-04",
         "employeeId": "employee-test-049",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-04-14T16:30:00.000Z",
         "updatedAt": "2026-04-14T16:30:00.000Z"
       },
@@ -7053,7 +7053,7 @@
         "id": "attendance-2026-05-010",
         "meetingId": "meeting-test-2026-05",
         "employeeId": "employee-test-010",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-05-12T16:30:00.000Z",
         "updatedAt": "2026-05-12T16:30:00.000Z"
       },
@@ -7061,7 +7061,7 @@
         "id": "attendance-2026-05-012",
         "meetingId": "meeting-test-2026-05",
         "employeeId": "employee-test-012",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-05-12T16:30:00.000Z",
         "updatedAt": "2026-05-12T16:30:00.000Z"
       },
@@ -7085,7 +7085,7 @@
         "id": "attendance-2026-05-015",
         "meetingId": "meeting-test-2026-05",
         "employeeId": "employee-test-015",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-05-12T16:30:00.000Z",
         "updatedAt": "2026-05-12T16:30:00.000Z"
       },
@@ -7541,7 +7541,7 @@
         "id": "attendance-2026-06-016",
         "meetingId": "meeting-test-2026-06",
         "employeeId": "employee-test-016",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-06-09T16:30:00.000Z",
         "updatedAt": "2026-06-09T16:30:00.000Z"
       },
@@ -7565,7 +7565,7 @@
         "id": "attendance-2026-06-007",
         "meetingId": "meeting-test-2026-06",
         "employeeId": "employee-test-007",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-06-09T16:30:00.000Z",
         "updatedAt": "2026-06-09T16:30:00.000Z"
       },
@@ -7589,7 +7589,7 @@
         "id": "attendance-2026-06-056",
         "meetingId": "meeting-test-2026-06",
         "employeeId": "employee-test-056",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-06-09T16:30:00.000Z",
         "updatedAt": "2026-06-09T16:30:00.000Z"
       },
@@ -7605,7 +7605,7 @@
         "id": "attendance-2026-06-043",
         "meetingId": "meeting-test-2026-06",
         "employeeId": "employee-test-043",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-06-09T16:30:00.000Z",
         "updatedAt": "2026-06-09T16:30:00.000Z"
       },
@@ -7637,7 +7637,7 @@
         "id": "attendance-2026-06-039",
         "meetingId": "meeting-test-2026-06",
         "employeeId": "employee-test-039",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-06-09T16:30:00.000Z",
         "updatedAt": "2026-06-09T16:30:00.000Z"
       },
@@ -7989,7 +7989,7 @@
         "id": "attendance-2026-07-055",
         "meetingId": "meeting-test-2026-07",
         "employeeId": "employee-test-055",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-07-14T16:30:00.000Z",
         "updatedAt": "2026-07-14T16:30:00.000Z"
       },
@@ -8005,7 +8005,7 @@
         "id": "attendance-2026-07-019",
         "meetingId": "meeting-test-2026-07",
         "employeeId": "employee-test-019",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-07-14T16:30:00.000Z",
         "updatedAt": "2026-07-14T16:30:00.000Z"
       },
@@ -8029,7 +8029,7 @@
         "id": "attendance-2026-07-011",
         "meetingId": "meeting-test-2026-07",
         "employeeId": "employee-test-011",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-07-14T16:30:00.000Z",
         "updatedAt": "2026-07-14T16:30:00.000Z"
       },
@@ -8045,7 +8045,7 @@
         "id": "attendance-2026-07-054",
         "meetingId": "meeting-test-2026-07",
         "employeeId": "employee-test-054",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-07-14T16:30:00.000Z",
         "updatedAt": "2026-07-14T16:30:00.000Z"
       },
@@ -8109,7 +8109,7 @@
         "id": "attendance-2026-07-014",
         "meetingId": "meeting-test-2026-07",
         "employeeId": "employee-test-014",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-07-14T16:30:00.000Z",
         "updatedAt": "2026-07-14T16:30:00.000Z"
       },
@@ -8429,7 +8429,7 @@
         "id": "attendance-2026-08-035",
         "meetingId": "meeting-test-2026-08",
         "employeeId": "employee-test-035",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-08-11T16:30:00.000Z",
         "updatedAt": "2026-08-11T16:30:00.000Z"
       },
@@ -8445,7 +8445,7 @@
         "id": "attendance-2026-08-031",
         "meetingId": "meeting-test-2026-08",
         "employeeId": "employee-test-031",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-08-11T16:30:00.000Z",
         "updatedAt": "2026-08-11T16:30:00.000Z"
       },
@@ -8565,7 +8565,7 @@
         "id": "attendance-2026-08-034",
         "meetingId": "meeting-test-2026-08",
         "employeeId": "employee-test-034",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-08-11T16:30:00.000Z",
         "updatedAt": "2026-08-11T16:30:00.000Z"
       },
@@ -8973,7 +8973,7 @@
         "id": "attendance-2026-09-023",
         "meetingId": "meeting-test-2026-09",
         "employeeId": "employee-test-023",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-09-08T16:30:00.000Z",
         "updatedAt": "2026-09-08T16:30:00.000Z"
       },
@@ -8989,7 +8989,7 @@
         "id": "attendance-2026-09-032",
         "meetingId": "meeting-test-2026-09",
         "employeeId": "employee-test-032",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-09-08T16:30:00.000Z",
         "updatedAt": "2026-09-08T16:30:00.000Z"
       },
@@ -9029,7 +9029,7 @@
         "id": "attendance-2026-09-030",
         "meetingId": "meeting-test-2026-09",
         "employeeId": "employee-test-030",
-        "status": "krankheit",
+        "status": "entschuldigt",
         "createdAt": "2026-09-08T16:30:00.000Z",
         "updatedAt": "2026-09-08T16:30:00.000Z"
       },

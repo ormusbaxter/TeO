@@ -1,3 +1,8 @@
+### 4.68.0 – Kein Teilnahmestatus „Krankheit“
+
+- **Geändert:** Teamsitzungen kennen den Teilnahmestatus **Krankheit** nicht mehr. Wer krank fehlt, ist **entschuldigt** – der Grund einer Erkrankung ist ein Gesundheitsdatum und wird für die Teilnahmestatistik nicht gebraucht. Die Spalte **Krankheit** entfällt in der Jahresauswertung und im CSV-Export
+- **Geändert:** Vorhandene Einträge „Krankheit“ übernimmt TeO beim Laden, beim Import und beim Einlesen der gemeinsamen Datei als **Entschuldigt**; mit der nächsten Speicherung ist der alte Status aus dem Datenbestand verschwunden. Ältere Sicherungsdateien enthalten ihn weiterhin
+
 ### 4.67.0 – Sicherungshinweis nur bei Bedarf
 
 - **Geändert:** Ist die automatische Sicherung in einen Ordner eingerichtet und läuft, erscheint der Hinweis **Datensicherung erforderlich** nicht mehr nach jeder Änderung – die Datei `teo-autosicherung.json` wird ohnehin zwei Sekunden später geschrieben. Ohne automatische Sicherung bleibt er wie bisher

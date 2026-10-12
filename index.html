@@ -2620,7 +2620,8 @@
 <p>Titel, Datum, Uhrzeit und Notizen werden erfasst. Die Sitzungen stehen mit der neuesten zuerst.</p>
 <h3 id="hilfe-teilnahme-effizient-dokumentieren">Teilnahme effizient dokumentieren</h3>
 <p>Für das aktive Team stehen folgende Statuswerte zur Verfügung:</p>
-<ul><li>teilgenommen</li><li>Urlaub</li><li>Dienst</li><li>Krankheit</li><li>Schule</li><li>entschuldigt</li><li>unentschuldigt</li><li>nicht zutreffend</li></ul>
+<ul><li>teilgenommen</li><li>Urlaub</li><li>Dienst</li><li>Schule</li><li>entschuldigt</li><li>unentschuldigt</li><li>nicht zutreffend</li></ul>
+<p>Einen Status „Krankheit“ gibt es bewusst nicht: Der Grund einer Erkrankung ist ein Gesundheitsdatum und für die Teilnahmestatistik nicht nötig. Wer krank fehlt, gilt als <strong>entschuldigt</strong>. Einträge „Krankheit“ aus Fassungen vor 4.68.0 übernimmt TeO beim Laden als „entschuldigt“.</p>
 <p>Der Status <strong>nicht zutreffend</strong> ist beispielsweise für Personen vorgesehen, die zum Sitzungszeitpunkt noch nicht zum Team gehörten. Diese Einträge werden weder im Zähler noch im Nenner der Anwesenheitsstatistik berücksichtigt.</p>
 <p>Über die Sammelaktion kann zunächst allen sichtbaren Mitarbeitern ein Status zugewiesen werden. Anschließend müssen nur noch Ausnahmen einzeln geändert werden.</p>
 <h3 id="hilfe-statistische-auswertung">Statistische Auswertung</h3>
@@ -2784,6 +2785,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-68-0-kein-teilnahmestatus-krankheit">4.68.0 – Kein Teilnahmestatus „Krankheit“</h3>
+<ul><li><strong>Geändert:</strong> Teamsitzungen kennen den Teilnahmestatus <strong>Krankheit</strong> nicht mehr. Wer krank fehlt, ist <strong>entschuldigt</strong> – der Grund einer Erkrankung ist ein Gesundheitsdatum und wird für die Teilnahmestatistik nicht gebraucht. Die Spalte <strong>Krankheit</strong> entfällt in der Jahresauswertung und im CSV-Export</li><li><strong>Geändert:</strong> Vorhandene Einträge „Krankheit“ übernimmt TeO beim Laden, beim Import und beim Einlesen der gemeinsamen Datei als <strong>Entschuldigt</strong>; mit der nächsten Speicherung ist der alte Status aus dem Datenbestand verschwunden. Ältere Sicherungsdateien enthalten ihn weiterhin</li></ul>
 <h3 id="hilfe-4-67-0-sicherungshinweis-nur-bei-bedarf">4.67.0 – Sicherungshinweis nur bei Bedarf</h3>
 <ul><li><strong>Geändert:</strong> Ist die automatische Sicherung in einen Ordner eingerichtet und läuft, erscheint der Hinweis <strong>Datensicherung erforderlich</strong> nicht mehr nach jeder Änderung – die Datei <code>teo-autosicherung.json</code> wird ohnehin zwei Sekunden später geschrieben. Ohne automatische Sicherung bleibt er wie bisher</li><li><strong>Neu:</strong> Stockt die automatische Sicherung (Ordnerzugriff nicht bestätigt, Schreiben fehlgeschlagen, Verschlüsselung gesperrt, Datei von einem anderen Arbeitsplatz geändert), meldet der Hinweis <strong>Automatische Sicherung gestoppt</strong> mit dem Grund, und <strong>Jetzt sichern</strong> holt die Sicherung nach</li></ul>
 <h3 id="hilfe-4-66-0-ubersichtlichere-einstellungen">4.66.0 – Übersichtlichere Einstellungen</h3>
@@ -4831,7 +4834,6 @@
               <option value="teilgenommen">Teilgenommen</option>
               <option value="urlaub">Urlaub</option>
               <option value="dienst">Dienst</option>
-              <option value="krankheit">Krankheit</option>
               <option value="schule">Schule</option>
               <option value="entschuldigt">Entschuldigt</option>
               <option value="unentschuldigt">Unentschuldigt</option>
