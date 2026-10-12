@@ -2125,12 +2125,6 @@
                       Nach einer Änderung wird die Sicherung automatisch mit
                       2 Sekunden Verzögerung geschrieben.
                     </p>
-                    <div class="automatic-backup-fields">
-                      <label class="checkbox-field automatic-backup-encryption-field">
-                        <input id="automaticBackupEncryption" type="checkbox" />
-                        <span>JSON-Sicherungen verschlüsseln</span>
-                      </label>
-                    </div>
                     <div class="automatic-backup-actions">
                       <button
                         class="button button-secondary"
@@ -2144,18 +2138,9 @@
                         class="button button-secondary"
                         id="setAutomaticBackupPasswordButton"
                         type="button"
-                        hidden
                       >
                         <svg><use href="#icon-lock"></use></svg>
-                        Login-Verschlüsselung einrichten
-                      </button>
-                      <button
-                        class="button button-secondary"
-                        id="saveAutomaticBackupSettingsButton"
-                        type="button"
-                      >
-                        Einstellungen speichern
-                      </button>
+                        Wiederherstellungsschlüssel anzeigen</button>
                       <button
                         class="button button-primary"
                         id="runAutomaticBackupButton"
@@ -2173,9 +2158,10 @@
                       </button>
                     </div>
                     <p class="field-hint">
-                      Die Ordnerfreigabe gilt nur für dieses Browserprofil. Der
-                      Sicherungsschlüssel wird beim Login automatisch mit dem
-                      jeweiligen Benutzerpasswort entsperrt. Jede Sicherung
+                      Sicherungen und der Datenbestand dieses Browsers sind immer
+                      verschlüsselt. Der Schlüssel wird beim Login mit dem
+                      jeweiligen Benutzerpasswort entsperrt. Die Ordnerfreigabe
+                      gilt nur für dieses Browserprofil; jede Sicherung
                       überschreibt die Datei <strong>teo-autosicherung.json</strong>.
                     </p>
                   </div>
@@ -2218,7 +2204,10 @@
                 </button>
                 <button class="button button-secondary" id="exportEncryptedDataButton" type="button">
                   <svg><use href="#icon-lock"></use></svg>
-                  Verschlüsselt exportieren
+                  Mit eigenem Passwort exportieren
+                </button>
+                <button class="button button-ghost" id="exportUnencryptedDataButton" type="button">
+                  Unverschlüsselt exportieren
                 </button>
                 <input
                   class="sr-only"
@@ -2308,7 +2297,7 @@
 <h3 id="hilfe-erste-sinnvolle-schritte">Erste sinnvolle Schritte</h3>
 <ol><li>Unter <strong>Einstellungen</strong> das gewünschte Farbthema – es gilt für das eigene Benutzerkonto – und die Sicherungserinnerung festlegen.</li><li>Unter <strong>Mitarbeiter</strong> Personalstammdaten, Stellenanteile, Berufe und Qualifikationen erfassen.</li><li>Stationsleitung und stellvertretende Stationsleitung kennzeichnen.</li><li>Unter <strong>Einstellungen → Feste Dienstwochenenden</strong> die beiden verantwortlichen Personen bestimmen.</li><li>Pflichtfortbildungen, Teamsitzungen, Termine und Geräte katalogisieren.</li><li>Eine erste vollständige Datensicherung exportieren.</li></ol>
 <h3 id="hilfe-grundprinzip-der-speicherung">Grundprinzip der Speicherung</h3>
-<p>Änderungen werden im lokalen Modus automatisch in localForage beziehungsweise IndexedDB gespeichert. Im MariaDB-Modus werden sie an den zentralen Server übertragen. Der zusätzliche <strong>Sicherungsexport</strong> ist trotzdem erforderlich, damit eine unabhängige Wiederherstellungsdatei vorhanden ist.</p>
+<p>Änderungen werden im lokalen Modus automatisch in localForage beziehungsweise IndexedDB gespeichert – verschlüsselt, siehe „Pflichtverschlüsselung“ im Kapitel Datenschutz und IT-Sicherheit. Im MariaDB-Modus werden sie an den zentralen Server übertragen. Der zusätzliche <strong>Sicherungsexport</strong> ist trotzdem erforderlich, damit eine unabhängige Wiederherstellungsdatei vorhanden ist.</p>
 <p>Nach Änderungen zeigt TeO deshalb oben im Inhaltsbereich eine Warnleiste an. Sie verschwindet erst nach einem erfolgreichen Sicherungsexport.</p>
 <h3 id="hilfe-installation-als-app">Installation als App</h3>
 <p>Chrome und Edge können TeO über das Browsermenü als eigenständige Web-App installieren. Die installierte Anwendung verwendet das TeO-App-Icon und öffnet sich in einem eigenen Fenster. Sie bleibt technisch mit derselben Serveradresse verbunden; deshalb sollte TeO immer über exakt dieselbe URL installiert und gestartet werden.</p>
@@ -2427,7 +2416,7 @@
 <p>Wird das Passwort eines normalen Benutzers zurückgesetzt, erzeugt TeO ein temporäres Passwort. Beim nächsten Anmelden muss der Benutzer ein neues Passwort festlegen.</p>
 <h3 id="hilfe-passworthinweis">Passworthinweis</h3>
 <p>Zu jedem Konto gehört ein <strong>Passworthinweis</strong> – eine Gedächtnisstütze, keine zweite Anmeldung. Er ist Pflicht und wird zusammen mit dem Passwort festgelegt: bei der Ersteinrichtung und immer dann, wenn ein neues Passwort gesetzt wird. Der Hinweis darf das Passwort nicht enthalten, denn er lässt sich vor der Anmeldung lesen. Konten ohne Hinweis (aus Fassungen vor 4.65.0) legen ihn direkt nach der nächsten Anmeldung fest; bis dahin bleibt TeO gesperrt. Ändern lässt er sich über <strong>Konto → Passworthinweis ändern</strong>.</p>
-<p>An der Anmeldung zeigt <strong>Passwort vergessen?</strong> den Hinweis zum eingegebenen Benutzernamen. Für einen unbekannten Namen antwortet TeO genauso wie für ein Konto ohne Hinweis, damit sich nicht ausprobieren lässt, welche Konten es gibt. Im lokalen Modus stammt der Hinweis aus dem zuletzt an diesem Arbeitsplatz geladenen Datenbestand, im MariaDB-Modus vom Server; dort zählt jede Abfrage wie ein Anmeldeversuch.</p>
+<p>An der Anmeldung zeigt <strong>Passwort vergessen?</strong> den Hinweis zum eingegebenen Benutzernamen. Für einen unbekannten Namen antwortet TeO genauso wie für ein Konto ohne Hinweis, damit sich nicht ausprobieren lässt, welche Konten es gibt. Im MariaDB-Modus kommt der Hinweis vom Server; dort zählt jede Abfrage wie ein Anmeldeversuch. Im lokalen Modus stehen die Hinweise im verschlüsselten Datenbestand und sind vor der Anmeldung nicht lesbar – TeO verweist dann auf einen Administrator. Nur ein Bestand aus einer Fassung vor 4.69.0, der noch nicht verschlüsselt ist, zeigt den Hinweis aus dem zuletzt an diesem Arbeitsplatz geladenen Stand.</p>
 <p>Hilft auch der Hinweis nicht, setzt ein Administrator das Passwort zurück. Der alte Hinweis entfällt dabei, mit dem neuen Passwort entsteht ein neuer. Hat der einzige Administrator sein Passwort vergessen, gibt es in TeO keinen Weg zurück – ein zweites Administratorkonto beugt dem vor.</p>
 <p>Passwörter werden mit PBKDF2 gehasht gespeichert. Im lokalen Modus steuert die Anmeldung die Bedienung der Oberfläche, schützt den Datenbestand aber nicht (siehe „Was der lokale Modus leistet – und was nicht“). Im MariaDB-Modus werden Anmeldung und Rollen zusätzlich serverseitig geprüft.</p>
 </section>
@@ -2677,22 +2666,24 @@
 <p>Die Hinweise beziehen sich auf den unabhängigen Sicherungsexport. Die laufende Browser- beziehungsweise MariaDB-Speicherung erfolgt bereits automatisch.</p>
 <h3 id="hilfe-sicherung-exportieren">Sicherung exportieren</h3>
 <ol><li>In der Warnleiste <strong>Jetzt exportieren</strong> wählen oder <strong>Einstellungen → Sicherung exportieren</strong> öffnen.</li><li>Die JSON-Datei an einem geschützten Ort speichern.</li><li>Prüfen, ob die Datei vollständig heruntergeladen wurde.</li></ol>
-<p>Optional kann die Sicherung mit Passwort, PBKDF2 und AES-GCM verschlüsselt werden. TeO verwendet dafür einen eigenen Passwortdialog mit Wiederholung, Eingabeprüfung und optionaler Passwortanzeige. Das Passwort kann nicht aus der Datei wiederhergestellt werden.</p>
+<p><strong>Sicherung exportieren</strong> verschlüsselt mit dem Datenschlüssel des Bestands (AES-GCM). Jede angemeldete Sitzung dieses Bestands öffnet die Datei beim Prüfen und Importieren von selbst; an anderer Stelle genügt der Wiederherstellungsschlüssel.</p>
+<p><strong>Mit eigenem Passwort exportieren</strong> schützt die Datei stattdessen mit einem frei gewählten Passwort (PBKDF2 und AES-GCM), etwa für die Übergabe an einen anderen Standort. Das Passwort kann nicht aus der Datei wiederhergestellt werden.</p>
+<p><strong>Unverschlüsselt exportieren</strong> gibt es nur nach einer ausdrücklichen Warnung: Die Datei enthält den vollständigen Bestand lesbar und gehört nach Gebrauch gelöscht. Auch die Sicherung, die TeO vor einem Import herunterlädt, ist verschlüsselt.</p>
 <h3 id="hilfe-automatische-sicherung-in-einen-ordner">Automatische Sicherung in einen Ordner</h3>
 <p>Unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong> kann ein lokaler Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung erneut. Jede Sicherung überschreibt dieselbe Datei <code>teo-autosicherung.json</code>. Solange sie läuft, entfällt der Hinweis <strong>Datensicherung erforderlich</strong>. Stockt sie, etwa weil der Ordnerzugriff neu bestätigt werden muss, erscheint stattdessen <strong>Automatische Sicherung gestoppt</strong> mit dem Grund und der Schaltfläche <strong>Jetzt sichern</strong>. Der Dateiname bleibt auch bei aktivierter Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.</p>
 <p>Administratoren können unter <strong>Einstellungen → Sicherungserinnerung</strong> die maximale Größe einer Sicherungsdatei zwischen 1 und 100 MB festlegen. Der Standardwert beträgt 20 MB. Die Grenze gilt beim Erstellen, Prüfen, Laden vor der Anmeldung und Import. Ab 90 % des eingestellten Volumens zeigt TeO eine Warnung mit aktueller Dateigröße und Grenzwert an. Wird die Grenze überschritten, muss sie vor der nächsten Sicherung oder dem Import erhöht werden.</p>
 <p>Ein farbiger Balken in den Einstellungen zeigt die zuletzt gemessene Sicherungsgröße als „xx von yy MB“. Solange noch keine Sicherung in diesem Browser erstellt oder eingelesen wurde, verwendet TeO eine Schätzung des aktuellen unverschlüsselten Datenbestands. Der Balken ist unter 90 % grün, ab 90 % gelb und bei überschrittenem Grenzwert rot.</p>
-<p>Automatische Sicherungen können in den Einstellungen mit AES-GCM verschlüsselt werden. TeO erzeugt dafür einen gemeinsamen zufälligen Sicherungsschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
+<p>Automatische Sicherungen sind immer mit AES-GCM verschlüsselt; einen Schalter dafür gibt es nicht. TeO verwendet einen gemeinsamen zufälligen Datenschlüssel und hinterlegt ihn für jedes Konto geschützt durch dessen Login-Passwort. Beim Anmelden wird der Schlüssel automatisch entsperrt; eine zusätzliche Eingabe für laufende Sicherungen ist nicht nötig. Neue Konten, Passwortänderungen und administrative Passwort-Resets erhalten automatisch eine aktualisierte Schlüsselhülle.</p>
 <p>Der Schlüssel gehört zum Datenbestand, nicht zum Arbeitsplatz: Sein Verzeichnis mit den Schlüsselhüllen aller Konten steht in <code>teo-autosicherung.json</code> selbst – in der äußeren Hülle, die auch ohne Schlüssel lesbar ist. Jeder Arbeitsplatz entsperrt daraus mit dem gewohnten Login-Passwort denselben Schlüssel. Ein einmal geschützter Datenbestand braucht dafür kein neues Passwort, und ein an einem anderen Arbeitsplatz angelegtes Konto bekommt seine Hülle beim ersten Login selbst.</p>
 <p>Bei der Einrichtung zeigt TeO einen Wiederherstellungsschlüssel an. Er muss getrennt von den Sicherungsdateien sicher verwahrt werden und ermöglicht die Wiederherstellung nach einem vollständigen Verlust des Browserprofils. Nach ihm fragt TeO erst, wenn auch das Schlüsselverzeichnis der gemeinsamen Datei keine passende Hülle kennt. Verschlüsselte Autosicherungen werden während einer entsperrten Sitzung beim Prüfen und Importieren automatisch entschlüsselt.</p>
-<p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Unverschlüsselte Sicherungen erfordern einen angemessen geschützten Ordner. Manueller und verschlüsselter Export bleiben unabhängig davon verfügbar.</p>
+<p>Die Ordnerverknüpfung wird nur im aktuellen Browserprofil gespeichert und ist nicht Teil des gemeinsamen Datenbestands. Sie wird von Chrome und Edge über HTTPS oder <code>localhost</code> unterstützt. Nach einem Browser- oder Profilwechsel kann eine erneute Freigabe erforderlich sein. Automatische Sicherungen laufen nur, solange TeO geöffnet ist. Der manuelle Export bleibt unabhängig davon verfügbar.</p>
 <p>In der lokalen Browser-Betriebsart kommt der Datenbestand <strong>vor der Anmeldung</strong>: Angemeldet wird mit den Konten aus <code>teo-autosicherung.json</code>, nicht mit dem Stand, den dieser Browser zuletzt kannte. Ein an einem anderen Arbeitsplatz geändertes Passwort oder gelöschtes Konto gilt damit sofort.</p>
 <p>Beim Start sucht TeO die Datei im zuletzt verknüpften Sicherungsordner; die Anmeldemaske nennt diesen Ordner. Mit der Anmeldung liest TeO die Datei frisch, prüft Benutzername und Passwort gegen ihre Konten, entschlüsselt sie gegebenenfalls mit dem Passwort und übernimmt sie als aktuellen Datenbestand – <strong>einschließlich der Benutzerkonten</strong>, denn die gemeinsame Datei ist der vollständige Datenbestand. Muss der Browser den Ordnerzugriff erneut bestätigen lassen, fragt er beim Klick auf <strong>Anmelden</strong>.</p>
 <p>Ist der Ordner nicht verknüpft, fehlt die Datei dort oder kann sie nicht gelesen werden, erscheint vor der Anmeldung der Dialog <strong>Aktuellen Datenbestand laden</strong>. Dort lässt sich die Datei einzeln wählen oder – besser – der Sicherungsordner freigeben; die Verknüpfung gilt dann auch für die nächste Sitzung. Stellt sich das erst beim Anmelden heraus, erscheint derselbe Dialog, und die Anmeldung geht nach der Auswahl von selbst weiter.</p>
 <p>Gibt es gar keine Sicherungsdatei, bietet derselbe Dialog unter <strong>Keine Sicherungsdatei vorhanden?</strong> zwei Auswege:</p>
 <ul><li><strong>Mit dem Stand dieses Browsers weiter</strong> – angemeldet wird mit den Konten, die dieser Browser zuletzt kannte; danach legt TeO wie nach der Ersteinrichtung eine neue <code>teo-autosicherung.json</code> im gewählten Sicherungsordner an.</li><li><strong>Neu beginnen</strong> – löscht nach Rückfrage Datenbestand, Konten, Ordnerverknüpfung und Sicherungsschlüssel dieses Browsers und führt durch die Ersteinrichtung. Eine Datei auf einem Laufwerk bleibt unberührt; ist dieser Browser der einzige Ort der Daten, gehen sie verloren.</li></ul>
 <p>Gibt es die Datei eigentlich auf einem gemeinsamen Laufwerk, ist sie in beiden Fällen die bessere Wahl – sonst arbeiten zwei Arbeitsplätze mit verschiedenen Ständen.</p>
-<p>Eine Sicherung, die älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand ist, wird abgewiesen. Wer TeO innerhalb einer Sitzung neu lädt, bleibt bei einer unverschlüsselten Datei angemeldet, sofern das Konto dort noch geführt wird; bei einer verschlüsselten verlangt TeO das Passwort erneut. In der MariaDB-Betriebsart prüft stattdessen der Server Anmeldung und Datenbestand.</p>
+<p>Eine Sicherung, die älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand ist, wird abgewiesen. Wer TeO innerhalb einer Sitzung neu lädt, meldet sich erneut an: Erst das Passwort entsperrt den Schlüssel. In der MariaDB-Betriebsart prüft stattdessen der Server Anmeldung und Datenbestand.</p>
 <p>Hat ein anderer Arbeitsplatz die Datei zwischenzeitlich geschrieben, überschreibt TeO sie nicht. Stattdessen erscheint ein Hinweis; der sichere Weg ist abmelden, TeO neu laden und erneut anmelden. Wer die Änderungen der laufenden Sitzung dennoch sichern muss, wählt <strong>Jetzt automatisch sichern</strong> und bestätigt das Überschreiben ausdrücklich.</p>
 <h3 id="hilfe-erster-start-an-einem-weiteren-arbeitsplatz">Erster Start an einem weiteren Arbeitsplatz</h3>
 <p>Liegt TeO in einem gemeinsamen Ordner und wird es an einem weiteren Arbeitsplatz zum ersten Mal geöffnet, fragt TeO zunächst, woher der Datenbestand kommt:</p>
@@ -2746,7 +2737,7 @@
 <p>TeO lehnt die Datei ab, wenn sie:</p>
 <ul><li>anders heißt oder das unter <strong>Einstellungen → Sicherungserinnerung</strong> festgelegte Maximalvolumen überschreitet</li><li>kein vollständiges und gültiges TeO-Sicherungsformat enthält</li><li>beschädigt oder manuell unvollständig bearbeitet wurde</li><li>aus einer neueren, nicht kompatiblen TeO-Version stammt</li><li>älter als die zuletzt in diesem Browser erfolgreich erstellte Autosicherung ist</li><li>verschlüsselt ist und nicht entschlüsselt werden kann</li></ul>
 <p>Die Meldung im Dialog <strong>Aktuellen Datenbestand laden</strong> nennt den erkannten Grund. Verwenden Sie nicht ersatzweise eine beliebige umbenannte JSON-Datei.</p>
-<h3 id="hilfe-muss-ich-fur-eine-verschlusselte-autosicherung-ein-zweites-passwort-eingeben">Muss ich für eine verschlüsselte Autosicherung ein zweites Passwort eingeben?</h3>
+<h3 id="hilfe-muss-ich-fur-die-verschlusselte-autosicherung-ein-zweites-passwort-eingeben">Muss ich für die verschlüsselte Autosicherung ein zweites Passwort eingeben?</h3>
 <p>Normalerweise nicht. Der gemeinsame Sicherungsschlüssel wird beim Login mit dem persönlichen Benutzerpasswort automatisch entsperrt – auch an einem Arbeitsplatz, an dem dieses Konto sich zum ersten Mal anmeldet: Die passende Schlüsselhülle steht im Verzeichnis der gemeinsamen Datei. Erst wenn auch dort keine Hülle zum Konto passt oder die Datei nicht erreichbar ist, wird einmalig der separat aufbewahrte Wiederherstellungsschlüssel benötigt. Dieser Schlüssel ist nicht das Login-Passwort.</p>
 <p>Ein neuer Arbeitsplatz erzeugt dabei <strong>kein</strong> neues Passwort und macht das alte nicht ungültig. Der Schlüssel bleibt derselbe, solange derselbe Datenbestand verwendet wird.</p>
 <h3 id="hilfe-wann-wird-die-gemeinsame-datei-aktualisiert">Wann wird die gemeinsame Datei aktualisiert?</h3>
@@ -2776,15 +2767,21 @@
 <p>Mindestens erforderlich sind:</p>
 <ul><li>geregelte Zugriffsrechte</li><li>persönliche Benutzerkonten</li><li>sichere Passwörter</li><li>HTTPS im MariaDB-Betrieb</li><li>kontrollierte Server- und Datenbank-Backups</li><li>Betriebssystem- und Netzwerkhärtung</li><li>Schutz exportierter Sicherungsdateien</li><li>geregelte Aufbewahrungs- und Löschfristen</li><li>Protokollierung und organisatorische Verantwortlichkeiten</li><li>abgestimmte Betriebsvereinbarung</li></ul>
 <p>Unverschlüsselte JSON-Sicherungen enthalten den vollständigen Datenbestand und müssen entsprechend geschützt gespeichert und übertragen werden.</p>
+<h3 id="hilfe-pflichtverschlusselung">Pflichtverschlüsselung</h3>
+<p>Im lokalen Modus ist der Datenbestand immer verschlüsselt – im Browserspeicher jedes Arbeitsplatzes und in <code>teo-autosicherung.json</code>. Beide verwenden denselben zufälligen Datenschlüssel (AES-GCM, 256 Bit). Er ist für jedes Konto mit dessen Login-Passwort umhüllt und wird bei der Anmeldung entsperrt; ein zweites Passwort gibt es nicht. Beim Abmelden und Neuladen verlassen Schlüssel und Datenbestand den Arbeitsspeicher.</p>
+<ul><li><strong>Ersteinrichtung:</strong> Der Schlüssel entsteht mit dem ersten Administratorkonto. Sobald TeO offen ist, zeigt es den Wiederherstellungsschlüssel.</li><li><strong>Bestände aus Fassungen vor 4.69.0:</strong> Die erste Anmeldung eines Administrators verschlüsselt den Bestand und zeigt den Wiederherstellungsschlüssel. Normale Konten arbeiten bis dahin wie bisher. Konten, die bei der Umstellung nicht angemeldet waren, bekommen eine vorläufige Schlüsselhülle aus ihrem gespeicherten Passwort-Hash und melden sich danach wie gewohnt an; ihre erste Anmeldung ersetzt sie durch eine reguläre Hülle.</li><li><strong>Wiederherstellungsschlüssel:</strong> getrennt von den Sicherungen verwahren, ebenso ein zweites Administratorkonto anlegen. Vergessen alle Administratoren ihr Passwort und ist der Wiederherstellungsschlüssel weg, sind die Daten verloren.</li></ul>
+<p>Ein Hinweis zur vorläufigen Hülle: Wer eine unverschlüsselte Sicherung aus der Zeit vor der Umstellung besitzt, kennt die darin gespeicherten Passwort-Hashes und könnte damit eine vorläufige Hülle öffnen, solange das Konto sich nicht neu angemeldet hat. Alte unverschlüsselte Sicherungen gehören deshalb nach der Umstellung gelöscht.</p>
 <h3 id="hilfe-was-der-lokale-modus-leistet-und-was-nicht">Was der lokale Modus leistet – und was nicht</h3>
-<p>Im lokalen Modus (localForage / IndexedDB) steuern Anmeldung und Rollen ausschließlich die Bedienung der Oberfläche. Sie sind kein Zugriffsschutz:</p>
-<ul><li>Der Datenbestand liegt <strong>unverschlüsselt</strong> im Profil des Browsers und lässt sich ohne TeO-Anmeldung auslesen.</li><li>Wer am selben Benutzerkonto des Rechners arbeitet, kann die Anmeldung mit Bordmitteln des Browsers umgehen und erhält damit auch Administratorrechte.</li><li>Die Rollentrennung wird erst im MariaDB-Betrieb serverseitig durchgesetzt.</li></ul>
+<p>Die Verschlüsselung schützt den Datenbestand im Ruhezustand: bei geschlossenem TeO, nach dem Abmelden, bei kopiertem Browserprofil oder ausgebautem Datenträger. Wer die Anmeldung mit Bordmitteln des Browsers umgeht, findet keine lesbaren Daten. Sie schützt nicht:</p>
+<ul><li>eine angemeldete, offene Sitzung – deren Daten liegen im Arbeitsspeicher</li><li>gegen Schadsoftware oder Tastaturmitschnitt unter demselben Benutzerkonto des Rechners</li><li>die Rollentrennung: Wer ein gültiges Konto hat, kann sich mit Bordmitteln des Browsers Administratorrechte verschaffen. Serverseitig durchgesetzt wird sie erst im MariaDB-Betrieb.</li></ul>
 <p>Daraus folgt für den Betrieb:</p>
 <ul><li>Den lokalen Modus nur auf einem <strong>persönlich gesicherten Rechner</strong> einsetzen – eigenes Windows- oder macOS-Konto, Anmeldekennwort, aktive Bildschirmsperre, idealerweise verschlüsselte Festplatte (BitLocker, FileVault).</li><li>Auf gemeinsam genutzten Stationsrechnern und überall dort, wo mehrere Personen mit demselben Datenbestand arbeiten, den <strong>MariaDB-Betrieb</strong> verwenden. Dort prüft der Server jede Anmeldung und jede Änderung.</li><li>Der lokale Modus eignet sich außerdem für Erprobung, Schulung und Demodaten.</li></ul>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-69-0-datenbestand-immer-verschlusselt">4.69.0 – Datenbestand immer verschlüsselt</h3>
+<ul><li><strong>Neu:</strong> Im lokalen Betrieb ist der Datenbestand auch im Browserspeicher verschlüsselt, mit demselben Schlüssel wie <code>teo-autosicherung.json</code>. Die Anmeldung entsperrt ihn wie bisher mit dem eigenen Passwort; beim Abmelden und Neuladen verlassen Schlüssel und Daten den Arbeitsspeicher. Wer die Anmeldung mit Bordmitteln des Browsers umgeht, findet nichts Lesbares mehr</li><li><strong>Geändert:</strong> Verschlüsselt wird immer, der Schalter <strong>JSON-Sicherungen verschlüsseln</strong> entfällt. Bei der Ersteinrichtung entsteht der Schlüssel mit dem ersten Administratorkonto; ein bestehender Datenbestand wird bei der ersten Anmeldung eines Administrators umgestellt, der dabei den Wiederherstellungsschlüssel erhält. Alle übrigen Konten melden sich danach wie gewohnt an</li><li><strong>Geändert:</strong> <strong>Sicherung exportieren</strong> verschlüsselt mit dem Schlüssel des Datenbestands, ebenso die Sicherung vor einem Import. Ein eigenes Passwort ist über <strong>Mit eigenem Passwort exportieren</strong> möglich, <strong>Unverschlüsselt exportieren</strong> nur nach ausdrücklicher Warnung</li><li><strong>Geändert:</strong> <strong>Passwort vergessen?</strong> zeigt im lokalen Betrieb keinen Hinweis mehr vor der Anmeldung, denn die Hinweise stehen im verschlüsselten Bestand. TeO verweist stattdessen auf einen Administrator</li></ul>
 <h3 id="hilfe-4-68-0-kein-teilnahmestatus-krankheit">4.68.0 – Kein Teilnahmestatus „Krankheit“</h3>
 <ul><li><strong>Geändert:</strong> Teamsitzungen kennen den Teilnahmestatus <strong>Krankheit</strong> nicht mehr. Wer krank fehlt, ist <strong>entschuldigt</strong> – der Grund einer Erkrankung ist ein Gesundheitsdatum und wird für die Teilnahmestatistik nicht gebraucht. Die Spalte <strong>Krankheit</strong> entfällt in der Jahresauswertung und im CSV-Export</li><li><strong>Geändert:</strong> Vorhandene Einträge „Krankheit“ übernimmt TeO beim Laden, beim Import und beim Einlesen der gemeinsamen Datei als <strong>Entschuldigt</strong>; mit der nächsten Speicherung ist der alte Status aus dem Datenbestand verschwunden. Ältere Sicherungsdateien enthalten ihn weiterhin</li></ul>
 <h3 id="hilfe-4-67-0-sicherungshinweis-nur-bei-bedarf">4.67.0 – Sicherungshinweis nur bei Bedarf</h3>
@@ -5325,6 +5322,11 @@
         </button>
       </div>
       <div class="modal-body">
+        <p class="backup-recovery-introduction" id="automaticBackupRecoveryIntroduction" hidden>
+          TeO verschlüsselt den Datenbestand ab jetzt – in diesem Browser und in
+          der gemeinsamen Sicherungsdatei. Alle Konten melden sich wie gewohnt
+          mit ihrem Passwort an.
+        </p>
         <div class="backup-password-notice">
           <svg><use href="#icon-lock"></use></svg>
           <p>

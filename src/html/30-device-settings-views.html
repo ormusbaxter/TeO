@@ -949,12 +949,6 @@
                       Nach einer Änderung wird die Sicherung automatisch mit
                       2 Sekunden Verzögerung geschrieben.
                     </p>
-                    <div class="automatic-backup-fields">
-                      <label class="checkbox-field automatic-backup-encryption-field">
-                        <input id="automaticBackupEncryption" type="checkbox" />
-                        <span>JSON-Sicherungen verschlüsseln</span>
-                      </label>
-                    </div>
                     <div class="automatic-backup-actions">
                       <button
                         class="button button-secondary"
@@ -968,18 +962,9 @@
                         class="button button-secondary"
                         id="setAutomaticBackupPasswordButton"
                         type="button"
-                        hidden
                       >
                         <svg><use href="#icon-lock"></use></svg>
-                        Login-Verschlüsselung einrichten
-                      </button>
-                      <button
-                        class="button button-secondary"
-                        id="saveAutomaticBackupSettingsButton"
-                        type="button"
-                      >
-                        Einstellungen speichern
-                      </button>
+                        Wiederherstellungsschlüssel anzeigen</button>
                       <button
                         class="button button-primary"
                         id="runAutomaticBackupButton"
@@ -997,9 +982,10 @@
                       </button>
                     </div>
                     <p class="field-hint">
-                      Die Ordnerfreigabe gilt nur für dieses Browserprofil. Der
-                      Sicherungsschlüssel wird beim Login automatisch mit dem
-                      jeweiligen Benutzerpasswort entsperrt. Jede Sicherung
+                      Sicherungen und der Datenbestand dieses Browsers sind immer
+                      verschlüsselt. Der Schlüssel wird beim Login mit dem
+                      jeweiligen Benutzerpasswort entsperrt. Die Ordnerfreigabe
+                      gilt nur für dieses Browserprofil; jede Sicherung
                       überschreibt die Datei <strong>teo-autosicherung.json</strong>.
                     </p>
                   </div>
@@ -1042,7 +1028,10 @@
                 </button>
                 <button class="button button-secondary" id="exportEncryptedDataButton" type="button">
                   <svg><use href="#icon-lock"></use></svg>
-                  Verschlüsselt exportieren
+                  Mit eigenem Passwort exportieren
+                </button>
+                <button class="button button-ghost" id="exportUnencryptedDataButton" type="button">
+                  Unverschlüsselt exportieren
                 </button>
                 <input
                   class="sr-only"

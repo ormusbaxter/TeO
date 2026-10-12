@@ -247,12 +247,20 @@ export async function openTeO(
     await page.fill("#loginUsername", konto.username);
     await page.fill("#loginPassword", konto.password);
     await page.evaluate(() => document.querySelector("#loginForm").requestSubmit());
+    // Die Demodaten sind unverschlüsselt. Die erste Anmeldung eines
+    // Administrators verschlüsselt sie und zeigt den Wiederherstellungsschlüssel,
+    // den ein Test nicht verwahren muss.
     await page.waitForFunction(
       () =>
         !document.body.classList.contains("is-auth-locked") &&
-        !document.querySelector("dialog[open]"),
+        [...document.querySelectorAll("dialog[open]")].every(
+          (dialog) => dialog.id === "automaticBackupRecoveryDialog",
+        ),
       null,
       { timeout: 15000 },
+    );
+    await page.evaluate(() =>
+      document.querySelector("#automaticBackupRecoveryDialog[open]")?.close(),
     );
   }
 

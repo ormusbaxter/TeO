@@ -139,12 +139,16 @@ test("Ein Konto ohne Hinweis legt ihn nach der Anmeldung fest", async (t) => {
     null,
     { timeout: 15000 },
   );
-  assert.equal(await offeneDialoge(teo), "");
+  // Erst danach verschlüsselt der Administrator den Bestand und bekommt den
+  // Wiederherstellungsschlüssel zu sehen.
+  assert.equal(await offeneDialoge(teo), "automaticBackupRecoveryDialog");
+  await teo.page.click("#automaticBackupRecoveryDialog .modal-footer [data-close-dialog]");
 
-  // Der neue Hinweis steht an der nächsten Anmeldung bereit.
+  // Der Hinweis steht im verschlüsselten Bestand und ist vor der nächsten
+  // Anmeldung nicht lesbar.
   await teo.evaluate(() => document.querySelector("[data-logout]").click());
   await teo.page.waitForSelector("#loginDialog[open]");
-  assert.equal(await zeigeHinweis(teo, "demoadmin"), "Passworthinweis: Startpasswort der Demo");
+  assert.match(await zeigeHinweis(teo, "demoadmin"), /erst nach der Anmeldung lesbar/);
   assert.deepEqual(teo.problems, []);
 });
 

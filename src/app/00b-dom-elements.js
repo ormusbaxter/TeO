@@ -70,16 +70,11 @@
     validateBackupButton: document.querySelector("#validateBackupButton"),
     validateBackupFile: document.querySelector("#validateBackupFile"),
     exportEncryptedDataButton: document.querySelector("#exportEncryptedDataButton"),
+    exportUnencryptedDataButton: document.querySelector("#exportUnencryptedDataButton"),
     backupStatus: document.querySelector("#backupStatus"),
     automaticBackupStatus: document.querySelector("#automaticBackupStatus"),
-    automaticBackupEncryption: document.querySelector(
-      "#automaticBackupEncryption",
-    ),
     setAutomaticBackupPasswordButton: document.querySelector(
       "#setAutomaticBackupPasswordButton",
-    ),
-    saveAutomaticBackupSettingsButton: document.querySelector(
-      "#saveAutomaticBackupSettingsButton",
     ),
     selectAutomaticBackupDirectoryButton: document.querySelector(
       "#selectAutomaticBackupDirectoryButton",
@@ -653,6 +648,9 @@
     backupPasswordSubmit: document.querySelector("#backupPasswordSubmit"),
     automaticBackupRecoveryDialog: document.querySelector(
       "#automaticBackupRecoveryDialog",
+    ),
+    automaticBackupRecoveryIntroduction: document.querySelector(
+      "#automaticBackupRecoveryIntroduction",
     ),
     automaticBackupRecoveryKey: document.querySelector(
       "#automaticBackupRecoveryKey",

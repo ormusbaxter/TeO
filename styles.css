@@ -9714,27 +9714,6 @@ button.device-employee-overview-row:hover {
   font-size: 0.78rem;
 }
 
-.automatic-backup-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(150px, 220px));
-  gap: 12px;
-  align-items: end;
-}
-
-.automatic-backup-encryption-field {
-  display: flex;
-  min-height: 38px;
-  gap: 8px;
-  align-items: center;
-  color: var(--slate-700);
-  font-size: 0.72rem;
-  font-weight: 650;
-  padding: 8px 10px;
-  border: 1px solid var(--slate-200);
-  border-radius: 8px;
-  background: white;
-}
-
 .automatic-backup-actions {
   display: flex;
   gap: 8px;
@@ -10151,6 +10130,12 @@ button.device-employee-overview-row:hover {
   width: min(520px, calc(100vw - 32px));
 }
 
+.backup-recovery-introduction {
+  margin: 0 0 14px;
+  color: var(--slate-700);
+  line-height: 1.5;
+}
+
 .backup-password-notice {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
@@ -10268,10 +10253,6 @@ button.device-employee-overview-row:hover {
 }
 
 @media (max-width: 720px) {
-  .automatic-backup-fields {
-    grid-template-columns: 1fr;
-  }
-
   .database-save-warning {
     padding: 10px 12px;
   }

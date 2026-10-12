@@ -6,6 +6,10 @@
     throw new Error("Die TeO-Projektmetadaten konnten nicht geladen werden.");
   }
   const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
+  // Der verschluesselte Bestand liegt unter eigenem Namen. Eine noch
+  // zwischengespeicherte aeltere Fassung findet ihn nicht - und kann ihn deshalb
+  // auch nicht als leeren Bestand lesen und ueberschreiben.
+  const ENCRYPTED_STORAGE_KEY = "intensivteam-personalverwaltung-verschluesselt-v1";
   const LOCAL_SAVE_TIMESTAMP_KEY =
     "intensivteam-personalverwaltung-last-save-v1";
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
@@ -17,6 +21,9 @@
   const PROJECT_NAME = PROJECT_META.name;
   const PROJECT_VERSION = PROJECT_META.version;
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
+  // Vorlaeufige Schluesselhuelle eines Kontos, das bei der Einrichtung der
+  // Verschluesselung nicht angemeldet war (siehe establishDataKey).
+  const PROVISIONAL_KEY_ENVELOPE_FORMAT = "teo-schluesselhuelle-vorlaeufig";
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   // Ein Schritt im Verlauf ist eine Kopie des Datenbestands ohne Protokoll:

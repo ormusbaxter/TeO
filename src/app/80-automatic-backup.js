@@ -22,7 +22,10 @@
           ([userId, envelope]) =>
             String(userId).length > 0 &&
             envelope &&
-            envelope.format === `${BACKUP_FORMAT}-verschluesselt` &&
+            [
+              `${BACKUP_FORMAT}-verschluesselt`,
+              PROVISIONAL_KEY_ENVELOPE_FORMAT,
+            ].includes(envelope.format) &&
             typeof envelope.salt === "string" &&
             typeof envelope.iv === "string" &&
             typeof envelope.ciphertext === "string",
@@ -90,6 +93,11 @@
       showToast(automaticBackupNotice, "error");
       return;
     }
+    // In einen Ordner wird nur verschluesselt gesichert. Ohne Schluessel
+    // entsteht er zuerst.
+    if (!automaticBackupSettings.encrypted && !(await configureAutomaticBackupEncryption())) {
+      return;
+    }
 
     try {
       const handle = await window.showDirectoryPicker({
@@ -154,7 +162,7 @@
   async function removeAutomaticBackupDirectory() {
     clearAutomaticBackupTimer();
     automaticBackupDirectoryHandle = null;
-    automaticBackupPassword = "";
+    // Der Schluessel bleibt entsperrt: Er schuetzt auch den Browserspeicher.
     automaticBackupSettings = normalizeAutomaticBackupSettings({
       ...automaticBackupSettings,
       enabled: false,
@@ -176,36 +184,11 @@
     }
   }
 
-  async function saveAutomaticBackupSettings() {
-    const encrypted = elements.automaticBackupEncryption.checked;
-    if (encrypted && !automaticBackupPassword) {
-      const configured = await configureAutomaticBackupEncryption({
-        persist: false,
-      });
-      if (!configured) {
-        renderAutomaticBackupStatus();
-        return;
-      }
-    }
-    if (!encrypted) automaticBackupPassword = "";
-    automaticBackupSettings = normalizeAutomaticBackupSettings({
-      ...automaticBackupSettings,
-      enabled: Boolean(automaticBackupDirectoryHandle),
-      encrypted,
-    });
-    try {
-      await persistAutomaticBackupConfiguration();
-      automaticBackupNotice = "";
-      scheduleAutomaticBackup();
-      renderAutomaticBackupStatus();
-      showToast("Die Einstellungen der automatischen Sicherung wurden gespeichert.");
-    } catch (error) {
-      console.error("Die Sicherungseinstellungen konnten nicht gespeichert werden.", error);
-      showToast("Die Sicherungseinstellungen konnten nicht gespeichert werden.", "error");
-    }
-  }
-
-  async function configureAutomaticBackupEncryption({ persist = true } = {}) {
+  // Verschluesselt wird immer. Fehlt der Schluessel noch - ein Datenbestand
+  // aus einer Fassung vor 4.69.0, an dem sich noch kein Administrator
+  // angemeldet hat -, entsteht er hier mit dem bestaetigten Login-Passwort.
+  // Ist er da, zeigt die Schaltflaeche den Wiederherstellungsschluessel.
+  async function configureAutomaticBackupEncryption() {
     if (automaticBackupSettings.encrypted) {
       if (!automaticBackupPassword) {
         automaticBackupPassword = await requestAutomaticBackupRecoveryKey();
@@ -218,41 +201,134 @@
 
     const loginPassword = await requestVerifiedAutomaticBackupLoginPassword();
     if (!loginPassword) return false;
-    automaticBackupPassword = generateAutomaticBackupRecoveryKey();
-    const keyFingerprint = await automaticBackupKeyFingerprint(
-      automaticBackupPassword,
-    );
-    const keyEnvelope = await encryptBackup(
-      automaticBackupPassword,
-      loginPassword,
-    );
+    try {
+      await establishDataKey(currentUser, loginPassword);
+    } catch (error) {
+      console.error("Der Datenschlüssel konnte nicht eingerichtet werden.", error);
+      showToast("Die Verschlüsselung konnte nicht eingerichtet werden.", "error");
+      return false;
+    }
+    if (!isMariaDbMode()) {
+      appendAuditEntry("Datenbestand verschlüsselt");
+      await persistState();
+    }
+    databaseSaveReminderArmed = true;
     automaticBackupNotice = "";
-    elements.automaticBackupEncryption.checked = true;
+    scheduleAutomaticBackup();
+    renderAutomaticBackupStatus();
+    showAutomaticBackupRecoveryKey({ introduction: true });
+    return true;
+  }
+
+  // Erzeugt den Datenschluessel samt Huellen und merkt ihn vor. Die Huelle des
+  // eigenen Kontos schuetzt das Login-Passwort. Die uebrigen Konten haben noch
+  // keine; ihre Passwoerter kennt TeO nicht. Sie bekommen eine vorlaeufige
+  // Huelle aus ihrem gespeicherten Passwort-Hash, der sich bei der Anmeldung
+  // aus dem Passwort ergibt - damit kommt jedes Konto ohne
+  // Wiederherstellungsschluessel herein. Die erste Anmeldung ersetzt sie durch
+  // eine regulaere Huelle.
+  async function establishDataKey(user, loginPassword) {
+    const key = generateAutomaticBackupRecoveryKey();
+    const keyEnvelopes = {
+      [user.id]: await encryptBackup(key, loginPassword),
+    };
+    for (const other of state.users) {
+      if (other.id === user.id || !other.passwordHash || !other.passwordSalt) continue;
+      keyEnvelopes[other.id] = await wrapKeyWithPasswordHash(key, other);
+    }
+    automaticBackupPassword = key;
     automaticBackupSettings = normalizeAutomaticBackupSettings({
       ...automaticBackupSettings,
       encrypted: true,
-      keyFingerprint,
-      keyEnvelopes: {
-        [currentUser.id]: keyEnvelope,
-      },
+      keyFingerprint: await automaticBackupKeyFingerprint(key),
+      keyEnvelopes,
     });
-    if (persist) {
-      try {
-        await persistAutomaticBackupConfiguration();
-      } catch (error) {
-        console.error(
-          "Die Einstellung zur automatischen Verschlüsselung konnte nicht gespeichert werden.",
-          error,
-        );
-        showToast("Die Verschlüsselungseinstellung konnte nicht gespeichert werden.", "error");
-        return false;
-      }
-      scheduleAutomaticBackup();
-      showToast("Die automatische Login-Verschlüsselung wurde eingerichtet.");
+    await persistAutomaticBackupConfiguration();
+    automaticBackupRecoveryKeyPending = true;
+  }
+
+  // Pflichtverschluesselung fuer Bestaende aus der Zeit davor: Die erste
+  // Anmeldung eines Administrators im lokalen Betrieb richtet den Schluessel
+  // ein und verschluesselt Browserspeicher und - mit der naechsten
+  // Sicherung - die gemeinsame Datei. Normale Konten arbeiten bis dahin wie
+  // bisher; den Wiederherstellungsschluessel verwahrt ein Administrator.
+  async function encryptDataSetOnLogin(user, loginPassword) {
+    if (
+      isMariaDbMode() ||
+      automaticBackupSettings?.encrypted ||
+      user?.role !== "admin"
+    ) {
+      return true;
     }
-    renderAutomaticBackupStatus();
-    showAutomaticBackupRecoveryKey();
+    try {
+      await establishDataKey(user, loginPassword);
+    } catch (error) {
+      console.error("Der Datenschlüssel konnte nicht eingerichtet werden.", error);
+      return false;
+    }
+    const previousUser = currentUser;
+    currentUser = user;
+    appendAuditEntry("Datenbestand verschlüsselt");
+    currentUser = previousUser;
+    if (!(await persistState())) return false;
+    databaseSaveReminderArmed = true;
     return true;
+  }
+
+  async function passwordHashKey(passwordHash, usage) {
+    const material = await crypto.subtle.importKey(
+      "raw",
+      base64ToBytes(passwordHash),
+      "HKDF",
+      false,
+      ["deriveKey"],
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: "HKDF",
+        hash: "SHA-256",
+        salt: new Uint8Array(16),
+        info: new TextEncoder().encode(PROVISIONAL_KEY_ENVELOPE_FORMAT),
+      },
+      material,
+      { name: "AES-GCM", length: 256 },
+      false,
+      [usage],
+    );
+  }
+
+  async function wrapKeyWithPasswordHash(key, user) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ciphertext = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      await passwordHashKey(user.passwordHash, "encrypt"),
+      new TextEncoder().encode(key),
+    );
+    return {
+      format: PROVISIONAL_KEY_ENVELOPE_FORMAT,
+      salt: user.passwordSalt,
+      iv: bytesToBase64(iv),
+      ciphertext: bytesToBase64(new Uint8Array(ciphertext)),
+    };
+  }
+
+  async function unwrapKeyWithPasswordHash(envelope, loginPassword) {
+    const passwordHash = await derivePasswordHash(
+      loginPassword,
+      envelope.salt,
+      PASSWORD_ITERATIONS,
+    );
+    const plainText = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: base64ToBytes(envelope.iv) },
+      await passwordHashKey(passwordHash, "decrypt"),
+      base64ToBytes(envelope.ciphertext),
+    );
+    return new TextDecoder().decode(plainText);
+  }
+
+  function automaticBackupUserKeyIsFinal(userId) {
+    const envelope = automaticBackupSettings?.keyEnvelopes?.[userId];
+    return Boolean(envelope && envelope.format !== PROVISIONAL_KEY_ENVELOPE_FORMAT);
   }
 
   async function requestVerifiedAutomaticBackupLoginPassword() {
@@ -379,7 +455,10 @@
     ];
     for (const id of order) {
       try {
-        const key = await decryptBackup(envelopes[id], loginPassword);
+        const key =
+          envelopes[id].format === PROVISIONAL_KEY_ENVELOPE_FORMAT
+            ? await unwrapKeyWithPasswordHash(envelopes[id], loginPassword)
+            : await decryptBackup(envelopes[id], loginPassword);
         if (
           (await automaticBackupKeyFingerprint(key)) ===
           automaticBackupSettings.keyFingerprint
@@ -442,9 +521,10 @@
     if (key) {
       automaticBackupPassword = key;
       automaticBackupNotice = "";
-      // Ein Konto, das der Schluessel ueber eine fremde Huelle erreicht hat,
-      // bekommt seine eigene - damit die naechste Anmeldung ohne Suche gelingt.
-      if (!automaticBackupSettings.keyEnvelopes?.[user.id]) {
+      // Ein Konto, das der Schluessel ueber eine fremde oder vorlaeufige Huelle
+      // erreicht hat, bekommt seine eigene - damit die naechste Anmeldung ohne
+      // Suche gelingt.
+      if (!automaticBackupUserKeyIsFinal(user.id)) {
         await registerAutomaticBackupUserKey(user.id, loginPassword);
       }
       return true;
@@ -478,8 +558,11 @@
     }
   }
 
-  function showAutomaticBackupRecoveryKey() {
+  // Mit introduction erklaert der Dialog, was eben eingerichtet wurde - beim
+  // spaeteren Anzeigen ueber die Einstellungen braucht es das nicht.
+  function showAutomaticBackupRecoveryKey({ introduction = false } = {}) {
     if (!automaticBackupPassword) return;
+    elements.automaticBackupRecoveryIntroduction.hidden = !introduction;
     elements.automaticBackupRecoveryKey.value = automaticBackupPassword;
     if (!elements.automaticBackupRecoveryDialog.open) {
       elements.automaticBackupRecoveryDialog.showModal();
@@ -500,22 +583,18 @@
   }
 
   function renderAutomaticBackupEncryptionControls() {
-    elements.setAutomaticBackupPasswordButton.hidden =
-      !elements.automaticBackupEncryption.checked;
-    elements.setAutomaticBackupPasswordButton.textContent =
+    elements.setAutomaticBackupPasswordButton.lastChild.textContent =
       automaticBackupSettings?.encrypted
         ? automaticBackupPassword
-          ? "Wiederherstellungsschlüssel anzeigen"
-          : "Wiederherstellungsschlüssel eingeben"
-        : "Login-Verschlüsselung einrichten";
+          ? " Wiederherstellungsschlüssel anzeigen"
+          : " Wiederherstellungsschlüssel eingeben"
+        : " Verschlüsselung einrichten";
   }
 
   function renderAutomaticBackupStatus() {
     if (!automaticBackupSettings) return;
     // Der Sicherungshinweis haengt am Zustand der automatischen Sicherung.
     renderDatabaseSaveWarning();
-    elements.automaticBackupEncryption.checked =
-      automaticBackupSettings.encrypted;
     renderAutomaticBackupEncryptionControls();
     const supported = typeof window.showDirectoryPicker === "function";
     const connected = Boolean(
@@ -527,7 +606,6 @@
     elements.runAutomaticBackupButton.disabled =
       !connected || !encryptionReady || automaticBackupRunning;
     elements.removeAutomaticBackupDirectoryButton.hidden = !automaticBackupDirectoryHandle;
-    elements.saveAutomaticBackupSettingsButton.disabled = !supported;
 
     if (!supported) {
       elements.automaticBackupStatus.textContent =

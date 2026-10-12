@@ -412,6 +412,16 @@
   // Benutzernamen antwortet TeO genauso wie auf ein Konto ohne Hinweis, damit
   // sich nicht ausprobieren laesst, welche Konten es gibt.
   async function showLoginPasswordHint() {
+    // Verschluesselt stehen die Hinweise im gesperrten Bestand. Vor der
+    // Anmeldung kann TeO sie nicht lesen - und gibt sie deshalb auch nicht
+    // preis.
+    if (!isMariaDbMode() && automaticBackupSettings?.encrypted) {
+      elements.loginError.textContent = "";
+      elements.loginPasswordHint.textContent =
+        "Der Datenbestand ist verschlüsselt, Passworthinweise sind erst nach der Anmeldung lesbar. Ein Administrator kann das Passwort zurücksetzen.";
+      elements.loginPasswordHint.hidden = false;
+      return;
+    }
     const username = document.querySelector("#loginUsername").value.trim();
     if (!username) {
       elements.loginError.textContent =
@@ -435,9 +445,9 @@
     elements.loginPasswordHint.hidden = false;
   }
 
-  // Im lokalen Betrieb stehen die Konten der gemeinsamen Datei erst nach dem
-  // Entschluesseln bereit. Der Hinweis kommt deshalb aus dem zuletzt in diesem
-  // Browser geladenen Bestand; im Serverbetrieb fragt TeO den Server.
+  // Im lokalen Betrieb kommt der Hinweis aus dem zuletzt in diesem Browser
+  // geladenen, noch unverschluesselten Bestand; im Serverbetrieb fragt TeO
+  // den Server.
   async function lookupPasswordHint(username) {
     if (isMariaDbMode()) {
       const result = await window.TeOBackend.passwordHint(

@@ -7,6 +7,10 @@
     throw new Error("Die TeO-Projektmetadaten konnten nicht geladen werden.");
   }
   const STORAGE_KEY = "intensivteam-personalverwaltung-v1";
+  // Der verschluesselte Bestand liegt unter eigenem Namen. Eine noch
+  // zwischengespeicherte aeltere Fassung findet ihn nicht - und kann ihn deshalb
+  // auch nicht als leeren Bestand lesen und ueberschreiben.
+  const ENCRYPTED_STORAGE_KEY = "intensivteam-personalverwaltung-verschluesselt-v1";
   const LOCAL_SAVE_TIMESTAMP_KEY =
     "intensivteam-personalverwaltung-last-save-v1";
   const SESSION_USER_KEY = "intensivteam-session-user-v1";
@@ -18,6 +22,9 @@
   const PROJECT_NAME = PROJECT_META.name;
   const PROJECT_VERSION = PROJECT_META.version;
   const BACKUP_FORMAT = PROJECT_META.backupFormat;
+  // Vorlaeufige Schluesselhuelle eines Kontos, das bei der Einrichtung der
+  // Verschluesselung nicht angemeldet war (siehe establishDataKey).
+  const PROVISIONAL_KEY_ENVELOPE_FORMAT = "teo-schluesselhuelle-vorlaeufig";
   const BACKUP_FORMAT_VERSION = PROJECT_META.backupFormatVersion;
   const MAX_AUDIT_LOG_ENTRIES = 1000;
   // Ein Schritt im Verlauf ist eine Kopie des Datenbestands ohne Protokoll:
@@ -643,6 +650,13 @@
   let automaticBackupSettings = null;
   let automaticBackupDirectoryHandle = null;
   let automaticBackupPassword = "";
+  // Der Browserspeicher ist verschluesselt und noch nicht (oder nach dem
+  // Abmelden nicht mehr) geoeffnet: Der Datenbestand im Arbeitsspeicher ist
+  // dann leer und nicht der gespeicherte.
+  let localStateLocked = false;
+  // Eben eingerichteter Schluessel; sein Wiederherstellungsschluessel wird
+  // gezeigt, sobald TeO sich nach der Anmeldung oeffnet.
+  let automaticBackupRecoveryKeyPending = false;
   let automaticBackupTimer = null;
   let automaticBackupRunning = false;
   // Zaehlt erfolgreich gespeicherte Aenderungen am Datenbestand. Die
@@ -805,16 +819,11 @@
     validateBackupButton: document.querySelector("#validateBackupButton"),
     validateBackupFile: document.querySelector("#validateBackupFile"),
     exportEncryptedDataButton: document.querySelector("#exportEncryptedDataButton"),
+    exportUnencryptedDataButton: document.querySelector("#exportUnencryptedDataButton"),
     backupStatus: document.querySelector("#backupStatus"),
     automaticBackupStatus: document.querySelector("#automaticBackupStatus"),
-    automaticBackupEncryption: document.querySelector(
-      "#automaticBackupEncryption",
-    ),
     setAutomaticBackupPasswordButton: document.querySelector(
       "#setAutomaticBackupPasswordButton",
-    ),
-    saveAutomaticBackupSettingsButton: document.querySelector(
-      "#saveAutomaticBackupSettingsButton",
     ),
     selectAutomaticBackupDirectoryButton: document.querySelector(
       "#selectAutomaticBackupDirectoryButton",
@@ -1389,6 +1398,9 @@
     automaticBackupRecoveryDialog: document.querySelector(
       "#automaticBackupRecoveryDialog",
     ),
+    automaticBackupRecoveryIntroduction: document.querySelector(
+      "#automaticBackupRecoveryIntroduction",
+    ),
     automaticBackupRecoveryKey: document.querySelector(
       "#automaticBackupRecoveryKey",
     ),
@@ -1857,6 +1869,14 @@
     }
 
     try {
+      // Verschluesselt oeffnet erst die Anmeldung den Bestand. Bis dahin bleibt
+      // der Arbeitsspeicher leer - auch ein alter Klartextstand daneben zaehlt
+      // nicht mehr.
+      if (isEncryptedLocalState(await dataStore.getItem(ENCRYPTED_STORAGE_KEY))) {
+        localStateLocked = true;
+        return emptyState();
+      }
+      localStateLocked = false;
       let parsed = await dataStore.getItem(STORAGE_KEY);
 
       if (!parsed) {
@@ -3099,7 +3119,7 @@
       }
     } else {
       try {
-        await dataStore.setItem(STORAGE_KEY, state);
+        await writeLocalState(state);
         localLastSaveAt = new Date().toISOString();
       } catch (error) {
         console.error("Daten konnten nicht gespeichert werden.", error);
@@ -3443,6 +3463,166 @@
     document.body.append(message);
   }
 
+  // Verschluesselter Browserspeicher im lokalen Betrieb. Er verwendet denselben
+  // Datenschluessel wie die gemeinsame Datei: zufaellig erzeugt, je Konto mit
+  // dessen Login-Passwort umhuellt und bei der Anmeldung entsperrt. Ein
+  // zweites Passwort gibt es deshalb nicht, und ohne Anmeldung liegt im
+  // Browserprofil nichts Lesbares.
+  //
+  // Der Schluessel ist selbst zufaellig; eine teure Ableitung wie bei
+  // Passwoertern braucht es nicht. HKDF trennt den Schluessel fuer den
+  // Browserspeicher von dem fuer die Datei, und das Speichern bleibt schnell.
+  const LOCAL_STATE_FORMAT = "teo-browserspeicher-verschluesselt";
+
+  function isEncryptedLocalState(value) {
+    return Boolean(
+      value &&
+        value.format === LOCAL_STATE_FORMAT &&
+        typeof value.salt === "string" &&
+        typeof value.iv === "string" &&
+        typeof value.ciphertext === "string",
+    );
+  }
+
+  async function localStateCryptoKey(dataKey, salt, usage) {
+    const material = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(dataKey),
+      "HKDF",
+      false,
+      ["deriveKey"],
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: "HKDF",
+        hash: "SHA-256",
+        salt,
+        info: new TextEncoder().encode(LOCAL_STATE_FORMAT),
+      },
+      material,
+      { name: "AES-GCM", length: 256 },
+      false,
+      [usage],
+    );
+  }
+
+  async function encryptLocalState(value, dataKey, keyFingerprint) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await localStateCryptoKey(dataKey, salt, "encrypt");
+    const ciphertext = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      key,
+      new TextEncoder().encode(JSON.stringify(value)),
+    );
+    return {
+      format: LOCAL_STATE_FORMAT,
+      formatVersion: 1,
+      keyFingerprint,
+      salt: bytesToBase64(salt),
+      iv: bytesToBase64(iv),
+      ciphertext: bytesToBase64(new Uint8Array(ciphertext)),
+    };
+  }
+
+  async function decryptLocalState(envelope, dataKey) {
+    try {
+      const key = await localStateCryptoKey(
+        dataKey,
+        base64ToBytes(envelope.salt),
+        "decrypt",
+      );
+      const plainText = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: base64ToBytes(envelope.iv) },
+        key,
+        base64ToBytes(envelope.ciphertext),
+      );
+      return JSON.parse(new TextDecoder().decode(plainText));
+    } catch {
+      throw new Error(
+        "Der Datenbestand dieses Browsers konnte nicht entschlüsselt werden.",
+      );
+    }
+  }
+
+  // Einziger Weg, den Bestand in den Browserspeicher zu schreiben. Ist der
+  // Bestand verschluesselt, wird ohne entsperrten Schluessel nichts
+  // geschrieben - unverschluesselt schon gar nicht.
+  async function writeLocalState(value) {
+    if (automaticBackupSettings?.encrypted) {
+      if (!automaticBackupPassword) {
+        throw new Error(
+          "Der Datenbestand ist gesperrt; ohne Anmeldung speichert TeO nichts.",
+        );
+      }
+      await dataStore.setItem(
+        ENCRYPTED_STORAGE_KEY,
+        await encryptLocalState(
+          value,
+          automaticBackupPassword,
+          automaticBackupSettings.keyFingerprint,
+        ),
+      );
+      await dataStore.removeItem(STORAGE_KEY);
+      return;
+    }
+    // Noch kein Schluessel: ein Bestand aus der Zeit vor der
+    // Pflichtverschluesselung, bis sich ein Administrator anmeldet. Einen
+    // verschluesselten Stand daneben gibt es dann nicht - Neubeginn und
+    // Verwerfen raeumen beide Ablagen mit clearLocalState.
+    await dataStore.setItem(STORAGE_KEY, value);
+  }
+
+  // Bei null anfangen: beide Ablagen leeren, verschluesselt wie im Klartext.
+  async function clearLocalState() {
+    await dataStore.removeItem(ENCRYPTED_STORAGE_KEY);
+    await dataStore.removeItem(STORAGE_KEY);
+    localStateLocked = false;
+  }
+
+  // Abmelden: Schluessel und Datenbestand verlassen den Arbeitsspeicher. Was
+  // auf dem Bildschirm stand, wird mit dem leeren Bestand neu gezeichnet.
+  function lockLocalState() {
+    if (isMariaDbMode() || !automaticBackupSettings?.encrypted) return;
+    state = emptyState();
+    clearUndoHistory();
+    localStateLocked = true;
+    renderAll();
+  }
+
+  // Anmeldung gegen die Konten dieses Browsers: Der Bestand wird mit dem
+  // Schluessel geoeffnet, den das Passwort entsperrt. Liegt er noch im
+  // Klartext vor, wird er wie bisher geladen. Rueckgabe ist eine Meldung fuer
+  // den Anmeldedialog, leer bei Erfolg.
+  async function openLocalStateForLogin(loginPassword) {
+    if (!localStateLocked) return "";
+    let envelope;
+    try {
+      envelope = await dataStore.getItem(ENCRYPTED_STORAGE_KEY);
+    } catch (error) {
+      console.warn("Der verschlüsselte Datenbestand konnte nicht gelesen werden.", error);
+      return "Der Datenbestand dieses Browsers konnte nicht gelesen werden.";
+    }
+    if (!isEncryptedLocalState(envelope)) {
+      state = await loadState();
+      return "";
+    }
+    const key =
+      automaticBackupPassword ||
+      (await unlockAutomaticBackupKeyWithPassword(loginPassword));
+    if (!key) return "Benutzername oder Passwort ist nicht korrekt.";
+    try {
+      state = normalizeState(await decryptLocalState(envelope, key));
+    } catch (error) {
+      return error.message;
+    }
+    automaticBackupPassword = key;
+    localStateLocked = false;
+    clearUndoHistory();
+    databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
+    return "";
+  }
+
   function bindNavigation() {
     document.querySelectorAll("[data-view]").forEach((button) => {
       button.addEventListener("click", () => showView(button.dataset.view));
@@ -3770,6 +3950,7 @@
       handleDatabaseSaveWarningAction,
     );
     elements.exportEncryptedDataButton.addEventListener("click", exportEncryptedDatabase);
+    elements.exportUnencryptedDataButton.addEventListener("click", exportUnencryptedDatabase);
     elements.selectAutomaticBackupDirectoryButton.addEventListener(
       "click",
       selectAutomaticBackupDirectory,
@@ -3782,17 +3963,9 @@
       "click",
       removeAutomaticBackupDirectory,
     );
-    elements.automaticBackupEncryption.addEventListener(
-      "change",
-      renderAutomaticBackupEncryptionControls,
-    );
     elements.setAutomaticBackupPasswordButton.addEventListener(
       "click",
-      configureAutomaticBackupEncryption,
-    );
-    elements.saveAutomaticBackupSettingsButton.addEventListener(
-      "click",
-      saveAutomaticBackupSettings,
+      () => void configureAutomaticBackupEncryption(),
     );
     elements.settingsMaxBackupFileSizeMb.addEventListener(
       "input",
@@ -5091,7 +5264,7 @@
   }
 
   function restoreAuthenticationSession() {
-    if (!isMariaDbMode() && state.users.length === 0) {
+    if (!isMariaDbMode() && state.users.length === 0 && !localStateLocked) {
       showDataOriginDialog();
       return;
     }
@@ -5202,6 +5375,18 @@
     state.users = [admin];
     currentUser = admin;
     appendAuditEntry("Ersteinrichtung abgeschlossen und Administratorkonto angelegt");
+    // Der Datenbestand ist von Anfang an verschluesselt - im Browser wie in
+    // der gemeinsamen Datei, die gleich danach entsteht.
+    try {
+      await establishDataKey(admin, password);
+    } catch (error) {
+      console.error("Der Datenschlüssel konnte nicht erzeugt werden.", error);
+      state.users = [];
+      currentUser = null;
+      elements.setupError.textContent =
+        "Die Verschlüsselung ist in diesem Browser nicht verfügbar.";
+      return;
+    }
     if (!(await persistState())) {
       state.users = [];
       currentUser = null;
@@ -5263,10 +5448,6 @@
       return;
     }
 
-    const user = state.users.find(
-      (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
-    );
-
     // Angemeldet wird gegen die Konten der gemeinsamen Datei, nicht gegen die
     // dieses Browsers: Ein anderswo geaendertes Passwort oder geloeschtes Konto
     // gilt damit sofort. Ausnahme ist nur ein eben eingerichteter Bestand, der
@@ -5280,6 +5461,18 @@
       return;
     }
 
+    // Ohne gemeinsame Datei stehen die Konten im Bestand dieses Browsers -
+    // verschluesselt oeffnet ihn erst das Passwort.
+    const lockedMessage = await openLocalStateForLogin(password);
+    if (lockedMessage) {
+      elements.loginError.textContent = lockedMessage;
+      document.querySelector("#loginPassword").value = "";
+      return;
+    }
+    const user = state.users.find(
+      (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
+    );
+
     let passwordMatches;
     try {
       passwordMatches = user ? await verifyPassword(password, user) : false;
@@ -5291,6 +5484,10 @@
     }
 
     if (!user || !passwordMatches) {
+      // Das Passwort eines anderen Kontos oeffnet den Bestand, meldet aber
+      // nicht an - er wird wieder gesperrt.
+      lockLocalState();
+      automaticBackupPassword = "";
       elements.loginError.textContent = "Benutzername oder Passwort ist nicht korrekt.";
       document.querySelector("#loginPassword").value = "";
       return;
@@ -5306,6 +5503,11 @@
       console.warn("Der automatische Sicherungsschlüssel konnte nicht entsperrt werden.", error);
       automaticBackupNotice =
         "Sicherungsschlüssel nicht entsperrt – erneut anmelden oder Wiederherstellungsschlüssel verwenden.";
+    }
+    if (!(await encryptDataSetOnLogin(user, password))) {
+      elements.loginError.textContent =
+        "Der Datenbestand konnte nicht verschlüsselt werden. Bitte erneut anmelden.";
+      return;
     }
     completeLogin(user);
   }
@@ -5352,6 +5554,14 @@
     document.body.classList.remove("is-auth-locked");
     if (elements.changePasswordDialog.open) elements.changePasswordDialog.close();
     scheduleAutomaticBackup();
+    // Ein eben eingerichteter Schluessel zeigt seinen Wiederherstellungs-
+    // schluessel, sobald TeO offen ist - vorher stuenden Passwort- und
+    // Hinweisdialoge im Weg.
+    if (automaticBackupRecoveryKeyPending) {
+      automaticBackupRecoveryKeyPending = false;
+      showAutomaticBackupRecoveryKey({ introduction: true });
+      return;
+    }
     // Erst jetzt: Vor der Anmeldung steht die Anwendung noch hinter der
     // Sperre, und ein Hinweis darueber waere im Weg.
     showWhatsNewIfUpdated();
@@ -5362,6 +5572,7 @@
     // Ohne angemeldetes Konto gilt wieder die gemeinsame Vorgabe.
     applyTheme(activeThemeKey());
     clearAutomaticBackupTimer();
+    lockLocalState();
     automaticBackupPassword = "";
     startupBackupSynchronized = false;
     startupBackupImportRunning = false;
@@ -6008,6 +6219,16 @@
   // Benutzernamen antwortet TeO genauso wie auf ein Konto ohne Hinweis, damit
   // sich nicht ausprobieren laesst, welche Konten es gibt.
   async function showLoginPasswordHint() {
+    // Verschluesselt stehen die Hinweise im gesperrten Bestand. Vor der
+    // Anmeldung kann TeO sie nicht lesen - und gibt sie deshalb auch nicht
+    // preis.
+    if (!isMariaDbMode() && automaticBackupSettings?.encrypted) {
+      elements.loginError.textContent = "";
+      elements.loginPasswordHint.textContent =
+        "Der Datenbestand ist verschlüsselt, Passworthinweise sind erst nach der Anmeldung lesbar. Ein Administrator kann das Passwort zurücksetzen.";
+      elements.loginPasswordHint.hidden = false;
+      return;
+    }
     const username = document.querySelector("#loginUsername").value.trim();
     if (!username) {
       elements.loginError.textContent =
@@ -6031,9 +6252,9 @@
     elements.loginPasswordHint.hidden = false;
   }
 
-  // Im lokalen Betrieb stehen die Konten der gemeinsamen Datei erst nach dem
-  // Entschluesseln bereit. Der Hinweis kommt deshalb aus dem zuletzt in diesem
-  // Browser geladenen Bestand; im Serverbetrieb fragt TeO den Server.
+  // Im lokalen Betrieb kommt der Hinweis aus dem zuletzt in diesem Browser
+  // geladenen, noch unverschluesselten Bestand; im Serverbetrieb fragt TeO
+  // den Server.
   async function lookupPasswordHint(username) {
     if (isMariaDbMode()) {
       const result = await window.TeOBackend.passwordHint(
@@ -20881,7 +21102,10 @@ ${rendered
           ([userId, envelope]) =>
             String(userId).length > 0 &&
             envelope &&
-            envelope.format === `${BACKUP_FORMAT}-verschluesselt` &&
+            [
+              `${BACKUP_FORMAT}-verschluesselt`,
+              PROVISIONAL_KEY_ENVELOPE_FORMAT,
+            ].includes(envelope.format) &&
             typeof envelope.salt === "string" &&
             typeof envelope.iv === "string" &&
             typeof envelope.ciphertext === "string",
@@ -20949,6 +21173,11 @@ ${rendered
       showToast(automaticBackupNotice, "error");
       return;
     }
+    // In einen Ordner wird nur verschluesselt gesichert. Ohne Schluessel
+    // entsteht er zuerst.
+    if (!automaticBackupSettings.encrypted && !(await configureAutomaticBackupEncryption())) {
+      return;
+    }
 
     try {
       const handle = await window.showDirectoryPicker({
@@ -21013,7 +21242,7 @@ ${rendered
   async function removeAutomaticBackupDirectory() {
     clearAutomaticBackupTimer();
     automaticBackupDirectoryHandle = null;
-    automaticBackupPassword = "";
+    // Der Schluessel bleibt entsperrt: Er schuetzt auch den Browserspeicher.
     automaticBackupSettings = normalizeAutomaticBackupSettings({
       ...automaticBackupSettings,
       enabled: false,
@@ -21035,36 +21264,11 @@ ${rendered
     }
   }
 
-  async function saveAutomaticBackupSettings() {
-    const encrypted = elements.automaticBackupEncryption.checked;
-    if (encrypted && !automaticBackupPassword) {
-      const configured = await configureAutomaticBackupEncryption({
-        persist: false,
-      });
-      if (!configured) {
-        renderAutomaticBackupStatus();
-        return;
-      }
-    }
-    if (!encrypted) automaticBackupPassword = "";
-    automaticBackupSettings = normalizeAutomaticBackupSettings({
-      ...automaticBackupSettings,
-      enabled: Boolean(automaticBackupDirectoryHandle),
-      encrypted,
-    });
-    try {
-      await persistAutomaticBackupConfiguration();
-      automaticBackupNotice = "";
-      scheduleAutomaticBackup();
-      renderAutomaticBackupStatus();
-      showToast("Die Einstellungen der automatischen Sicherung wurden gespeichert.");
-    } catch (error) {
-      console.error("Die Sicherungseinstellungen konnten nicht gespeichert werden.", error);
-      showToast("Die Sicherungseinstellungen konnten nicht gespeichert werden.", "error");
-    }
-  }
-
-  async function configureAutomaticBackupEncryption({ persist = true } = {}) {
+  // Verschluesselt wird immer. Fehlt der Schluessel noch - ein Datenbestand
+  // aus einer Fassung vor 4.69.0, an dem sich noch kein Administrator
+  // angemeldet hat -, entsteht er hier mit dem bestaetigten Login-Passwort.
+  // Ist er da, zeigt die Schaltflaeche den Wiederherstellungsschluessel.
+  async function configureAutomaticBackupEncryption() {
     if (automaticBackupSettings.encrypted) {
       if (!automaticBackupPassword) {
         automaticBackupPassword = await requestAutomaticBackupRecoveryKey();
@@ -21077,41 +21281,134 @@ ${rendered
 
     const loginPassword = await requestVerifiedAutomaticBackupLoginPassword();
     if (!loginPassword) return false;
-    automaticBackupPassword = generateAutomaticBackupRecoveryKey();
-    const keyFingerprint = await automaticBackupKeyFingerprint(
-      automaticBackupPassword,
-    );
-    const keyEnvelope = await encryptBackup(
-      automaticBackupPassword,
-      loginPassword,
-    );
+    try {
+      await establishDataKey(currentUser, loginPassword);
+    } catch (error) {
+      console.error("Der Datenschlüssel konnte nicht eingerichtet werden.", error);
+      showToast("Die Verschlüsselung konnte nicht eingerichtet werden.", "error");
+      return false;
+    }
+    if (!isMariaDbMode()) {
+      appendAuditEntry("Datenbestand verschlüsselt");
+      await persistState();
+    }
+    databaseSaveReminderArmed = true;
     automaticBackupNotice = "";
-    elements.automaticBackupEncryption.checked = true;
+    scheduleAutomaticBackup();
+    renderAutomaticBackupStatus();
+    showAutomaticBackupRecoveryKey({ introduction: true });
+    return true;
+  }
+
+  // Erzeugt den Datenschluessel samt Huellen und merkt ihn vor. Die Huelle des
+  // eigenen Kontos schuetzt das Login-Passwort. Die uebrigen Konten haben noch
+  // keine; ihre Passwoerter kennt TeO nicht. Sie bekommen eine vorlaeufige
+  // Huelle aus ihrem gespeicherten Passwort-Hash, der sich bei der Anmeldung
+  // aus dem Passwort ergibt - damit kommt jedes Konto ohne
+  // Wiederherstellungsschluessel herein. Die erste Anmeldung ersetzt sie durch
+  // eine regulaere Huelle.
+  async function establishDataKey(user, loginPassword) {
+    const key = generateAutomaticBackupRecoveryKey();
+    const keyEnvelopes = {
+      [user.id]: await encryptBackup(key, loginPassword),
+    };
+    for (const other of state.users) {
+      if (other.id === user.id || !other.passwordHash || !other.passwordSalt) continue;
+      keyEnvelopes[other.id] = await wrapKeyWithPasswordHash(key, other);
+    }
+    automaticBackupPassword = key;
     automaticBackupSettings = normalizeAutomaticBackupSettings({
       ...automaticBackupSettings,
       encrypted: true,
-      keyFingerprint,
-      keyEnvelopes: {
-        [currentUser.id]: keyEnvelope,
-      },
+      keyFingerprint: await automaticBackupKeyFingerprint(key),
+      keyEnvelopes,
     });
-    if (persist) {
-      try {
-        await persistAutomaticBackupConfiguration();
-      } catch (error) {
-        console.error(
-          "Die Einstellung zur automatischen Verschlüsselung konnte nicht gespeichert werden.",
-          error,
-        );
-        showToast("Die Verschlüsselungseinstellung konnte nicht gespeichert werden.", "error");
-        return false;
-      }
-      scheduleAutomaticBackup();
-      showToast("Die automatische Login-Verschlüsselung wurde eingerichtet.");
+    await persistAutomaticBackupConfiguration();
+    automaticBackupRecoveryKeyPending = true;
+  }
+
+  // Pflichtverschluesselung fuer Bestaende aus der Zeit davor: Die erste
+  // Anmeldung eines Administrators im lokalen Betrieb richtet den Schluessel
+  // ein und verschluesselt Browserspeicher und - mit der naechsten
+  // Sicherung - die gemeinsame Datei. Normale Konten arbeiten bis dahin wie
+  // bisher; den Wiederherstellungsschluessel verwahrt ein Administrator.
+  async function encryptDataSetOnLogin(user, loginPassword) {
+    if (
+      isMariaDbMode() ||
+      automaticBackupSettings?.encrypted ||
+      user?.role !== "admin"
+    ) {
+      return true;
     }
-    renderAutomaticBackupStatus();
-    showAutomaticBackupRecoveryKey();
+    try {
+      await establishDataKey(user, loginPassword);
+    } catch (error) {
+      console.error("Der Datenschlüssel konnte nicht eingerichtet werden.", error);
+      return false;
+    }
+    const previousUser = currentUser;
+    currentUser = user;
+    appendAuditEntry("Datenbestand verschlüsselt");
+    currentUser = previousUser;
+    if (!(await persistState())) return false;
+    databaseSaveReminderArmed = true;
     return true;
+  }
+
+  async function passwordHashKey(passwordHash, usage) {
+    const material = await crypto.subtle.importKey(
+      "raw",
+      base64ToBytes(passwordHash),
+      "HKDF",
+      false,
+      ["deriveKey"],
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: "HKDF",
+        hash: "SHA-256",
+        salt: new Uint8Array(16),
+        info: new TextEncoder().encode(PROVISIONAL_KEY_ENVELOPE_FORMAT),
+      },
+      material,
+      { name: "AES-GCM", length: 256 },
+      false,
+      [usage],
+    );
+  }
+
+  async function wrapKeyWithPasswordHash(key, user) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ciphertext = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      await passwordHashKey(user.passwordHash, "encrypt"),
+      new TextEncoder().encode(key),
+    );
+    return {
+      format: PROVISIONAL_KEY_ENVELOPE_FORMAT,
+      salt: user.passwordSalt,
+      iv: bytesToBase64(iv),
+      ciphertext: bytesToBase64(new Uint8Array(ciphertext)),
+    };
+  }
+
+  async function unwrapKeyWithPasswordHash(envelope, loginPassword) {
+    const passwordHash = await derivePasswordHash(
+      loginPassword,
+      envelope.salt,
+      PASSWORD_ITERATIONS,
+    );
+    const plainText = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: base64ToBytes(envelope.iv) },
+      await passwordHashKey(passwordHash, "decrypt"),
+      base64ToBytes(envelope.ciphertext),
+    );
+    return new TextDecoder().decode(plainText);
+  }
+
+  function automaticBackupUserKeyIsFinal(userId) {
+    const envelope = automaticBackupSettings?.keyEnvelopes?.[userId];
+    return Boolean(envelope && envelope.format !== PROVISIONAL_KEY_ENVELOPE_FORMAT);
   }
 
   async function requestVerifiedAutomaticBackupLoginPassword() {
@@ -21238,7 +21535,10 @@ ${rendered
     ];
     for (const id of order) {
       try {
-        const key = await decryptBackup(envelopes[id], loginPassword);
+        const key =
+          envelopes[id].format === PROVISIONAL_KEY_ENVELOPE_FORMAT
+            ? await unwrapKeyWithPasswordHash(envelopes[id], loginPassword)
+            : await decryptBackup(envelopes[id], loginPassword);
         if (
           (await automaticBackupKeyFingerprint(key)) ===
           automaticBackupSettings.keyFingerprint
@@ -21301,9 +21601,10 @@ ${rendered
     if (key) {
       automaticBackupPassword = key;
       automaticBackupNotice = "";
-      // Ein Konto, das der Schluessel ueber eine fremde Huelle erreicht hat,
-      // bekommt seine eigene - damit die naechste Anmeldung ohne Suche gelingt.
-      if (!automaticBackupSettings.keyEnvelopes?.[user.id]) {
+      // Ein Konto, das der Schluessel ueber eine fremde oder vorlaeufige Huelle
+      // erreicht hat, bekommt seine eigene - damit die naechste Anmeldung ohne
+      // Suche gelingt.
+      if (!automaticBackupUserKeyIsFinal(user.id)) {
         await registerAutomaticBackupUserKey(user.id, loginPassword);
       }
       return true;
@@ -21337,8 +21638,11 @@ ${rendered
     }
   }
 
-  function showAutomaticBackupRecoveryKey() {
+  // Mit introduction erklaert der Dialog, was eben eingerichtet wurde - beim
+  // spaeteren Anzeigen ueber die Einstellungen braucht es das nicht.
+  function showAutomaticBackupRecoveryKey({ introduction = false } = {}) {
     if (!automaticBackupPassword) return;
+    elements.automaticBackupRecoveryIntroduction.hidden = !introduction;
     elements.automaticBackupRecoveryKey.value = automaticBackupPassword;
     if (!elements.automaticBackupRecoveryDialog.open) {
       elements.automaticBackupRecoveryDialog.showModal();
@@ -21359,22 +21663,18 @@ ${rendered
   }
 
   function renderAutomaticBackupEncryptionControls() {
-    elements.setAutomaticBackupPasswordButton.hidden =
-      !elements.automaticBackupEncryption.checked;
-    elements.setAutomaticBackupPasswordButton.textContent =
+    elements.setAutomaticBackupPasswordButton.lastChild.textContent =
       automaticBackupSettings?.encrypted
         ? automaticBackupPassword
-          ? "Wiederherstellungsschlüssel anzeigen"
-          : "Wiederherstellungsschlüssel eingeben"
-        : "Login-Verschlüsselung einrichten";
+          ? " Wiederherstellungsschlüssel anzeigen"
+          : " Wiederherstellungsschlüssel eingeben"
+        : " Verschlüsselung einrichten";
   }
 
   function renderAutomaticBackupStatus() {
     if (!automaticBackupSettings) return;
     // Der Sicherungshinweis haengt am Zustand der automatischen Sicherung.
     renderDatabaseSaveWarning();
-    elements.automaticBackupEncryption.checked =
-      automaticBackupSettings.encrypted;
     renderAutomaticBackupEncryptionControls();
     const supported = typeof window.showDirectoryPicker === "function";
     const connected = Boolean(
@@ -21386,7 +21686,6 @@ ${rendered
     elements.runAutomaticBackupButton.disabled =
       !connected || !encryptionReady || automaticBackupRunning;
     elements.removeAutomaticBackupDirectoryButton.hidden = !automaticBackupDirectoryHandle;
-    elements.saveAutomaticBackupSettingsButton.disabled = !supported;
 
     if (!supported) {
       elements.automaticBackupStatus.textContent =
@@ -21824,8 +22123,46 @@ ${rendered
     }
   }
 
+  // Exportiert wird verschluesselt: mit dem Datenschluessel, den die Anmeldung
+  // entsperrt hat - TeO oeffnet solche Dateien in jeder angemeldeten Sitzung
+  // dieses Bestands von selbst, anderswo mit dem Wiederherstellungsschluessel.
+  // Ohne Datenschluessel fragt TeO nach einem Passwort.
   async function exportDatabase() {
-    await createAndDownloadBackup();
+    const options = dataKeyBackupOptions();
+    if (!options) {
+      await exportEncryptedDatabase();
+      return;
+    }
+    try {
+      await createAndDownloadBackup(options);
+    } catch (error) {
+      console.error("Verschlüsselte Sicherung fehlgeschlagen.", error);
+      showToast(
+        "Die verschlüsselte Sicherung wird von diesem Browser nicht unterstützt.",
+        "error",
+      );
+    }
+  }
+
+  function dataKeyBackupOptions() {
+    return automaticBackupSettings?.encrypted && automaticBackupPassword
+      ? { encrypted: true, password: automaticBackupPassword }
+      : null;
+  }
+
+  // Unverschluesselt nur auf ausdrueckliche Bestaetigung - etwa fuer die
+  // Uebergabe an die IT. Die Datei enthaelt den vollstaendigen Bestand lesbar.
+  function exportUnencryptedDatabase() {
+    requestConfirmation({
+      title: "Unverschlüsselt exportieren?",
+      message:
+        "Die Datei enthält den vollständigen Datenbestand lesbar – Beschäftigtendaten, " +
+        "Benutzerkonten und Änderungsprotokoll. Jeder, der sie öffnen kann, kann alles lesen. " +
+        "Nur verwenden, wenn eine verschlüsselte Sicherung nicht in Frage kommt, und die " +
+        "Datei danach löschen.",
+      acceptLabel: "Unverschlüsselt exportieren",
+      callback: () => void createAndDownloadBackup({ prefix: "unverschluesselt" }),
+    });
   }
 
   async function exportEncryptedDatabase() {
@@ -21849,7 +22186,7 @@ ${rendered
     elements.backupPasswordForm.reset();
     elements.backupPasswordDialog.dataset.mode = mode;
     elements.backupPasswordDialogTitle.textContent = automatic
-      ? "Login-Verschlüsselung einrichten"
+      ? "Verschlüsselung einrichten"
       : recovery
         ? "Wiederherstellungsschlüssel eingeben"
       : exporting
@@ -21861,7 +22198,7 @@ ${rendered
         ? "Dieses Konto benötigt einmalig den Wiederherstellungsschlüssel der automatischen Sicherung."
       : exporting
         ? "Schützen Sie den vollständigen Datenbestand mit einem eigenen Passwort."
-        : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort ein.";
+        : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort oder den Wiederherstellungsschlüssel ein.";
     elements.backupPasswordNotice.textContent = automatic
       ? "Das Login-Passwort wird nicht gespeichert. Bei späteren Anmeldungen entsperrt es den Sicherungsschlüssel automatisch."
       : recovery
@@ -22180,6 +22517,7 @@ ${rendered
         const recoveryBackupCreated = await createAndDownloadBackup({
           prefix: "vor-import",
           silent: true,
+          ...dataKeyBackupOptions(),
         });
         if (!recoveryBackupCreated) return;
         await importDatabase(importedState);
@@ -22503,6 +22841,18 @@ ${rendered
         "Diese Sicherungsdatei ist älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand. Bitte wählen Sie die aktuelle Datei aus.",
       );
     }
+    // Eine unverschluesselte Datei in einem Browser, dessen Bestand schon
+    // verschluesselt ist: Gespeichert wird trotzdem nur verschluesselt, also
+    // braucht es den Schluessel dieses Browsers.
+    if (automaticBackupSettings.encrypted && !automaticBackupPassword) {
+      automaticBackupPassword =
+        (await unlockAutomaticBackupKeyWithPassword(password, user.id)) ||
+        (await requestAutomaticBackupRecoveryKey()) ||
+        "";
+      if (!automaticBackupPassword) {
+        return "Ohne den Schlüssel dieses Arbeitsplatzes kann TeO den Datenbestand nicht speichern.";
+      }
+    }
 
     if (
       !(await importDatabase(importedState, {
@@ -22521,11 +22871,14 @@ ${rendered
     await rememberSharedBackupFileStamp(file);
     await rememberBackupVolume(volume.sizeBytes);
     renderBackupVolumeMeter();
-    if (
-      automaticBackupPassword &&
-      !automaticBackupSettings.keyEnvelopes?.[user.id]
-    ) {
+    if (automaticBackupPassword && !automaticBackupUserKeyIsFinal(user.id)) {
       await registerAutomaticBackupUserKey(user.id, password);
+    }
+    if (!(await encryptDataSetOnLogin(user, password))) {
+      currentUser = null;
+      startupBackupSynchronized = false;
+      automaticBackupPassword = "";
+      return "Der Datenbestand konnte nicht verschlüsselt werden. Bitte erneut anmelden.";
     }
     completeLogin(user);
     showToast(
@@ -22652,11 +23005,24 @@ ${rendered
     }
     const previousState = state;
     state = emptyState();
-    if (!(await persistState())) {
+    try {
+      await clearLocalState();
+    } catch (error) {
+      console.error("Der eingerichtete Datenbestand konnte nicht verworfen werden.", error);
       state = previousState;
       status.textContent = "Der eingerichtete Datenbestand konnte nicht verworfen werden.";
       return false;
     }
+    // Mit dem Bestand geht auch sein eben erzeugter Schluessel; es gilt der
+    // der gemeinsamen Datei.
+    automaticBackupRecoveryKeyPending = false;
+    automaticBackupPassword = "";
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      encrypted: false,
+      keyFingerprint: "",
+      keyEnvelopes: {},
+    });
     clearUndoHistory();
     databaseSaveReminderArmed = false;
     try {
@@ -22746,7 +23112,10 @@ ${rendered
   async function startOver() {
     const previousState = state;
     state = emptyState();
-    if (!(await persistState())) {
+    try {
+      await clearLocalState();
+    } catch (error) {
+      console.error("Der Datenbestand dieses Browsers konnte nicht gelöscht werden.", error);
       state = previousState;
       elements.startupBackupStatus.textContent =
         "Der Datenbestand dieses Browsers konnte nicht gelöscht werden.";
@@ -22757,6 +23126,7 @@ ${rendered
     clearAutomaticBackupTimer();
     automaticBackupDirectoryHandle = null;
     automaticBackupPassword = "";
+    automaticBackupRecoveryKeyPending = false;
     automaticBackupSettings = normalizeAutomaticBackupSettings();
     try {
       await Promise.all([
@@ -23173,7 +23543,7 @@ ${rendered
         );
       }
 
-      await dataStore.setItem(STORAGE_KEY, state);
+      await writeLocalState(state);
       backendConfig = window.TeOBackend.writeConfig({
         mode: "mariadb",
         apiUrl,
@@ -23221,7 +23591,7 @@ ${rendered
   async function switchToLocalBackend() {
     setBackendButtonsBusy(true);
     try {
-      await dataStore.setItem(STORAGE_KEY, state);
+      await writeLocalState(state);
       await window.TeOBackend.logout(
         backendConfig.apiUrl,
         window.TeOBackend.readToken(),

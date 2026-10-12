@@ -72,7 +72,9 @@ test("Ohne erreichbare Datei wird sie vor der Anmeldung gewählt", async (t) => 
     null,
     { timeout: 15000 },
   );
-  assert.equal(await offeneDialoge(teo), "");
+  // Die Demodatei ist unverschlüsselt; die Anmeldung des Administrators
+  // verschlüsselt den Bestand und zeigt den Wiederherstellungsschlüssel.
+  assert.equal(await offeneDialoge(teo), "automaticBackupRecoveryDialog");
   assert.equal(
     await teo.evaluate(() => document.body.dataset.userRole),
     "admin",
@@ -125,7 +127,11 @@ test("Fehlt die Datei erst beim Anmelden, geht die Anmeldung nach der Auswahl we
     null,
     { timeout: 15000 },
   );
-  assert.equal(await offeneDialoge(teo), "", "Die gemerkte Anmeldung ging von selbst weiter");
+  assert.equal(
+    await offeneDialoge(teo),
+    "automaticBackupRecoveryDialog",
+    "Die gemerkte Anmeldung ging von selbst weiter",
+  );
   assert.deepEqual(teo.problems, []);
 });
 

@@ -48,7 +48,7 @@
       }
     } else {
       try {
-        await dataStore.setItem(STORAGE_KEY, state);
+        await writeLocalState(state);
         localLastSaveAt = new Date().toISOString();
       } catch (error) {
         console.error("Daten konnten nicht gespeichert werden.", error);

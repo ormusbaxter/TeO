@@ -68,6 +68,13 @@
   let automaticBackupSettings = null;
   let automaticBackupDirectoryHandle = null;
   let automaticBackupPassword = "";
+  // Der Browserspeicher ist verschluesselt und noch nicht (oder nach dem
+  // Abmelden nicht mehr) geoeffnet: Der Datenbestand im Arbeitsspeicher ist
+  // dann leer und nicht der gespeicherte.
+  let localStateLocked = false;
+  // Eben eingerichteter Schluessel; sein Wiederherstellungsschluessel wird
+  // gezeigt, sobald TeO sich nach der Anmeldung oeffnet.
+  let automaticBackupRecoveryKeyPending = false;
   let automaticBackupTimer = null;
   let automaticBackupRunning = false;
   // Zaehlt erfolgreich gespeicherte Aenderungen am Datenbestand. Die
