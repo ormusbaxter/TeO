@@ -77,21 +77,26 @@ test("Nach der Ersteinrichtung legt TeO die gemeinsame Datei an, statt sie zu ve
     "Die vorhandene Datei bleibt unangetastet",
   );
 
-  // Ein leerer Ordner bekommt die erste Sicherung, danach ist TeO offen.
+  // Ein leerer Ordner bekommt die erste Sicherung, danach ist TeO offen und
+  // zeigt den Wiederherstellungsschlüssel des eben erzeugten Datenschlüssels.
   await waehleOrdner(teo, "gemeinsam");
   await teo.page.waitForFunction(
     () => !document.body.classList.contains("is-auth-locked"),
     null,
     { timeout: 15000 },
   );
+  assert.equal(await offeneDialoge(teo), "automaticBackupRecoveryDialog");
+  await teo.page.click("#automaticBackupRecoveryDialog .modal-footer [data-close-dialog]");
   assert.equal(await offeneDialoge(teo), "");
   const sicherung = await teo.evaluate(async () => {
     const wurzel = await navigator.storage.getDirectory();
     const ordner = await wurzel.getDirectoryHandle("gemeinsam");
     const datei = await (await ordner.getFileHandle("teo-autosicherung.json")).getFile();
-    return JSON.parse(await datei.text());
+    return datei.text();
   });
-  assert.equal(sicherung.data.users.map((user) => user.username).join(","), "leitung1");
+  // Die erste Datei ist bereits verschlüsselt; lesbar ist nur die Hülle.
+  assert.match(JSON.parse(sicherung).format, /-verschluesselt$/);
+  assert.doesNotMatch(sicherung, /leitung1/);
 
   // Der nächste Start gleicht sich mit genau dieser Datei ab - ohne Auswahl.
   const neu = await openTeO(t, { neustart: true });
@@ -161,7 +166,9 @@ test("Wer sich vertan hat, öffnet aus der Ordnerwahl den vorhandenen Datenbesta
     null,
     { timeout: 15000 },
   );
-  assert.equal(await offeneDialoge(teo), "");
+  // Die Datei war unverschlüsselt: Der Administrator verschlüsselt den Bestand
+  // mit dieser Anmeldung - mit einem neuen Schlüssel, nicht dem verworfenen.
+  assert.equal(await offeneDialoge(teo), "automaticBackupRecoveryDialog");
   assert.ok(
     (await teo.evaluate(() => Number(document.querySelector("#navEmployeeCount").textContent))) > 0,
     "Die Mitarbeiter der Datei sind geladen",
@@ -172,19 +179,26 @@ test("Wer sich vertan hat, öffnet aus der Ordnerwahl den vorhandenen Datenbesta
       const wurzel = await navigator.storage.getDirectory();
       const ordner = await wurzel.getDirectoryHandle("bestand");
       const datei = await (await ordner.getFileHandle("teo-autosicherung.json")).getFile();
-      return JSON.parse(await datei.text()).data.users.some((user) => user.username === "leitung1");
+      return (await datei.text()).includes("leitung1");
     }),
     false,
   );
 });
 
-test("Wer vor der Ordnerwahl neu lädt, landet wieder bei der Ordnerwahl", async (t) => {
+test("Wer vor der Ordnerwahl neu lädt, landet nach der Anmeldung wieder bei der Ordnerwahl", async (t) => {
   const teo = await openTeO(t);
   if (!teo) return;
   await richteEin(teo);
 
+  // Der Bestand ist verschlüsselt; nach dem Neuladen öffnet ihn erst wieder
+  // das Passwort.
   await teo.page.reload({ waitUntil: "load" });
   await teo.page.waitForSelector("dialog[open]");
+  assert.equal(await offeneDialoge(teo), "loginDialog");
+  await teo.page.fill("#loginUsername", "leitung1");
+  await teo.page.fill("#loginPassword", "Geheim123");
+  await teo.evaluate(() => document.querySelector("#loginForm").requestSubmit());
+  await teo.page.waitForSelector("#firstSharedFolderDialog[open]");
   assert.equal(await offeneDialoge(teo), "firstSharedFolderDialog");
 });
 

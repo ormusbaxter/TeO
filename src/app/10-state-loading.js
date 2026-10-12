@@ -155,6 +155,14 @@
     }
 
     try {
+      // Verschluesselt oeffnet erst die Anmeldung den Bestand. Bis dahin bleibt
+      // der Arbeitsspeicher leer - auch ein alter Klartextstand daneben zaehlt
+      // nicht mehr.
+      if (isEncryptedLocalState(await dataStore.getItem(ENCRYPTED_STORAGE_KEY))) {
+        localStateLocked = true;
+        return emptyState();
+      }
+      localStateLocked = false;
       let parsed = await dataStore.getItem(STORAGE_KEY);
 
       if (!parsed) {

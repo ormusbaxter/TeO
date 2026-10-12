@@ -1,3 +1,10 @@
+### 4.69.0 – Datenbestand immer verschlüsselt
+
+- **Neu:** Im lokalen Betrieb ist der Datenbestand auch im Browserspeicher verschlüsselt, mit demselben Schlüssel wie `teo-autosicherung.json`. Die Anmeldung entsperrt ihn wie bisher mit dem eigenen Passwort; beim Abmelden und Neuladen verlassen Schlüssel und Daten den Arbeitsspeicher. Wer die Anmeldung mit Bordmitteln des Browsers umgeht, findet nichts Lesbares mehr
+- **Geändert:** Verschlüsselt wird immer, der Schalter **JSON-Sicherungen verschlüsseln** entfällt. Bei der Ersteinrichtung entsteht der Schlüssel mit dem ersten Administratorkonto; ein bestehender Datenbestand wird bei der ersten Anmeldung eines Administrators umgestellt, der dabei den Wiederherstellungsschlüssel erhält. Alle übrigen Konten melden sich danach wie gewohnt an
+- **Geändert:** **Sicherung exportieren** verschlüsselt mit dem Schlüssel des Datenbestands, ebenso die Sicherung vor einem Import. Ein eigenes Passwort ist über **Mit eigenem Passwort exportieren** möglich, **Unverschlüsselt exportieren** nur nach ausdrücklicher Warnung
+- **Geändert:** **Passwort vergessen?** zeigt im lokalen Betrieb keinen Hinweis mehr vor der Anmeldung, denn die Hinweise stehen im verschlüsselten Bestand. TeO verweist stattdessen auf einen Administrator
+
 ### 4.68.0 – Kein Teilnahmestatus „Krankheit“
 
 - **Geändert:** Teamsitzungen kennen den Teilnahmestatus **Krankheit** nicht mehr. Wer krank fehlt, ist **entschuldigt** – der Grund einer Erkrankung ist ein Gesundheitsdatum und wird für die Teilnahmestatistik nicht gebraucht. Die Spalte **Krankheit** entfällt in der Jahresauswertung und im CSV-Export

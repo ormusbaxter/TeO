@@ -43,6 +43,7 @@
         const recoveryBackupCreated = await createAndDownloadBackup({
           prefix: "vor-import",
           silent: true,
+          ...dataKeyBackupOptions(),
         });
         if (!recoveryBackupCreated) return;
         await importDatabase(importedState);
@@ -366,6 +367,18 @@
         "Diese Sicherungsdatei ist älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand. Bitte wählen Sie die aktuelle Datei aus.",
       );
     }
+    // Eine unverschluesselte Datei in einem Browser, dessen Bestand schon
+    // verschluesselt ist: Gespeichert wird trotzdem nur verschluesselt, also
+    // braucht es den Schluessel dieses Browsers.
+    if (automaticBackupSettings.encrypted && !automaticBackupPassword) {
+      automaticBackupPassword =
+        (await unlockAutomaticBackupKeyWithPassword(password, user.id)) ||
+        (await requestAutomaticBackupRecoveryKey()) ||
+        "";
+      if (!automaticBackupPassword) {
+        return "Ohne den Schlüssel dieses Arbeitsplatzes kann TeO den Datenbestand nicht speichern.";
+      }
+    }
 
     if (
       !(await importDatabase(importedState, {
@@ -384,11 +397,14 @@
     await rememberSharedBackupFileStamp(file);
     await rememberBackupVolume(volume.sizeBytes);
     renderBackupVolumeMeter();
-    if (
-      automaticBackupPassword &&
-      !automaticBackupSettings.keyEnvelopes?.[user.id]
-    ) {
+    if (automaticBackupPassword && !automaticBackupUserKeyIsFinal(user.id)) {
       await registerAutomaticBackupUserKey(user.id, password);
+    }
+    if (!(await encryptDataSetOnLogin(user, password))) {
+      currentUser = null;
+      startupBackupSynchronized = false;
+      automaticBackupPassword = "";
+      return "Der Datenbestand konnte nicht verschlüsselt werden. Bitte erneut anmelden.";
     }
     completeLogin(user);
     showToast(
@@ -515,11 +531,24 @@
     }
     const previousState = state;
     state = emptyState();
-    if (!(await persistState())) {
+    try {
+      await clearLocalState();
+    } catch (error) {
+      console.error("Der eingerichtete Datenbestand konnte nicht verworfen werden.", error);
       state = previousState;
       status.textContent = "Der eingerichtete Datenbestand konnte nicht verworfen werden.";
       return false;
     }
+    // Mit dem Bestand geht auch sein eben erzeugter Schluessel; es gilt der
+    // der gemeinsamen Datei.
+    automaticBackupRecoveryKeyPending = false;
+    automaticBackupPassword = "";
+    automaticBackupSettings = normalizeAutomaticBackupSettings({
+      ...automaticBackupSettings,
+      encrypted: false,
+      keyFingerprint: "",
+      keyEnvelopes: {},
+    });
     clearUndoHistory();
     databaseSaveReminderArmed = false;
     try {
@@ -609,7 +638,10 @@
   async function startOver() {
     const previousState = state;
     state = emptyState();
-    if (!(await persistState())) {
+    try {
+      await clearLocalState();
+    } catch (error) {
+      console.error("Der Datenbestand dieses Browsers konnte nicht gelöscht werden.", error);
       state = previousState;
       elements.startupBackupStatus.textContent =
         "Der Datenbestand dieses Browsers konnte nicht gelöscht werden.";
@@ -620,6 +652,7 @@
     clearAutomaticBackupTimer();
     automaticBackupDirectoryHandle = null;
     automaticBackupPassword = "";
+    automaticBackupRecoveryKeyPending = false;
     automaticBackupSettings = normalizeAutomaticBackupSettings();
     try {
       await Promise.all([

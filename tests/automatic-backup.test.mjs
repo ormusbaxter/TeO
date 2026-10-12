@@ -20,7 +20,8 @@ test("Die Einstellungen enthalten die vollständige Bedienoberfläche für Autos
   assert.match(html, /id="automaticBackupStatus"/);
   assert.match(html, /id="selectAutomaticBackupDirectoryButton"/);
   assert.doesNotMatch(html, /id="automaticBackupRetention"/);
-  assert.match(html, /id="automaticBackupEncryption"/);
+  // Verschluesselt wird immer; einen Schalter dafuer gibt es nicht mehr.
+  assert.doesNotMatch(html, /id="automaticBackupEncryption"/);
   assert.match(html, /id="setAutomaticBackupPasswordButton"/);
   assert.match(html, /id="automaticBackupRecoveryDialog"/);
   assert.match(html, /id="automaticBackupRecoveryKey"/);

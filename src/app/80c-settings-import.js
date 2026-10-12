@@ -354,7 +354,7 @@
         );
       }
 
-      await dataStore.setItem(STORAGE_KEY, state);
+      await writeLocalState(state);
       backendConfig = window.TeOBackend.writeConfig({
         mode: "mariadb",
         apiUrl,
@@ -402,7 +402,7 @@
   async function switchToLocalBackend() {
     setBackendButtonsBusy(true);
     try {
-      await dataStore.setItem(STORAGE_KEY, state);
+      await writeLocalState(state);
       await window.TeOBackend.logout(
         backendConfig.apiUrl,
         window.TeOBackend.readToken(),

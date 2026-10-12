@@ -325,6 +325,7 @@
       handleDatabaseSaveWarningAction,
     );
     elements.exportEncryptedDataButton.addEventListener("click", exportEncryptedDatabase);
+    elements.exportUnencryptedDataButton.addEventListener("click", exportUnencryptedDatabase);
     elements.selectAutomaticBackupDirectoryButton.addEventListener(
       "click",
       selectAutomaticBackupDirectory,
@@ -337,17 +338,9 @@
       "click",
       removeAutomaticBackupDirectory,
     );
-    elements.automaticBackupEncryption.addEventListener(
-      "change",
-      renderAutomaticBackupEncryptionControls,
-    );
     elements.setAutomaticBackupPasswordButton.addEventListener(
       "click",
-      configureAutomaticBackupEncryption,
-    );
-    elements.saveAutomaticBackupSettingsButton.addEventListener(
-      "click",
-      saveAutomaticBackupSettings,
+      () => void configureAutomaticBackupEncryption(),
     );
     elements.settingsMaxBackupFileSizeMb.addEventListener(
       "input",

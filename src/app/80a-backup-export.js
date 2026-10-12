@@ -113,8 +113,46 @@
     }
   }
 
+  // Exportiert wird verschluesselt: mit dem Datenschluessel, den die Anmeldung
+  // entsperrt hat - TeO oeffnet solche Dateien in jeder angemeldeten Sitzung
+  // dieses Bestands von selbst, anderswo mit dem Wiederherstellungsschluessel.
+  // Ohne Datenschluessel fragt TeO nach einem Passwort.
   async function exportDatabase() {
-    await createAndDownloadBackup();
+    const options = dataKeyBackupOptions();
+    if (!options) {
+      await exportEncryptedDatabase();
+      return;
+    }
+    try {
+      await createAndDownloadBackup(options);
+    } catch (error) {
+      console.error("Verschlüsselte Sicherung fehlgeschlagen.", error);
+      showToast(
+        "Die verschlüsselte Sicherung wird von diesem Browser nicht unterstützt.",
+        "error",
+      );
+    }
+  }
+
+  function dataKeyBackupOptions() {
+    return automaticBackupSettings?.encrypted && automaticBackupPassword
+      ? { encrypted: true, password: automaticBackupPassword }
+      : null;
+  }
+
+  // Unverschluesselt nur auf ausdrueckliche Bestaetigung - etwa fuer die
+  // Uebergabe an die IT. Die Datei enthaelt den vollstaendigen Bestand lesbar.
+  function exportUnencryptedDatabase() {
+    requestConfirmation({
+      title: "Unverschlüsselt exportieren?",
+      message:
+        "Die Datei enthält den vollständigen Datenbestand lesbar – Beschäftigtendaten, " +
+        "Benutzerkonten und Änderungsprotokoll. Jeder, der sie öffnen kann, kann alles lesen. " +
+        "Nur verwenden, wenn eine verschlüsselte Sicherung nicht in Frage kommt, und die " +
+        "Datei danach löschen.",
+      acceptLabel: "Unverschlüsselt exportieren",
+      callback: () => void createAndDownloadBackup({ prefix: "unverschluesselt" }),
+    });
   }
 
   async function exportEncryptedDatabase() {
@@ -138,7 +176,7 @@
     elements.backupPasswordForm.reset();
     elements.backupPasswordDialog.dataset.mode = mode;
     elements.backupPasswordDialogTitle.textContent = automatic
-      ? "Login-Verschlüsselung einrichten"
+      ? "Verschlüsselung einrichten"
       : recovery
         ? "Wiederherstellungsschlüssel eingeben"
       : exporting
@@ -150,7 +188,7 @@
         ? "Dieses Konto benötigt einmalig den Wiederherstellungsschlüssel der automatischen Sicherung."
       : exporting
         ? "Schützen Sie den vollständigen Datenbestand mit einem eigenen Passwort."
-        : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort ein.";
+        : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort oder den Wiederherstellungsschlüssel ein.";
     elements.backupPasswordNotice.textContent = automatic
       ? "Das Login-Passwort wird nicht gespeichert. Bei späteren Anmeldungen entsperrt es den Sicherungsschlüssel automatisch."
       : recovery

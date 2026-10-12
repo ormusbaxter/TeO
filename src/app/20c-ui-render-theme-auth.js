@@ -196,7 +196,7 @@
   }
 
   function restoreAuthenticationSession() {
-    if (!isMariaDbMode() && state.users.length === 0) {
+    if (!isMariaDbMode() && state.users.length === 0 && !localStateLocked) {
       showDataOriginDialog();
       return;
     }
@@ -307,6 +307,18 @@
     state.users = [admin];
     currentUser = admin;
     appendAuditEntry("Ersteinrichtung abgeschlossen und Administratorkonto angelegt");
+    // Der Datenbestand ist von Anfang an verschluesselt - im Browser wie in
+    // der gemeinsamen Datei, die gleich danach entsteht.
+    try {
+      await establishDataKey(admin, password);
+    } catch (error) {
+      console.error("Der Datenschlüssel konnte nicht erzeugt werden.", error);
+      state.users = [];
+      currentUser = null;
+      elements.setupError.textContent =
+        "Die Verschlüsselung ist in diesem Browser nicht verfügbar.";
+      return;
+    }
     if (!(await persistState())) {
       state.users = [];
       currentUser = null;
@@ -368,10 +380,6 @@
       return;
     }
 
-    const user = state.users.find(
-      (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
-    );
-
     // Angemeldet wird gegen die Konten der gemeinsamen Datei, nicht gegen die
     // dieses Browsers: Ein anderswo geaendertes Passwort oder geloeschtes Konto
     // gilt damit sofort. Ausnahme ist nur ein eben eingerichteter Bestand, der
@@ -385,6 +393,18 @@
       return;
     }
 
+    // Ohne gemeinsame Datei stehen die Konten im Bestand dieses Browsers -
+    // verschluesselt oeffnet ihn erst das Passwort.
+    const lockedMessage = await openLocalStateForLogin(password);
+    if (lockedMessage) {
+      elements.loginError.textContent = lockedMessage;
+      document.querySelector("#loginPassword").value = "";
+      return;
+    }
+    const user = state.users.find(
+      (item) => item.username.toLocaleLowerCase("de-DE") === username.toLocaleLowerCase("de-DE"),
+    );
+
     let passwordMatches;
     try {
       passwordMatches = user ? await verifyPassword(password, user) : false;
@@ -396,6 +416,10 @@
     }
 
     if (!user || !passwordMatches) {
+      // Das Passwort eines anderen Kontos oeffnet den Bestand, meldet aber
+      // nicht an - er wird wieder gesperrt.
+      lockLocalState();
+      automaticBackupPassword = "";
       elements.loginError.textContent = "Benutzername oder Passwort ist nicht korrekt.";
       document.querySelector("#loginPassword").value = "";
       return;
@@ -411,6 +435,11 @@
       console.warn("Der automatische Sicherungsschlüssel konnte nicht entsperrt werden.", error);
       automaticBackupNotice =
         "Sicherungsschlüssel nicht entsperrt – erneut anmelden oder Wiederherstellungsschlüssel verwenden.";
+    }
+    if (!(await encryptDataSetOnLogin(user, password))) {
+      elements.loginError.textContent =
+        "Der Datenbestand konnte nicht verschlüsselt werden. Bitte erneut anmelden.";
+      return;
     }
     completeLogin(user);
   }
@@ -457,6 +486,14 @@
     document.body.classList.remove("is-auth-locked");
     if (elements.changePasswordDialog.open) elements.changePasswordDialog.close();
     scheduleAutomaticBackup();
+    // Ein eben eingerichteter Schluessel zeigt seinen Wiederherstellungs-
+    // schluessel, sobald TeO offen ist - vorher stuenden Passwort- und
+    // Hinweisdialoge im Weg.
+    if (automaticBackupRecoveryKeyPending) {
+      automaticBackupRecoveryKeyPending = false;
+      showAutomaticBackupRecoveryKey({ introduction: true });
+      return;
+    }
     // Erst jetzt: Vor der Anmeldung steht die Anwendung noch hinter der
     // Sperre, und ein Hinweis darueber waere im Weg.
     showWhatsNewIfUpdated();
@@ -467,6 +504,7 @@
     // Ohne angemeldetes Konto gilt wieder die gemeinsame Vorgabe.
     applyTheme(activeThemeKey());
     clearAutomaticBackupTimer();
+    lockLocalState();
     automaticBackupPassword = "";
     startupBackupSynchronized = false;
     startupBackupImportRunning = false;
