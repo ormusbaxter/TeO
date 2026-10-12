@@ -49,6 +49,9 @@
   let attendanceEmployeeIds = [];
   let confirmCallback = null;
   let backupPasswordResolver = null;
+  // Ob der Dialog fuer den Passworthinweis die Anmeldung abschliesst oder
+  // nur aus dem Kontodialog geoeffnet wurde.
+  let passwordHintRequired = false;
   let currentUser = null;
   let selectedEmployeeIds = new Set();
   let employeeProfessionFilter = "all";

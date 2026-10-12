@@ -140,6 +140,7 @@
       role,
       ...credentials,
       mustChangePassword: true,
+      passwordHint: "",
     };
 
     const committed = await commitStateMutation(() => {
@@ -288,7 +289,9 @@
     const committed = await commitStateMutation(() => {
       state.users = state.users.map((item) =>
         item.id === user.id
-          ? { ...item, ...credentials, mustChangePassword: true }
+          ? // Der alte Hinweis gehoert zum alten Passwort. Mit dem neuen
+            // Passwort wird auch ein neuer Hinweis festgelegt.
+            { ...item, ...credentials, mustChangePassword: true, passwordHint: "" }
           : item,
       );
     });
@@ -323,4 +326,134 @@
       .sort((a, b) => a.order - b.order)
       .map((item) => item.character)
       .join("");
+  }
+
+  // Der Passworthinweis ist eine Gedaechtnisstuetze, die vor der Anmeldung
+  // angezeigt werden kann - also fuer jeden lesbar, der den Benutzernamen
+  // kennt. Das Passwort selbst darf darin deshalb nicht vorkommen.
+  function validatePasswordHint(hint, password = "") {
+    const text = String(hint || "").trim();
+    if (!text) return "Bitte einen Passworthinweis angeben.";
+    if (text.length > PASSWORD_HINT_MAX_LENGTH) {
+      return `Der Passworthinweis darf höchstens ${PASSWORD_HINT_MAX_LENGTH} Zeichen lang sein.`;
+    }
+    if (
+      password &&
+      text.toLocaleLowerCase("de-DE").includes(password.toLocaleLowerCase("de-DE"))
+    ) {
+      return "Der Passworthinweis darf das Passwort nicht enthalten.";
+    }
+    return "";
+  }
+
+  // required: nach der Anmeldung eines Kontos ohne Hinweis - TeO bleibt bis
+  // dahin gesperrt, der Ausweg ist das Abmelden. Sonst aus dem Kontodialog,
+  // dann laesst er sich abbrechen.
+  function showPasswordHintDialog({ required = false } = {}) {
+    if (!currentUser) {
+      showLoginDialog();
+      return;
+    }
+    passwordHintRequired = required;
+    if (required) document.body.classList.add("is-auth-locked");
+    if (elements.accountDialog.open) elements.accountDialog.close();
+    elements.passwordHintForm.reset();
+    elements.passwordHintValue.value = currentUser.passwordHint || "";
+    elements.passwordHintError.textContent = "";
+    elements.passwordHintLogoutButton.hidden = !required;
+    elements.passwordHintCancelButton.hidden = required;
+    if (!elements.passwordHintDialog.open) elements.passwordHintDialog.showModal();
+    window.setTimeout(() => elements.passwordHintValue.focus(), 0);
+  }
+
+  async function handlePasswordHintSubmit(event) {
+    event.preventDefault();
+    if (!currentUser) {
+      showLoginDialog();
+      return;
+    }
+    const passwordHint = elements.passwordHintValue.value.trim();
+    let validationError = validatePasswordHint(passwordHint);
+    // Das Passwort selbst kennt TeO hier nicht mehr, nur seinen Hash. Damit
+    // laesst sich wenigstens ausschliessen, dass der Hinweis das Passwort ist.
+    if (
+      !validationError &&
+      currentUser.passwordHash &&
+      (await verifyPassword(passwordHint, currentUser))
+    ) {
+      validationError = "Der Passworthinweis darf das Passwort nicht enthalten.";
+    }
+    if (validationError) {
+      elements.passwordHintError.textContent = validationError;
+      return;
+    }
+
+    const userId = currentUser.id;
+    const committed = await commitStateMutation(
+      () => {
+        state.users = state.users.map((user) =>
+          user.id === userId ? { ...user, passwordHint } : user,
+        );
+      },
+      { auditAction: "Passworthinweis festgelegt" },
+    );
+    if (!committed) return;
+
+    currentUser = state.users.find((user) => user.id === userId) || currentUser;
+    elements.passwordHintDialog.close();
+    if (passwordHintRequired) {
+      passwordHintRequired = false;
+      continueLoginAfterAccountChecks();
+    }
+    showToast("Der Passworthinweis wurde gespeichert.");
+  }
+
+  // "Passwort vergessen?" an der Anmeldung. Auf einen unbekannten
+  // Benutzernamen antwortet TeO genauso wie auf ein Konto ohne Hinweis, damit
+  // sich nicht ausprobieren laesst, welche Konten es gibt.
+  async function showLoginPasswordHint() {
+    const username = document.querySelector("#loginUsername").value.trim();
+    if (!username) {
+      elements.loginError.textContent =
+        "Bitte zuerst den Benutzernamen eingeben, dann wird der Passworthinweis angezeigt.";
+      document.querySelector("#loginUsername").focus();
+      return;
+    }
+    elements.loginError.textContent = "";
+    let hint;
+    try {
+      hint = await lookupPasswordHint(username);
+    } catch (error) {
+      console.warn("Der Passworthinweis konnte nicht abgerufen werden.", error);
+      elements.loginError.textContent =
+        error.message || "Der Passworthinweis konnte nicht abgerufen werden.";
+      return;
+    }
+    elements.loginPasswordHint.textContent = hint
+      ? `Passworthinweis: ${hint}`
+      : "Für diesen Benutzernamen ist hier kein Passworthinweis bekannt. Ein Administrator kann das Passwort zurücksetzen.";
+    elements.loginPasswordHint.hidden = false;
+  }
+
+  // Im lokalen Betrieb stehen die Konten der gemeinsamen Datei erst nach dem
+  // Entschluesseln bereit. Der Hinweis kommt deshalb aus dem zuletzt in diesem
+  // Browser geladenen Bestand; im Serverbetrieb fragt TeO den Server.
+  async function lookupPasswordHint(username) {
+    if (isMariaDbMode()) {
+      const result = await window.TeOBackend.passwordHint(
+        backendConfig.apiUrl,
+        username,
+      );
+      return String(result?.hint || "");
+    }
+    const normalized = username.toLocaleLowerCase("de-DE");
+    const user = state.users.find(
+      (item) => item.username.toLocaleLowerCase("de-DE") === normalized,
+    );
+    return user?.passwordHint || "";
+  }
+
+  function hideLoginPasswordHint() {
+    elements.loginPasswordHint.hidden = true;
+    elements.loginPasswordHint.textContent = "";
   }

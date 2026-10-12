@@ -157,6 +157,20 @@
     elements.setupForm.addEventListener("submit", handleSetupSubmit);
     elements.loginForm.addEventListener("submit", handleLoginSubmit);
     elements.changePasswordForm.addEventListener("submit", handlePasswordChangeSubmit);
+    elements.passwordHintForm.addEventListener("submit", handlePasswordHintSubmit);
+    elements.passwordHintCancelButton.addEventListener("click", () =>
+      elements.passwordHintDialog.close(),
+    );
+    document.querySelectorAll("[data-open-password-hint]").forEach((button) => {
+      button.addEventListener("click", () => showPasswordHintDialog());
+    });
+    elements.showPasswordHintButton.addEventListener(
+      "click",
+      () => void showLoginPasswordHint(),
+    );
+    document
+      .querySelector("#loginUsername")
+      .addEventListener("input", hideLoginPasswordHint);
     document.querySelectorAll("[data-logout]").forEach((button) => {
       button.addEventListener("click", logout);
     });

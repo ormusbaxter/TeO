@@ -150,9 +150,17 @@
       passwordSalt,
       passwordHash,
       mustChangePassword: Boolean(user.mustChangePassword),
+      passwordHint: normalizePasswordHint(user.passwordHint),
       theme: normalizeUserTheme(user.theme),
       iconSet: normalizeUserIconSet(user.iconSet),
     };
+  }
+
+  // Der Passworthinweis ist Pflicht, fehlt aber bei Konten aus aelteren
+  // Fassungen. Leer heisst hier "noch nicht festgelegt" - nach der naechsten
+  // Anmeldung fragt TeO ihn ab.
+  function normalizePasswordHint(hint) {
+    return String(hint || "").trim().slice(0, PASSWORD_HINT_MAX_LENGTH);
   }
 
   function normalizeTheme(theme) {

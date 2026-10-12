@@ -45314,7 +45314,8 @@
         "role": "admin",
         "passwordSalt": "IsuQeqq+lG55f5qseebb0w==",
         "passwordHash": "+T4fSji3T70wJDJi7CfoM+8kRrah2J2TelxOq3XT0z0=",
-        "mustChangePassword": false
+        "mustChangePassword": false,
+        "passwordHint": "Siehe demo/README.md"
       },
       {
         "id": "user-test-1",
@@ -45322,7 +45323,8 @@
         "role": "user",
         "passwordSalt": "M9joS35LnetkzDqbmevCug==",
         "passwordHash": "SfywWsFa6OsRZTdKSlO7IcS3R/kC+kMWII86a/FB7AQ=",
-        "mustChangePassword": false
+        "mustChangePassword": false,
+        "passwordHint": "Siehe demo/README.md"
       }
     ],
     "auditLog": [],

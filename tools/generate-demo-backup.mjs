@@ -694,6 +694,7 @@ function initialUsers() {
       passwordSalt: "IsuQeqq+lG55f5qseebb0w==",
       passwordHash: "+T4fSji3T70wJDJi7CfoM+8kRrah2J2TelxOq3XT0z0=",
       mustChangePassword: false,
+      passwordHint: "Siehe demo/README.md",
     },
     {
       id: "user-botze",
@@ -702,6 +703,7 @@ function initialUsers() {
       passwordSalt: "M9joS35LnetkzDqbmevCug==",
       passwordHash: "SfywWsFa6OsRZTdKSlO7IcS3R/kC+kMWII86a/FB7AQ=",
       mustChangePassword: true,
+      passwordHint: "Siehe demo/README.md",
     },
     {
       id: "user-ferre",
@@ -710,6 +712,7 @@ function initialUsers() {
       passwordSalt: "TGOkhLO5sEg+BWMPvqoFgg==",
       passwordHash: "+MSWxorSpl/CaYCPZTCxn6GA4AybIAFCgIrtdppyjYM=",
       mustChangePassword: true,
+      passwordHint: "Siehe demo/README.md",
     },
   ];
 }

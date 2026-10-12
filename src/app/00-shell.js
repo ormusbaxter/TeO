@@ -307,6 +307,7 @@
   };
 
   const PASSWORD_ITERATIONS = 210000;
+  const PASSWORD_HINT_MAX_LENGTH = 120;
   const USER_FIRST_NAME_FALLBACKS = {
     becke003: "Oliver",
     botze003: "Elisabeth",

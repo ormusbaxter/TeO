@@ -887,6 +887,17 @@ body.is-sidebar-collapsed .sidebar-search {
   margin-top: 14px;
 }
 
+.auth-password-hint {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--blue-50);
+  color: var(--slate-700);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .auth-software-meta {
   display: grid;
   gap: 3px;
