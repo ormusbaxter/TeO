@@ -10,6 +10,10 @@
     databaseSaveWarningText: document.querySelector(
       "#databaseSaveWarningText",
     ),
+    databaseSaveWarningTitle: document.querySelector("#databaseSaveWarningTitle"),
+    databaseSaveWarningActionLabel: document.querySelector(
+      "#databaseSaveWarningActionLabel",
+    ),
     databaseSaveWarningExportButton: document.querySelector(
       "#databaseSaveWarningExportButton",
     ),

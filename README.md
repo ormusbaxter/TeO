@@ -1506,7 +1506,10 @@ Unter **Einstellungen → Gesamten Datenbestand sichern** kann ein lokaler
 Sicherungsordner ausgewählt werden. TeO schreibt sofort eine vollständige
 JSON-Sicherung und danach zwei Sekunden nach der jeweils letzten Änderung
 erneut. Jede Sicherung überschreibt dieselbe Datei
-`teo-autosicherung.json`. Der Dateiname bleibt auch bei aktivierter
+`teo-autosicherung.json`. Solange sie läuft, entfällt der Hinweis
+**Datensicherung erforderlich**. Stockt sie, etwa weil der Ordnerzugriff neu
+bestätigt werden muss, erscheint stattdessen **Automatische Sicherung
+gestoppt** mit dem Grund und der Schaltfläche **Jetzt sichern**. Der Dateiname bleibt auch bei aktivierter
 Verschlüsselung unverändert; TeO erkennt das Format am Dateiinhalt.
 
 Administratoren können unter **Einstellungen → Sicherungserinnerung** die
