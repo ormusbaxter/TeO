@@ -544,6 +544,7 @@
         });
       }
       trainingObligations().forEach((training) => {
+        if (isTrainingCoveredByQualification(employee.id, training)) return;
         const latest = latestCompletion(employee.id, training.id);
         let dueDate = "";
         if (latest && training.recurrenceMonths) {

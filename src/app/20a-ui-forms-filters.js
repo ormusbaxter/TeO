@@ -115,7 +115,17 @@
     trainingRecurrence.addEventListener("change", () => {
       trainingRecurrenceManuallyChanged = true;
     });
+    const trainingCoverage = document.querySelector("#trainingCoveredByQualification");
+    trainingCoverage.addEventListener("change", () => {
+      trainingCoverageManuallyChanged = true;
+    });
     trainingTitle.addEventListener("input", () => {
+      if (!trainingCoverageManuallyChanged) {
+        trainingCoverage.value = suggestedTrainingCoverageQualificationId(
+          trainingTitle.value,
+          state.catalogs.qualifications,
+        );
+      }
       if (trainingRecurrenceManuallyChanged) return;
       trainingRecurrence.value = String(
         defaultTrainingRecurrenceMonths(trainingTitle.value),

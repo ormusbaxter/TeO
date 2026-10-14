@@ -2593,6 +2593,10 @@
 <h3 id="hilfe-wiederholungsintervalle">Wiederholungsintervalle</h3>
 <p>Standardmäßig gilt eine jährliche Wiederholung. Für Gewaltprävention sind standardmäßig fünf Jahre vorgesehen. Andere Intervalle können ebenfalls festgelegt werden.</p>
 <p>Wiederkehrende Einträge desselben Themas werden zu einer Fortbildungsreihe verbunden. Der neueste gültige Nachweis bestimmt die nächste Fälligkeit der gesamten Reihe.</p>
+<h3 id="hilfe-durch-eine-qualifikation-abgedeckt">Durch eine Qualifikation abgedeckt</h3>
+<p>Manche Pflichtfortbildungen sind mit einer Zusatzqualifikation erledigt: Wer ACLS-Provider ist, muss das ACLS-Training nicht zusätzlich besuchen. Dafür wird im Fortbildungsdialog unter <strong>Abgedeckt durch Qualifikation</strong> die passende Zusatzqualifikation gewählt.</p>
+<p>Ein Mitarbeiter mit dieser Qualifikation gilt in jedem Kalenderjahr, in dem sie an mindestens einem Tag gültig ist, als absolviert – ohne Ablaufdatum immer, sonst bis einschließlich des Jahres, in dem sie abläuft. Fortbildungsliste, Mitarbeiter-Akte, Abschlussdialog und Jahresauswertung zeigen dann „durch … abgedeckt“, die Übersicht erinnert für dieses Jahr nicht an die Fortbildung. Ein erfasster Nachweis zählt weiterhin wie gewohnt.</p>
+<p>Heißt eine Fortbildung „ACLS…“ und führt der Katalog eine Qualifikation mit ACLS im Namen, schlägt TeO die Verbindung beim Anlegen vor und richtet sie für einen bestehenden Datenbestand beim ersten Laden selbst ein.</p>
 <h3 id="hilfe-abschluss-dokumentieren">Abschluss dokumentieren</h3>
 <ol><li><strong>Pflichtfortbildungen</strong> öffnen.</li><li><strong>Abschluss eintragen</strong> wählen.</li><li>Fortbildung auswählen.</li><li>Abschlussdatum erfassen.</li><li>Einen oder mehrere aktive Mitarbeiter auswählen.</li><li>Speichern.</li></ol>
 <p>Historische Nachweise können anschließend korrigiert oder gelöscht werden.</p>
@@ -2780,6 +2784,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-70-0-acls-provider-deckt-das-acls-training-ab">4.70.0 – ACLS-Provider deckt das ACLS-Training ab</h3>
+<ul><li><strong>Neu:</strong> Eine Pflichtfortbildung kann durch eine Zusatzqualifikation abgedeckt sein (<strong>Abgedeckt durch Qualifikation</strong> im Fortbildungsdialog). Solange etwa <strong>ACLS-Provider</strong> gültig ist, gilt das <strong>ACLS-Training</strong> für das jeweilige Kalenderjahr als absolviert – in jedem Jahr, in dem die Qualifikation an mindestens einem Tag gültig ist. Fortbildungsliste, Mitarbeiter-Akte, Abschlussdialog, Jahresauswertung und CSV-Export zeigen „durch ACLS-Provider abgedeckt“, die Übersicht erinnert dafür nicht mehr</li><li><strong>Neu:</strong> Heißt eine Fortbildung „ACLS…“ und führt der Katalog eine ACLS-Qualifikation, verbindet TeO beides beim Anlegen und beim ersten Laden eines bestehenden Datenbestands von selbst</li><li><strong>Geändert:</strong> Datenformat 28. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit die Verbindung nicht verloren geht</li></ul>
 <h3 id="hilfe-4-69-0-datenbestand-immer-verschlusselt">4.69.0 – Datenbestand immer verschlüsselt</h3>
 <ul><li><strong>Neu:</strong> Im lokalen Betrieb ist der Datenbestand auch im Browserspeicher verschlüsselt, mit demselben Schlüssel wie <code>teo-autosicherung.json</code>. Die Anmeldung entsperrt ihn wie bisher mit dem eigenen Passwort; beim Abmelden und Neuladen verlassen Schlüssel und Daten den Arbeitsspeicher. Wer die Anmeldung mit Bordmitteln des Browsers umgeht, findet nichts Lesbares mehr</li><li><strong>Geändert:</strong> Verschlüsselt wird immer, der Schalter <strong>JSON-Sicherungen verschlüsseln</strong> entfällt. Bei der Ersteinrichtung entsteht der Schlüssel mit dem ersten Administratorkonto; ein bestehender Datenbestand wird bei der ersten Anmeldung eines Administrators umgestellt, der dabei den Wiederherstellungsschlüssel erhält. Alle übrigen Konten melden sich danach wie gewohnt an</li><li><strong>Geändert:</strong> <strong>Sicherung exportieren</strong> verschlüsselt mit dem Schlüssel des Datenbestands, ebenso die Sicherung vor einem Import. Ein eigenes Passwort ist über <strong>Mit eigenem Passwort exportieren</strong> möglich, <strong>Unverschlüsselt exportieren</strong> nur nach ausdrücklicher Warnung</li><li><strong>Geändert:</strong> <strong>Passwort vergessen?</strong> zeigt im lokalen Betrieb keinen Hinweis mehr vor der Anmeldung, denn die Hinweise stehen im verschlüsselten Bestand. TeO verweist stattdessen auf einen Administrator</li></ul>
 <h3 id="hilfe-4-68-0-kein-teilnahmestatus-krankheit">4.68.0 – Kein Teilnahmestatus „Krankheit“</h3>
@@ -4332,6 +4338,16 @@
               </select>
               <small class="field-hint">
                 Standard: jährlich; Gewaltprävention wird mit fünf Jahren vorbelegt.
+              </small>
+            </label>
+            <label class="form-field form-field-wide">
+              <span>Abgedeckt durch Qualifikation</span>
+              <select id="trainingCoveredByQualification" name="coveredByQualificationId">
+                <option value="">Keine – nur Nachweise zählen</option>
+              </select>
+              <small class="field-hint">
+                Wer diese Zusatzqualifikation hat, gilt in jedem Jahr, in dem sie gültig ist,
+                als absolviert – etwa ACLS-Provider für das ACLS-Training.
               </small>
             </label>
             <label class="form-field form-field-wide">

@@ -1,3 +1,9 @@
+### 4.70.0 – ACLS-Provider deckt das ACLS-Training ab
+
+- **Neu:** Eine Pflichtfortbildung kann durch eine Zusatzqualifikation abgedeckt sein (**Abgedeckt durch Qualifikation** im Fortbildungsdialog). Solange etwa **ACLS-Provider** gültig ist, gilt das **ACLS-Training** für das jeweilige Kalenderjahr als absolviert – in jedem Jahr, in dem die Qualifikation an mindestens einem Tag gültig ist. Fortbildungsliste, Mitarbeiter-Akte, Abschlussdialog, Jahresauswertung und CSV-Export zeigen „durch ACLS-Provider abgedeckt“, die Übersicht erinnert dafür nicht mehr
+- **Neu:** Heißt eine Fortbildung „ACLS…“ und führt der Katalog eine ACLS-Qualifikation, verbindet TeO beides beim Anlegen und beim ersten Laden eines bestehenden Datenbestands von selbst
+- **Geändert:** Datenformat 28. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit die Verbindung nicht verloren geht
+
 ### 4.69.0 – Datenbestand immer verschlüsselt
 
 - **Neu:** Im lokalen Betrieb ist der Datenbestand auch im Browserspeicher verschlüsselt, mit demselben Schlüssel wie `teo-autosicherung.json`. Die Anmeldung entsperrt ihn wie bisher mit dem eigenen Passwort; beim Abmelden und Neuladen verlassen Schlüssel und Daten den Arbeitsspeicher. Wer die Anmeldung mit Bordmitteln des Browsers umgeht, findet nichts Lesbares mehr

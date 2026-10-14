@@ -26,6 +26,7 @@
   }
 
   function isEmployeeCurrentForTraining(employeeId, training) {
+    if (isTrainingCoveredByQualification(employeeId, training)) return true;
     const latest = latestCompletion(employeeId, training.id);
     if (!latest) return false;
     if (!training.recurrenceMonths) return true;
@@ -34,7 +35,13 @@
 
   function getEmployeeCompletionStatus(employeeId, training) {
     const latest = latestCompletion(employeeId, training.id);
-    if (!latest) return { kind: "open", label: "Offen" };
+    const coverage = isTrainingCoveredByQualification(employeeId, training)
+      ? {
+          kind: "current",
+          label: `durch ${trainingCoverageQualificationLabel(training)} abgedeckt`,
+        }
+      : null;
+    if (!latest) return coverage || { kind: "open", label: "Offen" };
 
     if (!training.recurrenceMonths) {
       return {
@@ -51,10 +58,48 @@
       };
     }
 
-    return {
-      kind: "expired",
-      label: `abgelaufen am ${formatDate(validUntil)}`,
-    };
+    return (
+      coverage || {
+        kind: "expired",
+        label: `abgelaufen am ${formatDate(validUntil)}`,
+      }
+    );
+  }
+
+  // Deckt eine Qualifikation die Fortbildung ab (ACLS-Provider fuer das
+  // ACLS-Training), gilt sie fuer jedes Kalenderjahr als absolviert, in dem
+  // die Qualifikation an mindestens einem Tag gueltig ist: ohne Ablaufdatum
+  // immer, sonst bis einschliesslich des Jahres, in dem sie ablaeuft. Die
+  // Verbindung darf an jeder Fortbildung derselben Reihe stehen.
+  function trainingCoverageQualificationId(training) {
+    if (!training) return "";
+    if (training.coveredByQualificationId) return training.coveredByQualificationId;
+    if (!training.recurrenceMonths || !training.seriesId) return "";
+    return (
+      state.trainings.find(
+        (item) =>
+          item.recurrenceMonths &&
+          item.seriesId === training.seriesId &&
+          item.coveredByQualificationId,
+      )?.coveredByQualificationId || ""
+    );
+  }
+
+  function trainingCoverageQualificationLabel(training) {
+    return qualificationLabel(trainingCoverageQualificationId(training));
+  }
+
+  function isTrainingCoveredByQualification(
+    employeeId,
+    training,
+    year = Number(todayIso().slice(0, 4)),
+  ) {
+    const qualificationId = trainingCoverageQualificationId(training);
+    if (!qualificationId) return false;
+    const employee = getEmployee(employeeId);
+    if (!employee?.qualifications?.[qualificationId]) return false;
+    const expiry = employee.qualificationExpiries?.[qualificationId];
+    return !expiry || expiry >= `${year}-01-01`;
   }
 
   function latestCompletion(employeeId, trainingId) {

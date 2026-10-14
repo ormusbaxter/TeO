@@ -20,7 +20,7 @@ const projectRoot = path.resolve(
 
 function emptyRelationalState() {
   return {
-    version: 27,
+    version: 28,
     employees: [],
     trainings: [],
     completions: [],

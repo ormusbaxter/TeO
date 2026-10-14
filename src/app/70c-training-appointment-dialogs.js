@@ -7,8 +7,10 @@
       DEFAULT_TRAINING_RECURRENCE_MONTHS,
     );
     trainingRecurrenceManuallyChanged = false;
+    trainingCoverageManuallyChanged = false;
 
     const training = trainingId ? getTraining(trainingId) : null;
+    renderTrainingCoverageOptions(training?.coveredByQualificationId || "");
     elements.trainingDialogTitle.textContent = training
       ? "Pflichtfortbildung bearbeiten"
       : "Pflichtfortbildung anlegen";
@@ -26,9 +28,24 @@
       document.querySelector("#trainingDescription").value = training.description;
     }
 
+    if (training) trainingCoverageManuallyChanged = true;
+
     elements.trainingDialog.showModal();
     captureCleanForm(elements.trainingForm);
     window.setTimeout(() => document.querySelector("#trainingTitle").focus(), 0);
+  }
+
+  function renderTrainingCoverageOptions(selectedId = "") {
+    const select = document.querySelector("#trainingCoveredByQualification");
+    select.innerHTML = [
+      '<option value="">Keine – nur Nachweise zählen</option>',
+      ...state.catalogs.qualifications.map(
+        ({ id, label }) => `<option value="${escapeHtml(id)}">${escapeHtml(label)}</option>`,
+      ),
+    ].join("");
+    select.value = state.catalogs.qualifications.some(({ id }) => id === selectedId)
+      ? selectedId
+      : "";
   }
 
   async function handleTrainingSubmit(event) {
@@ -63,6 +80,8 @@
           matchingSeries?.seriesId ||
           generatedTrainingSeriesId(titleInput.value, existingTraining?.id)
         : "",
+      coveredByQualificationId: document.querySelector("#trainingCoveredByQualification")
+        .value,
       description: document.querySelector("#trainingDescription").value.trim(),
       createdAt: existingTraining?.createdAt || now,
       updatedAt: now,

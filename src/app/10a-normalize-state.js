@@ -132,6 +132,23 @@
       });
     });
 
+    // Eine Fortbildung, die eine Qualifikation abdeckt, verweist auf deren ID
+    // im Katalog; faellt die Qualifikation weg, gilt nur noch der Nachweis.
+    // Bestaende vor Datenformat 28 kannten die Abdeckung nicht: Ein
+    // ACLS-Training wird dort mit einer ACLS-Qualifikation im Katalog
+    // verbunden, damit die Regel ohne Nacharbeit greift.
+    trainings.forEach((training) => {
+      if (!qualificationIds.has(training.coveredByQualificationId)) {
+        training.coveredByQualificationId = "";
+      }
+      if ((Number(parsed.version) || 0) < 28 && !training.coveredByQualificationId) {
+        training.coveredByQualificationId = suggestedTrainingCoverageQualificationId(
+          training.title,
+          catalogs.qualifications,
+        );
+      }
+    });
+
     const users = normalizeUsers(parsed.users);
     if ((Number(parsed.version) || 0) < 22) {
       users

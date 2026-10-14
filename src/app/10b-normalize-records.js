@@ -357,6 +357,7 @@
       targetMinutes:
         Number.isInteger(targetMinutes) && targetMinutes > 0 ? targetMinutes : null,
       seriesId: normalizeId(training.seriesId) || "",
+      coveredByQualificationId: normalizeId(training.coveredByQualificationId) || "",
       createdAt,
       updatedAt: validTimestamp(training.updatedAt || training.createdAt),
     };
@@ -371,6 +372,23 @@
       .replace(/\b(?:19|20)\d{2}\b/g, " ")
       .replace(/[^a-z0-9]+/g, " ")
       .trim();
+  }
+
+  // Ein ACLS-Training gilt als absolviert, solange die Qualifikation
+  // ACLS-Provider gueltig ist. Die Verbindung steht an der Fortbildung
+  // (coveredByQualificationId); vorgeschlagen wird sie, wenn die Bezeichnung
+  // ACLS nennt und der Katalog eine ACLS-Qualifikation fuehrt - bevorzugt
+  // die mit "Provider" im Namen.
+  function suggestedTrainingCoverageQualificationId(title, qualifications = []) {
+    const words = trainingSeriesSignature(title).split(" ");
+    if (!words.includes("acls") || words.includes("provider")) return "";
+    const candidates = qualifications.filter(({ label }) =>
+      trainingSeriesSignature(label).split(" ").includes("acls"),
+    );
+    const provider = candidates.find(({ label }) =>
+      trainingSeriesSignature(label).split(" ").includes("provider"),
+    );
+    return (provider || candidates[0])?.id || "";
   }
 
   function generatedTrainingSeriesId(title, fallbackId = "") {
