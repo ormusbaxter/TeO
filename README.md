@@ -1236,6 +1236,24 @@ Wiederkehrende Einträge desselben Themas werden zu einer Fortbildungsreihe
 verbunden. Der neueste gültige Nachweis bestimmt die nächste Fälligkeit der
 gesamten Reihe.
 
+### Durch eine Qualifikation abgedeckt
+
+Manche Pflichtfortbildungen sind mit einer Zusatzqualifikation erledigt: Wer
+ACLS-Provider ist, muss das ACLS-Training nicht zusätzlich besuchen. Dafür wird
+im Fortbildungsdialog unter **Abgedeckt durch Qualifikation** die passende
+Zusatzqualifikation gewählt.
+
+Ein Mitarbeiter mit dieser Qualifikation gilt in jedem Kalenderjahr, in dem sie
+an mindestens einem Tag gültig ist, als absolviert – ohne Ablaufdatum immer,
+sonst bis einschließlich des Jahres, in dem sie abläuft. Fortbildungsliste,
+Mitarbeiter-Akte, Abschlussdialog und Jahresauswertung zeigen dann „durch …
+abgedeckt“, die Übersicht erinnert für dieses Jahr nicht an die Fortbildung.
+Ein erfasster Nachweis zählt weiterhin wie gewohnt.
+
+Heißt eine Fortbildung „ACLS…“ und führt der Katalog eine Qualifikation mit
+ACLS im Namen, schlägt TeO die Verbindung beim Anlegen vor und richtet sie für
+einen bestehenden Datenbestand beim ersten Laden selbst ein.
+
 ### Abschluss dokumentieren
 
 1. **Pflichtfortbildungen** öffnen.

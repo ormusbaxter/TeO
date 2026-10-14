@@ -326,24 +326,31 @@
                     </th>
                     ${row.statuses
                       .map(
-                        ({ training, completed }) => `
+                        ({ training, completed, coveredBy }) => {
+                          const description = coveredBy
+                            ? `durch ${coveredBy} abgedeckt`
+                            : completed
+                              ? "für das Auswertungsjahr erfüllt"
+                              : "offen";
+                          return `
                           <td>
                             <span
                               class="matrix-status ${completed ? "matrix-complete" : "matrix-open"}"
                               role="img"
                               aria-label="${escapeHtml(
-                                `${fullName(row.employee)}: ${training.title} ${
-                                  completed ? "für das Auswertungsjahr erfüllt" : "offen"
-                                }`,
+                                `${fullName(row.employee)}: ${training.title} ${description}`,
                               )}"
-                              title="${
-                                completed
-                                  ? "Für das Auswertungsjahr erfüllt"
-                                  : "Zum Jahresende offen"
-                              }"
+                              title="${escapeHtml(
+                                coveredBy
+                                  ? `Durch ${coveredBy} abgedeckt`
+                                  : completed
+                                    ? "Für das Auswertungsjahr erfüllt"
+                                    : "Zum Jahresende offen",
+                              )}"
                             >${completed ? "✓" : "×"}</span>
                           </td>
-                        `,
+                        `;
+                        },
                       )
                       .join("")}
                   </tr>
@@ -417,7 +424,9 @@
       ["Mitarbeiter", ...matrix.trainings.map((training) => training.title)],
       matrix.rows.map((row) => [
         fullName(row.employee),
-        ...row.statuses.map(({ completed }) => (completed ? "Erfüllt" : "Offen")),
+        ...row.statuses.map(({ completed, coveredBy }) =>
+          coveredBy ? `Erfüllt (${coveredBy})` : completed ? "Erfüllt" : "Offen",
+        ),
       ]),
     );
   }
@@ -441,16 +450,22 @@
           training,
           referenceDate,
         );
-        const completed = Boolean(
+        const completedByProof = Boolean(
           latest &&
             (!training.recurrenceMonths ||
               addMonths(latest.completedOn, training.recurrenceMonths) >= referenceDate),
         );
+        const coveredBy =
+          !completedByProof &&
+          isTrainingCoveredByQualification(employee.id, training, year)
+            ? trainingCoverageQualificationLabel(training)
+            : "";
+        const completed = completedByProof || Boolean(coveredBy);
         if (completed) {
           completedAssignments += 1;
           completedPerTraining[trainingIndex] += 1;
         }
-        return { training, completed, completion: latest || null };
+        return { training, completed, coveredBy, completion: latest || null };
       }),
     }));
     const totalAssignments = employees.length * trainings.length;
@@ -539,6 +554,11 @@
                 <svg><use href="#icon-calendar"></use></svg>
                 ${recurrenceLabel(training)}
               </span>
+              ${
+                trainingCoverageQualificationId(training)
+                  ? `<span class="training-meta"><svg><use href="#icon-check"></use></svg>Gilt als absolviert, solange „${escapeHtml(trainingCoverageQualificationLabel(training))}“ gültig ist</span>`
+                  : ""
+              }
               ${
                 training.targetMinutes
                   ? `<span class="training-meta"><svg><use href="#icon-chart"></use></svg>Soll-Zeit: ${training.targetMinutes} Minuten (${formatMinutesAsHoursAndMinutes(training.targetMinutes)})</span>`

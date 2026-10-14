@@ -268,6 +268,11 @@
             delete employee.qualifications[id];
             delete employee.qualificationExpiries[id];
           });
+          state.trainings.forEach((training) => {
+            if (training.coveredByQualificationId === id) {
+              training.coveredByQualificationId = "";
+            }
+          });
         }, { undo: "Zusatzqualifikation gelöscht" });
         if (!committed) return;
         renderCatalogManagement();

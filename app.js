@@ -643,6 +643,7 @@
   let employeeSortDirection = "asc";
   let currentWeekendSimulation = null;
   let trainingRecurrenceManuallyChanged = false;
+  let trainingCoverageManuallyChanged = false;
   let trainingDisplayYear = new Date().getFullYear();
   let meetingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
@@ -2086,6 +2087,23 @@
       });
     });
 
+    // Eine Fortbildung, die eine Qualifikation abdeckt, verweist auf deren ID
+    // im Katalog; faellt die Qualifikation weg, gilt nur noch der Nachweis.
+    // Bestaende vor Datenformat 28 kannten die Abdeckung nicht: Ein
+    // ACLS-Training wird dort mit einer ACLS-Qualifikation im Katalog
+    // verbunden, damit die Regel ohne Nacharbeit greift.
+    trainings.forEach((training) => {
+      if (!qualificationIds.has(training.coveredByQualificationId)) {
+        training.coveredByQualificationId = "";
+      }
+      if ((Number(parsed.version) || 0) < 28 && !training.coveredByQualificationId) {
+        training.coveredByQualificationId = suggestedTrainingCoverageQualificationId(
+          training.title,
+          catalogs.qualifications,
+        );
+      }
+    });
+
     const users = normalizeUsers(parsed.users);
     if ((Number(parsed.version) || 0) < 22) {
       users
@@ -2612,6 +2630,7 @@
       targetMinutes:
         Number.isInteger(targetMinutes) && targetMinutes > 0 ? targetMinutes : null,
       seriesId: normalizeId(training.seriesId) || "",
+      coveredByQualificationId: normalizeId(training.coveredByQualificationId) || "",
       createdAt,
       updatedAt: validTimestamp(training.updatedAt || training.createdAt),
     };
@@ -2626,6 +2645,23 @@
       .replace(/\b(?:19|20)\d{2}\b/g, " ")
       .replace(/[^a-z0-9]+/g, " ")
       .trim();
+  }
+
+  // Ein ACLS-Training gilt als absolviert, solange die Qualifikation
+  // ACLS-Provider gueltig ist. Die Verbindung steht an der Fortbildung
+  // (coveredByQualificationId); vorgeschlagen wird sie, wenn die Bezeichnung
+  // ACLS nennt und der Katalog eine ACLS-Qualifikation fuehrt - bevorzugt
+  // die mit "Provider" im Namen.
+  function suggestedTrainingCoverageQualificationId(title, qualifications = []) {
+    const words = trainingSeriesSignature(title).split(" ");
+    if (!words.includes("acls") || words.includes("provider")) return "";
+    const candidates = qualifications.filter(({ label }) =>
+      trainingSeriesSignature(label).split(" ").includes("acls"),
+    );
+    const provider = candidates.find(({ label }) =>
+      trainingSeriesSignature(label).split(" ").includes("provider"),
+    );
+    return (provider || candidates[0])?.id || "";
   }
 
   function generatedTrainingSeriesId(title, fallbackId = "") {
@@ -4286,7 +4322,17 @@
     trainingRecurrence.addEventListener("change", () => {
       trainingRecurrenceManuallyChanged = true;
     });
+    const trainingCoverage = document.querySelector("#trainingCoveredByQualification");
+    trainingCoverage.addEventListener("change", () => {
+      trainingCoverageManuallyChanged = true;
+    });
     trainingTitle.addEventListener("input", () => {
+      if (!trainingCoverageManuallyChanged) {
+        trainingCoverage.value = suggestedTrainingCoverageQualificationId(
+          trainingTitle.value,
+          state.catalogs.qualifications,
+        );
+      }
       if (trainingRecurrenceManuallyChanged) return;
       trainingRecurrence.value = String(
         defaultTrainingRecurrenceMonths(trainingTitle.value),
@@ -6544,6 +6590,11 @@
           state.employees.forEach((employee) => {
             delete employee.qualifications[id];
             delete employee.qualificationExpiries[id];
+          });
+          state.trainings.forEach((training) => {
+            if (training.coveredByQualificationId === id) {
+              training.coveredByQualificationId = "";
+            }
           });
         }, { undo: "Zusatzqualifikation gelöscht" });
         if (!committed) return;
@@ -10014,6 +10065,7 @@
         });
       }
       trainingObligations().forEach((training) => {
+        if (isTrainingCoveredByQualification(employee.id, training)) return;
         const latest = latestCompletion(employee.id, training.id);
         let dueDate = "";
         if (latest && training.recurrenceMonths) {
@@ -14845,24 +14897,31 @@
                     </th>
                     ${row.statuses
                       .map(
-                        ({ training, completed }) => `
+                        ({ training, completed, coveredBy }) => {
+                          const description = coveredBy
+                            ? `durch ${coveredBy} abgedeckt`
+                            : completed
+                              ? "für das Auswertungsjahr erfüllt"
+                              : "offen";
+                          return `
                           <td>
                             <span
                               class="matrix-status ${completed ? "matrix-complete" : "matrix-open"}"
                               role="img"
                               aria-label="${escapeHtml(
-                                `${fullName(row.employee)}: ${training.title} ${
-                                  completed ? "für das Auswertungsjahr erfüllt" : "offen"
-                                }`,
+                                `${fullName(row.employee)}: ${training.title} ${description}`,
                               )}"
-                              title="${
-                                completed
-                                  ? "Für das Auswertungsjahr erfüllt"
-                                  : "Zum Jahresende offen"
-                              }"
+                              title="${escapeHtml(
+                                coveredBy
+                                  ? `Durch ${coveredBy} abgedeckt`
+                                  : completed
+                                    ? "Für das Auswertungsjahr erfüllt"
+                                    : "Zum Jahresende offen",
+                              )}"
                             >${completed ? "✓" : "×"}</span>
                           </td>
-                        `,
+                        `;
+                        },
                       )
                       .join("")}
                   </tr>
@@ -14936,7 +14995,9 @@
       ["Mitarbeiter", ...matrix.trainings.map((training) => training.title)],
       matrix.rows.map((row) => [
         fullName(row.employee),
-        ...row.statuses.map(({ completed }) => (completed ? "Erfüllt" : "Offen")),
+        ...row.statuses.map(({ completed, coveredBy }) =>
+          coveredBy ? `Erfüllt (${coveredBy})` : completed ? "Erfüllt" : "Offen",
+        ),
       ]),
     );
   }
@@ -14960,16 +15021,22 @@
           training,
           referenceDate,
         );
-        const completed = Boolean(
+        const completedByProof = Boolean(
           latest &&
             (!training.recurrenceMonths ||
               addMonths(latest.completedOn, training.recurrenceMonths) >= referenceDate),
         );
+        const coveredBy =
+          !completedByProof &&
+          isTrainingCoveredByQualification(employee.id, training, year)
+            ? trainingCoverageQualificationLabel(training)
+            : "";
+        const completed = completedByProof || Boolean(coveredBy);
         if (completed) {
           completedAssignments += 1;
           completedPerTraining[trainingIndex] += 1;
         }
-        return { training, completed, completion: latest || null };
+        return { training, completed, coveredBy, completion: latest || null };
       }),
     }));
     const totalAssignments = employees.length * trainings.length;
@@ -15058,6 +15125,11 @@
                 <svg><use href="#icon-calendar"></use></svg>
                 ${recurrenceLabel(training)}
               </span>
+              ${
+                trainingCoverageQualificationId(training)
+                  ? `<span class="training-meta"><svg><use href="#icon-check"></use></svg>Gilt als absolviert, solange „${escapeHtml(trainingCoverageQualificationLabel(training))}“ gültig ist</span>`
+                  : ""
+              }
               ${
                 training.targetMinutes
                   ? `<span class="training-meta"><svg><use href="#icon-chart"></use></svg>Soll-Zeit: ${training.targetMinutes} Minuten (${formatMinutesAsHoursAndMinutes(training.targetMinutes)})</span>`
@@ -20303,8 +20375,10 @@ ${rendered
       DEFAULT_TRAINING_RECURRENCE_MONTHS,
     );
     trainingRecurrenceManuallyChanged = false;
+    trainingCoverageManuallyChanged = false;
 
     const training = trainingId ? getTraining(trainingId) : null;
+    renderTrainingCoverageOptions(training?.coveredByQualificationId || "");
     elements.trainingDialogTitle.textContent = training
       ? "Pflichtfortbildung bearbeiten"
       : "Pflichtfortbildung anlegen";
@@ -20322,9 +20396,24 @@ ${rendered
       document.querySelector("#trainingDescription").value = training.description;
     }
 
+    if (training) trainingCoverageManuallyChanged = true;
+
     elements.trainingDialog.showModal();
     captureCleanForm(elements.trainingForm);
     window.setTimeout(() => document.querySelector("#trainingTitle").focus(), 0);
+  }
+
+  function renderTrainingCoverageOptions(selectedId = "") {
+    const select = document.querySelector("#trainingCoveredByQualification");
+    select.innerHTML = [
+      '<option value="">Keine – nur Nachweise zählen</option>',
+      ...state.catalogs.qualifications.map(
+        ({ id, label }) => `<option value="${escapeHtml(id)}">${escapeHtml(label)}</option>`,
+      ),
+    ].join("");
+    select.value = state.catalogs.qualifications.some(({ id }) => id === selectedId)
+      ? selectedId
+      : "";
   }
 
   async function handleTrainingSubmit(event) {
@@ -20359,6 +20448,8 @@ ${rendered
           matchingSeries?.seriesId ||
           generatedTrainingSeriesId(titleInput.value, existingTraining?.id)
         : "",
+      coveredByQualificationId: document.querySelector("#trainingCoveredByQualification")
+        .value,
       description: document.querySelector("#trainingDescription").value.trim(),
       createdAt: existingTraining?.createdAt || now,
       updatedAt: now,
@@ -24074,6 +24165,7 @@ ${rendered
   }
 
   function isEmployeeCurrentForTraining(employeeId, training) {
+    if (isTrainingCoveredByQualification(employeeId, training)) return true;
     const latest = latestCompletion(employeeId, training.id);
     if (!latest) return false;
     if (!training.recurrenceMonths) return true;
@@ -24082,7 +24174,13 @@ ${rendered
 
   function getEmployeeCompletionStatus(employeeId, training) {
     const latest = latestCompletion(employeeId, training.id);
-    if (!latest) return { kind: "open", label: "Offen" };
+    const coverage = isTrainingCoveredByQualification(employeeId, training)
+      ? {
+          kind: "current",
+          label: `durch ${trainingCoverageQualificationLabel(training)} abgedeckt`,
+        }
+      : null;
+    if (!latest) return coverage || { kind: "open", label: "Offen" };
 
     if (!training.recurrenceMonths) {
       return {
@@ -24099,10 +24197,48 @@ ${rendered
       };
     }
 
-    return {
-      kind: "expired",
-      label: `abgelaufen am ${formatDate(validUntil)}`,
-    };
+    return (
+      coverage || {
+        kind: "expired",
+        label: `abgelaufen am ${formatDate(validUntil)}`,
+      }
+    );
+  }
+
+  // Deckt eine Qualifikation die Fortbildung ab (ACLS-Provider fuer das
+  // ACLS-Training), gilt sie fuer jedes Kalenderjahr als absolviert, in dem
+  // die Qualifikation an mindestens einem Tag gueltig ist: ohne Ablaufdatum
+  // immer, sonst bis einschliesslich des Jahres, in dem sie ablaeuft. Die
+  // Verbindung darf an jeder Fortbildung derselben Reihe stehen.
+  function trainingCoverageQualificationId(training) {
+    if (!training) return "";
+    if (training.coveredByQualificationId) return training.coveredByQualificationId;
+    if (!training.recurrenceMonths || !training.seriesId) return "";
+    return (
+      state.trainings.find(
+        (item) =>
+          item.recurrenceMonths &&
+          item.seriesId === training.seriesId &&
+          item.coveredByQualificationId,
+      )?.coveredByQualificationId || ""
+    );
+  }
+
+  function trainingCoverageQualificationLabel(training) {
+    return qualificationLabel(trainingCoverageQualificationId(training));
+  }
+
+  function isTrainingCoveredByQualification(
+    employeeId,
+    training,
+    year = Number(todayIso().slice(0, 4)),
+  ) {
+    const qualificationId = trainingCoverageQualificationId(training);
+    if (!qualificationId) return false;
+    const employee = getEmployee(employeeId);
+    if (!employee?.qualifications?.[qualificationId]) return false;
+    const expiry = employee.qualificationExpiries?.[qualificationId];
+    return !expiry || expiry >= `${year}-01-01`;
   }
 
   function latestCompletion(employeeId, trainingId) {

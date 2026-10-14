@@ -61,6 +61,7 @@
   let employeeSortDirection = "asc";
   let currentWeekendSimulation = null;
   let trainingRecurrenceManuallyChanged = false;
+  let trainingCoverageManuallyChanged = false;
   let trainingDisplayYear = new Date().getFullYear();
   let meetingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
