@@ -144,6 +144,8 @@
   let deviceEmployeeOverviewEmployeeId = "";
   let deviceEmployeeOverviewOpenOnly = false;
   let deviceEmployeeOverviewInventoryOnly = false;
+  let deviceAuthorizationInventoryOnly = true;
+  let deviceAuthorizationGrouping = "officer";
   let deviceParticipantSearchTerm = "";
   let deviceParticipantDraft = new Map();
   let deviceInstructionSearchTerm = "";

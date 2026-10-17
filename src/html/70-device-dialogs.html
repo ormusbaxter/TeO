@@ -321,6 +321,53 @@
     </dialog>
 
     <dialog
+      class="modal modal-large device-authorization-dialog"
+      id="deviceAuthorizationDialog"
+      aria-labelledby="deviceAuthorizationTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Gerätebeauftragte</p>
+          <h2 id="deviceAuthorizationTitle">Einweisungsberechtigungen</h2>
+          <p class="modal-subtitle" id="deviceAuthorizationSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="device-authorization-rule">
+          Einweisungsberechtigt ist, wer als Gerätebeauftragte/r an einer gültigen
+          Herstellereinweisung für das Gerät teilgenommen hat. Maßgeblich ist der
+          Status zum Einweisungszeitpunkt.
+        </p>
+        <div class="device-employee-overview-filters device-authorization-filters">
+          <div
+            class="segmented-control"
+            id="deviceAuthorizationGrouping"
+            role="group"
+            aria-label="Gliederung"
+          >
+            <button type="button" data-device-authorization-grouping="officer" aria-pressed="true">
+              Nach Gerätebeauftragten
+            </button>
+            <button type="button" data-device-authorization-grouping="device" aria-pressed="false">
+              Nach Geräten
+            </button>
+          </div>
+          <label class="checkbox-field">
+            <input id="deviceAuthorizationInventoryFilter" type="checkbox" checked />
+            <span>Nur Geräte im Bestand</span>
+          </label>
+        </div>
+        <div id="deviceAuthorizationContent"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
       class="modal modal-large"
       id="deviceInstructionHistoryDialog"
       aria-labelledby="deviceInstructionHistoryTitle"

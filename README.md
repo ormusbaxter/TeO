@@ -1358,6 +1358,16 @@ Gerätebeauftragter erfasst war. Der historische Status ist maßgeblich. Der
 Katalog kann nach einer bestimmten berechtigten Person sowie nach Geräten mit
 oder ohne hinterlegte Einweisungsberechtigte gefiltert werden.
 
+Eine Gesamtübersicht öffnet **Einweisungsberechtigungen** im Kopf der
+Geräteeinweisungen. **Nach Gerätebeauftragten** nennt je Person die Geräte, die
+sie einweisen darf, mit dem Datum der letzten gültigen Herstellereinweisung;
+darunter stehen die Geräte ohne einweisungsberechtigte Person. Aktuelle
+Gerätebeauftragte ohne gültige Herstellereinweisung erscheinen ebenfalls, mit
+entsprechendem Hinweis. **Nach Geräten** zeigt dieselben Angaben je Gerät.
+**Nur Geräte im Bestand** ist vorgewählt. Wer nicht mehr beschäftigt oder
+derzeit nicht als Gerätebeauftragte/r geführt ist, bleibt nach der Regel oben
+berechtigt, wird aber gekennzeichnet.
+
 ### Einweisung dokumentieren
 
 Eine Geräteeinweisung enthält:

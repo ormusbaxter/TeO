@@ -1,3 +1,7 @@
+### 4.71.0 – Einweisungsberechtigungen
+
+- **Neu:** **Einweisungsberechtigungen** im Kopf der Geräteeinweisungen listet auf, welche Gerätebeauftragten welches Gerät einweisen dürfen, jeweils mit dem Datum der Herstellereinweisung. **Nach Geräten** kehrt die Sicht um und nennt je Gerät die Berechtigten. Geräte ohne einweisungsberechtigte Person sind eigens aufgeführt, ebenso aktuelle Gerätebeauftragte, denen noch keine Herstellereinweisung dokumentiert ist. **Nur Geräte im Bestand** ist vorgewählt; Berechtigte, die nicht mehr beschäftigt sind, werden gekennzeichnet
+
 ### 4.70.0 – ACLS-Provider deckt das ACLS-Training ab
 
 - **Neu:** Eine Pflichtfortbildung kann durch eine Zusatzqualifikation abgedeckt sein (**Abgedeckt durch Qualifikation** im Fortbildungsdialog). Solange etwa **ACLS-Provider** gültig ist, gilt das **ACLS-Training** für das jeweilige Kalenderjahr als absolviert – in jedem Jahr, in dem die Qualifikation an mindestens einem Tag gültig ist. Fortbildungsliste, Mitarbeiter-Akte, Abschlussdialog, Jahresauswertung und CSV-Export zeigen „durch ACLS-Provider abgedeckt“, die Übersicht erinnert dafür nicht mehr

@@ -1186,10 +1186,20 @@
                 Einweisungsnachweise personenbezogen dokumentieren und auswerten.
               </p>
             </div>
-            <button class="button button-primary" type="button" data-open-device-instruction>
-              <svg><use href="#icon-check"></use></svg>
-              Einweisung dokumentieren
-            </button>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="openDeviceAuthorizationButton"
+                type="button"
+              >
+                <svg><use href="#icon-clipboard-check"></use></svg>
+                Einweisungsberechtigungen
+              </button>
+              <button class="button button-primary" type="button" data-open-device-instruction>
+                <svg><use href="#icon-check"></use></svg>
+                Einweisung dokumentieren
+              </button>
+            </div>
           </div>
 
           <div class="training-summary" id="deviceSummary"></div>
@@ -2629,6 +2639,7 @@
 <p>Der Katalog ist alphabetisch nach Gerätenamen sortiert. Standardmäßig werden nur Geräte aus dem aktuellen Bestand angezeigt.</p>
 <p>Über das Suchfeld der Geräteverwaltung lässt sich der Katalog nach <strong>Geräte- oder Herstellername</strong> durchsuchen. Die Suche unterscheidet keine Groß- und Kleinschreibung und wirkt zusätzlich zu den Filtern für Bestand, Anlage 1 und Kategorie.</p>
 <p>Je Gerät werden alle <strong>einweisungsberechtigten Mitarbeiter</strong> angezeigt. Als einweisungsberechtigt gilt, wer bei einer dokumentierten Herstellereinweisung für dieses Gerät teilgenommen hat und zum Einweisungszeitpunkt als Gerätebeauftragter erfasst war. Der historische Status ist maßgeblich. Der Katalog kann nach einer bestimmten berechtigten Person sowie nach Geräten mit oder ohne hinterlegte Einweisungsberechtigte gefiltert werden.</p>
+<p>Eine Gesamtübersicht öffnet <strong>Einweisungsberechtigungen</strong> im Kopf der Geräteeinweisungen. <strong>Nach Gerätebeauftragten</strong> nennt je Person die Geräte, die sie einweisen darf, mit dem Datum der letzten gültigen Herstellereinweisung; darunter stehen die Geräte ohne einweisungsberechtigte Person. Aktuelle Gerätebeauftragte ohne gültige Herstellereinweisung erscheinen ebenfalls, mit entsprechendem Hinweis. <strong>Nach Geräten</strong> zeigt dieselben Angaben je Gerät. <strong>Nur Geräte im Bestand</strong> ist vorgewählt. Wer nicht mehr beschäftigt oder derzeit nicht als Gerätebeauftragte/r geführt ist, bleibt nach der Regel oben berechtigt, wird aber gekennzeichnet.</p>
 <h3 id="hilfe-einweisung-dokumentieren">Einweisung dokumentieren</h3>
 <p>Eine Geräteeinweisung enthält:</p>
 <ul><li>ein oder mehrere Geräte</li><li>Einweisungsdatum</li><li>einen oder mehrere Teilnehmer</li><li>Einweisenden</li></ul>
@@ -2784,6 +2795,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-71-0-einweisungsberechtigungen">4.71.0 – Einweisungsberechtigungen</h3>
+<ul><li><strong>Neu:</strong> <strong>Einweisungsberechtigungen</strong> im Kopf der Geräteeinweisungen listet auf, welche Gerätebeauftragten welches Gerät einweisen dürfen, jeweils mit dem Datum der Herstellereinweisung. <strong>Nach Geräten</strong> kehrt die Sicht um und nennt je Gerät die Berechtigten. Geräte ohne einweisungsberechtigte Person sind eigens aufgeführt, ebenso aktuelle Gerätebeauftragte, denen noch keine Herstellereinweisung dokumentiert ist. <strong>Nur Geräte im Bestand</strong> ist vorgewählt; Berechtigte, die nicht mehr beschäftigt sind, werden gekennzeichnet</li></ul>
 <h3 id="hilfe-4-70-0-acls-provider-deckt-das-acls-training-ab">4.70.0 – ACLS-Provider deckt das ACLS-Training ab</h3>
 <ul><li><strong>Neu:</strong> Eine Pflichtfortbildung kann durch eine Zusatzqualifikation abgedeckt sein (<strong>Abgedeckt durch Qualifikation</strong> im Fortbildungsdialog). Solange etwa <strong>ACLS-Provider</strong> gültig ist, gilt das <strong>ACLS-Training</strong> für das jeweilige Kalenderjahr als absolviert – in jedem Jahr, in dem die Qualifikation an mindestens einem Tag gültig ist. Fortbildungsliste, Mitarbeiter-Akte, Abschlussdialog, Jahresauswertung und CSV-Export zeigen „durch ACLS-Provider abgedeckt“, die Übersicht erinnert dafür nicht mehr</li><li><strong>Neu:</strong> Heißt eine Fortbildung „ACLS…“ und führt der Katalog eine ACLS-Qualifikation, verbindet TeO beides beim Anlegen und beim ersten Laden eines bestehenden Datenbestands von selbst</li><li><strong>Geändert:</strong> Datenformat 28. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit die Verbindung nicht verloren geht</li></ul>
 <h3 id="hilfe-4-69-0-datenbestand-immer-verschlusselt">4.69.0 – Datenbestand immer verschlüsselt</h3>
@@ -5191,6 +5204,53 @@
           </label>
         </div>
         <div id="deviceEmployeeOverviewContent"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large device-authorization-dialog"
+      id="deviceAuthorizationDialog"
+      aria-labelledby="deviceAuthorizationTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Gerätebeauftragte</p>
+          <h2 id="deviceAuthorizationTitle">Einweisungsberechtigungen</h2>
+          <p class="modal-subtitle" id="deviceAuthorizationSubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="device-authorization-rule">
+          Einweisungsberechtigt ist, wer als Gerätebeauftragte/r an einer gültigen
+          Herstellereinweisung für das Gerät teilgenommen hat. Maßgeblich ist der
+          Status zum Einweisungszeitpunkt.
+        </p>
+        <div class="device-employee-overview-filters device-authorization-filters">
+          <div
+            class="segmented-control"
+            id="deviceAuthorizationGrouping"
+            role="group"
+            aria-label="Gliederung"
+          >
+            <button type="button" data-device-authorization-grouping="officer" aria-pressed="true">
+              Nach Gerätebeauftragten
+            </button>
+            <button type="button" data-device-authorization-grouping="device" aria-pressed="false">
+              Nach Geräten
+            </button>
+          </div>
+          <label class="checkbox-field">
+            <input id="deviceAuthorizationInventoryFilter" type="checkbox" checked />
+            <span>Nur Geräte im Bestand</span>
+          </label>
+        </div>
+        <div id="deviceAuthorizationContent"></div>
       </div>
       <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>

@@ -515,6 +515,24 @@
     deviceReinstructionHistoryList: document.querySelector(
       "#deviceReinstructionHistoryList",
     ),
+    openDeviceAuthorizationButton: document.querySelector(
+      "#openDeviceAuthorizationButton",
+    ),
+    deviceAuthorizationDialog: document.querySelector(
+      "#deviceAuthorizationDialog",
+    ),
+    deviceAuthorizationSubtitle: document.querySelector(
+      "#deviceAuthorizationSubtitle",
+    ),
+    deviceAuthorizationContent: document.querySelector(
+      "#deviceAuthorizationContent",
+    ),
+    deviceAuthorizationGrouping: document.querySelector(
+      "#deviceAuthorizationGrouping",
+    ),
+    deviceAuthorizationInventoryFilter: document.querySelector(
+      "#deviceAuthorizationInventoryFilter",
+    ),
     deviceEmployeeOverviewDialog: document.querySelector(
       "#deviceEmployeeOverviewDialog",
     ),
