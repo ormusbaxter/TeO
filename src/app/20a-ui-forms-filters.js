@@ -392,6 +392,23 @@
         renderDeviceOverview();
       },
     );
+    elements.openDeviceAuthorizationButton.addEventListener(
+      "click",
+      openDeviceAuthorizationOverview,
+    );
+    elements.deviceAuthorizationGrouping.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-device-authorization-grouping]");
+      if (button) {
+        setDeviceAuthorizationGrouping(button.dataset.deviceAuthorizationGrouping);
+      }
+    });
+    elements.deviceAuthorizationInventoryFilter.addEventListener(
+      "change",
+      (event) => {
+        deviceAuthorizationInventoryOnly = event.target.checked;
+        renderDeviceAuthorizationOverview();
+      },
+    );
     elements.deviceEmployeeOverviewOpenFilter.addEventListener(
       "change",
       (event) => {

@@ -697,6 +697,119 @@ button.device-employee-overview-row:hover {
   white-space: nowrap;
 }
 
+.device-authorization-rule {
+  margin: 0 0 12px;
+  color: var(--slate-600);
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+
+.device-authorization-filters {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.device-authorization-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.device-authorization-group {
+  padding: 12px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+}
+
+.device-authorization-group > header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.device-authorization-group > header strong,
+.device-authorization-group > header small,
+.device-authorization-items strong,
+.device-authorization-items small {
+  display: block;
+}
+
+.device-authorization-group > header strong,
+.device-authorization-items strong {
+  color: var(--slate-800);
+  font-size: 0.72rem;
+}
+
+.device-authorization-group > header small,
+.device-authorization-items small {
+  margin-top: 3px;
+  color: var(--slate-500);
+  font-size: 0.62rem;
+  line-height: 1.4;
+}
+
+.device-authorization-items {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.device-authorization-items li {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--slate-50);
+}
+
+.device-authorization-group .device-authorization-items,
+.device-authorization-missing .device-authorization-items {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.device-authorization-missing {
+  margin-top: 18px;
+}
+
+.device-authorization-missing h3 {
+  margin: 0;
+  color: var(--orange-700);
+  font-size: 0.74rem;
+}
+
+.device-authorization-missing .device-authorization-items li,
+.device-authorization-by-device li.is-missing {
+  border-left: 3px solid var(--orange-700);
+}
+
+.device-authorization-by-device {
+  margin-top: 0;
+}
+
+.device-authorization-by-device li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.device-authorization-people {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  font-size: 0.62rem;
+}
+
+.device-authorization-person.is-former {
+  color: var(--slate-600);
+  border-color: var(--slate-200);
+  background: var(--slate-100);
+}
+
+.device-authorization-none {
+  color: var(--orange-700);
+  font-weight: 650;
+}
+
 .device-instruction-log-section {
   margin-top: 24px;
 }
@@ -937,7 +1050,8 @@ button.device-employee-overview-row:hover {
   .device-participant-row,
   .device-instruction-log-row,
   .device-employee-overview-row,
-  .device-history-row {
+  .device-history-row,
+  .device-authorization-by-device li {
     grid-template-columns: 1fr;
   }
 

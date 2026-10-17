@@ -258,6 +258,7 @@
         elements.deviceDialog,
         elements.deviceInstructionDialog,
         elements.deviceEmployeeOverviewDialog,
+        elements.deviceAuthorizationDialog,
         elements.deviceOverviewDialog,
         elements.deviceInstructionHistoryDialog,
         elements.deviceReinstructionDialog,
