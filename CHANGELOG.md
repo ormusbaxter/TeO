@@ -1,6 +1,7 @@
 ### 4.73.0 – Kennzahlen der Übersicht
 
-- **Neu:** Die Kennzahl **Nachweise überfällig** erklärt, was sie zählt: als Tooltip an der Kennzahl und als Hinweis über **Offene Nachweise nach Fortbildung**. Überfällig ist ein Nachweis, wenn die Frist einer Pflichtfortbildung abgelaufen ist (letzter Abschluss plus Wiederholungsintervall, ohne Abschluss der 31.12. des Fortbildungsjahres), je Person und Fortbildung einmal. Darunter steht jetzt auch, wie viele Personen betroffen sind
+- **Geändert:** Die erste Kennzahl der Übersicht zeigt statt der überfälligen Nachweise, wie viel Prozent aller Pflichtfortbildungen im laufenden Jahr erfüllt sind, mit „x von y erfüllt“ darunter. Gerechnet wird wie in der Jahresauswertung (jede aktive Person mal jede Pflichtfortbildung, Stand 31.12.); der Tooltip erklärt das. Ab 90 Prozent ist die Kachel grün, ab 70 Prozent orange, darunter rot
+- **Neu:** Über **Offene Nachweise nach Fortbildung** erklärt ein Hinweis, wann ein Nachweis als überfällig zählt
 - **Geändert:** Die Kennzahl **heute abwesend** samt „x von y im Dienst“ entfällt; die Übersicht zeigt drei Kennzahlen
 
 ### 4.72.0 – Von Geräteeinweisungen ausgenommen

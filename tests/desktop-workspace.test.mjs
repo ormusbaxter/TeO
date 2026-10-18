@@ -102,7 +102,9 @@ test("Das Dashboard bündelt überfällige Nachweise und blickt nach vorn", asyn
   assert.match(nachweise, /AB/, "Die Betroffenen erscheinen als Kürzel");
 
   app.renderDashboardSummary();
-  assert.match(app.dom.markupText("#dashboardKpis"), /1<\/strong>[\s\S]*Nachweis überfällig/);
+  // Die Quote rechnet wie die Jahresauswertung zum 31.12.: Hygiene gilt heute
+  // noch, läuft aber vor Jahresende ab und zählt deshalb nicht als erfüllt.
+  assert.match(app.dom.markupText("#dashboardKpis"), /0&thinsp;%<\/strong>[\s\S]*0 von 2 erfüllt/);
 
   // „7 Tage“ grenzt den Blick ein - die Hygiene in 20 Tagen fällt heraus.
   const woche = new app.HTMLElement({ tagName: "BUTTON", dataset: { deadlineHorizon: "7" } });

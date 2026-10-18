@@ -16,7 +16,8 @@ test("Das Dashboard zeigt Kennzahlen, anstehende Fristen und gebündelte Nachwei
     kennzahlen: [...document.querySelectorAll("#dashboardKpis .dashboard-kpi")].map(
       (kpi) => kpi.dataset.dashboardKpi,
     ),
-    ueberfaelligErklaert: document.querySelector('[data-dashboard-kpi="overdue"]').title,
+    quote: document.querySelector('[data-dashboard-kpi="trainingRate"]').textContent,
+    quoteErklaert: document.querySelector('[data-dashboard-kpi="trainingRate"]').title,
     hinweis: document.querySelector("#dashboardTrainingProgress .dashboard-training-note")?.textContent || "",
     schnellzugriffe: document.querySelectorAll(".dashboard-quick-panel .quick-action").length,
     nachweise: document.querySelectorAll("#dashboardTrainingProgress .dashboard-training-row").length,
@@ -25,10 +26,12 @@ test("Das Dashboard zeigt Kennzahlen, anstehende Fristen und gebündelte Nachwei
     ).length,
     zusammenfassung: document.querySelector("#dashboardSummary").textContent,
   }));
-  // Die Anwesenheit von heute steht nicht mehr unter den Kennzahlen; was als
-  // überfälliger Nachweis zählt, erklären Tooltip und Hinweis über der Liste.
-  assert.equal(bild.kennzahlen.join(","), "overdue,week,birthdays");
-  assert.match(bild.ueberfaelligErklaert, /Frist einer Pflichtfortbildung abgelaufen/);
+  // Vorn steht die Quote der Pflichtfortbildungen im laufenden Jahr, die
+  // Anwesenheit von heute nicht mehr; was als überfälliger Nachweis zählt,
+  // erklärt der Hinweis über der Liste.
+  assert.equal(bild.kennzahlen.join(","), "trainingRate,week,birthdays");
+  assert.match(bild.quote, /\d+\s%\s+Pflichtfortbildungen \d{4}\s+\d+ von \d+ erfüllt/);
+  assert.match(bild.quoteErklaert, /Jahresauswertung/);
   assert.match(bild.hinweis, /überfällig.*Wiederholungsintervall/s);
   assert.equal(bild.schnellzugriffe, 4);
   assert.ok(bild.nachweise > 0, "Jede Pflichtfortbildung hat eine Zeile");
