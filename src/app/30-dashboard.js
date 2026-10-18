@@ -2,14 +2,22 @@
   // schränkt keinen Bestand ein, sondern nur den Blick nach vorn.
   let dashboardHorizon = 30;
 
-  // Was „Nachweise überfällig“ zählt - dieselbe Regel wie getDeadlineItems.
-  // Steht als Tooltip an der Kennzahl und sichtbar über den offenen Nachweisen.
+  // Was als überfälliger Nachweis zählt - dieselbe Regel wie getDeadlineItems.
+  // Steht über den offenen Nachweisen.
   const OVERDUE_TRAINING_EXPLANATION =
     "Ein Nachweis ist überfällig, wenn die Frist einer Pflichtfortbildung abgelaufen ist: " +
     "bei wiederkehrenden Fortbildungen der letzte Abschluss plus Wiederholungsintervall, " +
     "ohne Abschluss der 31.12. des Fortbildungsjahres. Gezählt wird jede Person einmal je " +
     "Fortbildung, nur aktive Mitarbeiter; deckt eine Zusatzqualifikation die Fortbildung ab, " +
     "gilt sie als erfüllt.";
+
+  // Was die Quote zählt - dieselbe Rechnung wie die Jahresauswertung
+  // (getAnnualTrainingMatrix), damit beide Stellen dieselbe Zahl zeigen.
+  const TRAINING_RATE_EXPLANATION =
+    "Anteil der erfüllten Pflichtfortbildungen im laufenden Jahr: jede aktive Person mal jede " +
+    "Pflichtfortbildung, Stand 31.12. Erfüllt ist eine Fortbildung, wenn der Abschluss zum " +
+    "Jahresende gilt oder eine Zusatzqualifikation sie abdeckt. Dieselbe Zahl wie in der " +
+    "Jahresauswertung.";
 
   function renderDashboard() {
     renderDashboardGreeting();
@@ -35,8 +43,7 @@
     );
     return {
       overdueTrainings: overdueTrainings.length,
-      overdueTrainingCount: new Set(overdueTrainings.map((item) => item.trainingId)).size,
-      overdueEmployeeCount: new Set(overdueTrainings.map((item) => item.employeeId)).size,
+      trainingYear: getAnnualTrainingMatrix(parseLocalDate(today).getFullYear()),
       dueWeek: upcoming.filter((item) => item.daysUntil <= 7).length,
       dueMonth: upcoming.filter((item) => item.daysUntil <= 30).length,
       absentThisWeek: absentThisWeek.size,
@@ -61,15 +68,17 @@
     const nextBirthday = figures.birthdays[0];
     elements.dashboardKpis.innerHTML = [
       dashboardKpi({
-        key: "overdue",
-        tone: figures.overdueTrainings ? "critical" : "good",
-        icon: figures.overdueTrainings ? "icon-alert" : "icon-check",
-        value: figures.overdueTrainings,
-        label: figures.overdueTrainings === 1 ? "Nachweis überfällig" : "Nachweise überfällig",
-        hint: figures.overdueTrainings
-          ? `${figures.overdueEmployeeCount} ${figures.overdueEmployeeCount === 1 ? "Person" : "Personen"} in ${figures.overdueTrainingCount} Pflichtfortbildung${figures.overdueTrainingCount === 1 ? "" : "en"}`
-          : "Alle Pflichtfortbildungen auf Stand",
-        title: OVERDUE_TRAINING_EXPLANATION,
+        key: "trainingRate",
+        tone: dashboardTrainingRateTone(figures.trainingYear),
+        icon: "icon-training",
+        value: figures.trainingYear.totalAssignments
+          ? `${figures.trainingYear.completionRate}&thinsp;%`
+          : "–",
+        label: `Pflichtfortbildungen ${figures.trainingYear.year}`,
+        hint: figures.trainingYear.totalAssignments
+          ? `${figures.trainingYear.completedAssignments} von ${figures.trainingYear.totalAssignments} erfüllt`
+          : "Keine Pflichtfortbildung angelegt",
+        title: TRAINING_RATE_EXPLANATION,
       }),
       dashboardKpi({
         key: "week",
@@ -90,6 +99,13 @@
           : "in den nächsten 30 Tagen",
       }),
     ].join("");
+  }
+
+  // Rot erst bei deutlichem Rückstand: Im Lauf des Jahres steigt die Quote
+  // ohnehin erst nach und nach.
+  function dashboardTrainingRateTone({ completionRate, totalAssignments }) {
+    if (!totalAssignments || completionRate >= 90) return "good";
+    return completionRate >= 70 ? "warning" : "critical";
   }
 
   function dashboardKpi({ key, tone, icon, value, label, hint, title = "" }) {
@@ -441,7 +457,7 @@
     const kpi = event.target.closest("[data-dashboard-kpi]");
     if (kpi) {
       const key = kpi.dataset.dashboardKpi;
-      if (key === "overdue") {
+      if (key === "trainingRate") {
         document.querySelector("#dashboardTrainingPanel")?.scrollIntoView({ block: "start" });
         return;
       }

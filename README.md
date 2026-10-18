@@ -220,20 +220,20 @@ Daneben öffnet **Abschluss eintragen** direkt den Nachweisdialog.
 
 Darunter stehen drei Kennzahlen, jede ein Klick tief:
 
-- **Nachweise überfällig** springt zu den offenen Nachweisen
+- **Pflichtfortbildungen** mit dem Jahr zeigt, wie viel Prozent aller
+  Pflichtfortbildungen im laufenden Jahr erfüllt sind, und springt zu den
+  offenen Nachweisen
 - **Fristen in 7 Tagen** stellt die Liste „Als Nächstes“ auf sieben Tage
 - **Geburtstage** zeigt die Liste „Als Nächstes“ für 30 Tage
 
 Die Kennzahlen zählen immer den ganzen Bestand, unabhängig von den Filtern der
 Liste.
 
-Ein Nachweis ist **überfällig**, wenn die Frist einer Pflichtfortbildung
-abgelaufen ist: bei wiederkehrenden Fortbildungen der letzte Abschluss plus
-Wiederholungsintervall, ohne Abschluss der 31.12. des Fortbildungsjahres.
-Gezählt wird jede Person einmal je Fortbildung, nur aktive Mitarbeiter; deckt
-eine Zusatzqualifikation die Fortbildung ab, gilt sie als erfüllt. Unter der
-Zahl steht, wie viele Personen und Fortbildungen betroffen sind; die Erklärung
-zeigt die Kennzahl beim Darüberfahren und steht über den offenen Nachweisen.
+Die Quote der Pflichtfortbildungen ist dieselbe wie in der Jahresauswertung:
+jede aktive Person mal jede Pflichtfortbildung, Stand 31.12. des laufenden
+Jahres. Erfüllt ist eine Fortbildung, wenn ihr Abschluss zum Jahresende gilt
+oder eine Zusatzqualifikation sie abdeckt. Ab 90 Prozent ist die Kachel grün,
+ab 70 Prozent orange, darunter rot.
 
 **Als Nächstes** ist der Fristenmonitor (siehe unten). Daneben liegen die
 Schnellzugriffe zum Anlegen von Mitarbeitern, Fortbildungen, Teamsitzungen und
@@ -242,7 +242,11 @@ Memos.
 **Offene Nachweise nach Fortbildung** fasst die überfälligen
 Pflichtfortbildungen zusammen: eine Zeile je Fortbildung mit Erfüllungsgrad,
 der Zahl der überfälligen Nachweise und den Kürzeln der Betroffenen. Ein Klick
-auf die Zeile öffnet den Nachweisdialog für diese Fortbildung.
+auf die Zeile öffnet den Nachweisdialog für diese Fortbildung. Ein Nachweis
+ist **überfällig**, wenn die Frist einer Pflichtfortbildung abgelaufen ist: bei
+wiederkehrenden Fortbildungen der letzte Abschluss plus Wiederholungsintervall,
+ohne Abschluss der 31.12. des Fortbildungsjahres. Gezählt wird jede Person
+einmal je Fortbildung; ein Hinweis über der Liste erklärt das.
 
 Über **Anpassen** werden Kennzahlen, „Als Nächstes“ samt Schnellzugriff und die
 offenen Nachweise ein- oder ausgeblendet und neu angeordnet. Die
