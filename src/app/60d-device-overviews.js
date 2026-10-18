@@ -61,7 +61,7 @@
   }
 
   function getDeviceEmployeeOverview(deviceId) {
-    return [...state.employees].sort(sortEmployees).map((employee) => {
+    return deviceInstructionEmployees().sort(sortEmployees).map((employee) => {
       const instructions = state.deviceInstructions
         .filter(
           (instruction) =>

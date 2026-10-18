@@ -16,7 +16,7 @@ test("Die synthetische Demo-Sicherung bleibt importierbar", async () => {
     "utf8",
   );
   const state = app.parseBackup(content);
-  assert.equal(state.version, 28);
+  assert.equal(state.version, 29);
   assert.equal(state.employees.length, 60);
   assert.equal(state.devices.length, 60);
   assert.equal(

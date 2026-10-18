@@ -280,6 +280,7 @@
       serviceWeekend: normalizeServiceWeekend(employee.serviceWeekend),
       active: employmentStatus !== "inactive",
       employmentStatus,
+      deviceInstructionExempt: employee.deviceInstructionExempt === true,
       qualifications,
       qualificationExpiries,
       createdAt: validTimestamp(employee.createdAt),

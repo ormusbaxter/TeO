@@ -294,6 +294,7 @@
     employeeDialogTitle: document.querySelector("#employeeDialogTitle"),
     employeeSubmitLabel: document.querySelector("#employeeSubmitLabel"),
     serviceWeekend: document.querySelector("#serviceWeekend"),
+    deviceInstructionExempt: document.querySelector("#deviceInstructionExempt"),
     serviceWeekendOwnerHint: document.querySelector(
       "#serviceWeekendOwnerHint",
     ),

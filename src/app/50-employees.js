@@ -467,6 +467,9 @@
                   employee.username
                     ? `Benutzername: ${employee.username}`
                     : "",
+                  isDeviceInstructionExempt(employee)
+                    ? "ohne Geräteeinweisungen"
+                    : "",
                   employee.email || employee.phone || "",
                 ]
                   .filter(Boolean)

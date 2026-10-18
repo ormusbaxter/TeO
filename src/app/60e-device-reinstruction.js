@@ -34,7 +34,7 @@
   function getDeviceReinstructionStatus(device, today = todayIso()) {
     const reset = latestDeviceInstructionReset(device);
     if (!reset) return null;
-    const employees = employedActiveEmployees(today);
+    const employees = deviceInstructionEmployees(employedActiveEmployees(today));
     const index = deviceInstructionIndex();
     const pending = [];
     const renewed = [];

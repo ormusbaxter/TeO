@@ -1,5 +1,5 @@
   function deviceMatrixEmployees() {
-    return [...state.employees]
+    return deviceInstructionEmployees()
       .filter((employee) => {
         if (
           deviceEmployeeStatusFilter === "employed" &&

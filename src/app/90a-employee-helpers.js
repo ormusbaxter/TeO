@@ -41,6 +41,17 @@
     return activeEmployeeList().filter((employee) => isEmployedOn(employee, date));
   }
 
+  // Wer nicht mit den Medizingeräten arbeitet, ist von Geräteeinweisungen
+  // ausgenommen: Er fehlt in Matrix, Übersichten, Kennzahlen und Export,
+  // bleibt sonst aber ein gewöhnlicher Mitarbeiter.
+  function isDeviceInstructionExempt(employee) {
+    return Boolean(employee?.deviceInstructionExempt);
+  }
+
+  function deviceInstructionEmployees(employees = state.employees) {
+    return employees.filter((employee) => !isDeviceInstructionExempt(employee));
+  }
+
   // Stichtag einer Jahrespflicht: das Jahresende, im laufenden Jahr heute.
   function trainingReferenceDate(year) {
     const today = todayIso();

@@ -127,7 +127,7 @@
 
   function createDeviceMatrixWorkbook(
     devices = deviceMatrixExportDevices(),
-    employees = [...state.employees].sort(sortEmployees),
+    employees = deviceInstructionEmployees().sort(sortEmployees),
   ) {
     return createXlsxWorkbook(
       DEVICE_MATRIX_EXPORT_SHEETS.map((sheet) =>
@@ -137,18 +137,19 @@
   }
 
   function exportDeviceMatrixExcel() {
-    if (!state.devices.length || !state.employees.length) {
+    const employees = deviceInstructionEmployees().sort(sortEmployees);
+    if (!state.devices.length || !employees.length) {
       showToast("Für den Export fehlen noch Geräte oder Mitarbeiter.", "warning");
       return;
     }
     downloadTextFile(
       `TeO-Einweisungsmatrix-${todayIso()}.xlsx`,
-      createDeviceMatrixWorkbook(),
+      createDeviceMatrixWorkbook(deviceMatrixExportDevices(), employees),
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     showToast(
-      `Einweisungsmatrix mit ${state.employees.length} Mitarbeiter${
-        state.employees.length === 1 ? "" : "n"
+      `Einweisungsmatrix mit ${employees.length} Mitarbeiter${
+        employees.length === 1 ? "" : "n"
       } und ${state.devices.length} Gerät${
         state.devices.length === 1 ? "" : "en"
       } wurde nach Excel exportiert.`,

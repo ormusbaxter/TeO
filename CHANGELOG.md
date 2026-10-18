@@ -1,3 +1,8 @@
+### 4.72.0 – Von Geräteeinweisungen ausgenommen
+
+- **Neu:** Im Mitarbeiterdialog lässt sich unter **Beschäftigung** **Von Geräteeinweisungen ausgenommen** ankreuzen, für Mitarbeiter, die nicht mit den Medizingeräten arbeiten. Sie erscheinen nicht mehr in der Einweisungsmatrix samt Prozentwerten, in den Übersichten je Gerät, in den Kennzahlen der Geräteeinweisungen, bei offenen Neueinweisungen (auch in der Übersicht) und im Excel-Export der Matrix, und sie stehen beim Dokumentieren einer Einweisung nicht zur Auswahl. Bereits erfasste Einweisungen bleiben erhalten. Mitarbeiterliste und Schnellansicht vermerken die Ausnahme
+- **Geändert:** Datenformat 29. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit die Ausnahme nicht verloren geht
+
 ### 4.71.0 – Einweisungsberechtigungen
 
 - **Neu:** **Einweisungsberechtigungen** im Kopf der Geräteeinweisungen listet auf, welche Gerätebeauftragten welches Gerät einweisen dürfen, jeweils mit dem Datum der Herstellereinweisung. **Nach Geräten** kehrt die Sicht um und nennt je Gerät die Berechtigten. Geräte ohne einweisungsberechtigte Person sind eigens aufgeführt, ebenso aktuelle Gerätebeauftragte, denen noch keine Herstellereinweisung dokumentiert ist. **Nur Geräte im Bestand** ist vorgewählt; Berechtigte, die nicht mehr beschäftigt sind, werden gekennzeichnet

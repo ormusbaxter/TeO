@@ -6015,6 +6015,16 @@ body.is-vacation-planner-maximized {
   line-height: 1.45;
 }
 
+.employee-device-exempt-option {
+  margin-top: 10px;
+}
+
+.employee-device-exempt-option small {
+  display: block;
+  margin-top: 3px;
+  color: var(--slate-500);
+}
+
 .employee-meeting-stat-table tr.is-below-threshold {
   background: var(--red-100);
 }
