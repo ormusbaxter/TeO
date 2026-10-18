@@ -52,6 +52,7 @@
     employmentChanges: "Änderungen des Stellenumfangs",
     employmentStatus: "Status",
     serviceWeekend: "Dienstwochenende",
+    deviceInstructionExempt: "Von Geräteeinweisungen ausgenommen",
     qualifications: "Qualifikationen",
     qualificationExpiries: "Ablaufdaten",
   });
@@ -1046,6 +1047,7 @@
     employeeDialogTitle: document.querySelector("#employeeDialogTitle"),
     employeeSubmitLabel: document.querySelector("#employeeSubmitLabel"),
     serviceWeekend: document.querySelector("#serviceWeekend"),
+    deviceInstructionExempt: document.querySelector("#deviceInstructionExempt"),
     serviceWeekendOwnerHint: document.querySelector(
       "#serviceWeekendOwnerHint",
     ),
@@ -2573,6 +2575,7 @@
       serviceWeekend: normalizeServiceWeekend(employee.serviceWeekend),
       active: employmentStatus !== "inactive",
       employmentStatus,
+      deviceInstructionExempt: employee.deviceInstructionExempt === true,
       qualifications,
       qualificationExpiries,
       createdAt: validTimestamp(employee.createdAt),
@@ -7385,7 +7388,7 @@
             ["Bestand", device.currentInventory ? "Aktuell" : "Nicht mehr im Bestand"],
             [
               "Eingewiesen",
-              `${getDeviceInstructionPercentage(device.id, activeEmployeeList())} %`,
+              `${getDeviceInstructionPercentage(device.id, deviceInstructionEmployees(activeEmployeeList()))} %`,
             ],
             ...(reset
               ? [["Neueinweisung", `seit ${formatDate(reset.effectiveDate)} · ${reset.reason}`]]
@@ -7766,6 +7769,7 @@
         <div><dt>Stellenumfang</dt><dd>${currentEmploymentPercent(employee)}&thinsp;%</dd></div>
         <div><dt>Dienstwochenende</dt><dd>${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</dd></div>
         <div><dt>Fortbildungen</dt><dd>${training.current}/${training.total} aktuell</dd></div>
+        ${isDeviceInstructionExempt(employee) ? "<div><dt>Geräteeinweisungen</dt><dd>Ausgenommen</dd></div>" : ""}
         <div><dt>Telefon</dt><dd>${escapeHtml(employee.phone || "–")}</dd></div>
         <div><dt>E-Mail</dt><dd>${escapeHtml(employee.email || "–")}</dd></div>
       </dl>
@@ -14387,6 +14391,9 @@
                   employee.username
                     ? `Benutzername: ${employee.username}`
                     : "",
+                  isDeviceInstructionExempt(employee)
+                    ? "ohne Geräteeinweisungen"
+                    : "",
                   employee.email || employee.phone || "",
                 ]
                   .filter(Boolean)
@@ -16406,12 +16413,16 @@
     elements.deviceManagementAnnexFilter.value = deviceManagementAnnexFilter;
     elements.deviceEmployeeStatusFilter.value = deviceEmployeeStatusFilter;
 
+    const relevantEmployeeIds = new Set(
+      deviceInstructionEmployees().map((employee) => employee.id),
+    );
     const instructedEmployeeIds = new Set(
       state.deviceInstructions
         .filter((instruction) => isDeviceInstructionValid(instruction))
         .flatMap((instruction) =>
           instruction.participants.map((participant) => participant.employeeId),
-        ),
+        )
+        .filter((employeeId) => relevantEmployeeIds.has(employeeId)),
     );
     const openReinstructions = getOpenDeviceReinstructions().reduce(
       (sum, { status }) => sum + status.pending.length,
@@ -16815,7 +16826,7 @@
   }
 
   function deviceMatrixEmployees() {
-    return [...state.employees]
+    return deviceInstructionEmployees()
       .filter((employee) => {
         if (
           deviceEmployeeStatusFilter === "employed" &&
@@ -17716,12 +17727,16 @@
     }
   }
 
+  // Ausgenommene stehen nicht zur Auswahl, es sei denn, sie sind in einem
+  // älteren Nachweis schon eingetragen – dann bleiben sie abwählbar.
   function filteredDeviceParticipants() {
     return [...state.employees]
       .filter(
         (employee) =>
-          !deviceParticipantSearchTerm ||
-          searchKey(employeeSearchText(employee)).includes(deviceParticipantSearchTerm),
+          (!isDeviceInstructionExempt(employee) ||
+            deviceParticipantDraft.has(employee.id)) &&
+          (!deviceParticipantSearchTerm ||
+            searchKey(employeeSearchText(employee)).includes(deviceParticipantSearchTerm)),
       )
       .sort(compareDeviceInstructionEmployees);
   }
@@ -18007,7 +18022,7 @@
   }
 
   function getDeviceEmployeeOverview(deviceId) {
-    return [...state.employees].sort(sortEmployees).map((employee) => {
+    return deviceInstructionEmployees().sort(sortEmployees).map((employee) => {
       const instructions = state.deviceInstructions
         .filter(
           (instruction) =>
@@ -18417,7 +18432,7 @@
   function getDeviceReinstructionStatus(device, today = todayIso()) {
     const reset = latestDeviceInstructionReset(device);
     if (!reset) return null;
-    const employees = employedActiveEmployees(today);
+    const employees = deviceInstructionEmployees(employedActiveEmployees(today));
     const index = deviceInstructionIndex();
     const pending = [];
     const renewed = [];
@@ -18772,7 +18787,7 @@
 
   function createDeviceMatrixWorkbook(
     devices = deviceMatrixExportDevices(),
-    employees = [...state.employees].sort(sortEmployees),
+    employees = deviceInstructionEmployees().sort(sortEmployees),
   ) {
     return createXlsxWorkbook(
       DEVICE_MATRIX_EXPORT_SHEETS.map((sheet) =>
@@ -18782,18 +18797,19 @@
   }
 
   function exportDeviceMatrixExcel() {
-    if (!state.devices.length || !state.employees.length) {
+    const employees = deviceInstructionEmployees().sort(sortEmployees);
+    if (!state.devices.length || !employees.length) {
       showToast("Für den Export fehlen noch Geräte oder Mitarbeiter.", "warning");
       return;
     }
     downloadTextFile(
       `TeO-Einweisungsmatrix-${todayIso()}.xlsx`,
-      createDeviceMatrixWorkbook(),
+      createDeviceMatrixWorkbook(deviceMatrixExportDevices(), employees),
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     showToast(
-      `Einweisungsmatrix mit ${state.employees.length} Mitarbeiter${
-        state.employees.length === 1 ? "" : "n"
+      `Einweisungsmatrix mit ${employees.length} Mitarbeiter${
+        employees.length === 1 ? "" : "n"
       } und ${state.devices.length} Gerät${
         state.devices.length === 1 ? "" : "en"
       } wurde nach Excel exportiert.`,
@@ -20149,6 +20165,7 @@ ${rendered
       renderEmploymentChangeRows(employee.employmentChanges || []);
       renderNameChangeRows(employee.nameChanges || []);
       document.querySelector("#employeeStatus").value = employee.employmentStatus;
+      elements.deviceInstructionExempt.checked = isDeviceInstructionExempt(employee);
 
       document.querySelectorAll('input[name="qualification"]').forEach((checkbox) => {
         checkbox.checked = Boolean(employee.qualifications[checkbox.value]);
@@ -20526,6 +20543,7 @@ ${rendered
         document.querySelector("#serviceWeekend").value,
       employmentStatus: document.querySelector("#employeeStatus").value,
       active: document.querySelector("#employeeStatus").value !== "inactive",
+      deviceInstructionExempt: elements.deviceInstructionExempt.checked,
       qualifications,
       qualificationExpiries,
       createdAt: existingEmployee?.createdAt || now,
@@ -24904,6 +24922,17 @@ ${rendered
   // niemand zu Quoten, Matrizen und erwarteten Teilnehmern.
   function employedActiveEmployees(date = todayIso()) {
     return activeEmployeeList().filter((employee) => isEmployedOn(employee, date));
+  }
+
+  // Wer nicht mit den Medizingeräten arbeitet, ist von Geräteeinweisungen
+  // ausgenommen: Er fehlt in Matrix, Übersichten, Kennzahlen und Export,
+  // bleibt sonst aber ein gewöhnlicher Mitarbeiter.
+  function isDeviceInstructionExempt(employee) {
+    return Boolean(employee?.deviceInstructionExempt);
+  }
+
+  function deviceInstructionEmployees(employees = state.employees) {
+    return employees.filter((employee) => !isDeviceInstructionExempt(employee));
   }
 
   // Stichtag einer Jahrespflicht: das Jahresende, im laufenden Jahr heute.

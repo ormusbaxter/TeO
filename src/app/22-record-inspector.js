@@ -96,7 +96,7 @@
             ["Bestand", device.currentInventory ? "Aktuell" : "Nicht mehr im Bestand"],
             [
               "Eingewiesen",
-              `${getDeviceInstructionPercentage(device.id, activeEmployeeList())} %`,
+              `${getDeviceInstructionPercentage(device.id, deviceInstructionEmployees(activeEmployeeList()))} %`,
             ],
             ...(reset
               ? [["Neueinweisung", `seit ${formatDate(reset.effectiveDate)} · ${reset.reason}`]]

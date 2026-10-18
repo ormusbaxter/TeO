@@ -245,12 +245,16 @@
     }
   }
 
+  // Ausgenommene stehen nicht zur Auswahl, es sei denn, sie sind in einem
+  // älteren Nachweis schon eingetragen – dann bleiben sie abwählbar.
   function filteredDeviceParticipants() {
     return [...state.employees]
       .filter(
         (employee) =>
-          !deviceParticipantSearchTerm ||
-          searchKey(employeeSearchText(employee)).includes(deviceParticipantSearchTerm),
+          (!isDeviceInstructionExempt(employee) ||
+            deviceParticipantDraft.has(employee.id)) &&
+          (!deviceParticipantSearchTerm ||
+            searchKey(employeeSearchText(employee)).includes(deviceParticipantSearchTerm)),
       )
       .sort(compareDeviceInstructionEmployees);
   }

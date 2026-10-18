@@ -115,12 +115,16 @@
     elements.deviceManagementAnnexFilter.value = deviceManagementAnnexFilter;
     elements.deviceEmployeeStatusFilter.value = deviceEmployeeStatusFilter;
 
+    const relevantEmployeeIds = new Set(
+      deviceInstructionEmployees().map((employee) => employee.id),
+    );
     const instructedEmployeeIds = new Set(
       state.deviceInstructions
         .filter((instruction) => isDeviceInstructionValid(instruction))
         .flatMap((instruction) =>
           instruction.participants.map((participant) => participant.employeeId),
-        ),
+        )
+        .filter((employeeId) => relevantEmployeeIds.has(employeeId)),
     );
     const openReinstructions = getOpenDeviceReinstructions().reduce(
       (sum, { status }) => sum + status.pending.length,

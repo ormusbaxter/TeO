@@ -38,6 +38,7 @@
       renderEmploymentChangeRows(employee.employmentChanges || []);
       renderNameChangeRows(employee.nameChanges || []);
       document.querySelector("#employeeStatus").value = employee.employmentStatus;
+      elements.deviceInstructionExempt.checked = isDeviceInstructionExempt(employee);
 
       document.querySelectorAll('input[name="qualification"]').forEach((checkbox) => {
         checkbox.checked = Boolean(employee.qualifications[checkbox.value]);
@@ -415,6 +416,7 @@
         document.querySelector("#serviceWeekend").value,
       employmentStatus: document.querySelector("#employeeStatus").value,
       active: document.querySelector("#employeeStatus").value !== "inactive",
+      deviceInstructionExempt: elements.deviceInstructionExempt.checked,
       qualifications,
       qualificationExpiries,
       createdAt: existingEmployee?.createdAt || now,

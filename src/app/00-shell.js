@@ -51,6 +51,7 @@
     employmentChanges: "Änderungen des Stellenumfangs",
     employmentStatus: "Status",
     serviceWeekend: "Dienstwochenende",
+    deviceInstructionExempt: "Von Geräteeinweisungen ausgenommen",
     qualifications: "Qualifikationen",
     qualificationExpiries: "Ablaufdaten",
   });

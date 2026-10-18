@@ -99,6 +99,7 @@
         <div><dt>Stellenumfang</dt><dd>${currentEmploymentPercent(employee)}&thinsp;%</dd></div>
         <div><dt>Dienstwochenende</dt><dd>${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</dd></div>
         <div><dt>Fortbildungen</dt><dd>${training.current}/${training.total} aktuell</dd></div>
+        ${isDeviceInstructionExempt(employee) ? "<div><dt>Geräteeinweisungen</dt><dd>Ausgenommen</dd></div>" : ""}
         <div><dt>Telefon</dt><dd>${escapeHtml(employee.phone || "–")}</dd></div>
         <div><dt>E-Mail</dt><dd>${escapeHtml(employee.email || "–")}</dd></div>
       </dl>

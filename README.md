@@ -656,6 +656,18 @@ TeO unterscheidet:
 - **Inaktiv:** wird in aktuellen Planungen und Auswahlfeldern nicht regulär
   angeboten
 
+### Von Geräteeinweisungen ausgenommen
+
+Wer nicht mit den Medizingeräten arbeitet, etwa Stationssekretariat oder
+Servicekräfte, erhält im Mitarbeiterdialog unter **Beschäftigung** den Haken
+**Von Geräteeinweisungen ausgenommen**. Die Person erscheint dann nicht in der
+Einweisungsmatrix, in den Übersichten je Gerät, in den Kennzahlen der
+Geräteeinweisungen, bei offenen Neueinweisungen und im Excel-Export der
+Matrix, und sie steht beim Dokumentieren einer Einweisung nicht zur Auswahl.
+Bereits erfasste Einweisungen bleiben erhalten. In allen anderen Bereichen ist
+sie ein gewöhnlicher Mitarbeiter; die Mitarbeiterliste vermerkt
+„ohne Geräteeinweisungen“.
+
 ### Berufe und Qualifikationen
 
 Berufe und frei definierbare Zusatzqualifikationen werden über
