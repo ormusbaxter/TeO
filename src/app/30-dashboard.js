@@ -2,6 +2,15 @@
   // schränkt keinen Bestand ein, sondern nur den Blick nach vorn.
   let dashboardHorizon = 30;
 
+  // Was „Nachweise überfällig“ zählt - dieselbe Regel wie getDeadlineItems.
+  // Steht als Tooltip an der Kennzahl und sichtbar über den offenen Nachweisen.
+  const OVERDUE_TRAINING_EXPLANATION =
+    "Ein Nachweis ist überfällig, wenn die Frist einer Pflichtfortbildung abgelaufen ist: " +
+    "bei wiederkehrenden Fortbildungen der letzte Abschluss plus Wiederholungsintervall, " +
+    "ohne Abschluss der 31.12. des Fortbildungsjahres. Gezählt wird jede Person einmal je " +
+    "Fortbildung, nur aktive Mitarbeiter; deckt eine Zusatzqualifikation die Fortbildung ab, " +
+    "gilt sie als erfüllt.";
+
   function renderDashboard() {
     renderDashboardGreeting();
     renderDashboardSummary();
@@ -27,11 +36,10 @@
     return {
       overdueTrainings: overdueTrainings.length,
       overdueTrainingCount: new Set(overdueTrainings.map((item) => item.trainingId)).size,
+      overdueEmployeeCount: new Set(overdueTrainings.map((item) => item.employeeId)).size,
       dueWeek: upcoming.filter((item) => item.daysUntil <= 7).length,
       dueMonth: upcoming.filter((item) => item.daysUntil <= 30).length,
-      absentToday: dashboardAbsencesOn(today),
       absentThisWeek: absentThisWeek.size,
-      employed: employedActiveEmployees(today).length,
       birthdays,
     };
   }
@@ -51,7 +59,6 @@
     }
     if (!elements.dashboardKpis) return;
     const nextBirthday = figures.birthdays[0];
-    const present = Math.max(0, figures.employed - figures.absentToday.length);
     elements.dashboardKpis.innerHTML = [
       dashboardKpi({
         key: "overdue",
@@ -60,8 +67,9 @@
         value: figures.overdueTrainings,
         label: figures.overdueTrainings === 1 ? "Nachweis überfällig" : "Nachweise überfällig",
         hint: figures.overdueTrainings
-          ? `in ${figures.overdueTrainingCount} Pflichtfortbildung${figures.overdueTrainingCount === 1 ? "" : "en"}`
+          ? `${figures.overdueEmployeeCount} ${figures.overdueEmployeeCount === 1 ? "Person" : "Personen"} in ${figures.overdueTrainingCount} Pflichtfortbildung${figures.overdueTrainingCount === 1 ? "" : "en"}`
           : "Alle Pflichtfortbildungen auf Stand",
+        title: OVERDUE_TRAINING_EXPLANATION,
       }),
       dashboardKpi({
         key: "week",
@@ -70,14 +78,6 @@
         value: figures.dueWeek,
         label: "Fristen in 7 Tagen",
         hint: `${figures.dueMonth} in 30 Tagen`,
-      }),
-      dashboardKpi({
-        key: "absence",
-        tone: "calm",
-        icon: "icon-vacation",
-        value: figures.absentToday.length,
-        label: "heute abwesend",
-        hint: `${present} von ${figures.employed} im Dienst`,
       }),
       dashboardKpi({
         key: "birthdays",
@@ -92,9 +92,10 @@
     ].join("");
   }
 
-  function dashboardKpi({ key, tone, icon, value, label, hint }) {
+  function dashboardKpi({ key, tone, icon, value, label, hint, title = "" }) {
+    const tooltip = title ? ` title="${escapeHtml(title)}"` : "";
     return `
-      <button class="dashboard-kpi is-${tone}" type="button" data-dashboard-kpi="${key}">
+      <button class="dashboard-kpi is-${tone}" type="button" data-dashboard-kpi="${key}"${tooltip}>
         <span class="dashboard-kpi-icon"><svg><use href="#${icon}"></use></svg></span>
         <span class="dashboard-kpi-body">
           <strong>${value}</strong>
@@ -214,6 +215,10 @@
       );
 
     elements.dashboardTrainingProgress.innerHTML = `
+      <p class="dashboard-training-note">
+        <svg aria-hidden="true"><use href="#icon-help"></use></svg>
+        <span>${escapeHtml(OVERDUE_TRAINING_EXPLANATION)}</span>
+      </p>
       <div class="dashboard-training-list">
         ${sortedTrainings
           .map(({ training, stats, overdue }) => {
@@ -436,10 +441,6 @@
     const kpi = event.target.closest("[data-dashboard-kpi]");
     if (kpi) {
       const key = kpi.dataset.dashboardKpi;
-      if (key === "absence") {
-        showView("vacations");
-        return;
-      }
       if (key === "overdue") {
         document.querySelector("#dashboardTrainingPanel")?.scrollIntoView({ block: "start" });
         return;

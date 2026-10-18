@@ -218,15 +218,22 @@ Fristen in den nächsten sieben Tagen anstehen, wie viele Personen diese Woche
 abwesend sind und wie viele Nachweise bei den Pflichtfortbildungen noch fehlen.
 Daneben öffnet **Abschluss eintragen** direkt den Nachweisdialog.
 
-Darunter stehen vier Kennzahlen, jede ein Klick tief:
+Darunter stehen drei Kennzahlen, jede ein Klick tief:
 
 - **Nachweise überfällig** springt zu den offenen Nachweisen
 - **Fristen in 7 Tagen** stellt die Liste „Als Nächstes“ auf sieben Tage
-- **heute abwesend** öffnet die Urlaubsplanung
 - **Geburtstage** zeigt die Liste „Als Nächstes“ für 30 Tage
 
 Die Kennzahlen zählen immer den ganzen Bestand, unabhängig von den Filtern der
 Liste.
+
+Ein Nachweis ist **überfällig**, wenn die Frist einer Pflichtfortbildung
+abgelaufen ist: bei wiederkehrenden Fortbildungen der letzte Abschluss plus
+Wiederholungsintervall, ohne Abschluss der 31.12. des Fortbildungsjahres.
+Gezählt wird jede Person einmal je Fortbildung, nur aktive Mitarbeiter; deckt
+eine Zusatzqualifikation die Fortbildung ab, gilt sie als erfüllt. Unter der
+Zahl steht, wie viele Personen und Fortbildungen betroffen sind; die Erklärung
+zeigt die Kennzahl beim Darüberfahren und steht über den offenen Nachweisen.
 
 **Als Nächstes** ist der Fristenmonitor (siehe unten). Daneben liegen die
 Schnellzugriffe zum Anlegen von Mitarbeitern, Fortbildungen, Teamsitzungen und

@@ -1,3 +1,8 @@
+### 4.73.0 – Kennzahlen der Übersicht
+
+- **Neu:** Die Kennzahl **Nachweise überfällig** erklärt, was sie zählt: als Tooltip an der Kennzahl und als Hinweis über **Offene Nachweise nach Fortbildung**. Überfällig ist ein Nachweis, wenn die Frist einer Pflichtfortbildung abgelaufen ist (letzter Abschluss plus Wiederholungsintervall, ohne Abschluss der 31.12. des Fortbildungsjahres), je Person und Fortbildung einmal. Darunter steht jetzt auch, wie viele Personen betroffen sind
+- **Geändert:** Die Kennzahl **heute abwesend** samt „x von y im Dienst“ entfällt; die Übersicht zeigt drei Kennzahlen
+
 ### 4.72.0 – Von Geräteeinweisungen ausgenommen
 
 - **Neu:** Im Mitarbeiterdialog lässt sich unter **Beschäftigung** **Von Geräteeinweisungen ausgenommen** ankreuzen, für Mitarbeiter, die nicht mit den Medizingeräten arbeiten. Sie erscheinen nicht mehr in der Einweisungsmatrix samt Prozentwerten, in den Übersichten je Gerät, in den Kennzahlen der Geräteeinweisungen, bei offenen Neueinweisungen (auch in der Übersicht) und im Excel-Export der Matrix, und sie stehen beim Dokumentieren einer Einweisung nicht zur Auswahl. Bereits erfasste Einweisungen bleiben erhalten. Mitarbeiterliste und Schnellansicht vermerken die Ausnahme
