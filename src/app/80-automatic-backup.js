@@ -415,11 +415,16 @@
     if (!directory) return false;
     const sameKey =
       automaticBackupSettings?.keyFingerprint === directory.keyFingerprint;
+    // Bekannt heisst: dieselbe Huelle, nicht nur dasselbe Konto. Eine anderswo
+    // erneuerte Huelle - neues Passwort, neues Notfallblatt - ersetzt die
+    // gehaltene; sonst oeffnete hier weiter das alte Passwort.
     const known =
       sameKey &&
       automaticBackupSettings.encrypted &&
-      Object.keys(directory.keyEnvelopes).every((userId) =>
-        Object.hasOwn(automaticBackupSettings.keyEnvelopes, userId),
+      Object.entries(directory.keyEnvelopes).every(
+        ([userId, envelope]) =>
+          automaticBackupSettings.keyEnvelopes[userId]?.ciphertext ===
+          envelope.ciphertext,
       );
     if (known) return false;
     if (!sameKey) automaticBackupPassword = "";
@@ -541,11 +546,14 @@
     return true;
   }
 
-  async function requestAutomaticBackupRecoveryKey() {
+  async function requestAutomaticBackupRecoveryKey({ passwordReset = false } = {}) {
     let errorMessage = "";
     while (true) {
       const key = (
-        await requestBackupPassword({ mode: "recovery", errorMessage })
+        await requestBackupPassword({
+          mode: passwordReset ? "recovery-reset" : "recovery",
+          errorMessage,
+        })
       )?.trim();
       if (!key) return null;
       if (

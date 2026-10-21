@@ -547,7 +547,9 @@ Administratoren zur Verfügung:
 Zwei Konten lassen sich nicht löschen und sind entsprechend gekennzeichnet: das
 **eigene Konto**, damit man sich nicht mitten in der Sitzung aussperrt, und der
 **letzte verbliebene Administrator**, weil ein Datenbestand ohne Administrator
-nicht mehr verwaltbar wäre.
+nicht mehr verwaltbar wäre. Der **Notfallzugang** zählt dabei nicht mit; er
+lässt sich weder löschen, umbenennen noch zurücksetzen, sondern nur durch ein
+neues Notfallblatt erneuern (siehe „Notfallzugang“).
 
 ### Benutzerkonten beim Import
 
@@ -563,7 +565,9 @@ sich Administratorrechte zu verschaffen.
 ### Ersteinrichtung und Passwörter
 
 TeO enthält keine fest eingebauten Produktivkonten oder Standardpasswörter.
-Beim ersten Start wird ein Administratorkonto erstellt.
+Beim ersten Start wird ein Administratorkonto erstellt. Auch das Passwort des
+Notfallzugangs ist kein Standardpasswort: TeO erzeugt es für jede Installation
+neu und zufällig.
 
 Wird das Passwort eines normalen Benutzers zurückgesetzt, erzeugt TeO ein
 temporäres Passwort. Beim nächsten Anmelden muss der Benutzer ein neues
@@ -590,9 +594,54 @@ nicht verschlüsselt ist, zeigt den Hinweis aus dem zuletzt an diesem
 Arbeitsplatz geladenen Stand.
 
 Hilft auch der Hinweis nicht, setzt ein Administrator das Passwort zurück. Der
-alte Hinweis entfällt dabei, mit dem neuen Passwort entsteht ein neuer. Hat der
-einzige Administrator sein Passwort vergessen, gibt es in TeO keinen Weg
-zurück – ein zweites Administratorkonto beugt dem vor.
+alte Hinweis entfällt dabei, mit dem neuen Passwort entsteht ein neuer.
+
+Ohne Administrator hilft im lokalen Modus der **Wiederherstellungsschlüssel**:
+Benutzername eingeben, **Passwort vergessen?** und dann **Mit
+Wiederherstellungsschlüssel anmelden** wählen. Der Schlüssel öffnet den
+Datenbestand ohne Passwort, danach legt das Konto ein neues Passwort samt
+Hinweis fest – wie nach einem Zurücksetzen. Die Anmeldung steht im
+Änderungsprotokoll. Ist auch der Schlüssel verloren, bleibt der Notfallzugang.
+
+### Notfallzugang
+
+Der Notfallzugang ist ein eigenes Administratorkonto (Benutzername
+**Notfall**) für den Fall, dass niemand mehr an den Datenbestand kommt – auch
+wenn alle Administratorpasswörter und der Wiederherstellungsschlüssel verloren
+sind. Er öffnet den verschlüsselten Bestand an jedem Arbeitsplatz, auch in
+einem leeren Browser, der nur `teo-autosicherung.json` kennt.
+
+- **Einrichtung:** TeO legt ihn im lokalen Modus selbst an – bei der
+  Ersteinrichtung nach dem Wiederherstellungsschlüssel, bei einem bestehenden
+  Bestand bei der nächsten Anmeldung eines Administrators. Das Passwort ist 24
+  Zeichen lang und zufällig, für jede Installation ein anderes.
+- **Notfallblatt:** TeO zeigt das Passwort genau einmal auf dem Notfallblatt.
+  **Drucken**, in einen verschlossenen Umschlag legen und getrennt vom
+  Arbeitsplatz verwahren, etwa bei der Leitung oder im Tresor. Geschlossen
+  wird das Blatt erst, wenn bestätigt ist, dass es verwahrt ist.
+- **Unverändert:** Das Passwort bleibt, wie es ausgegeben wurde. Es läuft
+  nicht ab und muss nach der ersten Anmeldung nicht geändert werden.
+- **Im Notfall:** mit **Notfall** und dem Passwort vom Blatt anmelden –
+  Großbuchstaben und Bindestriche genau wie gedruckt. Danach in der
+  Benutzerverwaltung die Passwörter der Administratoren zurücksetzen.
+- **Benutzung wird gemeldet:** Jede Anmeldung mit dem Notfallzugang steht im
+  Änderungsprotokoll, und alle Administratoren sehen auf der Übersicht einen
+  Hinweis, bis einer ihn mit **Zur Kenntnis genommen** bestätigt.
+- **Neues Notfallblatt:** unter **Einstellungen → Gesamten Datenbestand
+  sichern**, in der Benutzerverwaltung oder im Hinweis der Übersicht. Das neue
+  Passwort ersetzt das alte; empfohlen nach jeder Benutzung und wenn ein Blatt
+  verloren gegangen sein könnte. Ältere Sicherungsdateien öffnet das alte
+  Blatt weiterhin – sie tragen die Hülle von damals.
+
+Wer das Blatt hat, hat vollen Zugriff auf alle Daten. Das ist bei einem
+Generalschlüssel nicht anders und wird organisatorisch beherrscht: verschlossen
+verwahren, Benutzung protokollieren, nach einem Verdacht neu ausstellen. Ein
+festes, überall gleiches Notfallpasswort gibt es bewusst nicht – es wäre eine
+Hintertür in jeden Datenbestand. Geht auch das Blatt verloren, kann niemand den
+Bestand mehr öffnen; das ist der Sinn der Verschlüsselung.
+
+Im MariaDB-Modus legt TeO keinen Notfallzugang an. Dort verwaltet der
+Datenbankadministrator die Konten auf dem Server.
 
 Passwörter werden mit PBKDF2 gehasht gespeichert. Im lokalen Modus steuert die
 Anmeldung die Bedienung der Oberfläche, schützt den Datenbestand aber nicht
@@ -2044,9 +2093,12 @@ Datenbestand den Arbeitsspeicher.
   sich danach wie gewohnt an; ihre erste Anmeldung ersetzt sie durch eine
   reguläre Hülle.
 - **Wiederherstellungsschlüssel:** getrennt von den Sicherungen verwahren,
-  ebenso ein zweites Administratorkonto anlegen. Vergessen alle
-  Administratoren ihr Passwort und ist der Wiederherstellungsschlüssel weg,
-  sind die Daten verloren.
+  ebenso ein zweites Administratorkonto anlegen. Mit dem Schlüssel legt ein
+  Konto an der Anmeldung selbst ein neues Passwort fest.
+- **Notfallzugang:** eine weitere Schlüsselhülle mit einem zufälligen Passwort
+  vom Notfallblatt (siehe „Notfallzugang“). Vergessen alle Administratoren ihr
+  Passwort und sind Wiederherstellungsschlüssel und Notfallblatt weg, sind die
+  Daten verloren.
 
 Ein Hinweis zur vorläufigen Hülle: Wer eine unverschlüsselte Sicherung aus der
 Zeit vor der Umstellung besitzt, kennt die darin gespeicherten Passwort-Hashes

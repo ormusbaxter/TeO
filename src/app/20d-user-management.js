@@ -24,11 +24,18 @@
   // Das eigene Konto bleibt ausgenommen, damit sich niemand mitten in der
   // Sitzung selbst aussperrt. Der letzte Administrator bleibt bestehen, weil
   // ein Datenbestand ohne Administrator nicht mehr verwaltbar wäre.
+  // Der Notfallzugang zaehlt dabei nicht mit: Er soll niemals der einzige
+  // Administrator sein, und loeschen laesst er sich nicht - ein neues
+  // Notfallblatt ersetzt ihn.
   function userDeletionBlocker(user) {
     if (user.id === currentUser?.id) return "Das eigene Konto kann nicht gelöscht werden.";
+    if (isEmergencyUser(user)) {
+      return "Der Notfallzugang kann nicht gelöscht werden; ein neues Notfallblatt ersetzt ihn.";
+    }
     if (
       user.role === "admin" &&
-      state.users.filter((item) => item.role === "admin").length <= 1
+      state.users.filter((item) => item.role === "admin" && !isEmergencyUser(item))
+        .length <= 1
     ) {
       return "Der letzte Administrator kann nicht gelöscht werden.";
     }
@@ -48,6 +55,7 @@
     elements.userManagementList.innerHTML = state.users
       .map((user) => {
         const isSelf = user.id === currentUser?.id;
+        const emergency = isEmergencyUser(user);
         const deletionBlocker = userDeletionBlocker(user);
         return `
           <article class="user-management-row">
@@ -65,24 +73,43 @@
                 spellcheck="false"
                 data-user-username="${user.id}"
                 aria-label="Benutzername für ${escapeHtml(user.username)}"
+                ${emergency ? "readonly" : ""}
               />
-              <small>${user.role === "admin" ? "Administrator" : "Normaler Benutzer"}${
+              <small>${
+                emergency
+                  ? `Notfallzugang · Blatt vom ${escapeHtml(
+                      formatDateTime(user.emergencyIssuedAt),
+                    )}`
+                  : user.role === "admin"
+                    ? "Administrator"
+                    : "Normaler Benutzer"
+              }${
                 isSelf ? " · eigenes Konto" : ""
               }${
                 user.mustChangePassword ? " · Passwortänderung erforderlich" : ""
               }</small>
             </label>
             <div class="user-management-actions">
-              <button
+              ${
+                emergency
+                  ? ""
+                  : `<button
                 class="button button-secondary"
                 type="button"
                 data-save-user-username="${user.id}"
               >
                 <svg><use href="#icon-check"></use></svg>
                 Benutzername speichern
-              </button>
+              </button>`
+              }
               ${
-                isSelf
+                emergency
+                  ? `<button
+                    class="button button-secondary"
+                    type="button"
+                    data-issue-emergency-sheet
+                  >Neues Notfallblatt</button>`
+                  : isSelf
                   ? ""
                   : `<button
                     class="button button-secondary"
@@ -220,7 +247,7 @@
     ].find(
       (field) => field.dataset.userUsername === userId,
     );
-    if (!user || !input) return;
+    if (!user || !input || isEmergencyUser(user)) return;
 
     const username = input.value.trim();
     if (!/^[A-Za-z0-9]{4,40}$/.test(username)) {
@@ -261,9 +288,12 @@
 
   // Das eigene Passwort wird über den Kontodialog geändert, nicht hier
   // zurückgesetzt – sonst wäre die eigene Sitzung sofort änderungspflichtig.
+  // Auch der Notfallzugang nicht: Sein Passwort steht auf dem Blatt, ein
+  // temporaeres Passwort wuerde es ungueltig machen.
   function resettableUser(userId) {
     return state.users.find(
-      (item) => item.id === userId && item.id !== currentUser?.id,
+      (item) =>
+        item.id === userId && item.id !== currentUser?.id && !isEmergencyUser(item),
     );
   }
 
@@ -418,8 +448,9 @@
     if (!isMariaDbMode() && automaticBackupSettings?.encrypted) {
       elements.loginError.textContent = "";
       elements.loginPasswordHint.textContent =
-        "Der Datenbestand ist verschlüsselt, Passworthinweise sind erst nach der Anmeldung lesbar. Ein Administrator kann das Passwort zurücksetzen.";
+        "Der Datenbestand ist verschlüsselt, Passworthinweise sind erst nach der Anmeldung lesbar. Ein Administrator kann das Passwort zurücksetzen. Mit dem Wiederherstellungsschlüssel legen Sie selbst ein neues fest.";
       elements.loginPasswordHint.hidden = false;
+      elements.loginWithRecoveryKeyButton.hidden = false;
       return;
     }
     const username = document.querySelector("#loginUsername").value.trim();
@@ -466,4 +497,5 @@
   function hideLoginPasswordHint() {
     elements.loginPasswordHint.hidden = true;
     elements.loginPasswordHint.textContent = "";
+    elements.loginWithRecoveryKeyButton.hidden = true;
   }

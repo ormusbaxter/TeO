@@ -153,6 +153,23 @@
       passwordHint: normalizePasswordHint(user.passwordHint),
       theme: normalizeUserTheme(user.theme),
       iconSet: normalizeUserIconSet(user.iconSet),
+      ...(user.emergency === true && role === "admin"
+        ? normalizeEmergencyAccountFields(user)
+        : {}),
+    };
+  }
+
+  // Nur das Notfallkonto traegt diese Felder; gewoehnliche Konten bleiben,
+  // wie sie waren.
+  function normalizeEmergencyAccountFields(user) {
+    const timestamp = (value) =>
+      typeof value === "string" && !Number.isNaN(Date.parse(value)) ? value : "";
+    return {
+      emergency: true,
+      emergencyIssuedAt: timestamp(user.emergencyIssuedAt),
+      emergencySheetConfirmed: Boolean(user.emergencySheetConfirmed),
+      emergencyLastUsedAt: timestamp(user.emergencyLastUsedAt),
+      emergencyUseAcknowledged: user.emergencyUseAcknowledged !== false,
     };
   }
 

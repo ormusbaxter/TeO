@@ -262,6 +262,19 @@ export async function openTeO(
     await page.evaluate(() =>
       document.querySelector("#automaticBackupRecoveryDialog[open]")?.close(),
     );
+    // Danach richtet TeO den Notfallzugang ein und zeigt sein Blatt. Auch das
+    // muss ein Test nicht verwahren; bestätigt wird es trotzdem, sonst
+    // erschiene beim nächsten Start ein neues.
+    if (anmeldenAls === "admin") {
+      await page.waitForSelector("#emergencySheetDialog[open]", { timeout: 15000 });
+      await page.check("#emergencySheetConfirmed");
+      await page.click("#closeEmergencySheet");
+      await page.waitForFunction(
+        () => !document.querySelector("dialog[open]"),
+        null,
+        { timeout: 15000 },
+      );
+    }
   }
 
   // Ohne dies misst ein Test unmittelbar nach einer Änderung den Startwert

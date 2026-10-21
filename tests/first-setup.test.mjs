@@ -87,7 +87,11 @@ test("Nach der Ersteinrichtung legt TeO die gemeinsame Datei an, statt sie zu ve
   );
   assert.equal(await offeneDialoge(teo), "automaticBackupRecoveryDialog");
   await teo.page.click("#automaticBackupRecoveryDialog .modal-footer [data-close-dialog]");
-  assert.equal(await offeneDialoge(teo), "");
+  // Danach das Blatt des Notfallzugangs.
+  await teo.page.waitForSelector("#emergencySheetDialog[open]");
+  await teo.page.check("#emergencySheetConfirmed");
+  await teo.page.click("#closeEmergencySheet");
+  await teo.page.waitForFunction(() => !document.querySelector("dialog[open]"));
   const sicherung = await teo.evaluate(async () => {
     const wurzel = await navigator.storage.getDirectory();
     const ordner = await wurzel.getDirectoryHandle("gemeinsam");

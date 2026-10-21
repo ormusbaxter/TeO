@@ -443,6 +443,29 @@
             </div>
           </div>
 
+          <section
+            class="emergency-access-notice"
+            id="emergencyAccessNotice"
+            role="status"
+            hidden
+          >
+            <svg><use href="#icon-lock"></use></svg>
+            <div>
+              <strong id="emergencyAccessNoticeTitle"></strong>
+              <p id="emergencyAccessNoticeText"></p>
+            </div>
+            <div class="emergency-access-notice-actions">
+              <button class="button button-secondary" type="button" id="emergencyAccessUsersButton" hidden>
+                Benutzerverwaltung
+              </button>
+              <button class="button button-secondary" type="button" id="emergencyAccessAcknowledgeButton" hidden>
+                Zur Kenntnis genommen
+              </button>
+              <button class="button button-primary" type="button" data-issue-emergency-sheet>
+                Neues Notfallblatt
+              </button>
+            </div>
+          </section>
           <div class="dashboard-kpis" id="dashboardKpis" data-dashboard-widget="summary"></div>
 
           <div class="dashboard-priority-grid" id="dashboardPriorityGrid" data-dashboard-widget="upcoming">

@@ -289,6 +289,9 @@ test("Der Client sperrt genau dieselben drei Bereiche wie der Server", async () 
       "requestPasswordReset",
       "resetUserPassword",
       "saveUsername",
+      // Notfallzugang, ebenfalls Benutzerverwaltung
+      "requestNewEmergencySheet",
+      "acknowledgeEmergencyAccessUse",
       // Speicherort
       "applyStorageBackend",
       "testBackendConnection",

@@ -105,6 +105,64 @@
     </dialog>
 
     <dialog
+      class="modal emergency-sheet-dialog"
+      id="emergencySheetDialog"
+      aria-labelledby="emergencySheetTitle"
+      data-persistent-dialog
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Notfallzugang</p>
+          <h2 id="emergencySheetTitle">Notfallblatt</h2>
+          <p class="modal-subtitle">
+            Ausdrucken, in einen verschlossenen Umschlag legen und getrennt vom
+            Arbeitsplatz verwahren.
+          </p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p class="emergency-sheet-introduction" id="emergencySheetIntroduction"></p>
+        <dl class="emergency-sheet-credentials">
+          <div>
+            <dt>Benutzername</dt>
+            <dd id="emergencySheetUsername"></dd>
+          </div>
+          <div>
+            <dt>Notfallpasswort</dt>
+            <dd class="emergency-sheet-password" id="emergencySheetPassword"></dd>
+          </div>
+        </dl>
+        <div class="backup-password-notice">
+          <svg><use href="#icon-lock"></use></svg>
+          <p>
+            Mit diesem Zugang öffnet sich der verschlüsselte Datenbestand an
+            jedem Arbeitsplatz – auch wenn alle Administratorpasswörter und der
+            Wiederherstellungsschlüssel verloren sind. TeO zeigt das Passwort
+            nur jetzt. Geht das Blatt verloren, erzeugen Sie unter
+            Einstellungen → Daten ein neues.
+          </p>
+        </div>
+        <label class="checkbox-field emergency-sheet-confirmation">
+          <input type="checkbox" id="emergencySheetConfirmed" />
+          <span>Das Notfallblatt ist ausgedruckt und sicher verwahrt.</span>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="copyEmergencySheetPassword" type="button">
+          <svg><use href="#icon-copy"></use></svg>
+          Passwort kopieren
+        </button>
+        <button class="button button-secondary" id="printEmergencySheet" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Drucken
+        </button>
+        <button class="button button-primary" id="closeEmergencySheet" type="button" disabled>
+          Fertig
+        </button>
+      </div>
+    </dialog>
+
+    <dialog
       class="modal phone-list-preview-dialog"
       id="phoneListPreviewDialog"
       aria-labelledby="phoneListPreviewTitle"
@@ -143,6 +201,12 @@
     <section
       class="appointment-print-surface"
       id="appointmentPrintSurface"
+      aria-hidden="true"
+    ></section>
+
+    <section
+      class="emergency-sheet-print-surface"
+      id="emergencySheetPrintSurface"
       aria-hidden="true"
     ></section>
 

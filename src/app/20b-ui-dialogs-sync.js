@@ -170,7 +170,11 @@
     );
     document
       .querySelector("#loginUsername")
-      .addEventListener("input", hideLoginPasswordHint);
+      .addEventListener("input", () => {
+        // Der Weg ueber den Wiederherstellungsschluessel braucht den
+        // Benutzernamen - er bleibt beim Tippen stehen.
+        if (elements.loginWithRecoveryKeyButton.hidden) hideLoginPasswordHint();
+      });
     document.querySelectorAll("[data-logout]").forEach((button) => {
       button.addEventListener("click", logout);
     });
@@ -188,6 +192,10 @@
       const deleteButton = event.target.closest("[data-delete-user]");
       if (deleteButton) {
         requestDeleteUser(deleteButton.dataset.deleteUser);
+        return;
+      }
+      if (event.target.closest("[data-issue-emergency-sheet]")) {
+        requestNewEmergencySheet();
         return;
       }
       const saveButton = event.target.closest("[data-save-user-username]");

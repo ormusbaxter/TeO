@@ -84,6 +84,82 @@
     background: white;
   }
 
+  body.print-emergency-sheet > * {
+    display: none !important;
+  }
+
+  body.print-emergency-sheet > #emergencySheetPrintSurface {
+    page: appointment;
+    display: block !important;
+    width: 100%;
+    color: #111;
+    background: white;
+  }
+
+  .emergency-sheet-document,
+  .emergency-sheet-document * {
+    box-sizing: border-box;
+    color: #111;
+  }
+
+  .emergency-sheet-document {
+    padding: 8mm 6mm;
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+
+  .emergency-sheet-document :is(h1, h2, p, dl, ol) {
+    margin: 0 0 4mm;
+  }
+
+  .emergency-sheet-document h1 {
+    font-size: 24pt;
+  }
+
+  .emergency-sheet-document h2 {
+    margin-top: 8mm;
+    font-size: 14pt;
+  }
+
+  .emergency-sheet-document-eyebrow {
+    font-size: 9pt !important;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .emergency-sheet-document dl {
+    margin-top: 8mm;
+    padding: 6mm;
+    border: 0.5mm solid #111;
+    border-radius: 3mm;
+  }
+
+  .emergency-sheet-document dt {
+    font-size: 9pt;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .emergency-sheet-document dd {
+    margin: 0 0 4mm;
+    font-size: 16pt;
+    font-weight: 700;
+  }
+
+  .emergency-sheet-document-password {
+    font-family: "Courier New", monospace;
+    font-size: 18pt !important;
+    letter-spacing: 0.08em;
+  }
+
+  .emergency-sheet-document-warning {
+    margin-top: 10mm !important;
+    padding-top: 4mm;
+    border-top: 0.35mm solid #555;
+    font-weight: 700;
+  }
+
   body.print-vacation-blank-year > * {
     display: none !important;
   }
@@ -571,6 +647,10 @@
   }
 
   body.print-vacation-blank-month > #trainingMatrixDialog {
+    display: none !important;
+  }
+
+  body.print-emergency-sheet > #trainingMatrixDialog {
     display: none !important;
   }
 

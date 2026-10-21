@@ -157,3 +157,37 @@
     databaseSaveReminderArmed = shouldRemindBeforeUnload(state);
     return "";
   }
+
+  // Wie openLocalStateForLogin, nur oeffnet der Wiederherstellungsschluessel
+  // statt eines Passworts. Fuer den eben eingerichteten Bestand, der noch
+  // keine gemeinsame Datei hat.
+  async function openLocalStateWithRecoveryKey(username) {
+    let envelope = null;
+    try {
+      envelope = await dataStore.getItem(ENCRYPTED_STORAGE_KEY);
+    } catch (error) {
+      console.warn("Der verschlüsselte Datenbestand konnte nicht gelesen werden.", error);
+    }
+    if (!isEncryptedLocalState(envelope) || !automaticBackupSettings?.keyFingerprint) {
+      return "Dieser Datenbestand ist nicht verschlüsselt; ein Administrator kann das Passwort zurücksetzen.";
+    }
+    const key = await requestAutomaticBackupRecoveryKey({ passwordReset: true });
+    if (!key) {
+      return "Ohne Wiederherstellungsschlüssel lässt sich das Passwort nicht neu festlegen.";
+    }
+    let unlockedState;
+    try {
+      unlockedState = normalizeState(await decryptLocalState(envelope, key));
+    } catch (error) {
+      return error.message;
+    }
+    const user = findUserByUsername(unlockedState.users, username);
+    if (!user) return "Dieser Benutzername ist im Datenbestand nicht bekannt.";
+    state = unlockedState;
+    automaticBackupPassword = key;
+    localStateLocked = false;
+    clearUndoHistory();
+    const message = await completeRecoveryKeyLogin(user);
+    if (message) showLoginDialog();
+    return message;
+  }

@@ -573,6 +573,47 @@
   width: min(520px, calc(100vw - 32px));
 }
 
+.emergency-sheet-dialog {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.emergency-sheet-introduction {
+  margin: 0 0 14px;
+  color: var(--slate-700);
+  line-height: 1.5;
+}
+
+.emergency-sheet-credentials {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.emergency-sheet-credentials dt {
+  color: var(--slate-500);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.emergency-sheet-credentials dd {
+  margin: 3px 0 0;
+  font-weight: 700;
+}
+
+.emergency-sheet-password {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.emergency-sheet-print-surface {
+  display: none;
+}
+
 .backup-recovery-introduction {
   margin: 0 0 14px;
   color: var(--slate-700);
