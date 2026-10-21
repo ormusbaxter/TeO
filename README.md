@@ -1243,6 +1243,25 @@ Darstellung und der zuletzt angesehene Monat bleiben im Browser gespeichert und
 stehen beim nächsten Aufruf wieder bereit. Auf schmalen Bildschirmen zeigt jedes
 Tagesfeld statt der Titel farbige Balken – ein Tippen öffnet den Termin.
 
+### Termine als Kalenderdatei
+
+**Kalenderdatei** im Kopf des Terminkalenders speichert die gerade angezeigten
+Termine als `.ics`-Datei. Outlook, Google Kalender, Thunderbird und die
+Kalender auf Smartphones lesen sie ein. Es gelten Suchbegriff und
+Zeitraumfilter; angepinnte Termine sind wie in der Liste immer dabei.
+
+- **Ein Termin:** **Kalenderdatei** in seiner Schnellansicht.
+- **Ausgewählte Termine:** mit Strg oder Umschalt mehrere Karten wählen, dann
+  die Sammelaktion **Kalenderdatei**.
+
+Termine mit Uhrzeit stehen in deutscher Zeit (Europe/Berlin), Termine ohne
+Uhrzeit als ganztägige Einträge; ist nur ein Beginn angegeben, steht der Termin
+als Zeitpunkt ohne Dauer im Kalender. Ort, Beschreibung und Kategorie werden
+mitgegeben, ein angepinnter Termin ist als wichtig markiert. Jeder Termin
+behält beim erneuten Export dieselbe Kennung: Ein Kalenderprogramm
+aktualisiert ihn beim nächsten Import, statt ihn doppelt anzulegen. Ein in TeO
+gelöschter Termin verschwindet dagegen nicht von selbst aus dem Kalender.
+
 ### Fristenmonitor
 
 Der Fristenmonitor steht auf der Übersichtsseite unter den Kennzahlen und

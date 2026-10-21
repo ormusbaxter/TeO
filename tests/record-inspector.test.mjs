@@ -80,7 +80,7 @@ test("Jede Datenart beschreibt ihre eigenen Eckdaten", async () => {
   assert.equal(fakten.Wichtig, "Angepinnt");
   assert.equal(
     termin.actions(gefunden).map((action) => action.label).join(","),
-    "Bearbeiten,Kalender",
+    "Bearbeiten,Kalenderdatei,Kalender",
   );
 
   const geraet = definitionen.device;

@@ -57,7 +57,12 @@ test("Jede Datenart bringt ihre Sammelaktionen mit", async () => {
 
   for (const [type, definition] of Object.entries(definitionen)) {
     const aktionen = definition.bulkActions(["x", "y"]).map((action) => action.label);
-    assert.equal(aktionen.length, 3, `${type} bietet drei Sammelaktionen`);
+    // Termine gehen zusätzlich als Kalenderdatei hinaus.
+    assert.equal(
+      aktionen.length,
+      type === "appointment" ? 4 : 3,
+      `${type} bietet ${type === "appointment" ? "vier" : "drei"} Sammelaktionen`,
+    );
     assert.ok(aktionen.includes("Löschen"), `${type} lässt sich sammelweise löschen`);
     assert.ok(
       definition.bulkActions(["x"]).at(-1).danger,

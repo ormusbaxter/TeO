@@ -1,3 +1,8 @@
+### 4.76.0 – Termine als Kalenderdatei
+
+- **Neu:** **Kalenderdatei** im Kopf des Terminkalenders speichert die angezeigten Termine als `.ics`-Datei für Outlook, Google Kalender oder das Smartphone. Suchbegriff und Zeitraumfilter gelten wie in der Liste; angepinnte Termine sind dabei. Einzelne Termine gehen über **Kalenderdatei** in der Schnellansicht hinaus, mehrere ausgewählte über die gleichnamige Sammelaktion
+- **Neu:** Uhrzeiten stehen in deutscher Zeit, Termine ohne Uhrzeit werden ganztägig, ein angepinnter Termin ist als wichtig markiert. Jeder Termin behält beim erneuten Export seine Kennung, sodass ein Kalenderprogramm ihn beim nächsten Import aktualisiert, statt ihn doppelt anzulegen
+
 ### 4.75.0 – Notfallzugang
 
 - **Neu:** Ein **Notfallzugang** öffnet den verschlüsselten Datenbestand auch dann, wenn alle Administratorpasswörter und der Wiederherstellungsschlüssel verloren sind – an jedem Arbeitsplatz, auch in einem leeren Browser mit nur `teo-autosicherung.json`. Er ist ein eigenes Administratorkonto **Notfall** mit einem zufälligen Passwort je Installation, das TeO einmal auf dem **Notfallblatt** zum Ausdrucken zeigt. Das Passwort bleibt unverändert, bis ein neues Blatt erzeugt wird. TeO legt den Zugang bei der Ersteinrichtung an, in einem bestehenden Datenbestand bei der nächsten Anmeldung eines Administrators

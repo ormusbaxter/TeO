@@ -10,14 +10,25 @@
                 Anstehende und vergangene Termine zentral verwalten.
               </p>
             </div>
-            <button
-              class="button button-primary"
-              type="button"
-              data-open-appointment
-            >
-              <svg><use href="#icon-plus"></use></svg>
-              Termin anlegen
-            </button>
+            <div class="header-actions">
+              <button
+                class="button button-secondary"
+                id="exportAppointmentsIcsButton"
+                type="button"
+                title="Die angezeigten Termine als .ics-Datei für Outlook, Google Kalender oder das Smartphone speichern"
+              >
+                <svg><use href="#icon-download"></use></svg>
+                Kalenderdatei
+              </button>
+              <button
+                class="button button-primary"
+                type="button"
+                data-open-appointment
+              >
+                <svg><use href="#icon-plus"></use></svg>
+                Termin anlegen
+              </button>
+            </div>
           </div>
 
           <div class="appointment-toolbar">

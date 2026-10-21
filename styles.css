@@ -2043,6 +2043,7 @@ body.is-compact-tables .icon-button {
 
 .record-inspector-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 7px;
   margin: 18px 0;
 }

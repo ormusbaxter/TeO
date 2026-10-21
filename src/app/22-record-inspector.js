@@ -36,6 +36,11 @@
         actions: (appointment) => [
           { label: "Bearbeiten", icon: "icon-edit", run: () => openAppointmentDialog(appointment.id) },
           {
+            label: "Kalenderdatei",
+            icon: "icon-download",
+            run: () => exportAppointmentsIcs([appointment]),
+          },
+          {
             label: "Kalender",
             icon: "icon-calendar",
             primary: true,

@@ -31,6 +31,7 @@
       (appointment) => appointment.date === today,
     ).length;
 
+    elements.exportAppointmentsIcsButton.disabled = state.appointments.length === 0;
     elements.appointmentSummary.innerHTML = `
       ${renderSummaryChip("calendar", state.appointments.length, "Termine gesamt")}
       ${renderSummaryChip("alert", visibleUpcomingCount, "anstehende Termine", "orange")}

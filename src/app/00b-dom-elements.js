@@ -237,6 +237,7 @@
     openMeetingStatsButton: document.querySelector("#openMeetingStatsButton"),
     appointmentSummary: document.querySelector("#appointmentSummary"),
     appointmentList: document.querySelector("#appointmentList"),
+    exportAppointmentsIcsButton: document.querySelector("#exportAppointmentsIcsButton"),
     appointmentSearch: document.querySelector("#appointmentSearch"),
     appointmentCalendar: document.querySelector("#appointmentCalendar"),
     appointmentCalendarGrid: document.querySelector("#appointmentCalendarGrid"),
