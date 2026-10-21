@@ -172,7 +172,8 @@
   function requestBackupPassword({ mode, errorMessage = "" }) {
     const exporting = mode === "export";
     const automatic = mode === "automatic";
-    const recovery = mode === "recovery";
+    const passwordReset = mode === "recovery-reset";
+    const recovery = mode === "recovery" || passwordReset;
     elements.backupPasswordForm.reset();
     elements.backupPasswordDialog.dataset.mode = mode;
     elements.backupPasswordDialogTitle.textContent = automatic
@@ -184,6 +185,8 @@
         : "Sicherung entschlüsseln";
     elements.backupPasswordDialogDescription.textContent = automatic
       ? "Bestätigen Sie Ihr aktuelles Login-Passwort. TeO verwendet es zum geschützten Hinterlegen des gemeinsamen Sicherungsschlüssels."
+      : passwordReset
+        ? "Der Wiederherstellungsschlüssel öffnet den Datenbestand ohne Passwort. Danach legen Sie ein neues Passwort fest."
       : recovery
         ? "Dieses Konto benötigt einmalig den Wiederherstellungsschlüssel der automatischen Sicherung."
       : exporting
@@ -191,6 +194,8 @@
         : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort oder den Wiederherstellungsschlüssel ein.";
     elements.backupPasswordNotice.textContent = automatic
       ? "Das Login-Passwort wird nicht gespeichert. Bei späteren Anmeldungen entsperrt es den Sicherungsschlüssel automatisch."
+      : passwordReset
+        ? "Die Anmeldung mit dem Wiederherstellungsschlüssel wird im Änderungsprotokoll vermerkt."
       : recovery
         ? "Nach erfolgreicher Eingabe wird der Sicherungsschlüssel mit Ihrem Login-Passwort geschützt."
       : exporting

@@ -909,3 +909,7 @@ body.is-sidebar-collapsed .sidebar-search {
   line-height: 1.45;
   text-align: center;
 }
+
+.auth-recovery-button {
+  margin-top: 10px;
+}

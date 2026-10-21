@@ -1444,6 +1444,24 @@
     phoneListPreviewContent: document.querySelector("#phoneListPreviewContent"),
     phoneListPrintSurface: document.querySelector("#phoneListPrintSurface"),
     appointmentPrintSurface: document.querySelector("#appointmentPrintSurface"),
+    emergencySheetDialog: document.querySelector("#emergencySheetDialog"),
+    emergencySheetIntroduction: document.querySelector("#emergencySheetIntroduction"),
+    emergencySheetUsername: document.querySelector("#emergencySheetUsername"),
+    emergencySheetPassword: document.querySelector("#emergencySheetPassword"),
+    emergencySheetConfirmed: document.querySelector("#emergencySheetConfirmed"),
+    copyEmergencySheetPassword: document.querySelector("#copyEmergencySheetPassword"),
+    printEmergencySheet: document.querySelector("#printEmergencySheet"),
+    closeEmergencySheet: document.querySelector("#closeEmergencySheet"),
+    emergencySheetPrintSurface: document.querySelector("#emergencySheetPrintSurface"),
+    emergencyAccessNotice: document.querySelector("#emergencyAccessNotice"),
+    emergencyAccessNoticeTitle: document.querySelector("#emergencyAccessNoticeTitle"),
+    emergencyAccessNoticeText: document.querySelector("#emergencyAccessNoticeText"),
+    emergencyAccessUsersButton: document.querySelector("#emergencyAccessUsersButton"),
+    emergencyAccessAcknowledgeButton: document.querySelector(
+      "#emergencyAccessAcknowledgeButton",
+    ),
+    issueEmergencySheetButton: document.querySelector("#issueEmergencySheetButton"),
+    loginWithRecoveryKeyButton: document.querySelector("#loginWithRecoveryKeyButton"),
     printEmployeePhoneListButton: document.querySelector(
       "#printEmployeePhoneListButton",
     ),
@@ -2457,6 +2475,23 @@
       passwordHint: normalizePasswordHint(user.passwordHint),
       theme: normalizeUserTheme(user.theme),
       iconSet: normalizeUserIconSet(user.iconSet),
+      ...(user.emergency === true && role === "admin"
+        ? normalizeEmergencyAccountFields(user)
+        : {}),
+    };
+  }
+
+  // Nur das Notfallkonto traegt diese Felder; gewoehnliche Konten bleiben,
+  // wie sie waren.
+  function normalizeEmergencyAccountFields(user) {
+    const timestamp = (value) =>
+      typeof value === "string" && !Number.isNaN(Date.parse(value)) ? value : "";
+    return {
+      emergency: true,
+      emergencyIssuedAt: timestamp(user.emergencyIssuedAt),
+      emergencySheetConfirmed: Boolean(user.emergencySheetConfirmed),
+      emergencyLastUsedAt: timestamp(user.emergencyLastUsedAt),
+      emergencyUseAcknowledged: user.emergencyUseAcknowledged !== false,
     };
   }
 
@@ -3701,6 +3736,40 @@
     return "";
   }
 
+  // Wie openLocalStateForLogin, nur oeffnet der Wiederherstellungsschluessel
+  // statt eines Passworts. Fuer den eben eingerichteten Bestand, der noch
+  // keine gemeinsame Datei hat.
+  async function openLocalStateWithRecoveryKey(username) {
+    let envelope = null;
+    try {
+      envelope = await dataStore.getItem(ENCRYPTED_STORAGE_KEY);
+    } catch (error) {
+      console.warn("Der verschlüsselte Datenbestand konnte nicht gelesen werden.", error);
+    }
+    if (!isEncryptedLocalState(envelope) || !automaticBackupSettings?.keyFingerprint) {
+      return "Dieser Datenbestand ist nicht verschlüsselt; ein Administrator kann das Passwort zurücksetzen.";
+    }
+    const key = await requestAutomaticBackupRecoveryKey({ passwordReset: true });
+    if (!key) {
+      return "Ohne Wiederherstellungsschlüssel lässt sich das Passwort nicht neu festlegen.";
+    }
+    let unlockedState;
+    try {
+      unlockedState = normalizeState(await decryptLocalState(envelope, key));
+    } catch (error) {
+      return error.message;
+    }
+    const user = findUserByUsername(unlockedState.users, username);
+    if (!user) return "Dieser Benutzername ist im Datenbestand nicht bekannt.";
+    state = unlockedState;
+    automaticBackupPassword = key;
+    localStateLocked = false;
+    clearUndoHistory();
+    const message = await completeRecoveryKeyLogin(user);
+    if (message) showLoginDialog();
+    return message;
+  }
+
   function bindNavigation() {
     document.querySelectorAll("[data-view]").forEach((button) => {
       button.addEventListener("click", () => showView(button.dataset.view));
@@ -4278,6 +4347,7 @@
       "click",
       copyAutomaticBackupRecoveryKey,
     );
+    bindEmergencyAccess();
     elements.employeeForm.addEventListener("submit", handleEmployeeSubmit);
     elements.trainingForm.addEventListener("submit", handleTrainingSubmit);
     elements.completionForm.addEventListener("submit", handleCompletionSubmit);
@@ -4954,7 +5024,11 @@
     );
     document
       .querySelector("#loginUsername")
-      .addEventListener("input", hideLoginPasswordHint);
+      .addEventListener("input", () => {
+        // Der Weg ueber den Wiederherstellungsschluessel braucht den
+        // Benutzernamen - er bleibt beim Tippen stehen.
+        if (elements.loginWithRecoveryKeyButton.hidden) hideLoginPasswordHint();
+      });
     document.querySelectorAll("[data-logout]").forEach((button) => {
       button.addEventListener("click", logout);
     });
@@ -4972,6 +5046,10 @@
       const deleteButton = event.target.closest("[data-delete-user]");
       if (deleteButton) {
         requestDeleteUser(deleteButton.dataset.deleteUser);
+        return;
+      }
+      if (event.target.closest("[data-issue-emergency-sheet]")) {
+        requestNewEmergencySheet();
         return;
       }
       const saveButton = event.target.closest("[data-save-user-username]");
@@ -5685,9 +5763,16 @@
       showAutomaticBackupRecoveryKey({ introduction: true });
       return;
     }
-    // Erst jetzt: Vor der Anmeldung steht die Anwendung noch hinter der
-    // Sperre, und ein Hinweis darueber waere im Weg.
-    showWhatsNewIfUpdated();
+    if (isEmergencyUser(currentUser)) {
+      void recordEmergencyAccessUse();
+      return;
+    }
+    // Fehlt der Notfallzugang noch, erscheint sein Blatt vor den Neuigkeiten.
+    void offerEmergencyAccess().then((shown) => {
+      // Erst jetzt: Vor der Anmeldung steht die Anwendung noch hinter der
+      // Sperre, und ein Hinweis darueber waere im Weg.
+      if (!shown) showWhatsNewIfUpdated();
+    });
   }
 
   function showLoginDialog() {
@@ -5700,6 +5785,7 @@
     startupBackupSynchronized = false;
     startupBackupImportRunning = false;
     backupReminderShown = false;
+    emergencyAccessUseRecorded = false;
     sessionStorage.removeItem(SESSION_USER_KEY);
     document.body.classList.add("is-auth-locked");
     document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
@@ -5818,6 +5904,10 @@
       );
     }
     currentUser = state.users.find((user) => user.id === currentUser.id);
+    // Waehrend des Speicherns galt das Konto noch als aenderungspflichtig, und
+    // dafuer sichert TeO nicht. Erst mit der Datei gilt das neue Passwort auch
+    // an den anderen Arbeitsplaetzen.
+    scheduleAutomaticBackup();
     elements.changePasswordDialog.close();
     if (!isMariaDbMode() && !startupBackupSynchronized) {
       showFirstSharedFolderDialog();
@@ -5954,11 +6044,18 @@
   // Das eigene Konto bleibt ausgenommen, damit sich niemand mitten in der
   // Sitzung selbst aussperrt. Der letzte Administrator bleibt bestehen, weil
   // ein Datenbestand ohne Administrator nicht mehr verwaltbar wäre.
+  // Der Notfallzugang zaehlt dabei nicht mit: Er soll niemals der einzige
+  // Administrator sein, und loeschen laesst er sich nicht - ein neues
+  // Notfallblatt ersetzt ihn.
   function userDeletionBlocker(user) {
     if (user.id === currentUser?.id) return "Das eigene Konto kann nicht gelöscht werden.";
+    if (isEmergencyUser(user)) {
+      return "Der Notfallzugang kann nicht gelöscht werden; ein neues Notfallblatt ersetzt ihn.";
+    }
     if (
       user.role === "admin" &&
-      state.users.filter((item) => item.role === "admin").length <= 1
+      state.users.filter((item) => item.role === "admin" && !isEmergencyUser(item))
+        .length <= 1
     ) {
       return "Der letzte Administrator kann nicht gelöscht werden.";
     }
@@ -5978,6 +6075,7 @@
     elements.userManagementList.innerHTML = state.users
       .map((user) => {
         const isSelf = user.id === currentUser?.id;
+        const emergency = isEmergencyUser(user);
         const deletionBlocker = userDeletionBlocker(user);
         return `
           <article class="user-management-row">
@@ -5995,24 +6093,43 @@
                 spellcheck="false"
                 data-user-username="${user.id}"
                 aria-label="Benutzername für ${escapeHtml(user.username)}"
+                ${emergency ? "readonly" : ""}
               />
-              <small>${user.role === "admin" ? "Administrator" : "Normaler Benutzer"}${
+              <small>${
+                emergency
+                  ? `Notfallzugang · Blatt vom ${escapeHtml(
+                      formatDateTime(user.emergencyIssuedAt),
+                    )}`
+                  : user.role === "admin"
+                    ? "Administrator"
+                    : "Normaler Benutzer"
+              }${
                 isSelf ? " · eigenes Konto" : ""
               }${
                 user.mustChangePassword ? " · Passwortänderung erforderlich" : ""
               }</small>
             </label>
             <div class="user-management-actions">
-              <button
+              ${
+                emergency
+                  ? ""
+                  : `<button
                 class="button button-secondary"
                 type="button"
                 data-save-user-username="${user.id}"
               >
                 <svg><use href="#icon-check"></use></svg>
                 Benutzername speichern
-              </button>
+              </button>`
+              }
               ${
-                isSelf
+                emergency
+                  ? `<button
+                    class="button button-secondary"
+                    type="button"
+                    data-issue-emergency-sheet
+                  >Neues Notfallblatt</button>`
+                  : isSelf
                   ? ""
                   : `<button
                     class="button button-secondary"
@@ -6150,7 +6267,7 @@
     ].find(
       (field) => field.dataset.userUsername === userId,
     );
-    if (!user || !input) return;
+    if (!user || !input || isEmergencyUser(user)) return;
 
     const username = input.value.trim();
     if (!/^[A-Za-z0-9]{4,40}$/.test(username)) {
@@ -6191,9 +6308,12 @@
 
   // Das eigene Passwort wird über den Kontodialog geändert, nicht hier
   // zurückgesetzt – sonst wäre die eigene Sitzung sofort änderungspflichtig.
+  // Auch der Notfallzugang nicht: Sein Passwort steht auf dem Blatt, ein
+  // temporaeres Passwort wuerde es ungueltig machen.
   function resettableUser(userId) {
     return state.users.find(
-      (item) => item.id === userId && item.id !== currentUser?.id,
+      (item) =>
+        item.id === userId && item.id !== currentUser?.id && !isEmergencyUser(item),
     );
   }
 
@@ -6348,8 +6468,9 @@
     if (!isMariaDbMode() && automaticBackupSettings?.encrypted) {
       elements.loginError.textContent = "";
       elements.loginPasswordHint.textContent =
-        "Der Datenbestand ist verschlüsselt, Passworthinweise sind erst nach der Anmeldung lesbar. Ein Administrator kann das Passwort zurücksetzen.";
+        "Der Datenbestand ist verschlüsselt, Passworthinweise sind erst nach der Anmeldung lesbar. Ein Administrator kann das Passwort zurücksetzen. Mit dem Wiederherstellungsschlüssel legen Sie selbst ein neues fest.";
       elements.loginPasswordHint.hidden = false;
+      elements.loginWithRecoveryKeyButton.hidden = false;
       return;
     }
     const username = document.querySelector("#loginUsername").value.trim();
@@ -6396,6 +6517,7 @@
   function hideLoginPasswordHint() {
     elements.loginPasswordHint.hidden = true;
     elements.loginPasswordHint.textContent = "";
+    elements.loginWithRecoveryKeyButton.hidden = true;
   }
 
   function openCatalogManagementDialog() {
@@ -6920,6 +7042,424 @@
       if (meetingDisplayYear === previousYear) meetingDisplayYear = year;
     }
     renderAll();
+  }
+
+  // Notfallzugang im lokalen Betrieb. Ein eigenes Administratorkonto, dessen
+  // Passwort TeO je Installation zufaellig erzeugt und einmal auf dem
+  // Notfallblatt ausgibt. Technisch ist es eine weitere Schluesselhuelle: Wer
+  // das Passwort kennt, oeffnet den Datenbestand an jedem Arbeitsplatz, auch
+  // wenn alle anderen Passwoerter und der Wiederherstellungsschluessel
+  // verloren sind. Ein festes, ueberall gleiches Passwort waere eine
+  // Hintertuer - deshalb gibt es keins.
+  //
+  // Das Passwort bleibt, wie es ausgegeben wurde, bis jemand ein neues Blatt
+  // erzeugt. Jede Benutzung landet im Protokoll und als Hinweis bei allen
+  // Administratoren.
+  const EMERGENCY_USERNAME = "Notfall";
+  const EMERGENCY_PASSWORD_HINT = "Steht auf dem Notfallblatt im verschlossenen Umschlag.";
+  // 32 Zeichen ohne Verwechsler (0/O, 1/I). 256 ist ein Vielfaches von 32,
+  // jedes Zeichen ist also gleich wahrscheinlich; 24 Zeichen ergeben 120 Bit.
+  const EMERGENCY_PASSWORD_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const EMERGENCY_PASSWORD_LENGTH = 24;
+
+  // Die Benutzung wird je Anmeldung einmal vermerkt.
+  let emergencyAccessUseRecorded = false;
+
+  function isEmergencyUser(user) {
+    return Boolean(user?.emergency);
+  }
+
+  function emergencyUser() {
+    return state.users.find(isEmergencyUser) || null;
+  }
+
+  function createEmergencyPassword() {
+    const bytes = crypto.getRandomValues(new Uint8Array(EMERGENCY_PASSWORD_LENGTH));
+    const characters = [...bytes].map(
+      (byte) => EMERGENCY_PASSWORD_ALPHABET[byte % EMERGENCY_PASSWORD_ALPHABET.length],
+    );
+    const groups = [];
+    for (let start = 0; start < characters.length; start += 4) {
+      groups.push(characters.slice(start, start + 4).join(""));
+    }
+    return groups.join("-");
+  }
+
+  // Heisst ein gewoehnliches Konto schon „Notfall“, bekommt der Zugang eine
+  // Nummer dazu.
+  function emergencyUsername() {
+    if (!isUsernameTaken(EMERGENCY_USERNAME)) return EMERGENCY_USERNAME;
+    let number = 2;
+    while (isUsernameTaken(`${EMERGENCY_USERNAME}${number}`)) number += 1;
+    return `${EMERGENCY_USERNAME}${number}`;
+  }
+
+  // Nur mit entsperrtem Datenschluessel: Ohne ihn liesse sich keine Huelle
+  // anlegen. Im Serverbetrieb verwaltet der Datenbankadministrator die Konten.
+  function emergencyAccessAvailable() {
+    return (
+      !isMariaDbMode() &&
+      Boolean(automaticBackupSettings?.encrypted && automaticBackupPassword)
+    );
+  }
+
+  // Legt den Zugang an oder erneuert ihn: neues Passwort, neue Huelle unter
+  // derselben Konto-ID. Die bisherige Huelle ist damit ersetzt, das alte Blatt
+  // oeffnet den Bestand nicht mehr.
+  async function issueEmergencyAccess() {
+    if (!emergencyAccessAvailable() || !isAdmin()) return false;
+    const existing = emergencyUser();
+    const password = createEmergencyPassword();
+    const credentials = await createPasswordCredentials(password);
+    const account = {
+      ...(existing || {
+        id: `user-${createId()}`,
+        username: emergencyUsername(),
+      }),
+      ...credentials,
+      role: "admin",
+      mustChangePassword: false,
+      passwordHint: EMERGENCY_PASSWORD_HINT,
+      emergency: true,
+      emergencyIssuedAt: new Date().toISOString(),
+      emergencySheetConfirmed: false,
+      emergencyLastUsedAt: existing?.emergencyLastUsedAt || "",
+      emergencyUseAcknowledged: true,
+    };
+    const committed = await commitStateMutation(
+      () => {
+        state.users = existing
+          ? state.users.map((item) => (item.id === account.id ? account : item))
+          : [...state.users, account];
+      },
+      {
+        auditAction: existing
+          ? "Neues Notfallblatt erzeugt"
+          : "Notfallzugang eingerichtet",
+      },
+    );
+    if (!committed) return false;
+    if (currentUser?.id === account.id) {
+      currentUser = state.users.find((item) => item.id === account.id);
+    }
+    try {
+      await registerAutomaticBackupUserKey(account.id, password);
+    } catch (error) {
+      console.error("Die Schlüsselhülle des Notfallzugangs konnte nicht angelegt werden.", error);
+      showToast(
+        "Der Notfallzugang konnte nicht mit dem Datenschlüssel verbunden werden. Bitte erneut ein Notfallblatt erzeugen.",
+        "error",
+      );
+      return false;
+    }
+    // Die gemeinsame Datei traegt das Schluesselverzeichnis; erst mit ihr
+    // gilt das neue Blatt auch an anderen Arbeitsplaetzen.
+    scheduleAutomaticBackup();
+    renderEmergencyAccessNotice();
+    showEmergencySheet(account, password, { renewed: Boolean(existing) });
+    return true;
+  }
+
+  // Nach der Anmeldung eines Administrators: Fehlt der Zugang noch, entsteht
+  // er jetzt. Einen vorhandenen erneuert TeO nie von selbst - auch nicht, wenn
+  // sein Blatt nicht bestaetigt wurde: Die Bestaetigung kann schlicht noch
+  // nicht in der gemeinsamen Datei stehen, und ein verwahrtes Blatt waere
+  // dann wertlos. Dafuer steht der Hinweis auf der Uebersicht.
+  async function offerEmergencyAccess() {
+    if (!isAdmin() || isEmergencyUser(currentUser) || !emergencyAccessAvailable()) {
+      return false;
+    }
+    if (document.querySelector("dialog[open]") || emergencyUser()) return false;
+    return issueEmergencyAccess();
+  }
+
+  function showEmergencySheet(account, password, { renewed = false } = {}) {
+    elements.emergencySheetIntroduction.textContent = renewed
+      ? "TeO hat ein neues Notfallblatt erzeugt. Das bisherige Notfallpasswort gilt nicht mehr – vernichten Sie das alte Blatt."
+      : "TeO hat einen Notfallzugang eingerichtet. Er ist ein eigenes Administratorkonto für den Fall, dass niemand mehr an den Datenbestand kommt.";
+    elements.emergencySheetUsername.textContent = account.username;
+    elements.emergencySheetPassword.textContent = password;
+    elements.emergencySheetConfirmed.checked = false;
+    elements.closeEmergencySheet.disabled = true;
+    elements.emergencySheetPrintSurface.innerHTML = emergencySheetDocument(
+      account,
+      password,
+    );
+    if (!elements.emergencySheetDialog.open) elements.emergencySheetDialog.showModal();
+    elements.printEmergencySheet.focus();
+  }
+
+  function emergencySheetDocument(account, password) {
+    const fingerprint = String(automaticBackupSettings?.keyFingerprint || "").slice(0, 8);
+    return `
+      <article class="emergency-sheet-document">
+        <p class="emergency-sheet-document-eyebrow">TeO – Team &amp; Employee Organizer</p>
+        <h1>Notfallblatt</h1>
+        <p>Ausgestellt am ${escapeHtml(formatDateTime(account.emergencyIssuedAt))}
+          · Schlüssel ${escapeHtml(fingerprint)}</p>
+        <dl>
+          <dt>Benutzername</dt>
+          <dd>${escapeHtml(account.username)}</dd>
+          <dt>Notfallpasswort</dt>
+          <dd class="emergency-sheet-document-password">${escapeHtml(password)}</dd>
+        </dl>
+        <h2>Im Notfall</h2>
+        <ol>
+          <li>TeO öffnen und mit diesem Benutzernamen und Passwort anmelden –
+            Großbuchstaben und Bindestriche genau wie hier.</li>
+          <li>Unter Konto → Benutzerverwaltung die Passwörter der
+            Administratoren zurücksetzen.</li>
+          <li>Danach unter Einstellungen → Daten ein neues Notfallblatt
+            erzeugen und dieses Blatt vernichten.</li>
+        </ol>
+        <p class="emergency-sheet-document-warning">Wer dieses Blatt hat, hat
+          vollen Zugriff auf alle Daten. Verschlossen und getrennt vom
+          Arbeitsplatz aufbewahren.</p>
+      </article>`;
+  }
+
+  async function confirmEmergencySheet() {
+    const account = emergencyUser();
+    if (account && !account.emergencySheetConfirmed) {
+      const committed = await commitStateMutation(
+        () => {
+          state.users = state.users.map((item) =>
+            item.id === account.id ? { ...item, emergencySheetConfirmed: true } : item,
+          );
+        },
+        { auditAction: "Notfallblatt als verwahrt bestätigt" },
+      );
+      if (!committed) return;
+      if (currentUser?.id === account.id) {
+        currentUser = state.users.find((item) => item.id === account.id);
+      }
+    }
+    elements.emergencySheetPassword.textContent = "";
+    elements.emergencySheetPrintSurface.innerHTML = "";
+    elements.emergencySheetDialog.close();
+    showToast("Das Notfallblatt ist verwahrt.");
+  }
+
+  function printEmergencySheet() {
+    document.body.classList.add("print-emergency-sheet");
+    window.print();
+    window.setTimeout(() => document.body.classList.remove("print-emergency-sheet"), 0);
+  }
+
+  async function copyEmergencySheetPassword() {
+    try {
+      await navigator.clipboard.writeText(elements.emergencySheetPassword.textContent);
+      showToast("Das Notfallpasswort wurde kopiert.");
+    } catch {
+      showToast("Das Passwort konnte nicht kopiert werden.", "error");
+    }
+  }
+
+  function requestNewEmergencySheet() {
+    if (!requireAdmin()) return;
+    if (!emergencyAccessAvailable()) {
+      showToast(
+        "Ein Notfallblatt lässt sich nur im lokalen Betrieb mit verschlüsseltem Datenbestand erzeugen.",
+        "error",
+      );
+      return;
+    }
+    requestConfirmation({
+      title: "Neues Notfallblatt erzeugen?",
+      message:
+        "TeO erzeugt ein neues Notfallpasswort. Das bisherige Notfallblatt gilt danach nicht mehr; ältere Sicherungsdateien lassen sich mit ihm aber weiterhin öffnen.",
+      acceptLabel: "Neues Notfallblatt",
+      tone: "primary",
+      callback: () => void issueEmergencyAccess(),
+    });
+  }
+
+  // Anmeldung mit dem Notfallzugang: vermerken und allen Administratoren
+  // anzeigen, bis einer den Hinweis bestaetigt.
+  async function recordEmergencyAccessUse() {
+    if (!isEmergencyUser(currentUser) || emergencyAccessUseRecorded) return;
+    emergencyAccessUseRecorded = true;
+    const usedAt = new Date().toISOString();
+    const committed = await commitStateMutation(
+      () => {
+        state.users = state.users.map((item) =>
+          item.id === currentUser.id
+            ? { ...item, emergencyLastUsedAt: usedAt, emergencyUseAcknowledged: false }
+            : item,
+        );
+      },
+      { auditAction: "Anmeldung mit dem Notfallzugang" },
+    );
+    if (committed) currentUser = state.users.find((item) => item.id === currentUser.id);
+    renderEmergencyAccessNotice();
+    showToast(
+      "Angemeldet mit dem Notfallzugang. Bitte danach ein neues Notfallblatt erzeugen.",
+      "warning",
+    );
+  }
+
+  // Bestaetigt, was der Hinweis meldet: eine Benutzung des Zugangs oder ein
+  // Blatt, das bei der Ausgabe nicht als verwahrt bestaetigt wurde.
+  async function acknowledgeEmergencyAccessUse() {
+    if (!requireAdmin()) return;
+    const account = emergencyUser();
+    if (!account) return;
+    const sheetPending = !account.emergencySheetConfirmed;
+    if (!sheetPending && account.emergencyUseAcknowledged) return;
+    await commitStateMutation(
+      () => {
+        state.users = state.users.map((item) =>
+          item.id === account.id
+            ? sheetPending
+              ? { ...item, emergencySheetConfirmed: true }
+              : { ...item, emergencyUseAcknowledged: true }
+            : item,
+        );
+      },
+      {
+        auditAction: sheetPending
+          ? "Notfallblatt als verwahrt bestätigt"
+          : "Benutzung des Notfallzugangs zur Kenntnis genommen",
+      },
+    );
+    renderEmergencyAccessNotice();
+  }
+
+  // Was der Hinweis ueber den Kennzahlen meldet, in dieser Reihenfolge: die
+  // eigene Anmeldung mit dem Zugang, eine Benutzung, ein unbestaetigtes Blatt.
+  function emergencyAccessNoticeContent() {
+    const account = emergencyUser();
+    if (isMariaDbMode() || !account || !isAdmin()) return null;
+    if (isEmergencyUser(currentUser)) {
+      return {
+        title: "Angemeldet mit dem Notfallzugang",
+        text: "Setzen Sie in der Benutzerverwaltung die Passwörter der Administratoren zurück und erzeugen Sie danach ein neues Notfallblatt – das bisherige ist geöffnet worden.",
+        users: true,
+      };
+    }
+    if (account.emergencyLastUsedAt && !account.emergencyUseAcknowledged) {
+      return {
+        title: "Der Notfallzugang wurde benutzt",
+        text: `Anmeldung mit dem Notfallzugang am ${formatDateTime(
+          account.emergencyLastUsedAt,
+        )}. War das nicht abgesprochen, erzeugen Sie ein neues Notfallblatt und prüfen Sie das Änderungsprotokoll.`,
+        acknowledge: "Zur Kenntnis genommen",
+      };
+    }
+    if (!account.emergencySheetConfirmed) {
+      return {
+        title: "Notfallblatt nicht bestätigt",
+        text: `Das Notfallblatt vom ${formatDateTime(
+          account.emergencyIssuedAt,
+        )} wurde nicht als verwahrt bestätigt. Liegt es nicht sicher vor, erzeugen Sie ein neues.`,
+        acknowledge: "Blatt liegt vor",
+      };
+    }
+    return null;
+  }
+
+  function renderEmergencyAccessNotice() {
+    const content = emergencyAccessNoticeContent();
+    elements.emergencyAccessNotice.hidden = !content;
+    if (elements.issueEmergencySheetButton) {
+      elements.issueEmergencySheetButton.hidden =
+        isMariaDbMode() || !automaticBackupSettings?.encrypted;
+    }
+    if (!content) return;
+    elements.emergencyAccessNoticeTitle.textContent = content.title;
+    elements.emergencyAccessNoticeText.textContent = content.text;
+    elements.emergencyAccessUsersButton.hidden = !content.users;
+    elements.emergencyAccessAcknowledgeButton.hidden = !content.acknowledge;
+    elements.emergencyAccessAcknowledgeButton.textContent = content.acknowledge || "";
+  }
+
+  // Anmeldung mit dem Wiederherstellungsschluessel statt des Passworts: Der
+  // Schluessel oeffnet den Bestand, danach legt das Konto ein neues Passwort
+  // fest - derselbe Weg wie nach einem Zuruecksetzen durch einen
+  // Administrator.
+  async function startRecoveryKeyLogin() {
+    const username = document.querySelector("#loginUsername").value.trim();
+    if (!username) {
+      elements.loginError.textContent =
+        "Bitte zuerst den Benutzernamen eingeben, dessen Passwort neu festgelegt werden soll.";
+      document.querySelector("#loginUsername").focus();
+      return;
+    }
+    if (isMariaDbMode() || startupBackupImportRunning) return;
+    elements.loginError.textContent = "";
+    startupBackupImportRunning = true;
+    let message;
+    try {
+      message = automaticBackupSettings?.firstSharedFilePending
+        ? await openLocalStateWithRecoveryKey(username)
+        : await loginWithSharedDataSet(username, "", { useRecoveryKey: true });
+    } finally {
+      startupBackupImportRunning = false;
+    }
+    if (message) elements.loginError.textContent = message;
+  }
+
+  function findUserByUsername(users, username) {
+    const normalized = username.toLocaleLowerCase("de-DE");
+    return users.find(
+      (item) => item.username.toLocaleLowerCase("de-DE") === normalized,
+    );
+  }
+
+  // Gemeinsamer Schluss beider Wege. Rueckgabe wie bei der Anmeldung: eine
+  // Meldung fuer den Dialog, leer bei Erfolg.
+  async function completeRecoveryKeyLogin(user) {
+    if (isEmergencyUser(user)) {
+      return "Der Notfallzugang wird über ein neues Notfallblatt erneuert, nicht über den Wiederherstellungsschlüssel.";
+    }
+    state.users = state.users.map((item) =>
+      item.id === user.id ? { ...item, mustChangePassword: true } : item,
+    );
+    const account = state.users.find((item) => item.id === user.id);
+    currentUser = account;
+    appendAuditEntry("Anmeldung mit dem Wiederherstellungsschlüssel");
+    if (!(await persistState())) {
+      currentUser = null;
+      return "Der Datenbestand konnte nicht gespeichert werden. Bitte erneut versuchen.";
+    }
+    databaseSaveReminderArmed = true;
+    completeLogin(account);
+    return "";
+  }
+
+  function bindEmergencyAccess() {
+    elements.emergencySheetConfirmed.addEventListener("change", () => {
+      elements.closeEmergencySheet.disabled = !elements.emergencySheetConfirmed.checked;
+    });
+    elements.closeEmergencySheet.addEventListener(
+      "click",
+      () => void confirmEmergencySheet(),
+    );
+    elements.printEmergencySheet.addEventListener("click", printEmergencySheet);
+    elements.copyEmergencySheetPassword.addEventListener(
+      "click",
+      () => void copyEmergencySheetPassword(),
+    );
+    // Die Schaltflaechen der Benutzerverwaltung entstehen erst beim Zeichnen;
+    // deren Klick nimmt die Liste entgegen.
+    document.querySelectorAll("[data-issue-emergency-sheet]").forEach((button) => {
+      button.addEventListener("click", requestNewEmergencySheet);
+    });
+    elements.emergencyAccessAcknowledgeButton.addEventListener(
+      "click",
+      () => void acknowledgeEmergencyAccessUse(),
+    );
+    elements.emergencyAccessUsersButton.addEventListener("click", openUserManagementDialog);
+    elements.loginWithRecoveryKeyButton.addEventListener(
+      "click",
+      () => void startRecoveryKeyLogin(),
+    );
+    // Der Wiederherstellungsschluessel geht dem Notfallblatt voraus: Beide
+    // entstehen bei der Einrichtung, das Blatt folgt, sobald der Schluessel
+    // verwahrt ist.
+    elements.automaticBackupRecoveryDialog.addEventListener("close", () => {
+      window.setTimeout(() => void offerEmergencyAccess(), 0);
+    });
   }
 
   // Mehrfachauswahl für Karten - Termine, Memos und Geräte.
@@ -9625,6 +10165,7 @@
     "Jahresauswertung.";
 
   function renderDashboard() {
+    renderEmergencyAccessNotice();
     renderDashboardGreeting();
     renderDashboardSummary();
     renderDashboardTrainingProgress();
@@ -22103,11 +22644,16 @@ ${rendered
     if (!directory) return false;
     const sameKey =
       automaticBackupSettings?.keyFingerprint === directory.keyFingerprint;
+    // Bekannt heisst: dieselbe Huelle, nicht nur dasselbe Konto. Eine anderswo
+    // erneuerte Huelle - neues Passwort, neues Notfallblatt - ersetzt die
+    // gehaltene; sonst oeffnete hier weiter das alte Passwort.
     const known =
       sameKey &&
       automaticBackupSettings.encrypted &&
-      Object.keys(directory.keyEnvelopes).every((userId) =>
-        Object.hasOwn(automaticBackupSettings.keyEnvelopes, userId),
+      Object.entries(directory.keyEnvelopes).every(
+        ([userId, envelope]) =>
+          automaticBackupSettings.keyEnvelopes[userId]?.ciphertext ===
+          envelope.ciphertext,
       );
     if (known) return false;
     if (!sameKey) automaticBackupPassword = "";
@@ -22229,11 +22775,14 @@ ${rendered
     return true;
   }
 
-  async function requestAutomaticBackupRecoveryKey() {
+  async function requestAutomaticBackupRecoveryKey({ passwordReset = false } = {}) {
     let errorMessage = "";
     while (true) {
       const key = (
-        await requestBackupPassword({ mode: "recovery", errorMessage })
+        await requestBackupPassword({
+          mode: passwordReset ? "recovery-reset" : "recovery",
+          errorMessage,
+        })
       )?.trim();
       if (!key) return null;
       if (
@@ -22790,7 +23339,8 @@ ${rendered
   function requestBackupPassword({ mode, errorMessage = "" }) {
     const exporting = mode === "export";
     const automatic = mode === "automatic";
-    const recovery = mode === "recovery";
+    const passwordReset = mode === "recovery-reset";
+    const recovery = mode === "recovery" || passwordReset;
     elements.backupPasswordForm.reset();
     elements.backupPasswordDialog.dataset.mode = mode;
     elements.backupPasswordDialogTitle.textContent = automatic
@@ -22802,6 +23352,8 @@ ${rendered
         : "Sicherung entschlüsseln";
     elements.backupPasswordDialogDescription.textContent = automatic
       ? "Bestätigen Sie Ihr aktuelles Login-Passwort. TeO verwendet es zum geschützten Hinterlegen des gemeinsamen Sicherungsschlüssels."
+      : passwordReset
+        ? "Der Wiederherstellungsschlüssel öffnet den Datenbestand ohne Passwort. Danach legen Sie ein neues Passwort fest."
       : recovery
         ? "Dieses Konto benötigt einmalig den Wiederherstellungsschlüssel der automatischen Sicherung."
       : exporting
@@ -22809,6 +23361,8 @@ ${rendered
         : "Diese Sicherungsdatei ist verschlüsselt. Geben Sie das zugehörige Passwort oder den Wiederherstellungsschlüssel ein.";
     elements.backupPasswordNotice.textContent = automatic
       ? "Das Login-Passwort wird nicht gespeichert. Bei späteren Anmeldungen entsperrt es den Sicherungsschlüssel automatisch."
+      : passwordReset
+        ? "Die Anmeldung mit dem Wiederherstellungsschlüssel wird im Änderungsprotokoll vermerkt."
       : recovery
         ? "Nach erfolgreicher Eingabe wird der Sicherungsschlüssel mit Ihrem Login-Passwort geschützt."
       : exporting
@@ -23366,7 +23920,15 @@ ${rendered
   // der Datei geprueft und der Bestand in einem Zug uebernommen.
   // Rueckgabe ist die Meldung fuer den Anmeldedialog, leer bei Erfolg oder
   // wenn stattdessen die Dateiauswahl offen ist.
-  async function loginWithSharedDataSet(username, password) {
+  // Mit useRecoveryKey oeffnet der Wiederherstellungsschluessel statt des
+  // Passworts die Datei; das Konto legt danach ein neues Passwort fest.
+  async function loginWithSharedDataSet(
+    username,
+    password,
+    { useRecoveryKey = false } = {},
+  ) {
+    const chooseFileFirst = (message) =>
+      chooseStartupBackupFileFirst(username, password, message, { useRecoveryKey });
     // Eine von Hand gewaehlte Datei gilt fuer diese Anmeldung. Sonst wird die
     // Datei im Ordner frisch gelesen - sie kann sich seit dem Start geaendert
     // haben, und erst jetzt darf der Browser nach dem Zugriff fragen.
@@ -23377,17 +23939,14 @@ ${rendered
         true,
       );
       if (located.status !== "found") {
-        return chooseStartupBackupFileFirst(
-          username,
-          password,
-          startupBackupFallbackMessage(located.status),
+        return chooseFileFirst(startupBackupFallbackMessage(located.status),
         );
       }
       file = located.file;
     }
     const volume = backupVolumeAssessment(file.size);
     if (volume.exceeded) {
-      return chooseStartupBackupFileFirst(username, password, backupVolumeMessage(volume));
+      return chooseFileFirst(backupVolumeMessage(volume));
     }
 
     let fileContent = await file.text();
@@ -23395,10 +23954,7 @@ ${rendered
     try {
       envelope = JSON.parse(fileContent);
     } catch {
-      return chooseStartupBackupFileFirst(
-        username,
-        password,
-        "Die gemeinsame Sicherungsdatei enthält kein gültiges JSON.",
+      return chooseFileFirst("Die gemeinsame Sicherungsdatei enthält kein gültiges JSON.",
       );
     }
 
@@ -23406,15 +23962,21 @@ ${rendered
       await adoptAutomaticBackupKeyDirectory(
         readAutomaticBackupKeyDirectory(envelope),
       );
-      let key = await unlockAutomaticBackupKeyWithPassword(password);
+      let key = useRecoveryKey ? "" : await unlockAutomaticBackupKeyWithPassword(password);
       if (!key) {
         // Ohne passende Huelle bleibt der getrennt verwahrte Schluessel. Fehlt
         // auch das Verzeichnis, stammt die Datei aus einer aelteren Fassung und
         // traegt ein frei gewaehltes Passwort.
         key = automaticBackupSettings.keyFingerprint
-          ? await requestAutomaticBackupRecoveryKey()
-          : ((await requestBackupPassword({ mode: "import" })) || "").trim();
-        if (!key) return "Benutzername oder Passwort ist nicht korrekt.";
+          ? await requestAutomaticBackupRecoveryKey({ passwordReset: useRecoveryKey })
+          : useRecoveryKey
+            ? ""
+            : ((await requestBackupPassword({ mode: "import" })) || "").trim();
+        if (!key) {
+          return useRecoveryKey
+            ? "Ohne Wiederherstellungsschlüssel lässt sich das Passwort nicht neu festlegen."
+            : "Benutzername oder Passwort ist nicht korrekt.";
+        }
       }
       try {
         fileContent = await decryptBackup(envelope, key);
@@ -23429,24 +23991,21 @@ ${rendered
       importedState = parseBackup(fileContent);
     } catch (error) {
       automaticBackupPassword = "";
-      return chooseStartupBackupFileFirst(username, password, error.message);
+      return chooseFileFirst(error.message);
     }
 
-    const user = importedState.users.find(
-      (item) =>
-        item.username.toLocaleLowerCase("de-DE") ===
-        username.toLocaleLowerCase("de-DE"),
-    );
-    if (!user || !(await verifyPassword(password, user))) {
+    const user = findUserByUsername(importedState.users, username);
+    if (useRecoveryKey && !user) {
+      automaticBackupPassword = "";
+      return "Dieser Benutzername ist im Datenbestand nicht bekannt.";
+    }
+    if (!user || (!useRecoveryKey && !(await verifyPassword(password, user)))) {
       automaticBackupPassword = "";
       return "Benutzername oder Passwort ist nicht korrekt.";
     }
     if (startupBackupIsOlder(importedState)) {
       automaticBackupPassword = "";
-      return chooseStartupBackupFileFirst(
-        username,
-        password,
-        "Diese Sicherungsdatei ist älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand. Bitte wählen Sie die aktuelle Datei aus.",
+      return chooseFileFirst("Diese Sicherungsdatei ist älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand. Bitte wählen Sie die aktuelle Datei aus.",
       );
     }
     // Eine unverschluesselte Datei in einem Browser, dessen Bestand schon
@@ -23460,6 +24019,11 @@ ${rendered
       if (!automaticBackupPassword) {
         return "Ohne den Schlüssel dieses Arbeitsplatzes kann TeO den Datenbestand nicht speichern.";
       }
+    }
+    // Ohne Verschluesselung gibt es keinen Wiederherstellungsschluessel - und
+    // ohne ihn kein Anmelden ohne Passwort.
+    if (useRecoveryKey && !automaticBackupPassword) {
+      return "Dieser Datenbestand ist nicht verschlüsselt; ein Administrator kann das Passwort zurücksetzen.";
     }
 
     if (
@@ -23479,6 +24043,15 @@ ${rendered
     await rememberSharedBackupFileStamp(file);
     await rememberBackupVolume(volume.sizeBytes);
     renderBackupVolumeMeter();
+    if (useRecoveryKey) {
+      const message = await completeRecoveryKeyLogin(user);
+      if (message) {
+        currentUser = null;
+        startupBackupSynchronized = false;
+        showLoginDialog();
+      }
+      return message;
+    }
     if (automaticBackupPassword && !automaticBackupUserKeyIsFinal(user.id)) {
       await registerAutomaticBackupUserKey(user.id, password);
     }
@@ -23501,9 +24074,14 @@ ${rendered
   // Die Datei ist nicht erreichbar oder taugt nicht: Vor der Anmeldung wird
   // sie gewaehlt. Die Eingaben bleiben gemerkt, nach der Auswahl geht die
   // Anmeldung von selbst weiter.
-  function chooseStartupBackupFileFirst(username, password, message) {
+  function chooseStartupBackupFileFirst(
+    username,
+    password,
+    message,
+    { useRecoveryKey = false } = {},
+  ) {
     startupBackupFile = null;
-    pendingStartupCredentials = { username, password };
+    pendingStartupCredentials = { username, password, useRecoveryKey };
     showStartupBackupDialog(message);
     return "";
   }
@@ -23784,6 +24362,7 @@ ${rendered
       const message = await loginWithSharedDataSet(
         credentials.username,
         credentials.password,
+        { useRecoveryKey: Boolean(credentials.useRecoveryKey) },
       );
       if (message && elements.loginDialog.open) {
         document.querySelector("#loginUsername").value = credentials.username;

@@ -284,7 +284,15 @@
   // der Datei geprueft und der Bestand in einem Zug uebernommen.
   // Rueckgabe ist die Meldung fuer den Anmeldedialog, leer bei Erfolg oder
   // wenn stattdessen die Dateiauswahl offen ist.
-  async function loginWithSharedDataSet(username, password) {
+  // Mit useRecoveryKey oeffnet der Wiederherstellungsschluessel statt des
+  // Passworts die Datei; das Konto legt danach ein neues Passwort fest.
+  async function loginWithSharedDataSet(
+    username,
+    password,
+    { useRecoveryKey = false } = {},
+  ) {
+    const chooseFileFirst = (message) =>
+      chooseStartupBackupFileFirst(username, password, message, { useRecoveryKey });
     // Eine von Hand gewaehlte Datei gilt fuer diese Anmeldung. Sonst wird die
     // Datei im Ordner frisch gelesen - sie kann sich seit dem Start geaendert
     // haben, und erst jetzt darf der Browser nach dem Zugriff fragen.
@@ -295,17 +303,14 @@
         true,
       );
       if (located.status !== "found") {
-        return chooseStartupBackupFileFirst(
-          username,
-          password,
-          startupBackupFallbackMessage(located.status),
+        return chooseFileFirst(startupBackupFallbackMessage(located.status),
         );
       }
       file = located.file;
     }
     const volume = backupVolumeAssessment(file.size);
     if (volume.exceeded) {
-      return chooseStartupBackupFileFirst(username, password, backupVolumeMessage(volume));
+      return chooseFileFirst(backupVolumeMessage(volume));
     }
 
     let fileContent = await file.text();
@@ -313,10 +318,7 @@
     try {
       envelope = JSON.parse(fileContent);
     } catch {
-      return chooseStartupBackupFileFirst(
-        username,
-        password,
-        "Die gemeinsame Sicherungsdatei enthält kein gültiges JSON.",
+      return chooseFileFirst("Die gemeinsame Sicherungsdatei enthält kein gültiges JSON.",
       );
     }
 
@@ -324,15 +326,21 @@
       await adoptAutomaticBackupKeyDirectory(
         readAutomaticBackupKeyDirectory(envelope),
       );
-      let key = await unlockAutomaticBackupKeyWithPassword(password);
+      let key = useRecoveryKey ? "" : await unlockAutomaticBackupKeyWithPassword(password);
       if (!key) {
         // Ohne passende Huelle bleibt der getrennt verwahrte Schluessel. Fehlt
         // auch das Verzeichnis, stammt die Datei aus einer aelteren Fassung und
         // traegt ein frei gewaehltes Passwort.
         key = automaticBackupSettings.keyFingerprint
-          ? await requestAutomaticBackupRecoveryKey()
-          : ((await requestBackupPassword({ mode: "import" })) || "").trim();
-        if (!key) return "Benutzername oder Passwort ist nicht korrekt.";
+          ? await requestAutomaticBackupRecoveryKey({ passwordReset: useRecoveryKey })
+          : useRecoveryKey
+            ? ""
+            : ((await requestBackupPassword({ mode: "import" })) || "").trim();
+        if (!key) {
+          return useRecoveryKey
+            ? "Ohne Wiederherstellungsschlüssel lässt sich das Passwort nicht neu festlegen."
+            : "Benutzername oder Passwort ist nicht korrekt.";
+        }
       }
       try {
         fileContent = await decryptBackup(envelope, key);
@@ -347,24 +355,21 @@
       importedState = parseBackup(fileContent);
     } catch (error) {
       automaticBackupPassword = "";
-      return chooseStartupBackupFileFirst(username, password, error.message);
+      return chooseFileFirst(error.message);
     }
 
-    const user = importedState.users.find(
-      (item) =>
-        item.username.toLocaleLowerCase("de-DE") ===
-        username.toLocaleLowerCase("de-DE"),
-    );
-    if (!user || !(await verifyPassword(password, user))) {
+    const user = findUserByUsername(importedState.users, username);
+    if (useRecoveryKey && !user) {
+      automaticBackupPassword = "";
+      return "Dieser Benutzername ist im Datenbestand nicht bekannt.";
+    }
+    if (!user || (!useRecoveryKey && !(await verifyPassword(password, user)))) {
       automaticBackupPassword = "";
       return "Benutzername oder Passwort ist nicht korrekt.";
     }
     if (startupBackupIsOlder(importedState)) {
       automaticBackupPassword = "";
-      return chooseStartupBackupFileFirst(
-        username,
-        password,
-        "Diese Sicherungsdatei ist älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand. Bitte wählen Sie die aktuelle Datei aus.",
+      return chooseFileFirst("Diese Sicherungsdatei ist älter als der zuletzt an diesem Arbeitsplatz gesicherte Stand. Bitte wählen Sie die aktuelle Datei aus.",
       );
     }
     // Eine unverschluesselte Datei in einem Browser, dessen Bestand schon
@@ -378,6 +383,11 @@
       if (!automaticBackupPassword) {
         return "Ohne den Schlüssel dieses Arbeitsplatzes kann TeO den Datenbestand nicht speichern.";
       }
+    }
+    // Ohne Verschluesselung gibt es keinen Wiederherstellungsschluessel - und
+    // ohne ihn kein Anmelden ohne Passwort.
+    if (useRecoveryKey && !automaticBackupPassword) {
+      return "Dieser Datenbestand ist nicht verschlüsselt; ein Administrator kann das Passwort zurücksetzen.";
     }
 
     if (
@@ -397,6 +407,15 @@
     await rememberSharedBackupFileStamp(file);
     await rememberBackupVolume(volume.sizeBytes);
     renderBackupVolumeMeter();
+    if (useRecoveryKey) {
+      const message = await completeRecoveryKeyLogin(user);
+      if (message) {
+        currentUser = null;
+        startupBackupSynchronized = false;
+        showLoginDialog();
+      }
+      return message;
+    }
     if (automaticBackupPassword && !automaticBackupUserKeyIsFinal(user.id)) {
       await registerAutomaticBackupUserKey(user.id, password);
     }
@@ -419,9 +438,14 @@
   // Die Datei ist nicht erreichbar oder taugt nicht: Vor der Anmeldung wird
   // sie gewaehlt. Die Eingaben bleiben gemerkt, nach der Auswahl geht die
   // Anmeldung von selbst weiter.
-  function chooseStartupBackupFileFirst(username, password, message) {
+  function chooseStartupBackupFileFirst(
+    username,
+    password,
+    message,
+    { useRecoveryKey = false } = {},
+  ) {
     startupBackupFile = null;
-    pendingStartupCredentials = { username, password };
+    pendingStartupCredentials = { username, password, useRecoveryKey };
     showStartupBackupDialog(message);
     return "";
   }
@@ -702,6 +726,7 @@
       const message = await loginWithSharedDataSet(
         credentials.username,
         credentials.password,
+        { useRecoveryKey: Boolean(credentials.useRecoveryKey) },
       );
       if (message && elements.loginDialog.open) {
         document.querySelector("#loginUsername").value = credentials.username;

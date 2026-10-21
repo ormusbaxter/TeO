@@ -143,6 +143,11 @@ test("Ein Konto ohne Hinweis legt ihn nach der Anmeldung fest", async (t) => {
   // Wiederherstellungsschlüssel zu sehen.
   assert.equal(await offeneDialoge(teo), "automaticBackupRecoveryDialog");
   await teo.page.click("#automaticBackupRecoveryDialog .modal-footer [data-close-dialog]");
+  // Der Notfallzugang bringt seinen Hinweis selbst mit; sein Blatt folgt.
+  await teo.page.waitForSelector("#emergencySheetDialog[open]");
+  await teo.page.check("#emergencySheetConfirmed");
+  await teo.page.click("#closeEmergencySheet");
+  await teo.page.waitForFunction(() => !document.querySelector("dialog[open]"));
 
   // Der Hinweis steht im verschlüsselten Bestand und ist vor der nächsten
   // Anmeldung nicht lesbar.

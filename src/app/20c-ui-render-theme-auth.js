@@ -495,9 +495,16 @@
       showAutomaticBackupRecoveryKey({ introduction: true });
       return;
     }
-    // Erst jetzt: Vor der Anmeldung steht die Anwendung noch hinter der
-    // Sperre, und ein Hinweis darueber waere im Weg.
-    showWhatsNewIfUpdated();
+    if (isEmergencyUser(currentUser)) {
+      void recordEmergencyAccessUse();
+      return;
+    }
+    // Fehlt der Notfallzugang noch, erscheint sein Blatt vor den Neuigkeiten.
+    void offerEmergencyAccess().then((shown) => {
+      // Erst jetzt: Vor der Anmeldung steht die Anwendung noch hinter der
+      // Sperre, und ein Hinweis darueber waere im Weg.
+      if (!shown) showWhatsNewIfUpdated();
+    });
   }
 
   function showLoginDialog() {
@@ -510,6 +517,7 @@
     startupBackupSynchronized = false;
     startupBackupImportRunning = false;
     backupReminderShown = false;
+    emergencyAccessUseRecorded = false;
     sessionStorage.removeItem(SESSION_USER_KEY);
     document.body.classList.add("is-auth-locked");
     document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
@@ -628,6 +636,10 @@
       );
     }
     currentUser = state.users.find((user) => user.id === currentUser.id);
+    // Waehrend des Speicherns galt das Konto noch als aenderungspflichtig, und
+    // dafuer sichert TeO nicht. Erst mit der Datei gilt das neue Passwort auch
+    // an den anderen Arbeitsplaetzen.
+    scheduleAutomaticBackup();
     elements.changePasswordDialog.close();
     if (!isMariaDbMode() && !startupBackupSynchronized) {
       showFirstSharedFolderDialog();

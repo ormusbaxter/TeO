@@ -152,6 +152,11 @@ test("Die erste Anmeldung eines Administrators verschlüsselt den Bestand", asyn
     "Der Dialog erklärt die Umstellung",
   );
   await page.click("#automaticBackupRecoveryDialog .modal-footer [data-close-dialog]");
+  // Danach folgt das Blatt des Notfallzugangs.
+  await page.waitForSelector("#emergencySheetDialog[open]");
+  await page.check("#emergencySheetConfirmed");
+  await page.click("#closeEmergencySheet");
+  await page.waitForFunction(() => !document.querySelector("dialog[open]"));
 
   const nachher = await browserspeicher(teo);
   assert.equal(nachher.klartext, null, "Der Klartext ist gelöscht");

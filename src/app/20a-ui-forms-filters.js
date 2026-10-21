@@ -15,6 +15,7 @@
       "click",
       copyAutomaticBackupRecoveryKey,
     );
+    bindEmergencyAccess();
     elements.employeeForm.addEventListener("submit", handleEmployeeSubmit);
     elements.trainingForm.addEventListener("submit", handleTrainingSubmit);
     elements.completionForm.addEventListener("submit", handleCompletionSubmit);

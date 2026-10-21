@@ -20,6 +20,7 @@
     "Jahresauswertung.";
 
   function renderDashboard() {
+    renderEmergencyAccessNotice();
     renderDashboardGreeting();
     renderDashboardSummary();
     renderDashboardTrainingProgress();

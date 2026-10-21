@@ -10,7 +10,7 @@
     "note": "Alle Mitarbeiter-, Kontakt- und Verlaufsdaten sind synthetisch."
   },
   "data": {
-    "version": 30,
+    "version": 31,
     "employees": [
       {
         "id": "employee-demo-001",

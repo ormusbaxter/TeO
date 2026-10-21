@@ -61,7 +61,7 @@ test("Fortbildungsreihen migrieren und verwenden den neuesten Nachweis", async (
   );
   app.setState(state);
 
-  assert.equal(state.version, 30);
+  assert.equal(state.version, 31);
   assert.equal(state.trainings[0].seriesId, state.trainings[1].seriesId);
   assert.equal(app.trainingObligations().length, 1);
   assert.equal(

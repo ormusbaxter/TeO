@@ -1,3 +1,12 @@
+### 4.75.0 – Notfallzugang
+
+- **Neu:** Ein **Notfallzugang** öffnet den verschlüsselten Datenbestand auch dann, wenn alle Administratorpasswörter und der Wiederherstellungsschlüssel verloren sind – an jedem Arbeitsplatz, auch in einem leeren Browser mit nur `teo-autosicherung.json`. Er ist ein eigenes Administratorkonto **Notfall** mit einem zufälligen Passwort je Installation, das TeO einmal auf dem **Notfallblatt** zum Ausdrucken zeigt. Das Passwort bleibt unverändert, bis ein neues Blatt erzeugt wird. TeO legt den Zugang bei der Ersteinrichtung an, in einem bestehenden Datenbestand bei der nächsten Anmeldung eines Administrators
+- **Neu:** Jede Anmeldung mit dem Notfallzugang steht im Änderungsprotokoll und wird allen Administratoren auf der Übersicht gemeldet, bis einer sie zur Kenntnis nimmt. **Neues Notfallblatt** (Einstellungen, Benutzerverwaltung oder Hinweis) ersetzt das bisherige Passwort
+- **Neu:** **Passwort vergessen?** bietet im lokalen Modus **Mit Wiederherstellungsschlüssel anmelden** an. Danach legt das Konto ein neues Passwort fest
+- **Behoben:** Nach dem Festlegen eines neuen Passworts anstelle eines temporären schrieb TeO die gemeinsame Datei erst mit der nächsten Änderung. Bis dahin galt an anderen Arbeitsplätzen und nach dem Abmelden noch das temporäre Passwort
+- **Behoben:** Wurde an einem anderen Arbeitsplatz ein Passwort geändert, behielt ein Arbeitsplatz, der das Konto schon kannte, dessen alte Schlüsselhülle und verlangte bei der Anmeldung mit dem neuen Passwort den Wiederherstellungsschlüssel
+- **Geändert:** Datenformat 31. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit der Notfallzugang nicht zu einem gewöhnlichen Konto wird
+
 ### 4.74.1 – Direktlinks auf Fortbildungen
 
 - **Behoben:** Der Wechsel zwischen **Pflichtfortbildungen** und **Fortbildungen** – über Direktlinks wie `index.html#pflichtfortbildungen` und `#fortbildungen`, über das Menü, Kürzel oder Zurück im Browser – zeigte nach dem ersten Mal weiter die zuvor geöffnete Art. Die Ansicht wird jetzt bei jedem Wechsel für die richtige Art aufgebaut

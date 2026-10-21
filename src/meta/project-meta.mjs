@@ -7,10 +7,10 @@ export const PROJECT_META = Object.freeze({
   name: "TeO – Team & Employee Organizer",
   version: Object.freeze({
     major: 4,
-    minor: 74,
-    patch: 1,
+    minor: 75,
+    patch: 0,
   }),
-  stateVersion: 30,
+  stateVersion: 31,
   backupFormat: "intensivteam-datensicherung",
   backupFormatVersion: 1,
 });

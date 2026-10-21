@@ -444,6 +444,29 @@
             </div>
           </div>
 
+          <section
+            class="emergency-access-notice"
+            id="emergencyAccessNotice"
+            role="status"
+            hidden
+          >
+            <svg><use href="#icon-lock"></use></svg>
+            <div>
+              <strong id="emergencyAccessNoticeTitle"></strong>
+              <p id="emergencyAccessNoticeText"></p>
+            </div>
+            <div class="emergency-access-notice-actions">
+              <button class="button button-secondary" type="button" id="emergencyAccessUsersButton" hidden>
+                Benutzerverwaltung
+              </button>
+              <button class="button button-secondary" type="button" id="emergencyAccessAcknowledgeButton" hidden>
+                Zur Kenntnis genommen
+              </button>
+              <button class="button button-primary" type="button" data-issue-emergency-sheet>
+                Neues Notfallblatt
+              </button>
+            </div>
+          </section>
           <div class="dashboard-kpis" id="dashboardKpis" data-dashboard-widget="summary"></div>
 
           <div class="dashboard-priority-grid" id="dashboardPriorityGrid" data-dashboard-widget="upcoming">
@@ -2157,6 +2180,17 @@
                         <svg><use href="#icon-lock"></use></svg>
                         Wiederherstellungsschlüssel anzeigen</button>
                       <button
+                        class="button button-secondary"
+                        id="issueEmergencySheetButton"
+                        type="button"
+                        data-issue-emergency-sheet
+                        data-admin-only
+                        hidden
+                      >
+                        <svg><use href="#icon-lock"></use></svg>
+                        Neues Notfallblatt
+                      </button>
+                      <button
                         class="button button-primary"
                         id="runAutomaticBackupButton"
                         type="button"
@@ -2423,17 +2457,23 @@
 <h3 id="hilfe-benutzer-verwalten">Benutzer verwalten</h3>
 <p>Über <strong>Einstellungen → Stammdaten &amp; Zugriffe → Benutzer verwalten</strong> stehen Administratoren zur Verfügung:</p>
 <ul><li><strong>Konto anlegen</strong> – Benutzername und Rolle wählen. TeO erzeugt ein einmalig angezeigtes temporäres Passwort; beim ersten Anmelden muss der Benutzer ein eigenes Passwort festlegen.</li><li><strong>Benutzername ändern</strong> – 4 bis 40 Buchstaben oder Ziffern, eindeutig.</li><li><strong>Passwort zurücksetzen</strong> – für jedes andere Konto, auch für weitere Administratoren. Es entsteht wieder ein temporäres Passwort. Das eigene Passwort wird stattdessen über <strong>Konto → Passwort ändern</strong> geändert.</li><li><strong>Konto löschen</strong> – dauerhaft; der fachliche Datenbestand bleibt unberührt.</li></ul>
-<p>Zwei Konten lassen sich nicht löschen und sind entsprechend gekennzeichnet: das <strong>eigene Konto</strong>, damit man sich nicht mitten in der Sitzung aussperrt, und der <strong>letzte verbliebene Administrator</strong>, weil ein Datenbestand ohne Administrator nicht mehr verwaltbar wäre.</p>
+<p>Zwei Konten lassen sich nicht löschen und sind entsprechend gekennzeichnet: das <strong>eigene Konto</strong>, damit man sich nicht mitten in der Sitzung aussperrt, und der <strong>letzte verbliebene Administrator</strong>, weil ein Datenbestand ohne Administrator nicht mehr verwaltbar wäre. Der <strong>Notfallzugang</strong> zählt dabei nicht mit; er lässt sich weder löschen, umbenennen noch zurücksetzen, sondern nur durch ein neues Notfallblatt erneuern (siehe „Notfallzugang“).</p>
 <h3 id="hilfe-benutzerkonten-beim-import">Benutzerkonten beim Import</h3>
 <p>Ein Sicherungsimport ersetzt den fachlichen Datenbestand, <strong>nicht</strong> die Benutzerkonten. Wer angemeldet ist, bleibt angemeldet, und die vorhandenen Konten und Passwörter gelten unverändert weiter. Nur wenn noch gar kein Konto existiert – etwa bei einer Wiederherstellung auf einem leeren System – werden die Konten aus der Sicherungsdatei übernommen.</p>
 <p>Deshalb kann der Import gefahrlos allen Konten offenstehen: Er ist kein Weg, sich Administratorrechte zu verschaffen.</p>
 <h3 id="hilfe-ersteinrichtung-und-passworter">Ersteinrichtung und Passwörter</h3>
-<p>TeO enthält keine fest eingebauten Produktivkonten oder Standardpasswörter. Beim ersten Start wird ein Administratorkonto erstellt.</p>
+<p>TeO enthält keine fest eingebauten Produktivkonten oder Standardpasswörter. Beim ersten Start wird ein Administratorkonto erstellt. Auch das Passwort des Notfallzugangs ist kein Standardpasswort: TeO erzeugt es für jede Installation neu und zufällig.</p>
 <p>Wird das Passwort eines normalen Benutzers zurückgesetzt, erzeugt TeO ein temporäres Passwort. Beim nächsten Anmelden muss der Benutzer ein neues Passwort festlegen.</p>
 <h3 id="hilfe-passworthinweis">Passworthinweis</h3>
 <p>Zu jedem Konto gehört ein <strong>Passworthinweis</strong> – eine Gedächtnisstütze, keine zweite Anmeldung. Er ist Pflicht und wird zusammen mit dem Passwort festgelegt: bei der Ersteinrichtung und immer dann, wenn ein neues Passwort gesetzt wird. Der Hinweis darf das Passwort nicht enthalten, denn er lässt sich vor der Anmeldung lesen. Konten ohne Hinweis (aus Fassungen vor 4.65.0) legen ihn direkt nach der nächsten Anmeldung fest; bis dahin bleibt TeO gesperrt. Ändern lässt er sich über <strong>Konto → Passworthinweis ändern</strong>.</p>
 <p>An der Anmeldung zeigt <strong>Passwort vergessen?</strong> den Hinweis zum eingegebenen Benutzernamen. Für einen unbekannten Namen antwortet TeO genauso wie für ein Konto ohne Hinweis, damit sich nicht ausprobieren lässt, welche Konten es gibt. Im MariaDB-Modus kommt der Hinweis vom Server; dort zählt jede Abfrage wie ein Anmeldeversuch. Im lokalen Modus stehen die Hinweise im verschlüsselten Datenbestand und sind vor der Anmeldung nicht lesbar – TeO verweist dann auf einen Administrator. Nur ein Bestand aus einer Fassung vor 4.69.0, der noch nicht verschlüsselt ist, zeigt den Hinweis aus dem zuletzt an diesem Arbeitsplatz geladenen Stand.</p>
-<p>Hilft auch der Hinweis nicht, setzt ein Administrator das Passwort zurück. Der alte Hinweis entfällt dabei, mit dem neuen Passwort entsteht ein neuer. Hat der einzige Administrator sein Passwort vergessen, gibt es in TeO keinen Weg zurück – ein zweites Administratorkonto beugt dem vor.</p>
+<p>Hilft auch der Hinweis nicht, setzt ein Administrator das Passwort zurück. Der alte Hinweis entfällt dabei, mit dem neuen Passwort entsteht ein neuer.</p>
+<p>Ohne Administrator hilft im lokalen Modus der <strong>Wiederherstellungsschlüssel</strong>: Benutzername eingeben, <strong>Passwort vergessen?</strong> und dann <strong>Mit Wiederherstellungsschlüssel anmelden</strong> wählen. Der Schlüssel öffnet den Datenbestand ohne Passwort, danach legt das Konto ein neues Passwort samt Hinweis fest – wie nach einem Zurücksetzen. Die Anmeldung steht im Änderungsprotokoll. Ist auch der Schlüssel verloren, bleibt der Notfallzugang.</p>
+<h3 id="hilfe-notfallzugang">Notfallzugang</h3>
+<p>Der Notfallzugang ist ein eigenes Administratorkonto (Benutzername <strong>Notfall</strong>) für den Fall, dass niemand mehr an den Datenbestand kommt – auch wenn alle Administratorpasswörter und der Wiederherstellungsschlüssel verloren sind. Er öffnet den verschlüsselten Bestand an jedem Arbeitsplatz, auch in einem leeren Browser, der nur <code>teo-autosicherung.json</code> kennt.</p>
+<ul><li><strong>Einrichtung:</strong> TeO legt ihn im lokalen Modus selbst an – bei der Ersteinrichtung nach dem Wiederherstellungsschlüssel, bei einem bestehenden Bestand bei der nächsten Anmeldung eines Administrators. Das Passwort ist 24 Zeichen lang und zufällig, für jede Installation ein anderes.</li><li><strong>Notfallblatt:</strong> TeO zeigt das Passwort genau einmal auf dem Notfallblatt. <strong>Drucken</strong>, in einen verschlossenen Umschlag legen und getrennt vom Arbeitsplatz verwahren, etwa bei der Leitung oder im Tresor. Geschlossen wird das Blatt erst, wenn bestätigt ist, dass es verwahrt ist.</li><li><strong>Unverändert:</strong> Das Passwort bleibt, wie es ausgegeben wurde. Es läuft nicht ab und muss nach der ersten Anmeldung nicht geändert werden.</li><li><strong>Im Notfall:</strong> mit <strong>Notfall</strong> und dem Passwort vom Blatt anmelden – Großbuchstaben und Bindestriche genau wie gedruckt. Danach in der Benutzerverwaltung die Passwörter der Administratoren zurücksetzen.</li><li><strong>Benutzung wird gemeldet:</strong> Jede Anmeldung mit dem Notfallzugang steht im Änderungsprotokoll, und alle Administratoren sehen auf der Übersicht einen Hinweis, bis einer ihn mit <strong>Zur Kenntnis genommen</strong> bestätigt.</li><li><strong>Neues Notfallblatt:</strong> unter <strong>Einstellungen → Gesamten Datenbestand sichern</strong>, in der Benutzerverwaltung oder im Hinweis der Übersicht. Das neue Passwort ersetzt das alte; empfohlen nach jeder Benutzung und wenn ein Blatt verloren gegangen sein könnte. Ältere Sicherungsdateien öffnet das alte Blatt weiterhin – sie tragen die Hülle von damals.</li></ul>
+<p>Wer das Blatt hat, hat vollen Zugriff auf alle Daten. Das ist bei einem Generalschlüssel nicht anders und wird organisatorisch beherrscht: verschlossen verwahren, Benutzung protokollieren, nach einem Verdacht neu ausstellen. Ein festes, überall gleiches Notfallpasswort gibt es bewusst nicht – es wäre eine Hintertür in jeden Datenbestand. Geht auch das Blatt verloren, kann niemand den Bestand mehr öffnen; das ist der Sinn der Verschlüsselung.</p>
+<p>Im MariaDB-Modus legt TeO keinen Notfallzugang an. Dort verwaltet der Datenbankadministrator die Konten auf dem Server.</p>
 <p>Passwörter werden mit PBKDF2 gehasht gespeichert. Im lokalen Modus steuert die Anmeldung die Bedienung der Oberfläche, schützt den Datenbestand aber nicht (siehe „Was der lokale Modus leistet – und was nicht“). Im MariaDB-Modus werden Anmeldung und Rollen zusätzlich serverseitig geprüft.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-mitarbeiterverwaltung">
@@ -2799,7 +2839,7 @@
 <p>Unverschlüsselte JSON-Sicherungen enthalten den vollständigen Datenbestand und müssen entsprechend geschützt gespeichert und übertragen werden.</p>
 <h3 id="hilfe-pflichtverschlusselung">Pflichtverschlüsselung</h3>
 <p>Im lokalen Modus ist der Datenbestand immer verschlüsselt – im Browserspeicher jedes Arbeitsplatzes und in <code>teo-autosicherung.json</code>. Beide verwenden denselben zufälligen Datenschlüssel (AES-GCM, 256 Bit). Er ist für jedes Konto mit dessen Login-Passwort umhüllt und wird bei der Anmeldung entsperrt; ein zweites Passwort gibt es nicht. Beim Abmelden und Neuladen verlassen Schlüssel und Datenbestand den Arbeitsspeicher.</p>
-<ul><li><strong>Ersteinrichtung:</strong> Der Schlüssel entsteht mit dem ersten Administratorkonto. Sobald TeO offen ist, zeigt es den Wiederherstellungsschlüssel.</li><li><strong>Bestände aus Fassungen vor 4.69.0:</strong> Die erste Anmeldung eines Administrators verschlüsselt den Bestand und zeigt den Wiederherstellungsschlüssel. Normale Konten arbeiten bis dahin wie bisher. Konten, die bei der Umstellung nicht angemeldet waren, bekommen eine vorläufige Schlüsselhülle aus ihrem gespeicherten Passwort-Hash und melden sich danach wie gewohnt an; ihre erste Anmeldung ersetzt sie durch eine reguläre Hülle.</li><li><strong>Wiederherstellungsschlüssel:</strong> getrennt von den Sicherungen verwahren, ebenso ein zweites Administratorkonto anlegen. Vergessen alle Administratoren ihr Passwort und ist der Wiederherstellungsschlüssel weg, sind die Daten verloren.</li></ul>
+<ul><li><strong>Ersteinrichtung:</strong> Der Schlüssel entsteht mit dem ersten Administratorkonto. Sobald TeO offen ist, zeigt es den Wiederherstellungsschlüssel.</li><li><strong>Bestände aus Fassungen vor 4.69.0:</strong> Die erste Anmeldung eines Administrators verschlüsselt den Bestand und zeigt den Wiederherstellungsschlüssel. Normale Konten arbeiten bis dahin wie bisher. Konten, die bei der Umstellung nicht angemeldet waren, bekommen eine vorläufige Schlüsselhülle aus ihrem gespeicherten Passwort-Hash und melden sich danach wie gewohnt an; ihre erste Anmeldung ersetzt sie durch eine reguläre Hülle.</li><li><strong>Wiederherstellungsschlüssel:</strong> getrennt von den Sicherungen verwahren, ebenso ein zweites Administratorkonto anlegen. Mit dem Schlüssel legt ein Konto an der Anmeldung selbst ein neues Passwort fest.</li><li><strong>Notfallzugang:</strong> eine weitere Schlüsselhülle mit einem zufälligen Passwort vom Notfallblatt (siehe „Notfallzugang“). Vergessen alle Administratoren ihr Passwort und sind Wiederherstellungsschlüssel und Notfallblatt weg, sind die Daten verloren.</li></ul>
 <p>Ein Hinweis zur vorläufigen Hülle: Wer eine unverschlüsselte Sicherung aus der Zeit vor der Umstellung besitzt, kennt die darin gespeicherten Passwort-Hashes und könnte damit eine vorläufige Hülle öffnen, solange das Konto sich nicht neu angemeldet hat. Alte unverschlüsselte Sicherungen gehören deshalb nach der Umstellung gelöscht.</p>
 <h3 id="hilfe-was-der-lokale-modus-leistet-und-was-nicht">Was der lokale Modus leistet – und was nicht</h3>
 <p>Die Verschlüsselung schützt den Datenbestand im Ruhezustand: bei geschlossenem TeO, nach dem Abmelden, bei kopiertem Browserprofil oder ausgebautem Datenträger. Wer die Anmeldung mit Bordmitteln des Browsers umgeht, findet keine lesbaren Daten. Sie schützt nicht:</p>
@@ -2810,6 +2850,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-75-0-notfallzugang">4.75.0 – Notfallzugang</h3>
+<ul><li><strong>Neu:</strong> Ein <strong>Notfallzugang</strong> öffnet den verschlüsselten Datenbestand auch dann, wenn alle Administratorpasswörter und der Wiederherstellungsschlüssel verloren sind – an jedem Arbeitsplatz, auch in einem leeren Browser mit nur <code>teo-autosicherung.json</code>. Er ist ein eigenes Administratorkonto <strong>Notfall</strong> mit einem zufälligen Passwort je Installation, das TeO einmal auf dem <strong>Notfallblatt</strong> zum Ausdrucken zeigt. Das Passwort bleibt unverändert, bis ein neues Blatt erzeugt wird. TeO legt den Zugang bei der Ersteinrichtung an, in einem bestehenden Datenbestand bei der nächsten Anmeldung eines Administrators</li><li><strong>Neu:</strong> Jede Anmeldung mit dem Notfallzugang steht im Änderungsprotokoll und wird allen Administratoren auf der Übersicht gemeldet, bis einer sie zur Kenntnis nimmt. <strong>Neues Notfallblatt</strong> (Einstellungen, Benutzerverwaltung oder Hinweis) ersetzt das bisherige Passwort</li><li><strong>Neu:</strong> <strong>Passwort vergessen?</strong> bietet im lokalen Modus <strong>Mit Wiederherstellungsschlüssel anmelden</strong> an. Danach legt das Konto ein neues Passwort fest</li><li><strong>Behoben:</strong> Nach dem Festlegen eines neuen Passworts anstelle eines temporären schrieb TeO die gemeinsame Datei erst mit der nächsten Änderung. Bis dahin galt an anderen Arbeitsplätzen und nach dem Abmelden noch das temporäre Passwort</li><li><strong>Behoben:</strong> Wurde an einem anderen Arbeitsplatz ein Passwort geändert, behielt ein Arbeitsplatz, der das Konto schon kannte, dessen alte Schlüsselhülle und verlangte bei der Anmeldung mit dem neuen Passwort den Wiederherstellungsschlüssel</li><li><strong>Geändert:</strong> Datenformat 31. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit der Notfallzugang nicht zu einem gewöhnlichen Konto wird</li></ul>
 <h3 id="hilfe-4-74-1-direktlinks-auf-fortbildungen">4.74.1 – Direktlinks auf Fortbildungen</h3>
 <ul><li><strong>Behoben:</strong> Der Wechsel zwischen <strong>Pflichtfortbildungen</strong> und <strong>Fortbildungen</strong> – über Direktlinks wie <code>index.html#pflichtfortbildungen</code> und <code>#fortbildungen</code>, über das Menü, Kürzel oder Zurück im Browser – zeigte nach dem ersten Mal weiter die zuvor geöffnete Art. Die Ansicht wird jetzt bei jedem Wechsel für die richtige Art aufgebaut</li></ul>
 <h3 id="hilfe-4-74-0-freiwillige-fortbildungen">4.74.0 – Freiwillige Fortbildungen</h3>
@@ -3283,6 +3325,15 @@
           <p class="auth-data-source" id="loginDataSource"></p>
           <p class="form-error auth-error" id="loginError" role="alert"></p>
           <p class="auth-password-hint" id="loginPasswordHint" role="status" hidden></p>
+          <button
+            class="button button-secondary auth-recovery-button"
+            id="loginWithRecoveryKeyButton"
+            type="button"
+            hidden
+          >
+            <svg><use href="#icon-lock"></use></svg>
+            Mit Wiederherstellungsschlüssel anmelden
+          </button>
           <p class="auth-software-meta" aria-label="Softwareinformationen">
             <span id="loginProjectVersion">Version wird geladen</span>
             <span id="loginCopyright">&copy; 2026 Oliver Becker</span>
@@ -5477,6 +5528,64 @@
     </dialog>
 
     <dialog
+      class="modal emergency-sheet-dialog"
+      id="emergencySheetDialog"
+      aria-labelledby="emergencySheetTitle"
+      data-persistent-dialog
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Notfallzugang</p>
+          <h2 id="emergencySheetTitle">Notfallblatt</h2>
+          <p class="modal-subtitle">
+            Ausdrucken, in einen verschlossenen Umschlag legen und getrennt vom
+            Arbeitsplatz verwahren.
+          </p>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p class="emergency-sheet-introduction" id="emergencySheetIntroduction"></p>
+        <dl class="emergency-sheet-credentials">
+          <div>
+            <dt>Benutzername</dt>
+            <dd id="emergencySheetUsername"></dd>
+          </div>
+          <div>
+            <dt>Notfallpasswort</dt>
+            <dd class="emergency-sheet-password" id="emergencySheetPassword"></dd>
+          </div>
+        </dl>
+        <div class="backup-password-notice">
+          <svg><use href="#icon-lock"></use></svg>
+          <p>
+            Mit diesem Zugang öffnet sich der verschlüsselte Datenbestand an
+            jedem Arbeitsplatz – auch wenn alle Administratorpasswörter und der
+            Wiederherstellungsschlüssel verloren sind. TeO zeigt das Passwort
+            nur jetzt. Geht das Blatt verloren, erzeugen Sie unter
+            Einstellungen → Daten ein neues.
+          </p>
+        </div>
+        <label class="checkbox-field emergency-sheet-confirmation">
+          <input type="checkbox" id="emergencySheetConfirmed" />
+          <span>Das Notfallblatt ist ausgedruckt und sicher verwahrt.</span>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="button button-secondary" id="copyEmergencySheetPassword" type="button">
+          <svg><use href="#icon-copy"></use></svg>
+          Passwort kopieren
+        </button>
+        <button class="button button-secondary" id="printEmergencySheet" type="button">
+          <svg><use href="#icon-print"></use></svg>
+          Drucken
+        </button>
+        <button class="button button-primary" id="closeEmergencySheet" type="button" disabled>
+          Fertig
+        </button>
+      </div>
+    </dialog>
+
+    <dialog
       class="modal phone-list-preview-dialog"
       id="phoneListPreviewDialog"
       aria-labelledby="phoneListPreviewTitle"
@@ -5515,6 +5624,12 @@
     <section
       class="appointment-print-surface"
       id="appointmentPrintSurface"
+      aria-hidden="true"
+    ></section>
+
+    <section
+      class="emergency-sheet-print-surface"
+      id="emergencySheetPrintSurface"
       aria-hidden="true"
     ></section>
 
