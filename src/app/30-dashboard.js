@@ -189,7 +189,7 @@
   }
 
   function renderDashboardTrainingProgress() {
-    if (state.trainings.length === 0) {
+    if (trainingObligations().length === 0) {
       elements.dashboardTrainingProgress.innerHTML = renderEmptyState({
         title: "Noch keine Pflichtfortbildungen",
         text: "Legen Sie die erste Pflichtfortbildung an, um den Teamfortschritt zu verfolgen.",

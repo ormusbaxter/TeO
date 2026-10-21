@@ -396,6 +396,7 @@
     appointments: [renderAppointments],
     memos: [renderMemos],
     trainings: [renderTrainings],
+    "voluntary-trainings": [renderTrainings],
     meetings: [renderMeetings],
     devices: [renderDevices],
     "device-management": [renderDevices],

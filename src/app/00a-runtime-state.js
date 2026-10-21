@@ -63,6 +63,9 @@
   let trainingRecurrenceManuallyChanged = false;
   let trainingCoverageManuallyChanged = false;
   let trainingDisplayYear = new Date().getFullYear();
+  // Welche Art die geoeffnete Jahresauswertung zeigt: Pflichten oder
+  // freiwillige Fortbildungen.
+  let trainingMatrixMandatory = true;
   let meetingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let databaseSaveReminderArmed = false;

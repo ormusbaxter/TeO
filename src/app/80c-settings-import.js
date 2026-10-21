@@ -47,7 +47,9 @@
               <label class="training-duration-setting-row">
                 <span>
                   <strong>${escapeHtml(training.title)}</strong>
-                  <small>Im Katalog seit ${training.year}</small>
+                  <small>${
+                    isMandatoryTraining(training) ? "Pflichtfortbildung" : "Freiwillig"
+                  } · im Katalog seit ${training.year}</small>
                 </span>
                 <span class="input-suffix">
                   <input
@@ -66,7 +68,7 @@
             `,
           )
           .join("")
-      : `<p class="settings-empty-copy">Legen Sie zuerst eine Pflichtfortbildung an.</p>`;
+      : `<p class="settings-empty-copy">Legen Sie zuerst eine Fortbildung an.</p>`;
     elements.saveTrainingDurationsButton.disabled = trainings.length === 0;
   }
 

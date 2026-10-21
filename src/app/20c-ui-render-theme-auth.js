@@ -12,7 +12,8 @@
     // Nur Mitarbeiter, die tatsaechlich im Dienst stehen. Ausgetretene sollen
     // die Zahl in der Seitenleiste nicht dauerhaft aufblaehen.
     elements.navEmployeeCount.textContent = String(employedActiveEmployees().length);
-    elements.navTrainingCount.textContent = String(state.trainings.length);
+    elements.navTrainingCount.textContent = String(trainingsOfKind(true).length);
+    elements.navVoluntaryTrainingCount.textContent = String(trainingsOfKind(false).length);
     elements.navMeetingCount.textContent = String(state.meetings.length);
     elements.navAppointmentCount.textContent = String(
       state.appointments.filter((appointment) => appointment.date >= todayIso()).length,

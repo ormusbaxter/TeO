@@ -182,7 +182,12 @@
       {
         label: "Pflichtfortbildung anlegen",
         icon: "icon-training",
-        run: () => openTrainingDialog(),
+        run: () => openTrainingDialog(null, { mandatory: true }),
+      },
+      {
+        label: "Fortbildung anlegen (freiwillig)",
+        icon: "icon-training",
+        run: () => openTrainingDialog(null, { mandatory: false }),
       },
       {
         label: "Fortbildungsnachweis anlegen",
@@ -304,12 +309,12 @@
           },
         })),
       ...state.trainings.map((training) => ({
-        group: "Pflichtfortbildungen",
+        group: isMandatoryTraining(training) ? "Pflichtfortbildungen" : "Fortbildungen",
         icon: "icon-training",
         label: training.title,
         hint: String(training.year || ""),
         run: () => {
-          showView("trainings");
+          showView(isMandatoryTraining(training) ? "trainings" : VOLUNTARY_TRAININGS_VIEW);
           openTrainingDialog(training.id);
         },
       })),

@@ -359,6 +359,9 @@
         Number.isInteger(targetMinutes) && targetMinutes > 0 ? targetMinutes : null,
       seriesId: normalizeId(training.seriesId) || "",
       coveredByQualificationId: normalizeId(training.coveredByQualificationId) || "",
+      // Pflichtfortbildung oder freiwillige Fortbildung. Bestaende aus der
+      // Zeit davor kennen nur Pflichten, ein fehlendes Feld bleibt deshalb eine.
+      mandatory: training.mandatory !== false,
       createdAt,
       updatedAt: validTimestamp(training.updatedAt || training.createdAt),
     };
@@ -392,8 +395,15 @@
     return (provider || candidates[0])?.id || "";
   }
 
-  function generatedTrainingSeriesId(title, fallbackId = "") {
-    const signature = trainingSeriesSignature(title) || fallbackId || "fortbildung";
+  // Freiwillige Fortbildungen bilden eigene Reihen: Eine freiwillige
+  // „Reanimation“ soll nicht als Nachweis der gleichnamigen Pflicht zaehlen.
+  function trainingSeriesKey(title, mandatory = true) {
+    const signature = trainingSeriesSignature(title);
+    return signature && !mandatory ? `freiwillig ${signature}` : signature;
+  }
+
+  function generatedTrainingSeriesId(title, fallbackId = "", mandatory = true) {
+    const signature = trainingSeriesKey(title, mandatory) || fallbackId || "fortbildung";
     let hash = 2166136261;
     for (let index = 0; index < signature.length; index += 1) {
       hash ^= signature.charCodeAt(index);
@@ -406,7 +416,7 @@
     const seriesBySignature = new Map();
     trainings.forEach((training) => {
       if (!training.recurrenceMonths || !training.seriesId) return;
-      const signature = trainingSeriesSignature(training.title);
+      const signature = trainingSeriesKey(training.title, training.mandatory);
       if (signature && !seriesBySignature.has(signature)) {
         seriesBySignature.set(signature, training.seriesId);
       }
@@ -417,10 +427,10 @@
         return;
       }
       if (training.seriesId) return;
-      const signature = trainingSeriesSignature(training.title);
+      const signature = trainingSeriesKey(training.title, training.mandatory);
       const seriesId =
         seriesBySignature.get(signature) ||
-        generatedTrainingSeriesId(training.title, training.id);
+        generatedTrainingSeriesId(training.title, training.id, training.mandatory);
       training.seriesId = seriesId;
       if (signature) seriesBySignature.set(signature, seriesId);
     });

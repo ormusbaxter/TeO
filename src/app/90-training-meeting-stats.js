@@ -202,9 +202,26 @@
     );
   }
 
+  function isMandatoryTraining(training) {
+    return training?.mandatory !== false;
+  }
+
+  // Pflichtfortbildungen und freiwillige Fortbildungen teilen Katalog,
+  // Nachweise und Reihen. Quoten, Fristen, Kennzahlen und die Jahresauswertung
+  // der Pflichten sehen aber nur die Pflichten - deshalb fragt alles, was
+  // zaehlt, trainingObligations() und nicht state.trainings.
   function trainingObligations() {
+    return trainingCatalog(true);
+  }
+
+  function voluntaryTrainingCatalog() {
+    return trainingCatalog(false);
+  }
+
+  function trainingCatalog(mandatory = true) {
     const obligations = new Map();
     state.trainings.forEach((training) => {
+      if (isMandatoryTraining(training) !== mandatory) return;
       const key =
         training.recurrenceMonths && training.seriesId
           ? `series:${training.seriesId}`

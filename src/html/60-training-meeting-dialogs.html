@@ -3,7 +3,7 @@
         <div class="modal-header">
           <div>
             <p class="eyebrow">Fortbildungskatalog</p>
-            <h2 id="trainingDialogTitle">Pflichtfortbildung anlegen</h2>
+            <h2 id="trainingDialogTitle">Fortbildung anlegen</h2>
           </div>
           <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
             <svg><use href="#icon-close"></use></svg>
@@ -23,6 +23,17 @@
                 placeholder="z. B. Brandschutzunterweisung"
               />
             </label>
+            <label class="form-field form-field-wide">
+              <span>Art <em>*</em></span>
+              <select id="trainingMandatory" name="mandatory">
+                <option value="true">Pflichtfortbildung</option>
+                <option value="false">Fortbildung (freiwillig)</option>
+              </select>
+              <small class="field-hint">
+                Freiwillige Fortbildungen zählen nicht zu den Pflichtfortbildungen: nicht zur
+                Quote, zu Fristen oder überfälligen Nachweisen.
+              </small>
+            </label>
             <label class="form-field">
               <span>Im Katalog seit <em>*</em></span>
               <input
@@ -35,7 +46,7 @@
                 required
               />
               <small class="field-hint">
-                Ab diesem Jahr gehört die Fortbildung zum Pflichtkatalog.
+                Ab diesem Jahr gehört die Fortbildung zum Katalog.
               </small>
             </label>
             <label class="form-field">
@@ -102,7 +113,7 @@
         <div class="modal-body">
           <div class="form-grid">
             <label class="form-field">
-              <span>Pflichtfortbildung <em>*</em></span>
+              <span>Fortbildung <em>*</em></span>
               <select id="completionTraining" name="trainingId" required></select>
             </label>
             <label class="form-field">
@@ -181,7 +192,7 @@
       </div>
       <div class="modal-body training-matrix-body">
         <details class="training-rate-history">
-          <summary>Verlauf der Pflichtfortbildungsquote nach Jahren</summary>
+          <summary id="trainingRateHistorySummary">Verlauf der Pflichtfortbildungsquote nach Jahren</summary>
           <div id="trainingRateHistoryChart"></div>
         </details>
         <div class="training-matrix-toolbar">

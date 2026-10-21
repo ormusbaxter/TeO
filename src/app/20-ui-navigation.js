@@ -85,8 +85,13 @@
     if (view === "dashboard") renderDashboardGreeting();
     elements.mobileCreateButton.hidden = ["settings", "help"].includes(view);
 
+    // Eine Ansicht kann mehreren Menuepunkten dienen: Pflichtfortbildungen und
+    // freiwillige Fortbildungen teilen sich ihr Markup.
     document.querySelectorAll("[data-view-panel]").forEach((panel) => {
-      panel.classList.toggle("is-active", panel.dataset.viewPanel === view);
+      panel.classList.toggle(
+        "is-active",
+        panel.dataset.viewPanel.split(" ").includes(view),
+      );
     });
 
     // Aenderungen, die waehrend der Abwesenheit dieser Ansicht entstanden
@@ -105,7 +110,7 @@
     if (view === "settings") showSettingsSection(activeSettingsSection);
 
     const mobileCreateType =
-      view === "trainings"
+      view === "trainings" || view === VOLUNTARY_TRAININGS_VIEW
         ? "training"
         : view === "meetings"
           ? "meeting"

@@ -1,6 +1,7 @@
   const elements = {
     navEmployeeCount: document.querySelector("#navEmployeeCount"),
     navTrainingCount: document.querySelector("#navTrainingCount"),
+    navVoluntaryTrainingCount: document.querySelector("#navVoluntaryTrainingCount"),
     navMeetingCount: document.querySelector("#navMeetingCount"),
     navAppointmentCount: document.querySelector("#navAppointmentCount"),
     navMemoCount: document.querySelector("#navMemoCount"),
@@ -217,6 +218,8 @@
       "#vacationPlannerMaximizeLabel",
     ),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
+    trainingsViewTitle: document.querySelector("#trainingsViewTitle"),
+    trainingsViewSubtitle: document.querySelector("#trainingsViewSubtitle"),
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),
     trainingList: document.querySelector("#trainingList"),
@@ -301,6 +304,7 @@
     trainingDialog: document.querySelector("#trainingDialog"),
     trainingForm: document.querySelector("#trainingForm"),
     trainingDialogTitle: document.querySelector("#trainingDialogTitle"),
+    trainingMandatory: document.querySelector("#trainingMandatory"),
     trainingSubmitLabel: document.querySelector("#trainingSubmitLabel"),
     completionDialog: document.querySelector("#completionDialog"),
     completionForm: document.querySelector("#completionForm"),
@@ -316,6 +320,7 @@
     trainingMatrixYear: document.querySelector("#trainingMatrixYear"),
     trainingMatrixSummary: document.querySelector("#trainingMatrixSummary"),
     trainingRateHistoryChart: document.querySelector("#trainingRateHistoryChart"),
+    trainingRateHistorySummary: document.querySelector("#trainingRateHistorySummary"),
     trainingMatrixContent: document.querySelector("#trainingMatrixContent"),
     exportTrainingMatrixCsvButton: document.querySelector(
       "#exportTrainingMatrixCsvButton",

@@ -37,6 +37,11 @@
     const trainings = trainingObligations().sort(
       (a, b) => b.year - a.year || a.title.localeCompare(b.title, "de"),
     );
+    // Freiwillige Fortbildungen stehen nur, wenn ein Nachweis vorliegt: Eine
+    // nicht besuchte freiwillige Fortbildung ist nichts Offenes.
+    const voluntaryTrainings = voluntaryTrainingCatalog()
+      .filter((training) => latestCompletion(employee.id, training.id))
+      .sort((a, b) => b.year - a.year || a.title.localeCompare(b.title, "de"));
     const attendances = state.meetingAttendances.filter(
       (attendance) => attendance.employeeId === employee.id,
     );
@@ -133,6 +138,28 @@
             : '<p class="field-hint">Keine Pflichtfortbildungen angelegt.</p>'
         }
       </section>
+      ${
+        voluntaryTrainingCatalog().length
+          ? `<section class="dossier-section">
+              <h3>Fortbildungen</h3>
+              ${
+                voluntaryTrainings.length
+                  ? `<div class="dossier-list">${voluntaryTrainings
+                      .map((training) => {
+                        const status = getEmployeeCompletionStatus(employee.id, training);
+                        return `<div class="dossier-list-row">
+                          <strong>${escapeHtml(training.title)} <small>${training.year}</small></strong>
+                          <span class="status-badge ${status.kind === "current" ? "" : status.kind}">${escapeHtml(
+                            status.label,
+                          )}</span>
+                        </div>`;
+                      })
+                      .join("")}</div>`
+                  : '<p class="field-hint">Keine Teilnahme an freiwilligen Fortbildungen erfasst.</p>'
+              }
+            </section>`
+          : ""
+      }
       <section class="dossier-section">
         <h3>Teamsitzungen</h3>
         <div class="dossier-list">
