@@ -246,6 +246,7 @@
     document.querySelectorAll("[data-open-appointment]").forEach((button) => {
       button.addEventListener("click", () => openAppointmentDialog());
     });
+    elements.exportAppointmentsIcsButton.addEventListener("click", exportVisibleAppointmentsIcs);
     document.querySelectorAll("[data-open-memo]").forEach((button) => {
       button.addEventListener("click", () => openMemoDialog());
     });

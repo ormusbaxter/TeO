@@ -33,6 +33,14 @@
             icon: "icon-star",
             run: () => setAppointmentsPinned(ids, false),
           },
+          {
+            label: "Kalenderdatei",
+            icon: "icon-download",
+            run: () =>
+              exportAppointmentsIcs(
+                state.appointments.filter((appointment) => ids.includes(appointment.id)),
+              ),
+          },
           { label: "Löschen", icon: "icon-trash", danger: true, run: () => deleteAppointments(ids) },
         ],
       },
