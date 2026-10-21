@@ -42,7 +42,7 @@ test("Obermenüs fassen die Menüpunkte zusammen und überleben den Neustart", a
   assert.equal(
     mit.gruppen,
     "personnel:employees:weekends:vacations schedule:appointments:memos " +
-      "training:trainings:meetings devices:devices:device-management",
+      "training:trainings:voluntary-trainings:meetings devices:devices:device-management",
   );
   assert.equal(mit.oben, "dashboard,settings,help", "Übersicht, Einstellungen und Hilfe bleiben für sich");
 
@@ -79,7 +79,7 @@ test("Obermenüs fassen die Menüpunkte zusammen und überleben den Neustart", a
   assert.equal(flach.gruppen, "");
   assert.equal(
     flach.oben,
-    "dashboard,employees,weekends,vacations,appointments,memos,trainings,meetings,devices,device-management,settings,help",
+    "dashboard,employees,weekends,vacations,appointments,memos,trainings,voluntary-trainings,meetings,devices,device-management,settings,help",
   );
   assert.deepEqual(neu.problems, []);
 });

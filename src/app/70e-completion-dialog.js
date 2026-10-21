@@ -1,7 +1,7 @@
   function openCompletionDialog(trainingId = null) {
     if (state.trainings.length === 0) {
       showView("trainings");
-      showToast("Legen Sie zuerst eine Pflichtfortbildung an.", "error");
+      showToast("Legen Sie zuerst eine Fortbildung an.", "error");
       return;
     }
 
@@ -19,10 +19,20 @@
     elements.completionDate.setCustomValidity("");
     elements.completionDate.value = todayIso();
 
-    elements.completionTraining.innerHTML = groupTrainingsByYear(trainingObligations())
+    // Beide Arten stehen zur Wahl, die der offenen Ansicht (oder der
+    // gewaehlten Fortbildung) zuerst - vorgewaehlt ist ihr erster Eintrag.
+    const preselected = trainingId ? getTraining(trainingId) : null;
+    const firstMandatory = preselected ? isMandatoryTraining(preselected) : trainingViewMandatory();
+    elements.completionTraining.innerHTML = [firstMandatory, !firstMandatory]
+      .flatMap((mandatory) =>
+        groupTrainingsByYear(trainingCatalog(mandatory)).map(([year, trainings]) => [
+          `${mandatory ? "Pflichtfortbildungen" : "Fortbildungen"} · im Katalog seit ${year}`,
+          trainings,
+        ]),
+      )
       .map(
-        ([year, trainings]) => `
-          <optgroup label="Im Katalog seit ${year}">
+        ([label, trainings]) => `
+          <optgroup label="${label}">
             ${trainings
               .map(
                 (training) =>

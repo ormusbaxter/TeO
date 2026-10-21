@@ -74,6 +74,8 @@ Folgende Bereiche stehen zur Verfügung:
   Liste oder als Monatskalender
 - **Memo / ToDo:** persönliche und gemeinsame Notizen und Aufgaben
 - **Pflichtfortbildungen:** Fortbildungskatalog, Nachweise und Jahresauswertung
+- **Fortbildungen:** freiwillige Fortbildungen mit denselben Möglichkeiten,
+  ohne Einfluss auf Pflichtquoten und Fristen
 - **Teamsitzungen:** Sitzungen, Teilnahmen und statistische Auswertung
 - **Geräteeinweisungen:** Einweisungsnachweise und Einweisungsmatrix
 - **Geräteverwaltung:** Administrativer Gerätekatalog
@@ -293,7 +295,7 @@ und als Untermenü unter dem Menüpunkt **Einstellungen** stehen:
   das eigene Konto), **Ansicht** (kompakte Tabellen und Obermenüs, nur an
   diesem Arbeitsplatz) und **Dialoge schließen**
 - **Planung:** feste Dienstwochenenden, Urlaubsplanung und Schulferien
-- **Pflichtfortbildungen:** Soll-Zeiten
+- **Fortbildungen:** Soll-Zeiten
 - **Stammdaten & Zugriffe:** Benutzer, Berufe und Qualifikationen,
   Datenqualität sowie die Kategorien für Memo / ToDo
 - **Daten & Sicherung:** Speicherort, Sicherungserinnerung und Datensicherung
@@ -310,7 +312,7 @@ die Menüpunkte zu Bereichen zusammen:
 
 - **Personal:** Mitarbeiter, Wochenendverteilung, Urlaubsplanung
 - **Termine:** Terminkalender, Memo / ToDo
-- **Fortbildungen:** Pflichtfortbildungen, Teamsitzungen
+- **Fortbildungen:** Pflichtfortbildungen, Fortbildungen, Teamsitzungen
 - **Geräte:** Geräteeinweisungen, Geräteverwaltung
 
 Übersicht, Einstellungen und Hilfe bleiben für sich. Ein Klick auf ein
@@ -396,7 +398,7 @@ im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.
 Die Ansicht wechselt mit **g** gefolgt vom Buchstaben des Bereichs: **u**
 Übersicht, **m** Mitarbeiter, **w** Wochenendverteilung, **p**
 Urlaubsplanung, **t** Terminkalender, **o** Memo / ToDo, **f**
-Pflichtfortbildungen, **s** Teamsitzungen, **g** Geräteeinweisungen, **v**
+Pflichtfortbildungen, **b** Fortbildungen, **s** Teamsitzungen, **g** Geräteeinweisungen, **v**
 Geräteverwaltung, **e** Einstellungen, **h** Hilfe. Nach dem **g** bleibt
 eineinhalb Sekunden Zeit für den zweiten Anschlag. Dieselbe Übersicht öffnet
 die Schaltfläche **Tastenkürzel** in der Hilfe.
@@ -1229,10 +1231,10 @@ Geburtsdatum.
 Beim Anlegen einer Pflichtfortbildung werden Titel, Einführungsjahr,
 Beschreibung und Wiederholungsintervall festgelegt.
 
-Das angegebene Jahr ist das Einführungsjahr im Pflichtkatalog. Eine
+Das angegebene Jahr ist das Einführungsjahr im Katalog. Eine
 Fortbildung steht ab diesem Jahr auch in späteren Jahren zur Verfügung.
 
-Unter **Einstellungen → Pflichtfortbildungen** kann für jede Fortbildung
+Unter **Einstellungen → Fortbildungen** kann für jede Fortbildung
 optional eine Soll-Zeit in Minuten hinterlegt werden.
 
 ### Zeiten berechnen
@@ -1311,6 +1313,28 @@ absoluten Zahlen.
 Mehrjährig gültige Nachweise erfüllen auch nachfolgende Auswertungsjahre.
 Die Matrix kann gedruckt, als PDF gespeichert oder Excel-kompatibel als CSV
 exportiert werden.
+
+## Fortbildungen
+
+Freiwillige Fortbildungen stehen unter dem eigenen Menüpunkt **Fortbildungen**.
+Sie lassen sich genauso anlegen, wiederholen, mit Nachweisen versehen und
+auswerten wie Pflichtfortbildungen, zählen aber nicht zu ihnen:
+
+- nicht zur Quote **Pflichtfortbildungen** der Übersicht und nicht zur
+  Jahresauswertung der Pflichten
+- nicht zu Fristen, überfälligen und offenen Nachweisen
+- nicht zum Fortbildungsstand eines Mitarbeiters in Liste und Schnellansicht
+
+Ob eine Fortbildung Pflicht ist, legt im Fortbildungsdialog das Feld **Art**
+fest; angelegt wird die Art der gerade geöffneten Ansicht. Eine Fortbildung
+lässt sich später umstellen, ihre Nachweise bleiben erhalten. Gleichnamige
+Pflicht- und freiwillige Fortbildungen bilden getrennte Fortbildungsreihen.
+
+**Abschluss eintragen** bietet beide Arten an, die der geöffneten Ansicht
+zuerst. Die Jahresauswertung der Fortbildungen zeigt, wer zum Jahresende einen
+gültigen Nachweis hat (Häkchen) und wer nicht (Strich). Die Mitarbeiter-Akte
+listet unter **Fortbildungen** die freiwilligen Fortbildungen, zu denen ein
+Nachweis vorliegt.
 
 ## Teamsitzungen
 
@@ -1812,7 +1836,7 @@ oben auf der Einstellungsseite:
   Benutzerkonto und begleiten es an jeden Arbeitsplatz, während andere Konten
   ihre eigene Wahl behalten
 - **Planung:** feste Dienstwochenenden, Urlaubsplanung und Schulferien
-- **Pflichtfortbildungen:** Soll-Zeiten
+- **Fortbildungen:** Soll-Zeiten
 - **Stammdaten & Zugriffe:** Benutzer, Berufe, Qualifikationen,
   Memo-/ToDo-Kategorien und Datenqualität
 - **Daten & Sicherung:** Datenbank-Backend, Sicherungserinnerung, manuelle und

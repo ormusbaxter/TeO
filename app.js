@@ -104,7 +104,7 @@
   // gegen den Datenvertrag ab, damit eine neue Sammlung nicht vergessen wird.
   const TRACKED_COLLECTIONS = Object.freeze([
     ["employees", "Mitarbeiter"],
-    ["trainings", "Pflichtfortbildungen"],
+    ["trainings", "Fortbildungen"],
     ["completions", "Fortbildungsnachweise"],
     ["meetings", "Teamsitzungen"],
     ["meetingAttendances", "Sitzungsteilnahmen"],
@@ -570,6 +570,7 @@
     appointments: "terminkalender",
     memos: "memo-todo",
     trainings: "pflichtfortbildungen",
+    "voluntary-trainings": "fortbildungen",
     meetings: "teamsitzungen",
     devices: "geraeteeinweisungen",
     "device-management": "geraeteverwaltung",
@@ -646,6 +647,9 @@
   let trainingRecurrenceManuallyChanged = false;
   let trainingCoverageManuallyChanged = false;
   let trainingDisplayYear = new Date().getFullYear();
+  // Welche Art die geoeffnete Jahresauswertung zeigt: Pflichten oder
+  // freiwillige Fortbildungen.
+  let trainingMatrixMandatory = true;
   let meetingDisplayYear = new Date().getFullYear();
   let backupReminderShown = false;
   let databaseSaveReminderArmed = false;
@@ -754,6 +758,7 @@
   const elements = {
     navEmployeeCount: document.querySelector("#navEmployeeCount"),
     navTrainingCount: document.querySelector("#navTrainingCount"),
+    navVoluntaryTrainingCount: document.querySelector("#navVoluntaryTrainingCount"),
     navMeetingCount: document.querySelector("#navMeetingCount"),
     navAppointmentCount: document.querySelector("#navAppointmentCount"),
     navMemoCount: document.querySelector("#navMemoCount"),
@@ -970,6 +975,8 @@
       "#vacationPlannerMaximizeLabel",
     ),
     openDataQualityButton: document.querySelector("#openDataQualityButton"),
+    trainingsViewTitle: document.querySelector("#trainingsViewTitle"),
+    trainingsViewSubtitle: document.querySelector("#trainingsViewSubtitle"),
     trainingDisplayYear: document.querySelector("#trainingDisplayYear"),
     trainingSummary: document.querySelector("#trainingSummary"),
     trainingList: document.querySelector("#trainingList"),
@@ -1054,6 +1061,7 @@
     trainingDialog: document.querySelector("#trainingDialog"),
     trainingForm: document.querySelector("#trainingForm"),
     trainingDialogTitle: document.querySelector("#trainingDialogTitle"),
+    trainingMandatory: document.querySelector("#trainingMandatory"),
     trainingSubmitLabel: document.querySelector("#trainingSubmitLabel"),
     completionDialog: document.querySelector("#completionDialog"),
     completionForm: document.querySelector("#completionForm"),
@@ -1069,6 +1077,7 @@
     trainingMatrixYear: document.querySelector("#trainingMatrixYear"),
     trainingMatrixSummary: document.querySelector("#trainingMatrixSummary"),
     trainingRateHistoryChart: document.querySelector("#trainingRateHistoryChart"),
+    trainingRateHistorySummary: document.querySelector("#trainingRateHistorySummary"),
     trainingMatrixContent: document.querySelector("#trainingMatrixContent"),
     exportTrainingMatrixCsvButton: document.querySelector(
       "#exportTrainingMatrixCsvButton",
@@ -2654,6 +2663,9 @@
         Number.isInteger(targetMinutes) && targetMinutes > 0 ? targetMinutes : null,
       seriesId: normalizeId(training.seriesId) || "",
       coveredByQualificationId: normalizeId(training.coveredByQualificationId) || "",
+      // Pflichtfortbildung oder freiwillige Fortbildung. Bestaende aus der
+      // Zeit davor kennen nur Pflichten, ein fehlendes Feld bleibt deshalb eine.
+      mandatory: training.mandatory !== false,
       createdAt,
       updatedAt: validTimestamp(training.updatedAt || training.createdAt),
     };
@@ -2687,8 +2699,15 @@
     return (provider || candidates[0])?.id || "";
   }
 
-  function generatedTrainingSeriesId(title, fallbackId = "") {
-    const signature = trainingSeriesSignature(title) || fallbackId || "fortbildung";
+  // Freiwillige Fortbildungen bilden eigene Reihen: Eine freiwillige
+  // „Reanimation“ soll nicht als Nachweis der gleichnamigen Pflicht zaehlen.
+  function trainingSeriesKey(title, mandatory = true) {
+    const signature = trainingSeriesSignature(title);
+    return signature && !mandatory ? `freiwillig ${signature}` : signature;
+  }
+
+  function generatedTrainingSeriesId(title, fallbackId = "", mandatory = true) {
+    const signature = trainingSeriesKey(title, mandatory) || fallbackId || "fortbildung";
     let hash = 2166136261;
     for (let index = 0; index < signature.length; index += 1) {
       hash ^= signature.charCodeAt(index);
@@ -2701,7 +2720,7 @@
     const seriesBySignature = new Map();
     trainings.forEach((training) => {
       if (!training.recurrenceMonths || !training.seriesId) return;
-      const signature = trainingSeriesSignature(training.title);
+      const signature = trainingSeriesKey(training.title, training.mandatory);
       if (signature && !seriesBySignature.has(signature)) {
         seriesBySignature.set(signature, training.seriesId);
       }
@@ -2712,10 +2731,10 @@
         return;
       }
       if (training.seriesId) return;
-      const signature = trainingSeriesSignature(training.title);
+      const signature = trainingSeriesKey(training.title, training.mandatory);
       const seriesId =
         seriesBySignature.get(signature) ||
-        generatedTrainingSeriesId(training.title, training.id);
+        generatedTrainingSeriesId(training.title, training.id, training.mandatory);
       training.seriesId = seriesId;
       if (signature) seriesBySignature.set(signature, seriesId);
     });
@@ -3769,8 +3788,13 @@
     if (view === "dashboard") renderDashboardGreeting();
     elements.mobileCreateButton.hidden = ["settings", "help"].includes(view);
 
+    // Eine Ansicht kann mehreren Menuepunkten dienen: Pflichtfortbildungen und
+    // freiwillige Fortbildungen teilen sich ihr Markup.
     document.querySelectorAll("[data-view-panel]").forEach((panel) => {
-      panel.classList.toggle("is-active", panel.dataset.viewPanel === view);
+      panel.classList.toggle(
+        "is-active",
+        panel.dataset.viewPanel.split(" ").includes(view),
+      );
     });
 
     // Aenderungen, die waehrend der Abwesenheit dieser Ansicht entstanden
@@ -3789,7 +3813,7 @@
     if (view === "settings") showSettingsSection(activeSettingsSection);
 
     const mobileCreateType =
-      view === "trainings"
+      view === "trainings" || view === VOLUNTARY_TRAININGS_VIEW
         ? "training"
         : view === "meetings"
           ? "meeting"
@@ -4345,6 +4369,7 @@
     trainingRecurrence.addEventListener("change", () => {
       trainingRecurrenceManuallyChanged = true;
     });
+    elements.trainingMandatory.addEventListener("change", () => updateTrainingDialogTitle());
     const trainingCoverage = document.querySelector("#trainingCoveredByQualification");
     trainingCoverage.addEventListener("change", () => {
       trainingCoverageManuallyChanged = true;
@@ -5146,6 +5171,7 @@
     appointments: [renderAppointments],
     memos: [renderMemos],
     trainings: [renderTrainings],
+    "voluntary-trainings": [renderTrainings],
     meetings: [renderMeetings],
     devices: [renderDevices],
     "device-management": [renderDevices],
@@ -5167,7 +5193,8 @@
     // Nur Mitarbeiter, die tatsaechlich im Dienst stehen. Ausgetretene sollen
     // die Zahl in der Seitenleiste nicht dauerhaft aufblaehen.
     elements.navEmployeeCount.textContent = String(employedActiveEmployees().length);
-    elements.navTrainingCount.textContent = String(state.trainings.length);
+    elements.navTrainingCount.textContent = String(trainingsOfKind(true).length);
+    elements.navVoluntaryTrainingCount.textContent = String(trainingsOfKind(false).length);
     elements.navMeetingCount.textContent = String(state.meetings.length);
     elements.navAppointmentCount.textContent = String(
       state.appointments.filter((appointment) => appointment.date >= todayIso()).length,
@@ -8368,7 +8395,7 @@
       id: "training",
       label: "Fortbildungen",
       icon: "icon-training",
-      views: ["trainings", "meetings"],
+      views: ["trainings", "voluntary-trainings", "meetings"],
     },
     {
       id: "devices",
@@ -9063,6 +9090,7 @@
     t: "appointments",
     o: "memos",
     f: "trainings",
+    b: "voluntary-trainings",
     s: "meetings",
     g: "devices",
     v: "device-management",
@@ -9400,7 +9428,12 @@
       {
         label: "Pflichtfortbildung anlegen",
         icon: "icon-training",
-        run: () => openTrainingDialog(),
+        run: () => openTrainingDialog(null, { mandatory: true }),
+      },
+      {
+        label: "Fortbildung anlegen (freiwillig)",
+        icon: "icon-training",
+        run: () => openTrainingDialog(null, { mandatory: false }),
       },
       {
         label: "Fortbildungsnachweis anlegen",
@@ -9522,12 +9555,12 @@
           },
         })),
       ...state.trainings.map((training) => ({
-        group: "Pflichtfortbildungen",
+        group: isMandatoryTraining(training) ? "Pflichtfortbildungen" : "Fortbildungen",
         icon: "icon-training",
         label: training.title,
         hint: String(training.year || ""),
         run: () => {
-          showView("trainings");
+          showView(isMandatoryTraining(training) ? "trainings" : VOLUNTARY_TRAININGS_VIEW);
           openTrainingDialog(training.id);
         },
       })),
@@ -9752,7 +9785,7 @@
   }
 
   function renderDashboardTrainingProgress() {
-    if (state.trainings.length === 0) {
+    if (trainingObligations().length === 0) {
       elements.dashboardTrainingProgress.innerHTML = renderEmptyState({
         title: "Noch keine Pflichtfortbildungen",
         text: "Legen Sie die erste Pflichtfortbildung an, um den Teamfortschritt zu verfolgen.",
@@ -10318,6 +10351,11 @@
     const trainings = trainingObligations().sort(
       (a, b) => b.year - a.year || a.title.localeCompare(b.title, "de"),
     );
+    // Freiwillige Fortbildungen stehen nur, wenn ein Nachweis vorliegt: Eine
+    // nicht besuchte freiwillige Fortbildung ist nichts Offenes.
+    const voluntaryTrainings = voluntaryTrainingCatalog()
+      .filter((training) => latestCompletion(employee.id, training.id))
+      .sort((a, b) => b.year - a.year || a.title.localeCompare(b.title, "de"));
     const attendances = state.meetingAttendances.filter(
       (attendance) => attendance.employeeId === employee.id,
     );
@@ -10414,6 +10452,28 @@
             : '<p class="field-hint">Keine Pflichtfortbildungen angelegt.</p>'
         }
       </section>
+      ${
+        voluntaryTrainingCatalog().length
+          ? `<section class="dossier-section">
+              <h3>Fortbildungen</h3>
+              ${
+                voluntaryTrainings.length
+                  ? `<div class="dossier-list">${voluntaryTrainings
+                      .map((training) => {
+                        const status = getEmployeeCompletionStatus(employee.id, training);
+                        return `<div class="dossier-list-row">
+                          <strong>${escapeHtml(training.title)} <small>${training.year}</small></strong>
+                          <span class="status-badge ${status.kind === "current" ? "" : status.kind}">${escapeHtml(
+                            status.label,
+                          )}</span>
+                        </div>`;
+                      })
+                      .join("")}</div>`
+                  : '<p class="field-hint">Keine Teilnahme an freiwilligen Fortbildungen erfasst.</p>'
+              }
+            </section>`
+          : ""
+      }
       <section class="dossier-section">
         <h3>Teamsitzungen</h3>
         <div class="dossier-list">
@@ -14631,8 +14691,54 @@
     employeeWeekendFilter = elements.employeeWeekendFilter.value;
   }
 
+  // Pflichtfortbildungen und freiwillige Fortbildungen teilen sich eine
+  // Ansicht; welche Art sie zeigt, entscheidet der Menuepunkt.
+  const VOLUNTARY_TRAININGS_VIEW = "voluntary-trainings";
+  const TRAINING_KIND_TEXT = {
+    mandatory: {
+      title: "Pflichtfortbildungen",
+      subtitle: "Pflichtfortbildungen anlegen und absolvierte Nachweise dokumentieren.",
+      emptyTitle: "Noch keine Pflichtfortbildungen",
+      emptyYearTitle: (year) => `Bis ${year} keine Pflichtfortbildungen`,
+      openLabel: "offene Nachweise",
+      matrixTitle: "Status der Pflichtfortbildungen",
+      matrixSummary: "Pflichten zum Jahresende erfüllt",
+      done: "erfüllt",
+      csvName: "teo-pflichtfortbildungen",
+    },
+    voluntary: {
+      title: "Fortbildungen",
+      subtitle:
+        "Freiwillige Fortbildungen und ihre Teilnahmen dokumentieren – sie zählen nicht zu den Pflichtfortbildungen.",
+      emptyTitle: "Noch keine Fortbildungen",
+      emptyYearTitle: (year) => `Bis ${year} keine Fortbildungen`,
+      openLabel: "ohne aktuellen Nachweis",
+      matrixTitle: "Teilnahme an Fortbildungen",
+      matrixSummary: "Teilnahmen zum Jahresende gültig",
+      done: "teilgenommen",
+      csvName: "teo-fortbildungen",
+    },
+  };
+
+  function trainingViewMandatory() {
+    return activeView !== VOLUNTARY_TRAININGS_VIEW;
+  }
+
+  function trainingKindText(mandatory = trainingViewMandatory()) {
+    return TRAINING_KIND_TEXT[mandatory ? "mandatory" : "voluntary"];
+  }
+
+  function trainingsOfKind(mandatory) {
+    return state.trainings.filter((training) => isMandatoryTraining(training) === mandatory);
+  }
+
   function renderTrainings() {
-    const availableYears = getTrainingDisplayYears();
+    const mandatory = trainingViewMandatory();
+    const text = trainingKindText(mandatory);
+    const kindTrainings = trainingsOfKind(mandatory);
+    elements.trainingsViewTitle.textContent = text.title;
+    elements.trainingsViewSubtitle.textContent = text.subtitle;
+    const availableYears = getTrainingDisplayYears(kindTrainings);
     if (!availableYears.includes(trainingDisplayYear)) {
       trainingDisplayYear = new Date().getFullYear();
     }
@@ -14643,7 +14749,7 @@
       )
       .join("");
 
-    const displayedTrainings = trainingObligations().filter(
+    const displayedTrainings = trainingCatalog(mandatory).filter(
       (training) => training.year <= trainingDisplayYear,
     );
     const activeCount = employedActiveEmployees().length;
@@ -14657,15 +14763,15 @@
     elements.trainingSummary.innerHTML = `
       ${renderSummaryChip("training", displayedTrainings.length, `im Katalog ${trainingDisplayYear}`)}
       ${renderSummaryChip("check", currentAssignments, "aktuelle Nachweise", "teal")}
-      ${renderSummaryChip("alert", openAssignments, "offene Nachweise", "orange")}
+      ${renderSummaryChip("alert", openAssignments, text.openLabel, mandatory ? "orange" : "blue")}
     `;
-    elements.openTrainingMatrixButton.disabled = state.trainings.length === 0;
+    elements.openTrainingMatrixButton.disabled = kindTrainings.length === 0;
 
-    if (state.trainings.length === 0) {
+    if (kindTrainings.length === 0) {
       elements.trainingList.innerHTML = `
         <section class="panel">
           ${renderEmptyState({
-            title: "Noch keine Pflichtfortbildungen",
+            title: text.emptyTitle,
             text: "Legen Sie eine Fortbildung an und erfassen Sie anschließend die absolvierten Nachweise aktiver Mitarbeiter.",
             buttonText: "Erste Fortbildung anlegen",
             buttonAttribute: "data-empty-add-training",
@@ -14682,7 +14788,7 @@
       elements.trainingList.innerHTML = `
         <section class="panel">
           ${renderEmptyState({
-            title: `Bis ${trainingDisplayYear} keine Pflichtfortbildungen`,
+            title: text.emptyYearTitle(trainingDisplayYear),
             text: "Wählen Sie ein späteres Jahr oder ergänzen Sie den Fortbildungskatalog.",
             buttonText: "Fortbildung anlegen",
             buttonAttribute: "data-empty-add-training",
@@ -14715,11 +14821,11 @@
       .join("");
   }
 
-  function getTrainingDisplayYears() {
+  function getTrainingDisplayYears(trainings = state.trainings) {
     return [
       ...new Set([
         new Date().getFullYear(),
-        ...state.trainings.map((training) => Number(training.year)),
+        ...trainings.map((training) => Number(training.year)),
       ]),
     ]
       .filter((year) => Number.isInteger(year) && year >= 2000 && year <= 2100)
@@ -14798,7 +14904,7 @@
           .join("")
       : `<div class="time-calculator-empty">
           <strong>Keine Soll-Zeiten hinterlegt</strong>
-          <p>Unter Einstellungen → Pflichtfortbildungen können Sie Soll-Zeiten in Minuten eintragen.</p>
+          <p>Unter Einstellungen → Fortbildungen können Sie Soll-Zeiten in Minuten eintragen.</p>
         </div>`;
 
     updateTimeSpanTotal();
@@ -14852,9 +14958,10 @@
   }
 
   function openTrainingMatrixDialog() {
-    const years = getTrainingEvaluationYears();
+    trainingMatrixMandatory = trainingViewMandatory();
+    const years = getTrainingEvaluationYears(trainingMatrixMandatory);
     if (years.length === 0) {
-      showToast("Für die Auswertung sind noch keine Pflichtfortbildungen vorhanden.", "error");
+      showToast("Für die Auswertung sind noch keine Fortbildungen vorhanden.", "error");
       return;
     }
 
@@ -14871,10 +14978,15 @@
     elements.trainingMatrixDialog.showModal();
   }
 
-  function renderTrainingRateHistory(years = getTrainingEvaluationYears()) {
+  function renderTrainingRateHistory(
+    years = getTrainingEvaluationYears(trainingMatrixMandatory),
+  ) {
     const annualRates = [...years]
       .sort((yearA, yearB) => yearA - yearB)
-      .map((year) => ({ year, rate: getAnnualTrainingMatrix(year).completionRate }));
+      .map((year) => ({
+        year,
+        rate: getAnnualTrainingMatrix(year, trainingMatrixMandatory).completionRate,
+      }));
     elements.trainingRateHistoryChart.innerHTML = annualRates.length
       ? `<div class="training-rate-chart" role="img" aria-label="${escapeHtml(
           annualRates.map(({ year, rate }) => `${year}: ${rate} Prozent`).join(", "),
@@ -14898,11 +15010,16 @@
 
   function renderTrainingMatrix() {
     const year = Number(elements.trainingMatrixYear.value);
-    const matrix = getAnnualTrainingMatrix(year);
-    elements.trainingMatrixDialogTitle.textContent = `Status der Pflichtfortbildungen · ${year}`;
+    const mandatory = trainingMatrixMandatory;
+    const text = trainingKindText(mandatory);
+    const matrix = getAnnualTrainingMatrix(year, mandatory);
+    elements.trainingMatrixDialogTitle.textContent = `${text.matrixTitle} · ${year}`;
+    elements.trainingRateHistorySummary.textContent = mandatory
+      ? "Verlauf der Pflichtfortbildungsquote nach Jahren"
+      : "Verlauf der Teilnahmequote nach Jahren";
     elements.trainingMatrixSummary.innerHTML = `
       <strong>${matrix.completedAssignments} von ${matrix.totalAssignments}</strong>
-      <span>Pflichten zum Jahresende erfüllt · ${matrix.completionRate}&thinsp;%</span>
+      <span>${text.matrixSummary} · ${matrix.completionRate}&thinsp;%</span>
     `;
 
     if (matrix.employees.length === 0) {
@@ -14934,9 +15051,11 @@
                       <span>${escapeHtml(training.title)}</span>
                       <small
                         class="completion-progress ${completionProgressTone(completionRate)}"
-                        title="${completedCount} von ${matrix.employees.length} aktiven Mitarbeitern erfüllen diese Pflicht zum Jahresende"
+                        title="${completedCount} von ${matrix.employees.length} aktiven Mitarbeitern ${
+                          mandatory ? "erfüllen diese Pflicht" : "haben zum Jahresende einen gültigen Nachweis"
+                        }"
                       >
-                        ${completionRate}&thinsp;% erfüllt
+                        ${completionRate}&thinsp;% ${text.done}
                       </small>
                     </th>
                   `,
@@ -14963,8 +15082,10 @@
                           const description = coveredBy
                             ? `durch ${coveredBy} abgedeckt`
                             : completed
-                              ? "für das Auswertungsjahr erfüllt"
-                              : "offen";
+                              ? `für das Auswertungsjahr ${text.done}`
+                              : mandatory
+                                ? "offen"
+                                : "ohne Nachweis";
                           return `
                           <td>
                             <span
@@ -14977,10 +15098,12 @@
                                 coveredBy
                                   ? `Durch ${coveredBy} abgedeckt`
                                   : completed
-                                    ? "Für das Auswertungsjahr erfüllt"
-                                    : "Zum Jahresende offen",
+                                    ? `Für das Auswertungsjahr ${text.done}`
+                                    : mandatory
+                                      ? "Zum Jahresende offen"
+                                      : "Kein gültiger Nachweis zum Jahresende",
                               )}"
-                            >${completed ? "✓" : "×"}</span>
+                            >${completed ? "✓" : mandatory ? "×" : "–"}</span>
                           </td>
                         `;
                         },
@@ -15046,27 +15169,31 @@
 
   function exportTrainingMatrixCsv() {
     const year = Number(elements.trainingMatrixYear.value);
-    const matrix = getAnnualTrainingMatrix(year);
+    const mandatory = trainingMatrixMandatory;
+    const matrix = getAnnualTrainingMatrix(year, mandatory);
     if (!matrix.employees.length || !matrix.trainings.length) {
       showToast("Für dieses Jahr sind keine auswertbaren Fortbildungsdaten vorhanden.", "error");
       return;
     }
+    const done = mandatory ? "Erfüllt" : "Teilgenommen";
 
     downloadCsv(
-      `teo-pflichtfortbildungen_${year}.csv`,
+      `${trainingKindText(mandatory).csvName}_${year}.csv`,
       ["Mitarbeiter", ...matrix.trainings.map((training) => training.title)],
       matrix.rows.map((row) => [
         fullName(row.employee),
         ...row.statuses.map(({ completed, coveredBy }) =>
-          coveredBy ? `Erfüllt (${coveredBy})` : completed ? "Erfüllt" : "Offen",
+          coveredBy ? `${done} (${coveredBy})` : completed ? done : "Offen",
         ),
       ]),
     );
   }
 
-  function getAnnualTrainingMatrix(year) {
+  // Die Jahresauswertung der Pflichten ist Grundlage der Quote im Dashboard;
+  // freiwillige Fortbildungen werten dieselbe Rechnung getrennt aus.
+  function getAnnualTrainingMatrix(year, mandatory = true) {
     const referenceDate = `${year}-12-31`;
-    const trainings = trainingObligations()
+    const trainings = trainingCatalog(mandatory)
       .filter((training) => training.year <= year)
       .sort((a, b) => a.title.localeCompare(b.title, "de"));
     // Erwartet wird, wer zum Stichtag des Jahres beschäftigt ist: Wer im
@@ -15121,13 +15248,17 @@
     };
   }
 
-  function getTrainingEvaluationYears() {
+  function getTrainingEvaluationYears(mandatory = true) {
     const currentYear = new Date().getFullYear();
-    const trainingYears = state.trainings
+    const trainings = trainingsOfKind(mandatory);
+    if (!trainings.length) return [];
+    const trainingYears = trainings
       .map((training) => Number(training.year))
       .filter(Number.isInteger);
     const completionYears = [];
+    const trainingIds = new Set(trainings.map((training) => training.id));
     state.completions.forEach((completion) => {
+      if (!trainingIds.has(completion.trainingId)) return;
       const completionYear = Number(completion.completedOn.slice(0, 4));
       if (Number.isInteger(completionYear)) completionYears.push(completionYear);
     });
@@ -15214,7 +15345,11 @@
             >
               <div class="progress-bar"${dynamicStyle({ "--progress": `${stats.percent}%` })}></div>
             </div>
-            <small>${stats.open} Nachweis${stats.open === 1 ? "" : "e"} offen</small>
+            <small>${
+              isMandatoryTraining(training)
+                ? `${stats.open} Nachweis${stats.open === 1 ? "" : "e"} offen`
+                : `${stats.open} ohne aktuellen Nachweis`
+            }</small>
           </div>
           <div class="training-actions">
             <button
@@ -20713,7 +20848,7 @@ ${rendered
     });
   }
 
-  function openTrainingDialog(trainingId = null) {
+  function openTrainingDialog(trainingId = null, { mandatory: requestedMandatory } = {}) {
     elements.trainingForm.reset();
     document.querySelector("#trainingTitle").setCustomValidity("");
     document.querySelector("#trainingId").value = "";
@@ -20726,9 +20861,12 @@ ${rendered
 
     const training = trainingId ? getTraining(trainingId) : null;
     renderTrainingCoverageOptions(training?.coveredByQualificationId || "");
-    elements.trainingDialogTitle.textContent = training
-      ? "Pflichtfortbildung bearbeiten"
-      : "Pflichtfortbildung anlegen";
+    // Neu angelegt wird die Art, deren Ansicht gerade offen ist.
+    const mandatory = training
+      ? isMandatoryTraining(training)
+      : (requestedMandatory ?? trainingViewMandatory());
+    elements.trainingMandatory.value = String(mandatory);
+    updateTrainingDialogTitle(Boolean(training));
     elements.trainingSubmitLabel.textContent = training
       ? "Änderungen speichern"
       : "Fortbildung speichern";
@@ -20748,6 +20886,11 @@ ${rendered
     elements.trainingDialog.showModal();
     captureCleanForm(elements.trainingForm);
     window.setTimeout(() => document.querySelector("#trainingTitle").focus(), 0);
+  }
+
+  function updateTrainingDialogTitle(editing = Boolean(document.querySelector("#trainingId").value)) {
+    const kind = elements.trainingMandatory.value === "false" ? "Fortbildung" : "Pflichtfortbildung";
+    elements.trainingDialogTitle.textContent = `${kind} ${editing ? "bearbeiten" : "anlegen"}`;
   }
 
   function renderTrainingCoverageOptions(selectedId = "") {
@@ -20778,12 +20921,18 @@ ${rendered
     const recurrenceMonths =
       Number.isFinite(recurrence) && recurrence > 0 ? recurrence : null;
     const trainingYear = Number(document.querySelector("#trainingYear").value);
+    const mandatory = elements.trainingMandatory.value !== "false";
+    const seriesKey = trainingSeriesKey(titleInput.value, mandatory);
     const matchingSeries = state.trainings.find(
       (item) =>
         item.id !== existingTraining?.id &&
         item.recurrenceMonths &&
-        trainingSeriesSignature(item.title) === trainingSeriesSignature(titleInput.value),
+        trainingSeriesKey(item.title, isMandatoryTraining(item)) === seriesKey,
     );
+    // Wechselt eine Fortbildung die Art, verlaesst sie ihre Reihe - sonst
+    // zaehlten freiwillige Nachweise bei der gleichnamigen Pflicht mit.
+    const keepsSeries =
+      existingTraining?.seriesId && isMandatoryTraining(existingTraining) === mandatory;
     const training = {
       id: existingTraining?.id || createId(),
       title: titleInput.value.trim(),
@@ -20791,13 +20940,14 @@ ${rendered
       recurrenceMonths,
       targetMinutes: existingTraining?.targetMinutes || null,
       seriesId: recurrenceMonths
-        ? existingTraining?.seriesId ||
+        ? (keepsSeries && existingTraining.seriesId) ||
           matchingSeries?.seriesId ||
-          generatedTrainingSeriesId(titleInput.value, existingTraining?.id)
+          generatedTrainingSeriesId(titleInput.value, existingTraining?.id, mandatory)
         : "",
       coveredByQualificationId: document.querySelector("#trainingCoveredByQualification")
         .value,
       description: document.querySelector("#trainingDescription").value.trim(),
+      mandatory,
       createdAt: existingTraining?.createdAt || now,
       updatedAt: now,
     };
@@ -20834,8 +20984,9 @@ ${rendered
         } werden ebenfalls gelöscht.`
       : "";
 
+    const kind = isMandatoryTraining(training) ? "Pflichtfortbildung" : "Fortbildung";
     requestConfirmation({
-      title: "Pflichtfortbildung löschen?",
+      title: `${kind} löschen?`,
       message: `„${training.title}“ (${training.year}) wird dauerhaft entfernt.${historyNote}`,
       acceptLabel: "Fortbildung löschen",
       callback: async () => {
@@ -20844,10 +20995,10 @@ ${rendered
           state.completions = state.completions.filter(
             (completion) => completion.trainingId !== trainingId,
           );
-        }, { undo: "Pflichtfortbildung gelöscht" });
+        }, { undo: `${kind} gelöscht` });
         if (!committed) return;
 
-        showUndoToast("Pflichtfortbildung wurde gelöscht.");
+        showUndoToast(`${kind} wurde gelöscht.`);
       },
     });
   }
@@ -21310,7 +21461,7 @@ ${rendered
   function openCompletionDialog(trainingId = null) {
     if (state.trainings.length === 0) {
       showView("trainings");
-      showToast("Legen Sie zuerst eine Pflichtfortbildung an.", "error");
+      showToast("Legen Sie zuerst eine Fortbildung an.", "error");
       return;
     }
 
@@ -21328,10 +21479,20 @@ ${rendered
     elements.completionDate.setCustomValidity("");
     elements.completionDate.value = todayIso();
 
-    elements.completionTraining.innerHTML = groupTrainingsByYear(trainingObligations())
+    // Beide Arten stehen zur Wahl, die der offenen Ansicht (oder der
+    // gewaehlten Fortbildung) zuerst - vorgewaehlt ist ihr erster Eintrag.
+    const preselected = trainingId ? getTraining(trainingId) : null;
+    const firstMandatory = preselected ? isMandatoryTraining(preselected) : trainingViewMandatory();
+    elements.completionTraining.innerHTML = [firstMandatory, !firstMandatory]
+      .flatMap((mandatory) =>
+        groupTrainingsByYear(trainingCatalog(mandatory)).map(([year, trainings]) => [
+          `${mandatory ? "Pflichtfortbildungen" : "Fortbildungen"} · im Katalog seit ${year}`,
+          trainings,
+        ]),
+      )
       .map(
-        ([year, trainings]) => `
-          <optgroup label="Im Katalog seit ${year}">
+        ([label, trainings]) => `
+          <optgroup label="${label}">
             ${trainings
               .map(
                 (training) =>
@@ -23674,7 +23835,9 @@ ${rendered
               <label class="training-duration-setting-row">
                 <span>
                   <strong>${escapeHtml(training.title)}</strong>
-                  <small>Im Katalog seit ${training.year}</small>
+                  <small>${
+                    isMandatoryTraining(training) ? "Pflichtfortbildung" : "Freiwillig"
+                  } · im Katalog seit ${training.year}</small>
                 </span>
                 <span class="input-suffix">
                   <input
@@ -23693,7 +23856,7 @@ ${rendered
             `,
           )
           .join("")
-      : `<p class="settings-empty-copy">Legen Sie zuerst eine Pflichtfortbildung an.</p>`;
+      : `<p class="settings-empty-copy">Legen Sie zuerst eine Fortbildung an.</p>`;
     elements.saveTrainingDurationsButton.disabled = trainings.length === 0;
   }
 
@@ -24688,9 +24851,26 @@ ${rendered
     );
   }
 
+  function isMandatoryTraining(training) {
+    return training?.mandatory !== false;
+  }
+
+  // Pflichtfortbildungen und freiwillige Fortbildungen teilen Katalog,
+  // Nachweise und Reihen. Quoten, Fristen, Kennzahlen und die Jahresauswertung
+  // der Pflichten sehen aber nur die Pflichten - deshalb fragt alles, was
+  // zaehlt, trainingObligations() und nicht state.trainings.
   function trainingObligations() {
+    return trainingCatalog(true);
+  }
+
+  function voluntaryTrainingCatalog() {
+    return trainingCatalog(false);
+  }
+
+  function trainingCatalog(mandatory = true) {
     const obligations = new Map();
     state.trainings.forEach((training) => {
+      if (isMandatoryTraining(training) !== mandatory) return;
       const key =
         training.recurrenceMonths && training.seriesId
           ? `series:${training.seriesId}`

@@ -258,6 +258,11 @@
             <span>Pflichtfortbildungen</span>
             <span class="nav-count" id="navTrainingCount">0</span>
           </button>
+          <button class="nav-item" type="button" data-view="voluntary-trainings">
+            <svg><use href="#icon-training"></use></svg>
+            <span>Fortbildungen</span>
+            <span class="nav-count" id="navVoluntaryTrainingCount">0</span>
+          </button>
           <button class="nav-item" type="button" data-view="meetings">
             <svg><use href="#icon-meeting"></use></svg>
             <span>Teamsitzungen</span>
@@ -288,7 +293,7 @@
           >
             <button type="button" data-settings-section-target="general">Allgemein</button>
             <button type="button" data-settings-section-target="planning">Planung</button>
-            <button type="button" data-settings-section-target="training">Pflichtfortbildungen</button>
+            <button type="button" data-settings-section-target="training">Fortbildungen</button>
             <button type="button" data-settings-section-target="master-data">Stammdaten &amp; Zugriffe</button>
             <button type="button" data-settings-section-target="data">Daten &amp; Sicherung</button>
           </div>
@@ -1095,16 +1100,16 @@
           </div>
         </section>
 
-        <section class="view" id="trainingsView" data-view-panel="trainings">
+        <section class="view" id="trainingsView" data-view-panel="trainings voluntary-trainings">
           <div class="page-header">
             <div class="page-header-text">
               <p class="eyebrow">
                 <svg class="eyebrow-icon"><use href="#icon-training"></use></svg>
                 <span>Qualität &amp; Sicherheit</span>
               </p>
-              <h1>Pflichtfortbildungen</h1>
-              <p class="page-subtitle">
-                Fortbildungen anlegen und absolvierte Nachweise dokumentieren.
+              <h1 id="trainingsViewTitle">Pflichtfortbildungen</h1>
+              <p class="page-subtitle" id="trainingsViewSubtitle">
+                Pflichtfortbildungen anlegen und absolvierte Nachweise dokumentieren.
               </p>
             </div>
             <div class="header-actions">
@@ -1472,7 +1477,7 @@
               aria-controls="settingsPanel-training"
               data-settings-section-target="training"
             >
-              Pflichtfortbildungen
+              Fortbildungen
             </button>
             <button
               id="settingsTab-master-data"
@@ -1840,12 +1845,12 @@
                       <svg><use href="#icon-training"></use></svg>
                     </span>
                     <div>
-                      <p class="eyebrow">Pflichtfortbildungen</p>
+                      <p class="eyebrow">Fortbildungen</p>
                       <h2>Soll-Zeiten</h2>
                     </div>
                   </div>
                   <p class="settings-description">
-                    Optionale Dauer je Pflichtfortbildung in Minuten. Fortbildungen mit
+                    Optionale Dauer je Pflicht- oder freiwilliger Fortbildung in Minuten. Fortbildungen mit
                     Soll-Zeit werden im Rechner für die anrechenbare Arbeitszeit angeboten.
                   </p>
                   <div class="training-duration-settings" id="trainingDurationSettings"></div>
@@ -2293,7 +2298,7 @@
             <div class="help-layout">
             <nav class="panel help-toc" aria-label="Inhaltsverzeichnis der Hilfe">
               <p class="eyebrow">Inhalt</p>
-              <button type="button" data-help-target="hilfe-schnellstart" data-help-nav-target="hilfe-schnellstart">Schnellstart</button><button type="button" data-help-target="hilfe-navigation-und-bedienung" data-help-nav-target="hilfe-navigation-und-bedienung">Navigation und Bedienung</button><button type="button" data-help-target="hilfe-benutzerkonten-und-berechtigungen" data-help-nav-target="hilfe-benutzerkonten-und-berechtigungen">Benutzerkonten und Berechtigungen</button><button type="button" data-help-target="hilfe-mitarbeiterverwaltung" data-help-nav-target="hilfe-mitarbeiterverwaltung">Mitarbeiterverwaltung</button><button type="button" data-help-target="hilfe-dienstwochenenden" data-help-nav-target="hilfe-dienstwochenenden">Dienstwochenenden</button><button type="button" data-help-target="hilfe-urlaubs-und-abwesenheitsplanung" data-help-nav-target="hilfe-urlaubs-und-abwesenheitsplanung">Urlaubs- und Abwesenheitsplanung</button><button type="button" data-help-target="hilfe-memo-todo" data-help-nav-target="hilfe-memo-todo">Memo / ToDo</button><button type="button" data-help-target="hilfe-terminkalender-und-fristenmonitor" data-help-nav-target="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</button><button type="button" data-help-target="hilfe-pflichtfortbildungen" data-help-nav-target="hilfe-pflichtfortbildungen">Pflichtfortbildungen</button><button type="button" data-help-target="hilfe-teamsitzungen" data-help-nav-target="hilfe-teamsitzungen">Teamsitzungen</button><button type="button" data-help-target="hilfe-gerateverwaltung-und-gerateeinweisungen" data-help-nav-target="hilfe-gerateverwaltung-und-gerateeinweisungen">Geräteverwaltung und Geräteeinweisungen</button><button type="button" data-help-target="hilfe-datensicherung-und-wiederherstellung" data-help-nav-target="hilfe-datensicherung-und-wiederherstellung">Datensicherung und Wiederherstellung</button><button type="button" data-help-target="hilfe-datenspeicherung-und-mariadb" data-help-nav-target="hilfe-datenspeicherung-und-mariadb">Datenspeicherung und MariaDB</button><button type="button" data-help-target="hilfe-einstellungen-und-administration" data-help-nav-target="hilfe-einstellungen-und-administration">Einstellungen und Administration</button><button type="button" data-help-target="hilfe-haufig-gestellte-fragen" data-help-nav-target="hilfe-haufig-gestellte-fragen">Häufig gestellte Fragen</button><button type="button" data-help-target="hilfe-datenschutz-und-it-sicherheit" data-help-nav-target="hilfe-datenschutz-und-it-sicherheit">Datenschutz und IT-Sicherheit</button><button type="button" data-help-target="hilfe-anderungshistorie" data-help-nav-target="hilfe-anderungshistorie">Änderungshistorie</button>
+              <button type="button" data-help-target="hilfe-schnellstart" data-help-nav-target="hilfe-schnellstart">Schnellstart</button><button type="button" data-help-target="hilfe-navigation-und-bedienung" data-help-nav-target="hilfe-navigation-und-bedienung">Navigation und Bedienung</button><button type="button" data-help-target="hilfe-benutzerkonten-und-berechtigungen" data-help-nav-target="hilfe-benutzerkonten-und-berechtigungen">Benutzerkonten und Berechtigungen</button><button type="button" data-help-target="hilfe-mitarbeiterverwaltung" data-help-nav-target="hilfe-mitarbeiterverwaltung">Mitarbeiterverwaltung</button><button type="button" data-help-target="hilfe-dienstwochenenden" data-help-nav-target="hilfe-dienstwochenenden">Dienstwochenenden</button><button type="button" data-help-target="hilfe-urlaubs-und-abwesenheitsplanung" data-help-nav-target="hilfe-urlaubs-und-abwesenheitsplanung">Urlaubs- und Abwesenheitsplanung</button><button type="button" data-help-target="hilfe-memo-todo" data-help-nav-target="hilfe-memo-todo">Memo / ToDo</button><button type="button" data-help-target="hilfe-terminkalender-und-fristenmonitor" data-help-nav-target="hilfe-terminkalender-und-fristenmonitor">Terminkalender und Fristenmonitor</button><button type="button" data-help-target="hilfe-pflichtfortbildungen" data-help-nav-target="hilfe-pflichtfortbildungen">Pflichtfortbildungen</button><button type="button" data-help-target="hilfe-fortbildungen" data-help-nav-target="hilfe-fortbildungen">Fortbildungen</button><button type="button" data-help-target="hilfe-teamsitzungen" data-help-nav-target="hilfe-teamsitzungen">Teamsitzungen</button><button type="button" data-help-target="hilfe-gerateverwaltung-und-gerateeinweisungen" data-help-nav-target="hilfe-gerateverwaltung-und-gerateeinweisungen">Geräteverwaltung und Geräteeinweisungen</button><button type="button" data-help-target="hilfe-datensicherung-und-wiederherstellung" data-help-nav-target="hilfe-datensicherung-und-wiederherstellung">Datensicherung und Wiederherstellung</button><button type="button" data-help-target="hilfe-datenspeicherung-und-mariadb" data-help-nav-target="hilfe-datenspeicherung-und-mariadb">Datenspeicherung und MariaDB</button><button type="button" data-help-target="hilfe-einstellungen-und-administration" data-help-nav-target="hilfe-einstellungen-und-administration">Einstellungen und Administration</button><button type="button" data-help-target="hilfe-haufig-gestellte-fragen" data-help-nav-target="hilfe-haufig-gestellte-fragen">Häufig gestellte Fragen</button><button type="button" data-help-target="hilfe-datenschutz-und-it-sicherheit" data-help-nav-target="hilfe-datenschutz-und-it-sicherheit">Datenschutz und IT-Sicherheit</button><button type="button" data-help-target="hilfe-anderungshistorie" data-help-nav-target="hilfe-anderungshistorie">Änderungshistorie</button>
             </nav>
             <article class="panel help-article">
               <h1 id="hilfe-teo-team-employee-organizer">TeO – Team &amp; Employee Organizer</h1>
@@ -2318,7 +2323,7 @@
 <h3 id="hilfe-hauptnavigation">Hauptnavigation</h3>
 <p>Die Desktop-Navigation befindet sich links. Auf kleinen Bildschirmen wird am unteren Rand eine horizontal scrollbarere Mobilnavigation angezeigt.</p>
 <p>Folgende Bereiche stehen zur Verfügung:</p>
-<ul><li><strong>Übersicht:</strong> Wochenzusammenfassung, Kennzahlen, anstehende Fristen und offene Nachweise</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung, wahlweise als Liste oder als Monatskalender</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
+<ul><li><strong>Übersicht:</strong> Wochenzusammenfassung, Kennzahlen, anstehende Fristen und offene Nachweise</li><li><strong>Mitarbeiter:</strong> Personalstammdaten, Filter, Sammelbearbeitung und Gesamtakten</li><li><strong>Wochenendverteilung:</strong> Vergleich der beiden festen Dienstwochenenden</li><li><strong>Urlaubsplanung:</strong> Monats- und Jahresplanung von Urlaub und Abwesenheiten</li><li><strong>Terminkalender:</strong> Termine mit Ort, Uhrzeit und Beschreibung, wahlweise als Liste oder als Monatskalender</li><li><strong>Memo / ToDo:</strong> persönliche und gemeinsame Notizen und Aufgaben</li><li><strong>Pflichtfortbildungen:</strong> Fortbildungskatalog, Nachweise und Jahresauswertung</li><li><strong>Fortbildungen:</strong> freiwillige Fortbildungen mit denselben Möglichkeiten, ohne Einfluss auf Pflichtquoten und Fristen</li><li><strong>Teamsitzungen:</strong> Sitzungen, Teilnahmen und statistische Auswertung</li><li><strong>Geräteeinweisungen:</strong> Einweisungsnachweise und Einweisungsmatrix</li><li><strong>Geräteverwaltung:</strong> Administrativer Gerätekatalog</li><li><strong>Einstellungen:</strong> Darstellung, Datenbank, Sicherungen und Stammdaten</li><li><strong>Hilfe:</strong> Dieses Benutzerhandbuch mit Volltextsuche</li></ul>
 <p>Die Zahl neben einem Eintrag nennt bei <strong>Mitarbeitern</strong> die aktiven und die in Einarbeitung befindlichen Personen – ausgetretene zählen nicht mit –, bei <strong>Terminen</strong> die noch bevorstehenden, bei <strong>Memo / ToDo</strong> die sichtbaren offenen Einträge und bei der <strong>Geräteverwaltung</strong> die Geräte im aktuellen Bestand.</p>
 <h3 id="hilfe-suche-und-filter">Suche und Filter</h3>
 <p>Suchfelder reagieren direkt während der Eingabe. Mehrere Filter können kombiniert werden. Filter beziehen sich immer auf die aktuell sichtbare Ansicht.</p>
@@ -2364,11 +2369,11 @@
 <p>Uhrzeiten werden im 24-Stunden-Format <code>HH:MM</code> angezeigt.</p>
 <h3 id="hilfe-aufbau-der-einstellungen">Aufbau der Einstellungen</h3>
 <p>Die Einstellungen sind in fünf Bereiche geteilt, die als Reiter über der Seite und als Untermenü unter dem Menüpunkt <strong>Einstellungen</strong> stehen:</p>
-<ul><li><strong>Allgemein:</strong> <strong>Darstellung</strong> (Farbthema und Symbolsatz, gespeichert für das eigene Konto), <strong>Ansicht</strong> (kompakte Tabellen und Obermenüs, nur an diesem Arbeitsplatz) und <strong>Dialoge schließen</strong></li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe und Qualifikationen, Datenqualität sowie die Kategorien für Memo / ToDo</li><li><strong>Daten &amp; Sicherung:</strong> Speicherort, Sicherungserinnerung und Datensicherung</li></ul>
+<ul><li><strong>Allgemein:</strong> <strong>Darstellung</strong> (Farbthema und Symbolsatz, gespeichert für das eigene Konto), <strong>Ansicht</strong> (kompakte Tabellen und Obermenüs, nur an diesem Arbeitsplatz) und <strong>Dialoge schließen</strong></li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Fortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe und Qualifikationen, Datenqualität sowie die Kategorien für Memo / ToDo</li><li><strong>Daten &amp; Sicherung:</strong> Speicherort, Sicherungserinnerung und Datensicherung</li></ul>
 <p>Mit der Tastatur führt <strong>Tab</strong> auf den gewählten Reiter, <strong>Pfeil links/rechts</strong> wechseln den Bereich, <strong>Pos1</strong> und <strong>Ende</strong> springen zum ersten und letzten. Vorleseprogramme kündigen die Reiter als Registerkarten an und nennen die Erläuterung eines Schalters oder Felds mit.</p>
 <h3 id="hilfe-obermenus-in-der-seitenleiste">Obermenüs in der Seitenleiste</h3>
 <p>Unter <strong>Einstellungen → Allgemein → Ansicht</strong> fasst <strong>Obermenüs in der Seitenleiste</strong> die Menüpunkte zu Bereichen zusammen:</p>
-<ul><li><strong>Personal:</strong> Mitarbeiter, Wochenendverteilung, Urlaubsplanung</li><li><strong>Termine:</strong> Terminkalender, Memo / ToDo</li><li><strong>Fortbildungen:</strong> Pflichtfortbildungen, Teamsitzungen</li><li><strong>Geräte:</strong> Geräteeinweisungen, Geräteverwaltung</li></ul>
+<ul><li><strong>Personal:</strong> Mitarbeiter, Wochenendverteilung, Urlaubsplanung</li><li><strong>Termine:</strong> Terminkalender, Memo / ToDo</li><li><strong>Fortbildungen:</strong> Pflichtfortbildungen, Fortbildungen, Teamsitzungen</li><li><strong>Geräte:</strong> Geräteeinweisungen, Geräteverwaltung</li></ul>
 <p>Übersicht, Einstellungen und Hilfe bleiben für sich. Ein Klick auf ein Obermenü klappt es auf oder zu; ein zugeklapptes Obermenü, in dem die gerade geöffnete Ansicht liegt, ist hervorgehoben. Wer eine Ansicht über die Suche oder ein Tastenkürzel öffnet, sieht ihren Menüpunkt, weil das Obermenü dann aufgeht. Umsortiert wird innerhalb eines Obermenüs; ein Obermenü steht dort, wo sein erster Eintrag in der eigenen Reihenfolge steht. In der eingeklappten Seitenleiste entfallen die Obermenüs, und alle Menüpunkte stehen wie gewohnt als Symbole untereinander. Die Einstellung und welche Obermenüs zugeklappt sind, gelten nur an diesem Arbeitsplatz.</p>
 <h3 id="hilfe-seitenleiste-einklappen">Seitenleiste einklappen</h3>
 <p>Der Winkel neben dem Namenszug klappt die Seitenleiste nach links ein. Im eingeklappten Zustand bleibt eine schmale Spur mit den Symbolen der Menüpunkte; wer mit der Maus darauf zeigt, sieht Bezeichnung und Zähler als Kurzhinweis. Ein erneuter Klick klappt sie wieder auf. Der Zustand wird im Browserprofil gespeichert und gilt beim nächsten Start wieder – er gehört wie die Reihenfolge der Navigation nicht zum gemeinsamen Datenbestand.</p>
@@ -2382,7 +2387,7 @@
 <h3 id="hilfe-tastenkurzel">Tastenkürzel</h3>
 <p>Am Schreibtisch lässt sich TeO weitgehend über die Tastatur bedienen. Die Kürzel gelten überall, solange kein Eingabefeld und kein Dialog den Fokus hat; im Raster der Urlaubsplanung behalten die Buchstaben ihre dortige Bedeutung.</p>
 <p>| Taste | Wirkung | | --- | --- | | <strong>Strg + K</strong> | Suchen und ausführen: Ansicht, Eintrag oder Aktion | | <strong>?</strong> | Übersicht aller Tastenkürzel öffnen | | <strong>/</strong> | Suchfeld der gezeigten Ansicht anspringen | | <strong>n</strong> | Neuen Eintrag der gezeigten Ansicht anlegen | | <strong>Strg + Z</strong> | Letzte Löschung oder Massenänderung zurücknehmen | | <strong>Strg + Y</strong> | Zurückgenommenen Schritt wiederholen (auch <strong>Strg + Umschalt + Z</strong>) | | <strong>Esc</strong> | Dialog schließen, Vollbild verlassen, Auswahl aufheben | | <strong>Strg + Klick</strong> | Karte zur Mehrfachauswahl hinzunehmen | | <strong>Umschalt + Klick</strong> | Alle Karten bis zur zuletzt angeklickten auswählen |</p>
-<p>Die Ansicht wechselt mit <strong>g</strong> gefolgt vom Buchstaben des Bereichs: <strong>u</strong> Übersicht, <strong>m</strong> Mitarbeiter, <strong>w</strong> Wochenendverteilung, <strong>p</strong> Urlaubsplanung, <strong>t</strong> Terminkalender, <strong>o</strong> Memo / ToDo, <strong>f</strong> Pflichtfortbildungen, <strong>s</strong> Teamsitzungen, <strong>g</strong> Geräteeinweisungen, <strong>v</strong> Geräteverwaltung, <strong>e</strong> Einstellungen, <strong>h</strong> Hilfe. Nach dem <strong>g</strong> bleibt eineinhalb Sekunden Zeit für den zweiten Anschlag. Dieselbe Übersicht öffnet die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe.</p>
+<p>Die Ansicht wechselt mit <strong>g</strong> gefolgt vom Buchstaben des Bereichs: <strong>u</strong> Übersicht, <strong>m</strong> Mitarbeiter, <strong>w</strong> Wochenendverteilung, <strong>p</strong> Urlaubsplanung, <strong>t</strong> Terminkalender, <strong>o</strong> Memo / ToDo, <strong>f</strong> Pflichtfortbildungen, <strong>b</strong> Fortbildungen, <strong>s</strong> Teamsitzungen, <strong>g</strong> Geräteeinweisungen, <strong>v</strong> Geräteverwaltung, <strong>e</strong> Einstellungen, <strong>h</strong> Hilfe. Nach dem <strong>g</strong> bleibt eineinhalb Sekunden Zeit für den zweiten Anschlag. Dieselbe Übersicht öffnet die Schaltfläche <strong>Tastenkürzel</strong> in der Hilfe.</p>
 <h3 id="hilfe-loschungen-zurucknehmen">Löschungen zurücknehmen</h3>
 <p>Nach dem Löschen eines Datensatzes und nach einer Sammelbearbeitung bietet die Meldung unten rechts <strong>Rückgängig</strong> an; dasselbe leistet <strong>Strg + Z</strong>. Damit kehrt der Datenbestand in den Zustand unmittelbar vor dieser Änderung zurück.</p>
 <p>TeO merkt sich die letzten <strong>zehn</strong> solcher Schritte. Jedes weitere <strong>Strg + Z</strong> nimmt den nächstälteren zurück. Nach einer Rücknahme bietet die Meldung <strong>Wiederholen</strong> an; dasselbe leisten <strong>Strg + Y</strong> und <strong>Strg + Umschalt + Z</strong>.</p>
@@ -2597,8 +2602,8 @@
 <h2 id="hilfe-pflichtfortbildungen">Pflichtfortbildungen</h2>
 <h3 id="hilfe-fortbildungskatalog">Fortbildungskatalog</h3>
 <p>Beim Anlegen einer Pflichtfortbildung werden Titel, Einführungsjahr, Beschreibung und Wiederholungsintervall festgelegt.</p>
-<p>Das angegebene Jahr ist das Einführungsjahr im Pflichtkatalog. Eine Fortbildung steht ab diesem Jahr auch in späteren Jahren zur Verfügung.</p>
-<p>Unter <strong>Einstellungen → Pflichtfortbildungen</strong> kann für jede Fortbildung optional eine Soll-Zeit in Minuten hinterlegt werden.</p>
+<p>Das angegebene Jahr ist das Einführungsjahr im Katalog. Eine Fortbildung steht ab diesem Jahr auch in späteren Jahren zur Verfügung.</p>
+<p>Unter <strong>Einstellungen → Fortbildungen</strong> kann für jede Fortbildung optional eine Soll-Zeit in Minuten hinterlegt werden.</p>
 <h3 id="hilfe-zeiten-berechnen">Zeiten berechnen</h3>
 <p>Über <strong>Pflichtfortbildungen → Zeiten berechnen</strong> öffnet sich ein Rechner mit zwei Bereichen:</p>
 <ul><li>Bis zu 20 Zeitspannen in Minuten und Sekunden werden live addiert und im Format <code>mm:ss</code> angezeigt.</li><li>Alle Fortbildungen mit hinterlegter Soll-Zeit werden aufgelistet. Je Fortbildung kann die tatsächlich anzurechnende Arbeitszeit in Minuten eingegeben werden.</li></ul>
@@ -2619,6 +2624,13 @@
 <ul><li>aktive Mitarbeiter in der ersten Spalte</li><li>Pflichtfortbildungen in der Kopfzeile, darunter jeweils der Komplettierungsgrad in Prozent</li><li>grünes Häkchen für erfüllt</li><li>rotes Kreuz für offen</li></ul>
 <p>Der Komplettierungsgrad gibt an, welcher Anteil der aktiven Mitarbeiter diese Pflicht zum Jahresende erfüllt. Die Farbskala entspricht der Einweisungsmatrix: bis 65 Prozent rot, bis 80 Prozent orange, darüber grün. Der Tooltip nennt die absoluten Zahlen.</p>
 <p>Mehrjährig gültige Nachweise erfüllen auch nachfolgende Auswertungsjahre. Die Matrix kann gedruckt, als PDF gespeichert oder Excel-kompatibel als CSV exportiert werden.</p>
+</section>
+<section class="help-section" data-help-section data-help-heading="hilfe-fortbildungen">
+<h2 id="hilfe-fortbildungen">Fortbildungen</h2>
+<p>Freiwillige Fortbildungen stehen unter dem eigenen Menüpunkt <strong>Fortbildungen</strong>. Sie lassen sich genauso anlegen, wiederholen, mit Nachweisen versehen und auswerten wie Pflichtfortbildungen, zählen aber nicht zu ihnen:</p>
+<ul><li>nicht zur Quote <strong>Pflichtfortbildungen</strong> der Übersicht und nicht zur Jahresauswertung der Pflichten</li><li>nicht zu Fristen, überfälligen und offenen Nachweisen</li><li>nicht zum Fortbildungsstand eines Mitarbeiters in Liste und Schnellansicht</li></ul>
+<p>Ob eine Fortbildung Pflicht ist, legt im Fortbildungsdialog das Feld <strong>Art</strong> fest; angelegt wird die Art der gerade geöffneten Ansicht. Eine Fortbildung lässt sich später umstellen, ihre Nachweise bleiben erhalten. Gleichnamige Pflicht- und freiwillige Fortbildungen bilden getrennte Fortbildungsreihen.</p>
+<p><strong>Abschluss eintragen</strong> bietet beide Arten an, die der geöffneten Ansicht zuerst. Die Jahresauswertung der Fortbildungen zeigt, wer zum Jahresende einen gültigen Nachweis hat (Häkchen) und wer nicht (Strich). Die Mitarbeiter-Akte listet unter <strong>Fortbildungen</strong> die freiwilligen Fortbildungen, zu denen ein Nachweis vorliegt.</p>
 </section>
 <section class="help-section" data-help-section data-help-heading="hilfe-teamsitzungen">
 <h2 id="hilfe-teamsitzungen">Teamsitzungen</h2>
@@ -2737,7 +2749,7 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-einstellungen-und-administration">
 <h2 id="hilfe-einstellungen-und-administration">Einstellungen und Administration</h2>
 <p>Die Einstellungen sind in fünf Untermenüs gegliedert. Das Untermenü erscheint unter <strong>Einstellungen</strong> in der Sidebar und zusätzlich als Abschnittsnavigation oben auf der Einstellungsseite:</p>
-<ul><li><strong>Allgemein:</strong> Farbthema, Symbolsatz, kompakte Tabellen und Verhalten beim Schließen von Dialogen; Farbthema und Symbolsatz gehören zum angemeldeten Benutzerkonto und begleiten es an jeden Arbeitsplatz, während andere Konten ihre eigene Wahl behalten</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Pflichtfortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen, Memo-/ToDo-Kategorien und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung, manuelle und automatische Datensicherungen, Sicherungsprüfung, Import und Änderungsprotokoll</li></ul>
+<ul><li><strong>Allgemein:</strong> Farbthema, Symbolsatz, kompakte Tabellen und Verhalten beim Schließen von Dialogen; Farbthema und Symbolsatz gehören zum angemeldeten Benutzerkonto und begleiten es an jeden Arbeitsplatz, während andere Konten ihre eigene Wahl behalten</li><li><strong>Planung:</strong> feste Dienstwochenenden, Urlaubsplanung und Schulferien</li><li><strong>Fortbildungen:</strong> Soll-Zeiten</li><li><strong>Stammdaten &amp; Zugriffe:</strong> Benutzer, Berufe, Qualifikationen, Memo-/ToDo-Kategorien und Datenqualität</li><li><strong>Daten &amp; Sicherung:</strong> Datenbank-Backend, Sicherungserinnerung, manuelle und automatische Datensicherungen, Sicherungsprüfung, Import und Änderungsprotokoll</li></ul>
 <p>Beim Wechsel eines Untermenüs werden nur die zugehörigen Einstellungskarten angezeigt. Administratorgeschützte Funktionen bleiben weiterhin ausschließlich für Administratoren sichtbar.</p>
 <p>Verfügbare Farbthemen sind Standard, Dark Mode, Solarized Light, Nord, Dracula, Gruvbox Dark, Tokyo Night, Catppuccin Latte, GitHub, GitHub Dark, Windows 95, Cellitinnen und Cellitinnen Rot. Die Auswahl wird für das angemeldete Benutzerkonto gespeichert.</p>
 <p>Unabhängig vom Farbthema lässt sich ein <strong>Symbolsatz</strong> wählen: TeO (die eigenen Symbole, Standard), Lucide, Tabler, Heroicons und Phosphor. Der Wechsel gilt sofort für alle Symbole der Anwendung; nur das Logo bleibt in jedem Satz dasselbe. Jeder Symbolsatz lässt sich mit jedem Farbthema kombinieren und wird wie dieses für das angemeldete Benutzerkonto gespeichert. Die fremden Sätze stehen unter freien Lizenzen (ISC bzw. MIT); ihre Lizenzhinweise liegen der Anwendung bei.</p>
@@ -2798,6 +2810,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-74-0-freiwillige-fortbildungen">4.74.0 – Freiwillige Fortbildungen</h3>
+<ul><li><strong>Neu:</strong> Neben den Pflichtfortbildungen gibt es den Menüpunkt <strong>Fortbildungen</strong> (Kürzel <strong>g b</strong>) für freiwillige Fortbildungen. Sie funktionieren wie Pflichtfortbildungen – Katalog mit Einführungsjahr, Wiederholung und Fortbildungsreihen, Abschluss eintragen, Nachweise, Soll-Zeiten, Abdeckung durch eine Qualifikation, Jahresauswertung mit Verlauf, Druck und CSV-Export –, zählen aber nicht zu den Pflichtfortbildungen: nicht zur Quote der Übersicht und der Jahresauswertung der Pflichten, nicht zu Fristen, überfälligen und offenen Nachweisen und nicht zum Fortbildungsstand eines Mitarbeiters</li><li><strong>Neu:</strong> Der Fortbildungsdialog fragt nach der <strong>Art</strong> (Pflichtfortbildung oder Fortbildung). Eine bestehende Fortbildung lässt sich umstellen; gleichnamige Pflicht- und freiwillige Fortbildungen bilden getrennte Reihen</li><li><strong>Neu:</strong> Die Mitarbeiter-Akte listet unter <strong>Fortbildungen</strong> die freiwilligen Fortbildungen mit Nachweis. <strong>Abschluss eintragen</strong> bietet beide Arten an, die der geöffneten Ansicht zuerst</li><li><strong>Geändert:</strong> Der Einstellungsbereich heißt <strong>Fortbildungen</strong></li><li><strong>Geändert:</strong> Datenformat 30. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit freiwillige Fortbildungen nicht zu Pflichten werden</li></ul>
 <h3 id="hilfe-4-73-0-kennzahlen-der-ubersicht">4.73.0 – Kennzahlen der Übersicht</h3>
 <ul><li><strong>Geändert:</strong> Die erste Kennzahl der Übersicht zeigt statt der überfälligen Nachweise, wie viel Prozent aller Pflichtfortbildungen im laufenden Jahr erfüllt sind, mit „x von y erfüllt“ darunter. Gerechnet wird wie in der Jahresauswertung (jede aktive Person mal jede Pflichtfortbildung, Stand 31.12.); der Tooltip erklärt das. Ab 90 Prozent ist die Kachel grün, ab 70 Prozent orange, darunter rot</li><li><strong>Neu:</strong> Über <strong>Offene Nachweise nach Fortbildung</strong> erklärt ein Hinweis, wann ein Nachweis als überfällig zählt</li><li><strong>Geändert:</strong> Die Kennzahl <strong>heute abwesend</strong> samt „x von y im Dienst“ entfällt; die Übersicht zeigt drei Kennzahlen</li></ul>
 <h3 id="hilfe-4-72-0-von-gerateeinweisungen-ausgenommen">4.72.0 – Von Geräteeinweisungen ausgenommen</h3>
@@ -3999,6 +4013,10 @@
                 <dd>Pflichtfortbildungen</dd>
               </div>
               <div>
+                <dt><kbd>g</kbd> <kbd>b</kbd></dt>
+                <dd>Fortbildungen</dd>
+              </div>
+              <div>
                 <dt><kbd>g</kbd> <kbd>s</kbd></dt>
                 <dd>Teamsitzungen</dd>
               </div>
@@ -4323,7 +4341,7 @@
         <div class="modal-header">
           <div>
             <p class="eyebrow">Fortbildungskatalog</p>
-            <h2 id="trainingDialogTitle">Pflichtfortbildung anlegen</h2>
+            <h2 id="trainingDialogTitle">Fortbildung anlegen</h2>
           </div>
           <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
             <svg><use href="#icon-close"></use></svg>
@@ -4343,6 +4361,17 @@
                 placeholder="z. B. Brandschutzunterweisung"
               />
             </label>
+            <label class="form-field form-field-wide">
+              <span>Art <em>*</em></span>
+              <select id="trainingMandatory" name="mandatory">
+                <option value="true">Pflichtfortbildung</option>
+                <option value="false">Fortbildung (freiwillig)</option>
+              </select>
+              <small class="field-hint">
+                Freiwillige Fortbildungen zählen nicht zu den Pflichtfortbildungen: nicht zur
+                Quote, zu Fristen oder überfälligen Nachweisen.
+              </small>
+            </label>
             <label class="form-field">
               <span>Im Katalog seit <em>*</em></span>
               <input
@@ -4355,7 +4384,7 @@
                 required
               />
               <small class="field-hint">
-                Ab diesem Jahr gehört die Fortbildung zum Pflichtkatalog.
+                Ab diesem Jahr gehört die Fortbildung zum Katalog.
               </small>
             </label>
             <label class="form-field">
@@ -4422,7 +4451,7 @@
         <div class="modal-body">
           <div class="form-grid">
             <label class="form-field">
-              <span>Pflichtfortbildung <em>*</em></span>
+              <span>Fortbildung <em>*</em></span>
               <select id="completionTraining" name="trainingId" required></select>
             </label>
             <label class="form-field">
@@ -4501,7 +4530,7 @@
       </div>
       <div class="modal-body training-matrix-body">
         <details class="training-rate-history">
-          <summary>Verlauf der Pflichtfortbildungsquote nach Jahren</summary>
+          <summary id="trainingRateHistorySummary">Verlauf der Pflichtfortbildungsquote nach Jahren</summary>
           <div id="trainingRateHistoryChart"></div>
         </details>
         <div class="training-matrix-toolbar">

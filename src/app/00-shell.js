@@ -103,7 +103,7 @@
   // gegen den Datenvertrag ab, damit eine neue Sammlung nicht vergessen wird.
   const TRACKED_COLLECTIONS = Object.freeze([
     ["employees", "Mitarbeiter"],
-    ["trainings", "Pflichtfortbildungen"],
+    ["trainings", "Fortbildungen"],
     ["completions", "Fortbildungsnachweise"],
     ["meetings", "Teamsitzungen"],
     ["meetingAttendances", "Sitzungsteilnahmen"],
@@ -569,6 +569,7 @@
     appointments: "terminkalender",
     memos: "memo-todo",
     trainings: "pflichtfortbildungen",
+    "voluntary-trainings": "fortbildungen",
     meetings: "teamsitzungen",
     devices: "geraeteeinweisungen",
     "device-management": "geraeteverwaltung",

@@ -22,7 +22,7 @@
       id: "training",
       label: "Fortbildungen",
       icon: "icon-training",
-      views: ["trainings", "meetings"],
+      views: ["trainings", "voluntary-trainings", "meetings"],
     },
     {
       id: "devices",

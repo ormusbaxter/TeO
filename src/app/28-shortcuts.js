@@ -10,6 +10,7 @@
     t: "appointments",
     o: "memos",
     f: "trainings",
+    b: "voluntary-trainings",
     s: "meetings",
     g: "devices",
     v: "device-management",

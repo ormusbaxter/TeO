@@ -1,4 +1,4 @@
-  function openTrainingDialog(trainingId = null) {
+  function openTrainingDialog(trainingId = null, { mandatory: requestedMandatory } = {}) {
     elements.trainingForm.reset();
     document.querySelector("#trainingTitle").setCustomValidity("");
     document.querySelector("#trainingId").value = "";
@@ -11,9 +11,12 @@
 
     const training = trainingId ? getTraining(trainingId) : null;
     renderTrainingCoverageOptions(training?.coveredByQualificationId || "");
-    elements.trainingDialogTitle.textContent = training
-      ? "Pflichtfortbildung bearbeiten"
-      : "Pflichtfortbildung anlegen";
+    // Neu angelegt wird die Art, deren Ansicht gerade offen ist.
+    const mandatory = training
+      ? isMandatoryTraining(training)
+      : (requestedMandatory ?? trainingViewMandatory());
+    elements.trainingMandatory.value = String(mandatory);
+    updateTrainingDialogTitle(Boolean(training));
     elements.trainingSubmitLabel.textContent = training
       ? "Änderungen speichern"
       : "Fortbildung speichern";
@@ -33,6 +36,11 @@
     elements.trainingDialog.showModal();
     captureCleanForm(elements.trainingForm);
     window.setTimeout(() => document.querySelector("#trainingTitle").focus(), 0);
+  }
+
+  function updateTrainingDialogTitle(editing = Boolean(document.querySelector("#trainingId").value)) {
+    const kind = elements.trainingMandatory.value === "false" ? "Fortbildung" : "Pflichtfortbildung";
+    elements.trainingDialogTitle.textContent = `${kind} ${editing ? "bearbeiten" : "anlegen"}`;
   }
 
   function renderTrainingCoverageOptions(selectedId = "") {
@@ -63,12 +71,18 @@
     const recurrenceMonths =
       Number.isFinite(recurrence) && recurrence > 0 ? recurrence : null;
     const trainingYear = Number(document.querySelector("#trainingYear").value);
+    const mandatory = elements.trainingMandatory.value !== "false";
+    const seriesKey = trainingSeriesKey(titleInput.value, mandatory);
     const matchingSeries = state.trainings.find(
       (item) =>
         item.id !== existingTraining?.id &&
         item.recurrenceMonths &&
-        trainingSeriesSignature(item.title) === trainingSeriesSignature(titleInput.value),
+        trainingSeriesKey(item.title, isMandatoryTraining(item)) === seriesKey,
     );
+    // Wechselt eine Fortbildung die Art, verlaesst sie ihre Reihe - sonst
+    // zaehlten freiwillige Nachweise bei der gleichnamigen Pflicht mit.
+    const keepsSeries =
+      existingTraining?.seriesId && isMandatoryTraining(existingTraining) === mandatory;
     const training = {
       id: existingTraining?.id || createId(),
       title: titleInput.value.trim(),
@@ -76,13 +90,14 @@
       recurrenceMonths,
       targetMinutes: existingTraining?.targetMinutes || null,
       seriesId: recurrenceMonths
-        ? existingTraining?.seriesId ||
+        ? (keepsSeries && existingTraining.seriesId) ||
           matchingSeries?.seriesId ||
-          generatedTrainingSeriesId(titleInput.value, existingTraining?.id)
+          generatedTrainingSeriesId(titleInput.value, existingTraining?.id, mandatory)
         : "",
       coveredByQualificationId: document.querySelector("#trainingCoveredByQualification")
         .value,
       description: document.querySelector("#trainingDescription").value.trim(),
+      mandatory,
       createdAt: existingTraining?.createdAt || now,
       updatedAt: now,
     };
@@ -119,8 +134,9 @@
         } werden ebenfalls gelöscht.`
       : "";
 
+    const kind = isMandatoryTraining(training) ? "Pflichtfortbildung" : "Fortbildung";
     requestConfirmation({
-      title: "Pflichtfortbildung löschen?",
+      title: `${kind} löschen?`,
       message: `„${training.title}“ (${training.year}) wird dauerhaft entfernt.${historyNote}`,
       acceptLabel: "Fortbildung löschen",
       callback: async () => {
@@ -129,10 +145,10 @@
           state.completions = state.completions.filter(
             (completion) => completion.trainingId !== trainingId,
           );
-        }, { undo: "Pflichtfortbildung gelöscht" });
+        }, { undo: `${kind} gelöscht` });
         if (!committed) return;
 
-        showUndoToast("Pflichtfortbildung wurde gelöscht.");
+        showUndoToast(`${kind} wurde gelöscht.`);
       },
     });
   }

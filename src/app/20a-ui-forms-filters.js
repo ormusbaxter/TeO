@@ -115,6 +115,7 @@
     trainingRecurrence.addEventListener("change", () => {
       trainingRecurrenceManuallyChanged = true;
     });
+    elements.trainingMandatory.addEventListener("change", () => updateTrainingDialogTitle());
     const trainingCoverage = document.querySelector("#trainingCoveredByQualification");
     trainingCoverage.addEventListener("change", () => {
       trainingCoverageManuallyChanged = true;

@@ -1,3 +1,11 @@
+### 4.74.0 – Freiwillige Fortbildungen
+
+- **Neu:** Neben den Pflichtfortbildungen gibt es den Menüpunkt **Fortbildungen** (Kürzel **g b**) für freiwillige Fortbildungen. Sie funktionieren wie Pflichtfortbildungen – Katalog mit Einführungsjahr, Wiederholung und Fortbildungsreihen, Abschluss eintragen, Nachweise, Soll-Zeiten, Abdeckung durch eine Qualifikation, Jahresauswertung mit Verlauf, Druck und CSV-Export –, zählen aber nicht zu den Pflichtfortbildungen: nicht zur Quote der Übersicht und der Jahresauswertung der Pflichten, nicht zu Fristen, überfälligen und offenen Nachweisen und nicht zum Fortbildungsstand eines Mitarbeiters
+- **Neu:** Der Fortbildungsdialog fragt nach der **Art** (Pflichtfortbildung oder Fortbildung). Eine bestehende Fortbildung lässt sich umstellen; gleichnamige Pflicht- und freiwillige Fortbildungen bilden getrennte Reihen
+- **Neu:** Die Mitarbeiter-Akte listet unter **Fortbildungen** die freiwilligen Fortbildungen mit Nachweis. **Abschluss eintragen** bietet beide Arten an, die der geöffneten Ansicht zuerst
+- **Geändert:** Der Einstellungsbereich heißt **Fortbildungen**
+- **Geändert:** Datenformat 30. Eine Sicherung aus dieser Fassung lässt sich in älteren Fassungen nicht einlesen, damit freiwillige Fortbildungen nicht zu Pflichten werden
+
 ### 4.73.0 – Kennzahlen der Übersicht
 
 - **Geändert:** Die erste Kennzahl der Übersicht zeigt statt der überfälligen Nachweise, wie viel Prozent aller Pflichtfortbildungen im laufenden Jahr erfüllt sind, mit „x von y erfüllt“ darunter. Gerechnet wird wie in der Jahresauswertung (jede aktive Person mal jede Pflichtfortbildung, Stand 31.12.); der Tooltip erklärt das. Ab 90 Prozent ist die Kachel grün, ab 70 Prozent orange, darunter rot
