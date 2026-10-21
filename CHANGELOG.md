@@ -1,3 +1,7 @@
+### 4.74.1 – Direktlinks auf Fortbildungen
+
+- **Behoben:** Der Wechsel zwischen **Pflichtfortbildungen** und **Fortbildungen** – über Direktlinks wie `index.html#pflichtfortbildungen` und `#fortbildungen`, über das Menü, Kürzel oder Zurück im Browser – zeigte nach dem ersten Mal weiter die zuvor geöffnete Art. Die Ansicht wird jetzt bei jedem Wechsel für die richtige Art aufgebaut
+
 ### 4.74.0 – Freiwillige Fortbildungen
 
 - **Neu:** Neben den Pflichtfortbildungen gibt es den Menüpunkt **Fortbildungen** (Kürzel **g b**) für freiwillige Fortbildungen. Sie funktionieren wie Pflichtfortbildungen – Katalog mit Einführungsjahr, Wiederholung und Fortbildungsreihen, Abschluss eintragen, Nachweise, Soll-Zeiten, Abdeckung durch eine Qualifikation, Jahresauswertung mit Verlauf, Druck und CSV-Export –, zählen aber nicht zu den Pflichtfortbildungen: nicht zur Quote der Übersicht und der Jahresauswertung der Pflichten, nicht zu Fristen, überfälligen und offenen Nachweisen und nicht zum Fortbildungsstand eines Mitarbeiters

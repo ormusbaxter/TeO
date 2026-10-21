@@ -3781,6 +3781,7 @@
     if (!VIEW_HASHES[view]) view = "dashboard";
     if (view !== "vacations") setVacationPlannerMaximized(false);
     if (view !== "devices") setDeviceMatrixMaximized(false);
+    const previousView = activeView;
     activeView = view;
 
     document.body.classList.toggle("is-vacation-view", view === "vacations");
@@ -3800,7 +3801,15 @@
     // Aenderungen, die waehrend der Abwesenheit dieser Ansicht entstanden
     // sind, werden jetzt nachgezogen - noch vor jeder Vermessung, damit das
     // Dashboard seine endgueltige Hoehe misst.
-    if (staleViews.has(view)) renderView(view);
+    //
+    // Teilt sich die Ansicht ihr Markup mit der vorigen, zeigt sie noch deren
+    // Inhalt - etwa freiwillige Fortbildungen beim Wechsel zu den Pflichten.
+    const sharesPanel = String(
+      document.querySelector(`[data-view-panel~="${view}"]`)?.dataset?.viewPanel || "",
+    )
+      .split(" ")
+      .includes(previousView);
+    if (staleViews.has(view) || (sharesPanel && previousView !== view)) renderView(view);
 
     document.querySelectorAll("[data-view]").forEach((button) => {
       const active = button.dataset.view === view;

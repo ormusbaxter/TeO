@@ -70,3 +70,31 @@ test("Fortbildungen haben eine eigene Ansicht und bleiben aus der Pflichtquote",
   const quote = await teo.evaluate(() => document.querySelector(".dashboard-training-list")?.textContent || "");
   assert.doesNotMatch(quote, /Wundmanagement|Kinästhetik/, "Die Übersicht zeigt nur Pflichten");
 });
+
+test("Direktlinks wechseln zwischen Pflichtfortbildungen und Fortbildungen", async (t) => {
+  const teo = await openTeO(t, { angemeldetAls: "admin" });
+  if (!teo) return;
+
+  const titel = () =>
+    teo.evaluate(() => document.querySelector("#trainingsViewTitle").textContent);
+  const springe = async (hash) => {
+    await teo.evaluate((ziel) => {
+      window.location.hash = ziel;
+    }, hash);
+    await teo.page.waitForFunction(
+      (ziel) => document.querySelector(".nav-item.is-active")?.dataset.view === ziel,
+      hash === "fortbildungen" ? "voluntary-trainings" : "trainings",
+    );
+  };
+
+  // Beide Menüpunkte teilen sich eine Ansicht: Auch ohne Datenänderung muss
+  // jeder Wechsel sie für die richtige Art aufbauen, in beide Richtungen.
+  await springe("pflichtfortbildungen");
+  assert.equal(await titel(), "Pflichtfortbildungen");
+  await springe("fortbildungen");
+  assert.equal(await titel(), "Fortbildungen");
+  await springe("pflichtfortbildungen");
+  assert.equal(await titel(), "Pflichtfortbildungen");
+  await teo.zeigeAnsicht("voluntary-trainings");
+  assert.equal(await titel(), "Fortbildungen");
+});
