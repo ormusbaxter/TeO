@@ -776,6 +776,15 @@
               </button>
               <button
                 class="button button-secondary"
+                id="openVacationCapacityButton"
+                type="button"
+                title="Jahresübersicht: an welchen Tagen noch Plätze frei sind und wo zu viele Abwesenheiten geplant sind"
+              >
+                <svg><use href="#icon-chart"></use></svg>
+                Jahresbelegung
+              </button>
+              <button
+                class="button button-secondary"
                 id="openVacationConflictsButton"
                 type="button"
               >
@@ -2602,6 +2611,11 @@
 <p>Die Schaltfläche <strong>Überschneidungen prüfen</strong> öffnet eine Liste aller Tage des Planungsjahres, an denen die Tagesgrenze überschritten ist. Zu jedem Tag erscheinen:</p>
 <ul><li>wirksame Abwesenheiten und geltende Grenze</li><li>Feiertag, Schulferien und Dienstwochenende des Tages</li><li>alle beteiligten Mitarbeiter mit Eintragsart, Beruf und Dienstwochenende</li></ul>
 <p>Einträge <strong>Schule / Weiterbildung / Uni</strong> und <strong>Externer Einsatz</strong> stehen je Tag vorn und sind ausgegraut: Sie zählen als Abwesenheit, lassen sich aber meist nicht verschieben. Die übrigen Abwesenheiten folgen darunter. Nicht angerechnete Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das Datum springt in den zugehörigen Monat der Planungstabelle.</p>
+<h3 id="hilfe-jahresbelegung">Jahresbelegung</h3>
+<p>Die Schaltfläche <strong>Jahresbelegung</strong> zeigt das ganze Planungsjahr auf einen Blick: zwölf Monate untereinander, die Tage als Spalten. Jeder Tag trägt eine Zahl und eine Farbe:</p>
+<ul><li><strong>grün</strong> – noch frei; die Zahl nennt die freien Plätze bis zur Tagesgrenze. Kräftig grün ist eine Lücke, in der mindestens die Hälfte der Grenze frei ist, hellgrün ein Tag mit weniger freien Plätzen, gestrichelt umrandet der letzte freie Platz</li><li><strong>orange</strong> <code>0</code> – die Grenze ist genau erreicht</li><li><strong>rot</strong> <code>+n</code> – überbelegt; die Zahl nennt die Abwesenheiten zu viel</li></ul>
+<p>Gerechnet wird wie in der Kopfzeile der Planungstabelle: dieselben Tagesgrenzen, ohne die nicht angerechneten Berufsgruppen und mit dem Ausgleich durch Dienstzusagen vom anderen Wochenende. Wochenenden, Feiertage und Schulferien bleiben hinter den Zahlen erkennbar. Vergangene Tage sind abgeblendet und zählen nicht zu den freien Plätzen; Überbelegungen zählen das ganze Jahr.</p>
+<p>Oben fasst die Übersicht zusammen, wie viele Tage überplant und wie viele ab heute ausgebucht sind und wie viele freie Plätze bleiben; die Spalten <strong>Frei</strong> und <strong>Über</strong> tun das je Monat. Ein Klick auf einen Tag öffnet seinen Monat in der Planungstabelle.</p>
 <h3 id="hilfe-dienstwochenenden-und-kompensation">Dienstwochenenden und Kompensation</h3>
 <p>Übernimmt ein Mitarbeiter einen Dienst an dem Wochenende, das nicht sein festes Dienstwochenende ist – eingetragen als <strong>Verpflichtende Dienstzusage</strong> (<code>D</code>) –, verringert das die wirksamen Abwesenheiten dieses Tages um eins. Jede solche Dienstübernahme wird also von einer Überplanung abgezogen, gleich welche Abwesenheit sie ausgleicht; unter null sinkt die Zahl nicht.</p>
 <p>Im Spaltenkopf steht dann neben der Belegung, um wie viel sie gesenkt wurde (etwa <code>−2</code>), und <code>D2</code> nennt die Zahl aller Dienstzusagen des Tages. Eine Dienstzusage auf dem eigenen Dienstwochenende, an einem Werktag oder von einem Mitarbeiter ohne festes Dienstwochenende zählt nicht, ebenso wenig die Zusage eines nicht angerechneten Assistenzberufs.</p>
@@ -2865,6 +2879,8 @@
 <section class="help-section" data-help-section data-help-heading="hilfe-anderungshistorie">
 <h2 id="hilfe-anderungshistorie">Änderungshistorie</h2>
 <p>Die Änderungshistorie nennt die tatsächlich sichtbaren Funktionen und Fehlerbehebungen in kurzen deutschen Stichpunkten, neueste Version zuerst. Technische Merge-Commits und interne Branch-Namen werden nicht aufgeführt.</p>
+<h3 id="hilfe-4-77-0-jahresbelegung-der-urlaubsplanung">4.77.0 – Jahresbelegung der Urlaubsplanung</h3>
+<ul><li><strong>Neu:</strong> <strong>Jahresbelegung</strong> im Kopf der Urlaubsplanung zeigt für jeden Tag des Jahres, wie viele Plätze bis zur Tagesgrenze noch frei sind (grün, kräftig bei großen Lücken), wo die Grenze erreicht ist (orange, <code>0</code>) und wo zu viele Abwesenheiten geplant sind (rot, <code>+n</code>). Gerechnet wird wie in der Planungstabelle, einschließlich der ausgenommenen Berufsgruppen und des Ausgleichs durch Dienstzusagen vom anderen Wochenende</li><li><strong>Neu:</strong> Kennzahlen oben und die Spalten <strong>Frei</strong> und <strong>Über</strong> je Monat fassen überplante Tage, ausgebuchte Tage und freie Plätze ab heute zusammen. Ein Klick auf einen Tag öffnet seinen Monat in der Planung</li></ul>
 <h3 id="hilfe-4-76-0-termine-als-kalenderdatei">4.76.0 – Termine als Kalenderdatei</h3>
 <ul><li><strong>Neu:</strong> <strong>Kalenderdatei</strong> im Kopf des Terminkalenders speichert die angezeigten Termine als <code>.ics</code>-Datei für Outlook, Google Kalender oder das Smartphone. Suchbegriff und Zeitraumfilter gelten wie in der Liste; angepinnte Termine sind dabei. Einzelne Termine gehen über <strong>Kalenderdatei</strong> in der Schnellansicht hinaus, mehrere ausgewählte über die gleichnamige Sammelaktion</li><li><strong>Neu:</strong> Uhrzeiten stehen in deutscher Zeit, Termine ohne Uhrzeit werden ganztägig, ein angepinnter Termin ist als wichtig markiert. Jeder Termin behält beim erneuten Export seine Kennung, sodass ein Kalenderprogramm ihn beim nächsten Import aktualisiert, statt ihn doppelt anzulegen</li></ul>
 <h3 id="hilfe-4-75-0-notfallzugang">4.75.0 – Notfallzugang</h3>
@@ -3742,6 +3758,27 @@
         </button>
       </div>
       <div class="modal-body" id="vacationConflictContent"></div>
+      <div class="modal-footer">
+        <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
+      </div>
+    </dialog>
+
+    <dialog
+      class="modal modal-large vacation-capacity-dialog"
+      id="vacationCapacityDialog"
+      aria-labelledby="vacationCapacityTitle"
+    >
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Urlaubsplanung</p>
+          <h2 id="vacationCapacityTitle">Belegung im Jahr</h2>
+          <p class="modal-subtitle" id="vacationCapacitySubtitle"></p>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="Dialog schließen">
+          <svg><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="vacationCapacityContent"></div>
       <div class="modal-footer">
         <button class="button button-primary" type="button" data-close-dialog>Schließen</button>
       </div>

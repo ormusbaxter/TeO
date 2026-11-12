@@ -449,6 +449,15 @@
       vacationEmployeeSearchTerm = elements.vacationEmployeeSearch.value;
       renderVacationPlanner();
     });
+    elements.openVacationCapacityButton.addEventListener(
+      "click",
+      openVacationCapacityOverview,
+    );
+    elements.vacationCapacityContent.addEventListener("click", (event) => {
+      const dayButton = event.target.closest("[data-vacation-capacity-date]");
+      if (!dayButton) return;
+      openVacationMonthFromCapacityOverview(dayButton.dataset.vacationCapacityDate);
+    });
     elements.openVacationConflictsButton.addEventListener(
       "click",
       openVacationConflictOverview,

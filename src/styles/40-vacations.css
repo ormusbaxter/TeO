@@ -1290,6 +1290,175 @@ body.is-vacation-planner-maximized {
   background: var(--slate-50);
 }
 
+/* Jahresbelegung: je Tag die freien Plätze bis zur Tagesgrenze oder die
+   Abwesenheiten darüber. Die Farbe trägt das Kästchen im Tag, nicht die
+   Zelle: Wochenende, Feiertag und Ferien bleiben so darunter erkennbar, wie
+   in der Monatsplanung. Die Tabelle ist mit 31 Tagen breiter als ein großer
+   Dialog; der Dialog nimmt deshalb fast die Fensterbreite. */
+.vacation-capacity-dialog {
+  width: min(1460px, calc(100vw - 32px));
+}
+
+.vacation-capacity-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.vacation-capacity-kpi {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--slate-200);
+  border-left-width: 4px;
+  border-radius: 11px;
+  background: var(--white);
+}
+
+.vacation-capacity-kpi strong {
+  color: var(--slate-900);
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.vacation-capacity-kpi span {
+  color: var(--slate-800);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.vacation-capacity-kpi small {
+  color: var(--slate-500);
+  font-size: 0.64rem;
+}
+
+.vacation-capacity-kpi.is-over {
+  border-left-color: var(--red-700);
+}
+
+.vacation-capacity-kpi.is-over strong {
+  color: var(--red-700);
+}
+
+.vacation-capacity-kpi.is-ok {
+  border-left-color: var(--green-700);
+}
+
+.vacation-capacity-kpi.is-full {
+  border-left-color: var(--orange-700);
+}
+
+.vacation-capacity-kpi.is-free {
+  border-left-color: var(--green-700);
+}
+
+.vacation-capacity-kpi.is-free strong {
+  color: var(--green-700);
+}
+
+.vacation-capacity-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 14px;
+  color: var(--slate-700);
+  font-size: 0.66rem;
+}
+
+.vacation-capacity-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vacation-capacity-note {
+  margin: 10px 0 0;
+  color: var(--slate-600);
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+
+.vacation-capacity-swatch,
+.vacation-capacity-value {
+  display: inline-grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  padding: 0;
+  color: var(--slate-800);
+  font: inherit;
+  font-size: 0.66rem;
+  font-style: normal;
+  font-weight: 900;
+  border: 1px solid transparent;
+  border-radius: 7px;
+}
+
+.vacation-capacity-value {
+  cursor: pointer;
+}
+
+.vacation-capacity-value:hover,
+.vacation-capacity-value:focus-visible {
+  outline: 2px solid var(--blue-700);
+  outline-offset: 1px;
+}
+
+.vacation-capacity-swatch.is-free-many,
+.vacation-capacity-value.is-free-many {
+  color: var(--white);
+  border-color: var(--green-700);
+  background: var(--green-700);
+}
+
+.vacation-capacity-swatch.is-free-some,
+.vacation-capacity-value.is-free-some {
+  color: var(--green-700);
+  border-color: var(--green-700);
+  background: var(--green-100);
+}
+
+.vacation-capacity-swatch.is-free-one,
+.vacation-capacity-value.is-free-one {
+  color: var(--green-700);
+  border-style: dashed;
+  border-color: var(--green-700);
+  background: var(--white);
+}
+
+.vacation-capacity-swatch.is-full,
+.vacation-capacity-value.is-full {
+  color: var(--orange-700);
+  border-color: var(--orange-700);
+  background: var(--orange-100);
+}
+
+.vacation-capacity-swatch.is-over,
+.vacation-capacity-value.is-over {
+  color: var(--white);
+  border-color: var(--red-700);
+  background: var(--red-700);
+}
+
+.vacation-capacity-swatch.is-past {
+  border-color: var(--slate-300);
+  background: var(--slate-100);
+}
+
+.vacation-capacity-matrix td.is-past .vacation-capacity-value {
+  opacity: 0.4;
+}
+
+/* Eine Überbelegung bleibt auch rückblickend ein Befund und wird nicht
+   abgeblendet. */
+.vacation-capacity-matrix td.is-past .vacation-capacity-value.is-over {
+  opacity: 0.75;
+}
+
+.vacation-capacity-matrix .vacation-capacity-total.is-over {
+  color: var(--red-700);
+}
+
 /* Fadenkreuz der Planungstabelle. Die Tönung liegt als eigene,
    durchscheinende Schicht über der Zelle, statt deren Hintergrund zu
    ersetzen: Wochenende, Feiertagsschraffur, Ferien und eine Überplanung

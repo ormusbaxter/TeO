@@ -278,6 +278,7 @@
         elements.employeeDossierDialog,
         elements.vacationEmployeeOverviewDialog,
         elements.vacationConflictDialog,
+        elements.vacationCapacityDialog,
         elements.weekendOverviewDialog,
         elements.weekendSimulationDialog,
         elements.bulkEditDialog,
