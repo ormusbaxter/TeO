@@ -1102,6 +1102,31 @@ nicht verschieben. Die übrigen Abwesenheiten folgen darunter. Nicht angerechnet
 Assistenzberufe sind gestrichelt umrandet. Ein Klick auf das Datum springt in
 den zugehörigen Monat der Planungstabelle.
 
+### Jahresbelegung
+
+Die Schaltfläche **Jahresbelegung** zeigt das ganze Planungsjahr auf einen
+Blick: zwölf Monate untereinander, die Tage als Spalten. Jeder Tag trägt eine
+Zahl und eine Farbe:
+
+- **grün** – noch frei; die Zahl nennt die freien Plätze bis zur Tagesgrenze.
+  Kräftig grün ist eine Lücke, in der mindestens die Hälfte der Grenze frei
+  ist, hellgrün ein Tag mit weniger freien Plätzen, gestrichelt umrandet der
+  letzte freie Platz
+- **orange** `0` – die Grenze ist genau erreicht
+- **rot** `+n` – überbelegt; die Zahl nennt die Abwesenheiten zu viel
+
+Gerechnet wird wie in der Kopfzeile der Planungstabelle: dieselben
+Tagesgrenzen, ohne die nicht angerechneten Berufsgruppen und mit dem
+Ausgleich durch Dienstzusagen vom anderen Wochenende. Wochenenden, Feiertage
+und Schulferien bleiben hinter den Zahlen erkennbar. Vergangene Tage sind
+abgeblendet und zählen nicht zu den freien Plätzen; Überbelegungen zählen das
+ganze Jahr.
+
+Oben fasst die Übersicht zusammen, wie viele Tage überplant und wie viele ab
+heute ausgebucht sind und wie viele freie Plätze bleiben; die Spalten **Frei**
+und **Über** tun das je Monat. Ein Klick auf einen Tag öffnet seinen Monat in
+der Planungstabelle.
+
 ### Dienstwochenenden und Kompensation
 
 Übernimmt ein Mitarbeiter einen Dienst an dem Wochenende, das nicht sein

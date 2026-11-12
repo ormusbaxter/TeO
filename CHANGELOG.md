@@ -1,3 +1,8 @@
+### 4.77.0 – Jahresbelegung der Urlaubsplanung
+
+- **Neu:** **Jahresbelegung** im Kopf der Urlaubsplanung zeigt für jeden Tag des Jahres, wie viele Plätze bis zur Tagesgrenze noch frei sind (grün, kräftig bei großen Lücken), wo die Grenze erreicht ist (orange, `0`) und wo zu viele Abwesenheiten geplant sind (rot, `+n`). Gerechnet wird wie in der Planungstabelle, einschließlich der ausgenommenen Berufsgruppen und des Ausgleichs durch Dienstzusagen vom anderen Wochenende
+- **Neu:** Kennzahlen oben und die Spalten **Frei** und **Über** je Monat fassen überplante Tage, ausgebuchte Tage und freie Plätze ab heute zusammen. Ein Klick auf einen Tag öffnet seinen Monat in der Planung
+
 ### 4.76.0 – Termine als Kalenderdatei
 
 - **Neu:** **Kalenderdatei** im Kopf des Terminkalenders speichert die angezeigten Termine als `.ics`-Datei für Outlook, Google Kalender oder das Smartphone. Suchbegriff und Zeitraumfilter gelten wie in der Liste; angepinnte Termine sind dabei. Einzelne Termine gehen über **Kalenderdatei** in der Schnellansicht hinaus, mehrere ausgewählte über die gleichnamige Sammelaktion

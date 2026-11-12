@@ -191,6 +191,9 @@
       "#vacationWeekendBLegend",
     ),
     saveVacationSettingsButton: document.querySelector("#saveVacationSettingsButton"),
+    openVacationCapacityButton: document.querySelector(
+      "#openVacationCapacityButton",
+    ),
     openVacationConflictsButton: document.querySelector(
       "#openVacationConflictsButton",
     ),
@@ -603,6 +606,10 @@
     printVacationEmployeeOverviewButton: document.querySelector(
       "#printVacationEmployeeOverviewButton",
     ),
+    vacationCapacityDialog: document.querySelector("#vacationCapacityDialog"),
+    vacationCapacityTitle: document.querySelector("#vacationCapacityTitle"),
+    vacationCapacitySubtitle: document.querySelector("#vacationCapacitySubtitle"),
+    vacationCapacityContent: document.querySelector("#vacationCapacityContent"),
     vacationConflictDialog: document.querySelector("#vacationConflictDialog"),
     vacationConflictSubtitle: document.querySelector("#vacationConflictSubtitle"),
     vacationConflictContent: document.querySelector("#vacationConflictContent"),
