@@ -1,3 +1,8 @@
+### 4.78.0 – Jahresurlaub je Mitarbeiter
+
+- **Neu:** Die **Jahresübersicht** eines Mitarbeiters (Klick auf den Namen in der Urlaubsplanung) nennt oben die **Urlaubstage gesamt** im Jahr, aufgeteilt in bis heute genommene und noch geplante Tage, dazu **Anspruch** und **Rest**. Unter der Matrix fasst die Zeile **Gesamt** die Urlaubs- und Schultage des Jahres zusammen
+- **Neu:** Der **Geburtstag** ist in der Jahresübersicht wie in der Planungstabelle golden schraffiert; der Tooltip nennt das Lebensjahr
+
 ### 4.77.0 – Jahresbelegung der Urlaubsplanung
 
 - **Neu:** **Jahresbelegung** im Kopf der Urlaubsplanung zeigt für jeden Tag des Jahres, wie viele Plätze bis zur Tagesgrenze noch frei sind (grün, kräftig bei großen Lücken), wo die Grenze erreicht ist (orange, `0`) und wo zu viele Abwesenheiten geplant sind (rot, `+n`). Gerechnet wird wie in der Planungstabelle, einschließlich der ausgenommenen Berufsgruppen und des Ausgleichs durch Dienstzusagen vom anderen Wochenende

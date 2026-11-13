@@ -5414,6 +5414,65 @@ body.is-vacation-planner-maximized {
   border-color: var(--weekend-b-accent);
 }
 
+.vacation-year-weekend-swatch.is-birthday {
+  border-color: var(--birthday-accent);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      var(--birthday-hatch) 0 3px,
+      transparent 3px 8px
+    ),
+    var(--white);
+}
+
+/* Kopf der Jahresabwesenheiten: Urlaubstage des Jahres, Anspruch und Rest. */
+.vacation-year-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.vacation-year-summary-item {
+  display: grid;
+  min-width: 150px;
+  gap: 2px;
+  padding: 10px 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  background: var(--slate-50);
+}
+
+.vacation-year-summary-item > span {
+  color: var(--slate-600);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.vacation-year-summary-item > strong {
+  color: var(--slate-900);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.vacation-year-summary-item > small {
+  color: var(--slate-600);
+  font-size: 0.66rem;
+}
+
+.vacation-year-summary-item.is-primary {
+  border-color: var(--button-secondary-border);
+  background: var(--blue-50);
+}
+
+.vacation-year-summary-item.is-negative {
+  border-color: var(--red-700);
+  background: var(--red-100);
+}
+
+.vacation-year-summary-item.is-negative > strong {
+  color: var(--red-700);
+}
+
 .vacation-year-matrix-scroll {
   max-width: 100%;
   margin-top: 15px;
@@ -5493,6 +5552,27 @@ body.is-vacation-planner-maximized {
 
 .vacation-year-matrix td.is-own-weekend {
   box-shadow: inset 0 0 0 2px rgb(24 102 186 / 72%);
+}
+
+/* Geburtstag: dieselbe Schraffur wie in der Monatsplanung, als eigene Ebene
+   unter dem Eintrag. */
+.vacation-year-matrix td.is-birthday {
+  position: relative;
+}
+
+.vacation-year-matrix td.is-birthday .vacation-year-entry {
+  position: relative;
+  z-index: 1;
+}
+
+/* Die Summenzeile setzt sich mit einer Linie vom Dezember ab. */
+.vacation-year-matrix .vacation-year-sum-row > * {
+  border-top: 2px solid var(--slate-300);
+  background: var(--slate-50);
+}
+
+.vacation-year-matrix .vacation-year-sum-row .vacation-year-total-column {
+  font-size: 0.82rem;
 }
 
 .vacation-year-entry {
