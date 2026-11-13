@@ -311,8 +311,31 @@
               ),
             ).join("")}
           </tbody>
+          ${personal ? renderVacationYearTotalRow(entries, days.length, showSchool) : ""}
         </table>
       </div>
+    `;
+  }
+
+  // Summenzeile der Jahresabwesenheiten: alle Urlaubstage des Jahres, die
+  // vom Anspruch abgehen – dieselbe Zaehlung wie „Geplant“ in der Monatsplanung.
+  function renderVacationYearTotalRow(entries, dayCount, showSchool) {
+    const vacationTotal = entries.filter(
+      (entry) => PLANNER_ENTRY_TYPES[entry.type]?.countsVacationEntitlement,
+    ).length;
+    const schoolTotal = entries.filter((entry) => entry.type === "school").length;
+    return `
+      <tfoot>
+        <tr class="vacation-year-sum-row">
+          <th class="vacation-year-month-column" scope="row">Gesamt</th>
+          <td colspan="${dayCount}" aria-hidden="true"></td>
+          <td class="vacation-year-total-column" data-vacation-year-total="vacation">${vacationTotal}</td>${
+            showSchool
+              ? `<td class="vacation-year-total-column" data-vacation-year-total="school">${schoolTotal}</td>`
+              : ""
+          }
+        </tr>
+      </tfoot>
     `;
   }
 
@@ -382,10 +405,14 @@
     const metadata = getVacationDayMetadata(date);
     const parsedDate = parseLocalDate(date);
     const weekday = dateFormat({ weekday: "long" }).format(parsedDate);
+    // Geburtstage zeigt nur die Ansicht eines Mitarbeiters; der leere
+    // Vordruck bleibt frei davon.
+    const birthday = personal ? employeeBirthdayAt(employee, date) : null;
     const details = [
       formatDate(date),
       weekday,
       entryType?.label,
+      birthday ? `${birthday.age}. Geburtstag` : "",
       metadata.holiday,
       metadata.schoolVacation ? `${metadata.schoolVacation} NRW` : "",
       metadata.weekendGroup
@@ -404,10 +431,15 @@
           metadata.weekendGroup === employee.serviceWeekend
             ? "is-own-weekend"
             : ""
-        } ${entry ? "has-entry" : ""}"
+        } ${entry ? "has-entry" : ""} ${birthday ? "is-birthday" : ""}"
         title="${escapeHtml(details.join(" · "))}"
         aria-label="${escapeHtml(details.join(", "))}"
       >
+        ${
+          birthday
+            ? '<span class="vacation-birthday-marker" aria-hidden="true"></span>'
+            : ""
+        }
         ${
           entry
             ? `<span class="vacation-year-entry planner-entry-${entry.type}">${entryType.shortLabel}</span>`

@@ -13266,6 +13266,7 @@
       `${employeeStatusLabel(employee)} · ${currentEmploymentPercent(employee)} % · ${serviceWeekendLabel(employee.serviceWeekend)}`;
 
     elements.vacationEmployeeOverviewContent.innerHTML = `
+      ${renderVacationEmployeeYearSummary(employee)}
       <div class="vacation-year-legend" aria-label="Legende der Jahresübersicht">
         ${Object.entries(PLANNER_ENTRY_TYPES)
           .map(
@@ -13282,10 +13283,65 @@
             ? `<span><i class="vacation-year-weekend-swatch is-own-weekend"></i> Eigenes Dienstwochenende ${escapeHtml(serviceWeekendLabel(employee.serviceWeekend))}</span>`
             : ""
         }
+        ${
+          parseLocalDate(employee.birthDate)
+            ? '<span><i class="vacation-year-weekend-swatch is-birthday"></i> Geburtstag</span>'
+            : ""
+        }
       </div>
       ${renderVacationYearMatrix(entries, employee, { personal: true })}
     `;
     elements.vacationEmployeeOverviewDialog.showModal();
+  }
+
+  // Kopf der Jahresabwesenheiten: die Urlaubstage des Jahres im Ganzen und
+  // ihr Verhaeltnis zum Anspruch. Gezaehlt wird wie in der Monatsplanung
+  // („Geplant“, „Rest“); „genommen“ sind die Tage bis einschliesslich heute.
+  function getVacationEmployeeYearSummary(employee, year, today = todayIso()) {
+    const entitlement = getVacationEntitlement(employee, year);
+    const vacationDates = vacationDaysOf(employee.id)
+      .filter(
+        (entry) =>
+          entry.date.startsWith(`${year}-`) &&
+          PLANNER_ENTRY_TYPES[entry.type]?.countsVacationEntitlement,
+      )
+      .map((entry) => entry.date);
+    const total = vacationDates.length;
+    const taken = vacationDates.filter((date) => date <= today).length;
+    return {
+      entitlement: entitlement.total,
+      total,
+      taken,
+      upcoming: total - taken,
+      remaining: entitlement.total - total,
+    };
+  }
+
+  function renderVacationEmployeeYearSummary(employee) {
+    const summary = getVacationEmployeeYearSummary(employee, vacationYear);
+    const item = (label, value, { key, note = "", tone = "" } = {}) => `
+      <div class="vacation-year-summary-item ${tone}" data-vacation-year-summary="${key}">
+        <span>${escapeHtml(label)}</span>
+        <strong>${formatVacationNumber(value)}</strong>
+        ${note ? `<small>${escapeHtml(note)}</small>` : ""}
+      </div>
+    `;
+    return `
+      <div class="vacation-year-summary" aria-label="Urlaubstage ${vacationYear}">
+        ${item("Urlaubstage gesamt", summary.total, {
+          key: "total",
+          note: summary.total
+            ? `${formatVacationNumber(summary.taken)} genommen · ${formatVacationNumber(summary.upcoming)} geplant`
+            : "",
+          tone: "is-primary",
+        })}
+        ${item("Anspruch", summary.entitlement, { key: "entitlement" })}
+        ${item("Rest", summary.remaining, {
+          key: "remaining",
+          tone: summary.remaining < 0 ? "is-negative" : "",
+        })}
+      </div>
+    `;
   }
 
   // Die Jahresmatrix ist breiter als hoch und wird deshalb quer gedruckt.
@@ -13612,8 +13668,31 @@
               ),
             ).join("")}
           </tbody>
+          ${personal ? renderVacationYearTotalRow(entries, days.length, showSchool) : ""}
         </table>
       </div>
+    `;
+  }
+
+  // Summenzeile der Jahresabwesenheiten: alle Urlaubstage des Jahres, die
+  // vom Anspruch abgehen – dieselbe Zaehlung wie „Geplant“ in der Monatsplanung.
+  function renderVacationYearTotalRow(entries, dayCount, showSchool) {
+    const vacationTotal = entries.filter(
+      (entry) => PLANNER_ENTRY_TYPES[entry.type]?.countsVacationEntitlement,
+    ).length;
+    const schoolTotal = entries.filter((entry) => entry.type === "school").length;
+    return `
+      <tfoot>
+        <tr class="vacation-year-sum-row">
+          <th class="vacation-year-month-column" scope="row">Gesamt</th>
+          <td colspan="${dayCount}" aria-hidden="true"></td>
+          <td class="vacation-year-total-column" data-vacation-year-total="vacation">${vacationTotal}</td>${
+            showSchool
+              ? `<td class="vacation-year-total-column" data-vacation-year-total="school">${schoolTotal}</td>`
+              : ""
+          }
+        </tr>
+      </tfoot>
     `;
   }
 
@@ -13683,10 +13762,14 @@
     const metadata = getVacationDayMetadata(date);
     const parsedDate = parseLocalDate(date);
     const weekday = dateFormat({ weekday: "long" }).format(parsedDate);
+    // Geburtstage zeigt nur die Ansicht eines Mitarbeiters; der leere
+    // Vordruck bleibt frei davon.
+    const birthday = personal ? employeeBirthdayAt(employee, date) : null;
     const details = [
       formatDate(date),
       weekday,
       entryType?.label,
+      birthday ? `${birthday.age}. Geburtstag` : "",
       metadata.holiday,
       metadata.schoolVacation ? `${metadata.schoolVacation} NRW` : "",
       metadata.weekendGroup
@@ -13705,10 +13788,15 @@
           metadata.weekendGroup === employee.serviceWeekend
             ? "is-own-weekend"
             : ""
-        } ${entry ? "has-entry" : ""}"
+        } ${entry ? "has-entry" : ""} ${birthday ? "is-birthday" : ""}"
         title="${escapeHtml(details.join(" · "))}"
         aria-label="${escapeHtml(details.join(", "))}"
       >
+        ${
+          birthday
+            ? '<span class="vacation-birthday-marker" aria-hidden="true"></span>'
+            : ""
+        }
         ${
           entry
             ? `<span class="vacation-year-entry planner-entry-${entry.type}">${entryType.shortLabel}</span>`

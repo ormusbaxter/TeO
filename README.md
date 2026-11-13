@@ -1143,14 +1143,18 @@ Zusage eines nicht angerechneten Assistenzberufs.
 
 ### Jahresübersicht je Mitarbeiter
 
-Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix:
+Ein Klick auf den Mitarbeiternamen öffnet eine Jahresmatrix. Darüber stehen
+die **Urlaubstage gesamt** des Jahres – aufgeteilt in bis heute genommene und
+noch geplante –, der **Anspruch** und der **Rest**, gezählt wie in den Spalten
+„Geplant“ und „Rest“ der Planungstabelle.
 
 - Monate in der ersten Spalte
 - Kalendertage in der Kopfzeile
 - das eigene Dienstwochenende blau umrahmt, Feiertage und Schulferien markiert
 - alle Abwesenheiten und Dienstzusagen tageweise sichtbar
 - rechts je Monat die genommenen Urlaubstage und – falls vorhanden – die Tage
-  „Schule / Weiterbildung / Uni“
+  „Schule / Weiterbildung / Uni“, in der Zeile **Gesamt** die Summe des Jahres
+- der Geburtstag mit derselben goldenen Schraffur wie in der Planungstabelle
 
 **Jahr drucken** gibt die Matrix aus. Da sie 31 Tagesspalten hat, ist das
 Querformat voreingestellt.

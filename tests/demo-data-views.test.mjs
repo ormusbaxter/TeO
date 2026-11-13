@@ -248,7 +248,10 @@ test("Jahresabwesenheiten: Summen je Monat, keine Kopfzahlen, nur eigenes Dienst
   assert.equal(ansicht.april, "/");
   assert.equal(ansicht.fremdeTönung, 0);
   assert.ok(ansicht.eigeneWochenenden > 40, `${ansicht.eigeneWochenenden} eigene Wochenendtage`);
-  assert.equal(ansicht.legende.join(","), "vacation-year-weekend-swatch is-own-weekend");
+  assert.equal(
+    ansicht.legende.join(","),
+    "vacation-year-weekend-swatch is-own-weekend,vacation-year-weekend-swatch is-birthday",
+  );
   assert.deepEqual(teo.problems, []);
 });
 
