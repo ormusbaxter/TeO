@@ -1,4 +1,5 @@
   async function initialize() {
+    bindBlankScreenGuard();
     if (!window.localforage) {
       throw new Error("localForage konnte nicht geladen werden.");
     }
@@ -74,6 +75,7 @@
     }
     void refreshBackendHealth();
     registerServiceWorker();
+    scheduleBlankScreenCheck();
   }
 
   // Haelt die Anwendung selbst offline verfuegbar. Der Datenbestand liegt

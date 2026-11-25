@@ -118,7 +118,21 @@
     }
   }
 
+  function withStartupTimeout(promise, fallback, delay = STARTUP_LOOKUP_TIMEOUT_MS) {
+    let timer = null;
+    const timeout = new Promise((resolve) => {
+      timer = window.setTimeout(() => {
+        console.warn("Der Sicherungsordner hat beim Start nicht geantwortet.");
+        resolve(fallback);
+      }, delay);
+    });
+    return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timer));
+  }
+
   function startupBackupFallbackMessage(status) {
+    if (status === "timeout") {
+      return "Der zuletzt verwendete Sicherungsordner antwortet nicht. Bitte wählen Sie teo-autosicherung.json aus.";
+    }
     if (status === "permission-required") {
       return "Der zuletzt verwendete Sicherungsordner muss erneut freigegeben werden. Bitte wählen Sie teo-autosicherung.json aus.";
     }
@@ -139,9 +153,12 @@
   async function prepareStartupDataSet({ resumeUserId = "" } = {}) {
     startupBackupSynchronized = false;
     startupBackupFile = null;
-    const located = await findStartupBackupFileInSavedDirectory(
-      automaticBackupDirectoryHandle,
-      false,
+    // Ohne Bedienung darf die Abfrage nicht ewig dauern: Bis sie antwortet,
+    // steht nur die Sperre da - eine leere Seite. In Chrome kehrte die Frage
+    // nach der Ordnerfreigabe beim Oeffnen per Doppelklick nicht zurueck.
+    const located = await withStartupTimeout(
+      findStartupBackupFileInSavedDirectory(automaticBackupDirectoryHandle, false),
+      { status: "timeout" },
     );
     if (located.status === "found") {
       if (resumeUserId && (await resumeSessionFromSharedDataSet(located.file, resumeUserId))) {

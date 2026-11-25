@@ -130,6 +130,9 @@
   const BACKUP_VOLUME_WARNING_RATIO = 0.9;
   const AUTO_BACKUP_DELAY_MS = 2000;
   const AUTO_BACKUP_FILENAME = "teo-autosicherung.json";
+  // So lange darf die Abfrage des Sicherungsordners vor der Anmeldung dauern,
+  // bevor TeO stattdessen die Datei waehlen laesst.
+  const STARTUP_LOOKUP_TIMEOUT_MS = 5000;
   const FOREIGN_BACKUP_NOTICE =
     `Ein anderer Arbeitsplatz hat ${AUTO_BACKUP_FILENAME} zwischenzeitlich ` +
     "geschrieben – es wurde nichts überschrieben. Abmelden, TeO neu laden und " +
@@ -1771,6 +1774,7 @@
   };
 
   async function initialize() {
+    bindBlankScreenGuard();
     if (!window.localforage) {
       throw new Error("localForage konnte nicht geladen werden.");
     }
@@ -1846,6 +1850,7 @@
     }
     void refreshBackendHealth();
     registerServiceWorker();
+    scheduleBlankScreenCheck();
   }
 
   // Haelt die Anwendung selbst offline verfuegbar. Der Datenbestand liegt
@@ -7479,6 +7484,73 @@
     elements.automaticBackupRecoveryDialog.addEventListener("close", () => {
       window.setTimeout(() => void offerEmergencyAccess(), 0);
     });
+  }
+
+  // Eine gesperrte Seite ohne Dialog ist eine leere Seite: Die Sperre verdeckt
+  // die Anwendung, und nichts laesst sich bedienen. So erging es TeO in Chrome
+  // beim Oeffnen per Doppelklick - und wo die Entwicklerwerkzeuge gesperrt
+  // sind, war nicht einmal zu sehen, woran es lag. Geht ein Fehler ins Leere,
+  // waehrend die Seite so dasteht, zeigt TeO ihn deshalb im Startdialog an und
+  // bietet dort den Weg ueber die Sicherungsdatei an.
+  function bindBlankScreenGuard() {
+    window.addEventListener("error", (event) => {
+      handleUncaughtStartupError(event.error || event.message);
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+      handleUncaughtStartupError(event.reason);
+    });
+  }
+
+  // Haengt der Start, ohne dass ein Fehler faellt - etwa weil eine Abfrage des
+  // Browsers nie zurueckkehrt -, greift dieselbe Rettung nach einer Weile.
+  function scheduleBlankScreenCheck(delay = STARTUP_LOOKUP_TIMEOUT_MS * 2) {
+    window.setTimeout(() => {
+      if (!lockedWithoutDialog()) return;
+      console.error("Der Start ist ohne Dialog stehen geblieben.");
+      recoverBlankScreen("Der Start ist stehen geblieben");
+    }, delay);
+  }
+
+  function lockedWithoutDialog() {
+    return (
+      document.body.classList.contains("is-auth-locked") &&
+      !document.querySelector("dialog[open]")
+    );
+  }
+
+  function handleUncaughtStartupError(error) {
+    // Erst nach dem laufenden Ablauf pruefen: Ein Dialog, der im selben Zug
+    // noch aufgeht, ist ein Ausweg, und dann bleibt alles, wie es ist.
+    window.setTimeout(() => {
+      if (!lockedWithoutDialog()) return;
+      console.error("Fehler bei gesperrter Seite.", error);
+      recoverBlankScreen(uncaughtErrorText(error));
+    }, 0);
+  }
+
+  function uncaughtErrorText(error) {
+    const text = String(error?.message || error || "").trim();
+    return text || "unbekannter Fehler";
+  }
+
+  function recoverBlankScreen(detail) {
+    const message = `TeO ist beim Start auf einen Fehler gestoßen: ${detail}`;
+    try {
+      // Im lokalen Modus fuehrt die gewaehlte Sicherungsdatei zur Anmeldung.
+      // Ein eben eingerichteter Bestand hat noch keine; er meldet sich gegen
+      // die Konten dieses Browsers an.
+      if (!isMariaDbMode() && !automaticBackupSettings?.firstSharedFilePending) {
+        showStartupBackupDialog(
+          `${message}. Bitte wählen Sie ${AUTO_BACKUP_FILENAME} aus.`,
+        );
+        return;
+      }
+      showLoginDialog();
+      elements.loginError.textContent = message;
+    } catch (recoveryError) {
+      console.error("Der Startdialog konnte nicht geöffnet werden.", recoveryError);
+      showToast(message, "error");
+    }
   }
 
   // Mehrfachauswahl für Karten - Termine, Memos und Geräte.
@@ -24263,7 +24335,21 @@ ${rendered
     }
   }
 
+  function withStartupTimeout(promise, fallback, delay = STARTUP_LOOKUP_TIMEOUT_MS) {
+    let timer = null;
+    const timeout = new Promise((resolve) => {
+      timer = window.setTimeout(() => {
+        console.warn("Der Sicherungsordner hat beim Start nicht geantwortet.");
+        resolve(fallback);
+      }, delay);
+    });
+    return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timer));
+  }
+
   function startupBackupFallbackMessage(status) {
+    if (status === "timeout") {
+      return "Der zuletzt verwendete Sicherungsordner antwortet nicht. Bitte wählen Sie teo-autosicherung.json aus.";
+    }
     if (status === "permission-required") {
       return "Der zuletzt verwendete Sicherungsordner muss erneut freigegeben werden. Bitte wählen Sie teo-autosicherung.json aus.";
     }
@@ -24284,9 +24370,12 @@ ${rendered
   async function prepareStartupDataSet({ resumeUserId = "" } = {}) {
     startupBackupSynchronized = false;
     startupBackupFile = null;
-    const located = await findStartupBackupFileInSavedDirectory(
-      automaticBackupDirectoryHandle,
-      false,
+    // Ohne Bedienung darf die Abfrage nicht ewig dauern: Bis sie antwortet,
+    // steht nur die Sperre da - eine leere Seite. In Chrome kehrte die Frage
+    // nach der Ordnerfreigabe beim Oeffnen per Doppelklick nicht zurueck.
+    const located = await withStartupTimeout(
+      findStartupBackupFileInSavedDirectory(automaticBackupDirectoryHandle, false),
+      { status: "timeout" },
     );
     if (located.status === "found") {
       if (resumeUserId && (await resumeSessionFromSharedDataSet(located.file, resumeUserId))) {

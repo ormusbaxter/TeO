@@ -1,3 +1,8 @@
+### 4.78.1 – Keine leere Seite mehr beim Start
+
+- **Behoben:** In Chrome blieb TeO nach dem Öffnen per Doppelklick leer; zu sehen war nur der Hinweis, dass noch keine Datensicherung dokumentiert ist. TeO wartete vor der Anmeldung auf die Antwort des Browsers, ob der Sicherungsordner noch freigegeben ist – und die kam nicht. Antwortet der Ordner nicht binnen fünf Sekunden, fragt TeO jetzt nach `teo-autosicherung.json`, und die Anmeldung geht damit weiter
+- **Behoben:** Gerät der Start sonst ins Stocken oder auf einen Fehler, bevor ein Dialog erscheint, zeigt TeO die Fehlermeldung im Startdialog an und bietet dort die Auswahl der Sicherungsdatei an. So lässt sich die Ursache auch dort benennen, wo die Entwicklerwerkzeuge des Browsers gesperrt sind
+
 ### 4.78.0 – Jahresurlaub je Mitarbeiter
 
 - **Neu:** Die **Jahresübersicht** eines Mitarbeiters (Klick auf den Namen in der Urlaubsplanung) nennt oben die **Urlaubstage gesamt** im Jahr, aufgeteilt in bis heute genommene und noch geplante Tage, dazu **Anspruch** und **Rest**. Unter der Matrix fasst die Zeile **Gesamt** die Urlaubs- und Schultage des Jahres zusammen
