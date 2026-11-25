@@ -129,6 +129,9 @@
   const BACKUP_VOLUME_WARNING_RATIO = 0.9;
   const AUTO_BACKUP_DELAY_MS = 2000;
   const AUTO_BACKUP_FILENAME = "teo-autosicherung.json";
+  // So lange darf die Abfrage des Sicherungsordners vor der Anmeldung dauern,
+  // bevor TeO stattdessen die Datei waehlen laesst.
+  const STARTUP_LOOKUP_TIMEOUT_MS = 5000;
   const FOREIGN_BACKUP_NOTICE =
     `Ein anderer Arbeitsplatz hat ${AUTO_BACKUP_FILENAME} zwischenzeitlich ` +
     "geschrieben – es wurde nichts überschrieben. Abmelden, TeO neu laden und " +
